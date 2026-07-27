@@ -218,6 +218,11 @@ class CcdLigandGraphBuilderTest {
         assertEquals(charged.totalFormalCharge(), charged.totalPartialCharge(), 1.0e-9);
         assertTrue(charged.graph().atoms().stream()
                 .allMatch(atom -> Double.isFinite(atom.getCharge())));
+        LigandAd4TypingResult typed =
+                new LigandAd4AtomTyper().assign(charged.graph());
+        assertEquals(charged.graph().atoms().size(), typed.atomCount());
+        assertTrue(typed.graph().atoms().stream()
+                .allMatch(atom -> atom.getAutoDockType() != null));
     }
 
     private Residue residue(Atom... atoms) {

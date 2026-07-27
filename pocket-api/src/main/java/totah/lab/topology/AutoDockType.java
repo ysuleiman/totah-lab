@@ -10,6 +10,7 @@ public enum AutoDockType {
     OA("OA", true),  // Oxygen (Acceptor)
     S("S", false),   // Sulfur
     SA("SA", true),  // Sulfur (Acceptor)
+    P("P", false),   // Phosphorus
     HD("HD", false), // Hydrogen donor (bound to N or O)
     H("H", false),   // Non-polar Hydrogen (bound to C)
     F("F", false),   // Fluorine
