@@ -22,12 +22,39 @@ public class TargetLoadStage implements Stage {
         Path targetPath = context.require(ContextKeys.TARGET_PDB_PATH);
         validateTargetPath(targetPath);
 
-        Structure structure = StructureIO.load(targetPath);
+        boolean onlineCcdLookup = parseBoolean(
+                context.get(ContextKeys.CCD_ONLINE_LOOKUP),
+                false);
+        Path ccdCacheDirectory = onlineCcdLookup
+                ? ccdCacheDirectory(context)
+                : null;
+
+        Structure structure = StructureIO.load(
+                targetPath,
+                onlineCcdLookup,
+                ccdCacheDirectory);
         List<Residue> residues = structure.getResidues();
         if (residues.isEmpty()) {
             throw new IllegalStateException("No residues loaded from " + targetPath);
         }
         context.put(ContextKeys.PROTEIN_RESIDUES, residues);
+    }
+
+    private Path ccdCacheDirectory(PipelineContext context) {
+        Object configured = context.get(ContextKeys.CCD_CACHE_DIRECTORY);
+        if (configured instanceof Path path) {
+            return path;
+        }
+        if (configured != null && !configured.toString().isBlank()) {
+            return Path.of(configured.toString());
+        }
+        return context.getWorkingDirectory().resolve(".ccd-cache");
+    }
+
+    private boolean parseBoolean(Object value, boolean defaultValue) {
+        if (value == null) return defaultValue;
+        if (value instanceof Boolean booleanValue) return booleanValue;
+        return Boolean.parseBoolean(value.toString());
     }
 
     private void validateTargetPath(Path targetPath) throws IOException {

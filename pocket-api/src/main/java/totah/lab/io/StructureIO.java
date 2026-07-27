@@ -3,25 +3,55 @@ package totah.lab.io;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.ResidueNumber;
+import org.biojava.nbio.structure.chem.ChemComp;
+import org.biojava.nbio.structure.chem.ChemCompProvider;
 import org.biojava.nbio.structure.chem.ChemCompGroupFactory;
+import org.biojava.nbio.structure.chem.DownloadChemCompProvider;
 import org.biojava.nbio.structure.chem.ReducedChemCompProvider;
 import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.cif.CifStructureConverter;
+import totah.lab.protein.ResidueClassificationEvidence;
 import totah.lab.protein.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
 public final class StructureIO {
 
+    private static final Object CHEM_COMP_PROVIDER_LOCK = new Object();
+
     private StructureIO() {
     }
 
     public static Structure load(Path structurePath) throws IOException {
-        Objects.requireNonNull(structurePath, "structurePath is null");
-        ChemCompGroupFactory.setChemCompProvider(new ReducedChemCompProvider());
+        return load(structurePath, false, null);
+    }
 
+    public static Structure load(
+            Path structurePath,
+            boolean onlineCcdLookup,
+            Path ccdCacheDirectory) throws IOException {
+        Objects.requireNonNull(structurePath, "structurePath is null");
+
+        synchronized (CHEM_COMP_PROVIDER_LOCK) {
+            ChemCompProvider provider = onlineCcdLookup
+                    ? onlineProvider(ccdCacheDirectory)
+                    : new ReducedChemCompProvider();
+            ChemCompProvider previousProvider = ChemCompGroupFactory.getChemCompProvider();
+            ChemCompGroupFactory.setChemCompProvider(provider);
+            ChemCompGroupFactory.clearCache();
+            try {
+                return loadWithConfiguredProvider(structurePath);
+            } finally {
+                ChemCompGroupFactory.setChemCompProvider(previousProvider);
+                ChemCompGroupFactory.clearCache();
+            }
+        }
+    }
+
+    private static Structure loadWithConfiguredProvider(Path structurePath) throws IOException {
         String name = structurePath.getFileName().toString().toLowerCase();
         org.biojava.nbio.structure.Structure bioStructure;
 
@@ -45,9 +75,19 @@ public final class StructureIO {
         return new Structure(residues);
     }
 
+    private static ChemCompProvider onlineProvider(Path ccdCacheDirectory) throws IOException {
+        Objects.requireNonNull(
+                ccdCacheDirectory,
+                "ccdCacheDirectory is required when online CCD lookup is enabled");
+        Files.createDirectories(ccdCacheDirectory);
+        return new OnlineFallbackChemCompProvider(
+                new ReducedChemCompProvider(),
+                new DownloadChemCompProvider(ccdCacheDirectory.toString()));
+    }
+
     private static Residue buildResidue(Group group) {
         ResidueNumber residueNumber = group.getResidueNumber();
-
+        ResidueClassificationEvidence evidence = extractClassificationEvidence(group);
         return Residue.builder()
                 .chain(residueNumber.getChainName())
                 .number(residueNumber.getSeqNum())
@@ -56,8 +96,28 @@ public final class StructureIO {
                                 ? residueNumber.getInsCode()
                                 : ' ')
                 .name(group.getPDBName().trim())
+                .residueClassificationEvidence(evidence)
                 .atoms(buildAtoms(group))
                 .build();
+    }
+
+    private static ResidueClassificationEvidence extractClassificationEvidence(Group group) {
+        ChemComp chemComp = group.getChemComp();
+        boolean available = chemComp != null && !chemComp.isEmpty();
+
+        return new ResidueClassificationEvidence(
+                available,
+                available && chemComp.isStandard(),
+                group.isPolymeric(),
+                group.isWater(),
+                available ? chemComp.getMonNstdParentCompId() : null,
+                available && chemComp.getResidueType() != null
+                        ? chemComp.getResidueType().name()
+                        : null,
+                available && chemComp.getPolymerType() != null
+                        ? chemComp.getPolymerType().name()
+                        : null
+        );
     }
 
     private static List<Atom> buildAtoms(Group group) {

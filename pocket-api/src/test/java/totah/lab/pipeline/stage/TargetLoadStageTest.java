@@ -16,6 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,6 +39,11 @@ class TargetLoadStageTest {
         assertEquals("A", first.getChain());
         assertEquals(32, first.getNumber());
         assertEquals(List.of("N", "CA", "C", "CB", "O", "SG"), atomNames(first));
+        assertNotNull(first.getResidueClassificationEvidence());
+        assertTrue(first.getResidueClassificationEvidence().available());
+        assertTrue(first.getResidueClassificationEvidence().standard());
+        assertTrue(first.getResidueClassificationEvidence().polymeric());
+        assertFalse(first.getResidueClassificationEvidence().water());
 
         Residue mse = residues.get(2);
         assertEquals("MSE", mse.getName());

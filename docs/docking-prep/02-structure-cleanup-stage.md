@@ -21,6 +21,35 @@ stage runs.
 - Publishes a `StructureCleanupReport` to
   `ContextKeys.STRUCTURE_CLEANUP_REPORT`.
 
+## CCD Lookup
+
+Target loading uses BioJava chemical-component evidence before cleanup runs.
+The default is fully offline and uses `ReducedChemCompProvider`.
+
+Optional per-component online enrichment is enabled through pipeline context:
+
+```java
+Map<String, Object> config = Map.of(
+        ContextKeys.CCD_ONLINE_LOOKUP, true,
+        ContextKeys.CCD_CACHE_DIRECTORY, Path.of("/data/totah-lab/ccd-cache"));
+```
+
+`CCD_CACHE_DIRECTORY` accepts either a `Path` or a path string. When online
+lookup is enabled without an explicit directory, the default is
+`.ccd-cache` under the configured pipeline workspace.
+
+The online provider consults the reduced CCD first, so standard and bundled
+components do not cause network requests. Only missing component identifiers
+are downloaded and cached. BioJava falls back to the reduced provider when a
+download fails, allowing the existing deterministic name-based cleanup rules
+to run. Online lookup therefore enriches classification but does not make
+pipeline execution depend on network availability.
+
+For `1A4W`, the reduced CCD recognizes `TYS I:363` as a nonstandard peptide
+with parent `TYR`. It does not contain `QWE H:373`. Online lookup identifies
+`QWE` as a non-polymeric `peptideLike` component with polymer type
+`otherPolymer`; cleanup still extracts it as a ligand.
+
 ## Scientific Boundary
 
 This stage does not convert residue names, add atoms, assign protonation, assign
@@ -57,6 +86,10 @@ policy via allowed special residues or a future cofactor policy stage.
 - Configured monoatomic metal and known-ion retention.
 - Configured special-residue retention by list and comma-separated string.
 - Unknown multi-atom ligand extraction.
+- CCD-first standard, modified-residue, non-polymer, and unavailable-evidence
+  classification.
+- Real `1A4W` reduced-CCD behavior for `TYS I:363` and `QWE H:373`.
+- Gated online `QWE` lookup, caching, and unchanged extraction behavior.
 - Failure when cleanup removes every residue.
 - Missing and empty input residue handling.
 - Defensive-copy behavior in the report.

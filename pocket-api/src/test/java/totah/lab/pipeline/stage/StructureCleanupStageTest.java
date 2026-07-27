@@ -8,6 +8,7 @@ import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
+import totah.lab.protein.ResidueClassificationEvidence;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -189,6 +190,62 @@ class StructureCleanupStageTest {
     }
 
     @Test
+    void keepsSupportedModifiedAminoAcidUsingCcdEvidence() {
+        Residue tys = residue("TYS", 40, atom("S", "S")).toBuilder()
+                .residueClassificationEvidence(evidence(
+                        true, false, true, false, "TYR", "lPeptideLinking", "peptide"))
+                .build();
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")), tys);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "TYS"), residueNames(residues));
+    }
+
+    @Test
+    void extractsExplicitCcdNonPolymerAsLigand() {
+        Residue ligand = residue("QWE", 373, atom("C1", "C"), atom("N1", "N")).toBuilder()
+                .residueClassificationEvidence(evidence(
+                        true, false, false, false, null, "nonPolymer", null))
+                .build();
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")), ligand);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertEquals(List.of("QWE"), residueNames(ligands));
+    }
+
+    @Test
+    void extractsNonPolymericCcdPeptideLikeComponentAsLigand() {
+        Residue ligand = residue("QWE", 373, atom("C1", "C"), atom("N1", "N")).toBuilder()
+                .residueClassificationEvidence(evidence(
+                        true, false, false, false, null, "peptideLike", "otherPolymer"))
+                .build();
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")), ligand);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertEquals(List.of("QWE"), residueNames(ligands));
+    }
+
+    @Test
+    void fallsBackToLegacyRulesWhenCcdEvidenceIsUnavailable() {
+        Residue cys = residue("CYS", 32, atom("CA", "C")).toBuilder()
+                .residueClassificationEvidence(evidence(
+                        false, false, false, false, null, null, null))
+                .build();
+        PipelineContext context = contextWith(cys);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS"), residueNames(residues));
+    }
+
+    @Test
     void rejectsWhenCleanupRemovesEverything() {
         PipelineContext context = contextWith(residue("HOH", 501, atom("O", "O")),
                 residue("QWE", 373, atom("C1", "C"), atom("N1", "N")));
@@ -278,6 +335,24 @@ class StructureCleanupStageTest {
                         .vdwRadius(0.0)
                         .build())
                 .build();
+    }
+
+    private ResidueClassificationEvidence evidence(
+            boolean available,
+            boolean standard,
+            boolean polymeric,
+            boolean water,
+            String parentComponentId,
+            String residueType,
+            String polymerType) {
+        return new ResidueClassificationEvidence(
+                available,
+                standard,
+                polymeric,
+                water,
+                parentComponentId,
+                residueType,
+                polymerType);
     }
 
     private List<String> residueNames(List<Residue> residues) {

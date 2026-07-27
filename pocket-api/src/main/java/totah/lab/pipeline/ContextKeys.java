@@ -46,5 +46,7 @@ public class ContextKeys {
     public static final String REMOVE_WATERS = "removeWaters";
     public static final String KEEP_METALS = "keepMetals";
     public static final String ALLOWED_SPECIAL_RESIDUES = "allowedSpecialResidues";
+    public static final String CCD_ONLINE_LOOKUP = "ccdOnlineLookup";
+    public static final String CCD_CACHE_DIRECTORY = "ccdCacheDirectory";
     public static final String STRUCTURE_CLEANUP_REPORT = "structure_cleanup_report";
 }

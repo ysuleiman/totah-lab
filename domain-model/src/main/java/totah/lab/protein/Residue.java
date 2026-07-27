@@ -20,16 +20,24 @@ public class Residue {
     @ToString.Include
     private final Character insertionCode;
 
+    private final ResidueClassificationEvidence residueClassificationEvidence;
+
     @ToString.Exclude
     @Builder.Default
     private final List<Atom> atoms = new ArrayList<>();
 
-    // Custom constructor ensures that standard builders receive an independent, mutable collection copy
     public Residue(String name, int number, String chain, Character insertionCode, List<Atom> atoms) {
+        this(name, number, chain, insertionCode, null, atoms);
+    }
+
+    // Custom constructor ensures that standard builders receive an independent, mutable collection copy
+    public Residue(String name, int number, String chain, Character insertionCode,
+                   ResidueClassificationEvidence residueClassificationEvidence, List<Atom> atoms) {
         this.name = name;
         this.number = number;
         this.chain = chain;
         this.insertionCode = insertionCode;
+        this.residueClassificationEvidence = residueClassificationEvidence;
         this.atoms = atoms != null ? new ArrayList<>(atoms) : new ArrayList<>();
     }
 
