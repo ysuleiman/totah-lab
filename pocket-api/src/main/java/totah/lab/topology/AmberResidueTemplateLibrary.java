@@ -1,0 +1,225 @@
+package totah.lab.topology;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.Stream;
+
+/**
+ * Singleton Amber residue template library.
+ * Loads all .lib/.off template files from a directory.
+ */
+public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
+
+    private static final AmberResidueTemplateLibrary INSTANCE = new AmberResidueTemplateLibrary();
+
+    private final Map<String, ResidueTemplate> templates = new HashMap<>();
+    private volatile boolean loaded = false;
+
+    private AmberResidueTemplateLibrary() {}
+
+    public static AmberResidueTemplateLibrary getInstance() {
+        if (!INSTANCE.loaded) {
+            synchronized (INSTANCE) {
+                if (!INSTANCE.loaded) {
+                    loadFromClasspath();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private static void loadFromClasspath() {
+        java.net.URL url = AmberResidueTemplateLibrary.class.getResource("/amber/lib");
+        if (url == null) {
+            throw new IllegalStateException(
+                    "Default Amber templates directory (/amber/lib) not found in classpath. " +
+                            "Call load(Path) or loadDirectory(Path) with explicit template location."
+            );
+        }
+
+        URI uri;
+        try {
+            uri = url.toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Invalid URI for /amber/lib: " + url, e);
+        }
+
+        Path libDir;
+        FileSystem fs = null;
+        boolean closeFs = false;
+
+        try {
+            if ("jar".equals(uri.getScheme())) {
+                try {
+                    fs = FileSystems.getFileSystem(uri);
+                    libDir = fs.getPath("/amber/lib");
+                } catch (FileSystemNotFoundException e) {
+                    fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                    closeFs = true;
+                    libDir = fs.getPath("/amber/lib");
+                }
+            } else {
+                libDir = Paths.get(uri);
+            }
+
+            if (libDir == null) {
+                throw new IllegalStateException("Could not resolve /amber/lib path");
+            }
+
+            INSTANCE.loadDirectory(libDir);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load default Amber templates", e);
+        } finally {
+            if (closeFs && fs != null) {
+                try {
+                    fs.close();
+                } catch (IOException e) {
+                    System.err.println("Warning: Failed to close JAR filesystem: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Load all .lib/.off files from a directory.
+     */
+    public void loadDirectory(Path dir) throws IOException {
+        if (dir == null) {
+            throw new IllegalArgumentException("Directory path cannot be null");
+        }
+        if (!Files.isDirectory(dir)) {
+            throw new IllegalArgumentException("Not a directory: " + dir);
+        }
+
+        synchronized (this) {
+            try (Stream<Path> files = Files.list(dir)) {
+                files.filter(Objects::nonNull).filter(p -> {
+                    Path fileName = p.getFileName();
+                    if (fileName == null) return false;
+                    String name = fileName.toString().toLowerCase();
+                    return name.endsWith(".lib") || name.endsWith(".off");
+                }).sorted().forEach(this::loadFileUnchecked);
+            }
+            loaded = true;
+        }
+    }
+
+    /**
+     * Load a single template file.
+     */
+    public void load(Path file) throws IOException {
+        if (file == null) {
+            throw new IllegalArgumentException("File path cannot be null");
+        }
+
+        synchronized (this) {
+            loadFile(file);
+            loaded = true;
+        }
+    }
+
+    private void loadFileUnchecked(Path file) {
+        try {
+            loadFile(file);
+        } catch (IOException e) {
+            System.err.println("Warning: Failed to load template file " + file + ": " + e.getMessage());
+        }
+    }
+
+    private void loadFile(Path file) throws IOException {
+        List<String> lines = Files.readAllLines(file);
+        ResidueTemplate current = null;
+        String section = "";
+
+        for (String raw : lines) {
+            if (raw == null) continue;
+            String line = raw.trim();
+            if (line.isEmpty()) continue;
+
+            if (line.startsWith("!entry.") && line.contains(".unit.atoms ")) {
+                String[] parts = line.split("\\.");
+                if (parts.length < 2) continue;
+                String residue = parts[1];
+                // A residue can be defined in several .lib files (e.g.
+                // all_amino94.lib and amino12.lib): the latest definition
+                // replaces the earlier one instead of appending duplicate
+                // atoms and bonds.
+                current = new ResidueTemplate(residue);
+                templates.put(residue, current);
+                section = "atoms";
+                continue;
+            }
+            if (line.startsWith("!entry.") && line.contains(".unit.connectivity")) {
+                section = "bonds";
+                continue;
+            }
+            if (line.startsWith("!entry.")) {
+                section = "";
+                continue;
+            }
+
+            if (current == null) continue;
+            switch (section) {
+                case "atoms":
+                    parseAtom(line, current);
+                    break;
+                case "bonds":
+                    parseBond(line, current);
+                    break;
+            }
+        }
+    }
+
+    public ResidueTemplate getTemplate(String residueName) {
+        return templates.get(residueName);
+    }
+
+    public Map<String, ResidueTemplate> getTemplates() {
+        return new HashMap<>(templates);
+    }
+
+    private void parseAtom(String line, ResidueTemplate residue) {
+        if (line == null || residue == null) return;
+        String[] t = line.replace("\"", "").split("\\s+");
+        if (t.length < 8) return;
+
+        String name = t[0];
+        String type = t[1];
+        double charge;
+        try {
+            charge = Double.parseDouble(t[7]);
+        } catch (Exception e) {
+            charge = 0.0;
+        }
+        residue.addAtom(AtomTemplate.builder()
+                .name(name)
+                .amberType(type)
+                .charge(charge)
+                .build());
+    }
+
+    private void parseBond(String line, ResidueTemplate residue) {
+        if (line == null || residue == null) return;
+        String[] t = line.split("\\s+");
+        if (t.length < 2) return;
+
+        try {
+            int i1 = Integer.parseInt(t[0]);
+            int i2 = Integer.parseInt(t[1]);
+            // Amber OFF connectivity indices are 1-based
+            String name1 = residue.getAtomNameByIndex(i1);
+            String name2 = residue.getAtomNameByIndex(i2);
+            if (name1 == null || name2 == null) return;
+            residue.addBond(BondTemplate.builder()
+                    .atom1(name1)
+                    .atom2(name2)
+                    .build());
+        } catch (NumberFormatException e) {
+            // malformed line
+        }
+    }
+}

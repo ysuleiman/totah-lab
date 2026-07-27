@@ -1,0 +1,46 @@
+package totah.lab.pipeline;
+
+public class ContextKeys {
+    public static final String TARGET_PDB_PATH = "target_pdb_path";
+    public static final String QEQ_FILE = "qeq_file";
+    public static final String PROTEIN_RESIDUES = "protein_residues";
+    public static final String PROTEIN_TOPOLOGY = "protein_topology";
+    public static final String RECEPTOR_PDBQT = "receptor_pdbqt";
+    public static final String FLEX_PDBQT = "flex_pdbqt";
+    public static final String OUTPUT_PDBQT_PATH = "output_pdbqt_path";
+    public static final String FLEX_PDBQT_PATH = "flex_pdbqt_path";
+    public static final String LIGAND_PATH = "ligand_path";
+    public static final String LIGAND_PDBQT = "ligand_pdbqt";
+    public static final String GRID_BOX = "grid_box";
+    public static final String DOCKING_RESULTS = "docking_results";
+    public static final String PLDDT_CUTOFF = "plddtCutoff";
+    public static final String ALPHAFOLD_CONFIDENCE_REPORT = "alphafold_confidence_report";
+    public static final String FLEX_RESIDUES = "flex_residues";
+    public static final String DISULFIDE_BONDS = "disulfide_bonds";
+    public static final String PH = "ph";
+    public static final String VOXEL_GRID_SIZE = "voxelGridSize";
+    public static final String DETECT_DISULFIDES = "detectDisulfides";
+    public static final String DISULFIDE_CUTOFF = "disulfideCutoff";
+    public static final String METAL_COORDINATION_CUTOFF = "metalCoordinationCutoff";
+    public static final String CAP_N_TERMINUS = "capNTerminus";
+    public static final String CAP_C_TERMINUS = "capCTerminus";
+    public static final String AMBER_PARM_PATH = "amberParmPath";
+    public static final String HIS_PROTONATION_STATE = "hisProtonationState";
+    public static final String RESIDUE_PROTONATION_OVERRIDES = "residueProtonationOverrides";
+    public static final String RESIDUE_STATES = "residue_states";
+    public static final String RESIDUE_STATE_REPORT = "residue_state_report";
+    public static final String HYDROGEN_CLASH_CUTOFF = "hydrogenClashCutoff";
+    public static final String HYDROGEN_CLASS_CUT_OFF = HYDROGEN_CLASH_CUTOFF;
+    public static final String HYDROGENATION_REPORT = "hydrogenation_report";
+    public static final String HYDROGEN_OPTIMIZATION_REPORT = "hydrogen_optimization_report";
+    public static final String TOPOLOGY_BUILD_REPORT = "topology_build_report";
+    public static final String CHARGE_ASSIGNMENT_REPORT = "charge_assignment_report";
+    public static final String AD4_ATOM_TYPING_REPORT = "ad4_atom_typing_report";
+    public static final String PDBQT_EXPORT_REPORT = "pdbqt_export_report";
+    public static final String OVERRIDE_CHARGES_WITH_MODEL = "overrideChargesWithModel";
+    public static final String RUN_DIRECTORY = "run_directory";
+    public static final String REMOVE_WATERS = "removeWaters";
+    public static final String KEEP_METALS = "keepMetals";
+    public static final String ALLOWED_SPECIAL_RESIDUES = "allowedSpecialResidues";
+    public static final String STRUCTURE_CLEANUP_REPORT = "structure_cleanup_report";
+}

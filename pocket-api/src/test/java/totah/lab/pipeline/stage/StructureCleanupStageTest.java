@@ -1,0 +1,234 @@
+package totah.lab.pipeline.stage;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import totah.lab.pipeline.ContextKeys;
+import totah.lab.pipeline.PipelineContext;
+import totah.lab.protein.Atom;
+import totah.lab.protein.Element;
+import totah.lab.protein.Point3D;
+import totah.lab.protein.Residue;
+
+import java.nio.file.Path;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class StructureCleanupStageTest {
+
+    @TempDir
+    Path tempDir;
+
+    @Test
+    void keepsStandardAminoAcidsInInputOrder() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("LYS", 33, atom("CA", "C")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "LYS"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(2, report.inputResidues());
+        assertEquals(2, report.outputResidues());
+        assertTrue(report.removedWaters().isEmpty());
+        assertTrue(report.removedMetals().isEmpty());
+        assertTrue(report.keptSpecialResidues().isEmpty());
+    }
+
+    @Test
+    void removesWatersByDefault() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("HOH", 501, atom("O", "O")),
+                residue("WAT", 502, atom("O", "O")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("HOH A:501", "WAT A:502"), report.removedWaters());
+    }
+
+    @Test
+    void rejectsWaterRetentionBecauseWaterDockingPolicyIsNotImplemented() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("HOH", 501, atom("O", "O")));
+        context.put(ContextKeys.REMOVE_WATERS, false);
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new StructureCleanupStage().run(context));
+
+        assertTrue(error.getMessage().contains("water retention is not supported"));
+    }
+
+    @Test
+    void keepsMseAsKnownSpecialResidueForLaterNormalization() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("MSE", 40, atom("SE", "Se")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "MSE"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("MSE A:40"), report.keptSpecialResidues());
+    }
+
+    @Test
+    void removesMonoatomicMetalsByDefault() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("ZN", 701, atom("ZN", "Zn")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("ZN A:701"), report.removedMetals());
+        assertTrue(report.keptSpecialResidues().isEmpty());
+    }
+
+    @Test
+    void keepsMonoatomicMetalsWhenConfigured() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("ZN", 701, atom("ZN", "Zn")));
+        context.put(ContextKeys.KEEP_METALS, true);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "ZN"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertTrue(report.removedMetals().isEmpty());
+        assertEquals(List.of("ZN A:701"), report.keptSpecialResidues());
+    }
+
+    @Test
+    void keepsConfiguredSpecialResidueFromList() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("SAM", 801, atom("C1", "C")));
+        context.put(ContextKeys.ALLOWED_SPECIAL_RESIDUES, List.of("SAM"));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "SAM"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("SAM A:801"), report.keptSpecialResidues());
+    }
+
+    @Test
+    void keepsConfiguredSpecialResidueFromCommaSeparatedString() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("NAG", 802, atom("C1", "C")));
+        context.put(ContextKeys.ALLOWED_SPECIAL_RESIDUES, "SAM, NAG");
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "NAG"), residueNames(residues));
+    }
+
+    @Test
+    void rejectsUnknownResidueWithoutPolicy() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("SAM", 801, atom("C1", "C")));
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new StructureCleanupStage().run(context));
+
+        assertTrue(error.getMessage().contains("Unsupported residue SAM A:801"));
+        assertTrue(error.getMessage().contains("no cleanup policy"));
+    }
+
+    @Test
+    void rejectsWhenCleanupRemovesEverything() {
+        PipelineContext context = contextWith(residue("HOH", 501, atom("O", "O")));
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new StructureCleanupStage().run(context));
+
+        assertTrue(error.getMessage().contains("removed every residue"));
+    }
+
+    @Test
+    void requiresLoadedResidues() {
+        PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new StructureCleanupStage().run(context));
+
+        assertTrue(error.getMessage().contains(ContextKeys.PROTEIN_RESIDUES));
+    }
+
+    @Test
+    void rejectsEmptyLoadedResidueList() {
+        PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
+        context.put(ContextKeys.PROTEIN_RESIDUES, List.of());
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new StructureCleanupStage().run(context));
+
+        assertTrue(error.getMessage().contains("Run TargetLoadStage first"));
+    }
+
+    @Test
+    void reportListsAreDefensiveCopies() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("HOH", 501, atom("O", "O")));
+
+        new StructureCleanupStage().run(context);
+
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertThrows(UnsupportedOperationException.class, () -> report.removedWaters().add("HOH A:999"));
+        assertFalse(report.removedWaters().isEmpty());
+    }
+
+    private PipelineContext contextWith(Residue... residues) {
+        PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
+        context.put(ContextKeys.PROTEIN_RESIDUES, List.of(residues));
+        return context;
+    }
+
+    private Residue residue(String name, int number, Atom... atoms) {
+        return Residue.builder()
+                .name(name)
+                .chain("A")
+                .number(number)
+                .insertionCode(' ')
+                .atoms(List.of(atoms))
+                .build();
+    }
+
+    private Atom atom(String name, String element) {
+        return Atom.builder()
+                .name(name)
+                .position(new Point3D(0.0, 0.0, 0.0))
+                .occupancy(1.0)
+                .bFactor(20.0)
+                .charge(0.0)
+                .element(Element.builder()
+                        .symbol(element)
+                        .atomicNumber(0)
+                        .atomicMass(0.0)
+                        .covalentRadius(0.0)
+                        .vdwRadius(0.0)
+                        .build())
+                .build();
+    }
+
+    private List<String> residueNames(List<Residue> residues) {
+        return residues.stream()
+                .map(Residue::getName)
+                .toList();
+    }
+}
