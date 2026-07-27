@@ -8,6 +8,8 @@ reinterpret chemistry.
 
 - Requires `ContextKeys.TARGET_PDB_PATH`.
 - Accepts regular, readable PDB, CIF, or mmCIF files through `StructureIO`.
+- Uses BioJava's reduced local chemical-component provider; target loading must
+  not attempt network downloads for HETATM component dictionaries.
 - Publishes loaded residues to `ContextKeys.PROTEIN_RESIDUES`.
 - Preserves BioJava residue and atom ordering.
 - Collapses alternate-location atoms to one representative atom per atom name,

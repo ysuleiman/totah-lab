@@ -3,6 +3,8 @@ package totah.lab.io;
 import org.biojava.nbio.structure.Chain;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.ResidueNumber;
+import org.biojava.nbio.structure.chem.ChemCompGroupFactory;
+import org.biojava.nbio.structure.chem.ReducedChemCompProvider;
 import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.cif.CifStructureConverter;
 import totah.lab.protein.*;
@@ -18,6 +20,7 @@ public final class StructureIO {
 
     public static Structure load(Path structurePath) throws IOException {
         Objects.requireNonNull(structurePath, "structurePath is null");
+        ChemCompGroupFactory.setChemCompProvider(new ReducedChemCompProvider());
 
         String name = structurePath.getFileName().toString().toLowerCase();
         org.biojava.nbio.structure.Structure bioStructure;
