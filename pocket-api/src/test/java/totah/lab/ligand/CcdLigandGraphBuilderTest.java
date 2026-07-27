@@ -15,6 +15,8 @@ import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -242,6 +244,52 @@ class CcdLigandGraphBuilderTest {
         assertEquals(typed.graph().atoms().size(), prepared.graph().atoms().size());
         assertTrue(prepared.pdbqt().startsWith("ROOT"));
         assertTrue(prepared.pdbqt().contains("TORSDOF "));
+        validatePreparedPdbqt(prepared);
+    }
+
+    private void validatePreparedPdbqt(LigandPreparationResult prepared) {
+        List<String> lines = prepared.pdbqt().lines().toList();
+        List<String> atomLines = lines.stream()
+                .filter(line -> line.startsWith("ATOM"))
+                .toList();
+        assertEquals(prepared.graph().atoms().size(), atomLines.size());
+        assertEquals(1, lines.stream().filter("ROOT"::equals).count());
+        assertEquals(1, lines.stream().filter("ENDROOT"::equals).count());
+        assertEquals(prepared.torsionTree().torsionalDegreesOfFreedom(),
+                lines.stream().filter(line -> line.startsWith("BRANCH ")).count());
+        assertEquals(prepared.torsionTree().torsionalDegreesOfFreedom(),
+                lines.stream().filter(line -> line.startsWith("ENDBRANCH ")).count());
+        assertEquals("TORSDOF " + prepared.torsionTree().torsionalDegreesOfFreedom(),
+                lines.getLast());
+
+        Set<Integer> serials = new HashSet<>();
+        double formattedChargeTotal = 0.0;
+        for (String atomLine : atomLines) {
+            String[] fields = atomLine.trim().split("\\s+");
+            assertEquals(13, fields.length, atomLine);
+            assertTrue(serials.add(Integer.parseInt(fields[1])), atomLine);
+            assertTrue(Double.isFinite(Double.parseDouble(fields[6])), atomLine);
+            assertTrue(Double.isFinite(Double.parseDouble(fields[7])), atomLine);
+            assertTrue(Double.isFinite(Double.parseDouble(fields[8])), atomLine);
+            double charge = Double.parseDouble(fields[11]);
+            assertTrue(Double.isFinite(charge), atomLine);
+            formattedChargeTotal += charge;
+            assertTrue(java.util.Arrays.stream(totah.lab.topology.AutoDockType.values())
+                    .anyMatch(type -> type.getSymbol().equals(fields[12])), atomLine);
+        }
+        assertEquals(prepared.graph().atoms().size(), serials.size());
+        assertEquals(prepared.chargeAssignment().totalFormalCharge(),
+                formattedChargeTotal,
+                prepared.graph().atoms().size() * 5.1e-5);
+
+        for (String line : lines) {
+            if (!line.startsWith("BRANCH ") && !line.startsWith("ENDBRANCH ")) {
+                continue;
+            }
+            String[] fields = line.split("\\s+");
+            assertTrue(serials.contains(Integer.parseInt(fields[1])), line);
+            assertTrue(serials.contains(Integer.parseInt(fields[2])), line);
+        }
     }
 
     private Residue residue(Atom... atoms) {
