@@ -223,6 +223,13 @@ class CcdLigandGraphBuilderTest {
         assertEquals(charged.graph().atoms().size(), typed.atomCount());
         assertTrue(typed.graph().atoms().stream()
                 .allMatch(atom -> atom.getAutoDockType() != null));
+        LigandTorsionTreeResult torsionTree =
+                new LigandTorsionTreeBuilder().build(typed.graph());
+        assertEquals(torsionTree.bondReport().rotatableBondCount(),
+                torsionTree.torsionalDegreesOfFreedom());
+        assertTrue(java.util.stream.IntStream
+                .range(0, typed.graph().atoms().size())
+                .allMatch(torsionTree.tree()::containsAtom));
     }
 
     private Residue residue(Atom... atoms) {
