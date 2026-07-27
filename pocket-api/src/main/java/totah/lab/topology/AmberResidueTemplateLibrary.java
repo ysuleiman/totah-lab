@@ -239,6 +239,7 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
     private void loadPrepiFile(Path file) throws IOException {
         List<String> lines = Files.readAllLines(file);
         ResidueTemplate current = null;
+        Map<String, ResidueTemplate> parsedTemplates = new HashMap<>();
         Map<Integer, String> atomNamesByPrepiIndex = new HashMap<>();
         String section = "";
 
@@ -250,7 +251,7 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
             String[] fields = line.split("\\s+");
             if (fields.length >= 3 && "INT".equals(fields[1])) {
                 current = new ResidueTemplate(fields[0]);
-                templates.put(fields[0], current);
+                parsedTemplates.put(fields[0], current);
                 atomNamesByPrepiIndex = new HashMap<>();
                 section = "atoms";
                 continue;
@@ -271,6 +272,9 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
                 parsePrepiLoop(line, current);
             }
         }
+
+        validatePublishedTysTemplate(parsedTemplates.get("TYS"));
+        templates.putAll(parsedTemplates);
     }
 
     private void parsePrepiAtom(String line, ResidueTemplate residue, Map<Integer, String> atomNamesByPrepiIndex) {
@@ -318,5 +322,32 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
                 .atom1(t[0])
                 .atom2(t[1])
                 .build());
+    }
+
+    private void validatePublishedTysTemplate(ResidueTemplate tys) {
+        if (tys == null) return;
+
+        double totalCharge = tys.getAtoms().stream()
+                .mapToDouble(AtomTemplate::getCharge)
+                .sum();
+        if (Math.abs(totalCharge - (-1.0)) > 1e-4) {
+            throw new IllegalStateException("TYS charge must be -1.0, found: " + totalCharge);
+        }
+
+        requireBond(tys, "CZ", "OH");
+        requireBond(tys, "OH", "S");
+        requireBond(tys, "S", "O1");
+        requireBond(tys, "S", "O2");
+        requireBond(tys, "S", "O3");
+    }
+
+    private void requireBond(ResidueTemplate template, String atom1, String atom2) {
+        boolean found = template.getBonds().stream().anyMatch(bond ->
+                (bond.getAtom1().equals(atom1) && bond.getAtom2().equals(atom2))
+                        || (bond.getAtom1().equals(atom2) && bond.getAtom2().equals(atom1)));
+        if (!found) {
+            throw new IllegalStateException(template.getName() + " template must contain bond "
+                    + atom1 + "-" + atom2);
+        }
     }
 }

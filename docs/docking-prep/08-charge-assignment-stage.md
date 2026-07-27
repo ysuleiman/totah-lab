@@ -41,6 +41,11 @@ is retained with the source resources for Amber minimization/MD review, but this
 PDBQT preparation stage only needs template atom names, Amber atom types,
 partial charges, and connectivity.
 
+TYS loading validates the published mid-chain template strictly: total charge
+must be -1.0 and the `CZ-OH`, `OH-S`, `S-O1`, `S-O2`, and `S-O3` bonds must be
+present. We do not synthesize TYS by modifying the normal TYR template because
+the sulfate charge is distributed across the modified side chain.
+
 The override path is intentionally explicit because QEq-like models are useful
 for experiments and non-Amber workflows, but they should not silently replace
 curated Amber residue charges during docking preparation.

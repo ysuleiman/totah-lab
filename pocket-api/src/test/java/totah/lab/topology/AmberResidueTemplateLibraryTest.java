@@ -1,9 +1,17 @@
 package totah.lab.topology;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,6 +95,7 @@ public class AmberResidueTemplateLibraryTest {
         assertEquals("SO", tys.getAtom("S").getAmberType(), "TYS sulfate sulfur type");
         assertEquals(1.2494, tys.getAtom("S").getCharge(), 1e-4, "TYS sulfate sulfur RESP charge");
         assertEquals("O2", ctys.getAtom("OXT").getAmberType(), "CTYS terminal OXT type");
+        assertBond(tys, "CZ", "OH");
         assertBond(tys, "OH", "S");
         assertBond(tys, "S", "O1");
         assertBond(tys, "S", "O2");
@@ -98,6 +107,21 @@ public class AmberResidueTemplateLibraryTest {
     public void unknownResidueHasNoTemplate() {
         assertNull(library.getTemplate("NOTARES"),
                 "unknown residue names must not resolve to a template");
+    }
+
+    @Test
+    public void rejectsTysPrepiWhenPublishedChargeIsCorrupted(@TempDir Path tempDir)
+            throws Exception {
+        String prepi = readResource("/amber/prep/tys/MTYS.prepi")
+                .replace("1.249400", "1.300000");
+        Path file = tempDir.resolve("MTYS.prepi");
+        Files.writeString(file, prepi, StandardCharsets.UTF_8);
+
+        AmberResidueTemplateLibrary isolated = newIsolatedLibrary();
+        IllegalStateException error = assertThrows(IllegalStateException.class, () -> isolated.load(file));
+        assertTrue(error.getMessage().startsWith("TYS charge must be -1.0, found:"),
+                "unexpected validation error: " + error.getMessage());
+        assertNull(isolated.getTemplate("TYS"), "invalid TYS template must not be registered");
     }
 
     @Test
@@ -123,5 +147,19 @@ public class AmberResidueTemplateLibraryTest {
         return template.getAtoms().stream()
                 .mapToDouble(AtomTemplate::getCharge)
                 .sum();
+    }
+
+    private static String readResource(String name) throws IOException {
+        try (InputStream in = AmberResidueTemplateLibraryTest.class.getResourceAsStream(name)) {
+            return new String(Objects.requireNonNull(in, "missing resource " + name).readAllBytes(),
+                    StandardCharsets.UTF_8);
+        }
+    }
+
+    private static AmberResidueTemplateLibrary newIsolatedLibrary() throws ReflectiveOperationException {
+        Constructor<AmberResidueTemplateLibrary> constructor =
+                AmberResidueTemplateLibrary.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        return constructor.newInstance();
     }
 }
