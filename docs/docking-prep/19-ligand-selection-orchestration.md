@@ -29,6 +29,14 @@ residue numbers, and insertion codes must match exactly.
   explicit `LigandSelection`;
 - an extracted fallback component whose role remains `UNKNOWN` is rejected
   with `UNSUPPORTED_CLASSIFICATION`.
+- a component rejected by `LigandSelectionPolicy` fails with
+  `EXCLUDED_BY_POLICY`.
+
+The default `LigandSelectionPolicy` excludes `GOL` and `SO4` from ordinary
+docking-ligand selection. These are technically useful chemistry fixtures but
+normally represent a crystallization additive/solvent and sulfate ion. Callers
+can provide an explicit exclusion set when their workflow has different
+selection semantics.
 
 `prepare(cleanupResult, selection)` also searches receptor, removed-water, and
 removed-ion categories. This allows it to distinguish a nonexistent selection
@@ -39,7 +47,8 @@ Typed selection failures are:
 - `AMBIGUOUS_SELECTION`;
 - `SELECTION_NOT_FOUND`;
 - `NOT_EXTRACTED_AS_LIGAND`;
-- `UNSUPPORTED_CLASSIFICATION`.
+- `UNSUPPORTED_CLASSIFICATION`;
+- `EXCLUDED_BY_POLICY`.
 
 Selection failures occur before CCD graph construction and therefore do not
 masquerade as chemistry capability failures.
@@ -70,7 +79,8 @@ masquerade as chemistry capability failures.
 
 Offline tests cover zero, one, and multiple extracted components; explicit
 residue selection; retained receptor, removed water/ion, unknown, and missing
-selection failures; and successful delegation to ligand chemistry.
+selection failures; default/configured selection policy; and successful
+delegation to ligand chemistry.
 
 The gated online `1A4W` integration test now exercises the full path:
 
@@ -81,3 +91,7 @@ TargetLoadStage
   -> LigandPreparationOrchestrator
   -> QWE PDBQT
 ```
+
+The offline deposited GOL regression and the complete validation criteria are
+documented in
+[20-real-structure-ligand-regression.md](20-real-structure-ligand-regression.md).

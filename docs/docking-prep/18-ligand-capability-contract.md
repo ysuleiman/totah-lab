@@ -15,6 +15,8 @@ supported boundary as machine-readable cases with three expected outcomes:
 The offline panel covers:
 
 - a connected two-carbon ligand that completes PDBQT preparation;
+- deposited `4E1J` glycerol chemistry with missing hydrogens and rotatable
+  bonds;
 - standard amino-acid, water, and monoatomic-ion classification exclusions;
 - incomplete CCD definitions;
 - missing and extra deposited heavy atoms;

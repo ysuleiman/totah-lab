@@ -1,10 +1,22 @@
-# Native Ligand Preparation TODO
+# Native Ligand Preparation Plan and Status
+
+## Version 1 Status
+
+Version 1 is implemented for explicitly selected, free, connected,
+single-residue ligands with complete CCD definitions and supported chemistry.
+The implementation includes CCD graph reconciliation, hydrogen generation,
+Gasteiger charges, AD4 typing, torsion construction, PDBQT writing, structured
+capability failures, cleanup-to-ligand orchestration, an offline deposited GOL
+regression, and gated online `1A4W/QWE` acceptance.
+
+The remaining items in this document describe broader hardening and future
+chemistry, not blockers for the declared Version 1 scope.
 
 ## Purpose
 
-The current docking-preparation pipeline prepares receptor PDBQT files and
-extracts bound non-polymer components, but it does not yet prepare those
-components as docking-ready ligands.
+The docking-preparation code prepares receptor PDBQT files, extracts bound
+non-polymer components, and can prepare explicitly selected supported
+components as docking-ready ligand PDBQT.
 
 The first target case is PDB `1A4W`:
 

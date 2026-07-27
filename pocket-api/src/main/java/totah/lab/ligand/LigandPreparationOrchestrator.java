@@ -2,7 +2,6 @@ package totah.lab.ligand;
 
 import totah.lab.pipeline.cleanup.ClassifiedResidue;
 import totah.lab.pipeline.cleanup.ResidueDisposition;
-import totah.lab.pipeline.cleanup.ResidueRole;
 import totah.lab.pipeline.cleanup.StructureCleanupResult;
 
 import java.util.ArrayList;
@@ -16,14 +15,23 @@ import java.util.Optional;
 public final class LigandPreparationOrchestrator {
 
     private final LigandPreparer ligandPreparer;
+    private final LigandSelectionPolicy selectionPolicy;
 
     public LigandPreparationOrchestrator() {
-        this(new LigandPreparer());
+        this(new LigandPreparer(), new LigandSelectionPolicy());
     }
 
     public LigandPreparationOrchestrator(LigandPreparer ligandPreparer) {
+        this(ligandPreparer, new LigandSelectionPolicy());
+    }
+
+    public LigandPreparationOrchestrator(
+            LigandPreparer ligandPreparer,
+            LigandSelectionPolicy selectionPolicy) {
         this.ligandPreparer = Objects.requireNonNull(
                 ligandPreparer, "ligandPreparer is null");
+        this.selectionPolicy = Objects.requireNonNull(
+                selectionPolicy, "selectionPolicy is null");
     }
 
     public Optional<SelectedLigandPreparation> prepareOnly(
@@ -72,10 +80,11 @@ public final class LigandPreparationOrchestrator {
     }
 
     private SelectedLigandPreparation prepare(ClassifiedResidue selected) {
-        if (selected.role() != ResidueRole.LIGAND) {
+        LigandSelectionDecision decision = selectionPolicy.evaluate(selected);
+        if (!decision.eligible()) {
             throw selectionFailure(
-                    LigandSelectionFailure.UNSUPPORTED_CLASSIFICATION,
-                    LigandSelection.from(selected.residue()) + " has role " + selected.role());
+                    decision.failure(),
+                    LigandSelection.from(selected.residue()) + ": " + decision.reason());
         }
         if (selected.disposition() != ResidueDisposition.EXTRACT_AS_LIGAND) {
             throw selectionFailure(
