@@ -194,7 +194,9 @@ class CcdLigandGraphBuilderTest {
                 .filter(residue -> residue.getNumber() == 373)
                 .findFirst()
                 .orElseThrow();
-        ChemComp qweCcd = new DownloadChemCompProvider(tempDir.toString()).getChemComp("QWE");
+        DownloadChemCompProvider provider =
+                new DownloadChemCompProvider(tempDir.toString());
+        ChemComp qweCcd = provider.getChemComp("QWE");
 
         CcdLigandGraphResult result = builder.build(qwe, qweCcd);
 
@@ -240,7 +242,7 @@ class CcdLigandGraphBuilderTest {
         assertTrue(java.util.stream.IntStream
                 .range(0, typed.graph().atoms().size())
                 .allMatch(torsionTree.tree()::containsAtom));
-        LigandPreparationResult prepared = new LigandPreparer().prepare(qwe, qweCcd);
+        LigandPreparationResult prepared = new LigandPreparer(provider).prepare(qwe);
         assertEquals(typed.graph().atoms().size(), prepared.graph().atoms().size());
         assertTrue(prepared.pdbqt().startsWith("ROOT"));
         assertTrue(prepared.pdbqt().contains("TORSDOF "));

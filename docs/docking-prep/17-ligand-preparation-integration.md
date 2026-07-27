@@ -6,14 +6,21 @@ PDBQT export services without adding ligand branches to receptor stages.
 
 ## Input and output
 
-The caller must provide exactly one explicitly selected deposited `Residue` and
-its complete BioJava `ChemComp`. `prepare` returns one typed
-`LigandPreparationResult`; `prepareToPath` additionally writes the validated
-PDBQT using `Path` and propagates checked I/O failures.
+The caller must provide exactly one explicitly selected deposited `Residue`.
+`LigandPreparer` can resolve its component through an injected BioJava
+`ChemCompProvider`, or the caller can use the explicit `ChemComp` overload for
+deterministic operation. `prepare` returns one typed `LigandPreparationResult`;
+`prepareToPath` additionally writes the validated PDBQT using `Path` and
+propagates checked I/O failures.
 
 The result contains the final molecular graph, graph validation,
 hydrogenation, charge, AD4 typing, torsion results, and the exact emitted PDBQT
 text.
+
+Ordinary ligand preparation requires a complete, connected, non-monatomic CCD
+component with both atom and bond definitions. Missing definitions fail with
+`UnsupportedLigandException` and reason `INCOMPLETE_CCD`. Monatomic components
+must be handled by classification or ion policy rather than this workflow.
 
 ## Execution order
 
@@ -35,7 +42,7 @@ text.
 ## Limitations
 
 - The caller must select one ligand; independent residues are never merged.
-- Complete CCD chemistry is required.
+- Complete CCD atom and bond chemistry is required.
 - Covalent ligands, multi-residue ligands, and receptor-linked cofactors are
   unsupported.
 - Protonation and tautomer selection are not performed; the CCD state is used.
