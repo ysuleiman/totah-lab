@@ -213,6 +213,11 @@ class CcdLigandGraphBuilderTest {
                 .allMatch(atom -> Double.isFinite(atom.getPosition().x())
                         && Double.isFinite(atom.getPosition().y())
                         && Double.isFinite(atom.getPosition().z())));
+        LigandChargeAssignmentResult charged =
+                new LigandChargeAssigner().assign(hydrogenated.graph());
+        assertEquals(charged.totalFormalCharge(), charged.totalPartialCharge(), 1.0e-9);
+        assertTrue(charged.graph().atoms().stream()
+                .allMatch(atom -> Double.isFinite(atom.getCharge())));
     }
 
     private Residue residue(Atom... atoms) {

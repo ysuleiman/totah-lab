@@ -16,13 +16,17 @@ import java.util.Map;
  */
 public class GasteigerModel implements ChargeModel {
 
-    // a, b, c from Gasteiger-Marsili 1980 (Table I; sp3 values where the paper
-    // distinguishes hybridization - ChargeSystem carries no hybridization info)
+    // a, b, c from Gasteiger-Marsili 1980 Table I.
     private static final Map<String, AtomParameters> PARAMETERS = Map.ofEntries(
             Map.entry("H",  new AtomParameters(7.17, 6.24, -0.56)),
-            Map.entry("C",  new AtomParameters(7.98, 9.18, 1.88)),
-            Map.entry("N",  new AtomParameters(11.54, 10.82, 1.36)),
-            Map.entry("O",  new AtomParameters(14.18, 12.92, 1.39)),
+            Map.entry("C:SP3", new AtomParameters(7.98, 9.18, 1.88)),
+            Map.entry("C:SP2", new AtomParameters(8.79, 9.32, 1.51)),
+            Map.entry("C:SP",  new AtomParameters(10.39, 9.45, 0.73)),
+            Map.entry("N:SP3", new AtomParameters(11.54, 10.82, 1.36)),
+            Map.entry("N:SP2", new AtomParameters(12.87, 11.15, 0.85)),
+            Map.entry("N:SP",  new AtomParameters(15.68, 11.70, -0.27)),
+            Map.entry("O:SP3", new AtomParameters(14.18, 12.92, 1.39)),
+            Map.entry("O:SP2", new AtomParameters(17.07, 13.79, 0.47)),
             Map.entry("S",  new AtomParameters(10.14, 9.13, 1.38)),
             Map.entry("P",  new AtomParameters(8.90, 8.24, 0.96)),
             Map.entry("F",  new AtomParameters(14.66, 13.85, 2.31)),
@@ -50,7 +54,7 @@ public class GasteigerModel implements ChargeModel {
         double[] q = initializeCharges(sys);
         AtomParameters[] params = new AtomParameters[n];
         for (int i = 0; i < n; i++) {
-            params[i] = getParams(sys.getElement(i));
+            params[i] = getParams(sys, i);
         }
 
         double damping = 1.0;
@@ -91,17 +95,57 @@ public class GasteigerModel implements ChargeModel {
         return q;
     }
 
-    /**
-     * Gasteiger-Marsili seeds the iteration with formal charges. ChargeSystem
-     * does not carry per-atom formal charges, so start neutral; the final
-     * normalization enforces the requested total charge.
-     */
+    /** Gasteiger-Marsili seeds the iteration with per-atom formal charges. */
     private double[] initializeCharges(ChargeSystem sys) {
-        return new double[sys.size()];
+        double[] charges = new double[sys.size()];
+        for (int index = 0; index < charges.length; index++) {
+            charges[index] = sys.getFormalCharge(index);
+        }
+        return charges;
     }
 
-    private AtomParameters getParams(String element) {
-        return PARAMETERS.getOrDefault(element, PARAMETERS.get("C"));
+    private AtomParameters getParams(ChargeSystem system, int atomIndex) {
+        String element = system.getElement(atomIndex);
+        String key = switch (element) {
+            case "C", "N" -> element + ":" + hybridization(system, atomIndex);
+            case "O" -> element + ":" + (isSp2(system, atomIndex) ? "SP2" : "SP3");
+            default -> element;
+        };
+        AtomParameters parameters = PARAMETERS.get(key);
+        if (parameters == null) {
+            throw new IllegalArgumentException(
+                    "No Gasteiger parameters for atom " + atomIndex + " (" + key + ")");
+        }
+        return parameters;
+    }
+
+    @Override
+    public boolean hasParameters(String element) {
+        return PARAMETERS.containsKey(element)
+                || PARAMETERS.containsKey(element + ":SP3");
+    }
+
+    private String hybridization(ChargeSystem system, int atomIndex) {
+        double maximumOrder = maximumBondOrder(system, atomIndex);
+        if (maximumOrder >= 2.5) {
+            return "SP";
+        }
+        return isSp2(system, atomIndex) ? "SP2" : "SP3";
+    }
+
+    private boolean isSp2(ChargeSystem system, int atomIndex) {
+        return system.isAromatic(atomIndex)
+                || maximumBondOrder(system, atomIndex) >= 1.5;
+    }
+
+    private double maximumBondOrder(ChargeSystem system, int atomIndex) {
+        double maximum = 0.0;
+        for (int neighbor : system.getNeighbors(atomIndex)) {
+            maximum = Math.max(
+                    maximum,
+                    system.getBondOrder(atomIndex, neighbor));
+        }
+        return maximum;
     }
 
     private record AtomParameters(double a, double b, double c) {

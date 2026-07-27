@@ -13,4 +13,16 @@ public interface ChargeSystem {
     double getZ(int i);
     String getElement(int i);
     List<Integer> getNeighbors(int i);
+
+    default int getFormalCharge(int i) {
+        return 0;
+    }
+
+    default double getBondOrder(int atomIndexA, int atomIndexB) {
+        return 1.0;
+    }
+
+    default boolean isAromatic(int i) {
+        return false;
+    }
 }

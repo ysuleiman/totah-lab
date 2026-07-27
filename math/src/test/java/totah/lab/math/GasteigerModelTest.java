@@ -5,6 +5,7 @@ import totah.lab.math.charges.ChargeSystem;
 import totah.lab.math.charges.GasteigerModel;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,5 +65,40 @@ public class GasteigerModelTest {
             assertTrue(q[0] < 0.0,
                     "oxygen sign flipped at " + iterations + " iterations");
         }
+    }
+
+    @Test
+    public void bondOrderSelectsHybridizationSpecificParameters() {
+        ChargeSystem singleBond = carbonOxygenSystem(1.0, false);
+        ChargeSystem doubleBond = carbonOxygenSystem(2.0, false);
+        ChargeSystem aromaticBond = carbonOxygenSystem(1.0, true);
+
+        double[] singleCharges = model.computeCharges(singleBond, 0.0);
+        double[] doubleCharges = model.computeCharges(doubleBond, 0.0);
+        double[] aromaticCharges = model.computeCharges(aromaticBond, 0.0);
+
+        assertNotEquals(singleCharges[0], doubleCharges[0],
+                "sp3 and sp2 carbon parameters must differ");
+        assertEquals(doubleCharges[0], aromaticCharges[0], 1.0e-12,
+                "aromatic atoms should select sp2 parameters");
+    }
+
+    private ChargeSystem carbonOxygenSystem(double bondOrder, boolean aromatic) {
+        return new ChargeSystem() {
+            @Override public int size() { return 2; }
+            @Override public double getX(int i) { return i; }
+            @Override public double getY(int i) { return 0.0; }
+            @Override public double getZ(int i) { return 0.0; }
+            @Override public String getElement(int i) { return i == 0 ? "C" : "O"; }
+            @Override public List<Integer> getNeighbors(int i) {
+                return List.of(i == 0 ? 1 : 0);
+            }
+            @Override public double getBondOrder(int first, int second) {
+                return bondOrder;
+            }
+            @Override public boolean isAromatic(int i) {
+                return aromatic;
+            }
+        };
     }
 }
