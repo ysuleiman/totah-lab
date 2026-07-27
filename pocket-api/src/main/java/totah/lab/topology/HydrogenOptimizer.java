@@ -17,6 +17,7 @@ public class HydrogenOptimizer {
     private static final double[] ROTAMER_ANGLES = {0, 60, 120, 180, 240, 300};
 
     private final HydrogenScorer scorer;
+    private final boolean allowHeavyAtomFlips;
 
     public HydrogenOptimizer(ResidueTemplateProvider amberLib, double clashCutoff) {
         this(amberLib, null, clashCutoff);
@@ -24,7 +25,15 @@ public class HydrogenOptimizer {
 
     public HydrogenOptimizer(ResidueTemplateProvider amberLib,
                              AmberParameterSet ljParams, double clashCutoff) {
+        this(amberLib, ljParams, clashCutoff, true);
+    }
+
+    public HydrogenOptimizer(ResidueTemplateProvider amberLib,
+                             AmberParameterSet ljParams,
+                             double clashCutoff,
+                             boolean allowHeavyAtomFlips) {
         this.scorer = new HydrogenScorer(Objects.requireNonNull(amberLib), ljParams, clashCutoff);
+        this.allowHeavyAtomFlips = allowHeavyAtomFlips;
     }
 
     public List<Atom> optimize(Residue residue, List<Residue> allResidues) {
@@ -66,12 +75,18 @@ public class HydrogenOptimizer {
 
     private List<Atom> optimizeAsn(Residue r, List<Residue> env) {
         List<Atom> stateA = buildAsn(r, false);
+        if (!allowHeavyAtomFlips) {
+            return stateA;
+        }
         List<Atom> stateB = buildAsn(r, true);
         return pickBest(stateA, stateB, r, env);
     }
 
     private List<Atom> optimizeGln(Residue r, List<Residue> env) {
         List<Atom> stateA = buildGln(r, false);
+        if (!allowHeavyAtomFlips) {
+            return stateA;
+        }
         List<Atom> stateB = buildGln(r, true);
         return pickBest(stateA, stateB, r, env);
     }
@@ -156,7 +171,8 @@ public class HydrogenOptimizer {
         // the input already carries both ring protons.
         int inputTautomerH = (r.getAtom("HD1") != null ? 1 : 0) + (r.getAtom("HE2") != null ? 1 : 0);
 
-        for (boolean flipped : new boolean[]{false, true}) {
+        boolean[] flipStates = allowHeavyAtomFlips ? new boolean[]{false, true} : new boolean[]{false};
+        for (boolean flipped : flipStates) {
             for (HisState state : HisState.values()) {
                 if (fixedState != null && state != fixedState) continue;
                 int trialTautomerH = state == HisState.HIP ? 2 : 1;

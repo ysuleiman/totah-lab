@@ -47,6 +47,15 @@ pipeline serializes the prepared receptor it was given. Stage 9 decides whether
 a hydrogen is nonpolar `H` or donor `HD`; Stage 10 writes that typed atom rather
 than merging it away.
 
+Open Babel PDBQT files are useful compatibility references for rigid PDBQT
+shape, field layout, and receptor heavy-atom preservation. They are not the
+scientific source of truth for this pipeline's receptor preparation choices.
+Plain Open Babel conversion should not be interpreted as authority for Amber
+charges, protonation-state assignment, missing-atom repair, or silent ASN/GLN/HIS
+heavy-atom flips. Exact whole-file matching to Open Babel is therefore not a
+goal unless a separate Open Babel compatibility export mode is explicitly
+enabled.
+
 ## Test Coverage
 
 `PdbqtExporterStageTest` covers:
@@ -66,3 +75,11 @@ than merging it away.
 - Unknown, malformed, and non-standard flex residue rejection.
 - Insertion-code-safe flex residue selection.
 - Export report publication.
+
+`PipelineTest` covers Open Babel compatibility at the agreed boundary:
+
+- Heavy-atom count, identity, order, and coordinates are compared against
+  `Q6UX53_TMT1B_HUMAN_3_clean.pdbqt`.
+- Hydrogens, charges, B-factors, and exact whole-file text are intentionally not
+  compared because this pipeline uses Amber/full-hydrogen receptor policy, not
+  Open Babel compatibility-export policy.

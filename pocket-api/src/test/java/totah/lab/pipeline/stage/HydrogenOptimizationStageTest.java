@@ -109,6 +109,28 @@ class HydrogenOptimizationStageTest {
     }
 
     @Test
+    void preservesHeavyAtomCoordinatesForAmideAndHistidineResidues() throws Exception {
+        Residue gln = glutamine(1);
+        Residue his = histidineHid(2);
+        Residue asn = asparagine(3);
+        Residue acceptor = residue("ASP", 4, atom("OD1", "O", 1.5, 3.0, 0.0));
+        PipelineContext context = contextWith(List.of(gln, his, asn, acceptor));
+        context.put(ContextKeys.HYDROGENATION_REPORT, hydrogenationReport(4));
+        context.put(ContextKeys.RESIDUE_STATES, states(
+                state("A:1", "GLN"),
+                state("A:2", "HID"),
+                state("A:3", "ASN"),
+                state("A:4", "CASP")));
+
+        new HydrogenOptimizationStage().run(context);
+
+        List<Residue> optimized = residues(context);
+        assertHeavyAtomCoordinatesUnchanged(gln, optimized.get(0));
+        assertHeavyAtomCoordinatesUnchanged(his, optimized.get(1));
+        assertHeavyAtomCoordinatesUnchanged(asn, optimized.get(2));
+    }
+
+    @Test
     void failsWhenOptimizationWouldChangeHydrogenIdentities() {
         Residue his = histidineHid(1);
         Residue acceptorNearNe2 = residue("ASP", 2,
@@ -214,6 +236,29 @@ class HydrogenOptimizationStageTest {
                 atom("OD2", "O", 6.0, 3.0, 0.0));
     }
 
+    private Residue asparagine(int number) {
+        return residue("ASN", number,
+                atom("CA", "C", 0.0, 0.0, 0.0),
+                atom("CB", "C", 0.0, 1.5, 0.0),
+                atom("CG", "C", 0.0, 2.5, 0.0),
+                atom("OD1", "O", 1.2, 3.0, 0.0),
+                atom("ND2", "N", -1.2, 3.0, 0.0),
+                atom("HD21", "H", -1.5, 3.5, 0.0),
+                atom("HD22", "H", -1.5, 2.5, 0.0));
+    }
+
+    private Residue glutamine(int number) {
+        return residue("GLN", number,
+                atom("CA", "C", 0.0, 0.0, 0.0),
+                atom("CB", "C", 0.0, 1.5, 0.0),
+                atom("CG", "C", 0.0, 2.5, 0.0),
+                atom("CD", "C", 0.0, 3.5, 0.0),
+                atom("OE1", "O", 1.2, 4.0, 0.0),
+                atom("NE2", "N", -1.2, 4.0, 0.0),
+                atom("HE21", "H", -1.5, 4.5, 0.0),
+                atom("HE22", "H", -1.5, 3.5, 0.0));
+    }
+
     private Residue histidineHid(int number) {
         return residue("HIS", number,
                 atom("CA", "C", 0.0, 0.0, 0.0),
@@ -278,5 +323,13 @@ class HydrogenOptimizationStageTest {
                 .map(Atom::getName)
                 .sorted()
                 .toList();
+    }
+
+    private void assertHeavyAtomCoordinatesUnchanged(Residue before, Residue after) {
+        for (Atom beforeAtom : before.getAtoms()) {
+            if ("H".equals(beforeAtom.getElement().getSymbol())) continue;
+            Atom afterAtom = after.getAtom(beforeAtom.getName());
+            assertEquals(beforeAtom.getPosition(), afterAtom.getPosition(), beforeAtom.getName());
+        }
     }
 }

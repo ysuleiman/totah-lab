@@ -5,6 +5,13 @@
 - Move `domain-model/src/main/java/totah/lab/docking` to a better-fitting module/package. The torsion tree model is docking/flex-receptor behavior, not core protein domain state; likely homes are `pocket-api` for now or a future receptor/prep module after boundaries settle.
 - Decide charge fallback policy for residues/atoms not covered by bundled Amber templates. Current docking prep uses Amber charges and atom types when Amber covers the residue and fails when it does not. We need a scientific design for special residues, ligands, cofactors, metals, modified residues, and missing template atoms before enabling computed charges as a fallback; that design should define when fallback is allowed, which charge model is acceptable, how total charge/protonation is chosen, how AD4 atom typing is assigned, and how the report makes mixed Amber/computed output explicit.
 - Revisit docking-prep pocket-center policy. `PocketGeometry.calculateCenter(Pocket)` now computes a resolved receptor heavy-atom centroid first. This is the P2Rank path because P2Rank pockets have residue refs but no alpha spheres. fpocket may fall back to alpha spheres, then stored parser center; confirm whether this priority should remain for missing-heavy-atom proximity and grid-box generation.
+- Decide whether to support an Open Babel compatibility export mode. Open Babel
+  PDBQT references are compatibility references, not scientific
+  source-of-truth references. Use them to validate rigid PDBQT shape and
+  receptor heavy-atom preservation, but do not treat them as authority for
+  Amber charges, protonation, missing-atom repair, or silent heavy-atom flips.
+  A compatibility mode would need an explicit policy for polar hydrogens only,
+  Gasteiger-style charges, B-factor zeroing, and Open Babel-like AD4 typing.
 - Revisit full Maven test failures separately from compile checks.
 
 ## Done

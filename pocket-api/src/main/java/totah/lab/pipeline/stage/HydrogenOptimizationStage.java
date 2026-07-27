@@ -60,7 +60,7 @@ public class HydrogenOptimizationStage implements Stage {
         }
 
         double clashCutoff = parseDouble(context, ContextKeys.HYDROGEN_CLASH_CUTOFF, 1.0);
-        HydrogenOptimizer optimizer = new HydrogenOptimizer(amberLib, ljSet, clashCutoff);
+        HydrogenOptimizer optimizer = new HydrogenOptimizer(amberLib, ljSet, clashCutoff, false);
 
         List<Residue> optimized = new ArrayList<>();
         List<String> optimizedResidueLabels = new ArrayList<>();
@@ -117,6 +117,18 @@ public class HydrogenOptimizationStage implements Stage {
         if (!inputHeavy.equals(outputHeavy)) {
             throw new IllegalStateException("Hydrogen optimization changed heavy-atom identity/order for "
                     + residueLabel(input));
+        }
+
+        for (Atom inputAtom : input.getAtoms()) {
+            if (isHydrogen(inputAtom)) continue;
+            Atom outputAtom = outputAtoms.stream()
+                    .filter(atom -> inputAtom.getName().equals(atom.getName()))
+                    .findFirst()
+                    .orElseThrow();
+            if (inputAtom.getPosition().distance(outputAtom.getPosition()) > 1e-6) {
+                throw new IllegalStateException("Hydrogen optimization moved heavy atom "
+                        + inputAtom.getName() + " in " + residueLabel(input));
+            }
         }
 
         long inputHydrogens = input.getAtoms().stream().filter(this::isHydrogen).count();
