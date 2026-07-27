@@ -16,7 +16,8 @@ stage runs.
   `ContextKeys.KEEP_METALS` is true.
 - Keeps additional configured special residues from
   `ContextKeys.ALLOWED_SPECIAL_RESIDUES`.
-- Fails on unsupported residues instead of guessing chemistry.
+- Extracts unknown multi-atom non-polymer residues from the receptor by default
+  and publishes them to `ContextKeys.EXTRACTED_LIGANDS`.
 - Publishes a `StructureCleanupReport` to
   `ContextKeys.STRUCTURE_CLEANUP_REPORT`.
 
@@ -32,9 +33,16 @@ case and should be handled by a later residue-state/template-normalization stage
 Amber PREPI templates from the 2023 ff14SB-compatible parameter package.
 Known monoatomic ions use the same coarse keep/remove switch as metals at this
 stage. If retained, later stages still decide whether a fixed charge and
-AutoDock4 atom type exist. Unknown ligands, cofactors, glycans, and covalent
-adducts are rejected unless the caller explicitly configures them as allowed
-special residues.
+AutoDock4 atom type exist.
+
+Unknown multi-atom non-polymer residues are treated as bound ligands by default:
+they are removed from `PROTEIN_RESIDUES` and published under
+`EXTRACTED_LIGANDS` for ligand-specific preparation. This is the correct path
+for PDB `1A4W` residue `QWE H:373` (RWJ-50215): `TYS` remains a modified
+protein residue, while `QWE` is extracted from receptor preparation rather than
+matched against an Amber amino-acid template. Cofactors, glycans, and covalent
+adducts that must remain in the receptor require an explicit keep/parameterize
+policy via allowed special residues or a future cofactor policy stage.
 
 ## Test Coverage
 
@@ -48,7 +56,7 @@ special residues.
 - Default monoatomic metal and known-ion removal.
 - Configured monoatomic metal and known-ion retention.
 - Configured special-residue retention by list and comma-separated string.
-- Unknown residue rejection.
+- Unknown multi-atom ligand extraction.
 - Failure when cleanup removes every residue.
 - Missing and empty input residue handling.
 - Defensive-copy behavior in the report.

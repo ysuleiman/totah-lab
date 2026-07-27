@@ -176,21 +176,22 @@ class StructureCleanupStageTest {
     }
 
     @Test
-    void rejectsUnknownResidueWithoutPolicy() {
+    void extractsUnknownMultiAtomResidueAsLigandByDefault() {
         PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
-                residue("SAM", 801, atom("C1", "C")));
+                residue("QWE", 373, atom("C1", "C"), atom("N1", "N")));
 
-        IllegalArgumentException error = assertThrows(
-                IllegalArgumentException.class,
-                () -> new StructureCleanupStage().run(context));
+        new StructureCleanupStage().run(context);
 
-        assertTrue(error.getMessage().contains("Unsupported residue SAM A:801"));
-        assertTrue(error.getMessage().contains("no cleanup policy"));
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        List<Residue> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertEquals(List.of("CYS"), residueNames(residues));
+        assertEquals(List.of("QWE"), residueNames(ligands));
     }
 
     @Test
     void rejectsWhenCleanupRemovesEverything() {
-        PipelineContext context = contextWith(residue("HOH", 501, atom("O", "O")));
+        PipelineContext context = contextWith(residue("HOH", 501, atom("O", "O")),
+                residue("QWE", 373, atom("C1", "C"), atom("N1", "N")));
 
         IllegalStateException error = assertThrows(
                 IllegalStateException.class,
@@ -232,6 +233,18 @@ class StructureCleanupStageTest {
         StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
         assertThrows(UnsupportedOperationException.class, () -> report.removedWaters().add("HOH A:999"));
         assertFalse(report.removedWaters().isEmpty());
+    }
+
+    @Test
+    void extractedLigandListIsImmutable() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("QWE", 373, atom("C1", "C"), atom("N1", "N")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertThrows(UnsupportedOperationException.class,
+                () -> ligands.add(residue("BAD", 999, atom("C1", "C"))));
     }
 
     private PipelineContext contextWith(Residue... residues) {

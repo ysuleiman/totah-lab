@@ -11,6 +11,7 @@ public class ContextKeys {
     public static final String FLEX_PDBQT_PATH = "flex_pdbqt_path";
     public static final String LIGAND_PATH = "ligand_path";
     public static final String LIGAND_PDBQT = "ligand_pdbqt";
+    public static final String EXTRACTED_LIGANDS = "extracted_ligands";
     public static final String GRID_BOX = "grid_box";
     public static final String POCKET = "pocket";
     public static final String POCKET_PROXIMITY_CUTOFF = "pocketProximityCutoff";

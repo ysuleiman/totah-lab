@@ -128,6 +128,26 @@ class ReceptorHydrogenationStageTest {
     }
 
     @Test
+    void skipsSideChainHydrogenWhenTetrahedralAnchorsAreIncomplete() throws Exception {
+        Residue incompleteValine = residue("VAL", 1,
+                atom("N", "N", 0.0, 0.0, 0.0),
+                atom("CA", "C", 1.5, 0.0, 0.0),
+                atom("C", "C", 2.0, 1.4, 0.0),
+                atom("O", "O", 2.9, 1.8, 0.0),
+                atom("CB", "C", 1.3, -0.8, 1.2),
+                atom("CG1", "C", 2.4, -1.4, 1.8));
+        PipelineContext context = contextWith(List.of(incompleteValine));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:1", "VAL", "NVAL")));
+
+        new ReceptorHydrogenationStage().run(context);
+
+        Residue result = residues(context).getFirst();
+        assertFalse(hasAtom(result, "HB"));
+        assertTrue(hasAtom(result, "HG11"));
+        assertTrue(hasAtom(result, "HA"));
+    }
+
+    @Test
     void usesLynTemplateForNeutralLysineAtPhysiologicPh() throws Exception {
         PipelineContext context = contextWith(List.of(lysine(1)));
         context.put(ContextKeys.PH, 7.4);
@@ -137,6 +157,26 @@ class ReceptorHydrogenationStageTest {
 
         Residue result = residues(context).getFirst();
         assertEquals(2, atomNameCount(result, "HZ"));
+    }
+
+    @Test
+    void skipsLysineHydrogensWhenSideChainAnchorsAreIncomplete() throws Exception {
+        Residue incompleteLysine = residue("LYS", 1,
+                atom("N", "N", 0.0, 0.0, 0.0),
+                atom("CA", "C", 1.5, 0.0, 0.0),
+                atom("C", "C", 2.0, 1.4, 0.0),
+                atom("O", "O", 2.9, 1.8, 0.0),
+                atom("CB", "C", 1.3, -0.8, 1.2),
+                atom("CG", "C", 2.3, -1.5, 1.9));
+        PipelineContext context = contextWith(List.of(incompleteLysine));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:1", "LYS", "NLYS")));
+
+        new ReceptorHydrogenationStage().run(context);
+
+        Residue result = residues(context).getFirst();
+        assertTrue(hasAtom(result, "HB2"));
+        assertFalse(hasAtom(result, "HG2"));
+        assertTrue(hasAtom(result, "HA"));
     }
 
     @Test

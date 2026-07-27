@@ -50,6 +50,11 @@ Hydrogens are added geometrically and clash-guarded. A later optimization stage
 may improve rotatable hydrogen positions, but it should not reinterpret residue
 state.
 
+When a residue is missing heavy atoms needed as geometric anchors, this stage
+skips only the hydrogens that cannot be placed from the available anchors.
+Strict missing-heavy-atom validation remains a later topology/template check;
+hydrogenation does not invent missing heavy atoms.
+
 For tetrahedral centers with one missing hydrogen and three resolved heavy
 neighbors, the missing hydrogen is placed opposite the normalized heavy-neighbor
 directions. This avoids false clashes caused by two-anchor dihedral guesses on
@@ -72,6 +77,7 @@ protein methine centers.
   geometric detection is disabled.
 - `TYS` uses polymer terminal handling from `NTYS/TYS/CTYS` state assignment
   and does not add a phenolic/sulfate proton.
+- Missing side-chain anchor handling for incomplete aliphatic residues.
 - Q6UX53 receptor-scale coverage at the default clash cutoff:
   - every standard non-glycine residue keeps its backbone `HA`;
   - every atom required by the assigned Amber templates is present after

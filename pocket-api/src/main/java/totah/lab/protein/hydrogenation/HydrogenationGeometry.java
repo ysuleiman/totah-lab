@@ -62,7 +62,7 @@ public final class HydrogenationGeometry {
      * rejected as a "clash" with its own nitrogen whenever cutoff >= bond length.
      */
     public static void tryAdd(List<Atom> atoms, Atom h, Atom parent, SpatialClashChecker checker, double cutoff) {
-        if (h == null) return;
+        if (h == null || h.getPosition() == null) return;
         if (!checker.hasClash(h.getPosition(), cutoff, parent)) {
             atoms.add(h);
             checker.addAtom(h);
@@ -73,6 +73,7 @@ public final class HydrogenationGeometry {
     }
 
     static Point3D tetrahedralFourthPosition(Atom center, Atom a1, Atom a2, Atom a3, double bondLength) {
+        if (center == null || a1 == null || a2 == null || a3 == null) return null;
         Point3D centerPos = center.getPosition();
         Point3D sum = normalize(a1.getPosition().subtract(centerPos))
                 .add(normalize(a2.getPosition().subtract(centerPos)))
@@ -86,6 +87,7 @@ public final class HydrogenationGeometry {
 
     public static void addMethyl(Atom center, Atom a1, Atom a2, String prefix,
                                  List<Atom> atoms, SpatialClashChecker c, double cutoff) {
+        if (center == null || a1 == null || a2 == null) return;
         double[] dihedrals = {Math.toRadians(60), Math.toRadians(180), Math.toRadians(-60)};
         String[] names = {prefix + "1", prefix + "2", prefix + "3"};
         for (int i = 0; i < 3; i++) {
@@ -98,6 +100,7 @@ public final class HydrogenationGeometry {
 
     public static void addMethylene(Atom center, Atom a1, Atom a2, String prefix,
                                     List<Atom> atoms, SpatialClashChecker c, double cutoff) {
+        if (center == null || a1 == null || a2 == null) return;
         double[] dihedrals = {Math.toRadians(120), Math.toRadians(-120)};
         String[] names = {prefix + "2", prefix + "3"};
         for (int i = 0; i < 2; i++) {
@@ -110,6 +113,7 @@ public final class HydrogenationGeometry {
 
     public static void addPlanarNH2(Atom center, Atom a1, Atom a2, String prefix,
                                     List<Atom> atoms, SpatialClashChecker c, double cutoff) {
+        if (center == null || a1 == null || a2 == null) return;
         double[] dihedrals = {Math.toRadians(0), Math.toRadians(180)};
         String[] names = {prefix + "1", prefix + "2"};
         for (int i = 0; i < 2; i++) {
@@ -127,6 +131,7 @@ public final class HydrogenationGeometry {
 
     public static void addAmmonium(Atom center, Atom a1, Atom a2, String prefix,
                                    List<Atom> atoms, SpatialClashChecker c, double cutoff) {
+        if (center == null || a1 == null || a2 == null) return;
         double[] dihedrals = {Math.toRadians(60), Math.toRadians(180), Math.toRadians(-60)};
         String[] names = {prefix + "1", prefix + "2", prefix + "3"};
         for (int i = 0; i < 3; i++) {
@@ -139,6 +144,7 @@ public final class HydrogenationGeometry {
 
     public static void addSecondaryAmmonium(Atom center, Atom a1, Atom a2, String prefix,
                                             List<Atom> atoms, SpatialClashChecker c, double cutoff) {
+        if (center == null || a1 == null || a2 == null) return;
         double[] dihedrals = {Math.toRadians(120), Math.toRadians(-120)};
         String[] names = {prefix + "1", prefix + "2"};
         for (int i = 0; i < 2; i++) {
@@ -152,6 +158,7 @@ public final class HydrogenationGeometry {
     // -------------------- aromatic geometry --------------------
 
     public static Atom aromaticH(String name, Atom carbon, Atom n1, Atom n2) {
+        if (carbon == null || n1 == null || n2 == null) return null;
         Point3D c = carbon.getPosition();
         Point3D v1 = normalize(sub(n1.getPosition(), c));
         Point3D v2 = normalize(sub(n2.getPosition(), c));

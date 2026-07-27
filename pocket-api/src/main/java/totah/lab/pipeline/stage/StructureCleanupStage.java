@@ -50,6 +50,7 @@ public class StructureCleanupStage implements Stage {
         List<String> removedWaters = new ArrayList<>();
         List<String> removedMetals = new ArrayList<>();
         List<String> keptSpecial = new ArrayList<>();
+        List<Residue> extractedLigands = new ArrayList<>();
 
         for (Residue residue : incoming) {
             String name = normalizeName(residue.getName());
@@ -83,7 +84,7 @@ public class StructureCleanupStage implements Stage {
                 continue;
             }
 
-            throw unsupported(residue, "no cleanup policy exists for residue '" + residue.getName() + "'");
+            extractedLigands.add(residue);
         }
 
         if (kept.isEmpty()) {
@@ -91,6 +92,7 @@ public class StructureCleanupStage implements Stage {
         }
 
         context.put(ContextKeys.PROTEIN_RESIDUES, List.copyOf(kept));
+        context.put(ContextKeys.EXTRACTED_LIGANDS, List.copyOf(extractedLigands));
         context.put(ContextKeys.STRUCTURE_CLEANUP_REPORT,
                 new StructureCleanupReport(incoming.size(), kept.size(), removedWaters, removedMetals, keptSpecial));
     }

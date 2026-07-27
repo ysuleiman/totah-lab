@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,15 +19,15 @@ class PipelineResourcePanelTest {
     private static final List<String> SUPPORTED_RECEPTORS = List.of(
             "1CRN.pdb",
             "1A8O.pdb",
+            "1G9V.pdb",
+            "1GZX.pdb",
+            "2POR.pdb",
             "1UBQ.pdb",
             "Q6UX53_TMT1B_HUMAN.pdb");
 
     private static final List<String> UNSUPPORTED_COMPLEXES = List.of(
             "1A4W.pdb",
-            "1G9V.pdb",
-            "1GZX.pdb",
             "1HVR.pdb",
-            "2POR.pdb",
             "4HVP.pdb");
 
     @TempDir
@@ -63,18 +64,25 @@ class PipelineResourcePanelTest {
             assertTrue(error.getMessage().contains("Unsupported residue")
                             || error.getMessage().contains("not supported")
                             || error.getMessage().contains("No residue template")
-                            || error.getMessage().contains("combined terminal templates"),
+                            || error.getMessage().contains("combined terminal templates")
+                            || error.getMessage().contains("Missing heavy atom")
+                            || error.getMessage().contains("No Amber atom"),
                     pdbName + ": " + error.getMessage());
         }
     }
 
     @Test
-    void tysSupportAllowsOneA4wToAdvanceToNextUnsupportedResidue() throws Exception {
+    void oneA4wExtractsQweLigandBeforeMissingHeavyAtomValidationFails() throws Exception {
         Pipeline pipeline = pipelineFor("1A4W.pdb");
 
         RuntimeException error = assertThrows(RuntimeException.class, pipeline::run);
 
-        assertTrue(error.getMessage().contains("Unsupported residue QWE H:373"), error.getMessage());
+        PipelineContext context = pipeline.getContext();
+        List<?> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertEquals(1, ligands.size());
+        assertTrue(ligands.getFirst().toString().contains("QWE"));
+        assertTrue(error.getMessage().contains("Missing heavy atom"), error.getMessage());
+        assertTrue(!error.getMessage().contains("Unsupported residue QWE H:373"), error.getMessage());
         assertTrue(!error.getMessage().contains("TYS I:363"), error.getMessage());
     }
 
