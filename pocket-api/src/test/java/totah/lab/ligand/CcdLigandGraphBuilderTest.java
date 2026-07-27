@@ -140,7 +140,7 @@ class CcdLigandGraphBuilderTest {
     }
 
     @Test
-    void appendsHydrogenUsingDeterministicLocalCcdFrame() {
+    void appendsHydrogenUsingDeterministicLocalCcdFrame() throws Exception {
         ChemCompAtom center = ccdAtom("C0", "C", 0, "N", "N");
         ChemCompAtom first = ccdAtom("C1", "C", 0, "N", "N");
         ChemCompAtom second = ccdAtom("C2", "C", 0, "N", "N");
@@ -172,6 +172,14 @@ class CcdLigandGraphBuilderTest {
         assertEquals(1.0, generated.z(), 1.0e-10);
         assertEquals(3, result.graph().bonds().getLast().atomIndexB());
         assertEquals(null, result.graph().atomProperties().getLast().depositedAtomIndex());
+
+        Path output = tempDir.resolve("ligand.pdbqt");
+        LigandPreparationResult prepared =
+                new LigandPreparer().prepareToPath(deposited, ccd, output);
+        assertEquals(4, prepared.graph().atoms().size());
+        assertEquals(prepared.pdbqt(), java.nio.file.Files.readString(output));
+        assertTrue(prepared.pdbqt().startsWith("ROOT"));
+        assertTrue(prepared.pdbqt().contains("TORSDOF "));
     }
 
     @Test
@@ -230,6 +238,10 @@ class CcdLigandGraphBuilderTest {
         assertTrue(java.util.stream.IntStream
                 .range(0, typed.graph().atoms().size())
                 .allMatch(torsionTree.tree()::containsAtom));
+        LigandPreparationResult prepared = new LigandPreparer().prepare(qwe, qweCcd);
+        assertEquals(typed.graph().atoms().size(), prepared.graph().atoms().size());
+        assertTrue(prepared.pdbqt().startsWith("ROOT"));
+        assertTrue(prepared.pdbqt().contains("TORSDOF "));
     }
 
     private Residue residue(Atom... atoms) {
