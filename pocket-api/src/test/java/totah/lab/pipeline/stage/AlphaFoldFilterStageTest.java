@@ -5,6 +5,7 @@ import org.junit.jupiter.api.io.TempDir;
 import totah.lab.io.StructureIO;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
+import totah.lab.pipeline.report.AlphaFoldConfidenceReport;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
 import totah.lab.protein.Point3D;

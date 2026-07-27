@@ -1,4 +1,4 @@
-package totah.lab.pipeline.stage;
+package totah.lab.pipeline.residue;
 
 public record ResidueState(
         String residueKey,

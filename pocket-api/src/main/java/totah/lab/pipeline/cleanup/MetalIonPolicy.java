@@ -1,4 +1,4 @@
-package totah.lab.pipeline.stage;
+package totah.lab.pipeline.cleanup;
 
 import totah.lab.protein.Atom;
 import totah.lab.protein.ElementResolver;
@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-final class MetalIonPolicy {
+public final class MetalIonPolicy {
 
     private static final Map<String, IonParameters> FIXED_IONS = Map.of(
             "ZN", new IonParameters("Zn", 2.0, "Zn"),
@@ -27,14 +27,14 @@ final class MetalIonPolicy {
             "NI", "nickel oxidation state is ambiguous"
     );
 
-    Optional<IonParameters> fixedIon(Residue residue) {
+    public Optional<IonParameters> fixedIon(Residue residue) {
         if (!isMonoatomicIon(residue)) {
             return Optional.empty();
         }
         return Optional.ofNullable(FIXED_IONS.get(elementKey(residue)));
     }
 
-    boolean isKnownIonResidue(Residue residue) {
+    public boolean isKnownIonResidue(Residue residue) {
         if (!isMonoatomicIon(residue)) {
             return false;
         }
@@ -42,7 +42,7 @@ final class MetalIonPolicy {
         return FIXED_IONS.containsKey(key) || AMBIGUOUS_IONS.containsKey(key);
     }
 
-    String requireFixedChargeFailureMessage(Residue residue) {
+    public String requireFixedChargeFailureMessage(Residue residue) {
         String key = elementKey(residue);
         String reason = AMBIGUOUS_IONS.get(key);
         if (reason != null) {
@@ -52,7 +52,7 @@ final class MetalIonPolicy {
         return "Unsupported ion '" + key + "' in " + residueLabel(residue);
     }
 
-    String requireAd4Type(IonParameters ion, Residue residue) {
+    public String requireAd4Type(IonParameters ion, Residue residue) {
         if (ion.ad4Type() == null || ion.ad4Type().isBlank()) {
             throw new IllegalArgumentException("No supported AutoDock4 atom type for "
                     + residueLabel(residue) + " (" + ion.elementSymbol()
@@ -77,6 +77,6 @@ final class MetalIonPolicy {
         return residue.getName() + " " + residue.getChain() + ":" + residue.getNumber() + insertion;
     }
 
-    record IonParameters(String elementSymbol, double formalCharge, String ad4Type) {
+    public record IonParameters(String elementSymbol, double formalCharge, String ad4Type) {
     }
 }

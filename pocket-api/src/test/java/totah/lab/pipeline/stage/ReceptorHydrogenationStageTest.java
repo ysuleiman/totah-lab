@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
+import totah.lab.pipeline.report.HydrogenationReport;
+import totah.lab.pipeline.residue.ResidueState;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
 import totah.lab.protein.Point3D;

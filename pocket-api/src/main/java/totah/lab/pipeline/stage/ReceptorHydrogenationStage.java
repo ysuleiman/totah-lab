@@ -3,6 +3,8 @@ package totah.lab.pipeline.stage;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.pipeline.Stage;
+import totah.lab.pipeline.report.HydrogenationReport;
+import totah.lab.pipeline.residue.ResidueState;
 import totah.lab.protein.Residue;
 import totah.lab.protein.hydrogenation.DisulfideDetector;
 import totah.lab.protein.hydrogenation.ProtonationConfig;

@@ -3,6 +3,8 @@ package totah.lab.pipeline.stage;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.pipeline.Stage;
+import totah.lab.pipeline.report.HydrogenOptimizationReport;
+import totah.lab.pipeline.residue.ResidueState;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Residue;
 import totah.lab.topology.AmberParameterSet;

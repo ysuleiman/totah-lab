@@ -1,4 +1,4 @@
-package totah.lab.pipeline.stage;
+package totah.lab.pipeline.report;
 
 public record PdbqtExportReport(
         int residueCount,

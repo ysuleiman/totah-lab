@@ -6,6 +6,7 @@ import totah.lab.docking.torsion.TorsionTree;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.pipeline.Stage;
+import totah.lab.pipeline.report.PdbqtExportReport;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Topology;
