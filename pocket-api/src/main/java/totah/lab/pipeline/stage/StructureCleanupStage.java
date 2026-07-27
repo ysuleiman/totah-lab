@@ -31,6 +31,7 @@ public class StructureCleanupStage implements Stage {
             "Y", "ZR", "NB", "MO", "TC", "RU", "RH", "PD", "AG", "CD",
             "LU", "HF", "TA", "W", "RE", "OS", "IR", "PT", "AU", "HG",
             "AL", "GA", "IN", "SN", "TL", "PB", "BI");
+    private final MetalIonPolicy metalIonPolicy = new MetalIonPolicy();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -66,7 +67,7 @@ public class StructureCleanupStage implements Stage {
                 throw unsupported(residue, "water retention is not supported for docking prep");
             }
 
-            if (isMonoatomicMetal(residue)) {
+            if (isMonoatomicMetalOrKnownIon(residue)) {
                 if (keepMetals) {
                     kept.add(residue);
                     keptSpecial.add(residueLabel(residue));
@@ -98,11 +99,12 @@ public class StructureCleanupStage implements Stage {
         return new IllegalArgumentException("Unsupported residue " + residueLabel(residue) + ": " + reason);
     }
 
-    private boolean isMonoatomicMetal(Residue residue) {
+    private boolean isMonoatomicMetalOrKnownIon(Residue residue) {
         if (residue.getAtoms().size() != 1) return false;
         Atom atom = residue.getAtoms().getFirst();
         if (atom.getElement() == null || atom.getElement().getSymbol() == null) return false;
-        return METAL_ELEMENTS.contains(atom.getElement().getSymbol().toUpperCase(Locale.ROOT));
+        return METAL_ELEMENTS.contains(atom.getElement().getSymbol().toUpperCase(Locale.ROOT))
+                || metalIonPolicy.isKnownIonResidue(residue);
     }
 
     private Set<String> allowedSpecialResidues(Object configured) {

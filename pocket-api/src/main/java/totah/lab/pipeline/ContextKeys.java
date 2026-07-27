@@ -12,6 +12,8 @@ public class ContextKeys {
     public static final String LIGAND_PATH = "ligand_path";
     public static final String LIGAND_PDBQT = "ligand_pdbqt";
     public static final String GRID_BOX = "grid_box";
+    public static final String POCKET = "pocket";
+    public static final String POCKET_PROXIMITY_CUTOFF = "pocketProximityCutoff";
     public static final String DOCKING_RESULTS = "docking_results";
     public static final String PLDDT_CUTOFF = "plddtCutoff";
     public static final String ALPHAFOLD_CONFIDENCE_REPORT = "alphafold_confidence_report";
@@ -34,6 +36,7 @@ public class ContextKeys {
     public static final String HYDROGENATION_REPORT = "hydrogenation_report";
     public static final String HYDROGEN_OPTIMIZATION_REPORT = "hydrogen_optimization_report";
     public static final String TOPOLOGY_BUILD_REPORT = "topology_build_report";
+    public static final String MISSING_HEAVY_ATOM_REPORT = "missing_heavy_atom_report";
     public static final String CHARGE_ASSIGNMENT_REPORT = "charge_assignment_report";
     public static final String AD4_ATOM_TYPING_REPORT = "ad4_atom_typing_report";
     public static final String PDBQT_EXPORT_REPORT = "pdbqt_export_report";

@@ -67,6 +67,37 @@ class AD4AtomTypingStageTest {
     }
 
     @Test
+    void rejectsTopologyAtomCountMismatch() {
+        PipelineContext context = contextWith(List.of(alanineWithHydrogens(1)),
+                new Topology(6, List.of(edge(0, 1))));
+        context.put(ContextKeys.CHARGE_ASSIGNMENT_REPORT, chargeReport(1, 7));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:1", "ALA", "NALA")));
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new AD4AtomTypingStage().run(context));
+
+        assertTrue(error.getMessage().contains("Topology atom count"));
+    }
+
+    @Test
+    void rejectsNonFiniteCharge() {
+        Residue residue = residue("ALA", 1,
+                atom("N", "N", "N", 0.0, 0.0, 0.0).toBuilder()
+                        .charge(Double.NaN)
+                        .build());
+        PipelineContext context = contextWith(List.of(residue), new Topology(1, List.of()));
+        context.put(ContextKeys.CHARGE_ASSIGNMENT_REPORT, chargeReport(1, 1));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:1", "ALA", "NALA")));
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new AD4AtomTypingStage().run(context));
+
+        assertTrue(error.getMessage().contains("Non-finite charge"));
+    }
+
+    @Test
     void assignsHydrogenTypeFromTopologyParentNotDistance() {
         Residue residue = residue("ALA", 1,
                 atom("C1", "C", "CT", 0.0, 0.0, 0.0),

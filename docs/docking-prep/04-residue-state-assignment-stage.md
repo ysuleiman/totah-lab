@@ -23,7 +23,9 @@ atom order stable.
 - Rejects `hisProtonationState=AUTO`; there is no external pKa/H-bond solver in
   this pipeline stage.
 - Applies per-residue overrides from
-  `ContextKeys.RESIDUE_PROTONATION_OVERRIDES` using keys like `A:123=HIE`.
+  `ContextKeys.RESIDUE_PROTONATION_OVERRIDES` using keys like `A:123=HIE`;
+  insertion-coded residues append the insertion code, for example
+  `A:123A=HIE`.
 - Uses simple pH heuristics for internal `ASP/ASH`, `GLU/GLH`, `CYS/CYM`, and
   `LYS/LYN` states.
 - Fails when a pH-driven or overridden terminal state has no bundled Amber
@@ -56,6 +58,8 @@ from curated structure knowledge or an external protonation workflow.
 - Preservation of unchanged residue object identity and residue order.
 - Explicit global histidine state.
 - Per-residue overrides from map and comma-separated string forms.
+- Insertion-code-safe residue-state keys and overrides.
+- Rejection of malformed override entries.
 - Rejection of incompatible overrides.
 - Rejection of unsupported `AUTO` histidine state.
 - `MSE -> MET` conversion with `SE -> SD` and sulfur element assignment.

@@ -14,7 +14,12 @@ receptor to PDBQT for rigid-only docking or Meeko-style flexible-residue docking
   `ContextKeys.OUTPUT_PDBQT_PATH`.
 - Without `ContextKeys.FLEX_RESIDUES`, writes every prepared atom to the rigid
   receptor file and writes no flex file.
+- Rigid receptor export keeps explicit prepared hydrogens, including nonpolar
+  carbon-bound hydrogens typed as `H`; this pipeline does not merge nonpolar
+  receptor hydrogens into parent carbons.
 - With `ContextKeys.FLEX_RESIDUES`, requires `ContextKeys.PROTEIN_TOPOLOGY`.
+- Flex residue entries use `chain:number`, for example `A:123`; insertion-coded
+  residues append the insertion code, for example `A:123A`.
 - In flex mode, keeps flex-residue backbone atoms in the rigid receptor and
   writes side-chain torsion trees to `prepared_flex.pdbqt`.
 - Publishes flex output path to `ContextKeys.FLEX_PDBQT` and
@@ -36,13 +41,22 @@ The exporter fails if AD4 types or charges are missing because PDBQT output with
 fallback element types or invalid charge fields would be silently wrong for
 docking.
 
+Hydrogen retention is an explicit project policy. Some PDBQT workflows use a
+unified-atom receptor representation and omit nonpolar hydrogens, but this
+pipeline serializes the prepared receptor it was given. Stage 9 decides whether
+a hydrogen is nonpolar `H` or donor `HD`; Stage 10 writes that typed atom rather
+than merging it away.
+
 ## Test Coverage
 
 `PdbqtExporterStageTest` covers:
 
 - Rigid-only export of every atom.
+- Rigid-only retention of explicit nonpolar hydrogens.
 - Missing AD4 typing report failure.
 - Missing AutoDock4 type failure.
+- Illegal AutoDock4 type failure.
+- Non-finite charge failure.
 - Flex residue root atom selection.
 - Nested chi-branch generation for lysine.
 - Exactly-once flex side-chain atom emission.
@@ -50,4 +64,5 @@ docking.
 - Backbone retention in the rigid receptor.
 - No `TORSDOF` output.
 - Unknown, malformed, and non-standard flex residue rejection.
+- Insertion-code-safe flex residue selection.
 - Export report publication.

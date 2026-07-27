@@ -11,6 +11,8 @@ finished.
   `HydrogenOptimizationStage`.
 - Requires `ContextKeys.RESIDUE_STATES` from `ResidueStateAssignmentStage`.
 - Requires every residue to have a matching residue state.
+- Optionally reads `ContextKeys.POCKET` and
+  `ContextKeys.POCKET_PROXIMITY_CUTOFF`.
 - Uses the assigned Amber template for each residue.
 - Adds intra-residue bonds from Amber template connectivity.
 - Requires every non-hydrogen atom in the assigned Amber template to be present.
@@ -23,6 +25,8 @@ finished.
 - Leaves residues and atoms untouched.
 - Publishes `Topology` to `ContextKeys.PROTEIN_TOPOLOGY`.
 - Publishes `TopologyBuildReport` to `ContextKeys.TOPOLOGY_BUILD_REPORT`.
+- If required heavy atoms are missing, publishes `MissingHeavyAtomReport` to
+  `ContextKeys.MISSING_HEAVY_ATOM_REPORT` before failing.
 
 ## Scientific Boundary
 
@@ -39,6 +43,19 @@ the topology matches the assigned Amber residue template. Missing hydrogens are
 not fatal here because previous stages may omit labile hydrogens for valid
 state, clash, metal, or disulfide reasons.
 
+When a pocket is available, missing-heavy-atom reporting marks whether the
+affected residue is near the pocket. The pocket center comes from
+`PocketGeometry.calculateCenter(pocket)`, which prefers resolved receptor
+heavy-atom coordinates and uses fpocket alpha spheres or stored parser metadata
+only as fallbacks. Because a missing atom has no coordinates, the reported
+distance is from the residue heavy-atom centroid to the pocket center. The
+default proximity cutoff is 8.0 angstroms and can be overridden with
+`ContextKeys.POCKET_PROXIMITY_CUTOFF`.
+
+Pocket proximity is a review priority signal, not a relaxation of the template
+requirement. Missing Amber-template heavy atoms remain fatal everywhere in the
+receptor, including outside the binding pocket.
+
 ## Test Coverage
 
 `TopologyBuilderStageTest` covers:
@@ -49,6 +66,7 @@ state, clash, metal, or disulfide reasons.
 - Amber template intra-residue bonds.
 - Explicit peptide-bond addition.
 - Rejection of missing template heavy atoms.
+- Missing-heavy-atom report publication with pocket proximity.
 - Rejection of out-of-range peptide-bond geometry.
 - Disulfide `SG-SG` bond addition from residue states.
 - Report publication and defensive-copy behavior.

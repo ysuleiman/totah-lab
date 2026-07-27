@@ -104,6 +104,26 @@ public class PdbqtExporterStageTest {
     }
 
     @Test
+    public void rigidOnlyExportRetainsExplicitNonpolarHydrogens() throws Exception {
+        PipelineContext context = baseContext(null);
+        new PdbqtExporterStage().run(context);
+
+        List<String> atomLines = atomLines(Files.readAllLines(
+                tempPath.resolve("prepared_receptor.pdbqt")));
+        Map<String, String> typeByName = new HashMap<>();
+        for (String line : atomLines) {
+            typeByName.put(atomName(line), atomType(line));
+        }
+
+        assertEquals("H", typeByName.get("HA"),
+                "nonpolar alpha hydrogen must stay explicit in receptor PDBQT");
+        assertEquals("H", typeByName.get("HB2"),
+                "nonpolar side-chain hydrogen must stay explicit in receptor PDBQT");
+        assertEquals("H", typeByName.get("HB3"),
+                "nonpolar side-chain hydrogen must stay explicit in receptor PDBQT");
+    }
+
+    @Test
     public void missingAd4TypingReportIsRejected() {
         PipelineContext context = baseContext(null);
         context.remove(ContextKeys.AD4_ATOM_TYPING_REPORT);
@@ -130,6 +150,44 @@ public class PdbqtExporterStageTest {
         Exception e = assertThrows(IllegalStateException.class,
                 () -> new PdbqtExporterStage().run(context));
         assertTrue(e.getMessage().contains("AutoDock4 type"));
+    }
+
+    @Test
+    public void illegalAutoDockTypeIsRejected() {
+        Residue broken = lysine33().toBuilder()
+                .atoms(lysine33().getAtoms().stream()
+                        .map(atom -> atom.getName().equals("N")
+                                ? atom.toBuilder().autoDockType("Xx").build()
+                                : atom)
+                        .toList())
+                .build();
+        List<Residue> residues = List.of(broken, phenylalanine34());
+        PipelineContext context = baseContext(null);
+        context.put(ContextKeys.PROTEIN_RESIDUES, residues);
+        context.put(ContextKeys.PROTEIN_TOPOLOGY, topologyFor(residues));
+
+        Exception e = assertThrows(IllegalStateException.class,
+                () -> new PdbqtExporterStage().run(context));
+        assertTrue(e.getMessage().contains("AutoDock4 type"));
+    }
+
+    @Test
+    public void nonFiniteChargeIsRejected() {
+        Residue broken = lysine33().toBuilder()
+                .atoms(lysine33().getAtoms().stream()
+                        .map(atom -> atom.getName().equals("N")
+                                ? atom.toBuilder().charge(Double.POSITIVE_INFINITY).build()
+                                : atom)
+                        .toList())
+                .build();
+        List<Residue> residues = List.of(broken, phenylalanine34());
+        PipelineContext context = baseContext(null);
+        context.put(ContextKeys.PROTEIN_RESIDUES, residues);
+        context.put(ContextKeys.PROTEIN_TOPOLOGY, topologyFor(residues));
+
+        Exception e = assertThrows(IllegalStateException.class,
+                () -> new PdbqtExporterStage().run(context));
+        assertTrue(e.getMessage().contains("Non-finite charge"));
     }
 
     @Test
@@ -405,6 +463,11 @@ public class PdbqtExporterStageTest {
 
     private String atomName(String atomLine) {
         return atomLine.trim().split("\\s+")[2];
+    }
+
+    private String atomType(String atomLine) {
+        String[] fields = atomLine.trim().split("\\s+");
+        return fields[fields.length - 1];
     }
 
     /** Parent/child serial pairs of all lines starting with the given keyword. */

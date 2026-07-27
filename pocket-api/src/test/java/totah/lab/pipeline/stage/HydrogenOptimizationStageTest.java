@@ -127,6 +127,38 @@ class HydrogenOptimizationStageTest {
     }
 
     @Test
+    void rejectsInvalidHydrogenClashCutoff() {
+        PipelineContext context = contextWith(List.of(serine(1), aspartateAcceptor(2)));
+        context.put(ContextKeys.HYDROGENATION_REPORT, hydrogenationReport(2));
+        context.put(ContextKeys.RESIDUE_STATES, states(
+                state("A:1", "SER"),
+                state("A:2", "CASP")));
+        context.put(ContextKeys.HYDROGEN_CLASH_CUTOFF, "NaN");
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new HydrogenOptimizationStage().run(context));
+
+        assertTrue(error.getMessage().contains(ContextKeys.HYDROGEN_CLASH_CUTOFF));
+    }
+
+    @Test
+    void failsWhenConfiguredAmberParametersCannotLoad() {
+        PipelineContext context = contextWith(List.of(serine(1), aspartateAcceptor(2)));
+        context.put(ContextKeys.HYDROGENATION_REPORT, hydrogenationReport(2));
+        context.put(ContextKeys.RESIDUE_STATES, states(
+                state("A:1", "SER"),
+                state("A:2", "CASP")));
+        context.put(ContextKeys.AMBER_PARM_PATH, tempDir.resolve("missing.dat"));
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new HydrogenOptimizationStage().run(context));
+
+        assertTrue(error.getMessage().contains("Amber Lennard-Jones"));
+    }
+
+    @Test
     void reportListsAreDefensiveCopies() throws Exception {
         PipelineContext context = contextWith(List.of(serine(1), aspartateAcceptor(2)));
         context.put(ContextKeys.HYDROGENATION_REPORT, hydrogenationReport(2));

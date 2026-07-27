@@ -2,10 +2,13 @@ package totah.lab.pipeline.stage;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import totah.lab.pocket.PocketSource;
+import totah.lab.pocket.ResidueRef;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
+import totah.lab.protein.Pocket;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Topology;
@@ -113,6 +116,38 @@ class TopologyBuilderStageTest {
                 () -> new TopologyBuilderStage().run(context));
 
         assertTrue(error.getMessage().contains("Missing heavy atom 'NZ'"));
+    }
+
+    @Test
+    void reportsMissingTemplateHeavyAtomNearPocketBeforeFailing() {
+        Residue broken = cLysine(2).toBuilder()
+                .atoms(cLysine(2).getAtoms().stream()
+                        .filter(atom -> !"NZ".equals(atom.getName()))
+                        .toList())
+                .build();
+        PipelineContext context = contextWith(List.of(nAlanine(1), broken));
+        context.put(ContextKeys.HYDROGEN_OPTIMIZATION_REPORT, optimizationReport(2));
+        context.put(ContextKeys.RESIDUE_STATES, states(
+                state("A:1", "ALA", "NALA"),
+                state("A:2", "LYS", "CLYS")));
+        context.put(ContextKeys.POCKET, pocketFor(broken));
+        context.put(ContextKeys.POCKET_PROXIMITY_CUTOFF, 2.0);
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new TopologyBuilderStage().run(context));
+
+        assertTrue(error.getMessage().contains(ContextKeys.MISSING_HEAVY_ATOM_REPORT));
+        MissingHeavyAtomReport report = context.require(ContextKeys.MISSING_HEAVY_ATOM_REPORT);
+        assertEquals(1, report.missingCount());
+        assertTrue(report.pocketCenterAvailable());
+        assertEquals(2.0, report.pocketProximityCutoff(), 1e-9);
+        MissingHeavyAtomReport.Entry entry = report.missingAtoms().getFirst();
+        assertEquals("A:2", entry.residueKey());
+        assertEquals("CLYS", entry.templateName());
+        assertEquals("NZ", entry.atomName());
+        assertEquals(0.0, entry.residueDistanceToPocketCenter(), 1e-9);
+        assertTrue(entry.nearPocket());
     }
 
     @Test
@@ -249,6 +284,14 @@ class TopologyBuilderStageTest {
                 .insertionCode(' ')
                 .atoms(List.of(atoms))
                 .build();
+    }
+
+    private Pocket pocketFor(Residue residue) {
+        return new Pocket(1L, "test-pocket", null, 1.0,
+                List.of(new ResidueRef(residue.getChain(), residue.getNumber(), residue.getName())),
+                PocketSource.builder().source("TEST").build(),
+                Map.of(),
+                ref -> residue);
     }
 
     private Atom atom(String name, String element, double x, double y, double z) {

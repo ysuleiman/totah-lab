@@ -123,6 +123,19 @@ class AlphaFoldFilterStageTest {
     }
 
     @Test
+    void rejectsNanCutoff() {
+        PipelineContext context = contextWith(List.of(residue("CYS", 32,
+                atom("N", "N", 75.0))));
+        context.put(ContextKeys.PLDDT_CUTOFF, "NaN");
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new AlphaFoldFilterStage().run(context));
+
+        assertTrue(error.getMessage().contains("0-100"));
+    }
+
+    @Test
     void rejectsMissingResidues() {
         PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
         context.put(ContextKeys.PLDDT_CUTOFF, 70.0);

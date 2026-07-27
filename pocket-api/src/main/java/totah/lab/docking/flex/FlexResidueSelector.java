@@ -21,17 +21,12 @@ public final class FlexResidueSelector {
                         "flex_residues entry '" + entry + "' must have format \"A:123\"");
             }
             String chain = parts[0].trim();
-            int number;
-            try {
-                number = Integer.parseInt(parts[1].trim());
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(
-                        "flex_residues entry '" + entry + "' has a non-numeric residue number");
-            }
+            ResidueId residueId = parseResidueId(entry, parts[1].trim());
 
             Residue match = null;
             for (Residue residue : residues) {
-                if (chain.equals(residue.getChain()) && number == residue.getNumber()) {
+                if (chain.equals(residue.getChain())
+                        && residueId.matches(residue)) {
                     match = residue;
                     break;
                 }
@@ -48,5 +43,30 @@ public final class FlexResidueSelector {
             result.put(trimmed, match);
         }
         return result;
+    }
+
+    private ResidueId parseResidueId(String entry, String value) {
+        int split = 0;
+        while (split < value.length() && Character.isDigit(value.charAt(split))) {
+            split++;
+        }
+        if (split == 0) {
+            throw new IllegalArgumentException(
+                    "flex_residues entry '" + entry + "' has a non-numeric residue number");
+        }
+        String insertion = value.substring(split).trim();
+        if (insertion.length() > 1) {
+            throw new IllegalArgumentException(
+                    "flex_residues entry '" + entry + "' has an invalid insertion code");
+        }
+        int number = Integer.parseInt(value.substring(0, split));
+        return new ResidueId(number, insertion.isEmpty() ? ' ' : insertion.charAt(0));
+    }
+
+    private record ResidueId(int number, char insertionCode) {
+        boolean matches(Residue residue) {
+            char residueInsertion = residue.getInsertionCode() == null ? ' ' : residue.getInsertionCode();
+            return number == residue.getNumber() && insertionCode == residueInsertion;
+        }
     }
 }

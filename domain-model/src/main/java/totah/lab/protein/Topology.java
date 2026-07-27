@@ -32,6 +32,10 @@ public class Topology {
         return edges.size();
     }
 
+    public int getAtomCount() {
+        return adjacency.size();
+    }
+
     public List<Integer> getNeighbors(int index) {
         if (index < 0 || index >= adjacency.size()) {
             return Collections.emptyList();

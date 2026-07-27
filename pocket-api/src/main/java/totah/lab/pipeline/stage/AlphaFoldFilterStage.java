@@ -31,7 +31,7 @@ public class AlphaFoldFilterStage implements Stage {
             return;
         }
         double plddtCutoff = parseCutoff(cutoffValue);
-        if (plddtCutoff < 0 || plddtCutoff > 100) {
+        if (!Double.isFinite(plddtCutoff) || plddtCutoff < 0 || plddtCutoff > 100) {
             throw new IllegalArgumentException(
                     "plddtCutoff must be 0-100, got: " + plddtCutoff);
         }

@@ -210,15 +210,19 @@ public class ResidueStateAssignmentStage implements Stage {
     private boolean isNTerminus(List<Residue> residues, int index) {
         Residue residue = residues.get(index);
         Residue prev = index > 0 ? residues.get(index - 1) : null;
-        return prev == null || !Objects.equals(prev.getChain(), residue.getChain())
-                || residue.getNumber() != prev.getNumber() + 1;
+        return prev == null || !isSequenceAdjacent(prev, residue);
     }
 
     private boolean isCTerminus(List<Residue> residues, int index) {
         Residue residue = residues.get(index);
         Residue next = index < residues.size() - 1 ? residues.get(index + 1) : null;
-        return next == null || !Objects.equals(next.getChain(), residue.getChain())
-                || next.getNumber() != residue.getNumber() + 1;
+        return next == null || !isSequenceAdjacent(residue, next);
+    }
+
+    private boolean isSequenceAdjacent(Residue previous, Residue current) {
+        return Objects.equals(previous.getChain(), current.getChain())
+                && (current.getNumber() == previous.getNumber()
+                || current.getNumber() == previous.getNumber() + 1);
     }
 
     private Map<String, String> protonationOverrides(Object configured) {
@@ -290,7 +294,13 @@ public class ResidueStateAssignmentStage implements Stage {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private String residueLabel(Residue residue) {

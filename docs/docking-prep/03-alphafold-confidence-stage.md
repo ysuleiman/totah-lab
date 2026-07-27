@@ -9,7 +9,7 @@ the B-factor column.
 - No-ops when `ContextKeys.PLDDT_CUTOFF` is absent.
 - Requires `ContextKeys.PROTEIN_RESIDUES` when a cutoff is configured.
 - Accepts numeric cutoff values or numeric strings.
-- Requires cutoff values to be in `[0, 100]`.
+- Requires cutoff values to be finite numbers in `[0, 100]`.
 - Keeps a residue when at least one backbone atom (`N`, `CA`, `C`) has
   `B-factor >= cutoff`.
 - Drops a residue when no backbone atom meets the cutoff.
@@ -38,6 +38,7 @@ complete enough for docking.
 - Preservation of low-confidence side-chain atoms in retained residues.
 - Numeric string cutoff parsing.
 - Non-numeric and out-of-range cutoff failures.
+- Non-finite cutoff failure.
 - Missing and empty input residue handling.
 - Failure when all residues would be removed.
 - Defensive-copy behavior in the report.

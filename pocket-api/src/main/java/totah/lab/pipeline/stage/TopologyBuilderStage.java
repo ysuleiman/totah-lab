@@ -4,11 +4,14 @@ import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.pipeline.Stage;
 import totah.lab.protein.Atom;
+import totah.lab.protein.Pocket;
+import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Topology;
 import totah.lab.topology.AmberResidueTemplateLibrary;
 import totah.lab.topology.BondTemplate;
 import totah.lab.topology.ResidueTemplate;
+import totah.lab.util.PocketGeometry;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,6 +34,7 @@ public class TopologyBuilderStage implements Stage {
     private static final double MAX_PEPTIDE_BOND = 1.55;
     private static final double MIN_DISULFIDE_BOND = 1.75;
     private static final double MAX_DISULFIDE_BOND = 2.35;
+    private static final double DEFAULT_POCKET_PROXIMITY_CUTOFF = 8.0;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -43,17 +47,22 @@ public class TopologyBuilderStage implements Stage {
         context.require(ContextKeys.HYDROGEN_OPTIMIZATION_REPORT);
         Map<String, ResidueState> states = (Map<String, ResidueState>) context.require(ContextKeys.RESIDUE_STATES);
 
-        BuildResult result = buildTopology(residues, states, AmberResidueTemplateLibrary.getInstance());
+        MissingHeavyAtomContext missingHeavyAtomContext = missingHeavyAtomContext(context);
+        BuildResult result = buildTopology(residues, states, AmberResidueTemplateLibrary.getInstance(),
+                context, missingHeavyAtomContext);
         context.put(ContextKeys.PROTEIN_TOPOLOGY, result.topology());
         context.put(ContextKeys.TOPOLOGY_BUILD_REPORT, result.report());
     }
 
     private BuildResult buildTopology(List<Residue> residues,
                                       Map<String, ResidueState> states,
-                                      AmberResidueTemplateLibrary amber) {
+                                      AmberResidueTemplateLibrary amber,
+                                      PipelineContext context,
+                                      MissingHeavyAtomContext missingHeavyAtomContext) {
         List<Atom> allAtoms = new ArrayList<>();
         List<ResidueAtoms> residueAtoms = new ArrayList<>();
         List<String> assignedTemplates = new ArrayList<>();
+        List<MissingHeavyAtomReport.Entry> missingHeavyAtoms = new ArrayList<>();
         int atomOffset = 0;
         int templateBondCount = 0;
 
@@ -70,7 +79,8 @@ public class TopologyBuilderStage implements Stage {
             }
 
             Map<String, Integer> atomIndices = indexAtoms(residue, atomOffset);
-            validateHeavyAtomsPresent(residue, template, state.amberTemplateName(), atomIndices);
+            missingHeavyAtoms.addAll(missingHeavyAtoms(residue, template, state.amberTemplateName(),
+                    atomIndices, missingHeavyAtomContext));
             for (BondTemplate bond : template.getBonds()) {
                 Integer i = atomIndices.get(bond.getAtom1());
                 Integer j = atomIndices.get(bond.getAtom2());
@@ -83,6 +93,22 @@ public class TopologyBuilderStage implements Stage {
             residueAtoms.add(new ResidueAtoms(residue, atomIndices));
             assignedTemplates.add(residueKey(residue) + " -> " + state.amberTemplateName());
             atomOffset += residue.getAtoms().size();
+        }
+
+        if (!missingHeavyAtoms.isEmpty()) {
+            MissingHeavyAtomReport report = new MissingHeavyAtomReport(
+                    missingHeavyAtoms.size(),
+                    missingHeavyAtomContext.pocketCenter() != null,
+                    missingHeavyAtomContext.proximityCutoff(),
+                    missingHeavyAtoms);
+            context.put(ContextKeys.MISSING_HEAVY_ATOM_REPORT, report);
+            MissingHeavyAtomReport.Entry first = missingHeavyAtoms.getFirst();
+            throw new IllegalStateException("Missing heavy atom '" + first.atomName()
+                    + "' required by Amber template '" + first.templateName()
+                    + "' for " + first.residueLabel()
+                    + "; " + missingHeavyAtoms.size()
+                    + " missing heavy atom(s) recorded in "
+                    + ContextKeys.MISSING_HEAVY_ATOM_REPORT);
         }
 
         int peptideBondCount = addPeptideBonds(residueAtoms, edgeKeys);
@@ -118,16 +144,71 @@ public class TopologyBuilderStage implements Stage {
         return atomIndices;
     }
 
-    private void validateHeavyAtomsPresent(Residue residue, ResidueTemplate template,
-                                           String templateName, Map<String, Integer> atomIndices) {
+    private List<MissingHeavyAtomReport.Entry> missingHeavyAtoms(Residue residue, ResidueTemplate template,
+                                                                 String templateName,
+                                                                 Map<String, Integer> atomIndices,
+                                                                 MissingHeavyAtomContext context) {
+        List<MissingHeavyAtomReport.Entry> missing = new ArrayList<>();
+        Double distanceToPocketCenter = residueDistanceToPocketCenter(residue, context.pocketCenter());
+        boolean nearPocket = distanceToPocketCenter != null
+                && distanceToPocketCenter <= context.proximityCutoff();
         for (var atomTemplate : template.getAtoms()) {
             String atomName = atomTemplate.getName();
             if (isHydrogenName(atomName)) continue;
             if (!atomIndices.containsKey(atomName)) {
-                throw new IllegalStateException("Missing heavy atom '" + atomName + "' required by Amber template '"
-                        + templateName + "' for " + residueLabel(residue));
+                missing.add(new MissingHeavyAtomReport.Entry(
+                        residueKey(residue),
+                        residueLabel(residue),
+                        templateName,
+                        atomName,
+                        distanceToPocketCenter,
+                        nearPocket));
             }
         }
+        return missing;
+    }
+
+    private MissingHeavyAtomContext missingHeavyAtomContext(PipelineContext context) {
+        Point3D pocketCenter = null;
+        Object pocketValue = context.get(ContextKeys.POCKET);
+        if (pocketValue instanceof Pocket pocket) {
+            try {
+                pocketCenter = PocketGeometry.calculateCenter(pocket);
+            } catch (IllegalArgumentException ignored) {
+                pocketCenter = null;
+            }
+        }
+        double cutoff = parseDouble(context.get(ContextKeys.POCKET_PROXIMITY_CUTOFF),
+                DEFAULT_POCKET_PROXIMITY_CUTOFF);
+        return new MissingHeavyAtomContext(pocketCenter, cutoff);
+    }
+
+    private Double residueDistanceToPocketCenter(Residue residue, Point3D pocketCenter) {
+        if (pocketCenter == null) {
+            return null;
+        }
+        Point3D center = residueHeavyAtomCenter(residue);
+        return center == null ? null : distance(center, pocketCenter);
+    }
+
+    private Point3D residueHeavyAtomCenter(Residue residue) {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        int count = 0;
+        for (Atom atom : residue.getAtoms()) {
+            if (isHydrogenName(atom.getName())) continue;
+            Point3D position = atom.getPosition();
+            if (position == null) continue;
+            x += position.x();
+            y += position.y();
+            z += position.z();
+            count++;
+        }
+        if (count == 0) {
+            return null;
+        }
+        return new Point3D(x / count, y / count, z / count);
     }
 
     private int addPeptideBonds(List<ResidueAtoms> residues, Set<EdgeKey> edges) {
@@ -193,7 +274,8 @@ public class TopologyBuilderStage implements Stage {
 
     private boolean isConsecutive(Residue previous, Residue current) {
         return Objects.equals(previous.getChain(), current.getChain())
-                && current.getNumber() == previous.getNumber() + 1;
+                && (current.getNumber() == previous.getNumber()
+                || current.getNumber() == previous.getNumber() + 1);
     }
 
     private boolean isHydrogenName(String atomName) {
@@ -201,7 +283,13 @@ public class TopologyBuilderStage implements Stage {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private String residueLabel(Residue residue) {
@@ -212,13 +300,26 @@ public class TopologyBuilderStage implements Stage {
     }
 
     private double distance(Atom a, Atom b) {
-        double dx = a.getPosition().x() - b.getPosition().x();
-        double dy = a.getPosition().y() - b.getPosition().y();
-        double dz = a.getPosition().z() - b.getPosition().z();
+        return distance(a.getPosition(), b.getPosition());
+    }
+
+    private double distance(Point3D a, Point3D b) {
+        double dx = a.x() - b.x();
+        double dy = a.y() - b.y();
+        double dz = a.z() - b.z();
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    private double parseDouble(Object value, double defaultValue) {
+        if (value == null) return defaultValue;
+        if (value instanceof Number n) return n.doubleValue();
+        return Double.parseDouble(value.toString());
+    }
+
     private record ResidueAtoms(Residue residue, Map<String, Integer> atomIndices) {
+    }
+
+    private record MissingHeavyAtomContext(Point3D pocketCenter, double proximityCutoff) {
     }
 
     private record EdgeKey(int indexA, int indexB) {

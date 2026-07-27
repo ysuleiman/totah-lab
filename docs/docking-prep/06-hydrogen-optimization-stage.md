@@ -16,6 +16,9 @@ geometry while preserving the chemistry chosen by earlier stages.
 - Uses bundled Amber Lennard-Jones parameters by default.
 - Uses `ContextKeys.AMBER_PARM_PATH` when provided as a `Path` or classpath
   resource string.
+- Fails if Amber Lennard-Jones parameters cannot be loaded.
+- Accepts only finite non-negative `ContextKeys.HYDROGEN_CLASH_CUTOFF`
+  values.
 - Preserves heavy-atom identity and heavy-atom order for every residue.
 - Preserves hydrogen count and hydrogen atom names for every residue.
 - Fails if optimization would add, remove, or rename hydrogens.
@@ -50,6 +53,8 @@ decisions.
 - Fixed histidine template preservation even when the environment favors a
   different tautomer.
 - Failure when optimization would change hydrogen identities.
+- Failure on invalid hydrogen clash cutoff.
+- Failure when configured Amber Lennard-Jones parameters cannot be loaded.
 
 `HydrogenOptimizerTest` remains the low-level topology test suite and covers:
 

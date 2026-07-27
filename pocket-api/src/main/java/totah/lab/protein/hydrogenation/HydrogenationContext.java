@@ -85,7 +85,13 @@ public final class HydrogenationContext {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private boolean usesTerminalTemplate(Residue residue, char prefix) {

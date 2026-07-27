@@ -94,6 +94,19 @@ class StructureCleanupStageTest {
     }
 
     @Test
+    void removesKnownMonoatomicIonsByDefault() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("CL", 702, atom("CL", "Cl")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("CL A:702"), report.removedMetals());
+    }
+
+    @Test
     void keepsMonoatomicMetalsWhenConfigured() {
         PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
                 residue("ZN", 701, atom("ZN", "Zn")));
@@ -106,6 +119,21 @@ class StructureCleanupStageTest {
         StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
         assertTrue(report.removedMetals().isEmpty());
         assertEquals(List.of("ZN A:701"), report.keptSpecialResidues());
+    }
+
+    @Test
+    void keepsKnownMonoatomicIonsWhenConfigured() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("CL", 702, atom("CL", "Cl")));
+        context.put(ContextKeys.KEEP_METALS, true);
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "CL"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertTrue(report.removedMetals().isEmpty());
+        assertEquals(List.of("CL A:702"), report.keptSpecialResidues());
     }
 
     @Test

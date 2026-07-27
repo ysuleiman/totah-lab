@@ -95,6 +95,38 @@ class ResidueStateAssignmentStageTest {
     }
 
     @Test
+    void preservesInsertionCodesInResidueStateKeysAndOverrides() {
+        PipelineContext context = contextWith(List.of(
+                residue("ALA", 10, ' ', atom("N", "N")),
+                residue("HIS", 10, 'A', atom("ND1", "N"), atom("NE2", "N")),
+                residue("GLY", 11, ' ', atom("N", "N"))));
+        context.put(ContextKeys.RESIDUE_PROTONATION_OVERRIDES, "A:10A=HIP");
+
+        new ResidueStateAssignmentStage().run(context);
+
+        Map<String, ResidueState> states = context.require(ContextKeys.RESIDUE_STATES);
+        assertEquals(3, states.size());
+        assertState(states.get("A:10"), "NALA", true, false, false);
+        assertState(states.get("A:10A"), "HIP", false, false, false);
+        assertState(states.get("A:11"), "CGLY", false, true, false);
+    }
+
+    @Test
+    void rejectsMalformedOverride() {
+        PipelineContext context = contextWith(List.of(
+                residue("ALA", 1, atom("N", "N")),
+                residue("HIS", 2, atom("ND1", "N")),
+                residue("GLY", 3, atom("N", "N"))));
+        context.put(ContextKeys.RESIDUE_PROTONATION_OVERRIDES, "A:2:HIE");
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new ResidueStateAssignmentStage().run(context));
+
+        assertTrue(error.getMessage().contains("A:123=HIE"));
+    }
+
+    @Test
     void rejectsIncompatibleOverride() {
         PipelineContext context = contextWith(List.of(
                 residue("ALA", 1, atom("N", "N")),
@@ -250,11 +282,15 @@ class ResidueStateAssignmentStageTest {
     }
 
     private Residue residue(String name, int number, Atom... atoms) {
+        return residue(name, number, ' ', atoms);
+    }
+
+    private Residue residue(String name, int number, char insertionCode, Atom... atoms) {
         return Residue.builder()
                 .name(name)
                 .chain("A")
                 .number(number)
-                .insertionCode(' ')
+                .insertionCode(insertionCode)
                 .atoms(List.of(atoms))
                 .build();
     }

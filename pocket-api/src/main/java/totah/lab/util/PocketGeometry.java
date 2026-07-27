@@ -12,6 +12,33 @@ public class PocketGeometry {
     private PocketGeometry(){}
 
     /**
+     * Computes the canonical docking-prep center for a bound protein pocket.
+     * P2Rank-style pockets use resolved receptor residue heavy atoms. fpocket
+     * can fall back to alpha spheres when residue refs are unavailable. Stored
+     * parser centers are last-resort metadata, not the primary science policy.
+     */
+    public static Point3D calculateCenter(Pocket pocket) {
+        Objects.requireNonNull(pocket, "Pocket cannot be null");
+
+        Point3D residueCenter = calculateResolvedResidueHeavyAtomCenter(pocket);
+        if (residueCenter != null) {
+            return residueCenter;
+        }
+
+        Point3D sphereCenter = calculateAlphaSphereCenter(pocket);
+        if (sphereCenter != null) {
+            return sphereCenter;
+        }
+
+        if (pocket.getCenter() != null) {
+            return pocket.getCenter();
+        }
+
+        throw new IllegalArgumentException("Cannot calculate pocket center for " + pocket.getName()
+                + ": no resolved residue atoms, fpocket alpha spheres, or stored parser center are available.");
+    }
+
+    /**
      * Calculates the bounding box size dimensions of a given pocket based on its
      * underlying atom positions. Automatically includes a standard padding buffer.
      */
@@ -48,6 +75,67 @@ public class PocketGeometry {
         double sizeZ = (maxZ - minZ) + 4.0;
 
         return new Dimensions(sizeX, sizeY, sizeZ);
+    }
+
+    private static Point3D calculateResolvedResidueHeavyAtomCenter(Pocket pocket) {
+        List<Residue> resolvedResidues;
+        try {
+            resolvedResidues = pocket.getResidues();
+        } catch (IllegalStateException e) {
+            return null;
+        }
+
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        int count = 0;
+        for (Residue residue : resolvedResidues) {
+            if (residue.getAtoms() == null) continue;
+            for (Atom atom : residue.getAtoms()) {
+                Point3D pos = atom.getPosition();
+                if (pos == null || isHydrogen(atom)) continue;
+                x += pos.x();
+                y += pos.y();
+                z += pos.z();
+                count++;
+            }
+        }
+        if (count == 0) {
+            return null;
+        }
+        return new Point3D(x / count, y / count, z / count);
+    }
+
+    private static Point3D calculateAlphaSphereCenter(Pocket pocket) {
+        Object value = pocket.getAttributes().get("alpha_spheres");
+        if (!(value instanceof List<?> values) || values.isEmpty()) {
+            return null;
+        }
+
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        int count = 0;
+        for (Object valueItem : values) {
+            if (valueItem instanceof Sphere sphere) {
+                x += sphere.x();
+                y += sphere.y();
+                z += sphere.z();
+                count++;
+            }
+        }
+        if (count == 0) {
+            return null;
+        }
+        return new Point3D(x / count, y / count, z / count);
+    }
+
+    private static boolean isHydrogen(Atom atom) {
+        if (atom.getElement() != null && atom.getElement().getSymbol() != null) {
+            return "H".equalsIgnoreCase(atom.getElement().getSymbol());
+        }
+        String name = atom.getName();
+        return name != null && name.trim().startsWith("H");
     }
 
     /**

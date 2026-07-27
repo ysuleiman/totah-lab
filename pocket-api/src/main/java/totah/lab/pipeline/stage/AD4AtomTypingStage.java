@@ -21,6 +21,8 @@ import java.util.Objects;
  */
 public class AD4AtomTypingStage implements Stage {
 
+    private final MetalIonPolicy metalIonPolicy = new MetalIonPolicy();
+
     @Override
     @SuppressWarnings("unchecked")
     public void run(PipelineContext context) {
@@ -34,6 +36,7 @@ public class AD4AtomTypingStage implements Stage {
         Map<String, ResidueState> states = (Map<String, ResidueState>) context.require(ContextKeys.RESIDUE_STATES);
 
         List<FlatAtom> flatAtoms = flatten(residues);
+        validateTopologyAtomCount(topology, flatAtoms.size());
         validateChargedAndAmberTyped(flatAtoms);
 
         List<Residue> typedResidues = new ArrayList<>();
@@ -41,7 +44,7 @@ public class AD4AtomTypingStage implements Stage {
         int flatIndex = 0;
         for (Residue residue : residues) {
             ResidueState state = states.get(residueKey(residue));
-            if (state == null) {
+            if (state == null && !metalIonPolicy.isKnownIonResidue(residue)) {
                 throw new IllegalStateException("Missing residue state for " + residueLabel(residue));
             }
             List<Atom> typedAtoms = new ArrayList<>();
@@ -76,6 +79,9 @@ public class AD4AtomTypingStage implements Stage {
                 throw new IllegalStateException("Non-finite charge on " + atom.getName()
                         + " in " + residueLabel(flatAtom.residue()));
             }
+            if (metalIonPolicy.isKnownIonResidue(flatAtom.residue())) {
+                continue;
+            }
             if (atom.getAmberType() == null || atom.getAmberType().isBlank()) {
                 throw new IllegalStateException("Missing Amber atom type on " + atom.getName()
                         + " in " + residueLabel(flatAtom.residue()));
@@ -83,8 +89,24 @@ public class AD4AtomTypingStage implements Stage {
         }
     }
 
+    private void validateTopologyAtomCount(Topology topology, int atomCount) {
+        if (topology.getAtomCount() != atomCount) {
+            throw new IllegalStateException("Topology atom count " + topology.getAtomCount()
+                    + " does not match receptor atom count " + atomCount);
+        }
+    }
+
     private String assignType(Atom atom, int flatIndex, Residue residue, ResidueState state,
                               Topology topology, List<FlatAtom> flatAtoms) {
+        var ion = metalIonPolicy.fixedIon(residue);
+        if (ion.isPresent()) {
+            String type = metalIonPolicy.requireAd4Type(ion.get(), residue);
+            assertLegalType(type);
+            return type;
+        }
+        if (metalIonPolicy.isKnownIonResidue(residue)) {
+            throw new IllegalStateException(metalIonPolicy.requireFixedChargeFailureMessage(residue));
+        }
         String element = ElementResolver.resolveSymbol(atom, residue).toUpperCase(Locale.ROOT);
         String type = switch (element) {
             case "H" -> assignHydrogenType(flatIndex, topology, flatAtoms);
@@ -203,7 +225,13 @@ public class AD4AtomTypingStage implements Stage {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private String residueLabel(Residue residue) {

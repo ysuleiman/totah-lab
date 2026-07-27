@@ -64,7 +64,7 @@ public final class StructureIO {
 
         List<Atom> atoms = new ArrayList<>(group.getAtoms().size());
 
-        for (org.biojava.nbio.structure.Atom bioAtom : group.getAtoms()) {
+        for (org.biojava.nbio.structure.Atom bioAtom : representativeAtoms(group)) {
             org.biojava.nbio.structure.Element bioElement = bioAtom.getElement();
             bioAtom.getPDBserial();
             atoms.add(
@@ -90,5 +90,62 @@ public final class StructureIO {
         }
 
         return atoms;
+    }
+
+    private static List<org.biojava.nbio.structure.Atom> representativeAtoms(Group group) {
+        Map<String, AtomCandidate> candidates = new LinkedHashMap<>();
+        int order = 0;
+        order = collectCandidates(candidates, group.getAtoms(), order);
+        if (group.hasAltLoc()) {
+            for (Group altLocGroup : group.getAltLocs()) {
+                order = collectCandidates(candidates, altLocGroup.getAtoms(), order);
+            }
+        }
+        return candidates.values().stream()
+                .sorted(Comparator.comparingInt(AtomCandidate::order))
+                .map(AtomCandidate::atom)
+                .toList();
+    }
+
+    private static int collectCandidates(Map<String, AtomCandidate> candidates,
+                                         List<org.biojava.nbio.structure.Atom> atoms,
+                                         int order) {
+        if (atoms == null) {
+            return order;
+        }
+        for (org.biojava.nbio.structure.Atom atom : atoms) {
+            String atomName = atom.getName() == null ? "" : atom.getName().trim();
+            AtomCandidate candidate = new AtomCandidate(atom, order++);
+            AtomCandidate previous = candidates.get(atomName);
+            if (previous == null || isBetterAltLoc(candidate.atom(), previous.atom())) {
+                candidates.put(atomName, previous == null
+                        ? candidate
+                        : new AtomCandidate(candidate.atom(), previous.order()));
+            }
+        }
+        return order;
+    }
+
+    private static boolean isBetterAltLoc(org.biojava.nbio.structure.Atom candidate,
+                                          org.biojava.nbio.structure.Atom current) {
+        int occupancy = Float.compare(candidate.getOccupancy(), current.getOccupancy());
+        if (occupancy != 0) {
+            return occupancy > 0;
+        }
+        int altLocRank = Integer.compare(altLocRank(candidate.getAltLoc()), altLocRank(current.getAltLoc()));
+        return altLocRank > 0;
+    }
+
+    private static int altLocRank(Character altLoc) {
+        if (altLoc != null && Character.toUpperCase(altLoc) == 'A') {
+            return 2;
+        }
+        if (altLoc == null || altLoc == ' ' || altLoc == '\0') {
+            return 1;
+        }
+        return 0;
+    }
+
+    private record AtomCandidate(org.biojava.nbio.structure.Atom atom, int order) {
     }
 }

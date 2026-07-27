@@ -10,8 +10,9 @@ stage runs.
 - Keeps the 20 standard amino-acid residue names.
 - Removes waters by default: `HOH`, `WAT`, `DOD`, `H2O`.
 - Keeps known modified amino-acid placeholders by default: currently `MSE`.
-- Removes monoatomic metals by default.
-- Keeps monoatomic metals only when `ContextKeys.KEEP_METALS` is true.
+- Removes monoatomic metals and known monoatomic ions by default.
+- Keeps monoatomic metals and known monoatomic ions only when
+  `ContextKeys.KEEP_METALS` is true.
 - Keeps additional configured special residues from
   `ContextKeys.ALLOWED_SPECIAL_RESIDUES`.
 - Fails on unsupported residues instead of guessing chemistry.
@@ -26,8 +27,11 @@ may still fail later Amber-template validation.
 
 `MSE` is passed through intentionally because it is a common modified amino-acid
 case and should be handled by a later residue-state/template-normalization stage.
-Unknown ligands, cofactors, glycans, and covalent adducts are rejected unless the
-caller explicitly configures them as allowed special residues.
+Known monoatomic ions use the same coarse keep/remove switch as metals at this
+stage. If retained, later stages still decide whether a fixed charge and
+AutoDock4 atom type exist. Unknown ligands, cofactors, glycans, and covalent
+adducts are rejected unless the caller explicitly configures them as allowed
+special residues.
 
 ## Test Coverage
 
@@ -37,8 +41,8 @@ caller explicitly configures them as allowed special residues.
 - Default water removal.
 - Rejection of water retention.
 - Default `MSE` retention for later normalization.
-- Default monoatomic metal removal.
-- Configured monoatomic metal retention.
+- Default monoatomic metal and known-ion removal.
+- Configured monoatomic metal and known-ion retention.
 - Configured special-residue retention by list and comma-separated string.
 - Unknown residue rejection.
 - Failure when cleanup removes every residue.

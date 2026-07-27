@@ -55,7 +55,8 @@ public class HydrogenOptimizationStage implements Stage {
                 ljSet.loadFromResource(AmberParameterSet.DEFAULT_RESOURCE);
             }
         } catch (Exception e) {
-            System.err.println("[HydrogenOptimization] Failed to load LJ parameters: " + e.getMessage());
+            throw new IllegalStateException("Failed to load Amber Lennard-Jones parameters for hydrogen optimization",
+                    e);
         }
 
         double clashCutoff = parseDouble(context, ContextKeys.HYDROGEN_CLASH_CUTOFF, 1.0);
@@ -88,12 +89,20 @@ public class HydrogenOptimizationStage implements Stage {
     private double parseDouble(PipelineContext ctx, String key, double defaultVal) {
         Object val = ctx.get(key);
         if (val == null) return defaultVal;
-        if (val instanceof Number) return ((Number) val).doubleValue();
-        try {
-            return Double.parseDouble(val.toString());
-        } catch (NumberFormatException e) {
-            return defaultVal;
+        double parsed;
+        if (val instanceof Number number) {
+            parsed = number.doubleValue();
+        } else {
+            try {
+                parsed = Double.parseDouble(val.toString());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(key + " must be numeric, got: " + val, e);
+            }
         }
+        if (!Double.isFinite(parsed) || parsed < 0.0) {
+            throw new IllegalArgumentException(key + " must be a finite non-negative number, got: " + parsed);
+        }
+        return parsed;
     }
 
     private void validatePreservedChemistry(Residue input, List<Atom> outputAtoms) {
@@ -152,7 +161,13 @@ public class HydrogenOptimizationStage implements Stage {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private String residueLabel(Residue residue) {

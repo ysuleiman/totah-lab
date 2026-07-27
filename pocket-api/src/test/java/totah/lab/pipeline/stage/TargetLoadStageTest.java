@@ -58,6 +58,53 @@ class TargetLoadStageTest {
     }
 
     @Test
+    void resolvesAlternateLocationsToSingleRepresentativeAtom() throws Exception {
+        Path altLocPdb = tempDir.resolve("altloc.pdb");
+        Files.writeString(altLocPdb, """
+                ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N
+                ATOM      2  CA  ALA A   1       1.450   0.000   0.000  1.00 20.00           C
+                ATOM      3  C   ALA A   1       2.000   1.400   0.000  1.00 20.00           C
+                ATOM      4  O   ALA A   1       1.300   2.300   0.000  1.00 20.00           O
+                ATOM      5  CB AALA A   1       1.600  -0.700   1.100  0.40 20.00           C
+                ATOM      6  CB BALA A   1       1.600  -1.200  -1.000  0.60 20.00           C
+                END
+                """);
+        PipelineContext context = contextWithTarget(altLocPdb);
+
+        new TargetLoadStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        Residue residue = residues.getFirst();
+        assertEquals(List.of("N", "CA", "C", "O", "CB"), atomNames(residue));
+        Atom cb = residue.getAtom("CB");
+        assertEquals(0.60, cb.getOccupancy(), 1e-6);
+        assertEquals(-1.200, cb.getPosition().y(), 1e-6);
+    }
+
+    @Test
+    void resolvesAlternateLocationTieToAltLocA() throws Exception {
+        Path altLocPdb = tempDir.resolve("altloc_tie.pdb");
+        Files.writeString(altLocPdb, """
+                ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00 20.00           N
+                ATOM      2  CA  ALA A   1       1.450   0.000   0.000  1.00 20.00           C
+                ATOM      3  C   ALA A   1       2.000   1.400   0.000  1.00 20.00           C
+                ATOM      4  O   ALA A   1       1.300   2.300   0.000  1.00 20.00           O
+                ATOM      5  CB BALA A   1       1.600  -1.200  -1.000  0.50 20.00           C
+                ATOM      6  CB AALA A   1       1.600  -0.700   1.100  0.50 20.00           C
+                END
+                """);
+        PipelineContext context = contextWithTarget(altLocPdb);
+
+        new TargetLoadStage().run(context);
+
+        Residue residue = context.<List<Residue>>require(ContextKeys.PROTEIN_RESIDUES).getFirst();
+        Atom cb = residue.getAtom("CB");
+        assertEquals(List.of("N", "CA", "C", "O", "CB"), atomNames(residue));
+        assertEquals(-0.700, cb.getPosition().y(), 1e-6);
+        assertEquals(1.100, cb.getPosition().z(), 1e-6);
+    }
+
+    @Test
     void requiresTargetPathInContext() {
         PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
 

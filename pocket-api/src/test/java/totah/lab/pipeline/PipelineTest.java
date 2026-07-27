@@ -31,7 +31,11 @@ public class PipelineTest {
         Path generatedPdbqt = Path.of(generatedPdbqtPath);
         assertTrue(Files.isRegularFile(expectedPdbqt));
         assertTrue(Files.isRegularFile(generatedPdbqt));
-        assertEquals(Files.readAllLines(expectedPdbqt), Files.readAllLines(generatedPdbqt));
+        Path artifactPdbqt = Path.of("target", "test-artifacts", "pipeline", "prepared_receptor.pdbqt");
+        Files.createDirectories(artifactPdbqt.getParent());
+        Files.copy(generatedPdbqt, artifactPdbqt, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        assertEquals(Files.readAllLines(expectedPdbqt), Files.readAllLines(generatedPdbqt),
+                "Generated PDBQT copied to " + artifactPdbqt.toAbsolutePath());
     }
 
     @TempDir

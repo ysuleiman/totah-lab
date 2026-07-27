@@ -28,6 +28,7 @@ import java.util.Objects;
 public class ChargeAssignmentStage implements Stage {
 
     private final ChargeModel model;
+    private final MetalIonPolicy metalIonPolicy = new MetalIonPolicy();
 
     public ChargeAssignmentStage(ChargeModel model) {
         this.model = model;
@@ -56,7 +57,9 @@ public class ChargeAssignmentStage implements Stage {
             ChargeSystem system = new ResidueChargeSystem(charged, topology);
             double totalCharge = totalCharge(charged);
             double[] charges = model.computeCharges(system, totalCharge);
+            validateChargeCount(charges, system.size());
             zeroUnsupportedElements(system, charges, totalCharge);
+            validateFiniteCharges(charges);
             charged = applyCharges(charged, charges);
             source = model.getClass().getSimpleName();
         }
@@ -72,6 +75,21 @@ public class ChargeAssignmentStage implements Stage {
         List<Residue> result = new ArrayList<>();
         List<String> assignedTemplates = new ArrayList<>();
         for (Residue residue : residues) {
+            if (metalIonPolicy.isKnownIonResidue(residue)) {
+                MetalIonPolicy.IonParameters ion = metalIonPolicy.fixedIon(residue)
+                        .orElseThrow(() -> new IllegalStateException(
+                                metalIonPolicy.requireFixedChargeFailureMessage(residue)));
+                Atom atom = residue.getAtoms().getFirst();
+                result.add(residue.toBuilder()
+                        .atoms(List.of(atom.toBuilder()
+                                .charge(ion.formalCharge())
+                                .amberType(ion.elementSymbol())
+                                .build()))
+                        .build());
+                assignedTemplates.add(residueKey(residue) + " -> ION:" + ion.elementSymbol()
+                        + "(" + formatCharge(ion.formalCharge()) + ")");
+                continue;
+            }
             ResidueState state = states.get(residueKey(residue));
             if (state == null) {
                 throw new IllegalStateException("Missing residue state for " + residueLabel(residue));
@@ -98,6 +116,10 @@ public class ChargeAssignmentStage implements Stage {
             assignedTemplates.add(residueKey(residue) + " -> " + state.amberTemplateName());
         }
         return new AmberAssignment(List.copyOf(result), assignedTemplates);
+    }
+
+    private String formatCharge(double charge) {
+        return charge > 0.0 ? "+" + charge : Double.toString(charge);
     }
 
     /**
@@ -128,6 +150,23 @@ public class ChargeAssignmentStage implements Stage {
         for (int i = 0; i < n; i++) {
             if (supported[i]) {
                 charges[i] += correction;
+            }
+        }
+    }
+
+    private void validateChargeCount(double[] charges, int expectedCount) {
+        if (charges == null || charges.length != expectedCount) {
+            throw new IllegalStateException("ChargeModel returned "
+                    + (charges == null ? "null" : charges.length)
+                    + " charge(s), expected " + expectedCount);
+        }
+    }
+
+    private void validateFiniteCharges(double[] charges) {
+        for (int i = 0; i < charges.length; i++) {
+            if (!Double.isFinite(charges[i])) {
+                throw new IllegalStateException("ChargeModel returned non-finite charge at atom index " + i
+                        + ": " + charges[i]);
             }
         }
     }
@@ -163,7 +202,13 @@ public class ChargeAssignmentStage implements Stage {
     }
 
     private String residueKey(Residue residue) {
-        return residue.getChain() + ":" + residue.getNumber();
+        return residue.getChain() + ":" + residue.getNumber() + insertionSuffix(residue);
+    }
+
+    private String insertionSuffix(Residue residue) {
+        return residue.getInsertionCode() == null || residue.getInsertionCode() == ' '
+                ? ""
+                : residue.getInsertionCode().toString();
     }
 
     private String residueLabel(Residue residue) {

@@ -152,6 +152,32 @@ class ChargeAssignmentStageTest {
     }
 
     @Test
+    void explicitOverrideRequiresOneChargePerAtom() {
+        PipelineContext context = preparedContext(List.of(nAlanine(1)),
+                states(state("A:1", "ALA", "NALA")));
+        context.put(ContextKeys.OVERRIDE_CHARGES_WITH_MODEL, true);
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new ChargeAssignmentStage(new WrongLengthChargeModel()).run(context));
+
+        assertTrue(error.getMessage().contains("expected 5"));
+    }
+
+    @Test
+    void explicitOverrideRejectsNonFiniteCharges() {
+        PipelineContext context = preparedContext(List.of(nAlanine(1)),
+                states(state("A:1", "ALA", "NALA")));
+        context.put(ContextKeys.OVERRIDE_CHARGES_WITH_MODEL, true);
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> new ChargeAssignmentStage(new NonFiniteChargeModel()).run(context));
+
+        assertTrue(error.getMessage().contains("non-finite"));
+    }
+
+    @Test
     void reportListsAreDefensiveCopies() throws Exception {
         PipelineContext context = preparedContext(List.of(nAlanine(1)),
                 states(state("A:1", "ALA", "NALA")));
@@ -270,6 +296,23 @@ class ChargeAssignmentStageTest {
             called = true;
             double[] charges = new double[system.size()];
             java.util.Arrays.fill(charges, 0.25);
+            return charges;
+        }
+    }
+
+    private static final class WrongLengthChargeModel implements ChargeModel {
+        @Override
+        public double[] computeCharges(ChargeSystem system, double totalFormalCharge) {
+            return new double[system.size() - 1];
+        }
+    }
+
+    private static final class NonFiniteChargeModel implements ChargeModel {
+        @Override
+        public double[] computeCharges(ChargeSystem system, double totalFormalCharge) {
+            double[] charges = new double[system.size()];
+            java.util.Arrays.fill(charges, 0.0);
+            charges[0] = Double.NaN;
             return charges;
         }
     }

@@ -9,16 +9,22 @@ partial charges and Amber atom types after topology construction.
 - Requires `ContextKeys.PROTEIN_TOPOLOGY`.
 - Requires `ContextKeys.TOPOLOGY_BUILD_REPORT` from `TopologyBuilderStage`.
 - Requires `ContextKeys.RESIDUE_STATES` from `ResidueStateAssignmentStage`.
-- Requires every residue to have a matching residue state.
+- Requires every non-ion residue to have a matching residue state.
 - Uses the assigned Amber template for each residue.
 - Requires every present atom to exist in the assigned Amber template.
 - Assigns Amber template partial charge to every present atom by default.
 - Assigns Amber atom type to every present atom.
+- Assigns fixed formal charges to supported monoatomic ions before Amber
+  lookup: `Zn +2`, `Mg +2`, `Ca +2`, `Na +1`, `K +1`, and `Cl -1`.
+- Rejects ambiguous monoatomic transition metals such as `Fe`, `Mn`, `Cu`,
+  `Co`, and `Ni` unless a future explicit metal policy is added.
 - Does not call the configured `ChargeModel` unless
   `ContextKeys.OVERRIDE_CHARGES_WITH_MODEL` is true.
 - When override is true, stamps Amber metadata first, then replaces charges with
   the configured model output.
 - Fails when override is requested but no `ChargeModel` is configured.
+- Fails when override model output is missing, the wrong length, or contains a
+  non-finite charge.
 - Publishes `ChargeAssignmentReport` to
   `ContextKeys.CHARGE_ASSIGNMENT_REPORT`.
 
@@ -36,6 +42,12 @@ An atom present in the receptor but absent from the assigned Amber template is a
 hard failure. Without a template atom entry, the stage has no authoritative
 Amber charge or Amber type to assign.
 
+Monoatomic ions are the one intentional bypass of Amber residue templates.
+Unambiguous salts and common divalent docking ions receive formal ionic
+charges from a curated table. The stage does not infer oxidation state from
+coordination geometry, residue names, or nearby atoms; ambiguous transition
+metals fail fast because a wrong metal charge can dominate docking scores.
+
 ## Test Coverage
 
 `ChargeAssignmentStageTest` covers:
@@ -48,4 +60,11 @@ Amber charge or Amber type to assign.
 - Failure when a present atom is absent from the Amber template.
 - Explicit model override after Amber metadata assignment.
 - Failure when model override is requested without a model.
+- Failure when model override returns the wrong charge count.
+- Failure when model override returns a non-finite charge.
 - Report publication and defensive-copy behavior.
+
+`MetalIonPolicyStageTest` covers:
+
+- Fixed formal charge assignment for monoatomic zinc.
+- Fail-fast behavior for ambiguous iron oxidation state.
