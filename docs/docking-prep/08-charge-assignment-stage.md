@@ -34,6 +34,13 @@ Amber charges are the source of truth for the protein receptor. This stage does
 not use QEq or another charge equilibration model by default, even though the
 pipeline still constructs the stage with a model for explicit override use.
 
+Bundled O-sulfo tyrosine (`TYS`) charges are loaded from the 2023 PREPI
+templates: mid-chain `TYS` has total charge -1, N-terminal `NTYS` has total
+charge 0, and C-terminal `CTYS` has total charge -2. The companion `TYS.frcmod`
+is retained with the source resources for Amber minimization/MD review, but this
+PDBQT preparation stage only needs template atom names, Amber atom types,
+partial charges, and connectivity.
+
 The override path is intentionally explicit because QEq-like models are useful
 for experiments and non-Amber workflows, but they should not silently replace
 curated Amber residue charges during docking preparation.

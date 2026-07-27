@@ -154,6 +154,31 @@ class AD4AtomTypingStageTest {
     }
 
     @Test
+    void typesTysRingAndSulfateAtoms() {
+        Residue tys = residue("TYS", 1,
+                atom("CG", "C", "CA", 0.0, 0.0, 0.0),
+                atom("CD1", "C", "CA", 1.0, 0.0, 0.0),
+                atom("CZ", "C", "CA", 2.0, 0.0, 0.0),
+                atom("OH", "O", "OS", 3.0, 0.0, 0.0),
+                atom("S", "S", "SO", 4.0, 0.0, 0.0),
+                atom("O1", "O", "O", 5.0, 0.0, 0.0));
+        PipelineContext context = contextWith(List.of(tys), new Topology(6, List.of(
+                edge(0, 1), edge(1, 2), edge(2, 3), edge(3, 4), edge(4, 5))));
+        context.put(ContextKeys.CHARGE_ASSIGNMENT_REPORT, chargeReport(1, 6));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:1", "TYS", "TYS")));
+
+        new AD4AtomTypingStage().run(context);
+
+        Residue typed = residues(context).getFirst();
+        assertEquals("A", typed.getAtom("CG").getAutoDockType());
+        assertEquals("A", typed.getAtom("CD1").getAutoDockType());
+        assertEquals("A", typed.getAtom("CZ").getAutoDockType());
+        assertEquals("OA", typed.getAtom("OH").getAutoDockType());
+        assertEquals("S", typed.getAtom("S").getAutoDockType());
+        assertEquals("OA", typed.getAtom("O1").getAutoDockType());
+    }
+
+    @Test
     void rejectsUnsupportedElementInsteadOfFallingBackToCarbon() {
         Residue residue = residue("MSE", 1, atom("SE", "Se", "Se", 0.0, 0.0, 0.0));
         PipelineContext context = contextWith(List.of(residue), new Topology(1, List.of()));

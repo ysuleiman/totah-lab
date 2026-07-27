@@ -182,6 +182,25 @@ class ResidueStateAssignmentStageTest {
     }
 
     @Test
+    void assignsExplicitTysTemplatesForInternalAndTerminalResidues() {
+        PipelineContext context = contextWith(List.of(
+                residue("TYS", 1, atom("N", "N")),
+                residue("TYS", 2, atom("N", "N")),
+                residue("TYS", 3, atom("N", "N"))));
+
+        new ResidueStateAssignmentStage().run(context);
+
+        Map<String, ResidueState> states = context.require(ContextKeys.RESIDUE_STATES);
+        assertState(states.get("A:1"), "NTYS", true, false, false);
+        assertState(states.get("A:2"), "TYS", false, false, false);
+        assertState(states.get("A:3"), "CTYS", false, true, false);
+
+        ResidueStateAssignmentReport report = context.require(ContextKeys.RESIDUE_STATE_REPORT);
+        assertEquals(List.of("TYS A:1 -> NTYS", "TYS A:2 -> TYS", "TYS A:3 -> CTYS"),
+                report.assignedTemplates());
+    }
+
+    @Test
     void detectsDisulfidesAndAssignsCyxTemplates() {
         PipelineContext context = contextWith(List.of(
                 residue("CYS", 1, atomAt("SG", "S", 0.0, 0.0, 0.0)),

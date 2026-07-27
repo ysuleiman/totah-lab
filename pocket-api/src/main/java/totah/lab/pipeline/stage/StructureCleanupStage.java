@@ -22,7 +22,7 @@ public class StructureCleanupStage implements Stage {
 
     private static final Set<String> WATER_NAMES = Set.of("HOH", "WAT", "DOD", "H2O");
 
-    private static final Set<String> DEFAULT_SPECIAL_RESIDUES = Set.of("MSE");
+    private static final Set<String> DEFAULT_SPECIAL_RESIDUES = Set.of("MSE", "TYS");
 
     private static final Set<String> METAL_ELEMENTS = Set.of(
             "LI", "NA", "K", "RB", "CS",

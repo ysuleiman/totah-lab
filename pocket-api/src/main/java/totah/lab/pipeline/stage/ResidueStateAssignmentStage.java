@@ -138,6 +138,9 @@ public class ResidueStateAssignmentStage implements Stage {
         if (STANDARD_AMINO_ACIDS.contains(name)) {
             return name;
         }
+        if ("TYS".equals(name)) {
+            return name;
+        }
         throw new IllegalArgumentException("Unsupported prepared residue " + residueLabel(residue)
                 + "; no Amber state assignment policy exists.");
     }

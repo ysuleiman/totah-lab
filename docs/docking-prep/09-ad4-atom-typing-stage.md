@@ -41,8 +41,10 @@ Histidine ring nitrogen typing also follows topology. A ring nitrogen with a
 bonded hydrogen is donor `N`; an unprotonated ring nitrogen is acceptor `NA`.
 The tautomer itself remains the Stage 4/5 residue-state decision.
 
-Sulfur typing follows residue state: `CYX` disulfide sulfur and methionine
-thioether sulfur are `S`, while deprotonated `CYM` sulfur is `SA`.
+Sulfur typing follows residue state: `CYX` disulfide sulfur, methionine
+thioether sulfur, and TYS sulfate sulfur are `S`, while deprotonated `CYM`
+sulfur is `SA`. TYS aromatic ring carbons are typed as aromatic `A`, following
+the same ring-carbon boundary as tyrosine.
 
 Monoatomic ion typing is deliberately table-driven. This stage does not infer
 metal oxidation state or docking parameters, and it does not write atom types
@@ -61,6 +63,7 @@ given an explicit future docking policy before PDBQT export.
 - Topology-based hydrogen parent typing.
 - Histidine donor/acceptor typing from topology-bonded hydrogens.
 - Cysteine sulfur typing from Amber residue state.
+- TYS aromatic ring, sulfate sulfur, and sulfate oxygen typing.
 - Unsupported element rejection.
 - Report publication and defensive-copy behavior.
 

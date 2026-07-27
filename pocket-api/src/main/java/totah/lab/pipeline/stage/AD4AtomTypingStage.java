@@ -202,7 +202,7 @@ public class AD4AtomTypingStage implements Stage {
 
     private boolean isAromaticCarbon(String atomName, String templateName) {
         return switch (templateName) {
-            case "PHE", "TYR" -> atomName.matches("CG|CD[12]|CE[12]|CZ");
+            case "PHE", "TYR", "TYS" -> atomName.matches("CG|CD[12]|CE[12]|CZ");
             case "TRP" -> atomName.matches("CG|CD[12]|CE[23]|CZ[23]|CH2");
             case "HID", "HIE", "HIP", "HIS" -> atomName.matches("CG|CD2|CE1");
             default -> false;

@@ -80,6 +80,19 @@ class StructureCleanupStageTest {
     }
 
     @Test
+    void keepsTysAsKnownSpecialResidueForExplicitAmberTemplateSupport() {
+        PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
+                residue("TYS", 40, atom("S", "S")));
+
+        new StructureCleanupStage().run(context);
+
+        List<Residue> residues = context.require(ContextKeys.PROTEIN_RESIDUES);
+        assertEquals(List.of("CYS", "TYS"), residueNames(residues));
+        StructureCleanupReport report = context.require(ContextKeys.STRUCTURE_CLEANUP_REPORT);
+        assertEquals(List.of("TYS A:40"), report.keptSpecialResidues());
+    }
+
+    @Test
     void removesMonoatomicMetalsByDefault() {
         PipelineContext context = contextWith(residue("CYS", 32, atom("CA", "C")),
                 residue("ZN", 701, atom("ZN", "Zn")));

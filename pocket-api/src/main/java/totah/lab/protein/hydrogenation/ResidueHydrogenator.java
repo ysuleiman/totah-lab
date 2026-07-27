@@ -51,6 +51,7 @@ public final class ResidueHydrogenator {
             case "MET" -> addMet(res, atoms, ctx);
             case "PHE" -> addPhe(res, atoms, ctx);
             case "TYR" -> addTyr(res, atoms, ctx, ph);
+            case "TYS" -> addTyrRing(res, atoms, ctx);
             case "TRP" -> addTrp(res, atoms, ctx);
             case "HIS", "HID", "HIE", "HIP" -> addHis(res, atoms, ctx, his, name);
             case "LYS", "LYN" -> addLys(res, atoms, ctx, ph, name);

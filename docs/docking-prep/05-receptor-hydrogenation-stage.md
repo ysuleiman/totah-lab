@@ -23,6 +23,8 @@ assigned by the Amber-template stage.
 - Adds terminal caps only when the assigned Amber template is terminal, and
   does not duplicate an existing `OXT`.
 - Does not add aromatic `HZ` to tyrosine `CZ`, which is substituted by `OH`.
+- Treats O-sulfo tyrosine (`TYS`) as tyrosine-like for ring hydrogens and
+  backbone/terminal handling, but does not protonate the sulfate substituent.
 - Uses global pH and global histidine state only when no more specific Amber
   state is available.
 - Suppresses thiol `HG` on `CYX` disulfide cysteines and `CYM` cysteine anions.
@@ -68,6 +70,8 @@ protein methine centers.
 - `HIP` overriding a conflicting global histidine setting.
 - `CYX` suppressing thiol hydrogen and publishing disulfide residues even when
   geometric detection is disabled.
+- `TYS` uses polymer terminal handling from `NTYS/TYS/CTYS` state assignment
+  and does not add a phenolic/sulfate proton.
 - Q6UX53 receptor-scale coverage at the default clash cutoff:
   - every standard non-glycine residue keeps its backbone `HA`;
   - every atom required by the assigned Amber templates is present after

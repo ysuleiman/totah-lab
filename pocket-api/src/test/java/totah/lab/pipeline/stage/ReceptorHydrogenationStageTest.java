@@ -174,6 +174,26 @@ class ReceptorHydrogenationStageTest {
     }
 
     @Test
+    void usesTysTemplateForRingHydrogensAndCterminalCapWithoutSulfateProton() throws Exception {
+        PipelineContext context = contextWith(List.of(tyrosineSulfate(363)));
+        context.put(ContextKeys.RESIDUE_STATES, states(state("A:363", "TYS", "CTYS")));
+
+        new ReceptorHydrogenationStage().run(context);
+
+        Residue result = residues(context).getFirst();
+        assertTrue(hasAtom(result, "HA"));
+        assertTrue(hasAtom(result, "HB2"));
+        assertTrue(hasAtom(result, "HB3"));
+        assertTrue(hasAtom(result, "HD1"));
+        assertTrue(hasAtom(result, "HD2"));
+        assertTrue(hasAtom(result, "HE1"));
+        assertTrue(hasAtom(result, "HE2"));
+        assertTrue(hasAtom(result, "OXT"));
+        assertFalse(hasAtom(result, "HH"),
+                "TYS sulfate replaces phenolic OH protonation; do not add TYR HH");
+    }
+
+    @Test
     void q6ux53AddsExpectedBackboneAlphaHydrogensAtDefaultClashCutoff() throws Exception {
         PipelineContext context = new PipelineContext(tempDir, tempDir.resolve("run"));
         context.put(ContextKeys.TARGET_PDB_PATH, resourcePath("/Q6UX53/Q6UX53_TMT1B_HUMAN.pdb"));
@@ -338,6 +358,26 @@ class ReceptorHydrogenationStageTest {
                 atom("O", "O", offset + 2.9, 1.8, 0.0),
                 atom("CB", "C", offset + 1.3, -0.8, 1.2),
                 atom("SG", "S", offset + 2.2, -1.5, 2.4));
+    }
+
+    private Residue tyrosineSulfate(int number) {
+        return residue("TYS", number,
+                atom("N", "N", 15.901, 2.361, -4.748),
+                atom("CA", "C", 16.482, 2.005, -3.448),
+                atom("CB", "C", 15.434, 1.805, -2.340),
+                atom("CG", "C", 14.580, 3.049, -2.234),
+                atom("CD1", "C", 15.156, 4.304, -2.015),
+                atom("CD2", "C", 13.219, 2.924, -2.545),
+                atom("CE1", "C", 14.343, 5.432, -2.005),
+                atom("CE2", "C", 12.411, 4.063, -2.563),
+                atom("CZ", "C", 12.986, 5.299, -2.287),
+                atom("OH", "O", 12.107, 6.361, -2.265),
+                atom("S", "S", 11.153, 6.571, -0.919),
+                atom("O1", "O", 10.528, 5.299, -0.666),
+                atom("O2", "O", 12.111, 7.170, -0.043),
+                atom("O3", "O", 10.170, 7.609, -1.318),
+                atom("C", "C", 17.330, 0.734, -3.630),
+                atom("O", "O", 18.126, 0.587, -2.682));
     }
 
     private Residue residue(String name, int number, Atom... atoms) {

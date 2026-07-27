@@ -9,7 +9,8 @@ stage runs.
 - Requires `ContextKeys.PROTEIN_RESIDUES`.
 - Keeps the 20 standard amino-acid residue names.
 - Removes waters by default: `HOH`, `WAT`, `DOD`, `H2O`.
-- Keeps known modified amino-acid placeholders by default: currently `MSE`.
+- Keeps known modified amino-acid placeholders by default: currently `MSE`
+  and `TYS`.
 - Removes monoatomic metals and known monoatomic ions by default.
 - Keeps monoatomic metals and known monoatomic ions only when
   `ContextKeys.KEEP_METALS` is true.
@@ -27,6 +28,8 @@ may still fail later Amber-template validation.
 
 `MSE` is passed through intentionally because it is a common modified amino-acid
 case and should be handled by a later residue-state/template-normalization stage.
+`TYS` is passed through because the project bundles explicit O-sulfo tyrosine
+Amber PREPI templates from the 2023 ff14SB-compatible parameter package.
 Known monoatomic ions use the same coarse keep/remove switch as metals at this
 stage. If retained, later stages still decide whether a fixed charge and
 AutoDock4 atom type exist. Unknown ligands, cofactors, glycans, and covalent
@@ -41,6 +44,7 @@ special residues.
 - Default water removal.
 - Rejection of water retention.
 - Default `MSE` retention for later normalization.
+- Default `TYS` retention for explicit Amber-template support.
 - Default monoatomic metal and known-ion removal.
 - Configured monoatomic metal and known-ion retention.
 - Configured special-residue retention by list and comma-separated string.

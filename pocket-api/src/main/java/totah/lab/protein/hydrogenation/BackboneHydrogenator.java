@@ -15,9 +15,11 @@ final class BackboneHydrogenator {
 
     // MSE is hydrogenated as MET elsewhere but is a modified residue:
     // it must not drive N-/C-terminus capping decisions (HETATM groups).
+    // TYS is a polymer amino acid with explicit NTYS/TYS/CTYS templates.
     private static final Set<String> STANDARD_AMINO_ACIDS = Set.of(
             "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE",
-            "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL");
+            "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL",
+            "TYS");
 
     private BackboneHydrogenator() {}
 

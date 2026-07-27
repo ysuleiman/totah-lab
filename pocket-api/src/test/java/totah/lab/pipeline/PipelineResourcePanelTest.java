@@ -68,6 +68,16 @@ class PipelineResourcePanelTest {
         }
     }
 
+    @Test
+    void tysSupportAllowsOneA4wToAdvanceToNextUnsupportedResidue() throws Exception {
+        Pipeline pipeline = pipelineFor("1A4W.pdb");
+
+        RuntimeException error = assertThrows(RuntimeException.class, pipeline::run);
+
+        assertTrue(error.getMessage().contains("Unsupported residue QWE H:373"), error.getMessage());
+        assertTrue(!error.getMessage().contains("TYS I:363"), error.getMessage());
+    }
+
     private Pipeline pipelineFor(String pdbName) throws Exception {
         Path pdb = resourcePath("/pipeline/" + pdbName);
         Map<String, Object> config = Map.of(ContextKeys.PLDDT_CUTOFF, 0.0);

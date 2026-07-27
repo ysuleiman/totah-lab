@@ -71,6 +71,30 @@ public class AmberResidueTemplateLibraryTest {
     }
 
     @Test
+    public void tysPrepiTemplatesLoadWithRespChargesAndSulfateConnectivity() {
+        ResidueTemplate tys = library.getTemplate("TYS");
+        ResidueTemplate ntys = library.getTemplate("NTYS");
+        ResidueTemplate ctys = library.getTemplate("CTYS");
+        assertNotNull(tys, "TYS PREPI template missing");
+        assertNotNull(ntys, "NTYS PREPI template missing");
+        assertNotNull(ctys, "CTYS PREPI template missing");
+
+        assertEquals(24, tys.getAtoms().size(), "TYS should define 24 non-dummy atoms");
+        assertEquals(-1.0, totalCharge(tys), 1e-4, "mid-chain TYS total charge");
+        assertEquals(0.0, totalCharge(ntys), 1e-4, "N-terminal NTYS total charge");
+        assertEquals(-2.0, totalCharge(ctys), 1e-4, "C-terminal CTYS total charge");
+
+        assertEquals("SO", tys.getAtom("S").getAmberType(), "TYS sulfate sulfur type");
+        assertEquals(1.2494, tys.getAtom("S").getCharge(), 1e-4, "TYS sulfate sulfur RESP charge");
+        assertEquals("O2", ctys.getAtom("OXT").getAmberType(), "CTYS terminal OXT type");
+        assertBond(tys, "OH", "S");
+        assertBond(tys, "S", "O1");
+        assertBond(tys, "S", "O2");
+        assertBond(tys, "S", "O3");
+        assertBond(tys, "CD2", "CG");
+    }
+
+    @Test
     public void unknownResidueHasNoTemplate() {
         assertNull(library.getTemplate("NOTARES"),
                 "unknown residue names must not resolve to a template");
@@ -93,5 +117,11 @@ public class AmberResidueTemplateLibraryTest {
                 (bond.getAtom1().equals(a) && bond.getAtom2().equals(b))
                         || (bond.getAtom1().equals(b) && bond.getAtom2().equals(a)));
         assertTrue(found, "template " + template.getName() + " lacks bond " + a + "-" + b);
+    }
+
+    private static double totalCharge(ResidueTemplate template) {
+        return template.getAtoms().stream()
+                .mapToDouble(AtomTemplate::getCharge)
+                .sum();
     }
 }

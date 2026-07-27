@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 /**
  * Singleton Amber residue template library.
- * Loads all .lib/.off template files from a directory.
+ * Loads all .lib/.off template files and Amber PREPI residues from a directory.
  */
 public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
 
@@ -32,10 +32,17 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
     }
 
     private static void loadFromClasspath() {
-        java.net.URL url = AmberResidueTemplateLibrary.class.getResource("/amber/lib");
+        INSTANCE.loadClasspathDirectory("/amber/lib", true);
+        INSTANCE.loadClasspathDirectory("/amber/prep", false);
+        INSTANCE.loaded = true;
+    }
+
+    private void loadClasspathDirectory(String resourceName, boolean required) {
+        java.net.URL url = AmberResidueTemplateLibrary.class.getResource(resourceName);
         if (url == null) {
+            if (!required) return;
             throw new IllegalStateException(
-                    "Default Amber templates directory (/amber/lib) not found in classpath. " +
+                    "Default Amber templates directory (" + resourceName + ") not found in classpath. " +
                             "Call load(Path) or loadDirectory(Path) with explicit template location."
             );
         }
@@ -44,10 +51,10 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
         try {
             uri = url.toURI();
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Invalid URI for /amber/lib: " + url, e);
+            throw new RuntimeException("Invalid URI for " + resourceName + ": " + url, e);
         }
 
-        Path libDir;
+        Path dir;
         FileSystem fs = null;
         boolean closeFs = false;
 
@@ -55,24 +62,24 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
             if ("jar".equals(uri.getScheme())) {
                 try {
                     fs = FileSystems.getFileSystem(uri);
-                    libDir = fs.getPath("/amber/lib");
+                    dir = fs.getPath(resourceName);
                 } catch (FileSystemNotFoundException e) {
                     fs = FileSystems.newFileSystem(uri, Collections.emptyMap());
                     closeFs = true;
-                    libDir = fs.getPath("/amber/lib");
+                    dir = fs.getPath(resourceName);
                 }
             } else {
-                libDir = Paths.get(uri);
+                dir = Paths.get(uri);
             }
 
-            if (libDir == null) {
-                throw new IllegalStateException("Could not resolve /amber/lib path");
+            if (dir == null) {
+                throw new IllegalStateException("Could not resolve " + resourceName + " path");
             }
 
-            INSTANCE.loadDirectory(libDir);
+            loadDirectory(dir);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load default Amber templates", e);
+            throw new RuntimeException("Failed to load default Amber templates from " + resourceName, e);
         } finally {
             if (closeFs && fs != null) {
                 try {
@@ -85,7 +92,7 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
     }
 
     /**
-     * Load all .lib/.off files from a directory.
+     * Load all .lib/.off/.prepi files from a directory.
      */
     public void loadDirectory(Path dir) throws IOException {
         if (dir == null) {
@@ -96,12 +103,12 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
         }
 
         synchronized (this) {
-            try (Stream<Path> files = Files.list(dir)) {
-                files.filter(Objects::nonNull).filter(p -> {
+            try (Stream<Path> files = Files.walk(dir)) {
+                files.filter(Objects::nonNull).filter(Files::isRegularFile).filter(p -> {
                     Path fileName = p.getFileName();
                     if (fileName == null) return false;
                     String name = fileName.toString().toLowerCase();
-                    return name.endsWith(".lib") || name.endsWith(".off");
+                    return name.endsWith(".lib") || name.endsWith(".off") || name.endsWith(".prepi");
                 }).sorted().forEach(this::loadFileUnchecked);
             }
             loaded = true;
@@ -131,6 +138,12 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
     }
 
     private void loadFile(Path file) throws IOException {
+        String fileName = file.getFileName() == null ? "" : file.getFileName().toString().toLowerCase(Locale.ROOT);
+        if (fileName.endsWith(".prepi")) {
+            loadPrepiFile(file);
+            return;
+        }
+
         List<String> lines = Files.readAllLines(file);
         ResidueTemplate current = null;
         String section = "";
@@ -221,5 +234,89 @@ public class AmberResidueTemplateLibrary implements ResidueTemplateProvider {
         } catch (NumberFormatException e) {
             // malformed line
         }
+    }
+
+    private void loadPrepiFile(Path file) throws IOException {
+        List<String> lines = Files.readAllLines(file);
+        ResidueTemplate current = null;
+        Map<Integer, String> atomNamesByPrepiIndex = new HashMap<>();
+        String section = "";
+
+        for (String raw : lines) {
+            if (raw == null) continue;
+            String line = raw.trim();
+            if (line.isEmpty()) continue;
+
+            String[] fields = line.split("\\s+");
+            if (fields.length >= 3 && "INT".equals(fields[1])) {
+                current = new ResidueTemplate(fields[0]);
+                templates.put(fields[0], current);
+                atomNamesByPrepiIndex = new HashMap<>();
+                section = "atoms";
+                continue;
+            }
+            if (current == null) continue;
+            if ("LOOP".equals(line)) {
+                section = "loop";
+                continue;
+            }
+            if ("IMPROPER".equals(line) || "DONE".equals(line) || "STOP".equals(line)) {
+                section = "";
+                continue;
+            }
+
+            if ("atoms".equals(section)) {
+                parsePrepiAtom(line, current, atomNamesByPrepiIndex);
+            } else if ("loop".equals(section)) {
+                parsePrepiLoop(line, current);
+            }
+        }
+    }
+
+    private void parsePrepiAtom(String line, ResidueTemplate residue, Map<Integer, String> atomNamesByPrepiIndex) {
+        String[] t = line.split("\\s+");
+        if (t.length < 11) return;
+
+        int index;
+        int parentIndex;
+        double charge;
+        try {
+            index = Integer.parseInt(t[0]);
+            parentIndex = Integer.parseInt(t[4]);
+            charge = Double.parseDouble(t[10]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        String name = t[1];
+        if ("DUMM".equals(name)) {
+            return;
+        }
+
+        String type = t[2];
+        residue.addAtom(AtomTemplate.builder()
+                .name(name)
+                .amberType(type)
+                .charge(charge)
+                .build());
+        atomNamesByPrepiIndex.put(index, name);
+
+        String parentName = atomNamesByPrepiIndex.get(parentIndex);
+        if (parentName != null) {
+            residue.addBond(BondTemplate.builder()
+                    .atom1(parentName)
+                    .atom2(name)
+                    .build());
+        }
+    }
+
+    private void parsePrepiLoop(String line, ResidueTemplate residue) {
+        String[] t = line.split("\\s+");
+        if (t.length < 2) return;
+        if (residue.getAtom(t[0]) == null || residue.getAtom(t[1]) == null) return;
+        residue.addBond(BondTemplate.builder()
+                .atom1(t[0])
+                .atom2(t[1])
+                .build());
     }
 }
