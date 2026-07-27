@@ -19,6 +19,11 @@ disposition. Selection policy must choose one extracted free-ligand residue
 before invoking `LigandPreparer`; the preparer does not reinterpret receptor
 cleanup policy.
 
+`LigandPreparationOrchestrator` implements this handoff. It supports automatic
+handling only when zero or one extracted component exists and requires
+`LigandSelection` for ambiguous multi-candidate structures. See
+[19-ligand-selection-orchestration.md](19-ligand-selection-orchestration.md).
+
 The result contains the final molecular graph, graph validation,
 hydrogenation, charge, AD4 typing, torsion results, and the exact emitted PDBQT
 text.
@@ -53,8 +58,9 @@ must be handled by classification or ion policy rather than this workflow.
   unsupported.
 - Protonation and tautomer selection are not performed; the CCD state is used.
 - Default Gasteiger parameter coverage excludes metal-containing ligands.
-- The service is not automatically inserted into `PipelineFactory`; callers
-  invoke the explicit ligand sub-pipeline when ligand preparation is requested.
+- Ligand preparation is not automatically inserted into the receptor
+  `PipelineFactory`; callers invoke the explicit ligand orchestrator when
+  ligand preparation is requested.
 
 The machine-readable support boundary and stable rejection mapping are
 documented in [18-ligand-capability-contract.md](18-ligand-capability-contract.md).

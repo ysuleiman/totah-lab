@@ -3,9 +3,14 @@ package totah.lab.pipeline.stage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.io.TempDir;
+import org.biojava.nbio.structure.chem.DownloadChemCompProvider;
 import totah.lab.io.StructureIO;
+import totah.lab.ligand.LigandPreparationOrchestrator;
+import totah.lab.ligand.LigandPreparer;
+import totah.lab.ligand.SelectedLigandPreparation;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
+import totah.lab.pipeline.cleanup.StructureCleanupResult;
 import totah.lab.pipeline.report.StructureCleanupReport;
 import totah.lab.protein.Residue;
 import totah.lab.protein.ResidueClassificationEvidence;
@@ -100,6 +105,19 @@ class StructureCleanupOneA4wTest {
         List<Residue> extractedLigands = context.require(ContextKeys.EXTRACTED_LIGANDS);
         assertEquals(1, extractedLigands.size());
         assertSame(qwe, extractedLigands.getFirst());
+
+        StructureCleanupResult cleanupResult =
+                context.require(ContextKeys.STRUCTURE_CLEANUP_RESULT);
+        DownloadChemCompProvider provider =
+                new DownloadChemCompProvider(cacheDirectory.toString());
+        SelectedLigandPreparation prepared =
+                new LigandPreparationOrchestrator(
+                        new LigandPreparer(provider))
+                        .prepareOnly(cleanupResult)
+                        .orElseThrow();
+        assertSame(qwe, prepared.selectedLigand().residue());
+        assertTrue(prepared.preparation().pdbqt().startsWith("ROOT"));
+        assertTrue(prepared.preparation().pdbqt().contains("TORSDOF "));
     }
 
     private Residue requireResidue(
