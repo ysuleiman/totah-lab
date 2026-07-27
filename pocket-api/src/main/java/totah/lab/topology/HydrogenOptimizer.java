@@ -1,5 +1,6 @@
 package totah.lab.topology;
 
+import totah.lab.chemistry.ChemicalAtomFactory;
 import totah.lab.protein.*;
 
 import java.util.*;
@@ -553,20 +554,7 @@ public class HydrogenOptimizer {
     }
 
     private Atom hAtom(String name, Point3D pos, double bFactor) {
-        return Atom.builder()
-                .name(name)
-                .position(pos)
-                .charge(0.0)
-                .occupancy(1.0)
-                .bFactor(bFactor)
-                .element(Element.builder()
-                        .symbol("H")
-                        .atomicNumber(1)
-                        .atomicMass(1.008)
-                        .covalentRadius(0.31)
-                        .vdwRadius(1.20)
-                        .build())
-                .build();
+        return ChemicalAtomFactory.hydrogen(name, pos, bFactor);
     }
 
     private Atom findByName(List<Atom> atoms, String name) {

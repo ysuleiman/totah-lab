@@ -1,6 +1,7 @@
 package totah.lab.protein.hydrogenation;
 
 import totah.lab.protein.Atom;
+import totah.lab.chemistry.ChemicalAtomFactory;
 import totah.lab.protein.Element;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
@@ -35,12 +36,7 @@ public final class HydrogenationGeometry {
     // -------------------- atom factories --------------------
 
     public static Atom hAtom(String name, Point3D pos, double bFactor) {
-        return Atom.builder()
-                .name(name).position(pos).charge(0.0).occupancy(1.0).bFactor(bFactor)
-                .element(Element.builder()
-                        .symbol("H").atomicNumber(1).atomicMass(1.008)
-                        .covalentRadius(0.31).vdwRadius(1.20).build())
-                .build();
+        return ChemicalAtomFactory.hydrogen(name, pos, bFactor);
     }
 
     public static Atom oxtAtom(String name, Point3D pos, double bFactor) {
