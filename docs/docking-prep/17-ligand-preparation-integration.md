@@ -55,3 +55,6 @@ must be handled by classification or ion policy rather than this workflow.
 - Default Gasteiger parameter coverage excludes metal-containing ligands.
 - The service is not automatically inserted into `PipelineFactory`; callers
   invoke the explicit ligand sub-pipeline when ligand preparation is requested.
+
+The machine-readable support boundary and stable rejection mapping are
+documented in [18-ligand-capability-contract.md](18-ligand-capability-contract.md).

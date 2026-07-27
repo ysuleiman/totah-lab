@@ -78,11 +78,12 @@ public final class LigandPreparer {
     private LigandPreparationResult prepareValidated(
             Residue selectedLigand,
             ChemComp chemComp) {
-        CcdLigandGraphResult initial = graphBuilder.build(selectedLigand, chemComp);
-        LigandHydrogenationResult hydrogenated = hydrogenator.hydrogenate(initial);
-        LigandChargeAssignmentResult charged = chargeAssigner.assign(hydrogenated.graph());
-        LigandAd4TypingResult typed = atomTyper.assign(charged.graph());
-        LigandTorsionTreeResult torsion = torsionTreeBuilder.build(typed.graph());
+        String componentId = selectedLigand.getName();
+        CcdLigandGraphResult initial = buildGraph(componentId, selectedLigand, chemComp);
+        LigandHydrogenationResult hydrogenated = hydrogenate(componentId, initial);
+        LigandChargeAssignmentResult charged = assignCharges(componentId, hydrogenated);
+        LigandAd4TypingResult typed = assignAtomTypes(componentId, charged);
+        LigandTorsionTreeResult torsion = buildTorsionTree(componentId, typed);
         Residue preparedResidue = selectedLigand.toBuilder()
                 .atoms(typed.graph().atoms())
                 .build();
@@ -96,6 +97,78 @@ public final class LigandPreparer {
                 typed,
                 torsion,
                 pdbqt);
+    }
+
+    private CcdLigandGraphResult buildGraph(
+            String componentId,
+            Residue selectedLigand,
+            ChemComp chemComp) {
+        try {
+            return graphBuilder.build(selectedLigand, chemComp);
+        } catch (LigandGraphValidationException exception) {
+            LigandGraphValidationReport report = exception.getReport();
+            LigandUnsupportedReason reason = report.missingHeavyAtoms().isEmpty()
+                    ? LigandUnsupportedReason.EXTRA_HEAVY_ATOMS
+                    : LigandUnsupportedReason.MISSING_HEAVY_ATOMS;
+            throw unsupported(componentId, reason, exception.getMessage());
+        }
+    }
+
+    private LigandHydrogenationResult hydrogenate(
+            String componentId,
+            CcdLigandGraphResult initial) {
+        try {
+            return hydrogenator.hydrogenate(initial);
+        } catch (LigandValenceException exception) {
+            throw unsupported(
+                    componentId,
+                    LigandUnsupportedReason.INVALID_VALENCE,
+                    exception.getMessage());
+        } catch (IllegalArgumentException exception) {
+            throw unsupported(
+                    componentId,
+                    LigandUnsupportedReason.UNUSABLE_HYDROGEN_REFERENCE_GEOMETRY,
+                    exception.getMessage());
+        }
+    }
+
+    private LigandChargeAssignmentResult assignCharges(
+            String componentId,
+            LigandHydrogenationResult hydrogenated) {
+        try {
+            return chargeAssigner.assign(hydrogenated.graph());
+        } catch (IllegalArgumentException exception) {
+            throw unsupported(
+                    componentId,
+                    LigandUnsupportedReason.UNSUPPORTED_ELEMENT_FOR_CHARGE,
+                    exception.getMessage());
+        }
+    }
+
+    private LigandAd4TypingResult assignAtomTypes(
+            String componentId,
+            LigandChargeAssignmentResult charged) {
+        try {
+            return atomTyper.assign(charged.graph());
+        } catch (IllegalArgumentException exception) {
+            throw unsupported(
+                    componentId,
+                    LigandUnsupportedReason.UNSUPPORTED_AD4_TYPE,
+                    exception.getMessage());
+        }
+    }
+
+    private LigandTorsionTreeResult buildTorsionTree(
+            String componentId,
+            LigandAd4TypingResult typed) {
+        try {
+            return torsionTreeBuilder.build(typed.graph());
+        } catch (IllegalArgumentException exception) {
+            throw unsupported(
+                    componentId,
+                    LigandUnsupportedReason.DISCONNECTED_GRAPH,
+                    exception.getMessage());
+        }
     }
 
     public LigandPreparationResult prepareToPath(
@@ -135,9 +208,13 @@ public final class LigandPreparer {
     private UnsupportedLigandException incompleteCcd(
             String componentId,
             String detail) {
-        return new UnsupportedLigandException(
-                componentId,
-                LigandUnsupportedReason.INCOMPLETE_CCD,
-                detail);
+        return unsupported(componentId, LigandUnsupportedReason.INCOMPLETE_CCD, detail);
+    }
+
+    private UnsupportedLigandException unsupported(
+            String componentId,
+            LigandUnsupportedReason reason,
+            String detail) {
+        return new UnsupportedLigandException(componentId, reason, detail);
     }
 }
