@@ -76,10 +76,18 @@ enabled.
 - Insertion-code-safe flex residue selection.
 - Export report publication.
 
-`PipelineTest` covers Open Babel compatibility at the agreed boundary:
+`PipelineTest` and `PipelineOpenBabelVerifierTest` cover Open Babel
+compatibility at the agreed boundary:
 
 - Heavy-atom count, identity, order, and coordinates are compared against
   `Q6UX53_TMT1B_HUMAN_3_clean.pdbqt`.
+- The curated pipeline verifier set currently contains Open Babel outputs for
+  `1CRN`, `1HVR`, `1UBQ`, `4HVP`, and `Q6UX53_TMT1B_HUMAN`.
+- All five verifier files are checked against their source PDB heavy atoms so
+  the reference resources cannot silently drift.
+- Pipeline output is compared against the Open Babel heavy-atom reference only
+  for receptors that the current chemistry policy supports end to end:
+  `1CRN`, `1UBQ`, and `Q6UX53_TMT1B_HUMAN`.
 - Hydrogens, charges, B-factors, and exact whole-file text are intentionally not
   compared because this pipeline uses Amber/full-hydrogen receptor policy, not
   Open Babel compatibility-export policy.
