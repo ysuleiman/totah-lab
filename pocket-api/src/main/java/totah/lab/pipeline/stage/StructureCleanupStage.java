@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
 import totah.lab.pipeline.Stage;
-import totah.lab.pipeline.cleanup.MetalIonPolicy;
+import totah.lab.pipeline.cleanup.ClassifiedResidue;
+import totah.lab.pipeline.cleanup.ResidueClassifier;
+import totah.lab.pipeline.cleanup.ResidueDisposition;
 import totah.lab.pipeline.cleanup.ResidueKind;
+import totah.lab.pipeline.cleanup.ResidueRole;
+import totah.lab.pipeline.cleanup.StructureCleanupResult;
 import totah.lab.pipeline.report.StructureCleanupReport;
-import totah.lab.protein.Atom;
 import totah.lab.protein.Residue;
 import totah.lab.protein.ResidueClassificationEvidence;
 
@@ -22,22 +25,9 @@ import java.util.Set;
 @Slf4j
 public class StructureCleanupStage implements Stage {
 
-    private static final Set<String> STANDARD_AMINO_ACIDS = Set.of(
-            "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE",
-            "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL");
-
-    private static final Set<String> WATER_NAMES = Set.of("HOH", "WAT", "DOD", "H2O");
-
     private static final Set<String> DEFAULT_SPECIAL_RESIDUES = Set.of("MSE", "TYS");
 
-    private static final Set<String> METAL_ELEMENTS = Set.of(
-            "LI", "NA", "K", "RB", "CS",
-            "BE", "MG", "CA", "SR", "BA",
-            "SC", "TI", "V", "CR", "MN", "FE", "CO", "NI", "CU", "ZN",
-            "Y", "ZR", "NB", "MO", "TC", "RU", "RH", "PD", "AG", "CD",
-            "LU", "HF", "TA", "W", "RE", "OS", "IR", "PT", "AU", "HG",
-            "AL", "GA", "IN", "SN", "TL", "PB", "BI");
-    private final MetalIonPolicy metalIonPolicy = new MetalIonPolicy();
+    private final ResidueClassifier residueClassifier = new ResidueClassifier();
 
     @Override
     @SuppressWarnings("unchecked")
@@ -57,11 +47,16 @@ public class StructureCleanupStage implements Stage {
         List<String> removedMetals = new ArrayList<>();
         List<String> keptSpecial = new ArrayList<>();
         List<Residue> extractedLigands = new ArrayList<>();
+        List<ClassifiedResidue> classifiedReceptor = new ArrayList<>();
+        List<ClassifiedResidue> classifiedLigands = new ArrayList<>();
+        List<ClassifiedResidue> classifiedWaters = new ArrayList<>();
+        List<ClassifiedResidue> classifiedMetals = new ArrayList<>();
+        List<ClassifiedResidue> classifiedSpecial = new ArrayList<>();
 
         for (Residue residue : incoming) {
             String name = normalizeName(residue.getName());
             ResidueClassificationEvidence evidence = residue.getResidueClassificationEvidence();
-            ResidueKind kind = classifyResidue(residue, evidence);
+            ResidueKind kind = residueClassifier.classify(residue);
             log.debug("Residue {} classified as {} using evidence {}",
                     residueLabel(residue), kind, evidence);
 
@@ -69,17 +64,36 @@ public class StructureCleanupStage implements Stage {
                 case WATER -> {
                     if (removeWaters) {
                         removedWaters.add(residueLabel(residue));
+                        classifiedWaters.add(classified(
+                                residue, ResidueRole.WATER, ResidueDisposition.REMOVE,
+                                "water removed by cleanup policy"));
                     } else {
                         throw unsupported(residue, "water retention is not supported for docking prep");
                     }
                 }
-                case STANDARD_AMINO_ACID -> kept.add(residue);
+                case STANDARD_AMINO_ACID -> {
+                    kept.add(residue);
+                    classifiedReceptor.add(classified(
+                            residue, ResidueRole.STANDARD_AMINO_ACID,
+                            ResidueDisposition.KEEP_IN_RECEPTOR,
+                            "standard protein residue"));
+                }
                 case MODIFIED_AMINO_ACID -> {
                     if (allowedSpecialResidues.contains(name)) {
                         kept.add(residue);
                         keptSpecial.add(residueLabel(residue));
+                        ClassifiedResidue classified = classified(
+                                residue, ResidueRole.MODIFIED_AMINO_ACID,
+                                ResidueDisposition.KEEP_IN_RECEPTOR,
+                                "modified protein residue enabled by special-residue policy");
+                        classifiedReceptor.add(classified);
+                        classifiedSpecial.add(classified);
                     } else {
                         extractedLigands.add(residue);
+                        classifiedLigands.add(classified(
+                                residue, ResidueRole.MODIFIED_AMINO_ACID,
+                                ResidueDisposition.EXTRACT_AS_LIGAND,
+                                "modified protein residue lacks enabled receptor support"));
                         log.warn("Modified protein residue {} has parent {}, "
                                         + "but is not enabled as a supported special residue",
                                 residueLabel(residue), evidence.parentComponentId());
@@ -89,29 +103,57 @@ public class StructureCleanupStage implements Stage {
                     if (keepMetals) {
                         kept.add(residue);
                         keptSpecial.add(residueLabel(residue));
+                        ClassifiedResidue classified = classified(
+                                residue, ResidueRole.METAL_OR_ION,
+                                ResidueDisposition.KEEP_IN_RECEPTOR,
+                                "metal or ion retained by cleanup policy");
+                        classifiedReceptor.add(classified);
+                        classifiedSpecial.add(classified);
                     } else {
                         removedMetals.add(residueLabel(residue));
+                        classifiedMetals.add(classified(
+                                residue, ResidueRole.METAL_OR_ION,
+                                ResidueDisposition.REMOVE,
+                                "metal or ion removed by cleanup policy"));
                     }
                 }
                 case NON_POLYMER -> {
                     if (allowedSpecialResidues.contains(name)) {
                         kept.add(residue);
                         keptSpecial.add(residueLabel(residue));
+                        ClassifiedResidue classified = classified(
+                                residue, ResidueRole.LIGAND,
+                                ResidueDisposition.KEEP_IN_RECEPTOR,
+                                "non-polymer retained by special-residue policy");
+                        classifiedReceptor.add(classified);
+                        classifiedSpecial.add(classified);
                     } else {
                         extractedLigands.add(residue);
+                        classifiedLigands.add(classified(
+                                residue, ResidueRole.LIGAND,
+                                ResidueDisposition.EXTRACT_AS_LIGAND,
+                                "CCD identifies a non-polymer component"));
                     }
                 }
-                case UNKNOWN -> applyLegacyFallback(
-                        residue,
-                        name,
-                        removeWaters,
-                        keepMetals,
-                        allowedSpecialResidues,
-                        kept,
-                        removedWaters,
-                        removedMetals,
-                        keptSpecial,
-                        extractedLigands);
+                case UNKNOWN -> {
+                    log.debug("Applying legacy name-based disposition to {}", residueLabel(residue));
+                    if (allowedSpecialResidues.contains(name)) {
+                        kept.add(residue);
+                        keptSpecial.add(residueLabel(residue));
+                        ClassifiedResidue classified = classified(
+                                residue, ResidueRole.UNKNOWN,
+                                ResidueDisposition.KEEP_IN_RECEPTOR,
+                                "unknown component retained by special-residue policy");
+                        classifiedReceptor.add(classified);
+                        classifiedSpecial.add(classified);
+                    } else {
+                        extractedLigands.add(residue);
+                        classifiedLigands.add(classified(
+                                residue, ResidueRole.UNKNOWN,
+                                ResidueDisposition.EXTRACT_AS_LIGAND,
+                                "unknown multi-atom component extracted by fallback policy"));
+                    }
+                }
             }
         }
 
@@ -121,139 +163,26 @@ public class StructureCleanupStage implements Stage {
 
         context.put(ContextKeys.PROTEIN_RESIDUES, List.copyOf(kept));
         context.put(ContextKeys.EXTRACTED_LIGANDS, List.copyOf(extractedLigands));
+        context.put(ContextKeys.STRUCTURE_CLEANUP_RESULT, new StructureCleanupResult(
+                classifiedReceptor,
+                classifiedLigands,
+                classifiedWaters,
+                classifiedMetals,
+                classifiedSpecial));
         context.put(ContextKeys.STRUCTURE_CLEANUP_REPORT,
                 new StructureCleanupReport(incoming.size(), kept.size(), removedWaters, removedMetals, keptSpecial));
-    }
-
-    private ResidueKind classifyResidue(
-            Residue residue,
-            ResidueClassificationEvidence evidence) {
-        if (isMonoatomicMetalOrKnownIon(residue)) {
-            return ResidueKind.ION_OR_METAL;
-        }
-
-        if (evidence == null || !evidence.available()) {
-            return ResidueKind.UNKNOWN;
-        }
-
-        if (evidence.water()) {
-            return ResidueKind.WATER;
-        }
-
-        if (isStandardProteinResidue(evidence)) {
-            return ResidueKind.STANDARD_AMINO_ACID;
-        }
-
-        if (isModifiedProteinResidue(evidence)) {
-            return ResidueKind.MODIFIED_AMINO_ACID;
-        }
-
-        if (isExplicitNonPolymer(evidence)) {
-            return ResidueKind.NON_POLYMER;
-        }
-
-        return ResidueKind.UNKNOWN;
-    }
-
-    private boolean isExplicitNonPolymer(ResidueClassificationEvidence evidence) {
-        if ("nonPolymer".equals(evidence.residueType())) {
-            return true;
-        }
-        return !evidence.polymeric()
-                && "peptideLike".equals(evidence.residueType())
-                && "otherPolymer".equals(evidence.polymerType());
-    }
-
-    private boolean isStandardProteinResidue(ResidueClassificationEvidence evidence) {
-        return evidence.standard()
-                && evidence.polymeric()
-                && isProteinPolymerType(evidence.polymerType());
-    }
-
-    private boolean isModifiedProteinResidue(ResidueClassificationEvidence evidence) {
-        return evidence.polymeric()
-                && isProteinPolymerType(evidence.polymerType())
-                && hasParentComponent(evidence.parentComponentId());
-    }
-
-    private boolean isProteinPolymerType(String polymerType) {
-        if (polymerType == null) {
-            return false;
-        }
-
-        return switch (polymerType.trim().toLowerCase(Locale.ROOT)) {
-            case "peptide", "dpeptide" -> true;
-            default -> false;
-        };
-    }
-
-    private boolean hasParentComponent(String parentComponentId) {
-        if (parentComponentId == null) {
-            return false;
-        }
-
-        String normalized = parentComponentId.trim();
-        return !normalized.isEmpty()
-                && !normalized.equals("?")
-                && !normalized.equals(".");
-    }
-
-    private void applyLegacyFallback(
-            Residue residue,
-            String name,
-            boolean removeWaters,
-            boolean keepMetals,
-            Set<String> allowedSpecialResidues,
-            List<Residue> kept,
-            List<String> removedWaters,
-            List<String> removedMetals,
-            List<String> keptSpecial,
-            List<Residue> extractedLigands) {
-        log.debug("Applying legacy name-based classification to {}", residueLabel(residue));
-
-        if (STANDARD_AMINO_ACIDS.contains(name)) {
-            kept.add(residue);
-            return;
-        }
-
-        if (WATER_NAMES.contains(name)) {
-            if (removeWaters) {
-                removedWaters.add(residueLabel(residue));
-                return;
-            }
-
-            throw unsupported(residue, "water retention is not supported for docking prep");
-        }
-
-        if (isMonoatomicMetalOrKnownIon(residue)) {
-            if (keepMetals) {
-                kept.add(residue);
-                keptSpecial.add(residueLabel(residue));
-            } else {
-                removedMetals.add(residueLabel(residue));
-            }
-            return;
-        }
-
-        if (allowedSpecialResidues.contains(name)) {
-            kept.add(residue);
-            keptSpecial.add(residueLabel(residue));
-            return;
-        }
-
-        extractedLigands.add(residue);
     }
 
     private IllegalArgumentException unsupported(Residue residue, String reason) {
         return new IllegalArgumentException("Unsupported residue " + residueLabel(residue) + ": " + reason);
     }
 
-    private boolean isMonoatomicMetalOrKnownIon(Residue residue) {
-        if (residue.getAtoms().size() != 1) return false;
-        Atom atom = residue.getAtoms().getFirst();
-        if (atom.getElement() == null || atom.getElement().getSymbol() == null) return false;
-        return METAL_ELEMENTS.contains(atom.getElement().getSymbol().toUpperCase(Locale.ROOT))
-                || metalIonPolicy.isKnownIonResidue(residue);
+    private ClassifiedResidue classified(
+            Residue residue,
+            ResidueRole role,
+            ResidueDisposition disposition,
+            String reason) {
+        return new ClassifiedResidue(residue, role, disposition, reason);
     }
 
     private Set<String> allowedSpecialResidues(Object configured) {

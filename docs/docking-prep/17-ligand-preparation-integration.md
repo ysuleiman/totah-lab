@@ -13,6 +13,12 @@ deterministic operation. `prepare` returns one typed `LigandPreparationResult`;
 `prepareToPath` additionally writes the validated PDBQT using `Path` and
 propagates checked I/O failures.
 
+Receptor cleanup now exposes candidates through `StructureCleanupResult`.
+Its `ClassifiedResidue` entries keep component identity separate from cleanup
+disposition. Selection policy must choose one extracted free-ligand residue
+before invoking `LigandPreparer`; the preparer does not reinterpret receptor
+cleanup policy.
+
 The result contains the final molecular graph, graph validation,
 hydrogenation, charge, AD4 typing, torsion results, and the exact emitted PDBQT
 text.

@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.pipeline.ContextKeys;
 import totah.lab.pipeline.PipelineContext;
+import totah.lab.pipeline.cleanup.ResidueDisposition;
+import totah.lab.pipeline.cleanup.ResidueRole;
+import totah.lab.pipeline.cleanup.StructureCleanupResult;
 import totah.lab.pipeline.report.StructureCleanupReport;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
@@ -303,6 +306,40 @@ class StructureCleanupStageTest {
         List<Residue> ligands = context.require(ContextKeys.EXTRACTED_LIGANDS);
         assertThrows(UnsupportedOperationException.class,
                 () -> ligands.add(residue("BAD", 999, atom("C1", "C"))));
+    }
+
+    @Test
+    void publishesTypedCleanupResultWithoutRemovingLegacyHandoffs() {
+        Residue qwe = residue("QWE", 373, atom("C1", "C"), atom("N1", "N")).toBuilder()
+                .residueClassificationEvidence(evidence(
+                        true, false, false, false, null, "nonPolymer", null))
+                .build();
+        PipelineContext context = contextWith(
+                residue("CYS", 32, atom("CA", "C")),
+                qwe,
+                residue("HOH", 501, atom("O", "O")),
+                residue("ZN", 701, atom("ZN", "Zn")));
+
+        new StructureCleanupStage().run(context);
+
+        StructureCleanupResult result = context.require(ContextKeys.STRUCTURE_CLEANUP_RESULT);
+        assertEquals(List.of("CYS"), result.receptorResidues().stream()
+                .map(classified -> classified.residue().getName())
+                .toList());
+        assertEquals(ResidueRole.LIGAND, result.extractedLigands().getFirst().role());
+        assertEquals(
+                ResidueDisposition.EXTRACT_AS_LIGAND,
+                result.extractedLigands().getFirst().disposition());
+        assertEquals(ResidueRole.WATER, result.removedWaters().getFirst().role());
+        assertEquals(ResidueRole.METAL_OR_ION, result.removedMetals().getFirst().role());
+
+        List<Residue> legacyLigands = context.require(ContextKeys.EXTRACTED_LIGANDS);
+        assertEquals(
+                result.extractedLigands().getFirst().residue(),
+                legacyLigands.getFirst());
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> result.extractedLigands().add(result.extractedLigands().getFirst()));
     }
 
     private PipelineContext contextWith(Residue... residues) {

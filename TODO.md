@@ -14,11 +14,10 @@
   Amber minimization/MD, and continue investigating the other unsupported
   `1A4W` chemistry (`QWE`) separately from TYS.
 - Revisit docking-prep pocket-center policy. `PocketGeometry.calculateCenter(Pocket)` now computes a resolved receptor heavy-atom centroid first. This is the P2Rank path because P2Rank pockets have residue refs but no alpha spheres. fpocket may fall back to alpha spheres, then stored parser center; confirm whether this priority should remain for missing-heavy-atom proximity and grid-box generation.
-- Replace `ContextKeys.EXTRACTED_LIGANDS` with a typed cleanup result. The
-  current context key is a short-term handoff for bound ligands extracted from
-  receptor prep; a dedicated result type should carry receptor residues,
-  extracted ligands, removed waters/metals, and kept special residues without
-  adding more loosely typed context entries.
+- Migrate downstream ligand selection from `ContextKeys.EXTRACTED_LIGANDS` to
+  the typed `StructureCleanupResult`. Cleanup now publishes categorized
+  receptor residues, extracted ligands, removed waters/metals, and kept special
+  residues. Keep the legacy key until its public API removal is approved.
 - Decide whether to support an Open Babel compatibility export mode. Open Babel
   PDBQT references are compatibility references, not scientific
   source-of-truth references. Use them to validate rigid PDBQT shape and

@@ -49,4 +49,5 @@ public class ContextKeys {
     public static final String CCD_ONLINE_LOOKUP = "ccdOnlineLookup";
     public static final String CCD_CACHE_DIRECTORY = "ccdCacheDirectory";
     public static final String STRUCTURE_CLEANUP_REPORT = "structure_cleanup_report";
+    public static final String STRUCTURE_CLEANUP_RESULT = "structure_cleanup_result";
 }

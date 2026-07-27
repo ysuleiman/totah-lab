@@ -18,8 +18,26 @@ stage runs.
   `ContextKeys.ALLOWED_SPECIAL_RESIDUES`.
 - Extracts unknown multi-atom non-polymer residues from the receptor by default
   and publishes them to `ContextKeys.EXTRACTED_LIGANDS`.
+- Publishes categorized immutable cleanup output as `StructureCleanupResult`
+  under `ContextKeys.STRUCTURE_CLEANUP_RESULT`.
 - Publishes a `StructureCleanupReport` to
   `ContextKeys.STRUCTURE_CLEANUP_REPORT`.
+
+`EXTRACTED_LIGANDS` remains available as a compatibility handoff. New code
+should read the typed result, whose entries preserve the residue identity,
+classification role, cleanup disposition, and policy reason.
+
+## Classification and policy
+
+`ResidueClassifier` owns reusable, policy-neutral component classification.
+It uses CCD evidence first and stable name/element rules only when that evidence
+is unavailable. `StructureCleanupStage` separately decides whether each
+classification is kept in the receptor, extracted as a ligand, or removed.
+
+This distinction is intentional. A component can be chemically identifiable
+without being selected as a docking ligand, and an unknown multi-atom group can
+be extracted by fallback policy without being falsely described as a
+CCD-confirmed ligand.
 
 ## CCD Lookup
 
@@ -93,3 +111,6 @@ policy via allowed special residues or a future cofactor policy stage.
 - Failure when cleanup removes every residue.
 - Missing and empty input residue handling.
 - Defensive-copy behavior in the report.
+- Typed cleanup-result categories, dispositions, reasons, and immutability.
+- A representative classification panel for standard residue, modified
+  residue, water, ion, CCD non-polymer, and unknown cases.

@@ -5,5 +5,6 @@ public enum ResidueRole {
     MODIFIED_AMINO_ACID,
     WATER,
     METAL_OR_ION,
+    LIGAND,
     UNKNOWN
 }
