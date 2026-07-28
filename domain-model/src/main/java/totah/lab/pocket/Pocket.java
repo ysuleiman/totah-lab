@@ -108,4 +108,8 @@ public class Pocket {
     public <T> T getAttribute(String key) {
         return (T) attributes.get(key);
     }
+
+    public List<Sphere> getSpheres() {
+        return this.getAttribute("alpha_spheres");
+    }
 }

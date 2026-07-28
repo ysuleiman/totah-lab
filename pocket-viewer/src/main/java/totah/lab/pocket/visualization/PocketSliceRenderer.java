@@ -221,7 +221,7 @@ public final class PocketSliceRenderer {
         graphics.setStroke(
                 new BasicStroke(options.alphaSphereStrokeWidth()));
 
-        List<Sphere>spheres = pocket.getAttribute("alpha-spheres");
+        List<Sphere>spheres = pocket.getSpheres();
         for (Sphere sphere : spheres) {
             PocketProjection.ProjectedPoint projected =
                     PocketProjection.project(sphere.getPoint(),
@@ -320,7 +320,7 @@ public final class PocketSliceRenderer {
         graphics.setStroke(
                 new BasicStroke(options.alphaSphereStrokeWidth()));
 
-        List<Sphere>spheres = pocket.getAttribute("alpha-spheres");
+        List<Sphere>spheres = pocket.getSpheres();
         for (Sphere sphere : spheres) {
             PocketProjection.ProjectedPoint projected =
                     PocketProjection.project(sphere.getPoint(),
@@ -450,7 +450,7 @@ public final class PocketSliceRenderer {
             }
         }
 
-        List<Sphere> spheres = pocket.getAttribute("alpha-spheres");
+        List<Sphere> spheres = pocket.getSpheres();
         for (Sphere sphere : spheres) {
             PocketProjection.ProjectedPoint projected =
                     PocketProjection.project(sphere.getPoint(),

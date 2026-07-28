@@ -2,8 +2,12 @@ package totah.lab.io;
 
 
 import java.io.IOException;
+import java.util.List;
 
 public interface Adapter<I, O> {
+    default String getName() {
+        return getClass().getSimpleName();
+    }
     boolean supports(I input);
-    O parse(I input) throws IOException;
+    List<O> parse(I input) throws IOException;
 }

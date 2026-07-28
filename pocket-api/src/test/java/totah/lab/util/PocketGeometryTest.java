@@ -99,7 +99,7 @@ class PocketGeometryTest {
     private Pocket pocket(List<ResidueRef> residueRefs, Map<String, Object> attributes,
                           Point3D center, java.util.function.Function<ResidueRef, Residue> resolver) {
         return new Pocket(1L, "pocket-1", center, 1.0, residueRefs,
-                PocketSource.builder().source("TEST").build(), attributes, resolver);
+                PocketSource.P2RANK, attributes, resolver);
     }
 
     private Atom atom(String name, String element, double x, double y, double z) {

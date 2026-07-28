@@ -293,7 +293,7 @@ class TopologyBuilderStageTest {
     private Pocket pocketFor(Residue residue) {
         return new Pocket(1L, "test-pocket", null, 1.0,
                 List.of(new ResidueRef(residue.getChain(), residue.getNumber(), residue.getName())),
-                PocketSource.builder().source("TEST").build(),
+                PocketSource.P2RANK,
                 Map.of(),
                 ref -> residue);
     }

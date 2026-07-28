@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class P2RankAdapter implements Adapter<Path, List<Pocket>> {
+public class P2RankAdapter implements Adapter<Path, Pocket> {
 
     private final P2RankJsonParser parser;
 

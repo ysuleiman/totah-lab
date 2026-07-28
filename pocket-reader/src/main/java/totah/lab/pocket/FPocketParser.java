@@ -79,7 +79,7 @@ public class FPocketParser {
                     // Reset mapping trackers for the new pocket block
                     currentProperties = new HashMap<>();
                     currentBuilder = Pocket.builder()
-                            .source(PocketSource.builder().source("FPOCKET").build())
+                            .source(PocketSource.FPOCKET)
                             .id(pocketId).attributes(currentProperties);
 
                     builders.put(pocketId, currentBuilder);

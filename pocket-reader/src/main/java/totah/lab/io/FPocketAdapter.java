@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class FPocketAdapter implements Adapter<Path, List<Pocket>> {
+public class FPocketAdapter implements Adapter<Path, Pocket> {
 
     public FPocketAdapter(){
     }

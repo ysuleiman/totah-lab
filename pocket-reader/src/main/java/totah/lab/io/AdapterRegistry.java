@@ -16,12 +16,17 @@ public final class AdapterRegistry<O> {
         adapters.add(Objects.requireNonNull(adapter));
     }
 
-    public O load(Path input) throws IOException {
+    public List<O> load(Path input) throws IOException {
+        List<O> results = new ArrayList<>();
         for (Adapter<Path, O> adapter : adapters) {
             if (adapter.supports(input)) {
-                return adapter.parse(input);
+                results.addAll(adapter.parse(input));
             }
         }
-        throw new IOException("No adapter supports: " + input);
+        if (results.isEmpty()) {
+            throw new IOException(
+                    "No adapter supports: " + input);
+        }
+        return results;
     }
 }

@@ -5,6 +5,7 @@ import totah.lab.pocket.Pocket;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -78,11 +79,10 @@ public final class PocketImageExporter {
             Files.createDirectories(parent);
         }
 
-        boolean written =
-                ImageIO.write(
-                        image,
-                        "png",
-                        absolutePath.toFile());
+        boolean written;
+        try (OutputStream output = Files.newOutputStream(absolutePath)) {
+            written = ImageIO.write(image, "png", output);
+        }
 
         if (!written) {
             throw new IOException(

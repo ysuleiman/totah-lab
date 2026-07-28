@@ -3,6 +3,7 @@ package totah.lab.protein;
 import lombok.Getter;
 import lombok.ToString;
 import totah.lab.pocket.Pocket;
+import totah.lab.pocket.PocketSource;
 
 import java.util.*;
 
@@ -58,5 +59,15 @@ public class Protein {
                 .orElse(null);
     }
 
+    public Pocket getPocket(int pocketIndex) {
+        return pockets.get(pocketIndex);
+    }
+
+    public List<Pocket> getPockets(PocketSource pocketSource) {
+        Objects.requireNonNull(pocketSource, "pocketSource");
+        return this.pockets.stream()
+                .filter(p -> pocketSource.equals(p.getSource()))
+                .toList();
+    }
 
 }

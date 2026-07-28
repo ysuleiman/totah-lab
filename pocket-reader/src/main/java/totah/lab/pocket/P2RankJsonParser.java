@@ -29,8 +29,8 @@ public class P2RankJsonParser {
         long index = 0;
         for (JsonNode node : pocketsNode) {
             index++;
-            Pocket.PocketBuilder builder = Pocket.builder().
-                    source(PocketSource.builder().source("P2Rank").build());
+            Pocket.PocketBuilder builder = Pocket.builder()
+                    .source(PocketSource.P2RANK);
             builder.name(node.get("name").asText());
 
             // Prefer the JSON rank field; fall back to the array order
