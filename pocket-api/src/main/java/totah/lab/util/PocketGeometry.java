@@ -1,6 +1,7 @@
 package totah.lab.util;
 
 import totah.lab.pocket.Dimensions;
+import totah.lab.pocket.Pocket;
 import totah.lab.pocket.Sphere;
 import totah.lab.protein.*;
 

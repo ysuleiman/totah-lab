@@ -11,6 +11,17 @@ public class ContextKeys {
     public static final String FLEX_PDBQT_PATH = "flex_pdbqt_path";
     public static final String LIGAND_PATH = "ligand_path";
     public static final String LIGAND_PDBQT = "ligand_pdbqt";
+    public static final String LIGAND_PDBQT_PATH = "ligand_pdbqt_path";
+    public static final String LIGAND_SELECTION = "ligand_selection";
+    public static final String SELECTED_LIGAND = "selected_ligand";
+    public static final String LIGAND_GRAPH_RESULT = "ligand_graph_result";
+    public static final String LIGAND_HYDROGENATION_RESULT = "ligand_hydrogenation_result";
+    public static final String LIGAND_CHARGE_ASSIGNMENT_RESULT = "ligand_charge_assignment_result";
+    public static final String LIGAND_AD4_TYPING_RESULT = "ligand_ad4_typing_result";
+    public static final String LIGAND_TORSION_TREE_RESULT = "ligand_torsion_tree_result";
+    public static final String LIGAND_PREPARATION_RESULT = "ligand_preparation_result";
+    public static final String CHEM_COMP_PROVIDER = "chem_comp_provider";
+    public static final String DOCKING_INPUT = "docking_input";
     public static final String EXTRACTED_LIGANDS = "extracted_ligands";
     public static final String GRID_BOX = "grid_box";
     public static final String POCKET = "pocket";

@@ -82,7 +82,7 @@ class LigandPreparerTest {
     private Atom atom(String name, double x) {
         return Atom.builder()
                 .name(name)
-                .element(Element.builder().symbol("C").build())
+                .element(Element.fromSymbol("C"))
                 .position(new Point3D(x, 0.0, 0.0))
                 .charge(0.0)
                 .occupancy(1.0)

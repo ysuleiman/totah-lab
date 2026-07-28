@@ -6,15 +6,12 @@ import org.biojava.nbio.structure.ResidueNumber;
 import org.biojava.nbio.structure.chem.ChemComp;
 import org.biojava.nbio.structure.chem.ChemCompProvider;
 import org.biojava.nbio.structure.chem.ChemCompGroupFactory;
-import org.biojava.nbio.structure.chem.DownloadChemCompProvider;
-import org.biojava.nbio.structure.chem.ReducedChemCompProvider;
 import org.biojava.nbio.structure.io.PDBFileReader;
 import org.biojava.nbio.structure.io.cif.CifStructureConverter;
 import totah.lab.protein.ResidueClassificationEvidence;
 import totah.lab.protein.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -35,10 +32,18 @@ public final class StructureIO {
             Path ccdCacheDirectory) throws IOException {
         Objects.requireNonNull(structurePath, "structurePath is null");
 
+        ChemCompProvider provider = ChemCompProviders.create(
+                onlineCcdLookup, ccdCacheDirectory);
+        return load(structurePath, provider);
+    }
+
+    public static Structure load(
+            Path structurePath,
+            ChemCompProvider provider) throws IOException {
+        Objects.requireNonNull(structurePath, "structurePath is null");
+        Objects.requireNonNull(provider, "provider is null");
+
         synchronized (CHEM_COMP_PROVIDER_LOCK) {
-            ChemCompProvider provider = onlineCcdLookup
-                    ? onlineProvider(ccdCacheDirectory)
-                    : new ReducedChemCompProvider();
             ChemCompProvider previousProvider = ChemCompGroupFactory.getChemCompProvider();
             ChemCompGroupFactory.setChemCompProvider(provider);
             ChemCompGroupFactory.clearCache();
@@ -73,16 +78,6 @@ public final class StructureIO {
         }
 
         return new Structure(residues);
-    }
-
-    private static ChemCompProvider onlineProvider(Path ccdCacheDirectory) throws IOException {
-        Objects.requireNonNull(
-                ccdCacheDirectory,
-                "ccdCacheDirectory is required when online CCD lookup is enabled");
-        Files.createDirectories(ccdCacheDirectory);
-        return new OnlineFallbackChemCompProvider(
-                new ReducedChemCompProvider(),
-                new DownloadChemCompProvider(ccdCacheDirectory.toString()));
     }
 
     private static Residue buildResidue(Group group) {
@@ -141,14 +136,7 @@ public final class StructureIO {
                             .amberType(null)
                             .occupancy(bioAtom.getOccupancy())
                             .bFactor(bioAtom.getTempFactor())
-                            .element(
-                                    Element.builder()
-                                            .atomicNumber(bioElement.getAtomicNumber())
-                                            .atomicMass(bioElement.getAtomicMass())
-                                            .symbol(bioElement.name().trim())
-                                            .covalentRadius(bioElement.getCovalentRadius())
-                                            .vdwRadius(bioElement.getVDWRadius())
-                                            .build())
+                            .element(Element.fromSymbol(bioElement.name()))
                             .build());
         }
 

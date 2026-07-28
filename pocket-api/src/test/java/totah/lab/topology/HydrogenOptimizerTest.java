@@ -39,7 +39,7 @@ class HydrogenOptimizerTest {
                 .name(name)
                 .position(new Point3D(x, y, z))
                 .bFactor(15.0)
-                .element(Element.builder().symbol(symbol).build())
+                .element(Element.fromSymbol(symbol))
                 .build();
     }
 

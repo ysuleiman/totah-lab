@@ -2,7 +2,6 @@ package totah.lab.pocket;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import totah.lab.protein.Pocket;
 import totah.lab.protein.Point3D;
 
 import java.io.IOException;

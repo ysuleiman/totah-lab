@@ -12,7 +12,7 @@ import totah.lab.pipeline.report.TopologyBuildReport;
 import totah.lab.pipeline.residue.ResidueState;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Topology;
@@ -305,13 +305,7 @@ class TopologyBuilderStageTest {
                 .charge(0.0)
                 .occupancy(1.0)
                 .bFactor(80.0)
-                .element(Element.builder()
-                        .symbol(element)
-                        .atomicNumber(0)
-                        .atomicMass(0.0)
-                        .covalentRadius(0.0)
-                        .vdwRadius(0.0)
-                        .build())
+                .element(Element.fromSymbol(element))
                 .build();
     }
 

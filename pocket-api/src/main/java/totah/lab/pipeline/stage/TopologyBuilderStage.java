@@ -7,7 +7,7 @@ import totah.lab.pipeline.report.MissingHeavyAtomReport;
 import totah.lab.pipeline.report.TopologyBuildReport;
 import totah.lab.pipeline.residue.ResidueState;
 import totah.lab.protein.Atom;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Topology;

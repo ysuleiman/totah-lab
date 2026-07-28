@@ -43,7 +43,7 @@ public final class ElementResolver {
             return "C";
         }
         Element element = atom.getElement();
-        if (element != null && element.getSymbol() != null && !element.getSymbol().isBlank()) {
+        if (element != null && !element.isUnknown()) {
             return canonicalize(element.getSymbol());
         }
 

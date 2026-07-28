@@ -1,7 +1,7 @@
 package totah.lab.io;
 
 import totah.lab.pocket.FPocketParser;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 
 import java.io.IOException;
 import java.nio.file.Files;

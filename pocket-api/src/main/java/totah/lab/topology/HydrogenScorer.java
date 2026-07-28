@@ -5,6 +5,7 @@ import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -98,7 +99,8 @@ final class HydrogenScorer {
         for (Residue er : env) {
             if (shareSameResidue(null, er)) continue; // env is full list, check all
             for (Atom a : er.getAtoms()) {
-                if (METAL_ELEMENTS.contains(a.getElement().getSymbol())) {
+                if (METAL_ELEMENTS.contains(
+                        a.getElement().getSymbol().toUpperCase(Locale.ROOT))) {
                     if (distance(pos, a.getPosition()) <= 4.0) {
                         return true;
                     }

@@ -265,7 +265,7 @@ Required tests:
 Suggested components:
 
 ```text
-LigandChargeSystem
+MolecularGraphChargeSystem
 LigandChargeAssignmentStage
 LigandChargeAssignmentReport
 ```

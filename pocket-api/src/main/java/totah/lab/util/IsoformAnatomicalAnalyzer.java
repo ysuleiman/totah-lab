@@ -2,7 +2,7 @@ package totah.lab.util;
 
 
 import totah.lab.protein.Atom;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Protein;
 import totah.lab.protein.Residue;

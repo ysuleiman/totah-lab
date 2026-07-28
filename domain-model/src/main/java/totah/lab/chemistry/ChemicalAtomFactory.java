@@ -20,13 +20,7 @@ public final class ChemicalAtomFactory {
                 .charge(0.0)
                 .occupancy(1.0)
                 .bFactor(bFactor)
-                .element(Element.builder()
-                        .symbol("H")
-                        .atomicNumber(1)
-                        .atomicMass(1.008)
-                        .covalentRadius(0.31)
-                        .vdwRadius(1.20)
-                        .build())
+                .element(Element.H)
                 .build();
     }
 }

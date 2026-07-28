@@ -1,5 +1,10 @@
 package totah.lab.ligand;
 
+import totah.lab.ligand.ccd.CcdLigandGraphBuilder;
+import totah.lab.ligand.charge.LigandChargeAssigner;
+import totah.lab.ligand.hydrogen.LigandHydrogenator;
+import totah.lab.ligand.torsion.LigandTorsionTreeBuilder;
+import totah.lab.ligand.typing.LigandAd4AtomTyper;
 import org.biojava.nbio.structure.chem.ChemComp;
 import org.biojava.nbio.structure.chem.ChemCompAtom;
 import org.biojava.nbio.structure.chem.ChemCompBond;
@@ -177,7 +182,7 @@ class LigandCapabilityMatrixTest {
     private Atom atom(String name, String element, double x) {
         return Atom.builder()
                 .name(name)
-                .element(Element.builder().symbol(element).build())
+                .element(Element.fromSymbol(element))
                 .position(new Point3D(x, 0.0, 0.0))
                 .charge(0.0)
                 .occupancy(1.0)

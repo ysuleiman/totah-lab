@@ -365,13 +365,7 @@ class StructureCleanupStageTest {
                 .occupancy(1.0)
                 .bFactor(20.0)
                 .charge(0.0)
-                .element(Element.builder()
-                        .symbol(element)
-                        .atomicNumber(0)
-                        .atomicMass(0.0)
-                        .covalentRadius(0.0)
-                        .vdwRadius(0.0)
-                        .build())
+                .element(Element.fromSymbol(element))
                 .build();
     }
 

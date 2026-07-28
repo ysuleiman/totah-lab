@@ -4,6 +4,26 @@
 CCD graph, hydrogenation, Gasteiger charge, AutoDock4 typing, torsion-tree, and
 PDBQT export services without adding ligand branches to receptor stages.
 
+## Package boundaries
+
+The root `totah.lab.ligand` package is intentionally limited to the preparation
+facade, aggregate result, and stable unsupported-ligand failure contract.
+Implementation responsibilities are separated as follows:
+
+```text
+totah.lab.ligand.ccd        CCD graph reconciliation and validation
+totah.lab.ligand.hydrogen   valence checking and hydrogen generation
+totah.lab.ligand.charge     small-molecule charge assignment
+totah.lab.ligand.typing     AutoDock4 atom typing
+totah.lab.ligand.torsion    rings, rotatable bonds, and torsion trees
+totah.lab.ligand.selection  cleanup candidate selection and orchestration
+```
+
+`MolecularGraphChargeSystem` is the small-molecule adapter to the generic
+`totah.lab.math.charges.ChargeSystem`. It is deliberately separate from the
+receptor adapter: ligand charging uses CCD formal charges, bond orders, and
+aromaticity, while receptor charging remains Amber-template based by default.
+
 ## Input and output
 
 The caller must provide exactly one explicitly selected deposited `Residue`.
@@ -19,7 +39,7 @@ disposition. Selection policy must choose one extracted free-ligand residue
 before invoking `LigandPreparer`; the preparer does not reinterpret receptor
 cleanup policy.
 
-`LigandPreparationOrchestrator` implements this handoff. It supports automatic
+`ligand.selection.LigandPreparationOrchestrator` implements this handoff. It supports automatic
 handling only when zero or one extracted component exists and requires
 `LigandSelection` for ambiguous multi-candidate structures. See
 [19-ligand-selection-orchestration.md](19-ligand-selection-orchestration.md).

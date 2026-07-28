@@ -2,6 +2,7 @@ package totah.lab.protein;
 
 import lombok.Getter;
 import lombok.ToString;
+import totah.lab.pocket.Pocket;
 
 import java.util.*;
 

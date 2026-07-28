@@ -42,9 +42,7 @@ public final class HydrogenationGeometry {
     public static Atom oxtAtom(String name, Point3D pos, double bFactor) {
         return Atom.builder()
                 .name(name).position(pos).charge(0.0).occupancy(1.0).bFactor(bFactor)
-                .element(Element.builder()
-                        .symbol("O").atomicNumber(8).atomicMass(15.999)
-                        .covalentRadius(0.73).vdwRadius(1.52).build())
+                .element(Element.O)
                 .build();
     }
 

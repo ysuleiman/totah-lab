@@ -21,4 +21,12 @@ public class Atom {
     private final double occupancy;
     private final double bFactor;
     private final Element element;
+
+    public boolean isHydrogen() {
+        return element == Element.H;
+    }
+
+    public boolean isHeavyAtom() {
+        return !isHydrogen();
+    }
 }

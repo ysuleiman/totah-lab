@@ -442,7 +442,7 @@ public class PdbqtExporterStageTest {
                 .charge("H".equals(element) ? 0.05 : -0.05)
                 .occupancy(1.0)
                 .bFactor(0.0)
-                .element(Element.builder().symbol(element).build())
+                .element(Element.fromSymbol(element))
                 .build();
     }
 

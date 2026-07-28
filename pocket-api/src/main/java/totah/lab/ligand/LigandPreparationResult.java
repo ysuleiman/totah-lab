@@ -1,6 +1,11 @@
 package totah.lab.ligand;
 
 import totah.lab.chemistry.MolecularGraph;
+import totah.lab.ligand.ccd.LigandGraphValidationReport;
+import totah.lab.ligand.charge.LigandChargeAssignmentResult;
+import totah.lab.ligand.hydrogen.LigandHydrogenationResult;
+import totah.lab.ligand.torsion.LigandTorsionTreeResult;
+import totah.lab.ligand.typing.LigandAd4TypingResult;
 
 import java.util.Objects;
 

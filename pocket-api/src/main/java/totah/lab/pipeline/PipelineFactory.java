@@ -10,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 
@@ -40,7 +38,7 @@ public class PipelineFactory {
         QEqModel qeqModel = qeqFile != null
                 ? new QEqModel(new HybridSolver(2000), qeqFile)
                 : new QEqModel(new HybridSolver(2000));
-        Path runDirectory = createRunDirectory();
+        Path runDirectory = PipelineRunDirectoryFactory.create(properties.workspace());
 
         PipelineContext context = new PipelineContext(properties.workspace(), runDirectory)
                 .with(ContextKeys.TARGET_PDB_PATH, targetPdb)
@@ -60,15 +58,6 @@ public class PipelineFactory {
                 .stage(new AD4AtomTypingStage())
                 .stage(new PdbqtExporterStage())
                 .build();
-    }
-
-    private Path createRunDirectory() throws IOException {
-        LocalDateTime now = LocalDateTime.now();
-        String runId = now
-                .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS"));
-        Path runDirectory = this.properties.workspace().resolve(runId);
-        Files.createDirectories(runDirectory);
-        return runDirectory;
     }
 
     private Path loadQeqFromResources() {

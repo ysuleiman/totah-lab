@@ -54,13 +54,7 @@ class FlexPDBQTWriterTest {
                 .charge(0.0)
                 .bFactor(0.0)
                 .occupancy(1.0)
-                .element(Element.builder()
-                        .symbol(elementSymbol)
-                        .atomicNumber(atomicNumber(elementSymbol))
-                        .atomicMass(0.0)
-                        .covalentRadius(0.0)
-                        .vdwRadius(0.0)
-                        .build())
+                .element(Element.fromSymbol(elementSymbol))
                 .build();
     }
 

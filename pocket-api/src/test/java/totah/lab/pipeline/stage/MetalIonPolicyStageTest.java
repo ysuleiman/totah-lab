@@ -91,10 +91,7 @@ class MetalIonPolicyStageTest {
                         .charge(0.0)
                         .occupancy(1.0)
                         .bFactor(20.0)
-                        .element(Element.builder()
-                                .symbol(symbol)
-                                .atomicNumber(atomicNumber)
-                                .build())
+                        .element(Element.fromSymbol(symbol))
                         .build()))
                 .build();
     }

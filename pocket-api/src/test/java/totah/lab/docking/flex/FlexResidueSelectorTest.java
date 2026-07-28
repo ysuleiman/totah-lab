@@ -52,7 +52,7 @@ class FlexResidueSelectorTest {
                 .position(new Point3D(0.0, 0.0, 0.0))
                 .charge(0.0)
                 .autoDockType("C")
-                .element(Element.builder().symbol(element).build())
+                .element(Element.fromSymbol(element))
                 .build();
     }
 }

@@ -20,7 +20,7 @@ public class SpatialClashCheckerTest {
                 .charge(0.0)
                 .occupancy(1.0)
                 .bFactor(0.0)
-                .element(Element.builder().symbol("C").build())
+                .element(Element.fromSymbol("C"))
                 .build();
     }
 

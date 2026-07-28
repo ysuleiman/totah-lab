@@ -6,7 +6,7 @@ import totah.lab.pocket.ResidueRef;
 import totah.lab.pocket.Sphere;
 import totah.lab.protein.Atom;
 import totah.lab.protein.Element;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 import totah.lab.protein.Point3D;
 import totah.lab.protein.Residue;
 
@@ -109,7 +109,7 @@ class PocketGeometryTest {
                 .charge(0.0)
                 .occupancy(1.0)
                 .bFactor(10.0)
-                .element(Element.builder().symbol(element).build())
+                .element(Element.fromSymbol(element))
                 .build();
     }
 }

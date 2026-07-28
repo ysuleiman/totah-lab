@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,7 +53,8 @@ public final class ReceptorHydrogenator {
         List<Atom> metals = new ArrayList<>();
         for (Residue r : residues) {
             for (Atom a : r.getAtoms()) {
-                if (ProtonationConfig.METAL_ELEMENTS.contains(a.getElement().getSymbol())){
+                if (ProtonationConfig.METAL_ELEMENTS.contains(
+                        a.getElement().getSymbol().toUpperCase(Locale.ROOT))){
                     metals.add(a);
                 }
             }

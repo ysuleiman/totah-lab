@@ -203,13 +203,7 @@ public class ResidueStateAssignmentStage implements Stage {
     }
 
     private Element sulfur() {
-        return Element.builder()
-                .symbol("S")
-                .atomicNumber(16)
-                .atomicMass(32.06)
-                .covalentRadius(1.05)
-                .vdwRadius(1.80)
-                .build();
+        return Element.S;
     }
 
     private boolean isNTerminus(List<Residue> residues, int index) {

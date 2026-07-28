@@ -1,7 +1,7 @@
 package totah.lab.util;
 
 import totah.lab.pocket.ResidueRef;
-import totah.lab.protein.Pocket;
+import totah.lab.pocket.Pocket;
 import totah.lab.protein.Residue;
 import totah.lab.protein.Structure;
 

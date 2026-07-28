@@ -86,7 +86,7 @@ class LigandPDBQTWriterTest {
     private Atom atom(String name, String element, String type, double x) {
         return Atom.builder()
                 .name(name)
-                .element(Element.builder().symbol(element).build())
+                .element(Element.fromSymbol(element))
                 .position(new Point3D(x, 0.0, 0.0))
                 .charge(0.0).occupancy(1.0).bFactor(0.0)
                 .autoDockType(type)

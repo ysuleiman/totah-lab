@@ -1,6 +1,5 @@
 package totah.lab.pocket;
 
-import totah.lab.protein.Pocket;
 import totah.lab.protein.Point3D;
 
 import java.io.BufferedReader;

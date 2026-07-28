@@ -72,13 +72,7 @@ public class ProteinTopologyBuilder {
                     .charge(charge)
                     .occupancy(bioAtom.getOccupancy())
                     .bFactor(bioAtom.getTempFactor())
-                    .element(Element.builder()
-                            .atomicNumber(bioElement.getAtomicNumber())
-                            .atomicMass(bioElement.getAtomicMass())
-                            .symbol(bioElement.name().trim())
-                            .covalentRadius(bioElement.getCovalentRadius())
-                            .vdwRadius(bioElement.getVDWRadius())
-                            .build())
+                    .element(Element.fromSymbol(bioElement.name()))
                     .build());
         }
         return atoms;

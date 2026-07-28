@@ -10,7 +10,7 @@ class ElementResolverTest {
     void trustsExplicitElement() {
         Atom atom = Atom.builder()
                 .name("CA")
-                .element(Element.builder().symbol("mg").build())
+                .element(Element.fromSymbol("mg"))
                 .build();
 
         assertThat(ElementResolver.resolveSymbol(atom, false)).isEqualTo("Mg");
@@ -42,5 +42,15 @@ class ElementResolverTest {
         assertThat(ElementResolver.resolveSymbol(Atom.builder().name("CL").build(), false)).isEqualTo("Cl");
         assertThat(ElementResolver.resolveSymbol(Atom.builder().name("zn").build(), false)).isEqualTo("Zn");
         assertThat(ElementResolver.resolveSymbol(Atom.builder().name("NA").build(), true)).isEqualTo("Na");
+    }
+
+    @Test
+    void fallsBackToAtomNameForUnknownEnumElement() {
+        Atom atom = Atom.builder()
+                .name("MN")
+                .element(Element.UNKNOWN)
+                .build();
+
+        assertThat(ElementResolver.resolveSymbol(atom, true)).isEqualTo("Mn");
     }
 }
