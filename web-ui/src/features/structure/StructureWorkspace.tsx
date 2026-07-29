@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react'
-import type { PocketDetails, PocketSummary, Structure } from '../../api/types'
+import type {
+  DockingRunSummary,
+  PocketDetails,
+  PocketSummary,
+  ResidueAnalysis,
+  Structure,
+} from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { StructureHero } from './components/StructureHero'
@@ -19,19 +25,39 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
     structureQuery.data?.pocketsUrl ?? null,
   )
   const [selectedPocketId, setSelectedPocketId] = useState<number | null>(null)
+  const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
   const effectivePocketId =
     selectedPocketId ?? structureQuery.data?.chosenPocket?.id ?? null
   const pocketQuery = useApiQuery<PocketDetails>(
     effectivePocketId ? `/api/pockets/${effectivePocketId}` : null,
+  )
+  const dockingRunsQuery = useApiQuery<DockingRunSummary[]>(
+    `/api/structures/${structureId}/docking-runs`,
+  )
+  const effectiveRunId = selectedRunId ?? dockingRunsQuery.data?.[0]?.id ?? null
+  const residueAnalysisQuery = useApiQuery<ResidueAnalysis[]>(
+    effectiveRunId
+      ? `/api/docking-runs/${effectiveRunId}/residue-summary`
+      : null,
   )
 
   const pocketResidueIds = useMemo(
     () => new Set(pocketQuery.data?.residues.map((residue) => residue.id) ?? []),
     [pocketQuery.data],
   )
+  const residueAnalysis = useMemo(
+    () => new Map(
+      residueAnalysisQuery.data?.map((analysis) => [
+        analysis.residueId,
+        analysis,
+      ]) ?? [],
+    ),
+    [residueAnalysisQuery.data],
+  )
 
   function handleStructureSubmit(nextId: number) {
     setSelectedPocketId(null)
+    setSelectedRunId(null)
     onNavigate(nextId)
   }
 
@@ -65,6 +91,13 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           highlightedResidueIds={pocketResidueIds}
           activePocket={pocketQuery.data}
           pocketLoading={pocketQuery.loading}
+          dockingRuns={dockingRunsQuery.data ?? []}
+          selectedRunId={effectiveRunId}
+          onRunSelect={setSelectedRunId}
+          residueAnalysis={residueAnalysis}
+          analysisLoading={
+            dockingRunsQuery.loading || residueAnalysisQuery.loading
+          }
         />
         <PocketPanel
           pockets={pocketsQuery.data ?? []}

@@ -85,3 +85,69 @@ export interface AtomDistance {
   secondAtom: string
   distance: number
 }
+
+export interface DockingRunSummary {
+  id: number
+  structureId: number
+  receptorId: number
+  createdAt: string
+  totalLigandCount: number
+  totalPoseCount: number
+}
+
+export interface ResidueAnalysis {
+  runId: number
+  structureId: number
+  receptorId: number
+  residueId: number
+  chain: string
+  residueNumber: number
+  residueName: string
+  totalLigandCount: number
+  contactingLigandCount: number
+  contactingLigandFraction: number
+  totalPoseCount: number
+  contactingPoseCount: number
+  contactingPoseFraction: number
+  totalGoodLigandCount: number
+  goodContactingLigandCount: number
+  goodContactingLigandFraction: number
+  totalBadLigandCount: number
+  badContactingLigandCount: number
+  badContactingLigandFraction: number
+  contactFractionDifference: number
+  enrichmentRatio: number | null
+  log2Enrichment: number | null
+  avgContactingScore: number | null
+  medianContactingScore: number | null
+  bestContactingScore: number | null
+  worstContactingScore: number | null
+  closestDistance: number | null
+  avgLigandMinDistance: number | null
+  avgPoseMinDistance: number | null
+}
+
+export interface ResidueScoreBand {
+  runId: number
+  structureId: number
+  receptorId: number
+  scoreLower: number
+  scoreUpper: number
+  residueId: number
+  chain: string
+  residueNumber: number
+  residueName: string
+  ligandCount: number
+  contactingLigandCount: number
+  contactingLigandFraction: number
+  poseCount: number
+  contactingPoseCount: number
+  contactingPoseFraction: number
+  avgContactingScore: number | null
+  medianContactingScore: number | null
+  bestContactingScore: number | null
+  worstContactingScore: number | null
+  closestDistance: number | null
+  avgLigandMinDistance: number | null
+  avgPoseMinDistance: number | null
+}

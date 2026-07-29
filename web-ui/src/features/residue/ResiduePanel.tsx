@@ -1,13 +1,17 @@
 import { useMemo, useState } from 'react'
 import type {
   AtomDistance,
+  DockingRunSummary,
   PocketDetails,
   Residue,
+  ResidueAnalysis,
   ResidueNeighborhood,
+  ResidueScoreBand,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AtomDistanceControl } from './components/AtomDistanceControl'
 import { ResidueSequence } from './components/ResidueSequence'
+import { ResidueDockingAnalysis } from './components/ResidueDockingAnalysis'
 
 interface Props {
   structureId: number
@@ -15,6 +19,11 @@ interface Props {
   highlightedResidueIds: Set<number>
   activePocket: PocketDetails | null
   pocketLoading: boolean
+  dockingRuns: DockingRunSummary[]
+  selectedRunId: number | null
+  onRunSelect: (runId: number) => void
+  residueAnalysis: Map<number, ResidueAnalysis>
+  analysisLoading: boolean
 }
 
 export function ResiduePanel({
@@ -23,6 +32,11 @@ export function ResiduePanel({
   highlightedResidueIds,
   activePocket,
   pocketLoading,
+  dockingRuns,
+  selectedRunId,
+  onRunSelect,
+  residueAnalysis,
+  analysisLoading,
 }: Props) {
   const [query, setQuery] = useState('')
   const [selectedResidue, setSelectedResidue] = useState<Residue | null>(null)
@@ -70,6 +84,12 @@ export function ResiduePanel({
           + `&toAtom=${encodeURIComponent(secondAtom)}`
       : null,
   )
+  const scoreBands = useApiQuery<ResidueScoreBand[]>(
+    selectedRunId && selectedResidue
+      ? `/api/docking-runs/${selectedRunId}/residue-score-bands`
+          + `?residueId=${selectedResidue.id}`
+      : null,
+  )
   const filtered = useMemo(() => {
     const normalized = query.trim().toUpperCase()
     if (!normalized) return residues
@@ -96,15 +116,32 @@ export function ResiduePanel({
         </label>
       </div>
       <div className="residue-context">
-        {pocketLoading ? (
-          'Loading pocket residues…'
-        ) : activePocket ? (
-          <>
-            Highlighting {activePocket.residues.length} residues for{' '}
-            <strong>{activePocket.source} {activePocket.pocketNumber}</strong>
-          </>
-        ) : (
-          'Select a pocket to highlight its residues'
+        <span>
+          {pocketLoading ? (
+            'Loading pocket residues…'
+          ) : activePocket ? (
+            <>
+              Highlighting {activePocket.residues.length} residues for{' '}
+              <strong>{activePocket.source} {activePocket.pocketNumber}</strong>
+            </>
+          ) : (
+            'Select a pocket to highlight its residues'
+          )}
+        </span>
+        {dockingRuns.length > 0 && (
+          <label className="run-selector">
+            <span>Docking run</span>
+            <select
+              value={selectedRunId ?? ''}
+              onChange={(event) => onRunSelect(Number(event.target.value))}
+            >
+              {dockingRuns.map((run) => (
+                <option key={run.id} value={run.id}>
+                  Run {run.id} · {run.totalLigandCount.toLocaleString()} ligands
+                </option>
+              ))}
+            </select>
+          </label>
         )}
       </div>
       <ResidueSequence
@@ -170,6 +207,12 @@ export function ResiduePanel({
               <p>No residues within {cutoff.toFixed(1)} Å.</p>
             )}
           </div>
+          <ResidueDockingAnalysis
+            analysis={residueAnalysis.get(selectedResidue.id) ?? null}
+            analysisLoading={analysisLoading}
+            bands={scoreBands.data ?? []}
+            bandsLoading={scoreBands.loading}
+          />
           {neighborhood.data
               && measurementNeighbor
               && firstAtom

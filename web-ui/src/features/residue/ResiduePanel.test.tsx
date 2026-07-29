@@ -58,6 +58,11 @@ describe('ResiduePanel', () => {
         highlightedResidueIds={new Set([202])}
         activePocket={null}
         pocketLoading={false}
+        dockingRuns={[]}
+        selectedRunId={null}
+        onRunSelect={() => undefined}
+        residueAnalysis={new Map()}
+        analysisLoading={false}
       />,
     )
 
