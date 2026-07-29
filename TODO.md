@@ -15,6 +15,7 @@
   `1A4W` chemistry (`QWE`) separately from TYS.
 - Revisit docking-prep pocket-center policy. `PocketGeometry.calculateCenter(Pocket)` now computes a resolved receptor heavy-atom centroid first. This is the P2Rank path because P2Rank pockets have residue refs but no alpha spheres. fpocket may fall back to alpha spheres, then stored parser center; confirm whether this priority should remain for missing-heavy-atom proximity and grid-box generation.
 - Revisit derived residue annotations after the docking data and score bands are finalized. Migrate annotations to the canonical `residue.id`, make derivation reproducible from the contact materialized views, decide when derived assignments should refresh, and distinguish `DOCKING_ANCHOR` from `PRODUCTIVE_CONTACT` because their current rules select the same residues. Also define and validate rules before assigning the currently unused `STRUCTURAL_HUB`, `SELECTIVITY_HOTSPOT`, `UNFAVORABLE_CONTACT`, and `PERIPHERAL` roles.
+- Rebuild the legacy residue pair/triplet materialized views from the compact `pose_residue_contact` table. Their replacements must be scoped by `docking_run.id`, use canonical `residue.id`, count distinct ligands, and share the same score-band policy as the residue-level views.
 - Migrate remaining legacy consumers and tests from
   `ContextKeys.EXTRACTED_LIGANDS` to `StructureCleanupResult`. The ligand
   preparation orchestrator now consumes the typed result; keep the legacy key
