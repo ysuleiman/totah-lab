@@ -50,6 +50,7 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   }
 
   const structure = structureQuery.data
+  const residues = structure.residues ?? []
   return (
     <div className="workspace">
       <StructureHero
@@ -67,7 +68,7 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           onRetry={pocketsQuery.retry}
         />
         <ResiduePanel
-          residues={structure.residues}
+          residues={residues}
           highlightedResidueIds={pocketResidueIds}
           activePocket={pocketQuery.data}
           pocketLoading={pocketQuery.loading}

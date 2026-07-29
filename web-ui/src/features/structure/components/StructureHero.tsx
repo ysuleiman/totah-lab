@@ -42,7 +42,7 @@ export function StructureHero({ structure, onStructureSubmit }: Props) {
         <div><dt>Source</dt><dd>{structure.source}</dd></div>
         <div><dt>Chain</dt><dd>{structure.chain ?? '—'}</dd></div>
         <div><dt>State</dt><dd>{structure.preparationState}</dd></div>
-        <div><dt>Residues</dt><dd>{structure.residues.length}</dd></div>
+        <div><dt>Residues</dt><dd>{structure.residues?.length ?? 0}</dd></div>
         <div>
           <dt>Chosen pocket</dt>
           <dd>
