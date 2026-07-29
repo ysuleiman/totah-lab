@@ -96,4 +96,15 @@ public interface PocketRepository
     List<PocketResidueProjection> findResiduesByPocketId(
             @Param("pocketId") long pocketId
     );
+
+    @Query(value = """
+            SELECT membership.residue_id
+            FROM docking.structure structure
+            JOIN docking.pocket_residue membership
+                ON membership.pocket_id = structure.chosen_pocket_id
+            WHERE structure.id = :structureId
+            """, nativeQuery = true)
+    List<Long> findChosenPocketResidueIds(
+            @Param("structureId") long structureId
+    );
 }

@@ -38,7 +38,7 @@ class PocketControllerTest {
         private long structureId;
 
         private RecordingPocketService() {
-            super(null);
+            super(null, null);
         }
 
         @Override

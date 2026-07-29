@@ -21,9 +21,14 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PocketService {
 
     private final PocketRepository pocketRepository;
+    private final BiohubPocketEvidenceService evidenceService;
 
-    public PocketService(PocketRepository pocketRepository) {
+    public PocketService(
+            PocketRepository pocketRepository,
+            BiohubPocketEvidenceService evidenceService
+    ) {
         this.pocketRepository = pocketRepository;
+        this.evidenceService = evidenceService;
     }
 
     @Transactional(readOnly = true)
@@ -34,14 +39,29 @@ public class PocketService {
                         NOT_FOUND,
                         "Pocket not found: " + pocketId
                 ));
-        return toDetails(pocket, residues(pocketId));
+        List<ResidueDetails> residues = residues(pocketId);
+        return toDetails(
+                pocket,
+                residues,
+                evidenceService.read(pocket, residues)
+        );
     }
 
     @Transactional(readOnly = true)
     public List<PocketSummary> getPocketsForStructure(long structureId) {
         return pocketRepository.findPocketDetailsByStructureId(structureId)
                 .stream()
-                .map(this::toSummary)
+                .map(pocket -> {
+                    if (!"BIOHUB".equals(pocket.getSource())) {
+                        return toSummary(pocket, null);
+                    }
+                    List<ResidueDetails> residues =
+                            residues(pocket.getId());
+                    return toSummary(
+                            pocket,
+                            evidenceService.read(pocket, residues)
+                    );
+                })
                 .toList();
     }
 
@@ -58,7 +78,8 @@ public class PocketService {
 
     private PocketDetails toDetails(
             PocketDetailsProjection pocket,
-            List<ResidueDetails> residues
+            List<ResidueDetails> residues,
+            PocketEvidence evidence
     ) {
         return new PocketDetails(
                 pocket.getId(),
@@ -85,11 +106,15 @@ public class PocketService {
                         pocket.getArtifactLabel(),
                         pocket.getArtifactStorageLocation()
                 ),
-                residues
+                residues,
+                evidence
         );
     }
 
-    private PocketSummary toSummary(PocketDetailsProjection pocket) {
+    private PocketSummary toSummary(
+            PocketDetailsProjection pocket,
+            PocketEvidence evidence
+    ) {
         return new PocketSummary(
                 pocket.getId(),
                 pocket.getPocketNumber(),
@@ -98,7 +123,8 @@ public class PocketService {
                 pocket.getScore(),
                 pocket.getDruggabilityScore(),
                 pocket.getProbability(),
-                pocket.getArtifactId()
+                pocket.getArtifactId(),
+                evidence
         );
     }
 
@@ -132,7 +158,8 @@ public class PocketService {
             StructureSummary structure,
             ReceptorSummary receptor,
             ArtifactSummary artifact,
-            List<ResidueDetails> residues
+            List<ResidueDetails> residues,
+            PocketEvidence evidence
     ) {
         public PocketDetails {
             residues = List.copyOf(residues);
@@ -147,8 +174,34 @@ public class PocketService {
             Double score,
             Double druggabilityScore,
             Double probability,
-            long artifactId
+            long artifactId,
+            PocketEvidence evidence
     ) {
+    }
+
+    public record PocketEvidence(
+            String ligandCcd,
+            String model,
+            double shellCutoff,
+            double directContactCutoff,
+            Double ptm,
+            Double interfacePtm,
+            int shellResidueCount,
+            int directContactResidueCount,
+            int chosenPocketOverlapCount,
+            int directChosenPocketOverlapCount,
+            List<Long> directContactResidueIds,
+            List<Long> chosenPocketOverlapResidueIds,
+            List<Long> directChosenPocketOverlapResidueIds
+    ) {
+        public PocketEvidence {
+            directContactResidueIds =
+                    List.copyOf(directContactResidueIds);
+            chosenPocketOverlapResidueIds =
+                    List.copyOf(chosenPocketOverlapResidueIds);
+            directChosenPocketOverlapResidueIds =
+                    List.copyOf(directChosenPocketOverlapResidueIds);
+        }
     }
 
     public record StructureSummary(
