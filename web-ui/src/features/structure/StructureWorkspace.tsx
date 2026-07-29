@@ -11,6 +11,7 @@ import { StructureHero } from './components/StructureHero'
 import { PocketPanel } from '../pocket/PocketPanel'
 import { ResiduePanel } from '../residue/ResiduePanel'
 import { useResidueContactAnalysis } from '../residue/hooks/useResidueContactAnalysis'
+import { useResidueEvidence } from '../residue/hooks/useResidueEvidence'
 
 interface Props {
   structureId: number
@@ -36,6 +37,7 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   )
   const effectiveRunId = selectedRunId ?? dockingRunsQuery.data?.[0]?.id ?? null
   const residueAnalysis = useResidueContactAnalysis(effectiveRunId)
+  const residueEvidence = useResidueEvidence(structureId)
 
   const pocketResidueIds = useMemo(
     () => new Set(pocketQuery.data?.residues.map((residue) => residue.id) ?? []),
@@ -84,6 +86,8 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           analysisLoading={
             dockingRunsQuery.loading || residueAnalysis.loading
           }
+          residueEvidence={residueEvidence.byResidueId}
+          evidenceLoading={residueEvidence.loading}
         />
         <PocketPanel
           pockets={pocketsQuery.data ?? []}

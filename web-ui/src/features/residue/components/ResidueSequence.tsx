@@ -1,5 +1,9 @@
 import type { CSSProperties } from 'react'
-import type { Residue, ResidueAnalysis } from '../../../api/types'
+import type {
+  Residue,
+  ResidueAnalysis,
+  ResidueEvidence,
+} from '../../../api/types'
 
 const ONE_LETTER: Record<string, string> = {
   ALA: 'A', ARG: 'R', ASN: 'N', ASP: 'D', CYS: 'C',
@@ -13,6 +17,7 @@ interface Props {
   pocketResidueIds: Set<number>
   neighborResidueIds: Set<number>
   residueAnalysis: Map<number, ResidueAnalysis>
+  residueEvidence?: Map<number, ResidueEvidence>
   selectedResidueId: number | null
   onResidueSelect: (residue: Residue) => void
 }
@@ -22,6 +27,7 @@ export function ResidueSequence({
   pocketResidueIds,
   neighborResidueIds,
   residueAnalysis,
+  residueEvidence = new Map(),
   selectedResidueId,
   onResidueSelect,
 }: Props) {
@@ -29,9 +35,10 @@ export function ResidueSequence({
     <div className="sequence-strip" role="list" aria-label="Structure residues">
       {residues.map((residue) => {
         const analysis = residueAnalysis.get(residue.id)
+        const evidence = residueEvidence.get(residue.id)
         const label = `${residue.residueName} ${residue.residueNumber}, `
             + `chain ${residue.chain}`
-        const title = analysis
+        const contactTitle = analysis
           ? `${label} · score < ${formatScore(analysis.contactScoreThreshold)}: `
               + `${formatPercent(
                 analysis.scoreFilteredContactingLigandFraction,
@@ -39,10 +46,14 @@ export function ResidueSequence({
               + `(${analysis.scoreFilteredContactingLigandCount.toLocaleString()}`
               + ` / ${analysis.scoreFilteredLigandCount.toLocaleString()})`
           : label
+        const title = evidence?.score == null
+          ? contactTitle
+          : `${contactTitle} · ESMC constraint ${evidence.score.toFixed(2)}`
         const className = [
           'sequence-residue',
           pocketResidueIds.has(residue.id) ? 'highlighted' : '',
           analysis ? 'has-docking-analysis' : '',
+          evidence ? 'has-constraint-evidence' : '',
           neighborResidueIds.has(residue.id) ? 'spatial-neighbor' : '',
           selectedResidueId === residue.id ? 'selected' : '',
         ].filter(Boolean).join(' ')
@@ -56,15 +67,16 @@ export function ResidueSequence({
             aria-label={label}
             aria-pressed={selectedResidueId === residue.id}
             title={title}
-            style={analysis ? {
+            style={analysis || evidence ? {
               '--contact-rate': `${Math.min(
                 100,
                 Math.max(
                   0,
-                  analysis.scoreFilteredContactingLigandFraction * 100,
+                  (analysis?.scoreFilteredContactingLigandFraction ?? 0) * 100,
                 ),
               )}%`,
-            } as ContactRateStyle : undefined}
+              '--constraint-strength': constraintStrength(evidence?.score),
+            } as ResidueSignalStyle : undefined}
             onClick={() => onResidueSelect(residue)}
           >
             <span>{ONE_LETTER[residue.residueName] ?? 'X'}</span>
@@ -75,8 +87,9 @@ export function ResidueSequence({
   )
 }
 
-type ContactRateStyle = CSSProperties & {
+type ResidueSignalStyle = CSSProperties & {
   '--contact-rate': string
+  '--constraint-strength': string
 }
 
 function formatPercent(fraction: number) {
@@ -85,4 +98,9 @@ function formatPercent(fraction: number) {
 
 function formatScore(score: number) {
   return Number.isInteger(score) ? score.toFixed(0) : score.toFixed(1)
+}
+
+function constraintStrength(score: number | null | undefined) {
+  if (score == null) return '0'
+  return `${Math.min(1, Math.max(0.12, score / 15))}`
 }

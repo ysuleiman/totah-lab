@@ -135,6 +135,10 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
   width: var(--contact-rate); height: 3px;
   background: #287f9d;
 }
+.sequence-residue.has-constraint-evidence::after {
+  content: ''; position: absolute; top: 4px; right: 0; bottom: 4px;
+  width: 3px; background: rgba(190, 117, 28, var(--constraint-strength));
+}
 .sequence-residue:hover { border-color: #98aa9e; background: white; }
 .sequence-residue.highlighted { color: var(--accent-dark); background: var(--accent); }
 .sequence-residue.spatial-neighbor { box-shadow: inset 0 -3px 0 #d95852; }
@@ -194,6 +198,31 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
 .docking-analysis {
   margin: 0 24px 18px; padding: 16px; background: white;
   border: 1px solid var(--line); border-radius: 12px;
+}
+.constraint-evidence {
+  margin: 0 24px 18px; padding: 16px; background: #fffaf1;
+  border: 1px solid #ead8b8; border-radius: 12px;
+}
+.constraint-evidence > p { margin: 0; color: var(--muted); font-size: 12px; }
+.constraint-evidence header {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.constraint-evidence h4 { margin: 0; font-size: 16px; }
+.constraint-score { color: #9a5a10; font: 500 24px 'DM Mono', monospace; }
+.constraint-metrics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px; margin-top: 14px;
+}
+.constraint-metrics div { padding: 10px; background: #fff; border-radius: 8px; }
+.constraint-metrics span, .constraint-metrics strong, .constraint-metrics small { display: block; }
+.constraint-metrics span {
+  color: var(--muted); font-size: 9px; letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.constraint-metrics strong { margin-top: 4px; font: 500 15px 'DM Mono', monospace; }
+.constraint-metrics small {
+  margin-top: 3px; overflow: hidden; color: var(--muted);
+  font: 9px 'DM Mono', monospace; text-overflow: ellipsis;
 }
 .docking-analysis > p { margin: 0; color: var(--muted); font-size: 12px; }
 .docking-analysis header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }

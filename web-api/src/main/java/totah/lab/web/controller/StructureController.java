@@ -5,18 +5,37 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import totah.lab.web.service.ResidueEvidenceService;
 import totah.lab.web.service.StructureService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/structures")
 public final class StructureController {
 
     private final StructureService structureService;
+    private final ResidueEvidenceService residueEvidenceService;
 
-    public StructureController(StructureService structureService) {
+    public StructureController(
+            StructureService structureService,
+            ResidueEvidenceService residueEvidenceService
+    ) {
         this.structureService = structureService;
+        this.residueEvidenceService = residueEvidenceService;
+    }
+
+    @GetMapping("/{structureId}/residue-evidence")
+    public List<ResidueEvidenceService.ResidueEvidence> residueEvidence(
+            @PathVariable("structureId") long structureId,
+            @RequestParam(
+                    name = "analysisType",
+                    defaultValue = ResidueEvidenceService.ESMC_CONSTRAINT
+            )
+            String analysisType
+    ) {
+        return residueEvidenceService.getEvidence(structureId, analysisType);
     }
 
     @GetMapping("/{structureId}")

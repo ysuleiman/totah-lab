@@ -6,6 +6,19 @@ export interface Residue {
   residueName: string
 }
 
+export interface ResidueEvidence {
+  residueId: number
+  analysisType: string
+  score: number | null
+  rank: number | null
+  provider: string | null
+  model: string | null
+  bestAlternative: string | null
+  wildTypeMinusBestAlternative: number | null
+  aminoAcidEntropy: number | null
+  artifactId: number
+}
+
 export interface ChosenPocket {
   id: number
   pocketNumber: number

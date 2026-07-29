@@ -5,6 +5,7 @@ import type {
   PocketDetails,
   Residue,
   ResidueAnalysis,
+  ResidueEvidence,
   ResidueNeighborhood,
   ResidueScoreBand,
 } from '../../api/types'
@@ -13,6 +14,7 @@ import { AtomDistanceControl } from './components/AtomDistanceControl'
 import { ResidueSequence } from './components/ResidueSequence'
 import { ResidueContactLegend } from './components/ResidueContactLegend'
 import { ResidueDockingAnalysis } from './components/ResidueDockingAnalysis'
+import { ResidueConstraintEvidence } from './components/ResidueConstraintEvidence'
 
 interface Props {
   structureId: number
@@ -25,6 +27,8 @@ interface Props {
   onRunSelect: (runId: number) => void
   residueAnalysis: Map<number, ResidueAnalysis>
   analysisLoading: boolean
+  residueEvidence?: Map<number, ResidueEvidence>
+  evidenceLoading?: boolean
 }
 
 export function ResiduePanel({
@@ -38,6 +42,8 @@ export function ResiduePanel({
   onRunSelect,
   residueAnalysis,
   analysisLoading,
+  residueEvidence = new Map(),
+  evidenceLoading = false,
 }: Props) {
   const [query, setQuery] = useState('')
   const [selectedResidue, setSelectedResidue] = useState<Residue | null>(null)
@@ -153,6 +159,7 @@ export function ResiduePanel({
         pocketResidueIds={highlightedResidueIds}
         neighborResidueIds={neighborResidueIds}
         residueAnalysis={residueAnalysis}
+        residueEvidence={residueEvidence}
         selectedResidueId={selectedResidue?.id ?? null}
         onResidueSelect={setSelectedResidue}
       />
@@ -217,6 +224,10 @@ export function ResiduePanel({
             analysisLoading={analysisLoading}
             bands={scoreBands.data ?? []}
             bandsLoading={scoreBands.loading}
+          />
+          <ResidueConstraintEvidence
+            evidence={residueEvidence.get(selectedResidue.id) ?? null}
+            loading={evidenceLoading}
           />
           {neighborhood.data
               && measurementNeighbor

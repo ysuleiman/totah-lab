@@ -3,6 +3,7 @@ package totah.lab.web.controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import totah.lab.web.service.ResidueEvidenceService;
 import totah.lab.web.service.StructureService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +17,10 @@ class StructureControllerTest {
     void returnsStructureWithCanonicalPocketsUrl() throws Exception {
         RecordingStructureService service = new RecordingStructureService();
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new StructureController(service))
+                .standaloneSetup(new StructureController(
+                        service,
+                        new RecordingResidueEvidenceService()
+                ))
                 .build();
 
         mockMvc.perform(get("/api/structures/2"))
@@ -40,7 +44,10 @@ class StructureControllerTest {
     void bindsResidueNeighborCutoff() throws Exception {
         RecordingStructureService service = new RecordingStructureService();
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new StructureController(service))
+                .standaloneSetup(new StructureController(
+                        service,
+                        new RecordingResidueEvidenceService()
+                ))
                 .build();
 
         mockMvc.perform(get(
@@ -61,7 +68,10 @@ class StructureControllerTest {
     void bindsNamedAtomDistanceRequest() throws Exception {
         RecordingStructureService service = new RecordingStructureService();
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new StructureController(service))
+                .standaloneSetup(new StructureController(
+                        service,
+                        new RecordingResidueEvidenceService()
+                ))
                 .build();
 
         mockMvc.perform(get(
@@ -74,6 +84,33 @@ class StructureControllerTest {
                 .andExpect(jsonPath("$.firstAtom").value("SG"))
                 .andExpect(jsonPath("$.secondAtom").value("SG"))
                 .andExpect(jsonPath("$.distance").value(4.8));
+    }
+
+    @Test
+    void returnsStructureResidueEvidence() throws Exception {
+        RecordingResidueEvidenceService evidenceService =
+                new RecordingResidueEvidenceService();
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new StructureController(
+                        new RecordingStructureService(),
+                        evidenceService
+                ))
+                .build();
+
+        mockMvc.perform(get(
+                        "/api/structures/2/residue-evidence"
+                                + "?analysisType=ESMC_CONSTRAINT"
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].residueId").value(78))
+                .andExpect(jsonPath("$[0].score").value(15.140625))
+                .andExpect(jsonPath("$[0].rank").value(1))
+                .andExpect(jsonPath("$[0].provider")
+                        .value("BIOHUB_ESMC"))
+                .andExpect(jsonPath("$[0].artifactId").value(43));
+
+        assertEquals(2L, evidenceService.structureId);
+        assertEquals("ESMC_CONSTRAINT", evidenceService.analysisType);
     }
 
     private static final class RecordingStructureService
@@ -165,6 +202,38 @@ class StructureControllerTest {
                     secondAtomName,
                     4.8
             );
+        }
+    }
+
+    private static final class RecordingResidueEvidenceService
+            extends ResidueEvidenceService {
+
+        private long structureId;
+        private String analysisType;
+
+        private RecordingResidueEvidenceService() {
+            super(null, null);
+        }
+
+        @Override
+        public java.util.List<ResidueEvidence> getEvidence(
+                long structureId,
+                String analysisType
+        ) {
+            this.structureId = structureId;
+            this.analysisType = analysisType;
+            return java.util.List.of(new ResidueEvidence(
+                    78,
+                    "ESMC_CONSTRAINT",
+                    15.140625,
+                    1,
+                    "BIOHUB_ESMC",
+                    "esmc-300m-2024-12",
+                    "A",
+                    12.0,
+                    0.1,
+                    43
+            ));
         }
     }
 }
