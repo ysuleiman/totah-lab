@@ -61,3 +61,13 @@ export interface PocketDetails {
   artifact: Artifact
   residues: Residue[]
 }
+
+export interface ResidueNeighbor extends Residue {
+  distance: number
+}
+
+export interface ResidueNeighborhood {
+  selectedResidue: Residue
+  cutoff: number
+  neighbors: ResidueNeighbor[]
+}

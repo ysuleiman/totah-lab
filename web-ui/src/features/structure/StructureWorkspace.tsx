@@ -58,6 +58,14 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
         onStructureSubmit={handleStructureSubmit}
       />
       <div className="workspace-grid">
+        <ResiduePanel
+          key={structure.id}
+          structureId={structure.id}
+          residues={residues}
+          highlightedResidueIds={pocketResidueIds}
+          activePocket={pocketQuery.data}
+          pocketLoading={pocketQuery.loading}
+        />
         <PocketPanel
           pockets={pocketsQuery.data ?? []}
           chosenPocketId={structure.chosenPocket?.id ?? null}
@@ -66,12 +74,6 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           error={pocketsQuery.error}
           onPocketSelect={setSelectedPocketId}
           onRetry={pocketsQuery.retry}
-        />
-        <ResiduePanel
-          residues={residues}
-          highlightedResidueIds={pocketResidueIds}
-          activePocket={pocketQuery.data}
-          pocketLoading={pocketQuery.loading}
         />
       </div>
     </div>
