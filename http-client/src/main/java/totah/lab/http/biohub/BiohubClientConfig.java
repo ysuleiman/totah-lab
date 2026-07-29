@@ -32,8 +32,12 @@ public record BiohubClientConfig(
             token = System.getenv("FORGE_API_TOKEN");
         }
         if (token == null || token.isBlank()) {
+            token = System.getenv("ESM_API_KEY");
+        }
+        if (token == null || token.isBlank()) {
             throw new IllegalStateException(
-                    "BIOHUB_API_TOKEN or FORGE_API_TOKEN must be configured"
+                    "BIOHUB_API_TOKEN, FORGE_API_TOKEN, or ESM_API_KEY "
+                            + "must be configured"
             );
         }
         return new BiohubClientConfig(
