@@ -75,6 +75,8 @@ class BiohubEsmcClientTest {
                 .isEqualTo(4);
         assertThat(logitsRequest.path("logits_config").path("sequence")
                 .asBoolean()).isTrue();
+        assertThat(logitsRequest.path("logits_config")
+                .path("ith_hidden_layer").asInt()).isEqualTo(-1);
     }
 
     private String logitsResponse() throws IOException {

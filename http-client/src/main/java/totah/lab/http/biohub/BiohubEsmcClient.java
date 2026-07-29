@@ -109,7 +109,7 @@ public final class BiohubEsmcClient {
         logitsConfig.put("return_mean_embedding", false);
         logitsConfig.put("return_mean_hidden_states", false);
         logitsConfig.put("return_hidden_states", false);
-        logitsConfig.putNull("ith_hidden_layer");
+        logitsConfig.put("ith_hidden_layer", -1);
         logitsConfig.putNull("sae_config");
 
         JsonNode response = post("logits", request);
