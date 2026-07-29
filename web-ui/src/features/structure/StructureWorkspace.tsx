@@ -43,6 +43,24 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
     () => new Set(pocketQuery.data?.residues.map((residue) => residue.id) ?? []),
     [pocketQuery.data],
   )
+  const directContactResidueIds = useMemo(
+    () => new Set(
+      pocketQuery.data?.evidence?.directContactResidueIds ?? [],
+    ),
+    [pocketQuery.data],
+  )
+  const consensusResidueIds = useMemo(
+    () => new Set(
+      pocketQuery.data?.evidence?.chosenPocketOverlapResidueIds ?? [],
+    ),
+    [pocketQuery.data],
+  )
+  const directConsensusResidueIds = useMemo(
+    () => new Set(
+      pocketQuery.data?.evidence?.directChosenPocketOverlapResidueIds ?? [],
+    ),
+    [pocketQuery.data],
+  )
   function handleStructureSubmit(nextId: number) {
     setSelectedPocketId(null)
     setSelectedRunId(null)
@@ -77,6 +95,9 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           structureId={structure.id}
           residues={residues}
           highlightedResidueIds={pocketResidueIds}
+          directContactResidueIds={directContactResidueIds}
+          consensusResidueIds={consensusResidueIds}
+          directConsensusResidueIds={directConsensusResidueIds}
           activePocket={pocketQuery.data}
           pocketLoading={pocketQuery.loading}
           dockingRuns={dockingRunsQuery.data ?? []}

@@ -18,18 +18,11 @@ import java.util.Set;
 public final class BiohubPocketEvidenceService {
 
     private final PocketRepository pocketRepository;
-    private final BiohubPocketEvidenceReader reader;
+    private final BiohubPocketEvidenceReader reader =
+            new BiohubPocketEvidenceReader();
 
     public BiohubPocketEvidenceService(PocketRepository pocketRepository) {
-        this(pocketRepository, new BiohubPocketEvidenceReader());
-    }
-
-    BiohubPocketEvidenceService(
-            PocketRepository pocketRepository,
-            BiohubPocketEvidenceReader reader
-    ) {
         this.pocketRepository = pocketRepository;
-        this.reader = reader;
     }
 
     public PocketService.PocketEvidence read(
@@ -114,6 +107,9 @@ public final class BiohubPocketEvidenceService {
                 directResidueIds.size(),
                 overlapResidueIds.size(),
                 directOverlapResidueIds.size(),
+                residues.stream()
+                        .map(PocketService.ResidueDetails::id)
+                        .toList(),
                 directResidueIds.stream().sorted().toList(),
                 overlapResidueIds,
                 directOverlapResidueIds

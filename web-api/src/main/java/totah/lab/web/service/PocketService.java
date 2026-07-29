@@ -190,11 +190,13 @@ public class PocketService {
             int directContactResidueCount,
             int chosenPocketOverlapCount,
             int directChosenPocketOverlapCount,
+            List<Long> shellResidueIds,
             List<Long> directContactResidueIds,
             List<Long> chosenPocketOverlapResidueIds,
             List<Long> directChosenPocketOverlapResidueIds
     ) {
         public PocketEvidence {
+            shellResidueIds = List.copyOf(shellResidueIds);
             directContactResidueIds =
                     List.copyOf(directContactResidueIds);
             chosenPocketOverlapResidueIds =

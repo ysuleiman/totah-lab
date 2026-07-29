@@ -25,7 +25,12 @@ export interface ChosenPocket {
   source: PocketSource
 }
 
-export type PocketSource = 'FPOCKET' | 'P2RANK' | 'MANUAL' | 'IMPORTED'
+export type PocketSource =
+  | 'FPOCKET'
+  | 'P2RANK'
+  | 'BIOHUB'
+  | 'MANUAL'
+  | 'IMPORTED'
 
 export interface Structure {
   id: number
@@ -65,6 +70,7 @@ export interface PocketSummary {
   druggabilityScore: number | null
   probability: number | null
   artifactId: number
+  evidence: PocketEvidence | null
 }
 
 export interface PocketDetails {
@@ -77,6 +83,24 @@ export interface PocketDetails {
   probability: number | null
   artifact: Artifact
   residues: Residue[]
+  evidence: PocketEvidence | null
+}
+
+export interface PocketEvidence {
+  ligandCcd: string
+  model: string
+  shellCutoff: number
+  directContactCutoff: number
+  ptm: number | null
+  interfacePtm: number | null
+  shellResidueCount: number
+  directContactResidueCount: number
+  chosenPocketOverlapCount: number
+  directChosenPocketOverlapCount: number
+  shellResidueIds: number[]
+  directContactResidueIds: number[]
+  chosenPocketOverlapResidueIds: number[]
+  directChosenPocketOverlapResidueIds: number[]
 }
 
 export interface ResidueNeighbor extends Residue {

@@ -15,11 +15,15 @@ import { ResidueSequence } from './components/ResidueSequence'
 import { ResidueContactLegend } from './components/ResidueContactLegend'
 import { ResidueDockingAnalysis } from './components/ResidueDockingAnalysis'
 import { ResidueConstraintEvidence } from './components/ResidueConstraintEvidence'
+import { BiohubPocketEvidence } from '../pocket/BiohubPocketEvidence'
 
 interface Props {
   structureId: number
   residues: Residue[]
   highlightedResidueIds: Set<number>
+  directContactResidueIds?: Set<number>
+  consensusResidueIds?: Set<number>
+  directConsensusResidueIds?: Set<number>
   activePocket: PocketDetails | null
   pocketLoading: boolean
   dockingRuns: DockingRunSummary[]
@@ -35,6 +39,9 @@ export function ResiduePanel({
   structureId,
   residues,
   highlightedResidueIds,
+  directContactResidueIds = new Set(),
+  consensusResidueIds = new Set(),
+  directConsensusResidueIds = new Set(),
   activePocket,
   pocketLoading,
   dockingRuns,
@@ -154,9 +161,15 @@ export function ResiduePanel({
         )}
       </div>
       <ResidueContactLegend threshold={contactScoreThreshold} />
+      {activePocket?.evidence && (
+        <BiohubPocketEvidence evidence={activePocket.evidence} />
+      )}
       <ResidueSequence
         residues={filtered}
         pocketResidueIds={highlightedResidueIds}
+        directContactResidueIds={directContactResidueIds}
+        consensusResidueIds={consensusResidueIds}
+        directConsensusResidueIds={directConsensusResidueIds}
         neighborResidueIds={neighborResidueIds}
         residueAnalysis={residueAnalysis}
         residueEvidence={residueEvidence}

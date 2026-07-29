@@ -56,6 +56,9 @@ describe('ResidueSequence', () => {
       <ResidueSequence
         residues={[residue]}
         pocketResidueIds={new Set([residue.id])}
+        directContactResidueIds={new Set([residue.id])}
+        consensusResidueIds={new Set([residue.id])}
+        directConsensusResidueIds={new Set([residue.id])}
         neighborResidueIds={new Set([residue.id])}
         residueAnalysis={new Map([[residue.id, analysis]])}
         selectedResidueId={null}
@@ -70,6 +73,9 @@ describe('ResidueSequence', () => {
       'highlighted',
       'spatial-neighbor',
       'has-docking-analysis',
+      'biohub-direct-contact',
+      'chosen-pocket-consensus',
+      'direct-consensus',
     )
     expect(cell).toHaveStyle({ '--contact-rate': '30%' })
     expect(cell).toHaveAttribute(
