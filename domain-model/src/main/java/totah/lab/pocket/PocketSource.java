@@ -5,5 +5,7 @@ package totah.lab.pocket;
  */
 public enum PocketSource {
     P2RANK,
-    FPOCKET
+    FPOCKET,
+    MANUAL,
+    IMPORTED
 }
