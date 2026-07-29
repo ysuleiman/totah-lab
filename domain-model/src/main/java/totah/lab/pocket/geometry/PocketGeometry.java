@@ -4,6 +4,7 @@ import totah.lab.pocket.Dimensions;
 import totah.lab.pocket.Pocket;
 import totah.lab.pocket.PocketBox;
 import totah.lab.pocket.Sphere;
+import totah.lab.ligand.Ligand;
 import totah.lab.protein.*;
 
 import java.util.*;
@@ -434,6 +435,86 @@ public final class PocketGeometry {
             }
         }
         return neighbors;
+    }
+
+    public static List<Residue> ligandNeighbors(
+            Structure structure,
+            Ligand ligand,
+            double cutoff) {
+        Objects.requireNonNull(structure, "structure");
+        Objects.requireNonNull(ligand, "ligand");
+        if (!Double.isFinite(cutoff) || cutoff <= 0.0) {
+            throw new IllegalArgumentException(
+                    "Cutoff must be finite and greater than zero");
+        }
+        return structure.getResidues().stream()
+                .filter(residue -> areNeighbors(residue, ligand, cutoff))
+                .toList();
+    }
+
+    public static boolean areNeighbors(
+            Residue residue,
+            Ligand ligand,
+            double cutoff) {
+        return contactingAtomPairCount(residue, ligand, cutoff) > 0;
+    }
+
+    public static int contactingAtomPairCount(
+            Residue residue,
+            Ligand ligand,
+            double cutoff) {
+        Objects.requireNonNull(residue, "residue");
+        Objects.requireNonNull(ligand, "ligand");
+        if (!Double.isFinite(cutoff) || cutoff <= 0.0) {
+            throw new IllegalArgumentException(
+                    "Cutoff must be finite and greater than zero");
+        }
+        double cutoffSquared = cutoff * cutoff;
+        int count = 0;
+        for (Atom residueAtom : residue.getAtoms()) {
+            if (!residueAtom.isHeavyAtom()) {
+                continue;
+            }
+            for (Atom ligandAtom : ligand.atoms()) {
+                if (!ligandAtom.isHeavyAtom()) {
+                    continue;
+                }
+                if (squaredDistance(
+                        residueAtom.getPosition(),
+                        ligandAtom.getPosition()) <= cutoffSquared) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public static double calculateDistance(
+            Residue residue,
+            Ligand ligand) {
+        Objects.requireNonNull(residue, "residue");
+        Objects.requireNonNull(ligand, "ligand");
+        double minimumSquared = Double.POSITIVE_INFINITY;
+        for (Atom residueAtom : residue.getAtoms()) {
+            if (!residueAtom.isHeavyAtom()) {
+                continue;
+            }
+            for (Atom ligandAtom : ligand.atoms()) {
+                if (!ligandAtom.isHeavyAtom()) {
+                    continue;
+                }
+                minimumSquared = Math.min(
+                        minimumSquared,
+                        squaredDistance(
+                                residueAtom.getPosition(),
+                                ligandAtom.getPosition()));
+            }
+        }
+        if (!Double.isFinite(minimumSquared)) {
+            throw new IllegalArgumentException(
+                    "Residue and ligand must contain heavy atoms");
+        }
+        return Math.sqrt(minimumSquared);
     }
 
     private static boolean sameResidue(

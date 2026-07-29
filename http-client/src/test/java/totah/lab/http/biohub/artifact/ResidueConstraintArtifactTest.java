@@ -1,9 +1,9 @@
-package totah.lab.analysis.io;
+package totah.lab.http.biohub.artifact;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.protein.analysis.ResidueConstraintAnalysis;
-import totah.lab.protein.analysis.ResidueConstraintEvidence;
+import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
+import totah.lab.http.biohub.model.ResidueConstraintEvidence;
 
 import java.nio.file.Path;
 import java.time.Instant;

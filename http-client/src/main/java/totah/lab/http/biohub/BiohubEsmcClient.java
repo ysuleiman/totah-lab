@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import totah.lab.protein.analysis.ResidueConstraintAnalysis;
-import totah.lab.protein.analysis.ResidueConstraintEvidence;
+import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
+import totah.lab.http.biohub.model.ResidueConstraintEvidence;
 
 import java.io.IOException;
 import java.net.URI;

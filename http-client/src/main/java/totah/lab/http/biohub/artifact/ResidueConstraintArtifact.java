@@ -1,6 +1,6 @@
-package totah.lab.analysis.io;
+package totah.lab.http.biohub.artifact;
 
-import totah.lab.protein.analysis.ResidueConstraintAnalysis;
+import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
 
 record ResidueConstraintArtifact(
         String schemaVersion,

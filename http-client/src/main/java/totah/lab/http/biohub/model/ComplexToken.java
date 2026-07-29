@@ -1,4 +1,4 @@
-package totah.lab.protein.analysis;
+package totah.lab.http.biohub.model;
 
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +9,7 @@ public record ComplexToken(
         int chainPosition,
         String residueName,
         double confidence,
-        List<ComplexAtom> atoms
+        List<AtomComplex> atoms
 ) {
 
     public ComplexToken {

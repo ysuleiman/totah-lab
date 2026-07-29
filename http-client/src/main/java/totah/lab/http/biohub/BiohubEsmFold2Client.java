@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import totah.lab.protein.analysis.ComplexAtom;
-import totah.lab.protein.analysis.ComplexToken;
-import totah.lab.protein.analysis.MolecularComplexPrediction;
+import totah.lab.http.biohub.model.AtomComplex;
+import totah.lab.http.biohub.model.ComplexToken;
+import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.protein.Atom;
+import totah.lab.protein.Element;
+import totah.lab.protein.Point3D;
 
 import java.io.IOException;
 import java.net.URI;
@@ -183,7 +186,7 @@ public final class BiohubEsmFold2Client {
         Map<Integer, String> chainLookup = chainLookup(
                 complex.path("metadata").path("chain_lookup")
         );
-        List<ComplexAtom> atoms = parseAtoms(
+        List<AtomComplex> atoms = parseAtoms(
                 positions,
                 elements,
                 atomNames,
@@ -208,13 +211,13 @@ public final class BiohubEsmFold2Client {
         );
     }
 
-    private List<ComplexAtom> parseAtoms(
+    private List<AtomComplex> parseAtoms(
             List<JsonNode> positions,
             List<String> elements,
             List<String> names,
             List<Boolean> hetero
     ) throws IOException {
-        List<ComplexAtom> atoms = new ArrayList<>(positions.size());
+        List<AtomComplex> atoms = new ArrayList<>(positions.size());
         for (int index = 0; index < positions.size(); index++) {
             JsonNode position = positions.get(index);
             if (!position.isArray() || position.size() != 3) {
@@ -222,13 +225,23 @@ public final class BiohubEsmFold2Client {
                         "BioHub atom position must contain x, y, and z"
                 );
             }
-            atoms.add(new ComplexAtom(
-                    names.get(index),
-                    elements.get(index),
-                    hetero.get(index),
-                    position.get(0).asDouble(),
-                    position.get(1).asDouble(),
-                    position.get(2).asDouble()
+            atoms.add(new AtomComplex(
+                    Atom.builder()
+                            .pdbSerial(index + 1)
+                            .name(names.get(index))
+                            .position(new Point3D(
+                                    position.get(0).asDouble(),
+                                    position.get(1).asDouble(),
+                                    position.get(2).asDouble()
+                            ))
+                            .charge(0.0)
+                            .occupancy(1.0)
+                            .bFactor(0.0)
+                            .element(Element.fromSymbol(
+                                    elements.get(index)
+                            ))
+                            .build(),
+                    hetero.get(index)
             ));
         }
         return atoms;
@@ -240,7 +253,7 @@ public final class BiohubEsmFold2Client {
             List<Integer> chainIds,
             List<Double> confidence,
             Map<Integer, String> chainLookup,
-            List<ComplexAtom> atoms
+            List<AtomComplex> atoms
     ) throws IOException {
         Map<Integer, Integer> positionsByChain = new HashMap<>();
         List<ComplexToken> tokens = new ArrayList<>(sequence.size());

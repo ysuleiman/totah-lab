@@ -1,11 +1,12 @@
-package totah.lab.analysis.io;
+package totah.lab.http.biohub.artifact;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import totah.lab.protein.analysis.ComplexAtom;
-import totah.lab.protein.analysis.ComplexToken;
-import totah.lab.protein.analysis.MolecularComplexPrediction;
+import totah.lab.http.biohub.model.AtomComplex;
+import totah.lab.http.biohub.model.ComplexToken;
+import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.protein.Atom;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public final class MolecularComplexPredictionArtifactWriter {
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
             int serial = 1;
             for (ComplexToken token : prediction.tokens()) {
-                for (ComplexAtom atom : token.atoms()) {
+                for (AtomComplex atom : token.atoms()) {
                     writer.write(pdbLine(serial++, token, atom));
                     writer.newLine();
                 }
@@ -70,12 +71,13 @@ public final class MolecularComplexPredictionArtifactWriter {
     private String pdbLine(
             int serial,
             ComplexToken token,
-            ComplexAtom atom
+            AtomComplex atomComplex
     ) {
-        String record = atom.hetero() ? "HETATM" : "ATOM";
-        String atomName = atom.name().length() > 4
-                ? atom.name().substring(0, 4)
-                : atom.name();
+        Atom atom = atomComplex.atom();
+        String record = atomComplex.hetero() ? "HETATM" : "ATOM";
+        String atomName = atom.getName().length() > 4
+                ? atom.getName().substring(0, 4)
+                : atom.getName();
         String residueName = token.residueName().length() > 3
                 ? token.residueName().substring(0, 3)
                 : token.residueName();
@@ -90,12 +92,12 @@ public final class MolecularComplexPredictionArtifactWriter {
                 residueName,
                 chain,
                 token.chainPosition(),
-                atom.x(),
-                atom.y(),
-                atom.z(),
+                atom.getPosition().x(),
+                atom.getPosition().y(),
+                atom.getPosition().z(),
                 1.0,
                 token.confidence() * 100.0,
-                atom.element()
+                atom.getElement().getSymbol()
         );
     }
 

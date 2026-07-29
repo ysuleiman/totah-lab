@@ -1,6 +1,6 @@
 package totah.lab.http.biohub;
 
-import totah.lab.protein.analysis.ResidueConstraintEvidence;
+import totah.lab.http.biohub.model.ResidueConstraintEvidence;
 
 import java.util.ArrayList;
 import java.util.Comparator;

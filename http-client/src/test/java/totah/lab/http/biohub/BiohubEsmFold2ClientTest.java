@@ -82,6 +82,16 @@ class BiohubEsmFold2ClientTest {
         assertEquals("L", prediction.tokens().get(2).chain());
         assertEquals("SAH", prediction.tokens().get(2).residueName());
         assertTrue(prediction.tokens().get(2).atoms().getFirst().hetero());
+        BiohubComplexMapper mapper = new BiohubComplexMapper();
+        assertEquals(
+                2,
+                mapper.proteinStructure(prediction, "A")
+                        .getResidues().size()
+        );
+        assertEquals(
+                prediction.tokens().get(2).atoms().getFirst().atom(),
+                mapper.ligand(prediction, "L").atoms().getFirst()
+        );
     }
 
     private String responseBody() {

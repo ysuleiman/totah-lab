@@ -1,13 +1,16 @@
-package totah.lab.analysis.io;
+package totah.lab.http.biohub.artifact;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.protein.analysis.ComplexAtom;
-import totah.lab.protein.analysis.ComplexToken;
-import totah.lab.protein.analysis.MolecularComplexPrediction;
+import totah.lab.http.biohub.model.AtomComplex;
+import totah.lab.http.biohub.model.ComplexToken;
+import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.protein.Atom;
+import totah.lab.protein.Element;
+import totah.lab.protein.Point3D;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,6 +27,15 @@ class MolecularComplexPredictionArtifactWriterTest {
 
     @Test
     void writesVersionedJsonAndCoordinateArtifact() throws Exception {
+        Atom atom = Atom.builder()
+                .pdbSerial(1)
+                .name("C1")
+                .position(new Point3D(1.0, 2.0, 3.0))
+                .charge(0.0)
+                .occupancy(1.0)
+                .bFactor(0.0)
+                .element(Element.C)
+                .build();
         MolecularComplexPrediction prediction =
                 new MolecularComplexPrediction(
                         "BIOHUB_ESMFOLD2",
@@ -38,14 +50,7 @@ class MolecularComplexPredictionArtifactWriterTest {
                                 1,
                                 "SAH",
                                 0.9,
-                                List.of(new ComplexAtom(
-                                        "C1",
-                                        "C",
-                                        true,
-                                        1.0,
-                                        2.0,
-                                        3.0
-                                ))
+                                List.of(new AtomComplex(atom, true))
                         ))
                 );
         Path json = temporaryDirectory.resolve("prediction.json");

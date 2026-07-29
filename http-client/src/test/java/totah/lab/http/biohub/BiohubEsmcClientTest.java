@@ -3,7 +3,7 @@ package totah.lab.http.biohub;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import totah.lab.protein.analysis.ResidueConstraintAnalysis;
+import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
 
 import java.io.IOException;
 import java.net.URI;

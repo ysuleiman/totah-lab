@@ -1,8 +1,8 @@
-package totah.lab.analysis.io;
+package totah.lab.http.biohub.artifact;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import totah.lab.protein.analysis.ResidueConstraintAnalysis;
+import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
 
 import java.io.IOException;
 import java.io.InputStream;

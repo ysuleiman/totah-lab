@@ -1,4 +1,4 @@
-package totah.lab.protein.analysis;
+package totah.lab.http.biohub.model;
 
 import java.util.Objects;
 
