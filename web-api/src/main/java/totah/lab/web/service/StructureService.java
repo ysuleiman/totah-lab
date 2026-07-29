@@ -3,8 +3,11 @@ package totah.lab.web.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import totah.lab.web.persistence.PocketResidueProjection;
 import totah.lab.web.persistence.StructureDetailsProjection;
 import totah.lab.web.persistence.StructureRepository;
+
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -44,7 +47,23 @@ public class StructureService {
                         structure.getArtifactLabel(),
                         structure.getArtifactStorageLocation()
                 ),
+                structureRepository.findResiduesByStructureId(structureId)
+                        .stream()
+                        .map(this::toResidueDetails)
+                        .toList(),
                 "/api/structures/" + structure.getId() + "/pockets"
+        );
+    }
+
+    private ResidueDetails toResidueDetails(
+            PocketResidueProjection residue
+    ) {
+        return new ResidueDetails(
+                residue.getId(),
+                residue.getChain(),
+                residue.getResidueNumber(),
+                residue.getInsertionCode(),
+                residue.getResidueName()
         );
     }
 
@@ -58,8 +77,12 @@ public class StructureService {
             Long parentStructureId,
             ReceptorSummary receptor,
             ArtifactSummary artifact,
+            List<ResidueDetails> residues,
             String pocketsUrl
     ) {
+        public StructureDetails {
+            residues = List.copyOf(residues);
+        }
     }
 
     public record ReceptorSummary(
@@ -73,6 +96,15 @@ public class StructureService {
             String filename,
             String label,
             String storageLocation
+    ) {
+    }
+
+    public record ResidueDetails(
+            long id,
+            String chain,
+            int residueNumber,
+            String insertionCode,
+            String residueName
     ) {
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StructureRepository
@@ -32,6 +33,24 @@ public interface StructureRepository
             WHERE s.id = :structureId
             """, nativeQuery = true)
     Optional<StructureDetailsProjection> findStructureDetails(
+            @Param("structureId") long structureId
+    );
+
+    @Query(value = """
+            SELECT
+                residue.id AS id,
+                residue.chain AS chain,
+                residue.residue_number AS residueNumber,
+                residue.insertion_code AS insertionCode,
+                residue.residue_name AS residueName
+            FROM docking.residue residue
+            WHERE residue.structure_id = :structureId
+            ORDER BY
+                residue.chain,
+                residue.residue_number,
+                residue.insertion_code
+            """, nativeQuery = true)
+    List<PocketResidueProjection> findResiduesByStructureId(
             @Param("structureId") long structureId
     );
 }
