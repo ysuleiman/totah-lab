@@ -103,6 +103,13 @@ export interface ResidueAnalysis {
   chain: string
   residueNumber: number
   residueName: string
+  contactScoreThreshold: number
+  scoreFilteredLigandCount: number
+  scoreFilteredContactingLigandCount: number
+  scoreFilteredContactingLigandFraction: number
+  scoreFilteredPoseCount: number
+  scoreFilteredContactingPoseCount: number
+  scoreFilteredContactingPoseFraction: number
   totalLigandCount: number
   contactingLigandCount: number
   contactingLigandFraction: number

@@ -14,6 +14,13 @@ const analysis: ResidueAnalysis = {
   chain: 'A',
   residueNumber: 200,
   residueName: 'ASP',
+  contactScoreThreshold: -5,
+  scoreFilteredLigandCount: 9999,
+  scoreFilteredContactingLigandCount: 9724,
+  scoreFilteredContactingLigandFraction: 0.9724972497249725,
+  scoreFilteredPoseCount: 9999,
+  scoreFilteredContactingPoseCount: 9724,
+  scoreFilteredContactingPoseFraction: 0.9724972497249725,
   totalLigandCount: 9999,
   contactingLigandCount: 9724,
   contactingLigandFraction: 0.9724972497249725,
@@ -74,6 +81,8 @@ describe('ResidueDockingAnalysis', () => {
       />,
     )
 
+    expect(screen.getByLabelText('Docking contacts'))
+      .toHaveTextContent('score < -5')
     expect(screen.getByLabelText('Docking contacts'))
       .toHaveTextContent('97.25%')
     expect(screen.getAllByText('9,724 / 9,999')).toHaveLength(2)

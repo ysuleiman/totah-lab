@@ -123,10 +123,17 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
 }
 .sequence-strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 18px 20px; }
 .sequence-residue {
+  position: relative; overflow: hidden;
   width: 28px; height: 28px; display: grid; place-items: center;
   padding: 0; color: var(--ink); background: #f2f4ef;
   border: 1px solid transparent; border-radius: 6px;
   font: 500 10px 'DM Mono', monospace;
+}
+.sequence-residue > span { position: relative; z-index: 1; }
+.sequence-residue.has-docking-analysis::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: var(--contact-rate); height: 3px;
+  background: #287f9d;
 }
 .sequence-residue:hover { border-color: #98aa9e; background: white; }
 .sequence-residue.highlighted { color: var(--accent-dark); background: var(--accent); }
@@ -134,6 +141,19 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
 .sequence-residue.selected { border-color: var(--ink); box-shadow: 0 0 0 2px white, 0 0 0 4px var(--ink); }
 .sequence-residue.selected.spatial-neighbor {
   box-shadow: inset 0 -3px 0 #d95852, 0 0 0 2px white, 0 0 0 4px var(--ink);
+}
+.residue-contact-legend {
+  display: grid; grid-template-columns: 82px 1fr auto auto;
+  gap: 8px; align-items: center;
+  padding: 9px 24px 0; color: var(--muted);
+  font: 9px 'DM Mono', monospace;
+}
+.contact-legend-track {
+  position: relative; height: 3px; background: #dce9ed;
+}
+.contact-legend-track i {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, #287f9d);
 }
 .residue-detail { border-top: 1px solid var(--line); background: #f6f8f3; }
 .residue-detail-title {
@@ -179,7 +199,7 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
 .docking-analysis header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .docking-analysis h4 { margin: 0; font-size: 16px; }
 .primary-contact-rate { color: var(--accent-dark); font: 500 24px 'DM Mono', monospace; }
-.contact-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.contact-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 14px; }
 .contact-metrics div { padding: 10px; background: #f4f6f1; border-radius: 8px; }
 .contact-metrics span, .contact-metrics strong, .contact-metrics small { display: block; }
 .contact-metrics span { color: var(--muted); font-size: 9px; letter-spacing: .07em; text-transform: uppercase; }

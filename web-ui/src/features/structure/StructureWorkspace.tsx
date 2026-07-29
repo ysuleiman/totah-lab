@@ -3,7 +3,6 @@ import type {
   DockingRunSummary,
   PocketDetails,
   PocketSummary,
-  ResidueAnalysis,
   Structure,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
@@ -11,6 +10,7 @@ import { AsyncState } from '../../components/AsyncState'
 import { StructureHero } from './components/StructureHero'
 import { PocketPanel } from '../pocket/PocketPanel'
 import { ResiduePanel } from '../residue/ResiduePanel'
+import { useResidueContactAnalysis } from '../residue/hooks/useResidueContactAnalysis'
 
 interface Props {
   structureId: number
@@ -35,26 +35,12 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
     `/api/structures/${structureId}/docking-runs`,
   )
   const effectiveRunId = selectedRunId ?? dockingRunsQuery.data?.[0]?.id ?? null
-  const residueAnalysisQuery = useApiQuery<ResidueAnalysis[]>(
-    effectiveRunId
-      ? `/api/docking-runs/${effectiveRunId}/residue-summary`
-      : null,
-  )
+  const residueAnalysis = useResidueContactAnalysis(effectiveRunId)
 
   const pocketResidueIds = useMemo(
     () => new Set(pocketQuery.data?.residues.map((residue) => residue.id) ?? []),
     [pocketQuery.data],
   )
-  const residueAnalysis = useMemo(
-    () => new Map(
-      residueAnalysisQuery.data?.map((analysis) => [
-        analysis.residueId,
-        analysis,
-      ]) ?? [],
-    ),
-    [residueAnalysisQuery.data],
-  )
-
   function handleStructureSubmit(nextId: number) {
     setSelectedPocketId(null)
     setSelectedRunId(null)
@@ -94,9 +80,9 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           dockingRuns={dockingRunsQuery.data ?? []}
           selectedRunId={effectiveRunId}
           onRunSelect={setSelectedRunId}
-          residueAnalysis={residueAnalysis}
+          residueAnalysis={residueAnalysis.byResidueId}
           analysisLoading={
-            dockingRunsQuery.loading || residueAnalysisQuery.loading
+            dockingRunsQuery.loading || residueAnalysis.loading
           }
         />
         <PocketPanel

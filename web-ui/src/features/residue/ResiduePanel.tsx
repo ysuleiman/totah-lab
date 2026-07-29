@@ -11,6 +11,7 @@ import type {
 import { useApiQuery } from '../../api/hooks'
 import { AtomDistanceControl } from './components/AtomDistanceControl'
 import { ResidueSequence } from './components/ResidueSequence'
+import { ResidueContactLegend } from './components/ResidueContactLegend'
 import { ResidueDockingAnalysis } from './components/ResidueDockingAnalysis'
 
 interface Props {
@@ -97,6 +98,8 @@ export function ResiduePanel({
       `${residue.residueName}${residue.residueNumber}`.includes(normalized),
     )
   }, [query, residues])
+  const contactScoreThreshold =
+    residueAnalysis.values().next().value?.contactScoreThreshold ?? null
 
   return (
     <section className="panel residue-panel" aria-labelledby="residues-heading">
@@ -144,10 +147,12 @@ export function ResiduePanel({
           </label>
         )}
       </div>
+      <ResidueContactLegend threshold={contactScoreThreshold} />
       <ResidueSequence
         residues={filtered}
         pocketResidueIds={highlightedResidueIds}
         neighborResidueIds={neighborResidueIds}
+        residueAnalysis={residueAnalysis}
         selectedResidueId={selectedResidue?.id ?? null}
         onResidueSelect={setSelectedResidue}
       />
