@@ -25,7 +25,7 @@ class StructureControllerTest {
                 .andExpect(jsonPath("$.receptor.uniProtId").value("Q6UX53"))
                 .andExpect(jsonPath("$.receptor.proteinName")
                         .value("Thiol S-methyltransferase TMT1B"))
-                .andExpect(jsonPath("$.chosenPocket.id").value(3))
+                .andExpect(jsonPath("$.chosenPocket.id").value(1))
                 .andExpect(jsonPath("$.chosenPocket.source")
                         .value("FPOCKET"))
                 .andExpect(jsonPath("$.residues[0].residueName")
@@ -70,7 +70,7 @@ class StructureControllerTest {
                             "STRUCTURE",
                             "/structures/structure.pdb"
                     ),
-                    new ChosenPocketSummary(3, 1, "FPOCKET"),
+                    new ChosenPocketSummary(1, 2, "FPOCKET"),
                     java.util.List.of(new ResidueDetails(
                             1,
                             "A",

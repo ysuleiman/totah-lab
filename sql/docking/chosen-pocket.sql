@@ -50,9 +50,9 @@ JOIN docking.receptor receptor
 WHERE pocket.structure_id = structure.id
   AND pocket.source = 'FPOCKET'::docking.pocket_source
   AND (
-      (receptor.target_name = 'METTL7B' AND pocket.pocket_number = 1)
+      (receptor.target_name = 'METTL7B' AND pocket.pocket_number = 2)
       OR
-      (receptor.target_name = 'METTL7A' AND pocket.pocket_number = 12)
+      (receptor.target_name = 'METTL7A' AND pocket.pocket_number = 13)
   );
 
 COMMENT ON COLUMN docking.structure.chosen_pocket_id IS
