@@ -25,6 +25,10 @@ export interface Structure {
   receptor: {
     id: number
     targetName: string
+    uniProtId?: string | null
+    proteinName?: string | null
+    geneName?: string | null
+    organism?: string | null
   }
   artifact: Artifact
   chosenPocket: ChosenPocket | null

@@ -8,6 +8,9 @@ interface Props {
 
 export function StructureHero({ structure, onStructureSubmit }: Props) {
   const [input, setInput] = useState(String(structure.id))
+  const receptor = structure.receptor
+  const geneName = receptor.geneName ?? receptor.targetName
+  const proteinName = receptor.proteinName ?? receptor.targetName
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -20,11 +23,26 @@ export function StructureHero({ structure, onStructureSubmit }: Props) {
   return (
     <section className="structure-hero">
       <div>
-        <p className="eyebrow">Structure investigation</p>
-        <h1>{structure.receptor.targetName}</h1>
-        <p className="accession">
-          {structure.sourceAccession ?? `Structure ${structure.id}`}
+        <p className="eyebrow">
+          Structure {structure.id}
+          {receptor.organism ? ` · ${receptor.organism}` : ''}
         </p>
+        <h1>{proteinName}</h1>
+        <div className="identity-line">
+          <span className="gene-symbol">{geneName}</span>
+          {receptor.uniProtId && (
+            <a
+              href={`https://www.uniprot.org/uniprotkb/${receptor.uniProtId}/entry`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              UniProt {receptor.uniProtId}
+            </a>
+          )}
+          <span className="accession">
+            {structure.sourceAccession ?? `${structure.source} model`}
+          </span>
+        </div>
       </div>
       <form className="structure-jump" onSubmit={handleSubmit}>
         <label htmlFor="structure-id">Structure ID</label>
