@@ -39,4 +39,21 @@ public final class StructureController {
                 cutoff
         );
     }
+
+    @GetMapping("/{structureId}/residues/{residueId}/distance")
+    public StructureService.AtomDistance atomDistance(
+            @PathVariable("structureId") long structureId,
+            @PathVariable("residueId") long residueId,
+            @RequestParam("toResidueId") long toResidueId,
+            @RequestParam("fromAtom") String fromAtom,
+            @RequestParam("toAtom") String toAtom
+    ) throws IOException {
+        return structureService.getAtomDistance(
+                structureId,
+                residueId,
+                toResidueId,
+                fromAtom,
+                toAtom
+        );
+    }
 }

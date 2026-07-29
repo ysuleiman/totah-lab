@@ -93,9 +93,84 @@ public class StructureService {
 
         return new ResidueNeighborhood(
                 toResidueDetails(selectedRow),
+                atomNames(selected),
                 cutoff,
                 neighbors
         );
+    }
+
+    @Transactional(readOnly = true)
+    public AtomDistance getAtomDistance(
+            long structureId,
+            long firstResidueId,
+            long secondResidueId,
+            String firstAtomName,
+            String secondAtomName
+    ) throws IOException {
+        StructureDetailsProjection structure = structureRepository
+                .findStructureDetails(structureId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Structure not found: " + structureId
+                ));
+        List<PocketResidueProjection> databaseResidues =
+                structureRepository.findResiduesByStructureId(structureId);
+        PocketResidueProjection firstRow = findDatabaseResidue(
+                databaseResidues,
+                firstResidueId
+        );
+        PocketResidueProjection secondRow = findDatabaseResidue(
+                databaseResidues,
+                secondResidueId
+        );
+        totah.lab.protein.Structure artifactStructure =
+                structureArtifactService.load(
+                        structure.getArtifactId(),
+                        structure.getArtifactStorageLocation()
+                );
+        Residue first = findArtifactResidue(
+                artifactStructure.getResidues(),
+                firstRow
+        );
+        Residue second = findArtifactResidue(
+                artifactStructure.getResidues(),
+                secondRow
+        );
+        String normalizedFirstAtom = normalizeAtomName(firstAtomName);
+        String normalizedSecondAtom = normalizeAtomName(secondAtomName);
+
+        return new AtomDistance(
+                toResidueDetails(firstRow),
+                normalizedFirstAtom,
+                toResidueDetails(secondRow),
+                normalizedSecondAtom,
+                PocketGeometry.calculateDistance(
+                        first,
+                        normalizedFirstAtom,
+                        second,
+                        normalizedSecondAtom
+                )
+        );
+    }
+
+    private PocketResidueProjection findDatabaseResidue(
+            List<PocketResidueProjection> residues,
+            long residueId
+    ) {
+        return residues.stream()
+                .filter(residue -> residue.getId() == residueId)
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Residue not found in structure: " + residueId
+                ));
+    }
+
+    private String normalizeAtomName(String atomName) {
+        if (atomName == null || atomName.isBlank()) {
+            throw new IllegalArgumentException("Atom name is required");
+        }
+        return atomName.trim().toUpperCase();
     }
 
     private Residue findArtifactResidue(
@@ -122,8 +197,15 @@ public class StructureService {
                 neighbor.getNumber(),
                 String.valueOf(neighbor.getInsertionCode()),
                 neighbor.getName(),
+                atomNames(neighbor),
                 PocketGeometry.calculateDistance(selected, neighbor)
         );
+    }
+
+    private List<String> atomNames(Residue residue) {
+        return residue.getAtoms().stream()
+                .map(atom -> atom.getName())
+                .toList();
     }
 
     private ResidueKey key(PocketResidueProjection residue) {
@@ -268,10 +350,12 @@ public class StructureService {
 
     public record ResidueNeighborhood(
             ResidueDetails selectedResidue,
+            List<String> selectedAtomNames,
             double cutoff,
             List<NeighborDetails> neighbors
     ) {
         public ResidueNeighborhood {
+            selectedAtomNames = List.copyOf(selectedAtomNames);
             neighbors = List.copyOf(neighbors);
         }
     }
@@ -282,6 +366,19 @@ public class StructureService {
             int residueNumber,
             String insertionCode,
             String residueName,
+            List<String> atomNames,
+            double distance
+    ) {
+        public NeighborDetails {
+            atomNames = List.copyOf(atomNames);
+        }
+    }
+
+    public record AtomDistance(
+            ResidueDetails firstResidue,
+            String firstAtom,
+            ResidueDetails secondResidue,
+            String secondAtom,
             double distance
     ) {
     }

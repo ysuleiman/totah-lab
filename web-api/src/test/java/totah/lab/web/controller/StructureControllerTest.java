@@ -57,6 +57,25 @@ class StructureControllerTest {
         assertEquals(5.5, service.cutoff);
     }
 
+    @Test
+    void bindsNamedAtomDistanceRequest() throws Exception {
+        RecordingStructureService service = new RecordingStructureService();
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new StructureController(service))
+                .build();
+
+        mockMvc.perform(get(
+                        "/api/structures/2/residues/202/distance"
+                                + "?toResidueId=203"
+                                + "&fromAtom=SG"
+                                + "&toAtom=SG"
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstAtom").value("SG"))
+                .andExpect(jsonPath("$.secondAtom").value("SG"))
+                .andExpect(jsonPath("$.distance").value(4.8));
+    }
+
     private static final class RecordingStructureService
             extends StructureService {
 
@@ -117,6 +136,7 @@ class StructureControllerTest {
             this.cutoff = cutoff;
             return new ResidueNeighborhood(
                     new ResidueDetails(202, "A", 202, " ", "CYS"),
+                    java.util.List.of("CA", "SG"),
                     cutoff,
                     java.util.List.of(new NeighborDetails(
                             203L,
@@ -124,8 +144,26 @@ class StructureControllerTest {
                             203,
                             " ",
                             "ASN",
+                            java.util.List.of("CA", "CB"),
                             3.2
                     ))
+            );
+        }
+
+        @Override
+        public AtomDistance getAtomDistance(
+                long structureId,
+                long firstResidueId,
+                long secondResidueId,
+                String firstAtomName,
+                String secondAtomName
+        ) {
+            return new AtomDistance(
+                    new ResidueDetails(202, "A", 202, " ", "CYS"),
+                    firstAtomName,
+                    new ResidueDetails(203, "A", 203, " ", "CYS"),
+                    secondAtomName,
+                    4.8
             );
         }
     }
