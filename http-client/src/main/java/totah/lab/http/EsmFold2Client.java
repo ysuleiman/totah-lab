@@ -90,11 +90,18 @@ public class EsmFold2Client {
     }
 
     public static void main(String[] args) {
+        String apiToken = System.getenv("BIOHUB_API_TOKEN");
+        if (apiToken == null || apiToken.isBlank()) {
+            throw new IllegalStateException(
+                    "BIOHUB_API_TOKEN must be configured"
+            );
+        }
+        String configuredApiToken = apiToken;
         EsmHttpClientConfig mockConfig = new EsmHttpClientConfig() {
             @Override
             public String getApiUrl() { return "https://biohub.ai"; }
             @Override
-            public String getApiKey() { return "6h1XwS5OSMhjDDNHZFNER7"; }
+            public String getApiKey() { return configuredApiToken; }
         };
 
         EsmFold2Client client = new EsmFold2Client(mockConfig);
