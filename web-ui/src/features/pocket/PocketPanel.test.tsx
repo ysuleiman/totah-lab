@@ -9,7 +9,9 @@ const pockets = [
     pocketNumber: 1,
     source: 'FPOCKET' as const,
     volume: 100,
+    score: 0.25,
     druggabilityScore: 0.5,
+    probability: null,
     artifactId: 9,
   },
 ]
@@ -32,6 +34,8 @@ describe('PocketPanel', () => {
     expect(screen.getByText('Chosen')).toBeInTheDocument()
     expect(screen.getByText('Chosen pocket')).toBeInTheDocument()
     expect(screen.getByText('Inspecting now')).toBeInTheDocument()
+    expect(screen.getByText('Source score')).toBeInTheDocument()
+    expect(screen.getByText('druggability 0.500')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { pressed: true }))
     expect(onPocketSelect).toHaveBeenCalledWith(3)
   })

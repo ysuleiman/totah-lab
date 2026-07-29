@@ -45,9 +45,19 @@ export function PocketPanel({
             </strong>
           </span>
           <span>
-            <small>Druggability</small>
+            <small>Source score</small>
+            <strong>{formatMetric(chosenPocket.score)}</strong>
+          </span>
+          <span>
+            <small>
+              {chosenPocket.source === 'P2RANK'
+                ? 'Probability'
+                : 'Druggability'}
+            </small>
             <strong>
-              {chosenPocket.druggabilityScore?.toFixed(3) ?? 'Not scored'}
+              {chosenPocket.source === 'P2RANK'
+                ? formatMetric(chosenPocket.probability)
+                : formatMetric(chosenPocket.druggabilityScore)}
             </strong>
           </span>
           <span className="chosen-pocket-action">
@@ -91,8 +101,15 @@ export function PocketPanel({
                   </small>
                 </span>
                 <span className="pocket-score">
-                  {pocket.druggabilityScore?.toFixed(3) ?? '—'}
+                  {formatMetric(pocket.score)}
                   <small>score</small>
+                  <small className="secondary-score">
+                    {pocket.source === 'P2RANK'
+                      ? `probability ${formatMetric(pocket.probability)}`
+                      : `druggability ${formatMetric(
+                        pocket.druggabilityScore,
+                      )}`}
+                  </small>
                 </span>
                 {chosen && <span className="chosen-tag">Chosen</span>}
               </button>
@@ -102,4 +119,8 @@ export function PocketPanel({
       )}
     </section>
   )
+}
+
+function formatMetric(value: number | null): string {
+  return value == null ? '—' : value.toFixed(3)
 }

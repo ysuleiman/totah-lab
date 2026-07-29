@@ -48,7 +48,9 @@ export interface PocketSummary {
   pocketNumber: number
   source: PocketSource
   volume: number | null
+  score: number | null
   druggabilityScore: number | null
+  probability: number | null
   artifactId: number
 }
 
@@ -57,7 +59,9 @@ export interface PocketDetails {
   pocketNumber: number
   source: PocketSource
   volume: number | null
+  score: number | null
   druggabilityScore: number | null
+  probability: number | null
   artifact: Artifact
   residues: Residue[]
 }
