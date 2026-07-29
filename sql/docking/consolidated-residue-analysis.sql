@@ -1,13 +1,19 @@
 BEGIN;
 
-DROP MATERIALIZED VIEW docking.residue_enrichment_summary;
-DROP MATERIALIZED VIEW docking.residue_enrichment_by_receptor;
-DROP MATERIALIZED VIEW docking.residue_contact_by_score_band;
-DROP MATERIALIZED VIEW docking.residue_contact_score_band_summary;
-DROP MATERIALIZED VIEW docking.residue_contact_score_summary;
+DROP MATERIALIZED VIEW IF EXISTS docking.residue_enrichment_summary;
+DROP MATERIALIZED VIEW IF EXISTS docking.residue_enrichment_by_receptor;
+DROP MATERIALIZED VIEW IF EXISTS docking.residue_contact_by_score_band;
+DROP MATERIALIZED VIEW IF EXISTS docking.residue_contact_score_band_summary;
+DROP MATERIALIZED VIEW IF EXISTS docking.residue_contact_score_summary;
+DROP MATERIALIZED VIEW IF EXISTS docking.docking_run_residue_summary;
+DROP MATERIALIZED VIEW IF EXISTS
+    docking.docking_run_residue_score_band_summary;
 
 CREATE MATERIALIZED VIEW docking.docking_run_residue_summary AS
-WITH ligand_score AS (
+WITH analysis_parameter AS (
+    SELECT -5.0::double precision AS contact_score_threshold
+),
+ligand_score AS (
     SELECT
         pose.run_id,
         pose.ligand_id,
@@ -18,32 +24,51 @@ WITH ligand_score AS (
 pose_total AS (
     SELECT
         pose.run_id,
-        count(*) AS total_pose_count
+        count(*) AS total_pose_count,
+        count(*) FILTER (
+            WHERE pose.vina_score
+                < parameter.contact_score_threshold
+        ) AS score_filtered_pose_count
     FROM docking.docking_pose pose
+    CROSS JOIN analysis_parameter parameter
     GROUP BY pose.run_id
 ),
 run_totals AS (
     SELECT
         score.run_id,
         pose.total_pose_count,
+        pose.score_filtered_pose_count,
         count(*) AS total_ligand_count,
+        count(*) FILTER (
+            WHERE score.vina_score
+                < parameter.contact_score_threshold
+        ) AS score_filtered_ligand_count,
         count(*) FILTER (WHERE score.vina_score <= -9.0)
             AS total_good_ligand_count,
         count(*) FILTER (WHERE score.vina_score >= -6.0)
             AS total_bad_ligand_count
     FROM ligand_score score
     JOIN pose_total pose ON pose.run_id = score.run_id
-    GROUP BY score.run_id, pose.total_pose_count
+    CROSS JOIN analysis_parameter parameter
+    GROUP BY
+        score.run_id,
+        pose.total_pose_count,
+        pose.score_filtered_pose_count
 ),
 contacted_pose AS (
     SELECT
         pose.run_id,
         contact.residue_id,
         count(*) AS contacting_pose_count,
+        count(*) FILTER (
+            WHERE pose.vina_score
+                < parameter.contact_score_threshold
+        ) AS score_filtered_contacting_pose_count,
         min(contact.min_distance) AS closest_distance,
         avg(contact.min_distance) AS avg_pose_min_distance
     FROM docking.pose_residue_contact contact
     JOIN docking.docking_pose pose ON pose.id = contact.pose_id
+    CROSS JOIN analysis_parameter parameter
     GROUP BY pose.run_id, contact.residue_id
 ),
 contacted_ligand AS (
@@ -62,6 +87,10 @@ contacted_ligand_summary AS (
         contact.run_id,
         contact.residue_id,
         count(*) AS contacting_ligand_count,
+        count(*) FILTER (
+            WHERE contact.vina_score
+                < parameter.contact_score_threshold
+        ) AS score_filtered_contacting_ligand_count,
         count(*) FILTER (WHERE contact.vina_score <= -9.0)
             AS good_contacting_ligand_count,
         count(*) FILTER (WHERE contact.vina_score >= -6.0)
@@ -74,6 +103,7 @@ contacted_ligand_summary AS (
         min(contact.min_distance) AS closest_distance,
         avg(contact.min_distance) AS avg_ligand_min_distance
     FROM contacted_ligand contact
+    CROSS JOIN analysis_parameter parameter
     GROUP BY contact.run_id, contact.residue_id
 )
 SELECT
@@ -84,6 +114,23 @@ SELECT
     residue.chain,
     residue.residue_number,
     residue.residue_name,
+    parameter.contact_score_threshold,
+    totals.score_filtered_ligand_count,
+    COALESCE(ligand.score_filtered_contacting_ligand_count, 0)
+        AS score_filtered_contacting_ligand_count,
+    COALESCE(
+        ligand.score_filtered_contacting_ligand_count::double precision
+            / NULLIF(totals.score_filtered_ligand_count, 0),
+        0.0
+    ) AS score_filtered_contacting_ligand_fraction,
+    totals.score_filtered_pose_count,
+    COALESCE(pose.score_filtered_contacting_pose_count, 0)
+        AS score_filtered_contacting_pose_count,
+    COALESCE(
+        pose.score_filtered_contacting_pose_count::double precision
+            / NULLIF(totals.score_filtered_pose_count, 0),
+        0.0
+    ) AS score_filtered_contacting_pose_fraction,
     totals.total_ligand_count,
     COALESCE(ligand.contacting_ligand_count, 0) AS contacting_ligand_count,
     COALESCE(
@@ -156,6 +203,7 @@ SELECT
 FROM docking.docking_run run
 JOIN run_totals totals ON totals.run_id = run.id
 JOIN docking.residue residue ON residue.structure_id = run.structure_id
+CROSS JOIN analysis_parameter parameter
 LEFT JOIN contacted_ligand_summary ligand
   ON ligand.run_id = run.id
  AND ligand.residue_id = residue.id

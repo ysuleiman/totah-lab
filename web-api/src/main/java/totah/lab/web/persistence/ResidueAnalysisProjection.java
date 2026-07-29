@@ -16,6 +16,20 @@ public interface ResidueAnalysisProjection {
 
     String getResidueName();
 
+    double getContactScoreThreshold();
+
+    long getScoreFilteredLigandCount();
+
+    long getScoreFilteredContactingLigandCount();
+
+    double getScoreFilteredContactingLigandFraction();
+
+    long getScoreFilteredPoseCount();
+
+    long getScoreFilteredContactingPoseCount();
+
+    double getScoreFilteredContactingPoseFraction();
+
     long getTotalLigandCount();
 
     long getContactingLigandCount();

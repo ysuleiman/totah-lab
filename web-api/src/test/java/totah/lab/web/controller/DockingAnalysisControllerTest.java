@@ -30,8 +30,10 @@ class DockingAnalysisControllerTest {
         mockMvc.perform(get("/api/docking-runs/7/residue-summary"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].residueId").value(200))
-                .andExpect(jsonPath("$[0].contactingLigandFraction")
-                        .value(0.3));
+                .andExpect(jsonPath("$[0].contactScoreThreshold").value(-5))
+                .andExpect(jsonPath(
+                        "$[0].scoreFilteredContactingLigandFraction"
+                ).value(0.25));
 
         mockMvc.perform(get(
                         "/api/docking-runs/7/residue-score-bands"
@@ -84,6 +86,13 @@ class DockingAnalysisControllerTest {
                     "A",
                     200,
                     "ASP",
+                    -5.0,
+                    80,
+                    20,
+                    0.25,
+                    90,
+                    24,
+                    24.0 / 90.0,
                     100,
                     30,
                     0.3,
