@@ -1,0 +1,78 @@
+package totah.lab.web.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import totah.lab.web.persistence.StructureDetailsProjection;
+import totah.lab.web.persistence.StructureRepository;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+@Service
+public class StructureService {
+
+    private final StructureRepository structureRepository;
+
+    public StructureService(StructureRepository structureRepository) {
+        this.structureRepository = structureRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public StructureDetails getStructure(long structureId) {
+        StructureDetailsProjection structure = structureRepository
+                .findStructureDetails(structureId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Structure not found: " + structureId
+                ));
+
+        return new StructureDetails(
+                structure.getId(),
+                structure.getSource(),
+                structure.getSourceAccession(),
+                structure.getChain(),
+                structure.getModelNumber(),
+                structure.getPreparationState(),
+                structure.getParentStructureId(),
+                new ReceptorSummary(
+                        structure.getReceptorId(),
+                        structure.getTargetName()
+                ),
+                new ArtifactSummary(
+                        structure.getArtifactId(),
+                        structure.getArtifactFilename(),
+                        structure.getArtifactLabel(),
+                        structure.getArtifactStorageLocation()
+                ),
+                "/api/structures/" + structure.getId() + "/pockets"
+        );
+    }
+
+    public record StructureDetails(
+            long id,
+            String source,
+            String sourceAccession,
+            String chain,
+            Integer modelNumber,
+            String preparationState,
+            Long parentStructureId,
+            ReceptorSummary receptor,
+            ArtifactSummary artifact,
+            String pocketsUrl
+    ) {
+    }
+
+    public record ReceptorSummary(
+            long id,
+            String targetName
+    ) {
+    }
+
+    public record ArtifactSummary(
+            long id,
+            String filename,
+            String label,
+            String storageLocation
+    ) {
+    }
+}
