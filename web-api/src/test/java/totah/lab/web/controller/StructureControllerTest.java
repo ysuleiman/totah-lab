@@ -22,6 +22,9 @@ class StructureControllerTest {
         mockMvc.perform(get("/api/structures/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.chosenPocket.id").value(3))
+                .andExpect(jsonPath("$.chosenPocket.source")
+                        .value("FPOCKET"))
                 .andExpect(jsonPath("$.residues[0].residueName")
                         .value("MET"))
                 .andExpect(jsonPath("$.pocketsUrl")
@@ -57,6 +60,7 @@ class StructureControllerTest {
                             "STRUCTURE",
                             "/structures/structure.pdb"
                     ),
+                    new ChosenPocketSummary(3, 1, "FPOCKET"),
                     java.util.List.of(new ResidueDetails(
                             1,
                             "A",

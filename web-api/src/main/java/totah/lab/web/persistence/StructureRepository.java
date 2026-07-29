@@ -24,12 +24,17 @@ public interface StructureRepository
                 a.id AS artifactId,
                 a.filename AS artifactFilename,
                 a.label AS artifactLabel,
-                a.storage_location AS artifactStorageLocation
+                a.storage_location AS artifactStorageLocation,
+                chosen.id AS chosenPocketId,
+                chosen.pocket_number AS chosenPocketNumber,
+                chosen.source::text AS chosenPocketSource
             FROM docking.structure s
             JOIN docking.receptor r
                 ON r.id = s.receptor_id
             JOIN docking.artifacts a
                 ON a.id = s.artifact_id
+            LEFT JOIN docking.pocket chosen
+                ON chosen.id = s.chosen_pocket_id
             WHERE s.id = :structureId
             """, nativeQuery = true)
     Optional<StructureDetailsProjection> findStructureDetails(

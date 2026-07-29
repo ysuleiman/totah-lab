@@ -27,4 +27,10 @@ public interface StructureDetailsProjection {
     String getArtifactLabel();
 
     String getArtifactStorageLocation();
+
+    Long getChosenPocketId();
+
+    Integer getChosenPocketNumber();
+
+    String getChosenPocketSource();
 }

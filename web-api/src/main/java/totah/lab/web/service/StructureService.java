@@ -47,11 +47,25 @@ public class StructureService {
                         structure.getArtifactLabel(),
                         structure.getArtifactStorageLocation()
                 ),
+                chosenPocket(structure),
                 structureRepository.findResiduesByStructureId(structureId)
                         .stream()
                         .map(this::toResidueDetails)
                         .toList(),
                 "/api/structures/" + structure.getId() + "/pockets"
+        );
+    }
+
+    private ChosenPocketSummary chosenPocket(
+            StructureDetailsProjection structure
+    ) {
+        if (structure.getChosenPocketId() == null) {
+            return null;
+        }
+        return new ChosenPocketSummary(
+                structure.getChosenPocketId(),
+                structure.getChosenPocketNumber(),
+                structure.getChosenPocketSource()
         );
     }
 
@@ -77,6 +91,7 @@ public class StructureService {
             Long parentStructureId,
             ReceptorSummary receptor,
             ArtifactSummary artifact,
+            ChosenPocketSummary chosenPocket,
             List<ResidueDetails> residues,
             String pocketsUrl
     ) {
@@ -96,6 +111,13 @@ public class StructureService {
             String filename,
             String label,
             String storageLocation
+    ) {
+    }
+
+    public record ChosenPocketSummary(
+            long id,
+            int pocketNumber,
+            String source
     ) {
     }
 
