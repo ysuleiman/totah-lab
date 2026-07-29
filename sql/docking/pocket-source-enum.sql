@@ -13,6 +13,7 @@ BEGIN
         CREATE TYPE docking.pocket_source AS ENUM (
             'FPOCKET',
             'P2RANK',
+            'BIOHUB',
             'MANUAL',
             'IMPORTED'
         );
@@ -28,3 +29,6 @@ COMMENT ON COLUMN docking.pocket.source IS
     'Method used to detect or define the pocket.';
 
 COMMIT;
+
+ALTER TYPE docking.pocket_source
+    ADD VALUE IF NOT EXISTS 'BIOHUB';
