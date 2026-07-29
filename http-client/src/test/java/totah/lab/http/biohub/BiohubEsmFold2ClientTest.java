@@ -75,6 +75,7 @@ class BiohubEsmFold2ClientTest {
         );
         assertEquals(32, request.path("num_sampling_steps").asInt());
         assertEquals(3, request.path("num_loops").asInt());
+        assertEquals(0.1, request.path("lm_mask_pct").asDouble());
         assertEquals("SAH", prediction.ligandCcd());
         assertEquals(0.72, prediction.interfacePtm());
         assertEquals(3, prediction.tokens().size());

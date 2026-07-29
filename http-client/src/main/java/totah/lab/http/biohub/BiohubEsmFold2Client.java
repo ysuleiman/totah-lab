@@ -123,7 +123,7 @@ public final class BiohubEsmFold2Client {
         request.put("num_sampling_steps", config.numSamplingSteps());
         request.put("num_loops", config.numLoops());
         request.put("lm_dropout", config.lmDropout());
-        request.putNull("lm_mask_pct");
+        request.put("lm_mask_pct", 0.1);
         request.put("msa_max_depth", 1024);
         request.put(
                 "msa_column_mask_rate",
