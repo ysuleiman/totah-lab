@@ -21,9 +21,8 @@ interface Props {
   structureId: number
   residues: Residue[]
   highlightedResidueIds: Set<number>
+  chosenPocketResidueIds?: Set<number>
   directContactResidueIds?: Set<number>
-  consensusResidueIds?: Set<number>
-  directConsensusResidueIds?: Set<number>
   activePocket: PocketDetails | null
   pocketLoading: boolean
   dockingRuns: DockingRunSummary[]
@@ -39,9 +38,8 @@ export function ResiduePanel({
   structureId,
   residues,
   highlightedResidueIds,
+  chosenPocketResidueIds = new Set(),
   directContactResidueIds = new Set(),
-  consensusResidueIds = new Set(),
-  directConsensusResidueIds = new Set(),
   activePocket,
   pocketLoading,
   dockingRuns,
@@ -167,9 +165,9 @@ export function ResiduePanel({
       <ResidueSequence
         residues={filtered}
         pocketResidueIds={highlightedResidueIds}
+        chosenPocketResidueIds={chosenPocketResidueIds}
+        biohubSelected={activePocket?.source === 'BIOHUB'}
         directContactResidueIds={directContactResidueIds}
-        consensusResidueIds={consensusResidueIds}
-        directConsensusResidueIds={directConsensusResidueIds}
         neighborResidueIds={neighborResidueIds}
         residueAnalysis={residueAnalysis}
         residueEvidence={residueEvidence}

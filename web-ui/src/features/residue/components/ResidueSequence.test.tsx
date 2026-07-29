@@ -57,8 +57,6 @@ describe('ResidueSequence', () => {
         residues={[residue]}
         pocketResidueIds={new Set([residue.id])}
         directContactResidueIds={new Set([residue.id])}
-        consensusResidueIds={new Set([residue.id])}
-        directConsensusResidueIds={new Set([residue.id])}
         neighborResidueIds={new Set([residue.id])}
         residueAnalysis={new Map([[residue.id, analysis]])}
         selectedResidueId={null}
@@ -74,13 +72,34 @@ describe('ResidueSequence', () => {
       'spatial-neighbor',
       'has-docking-analysis',
       'biohub-direct-contact',
-      'chosen-pocket-consensus',
-      'direct-consensus',
     )
     expect(cell).toHaveStyle({ '--contact-rate': '30%' })
     expect(cell).toHaveAttribute(
       'title',
       expect.stringContaining('score < -5: 30.00% contacted ligands (30 / 100)'),
     )
+  })
+
+  it('distinguishes fpocket overlap from BioHub-only residues', () => {
+    const biohubOnlyResidue = { ...residue, id: 446, residueNumber: 201 }
+    render(
+      <ResidueSequence
+        residues={[residue, biohubOnlyResidue]}
+        pocketResidueIds={new Set([residue.id, biohubOnlyResidue.id])}
+        chosenPocketResidueIds={new Set([residue.id])}
+        biohubSelected
+        neighborResidueIds={new Set()}
+        residueAnalysis={new Map()}
+        selectedResidueId={null}
+        onResidueSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('listitem', {
+      name: 'ASP 200, chain A',
+    })).toHaveClass('fpocket-residue', 'biohub-fpocket-overlap')
+    expect(screen.getByRole('listitem', {
+      name: 'ASP 201, chain A',
+    })).toHaveClass('biohub-only')
   })
 })

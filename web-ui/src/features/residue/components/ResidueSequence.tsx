@@ -15,9 +15,9 @@ const ONE_LETTER: Record<string, string> = {
 interface Props {
   residues: Residue[]
   pocketResidueIds: Set<number>
+  chosenPocketResidueIds?: Set<number>
+  biohubSelected?: boolean
   directContactResidueIds?: Set<number>
-  consensusResidueIds?: Set<number>
-  directConsensusResidueIds?: Set<number>
   neighborResidueIds: Set<number>
   residueAnalysis: Map<number, ResidueAnalysis>
   residueEvidence?: Map<number, ResidueEvidence>
@@ -28,9 +28,9 @@ interface Props {
 export function ResidueSequence({
   residues,
   pocketResidueIds,
+  chosenPocketResidueIds = new Set(),
+  biohubSelected = false,
   directContactResidueIds = new Set(),
-  consensusResidueIds = new Set(),
-  directConsensusResidueIds = new Set(),
   neighborResidueIds,
   residueAnalysis,
   residueEvidence = new Map(),
@@ -40,6 +40,8 @@ export function ResidueSequence({
   return (
     <div className="sequence-strip" role="list" aria-label="Structure residues">
       {residues.map((residue) => {
+        const inSelectedPocket = pocketResidueIds.has(residue.id)
+        const inChosenPocket = chosenPocketResidueIds.has(residue.id)
         const analysis = residueAnalysis.get(residue.id)
         const evidence = residueEvidence.get(residue.id)
         const label = `${residue.residueName} ${residue.residueNumber}, `
@@ -57,15 +59,16 @@ export function ResidueSequence({
           : `${contactTitle} · ESMC constraint ${evidence.score.toFixed(2)}`
         const className = [
           'sequence-residue',
-          pocketResidueIds.has(residue.id) ? 'highlighted' : '',
+          !biohubSelected && inSelectedPocket ? 'highlighted' : '',
+          biohubSelected && inChosenPocket ? 'fpocket-residue' : '',
+          biohubSelected && inSelectedPocket && inChosenPocket
+            ? 'biohub-fpocket-overlap'
+            : '',
+          biohubSelected && inSelectedPocket && !inChosenPocket
+            ? 'biohub-only'
+            : '',
           directContactResidueIds.has(residue.id)
             ? 'biohub-direct-contact'
-            : '',
-          consensusResidueIds.has(residue.id)
-            ? 'chosen-pocket-consensus'
-            : '',
-          directConsensusResidueIds.has(residue.id)
-            ? 'direct-consensus'
             : '',
           analysis ? 'has-docking-analysis' : '',
           evidence ? 'has-constraint-evidence' : '',
