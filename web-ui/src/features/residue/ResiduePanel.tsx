@@ -1,17 +1,13 @@
 import { useMemo, useState } from 'react'
 import type {
+  AtomDistance,
   PocketDetails,
   Residue,
   ResidueNeighborhood,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
-
-const ONE_LETTER: Record<string, string> = {
-  ALA: 'A', ARG: 'R', ASN: 'N', ASP: 'D', CYS: 'C',
-  GLN: 'Q', GLU: 'E', GLY: 'G', HIS: 'H', ILE: 'I',
-  LEU: 'L', LYS: 'K', MET: 'M', PHE: 'F', PRO: 'P',
-  SER: 'S', THR: 'T', TRP: 'W', TYR: 'Y', VAL: 'V',
-}
+import { AtomDistanceControl } from './components/AtomDistanceControl'
+import { ResidueSequence } from './components/ResidueSequence'
 
 interface Props {
   structureId: number
@@ -31,6 +27,10 @@ export function ResiduePanel({
   const [query, setQuery] = useState('')
   const [selectedResidue, setSelectedResidue] = useState<Residue | null>(null)
   const [cutoff, setCutoff] = useState(6)
+  const [measurementNeighborId, setMeasurementNeighborId] =
+    useState<number | null>(null)
+  const [firstAtomChoice, setFirstAtomChoice] = useState<string | null>(null)
+  const [secondAtomChoice, setSecondAtomChoice] = useState<string | null>(null)
   const neighborhood = useApiQuery<ResidueNeighborhood>(
     selectedResidue
       ? `/api/structures/${structureId}/residues/${selectedResidue.id}`
@@ -42,6 +42,33 @@ export function ResiduePanel({
       neighborhood.data?.neighbors.map((neighbor) => neighbor.id) ?? [],
     ),
     [neighborhood.data],
+  )
+  const measurementNeighbor =
+    neighborhood.data?.neighbors.find(
+      (neighbor) => neighbor.id === measurementNeighborId,
+    )
+    ?? neighborhood.data?.neighbors.find(
+      (neighbor) =>
+        neighborhood.data?.selectedAtomNames.includes('SG')
+        && neighbor.atomNames.includes('SG'),
+    )
+    ?? neighborhood.data?.neighbors[0]
+    ?? null
+  const firstAtom = validAtomChoice(
+    firstAtomChoice,
+    neighborhood.data?.selectedAtomNames ?? [],
+  )
+  const secondAtom = validAtomChoice(
+    secondAtomChoice,
+    measurementNeighbor?.atomNames ?? [],
+  )
+  const atomDistance = useApiQuery<AtomDistance>(
+    selectedResidue && measurementNeighbor && firstAtom && secondAtom
+      ? `/api/structures/${structureId}/residues/${selectedResidue.id}`
+          + `/distance?toResidueId=${measurementNeighbor.id}`
+          + `&fromAtom=${encodeURIComponent(firstAtom)}`
+          + `&toAtom=${encodeURIComponent(secondAtom)}`
+      : null,
   )
   const filtered = useMemo(() => {
     const normalized = query.trim().toUpperCase()
@@ -80,34 +107,13 @@ export function ResiduePanel({
           'Select a pocket to highlight its residues'
         )}
       </div>
-      <div className="sequence-strip" role="list" aria-label="Structure residues">
-        {filtered.map((residue) => {
-          const highlighted = highlightedResidueIds.has(residue.id)
-          const selected = selectedResidue?.id === residue.id
-          const neighbor = neighborResidueIds.has(residue.id)
-          const label = `${residue.residueName} ${residue.residueNumber}, `
-              + `chain ${residue.chain}`
-          return (
-            <button
-              className={[
-                'sequence-residue',
-                highlighted ? 'highlighted' : '',
-                neighbor ? 'spatial-neighbor' : '',
-                selected ? 'selected' : '',
-              ].filter(Boolean).join(' ')}
-              key={residue.id}
-              type="button"
-              role="listitem"
-              aria-label={label}
-              aria-pressed={selected}
-              title={label}
-              onClick={() => setSelectedResidue(residue)}
-            >
-              {ONE_LETTER[residue.residueName] ?? 'X'}
-            </button>
-          )
-        })}
-      </div>
+      <ResidueSequence
+        residues={filtered}
+        pocketResidueIds={highlightedResidueIds}
+        neighborResidueIds={neighborResidueIds}
+        selectedResidueId={selectedResidue?.id ?? null}
+        onResidueSelect={setSelectedResidue}
+      />
       {selectedResidue && (
         <div className="residue-detail">
           <div className="residue-detail-title">
@@ -143,10 +149,15 @@ export function ResiduePanel({
             ) : neighborhood.data?.neighbors.length ? (
               neighborhood.data.neighbors.map((neighbor) => (
                 <button
-                  className="neighbor-card"
+                  className={[
+                    'neighbor-card',
+                    measurementNeighbor?.id === neighbor.id
+                      ? 'measuring'
+                      : '',
+                  ].filter(Boolean).join(' ')}
                   key={neighbor.id}
                   type="button"
-                  onClick={() => setSelectedResidue(neighbor)}
+                  onClick={() => setMeasurementNeighborId(neighbor.id)}
                 >
                   <span>
                     <strong>{neighbor.residueName}</strong>
@@ -159,8 +170,36 @@ export function ResiduePanel({
               <p>No residues within {cutoff.toFixed(1)} Å.</p>
             )}
           </div>
+          {neighborhood.data
+              && measurementNeighbor
+              && firstAtom
+              && secondAtom && (
+            <footer className="residue-detail-footer">
+              <AtomDistanceControl
+                neighborhood={neighborhood.data}
+                neighbor={measurementNeighbor}
+                firstAtom={firstAtom}
+                secondAtom={secondAtom}
+                distance={atomDistance.data}
+                loading={atomDistance.loading}
+                onNeighborChange={setMeasurementNeighborId}
+                onFirstAtomChange={setFirstAtomChoice}
+                onSecondAtomChange={setSecondAtomChoice}
+              />
+            </footer>
+          )}
         </div>
       )}
     </section>
   )
+}
+
+function validAtomChoice(
+  choice: string | null,
+  atomNames: string[],
+): string | null {
+  if (choice && atomNames.includes(choice)) return choice
+  if (atomNames.includes('SG')) return 'SG'
+  if (atomNames.includes('CA')) return 'CA'
+  return atomNames[0] ?? null
 }

@@ -63,11 +63,21 @@ export interface PocketDetails {
 }
 
 export interface ResidueNeighbor extends Residue {
+  atomNames: string[]
   distance: number
 }
 
 export interface ResidueNeighborhood {
   selectedResidue: Residue
+  selectedAtomNames: string[]
   cutoff: number
   neighbors: ResidueNeighbor[]
+}
+
+export interface AtomDistance {
+  firstResidue: Residue
+  firstAtom: string
+  secondResidue: Residue
+  secondAtom: string
+  distance: number
 }
