@@ -22,6 +22,9 @@ class StructureControllerTest {
         mockMvc.perform(get("/api/structures/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.receptor.uniProtId").value("Q6UX53"))
+                .andExpect(jsonPath("$.receptor.proteinName")
+                        .value("Thiol S-methyltransferase TMT1B"))
                 .andExpect(jsonPath("$.chosenPocket.id").value(3))
                 .andExpect(jsonPath("$.chosenPocket.source")
                         .value("FPOCKET"))
@@ -53,7 +56,14 @@ class StructureControllerTest {
                     1,
                     "RAW",
                     null,
-                    new ReceptorSummary(1, "METTL7B"),
+                    new ReceptorSummary(
+                            1,
+                            "METTL7B",
+                            "Q6UX53",
+                            "Thiol S-methyltransferase TMT1B",
+                            "METTL7B",
+                            "Homo sapiens"
+                    ),
                     new ArtifactSummary(
                             1,
                             "structure.pdb",

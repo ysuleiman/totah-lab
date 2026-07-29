@@ -20,6 +20,14 @@ public interface StructureDetailsProjection {
 
     String getTargetName();
 
+    String getUniProtId();
+
+    String getProteinName();
+
+    String getGeneName();
+
+    String getOrganism();
+
     Long getArtifactId();
 
     String getArtifactFilename();

@@ -39,7 +39,11 @@ public class StructureService {
                 structure.getParentStructureId(),
                 new ReceptorSummary(
                         structure.getReceptorId(),
-                        structure.getTargetName()
+                        structure.getTargetName(),
+                        structure.getUniProtId(),
+                        structure.getProteinName(),
+                        structure.getGeneName(),
+                        structure.getOrganism()
                 ),
                 new ArtifactSummary(
                         structure.getArtifactId(),
@@ -102,7 +106,11 @@ public class StructureService {
 
     public record ReceptorSummary(
             long id,
-            String targetName
+            String targetName,
+            String uniProtId,
+            String proteinName,
+            String geneName,
+            String organism
     ) {
     }
 
