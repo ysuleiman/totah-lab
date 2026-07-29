@@ -49,6 +49,10 @@ export function PocketPanel({
             <strong>{formatMetric(chosenPocket.score)}</strong>
           </span>
           <span>
+            <small>Volume</small>
+            <strong>{formatVolume(chosenPocket.volume)}</strong>
+          </span>
+          <span>
             <small>
               {chosenPocket.source === 'P2RANK'
                 ? 'Probability'
@@ -96,8 +100,8 @@ export function PocketPanel({
                   <strong>{pocket.source}</strong>
                   <small>
                     {pocket.volume == null
-                      ? 'Volume unavailable'
-                      : `${pocket.volume.toFixed(1)} Å³`}
+                      ? 'volume unavailable'
+                      : `volume ${pocket.volume.toFixed(1)} Å³`}
                   </small>
                 </span>
                 <span className="pocket-score">
@@ -123,4 +127,8 @@ export function PocketPanel({
 
 function formatMetric(value: number | null): string {
   return value == null ? '—' : value.toFixed(3)
+}
+
+function formatVolume(value: number | null): string {
+  return value == null ? '—' : `${value.toFixed(1)} Å³`
 }
