@@ -30,7 +30,29 @@ describe('PocketPanel', () => {
     )
 
     expect(screen.getByText('Chosen')).toBeInTheDocument()
+    expect(screen.getByText('Chosen pocket')).toBeInTheDocument()
+    expect(screen.getByText('Inspecting now')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { pressed: true }))
+    expect(onPocketSelect).toHaveBeenCalledWith(3)
+  })
+
+  it('returns to the chosen pocket from another inspected pocket', async () => {
+    const onPocketSelect = vi.fn()
+    render(
+      <PocketPanel
+        pockets={pockets}
+        chosenPocketId={3}
+        selectedPocketId={9}
+        loading={false}
+        error={null}
+        onPocketSelect={onPocketSelect}
+        onRetry={() => undefined}
+      />,
+    )
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /Chosen pocket FPOCKET 1/i }),
+    )
     expect(onPocketSelect).toHaveBeenCalledWith(3)
   })
 })

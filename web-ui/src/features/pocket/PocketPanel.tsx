@@ -20,6 +20,9 @@ export function PocketPanel({
   onPocketSelect,
   onRetry,
 }: Props) {
+  const chosenPocket = pockets.find((pocket) => pocket.id === chosenPocketId)
+  const inspectingChosen = selectedPocketId === chosenPocketId
+
   return (
     <section className="panel pocket-panel" aria-labelledby="pockets-heading">
       <div className="panel-heading">
@@ -29,6 +32,29 @@ export function PocketPanel({
         </div>
         <span className="count-badge">{pockets.length}</span>
       </div>
+      {chosenPocket && (
+        <button
+          className="chosen-pocket-summary"
+          type="button"
+          onClick={() => onPocketSelect(chosenPocket.id)}
+        >
+          <span>
+            <small>Chosen pocket</small>
+            <strong>
+              {chosenPocket.source} {chosenPocket.pocketNumber}
+            </strong>
+          </span>
+          <span>
+            <small>Druggability</small>
+            <strong>
+              {chosenPocket.druggabilityScore?.toFixed(3) ?? 'Not scored'}
+            </strong>
+          </span>
+          <span className="chosen-pocket-action">
+            {inspectingChosen ? 'Inspecting now' : 'Inspect'}
+          </span>
+        </button>
+      )}
       {loading && pockets.length === 0 ? (
         <AsyncState loading title="Loading pockets" compact />
       ) : error ? (
