@@ -65,7 +65,9 @@ public class PocketService {
                 pocket.getPocketNumber(),
                 pocket.getSource(),
                 pocket.getVolume(),
+                pocket.getScore(),
                 pocket.getDruggabilityScore(),
+                pocket.getProbability(),
                 new StructureSummary(
                         pocket.getStructureId(),
                         pocket.getStructureSource(),
@@ -93,7 +95,9 @@ public class PocketService {
                 pocket.getPocketNumber(),
                 pocket.getSource(),
                 pocket.getVolume(),
+                pocket.getScore(),
                 pocket.getDruggabilityScore(),
+                pocket.getProbability(),
                 pocket.getArtifactId()
         );
     }
@@ -122,7 +126,9 @@ public class PocketService {
             int pocketNumber,
             String source,
             Double volume,
+            Double score,
             Double druggabilityScore,
+            Double probability,
             StructureSummary structure,
             ReceptorSummary receptor,
             ArtifactSummary artifact,
@@ -138,7 +144,9 @@ public class PocketService {
             int pocketNumber,
             String source,
             Double volume,
+            Double score,
             Double druggabilityScore,
+            Double probability,
             long artifactId
     ) {
     }

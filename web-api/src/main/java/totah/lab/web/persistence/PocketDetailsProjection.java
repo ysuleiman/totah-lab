@@ -10,7 +10,11 @@ public interface PocketDetailsProjection {
 
     Double getVolume();
 
+    Double getScore();
+
     Double getDruggabilityScore();
+
+    Double getProbability();
 
     Long getStructureId();
 

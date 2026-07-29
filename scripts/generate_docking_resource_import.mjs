@@ -367,7 +367,9 @@ INSERT INTO docking.pocket (
     source,
     fpocket_file,
     volume,
+    score,
     druggability_score,
+    probability,
     artifact_id
 )
 SELECT
@@ -377,7 +379,9 @@ SELECT
     'FPOCKET',
     ${sqlString(path.basename(pocketFile))},
     ${pocket.volume},
+    ${pocket.score},
     ${pocket.druggability},
+    NULL,
     a.id
 FROM docking.structure s
 JOIN public.targets t
@@ -395,7 +399,9 @@ DO UPDATE SET
     receptor_id = EXCLUDED.receptor_id,
     fpocket_file = EXCLUDED.fpocket_file,
     volume = EXCLUDED.volume,
+    score = EXCLUDED.score,
     druggability_score = EXCLUDED.druggability_score,
+    probability = EXCLUDED.probability,
     artifact_id = EXCLUDED.artifact_id;
 `);
 
@@ -453,7 +459,9 @@ INSERT INTO docking.pocket (
     source,
     fpocket_file,
     volume,
+    score,
     druggability_score,
+    probability,
     artifact_id
 )
 SELECT
@@ -463,7 +471,9 @@ SELECT
     'P2RANK',
     NULL,
     NULL,
+    ${pocket.score},
     NULL,
+    ${pocket.probability},
     a.id
 FROM docking.structure s
 JOIN public.targets t
@@ -481,7 +491,9 @@ DO UPDATE SET
     receptor_id = EXCLUDED.receptor_id,
     fpocket_file = NULL,
     volume = NULL,
+    score = EXCLUDED.score,
     druggability_score = NULL,
+    probability = EXCLUDED.probability,
     artifact_id = EXCLUDED.artifact_id;
 `);
 
