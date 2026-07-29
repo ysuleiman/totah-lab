@@ -37,6 +37,12 @@ export function ResiduePanel({
           + `/neighbors?cutoff=${cutoff}`
       : null,
   )
+  const neighborResidueIds = useMemo(
+    () => new Set(
+      neighborhood.data?.neighbors.map((neighbor) => neighbor.id) ?? [],
+    ),
+    [neighborhood.data],
+  )
   const filtered = useMemo(() => {
     const normalized = query.trim().toUpperCase()
     if (!normalized) return residues
@@ -78,6 +84,7 @@ export function ResiduePanel({
         {filtered.map((residue) => {
           const highlighted = highlightedResidueIds.has(residue.id)
           const selected = selectedResidue?.id === residue.id
+          const neighbor = neighborResidueIds.has(residue.id)
           const label = `${residue.residueName} ${residue.residueNumber}, `
               + `chain ${residue.chain}`
           return (
@@ -85,6 +92,7 @@ export function ResiduePanel({
               className={[
                 'sequence-residue',
                 highlighted ? 'highlighted' : '',
+                neighbor ? 'spatial-neighbor' : '',
                 selected ? 'selected' : '',
               ].filter(Boolean).join(' ')}
               key={residue.id}

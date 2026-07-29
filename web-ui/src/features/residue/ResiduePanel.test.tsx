@@ -10,6 +10,13 @@ const residue = {
   insertionCode: ' ',
   residueName: 'CYS',
 }
+const neighborResidue = {
+  id: 203,
+  chain: 'A',
+  residueNumber: 203,
+  insertionCode: ' ',
+  residueName: 'ASN',
+}
 
 afterEach(() => vi.restoreAllMocks())
 
@@ -19,14 +26,7 @@ describe('ResiduePanel', () => {
       new Response(JSON.stringify({
         selectedResidue: residue,
         cutoff: 6,
-        neighbors: [{
-          id: 203,
-          chain: 'A',
-          residueNumber: 203,
-          insertionCode: ' ',
-          residueName: 'ASN',
-          distance: 3.2,
-        }],
+        neighbors: [{ ...neighborResidue, distance: 3.2 }],
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -36,7 +36,7 @@ describe('ResiduePanel', () => {
     render(
       <ResiduePanel
         structureId={2}
-        residues={[residue]}
+        residues={[residue, neighborResidue]}
         highlightedResidueIds={new Set([202])}
         activePocket={null}
         pocketLoading={false}
@@ -50,6 +50,8 @@ describe('ResiduePanel', () => {
     await userEvent.click(residueButton)
 
     expect(await screen.findByText('3.20 Å')).toBeInTheDocument()
+    expect(screen.getByRole('listitem', { name: 'ASN 203, chain A' }))
+      .toHaveClass('spatial-neighbor')
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
       '/api/structures/2/residues/202/neighbors?cutoff=6',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
