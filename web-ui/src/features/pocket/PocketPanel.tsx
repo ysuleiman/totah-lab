@@ -105,7 +105,7 @@ export function PocketPanel({
               </div>
               {group.source === 'BIOHUB' && identicalBiohubSets && (
                 <p className="biohub-comparison-note">
-                  SAM and SAH predict the same wall and direct-contact residues.
+                  SAM and SAH produce the same direct-contact evidence.
                 </p>
               )}
             </section>
@@ -144,7 +144,7 @@ function PocketCard({
       <span className="pocket-copy">
         <strong>
           {evidence
-            ? `${evidence.ligandCcd}-bound pocket`
+            ? `${evidence.ligandCcd} contact evidence`
             : pocket.source}
         </strong>
         <small>
@@ -158,7 +158,7 @@ function PocketCard({
         {evidence && (
           <small>
             {evidence.chosenPocketOverlapCount}
-            /{evidence.shellResidueCount} overlap with chosen fpocket
+            /{evidence.shellResidueCount} wall overlap with chosen fpocket
           </small>
         )}
       </span>

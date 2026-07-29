@@ -132,12 +132,24 @@ export function ResiduePanel({
       <div className="residue-context">
         <span>
           {pocketLoading ? (
-            'Loading pocket residues…'
+            'Loading residue evidence…'
           ) : activePocket ? (
-            <>
-              Highlighting {activePocket.residues.length} residues for{' '}
-              <strong>{activePocket.source} {activePocket.pocketNumber}</strong>
-            </>
+            activePocket.evidence ? (
+              <>
+                Chosen fpocket with{' '}
+                <strong>
+                  {activePocket.evidence.directContactResidueCount}{' '}
+                  {activePocket.evidence.ligandCcd} direct contacts
+                </strong>
+              </>
+            ) : (
+              <>
+                Highlighting {activePocket.residues.length} residues for{' '}
+                <strong>
+                  {activePocket.source} {activePocket.pocketNumber}
+                </strong>
+              </>
+            )
           ) : (
             'Select a pocket to highlight its residues'
           )}

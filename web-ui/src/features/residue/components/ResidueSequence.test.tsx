@@ -80,14 +80,23 @@ describe('ResidueSequence', () => {
     )
   })
 
-  it('distinguishes fpocket overlap from BioHub-only residues', () => {
-    const biohubOnlyResidue = { ...residue, id: 446, residueNumber: 201 }
+  it('keeps fpocket green and marks only direct contacts outside it red', () => {
+    const directOutsideResidue = { ...residue, id: 446, residueNumber: 201 }
+    const wallOutsideResidue = { ...residue, id: 447, residueNumber: 202 }
     render(
       <ResidueSequence
-        residues={[residue, biohubOnlyResidue]}
-        pocketResidueIds={new Set([residue.id, biohubOnlyResidue.id])}
+        residues={[residue, directOutsideResidue, wallOutsideResidue]}
+        pocketResidueIds={new Set([
+          residue.id,
+          directOutsideResidue.id,
+          wallOutsideResidue.id,
+        ])}
         chosenPocketResidueIds={new Set([residue.id])}
         biohubSelected
+        directContactResidueIds={new Set([
+          residue.id,
+          directOutsideResidue.id,
+        ])}
         neighborResidueIds={new Set()}
         residueAnalysis={new Map()}
         selectedResidueId={null}
@@ -97,9 +106,12 @@ describe('ResidueSequence', () => {
 
     expect(screen.getByRole('listitem', {
       name: 'ASP 200, chain A',
-    })).toHaveClass('fpocket-residue', 'biohub-fpocket-overlap')
+    })).toHaveClass('highlighted', 'biohub-direct-contact')
     expect(screen.getByRole('listitem', {
       name: 'ASP 201, chain A',
-    })).toHaveClass('biohub-only')
+    })).toHaveClass('biohub-only', 'biohub-direct-contact')
+    expect(screen.getByRole('listitem', {
+      name: 'ASP 202, chain A',
+    })).not.toHaveClass('highlighted', 'biohub-only', 'biohub-direct-contact')
   })
 })

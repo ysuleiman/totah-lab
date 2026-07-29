@@ -60,11 +60,10 @@ export function ResidueSequence({
         const className = [
           'sequence-residue',
           !biohubSelected && inSelectedPocket ? 'highlighted' : '',
-          biohubSelected && inChosenPocket ? 'fpocket-residue' : '',
-          biohubSelected && inSelectedPocket && inChosenPocket
-            ? 'biohub-fpocket-overlap'
-            : '',
-          biohubSelected && inSelectedPocket && !inChosenPocket
+          biohubSelected && inChosenPocket ? 'highlighted' : '',
+          biohubSelected
+              && directContactResidueIds.has(residue.id)
+              && !inChosenPocket
             ? 'biohub-only'
             : '',
           directContactResidueIds.has(residue.id)

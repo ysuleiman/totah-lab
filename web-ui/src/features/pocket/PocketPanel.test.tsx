@@ -106,12 +106,12 @@ describe('PocketPanel', () => {
       />,
     )
 
-    expect(screen.getByText('SAM-bound pocket')).toBeInTheDocument()
-    expect(screen.getByText('SAH-bound pocket')).toBeInTheDocument()
-    expect(screen.getAllByText('27/35 overlap with chosen fpocket'))
+    expect(screen.getByText('SAM contact evidence')).toBeInTheDocument()
+    expect(screen.getByText('SAH contact evidence')).toBeInTheDocument()
+    expect(screen.getAllByText('27/35 wall overlap with chosen fpocket'))
       .toHaveLength(2)
     expect(screen.getByText(
-      'SAM and SAH predict the same wall and direct-contact residues.',
+      'SAM and SAH produce the same direct-contact evidence.',
     )).toBeInTheDocument()
   })
 })

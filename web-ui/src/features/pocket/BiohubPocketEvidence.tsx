@@ -8,12 +8,12 @@ export function BiohubPocketEvidence({ evidence }: Props) {
   return (
     <section
       className="biohub-pocket-evidence"
-      aria-label={`${evidence.ligandCcd} BioHub pocket evidence`}
+      aria-label={`${evidence.ligandCcd} BioHub contact evidence`}
     >
       <header>
         <div>
           <p className="eyebrow">Ligand-conditioned prediction</p>
-          <h3>{evidence.ligandCcd}-bound pocket</h3>
+          <h3>{evidence.ligandCcd} contact evidence</h3>
         </div>
         <span className="interface-confidence">
           {formatMetric(evidence.interfacePtm)}
