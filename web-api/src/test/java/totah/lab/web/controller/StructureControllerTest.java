@@ -36,13 +36,37 @@ class StructureControllerTest {
         assertEquals(2L, service.structureId);
     }
 
+    @Test
+    void bindsResidueNeighborCutoff() throws Exception {
+        RecordingStructureService service = new RecordingStructureService();
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new StructureController(service))
+                .build();
+
+        mockMvc.perform(get(
+                        "/api/structures/2/residues/202/neighbors"
+                                + "?cutoff=5.5"
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.selectedResidue.id").value(202))
+                .andExpect(jsonPath("$.cutoff").value(5.5))
+                .andExpect(jsonPath("$.neighbors[0].distance").value(3.2));
+
+        assertEquals(2L, service.neighborStructureId);
+        assertEquals(202L, service.residueId);
+        assertEquals(5.5, service.cutoff);
+    }
+
     private static final class RecordingStructureService
             extends StructureService {
 
         private long structureId;
+        private long neighborStructureId;
+        private long residueId;
+        private double cutoff;
 
         private RecordingStructureService() {
-            super(null);
+            super(null, null);
         }
 
         @Override
@@ -79,6 +103,29 @@ class StructureControllerTest {
                             "MET"
                     )),
                     "/api/structures/" + structureId + "/pockets"
+            );
+        }
+
+        @Override
+        public ResidueNeighborhood getResidueNeighbors(
+                long structureId,
+                long residueId,
+                double cutoff
+        ) {
+            this.neighborStructureId = structureId;
+            this.residueId = residueId;
+            this.cutoff = cutoff;
+            return new ResidueNeighborhood(
+                    new ResidueDetails(202, "A", 202, " ", "CYS"),
+                    cutoff,
+                    java.util.List.of(new NeighborDetails(
+                            203L,
+                            "A",
+                            203,
+                            " ",
+                            "ASN",
+                            3.2
+                    ))
             );
         }
     }

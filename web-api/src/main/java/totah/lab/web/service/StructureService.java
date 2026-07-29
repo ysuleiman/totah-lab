@@ -3,11 +3,18 @@ package totah.lab.web.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import totah.lab.pocket.geometry.PocketGeometry;
+import totah.lab.protein.Residue;
 import totah.lab.web.persistence.PocketResidueProjection;
 import totah.lab.web.persistence.StructureDetailsProjection;
 import totah.lab.web.persistence.StructureRepository;
 
+import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -15,9 +22,130 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class StructureService {
 
     private final StructureRepository structureRepository;
+    private final StructureArtifactService structureArtifactService;
 
-    public StructureService(StructureRepository structureRepository) {
+    public StructureService(
+            StructureRepository structureRepository,
+            StructureArtifactService structureArtifactService
+    ) {
         this.structureRepository = structureRepository;
+        this.structureArtifactService = structureArtifactService;
+    }
+
+    @Transactional(readOnly = true)
+    public ResidueNeighborhood getResidueNeighbors(
+            long structureId,
+            long residueId,
+            double cutoff
+    ) throws IOException {
+        if (!Double.isFinite(cutoff) || cutoff <= 0.0 || cutoff > 20.0) {
+            throw new IllegalArgumentException(
+                    "Cutoff must be greater than zero and at most 20 Å"
+            );
+        }
+
+        StructureDetailsProjection structure = structureRepository
+                .findStructureDetails(structureId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Structure not found: " + structureId
+                ));
+        List<PocketResidueProjection> databaseResidues =
+                structureRepository.findResiduesByStructureId(structureId);
+        PocketResidueProjection selectedRow = databaseResidues.stream()
+                .filter(residue -> residue.getId() == residueId)
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Residue not found in structure: " + residueId
+                ));
+
+        totah.lab.protein.Structure artifactStructure =
+                structureArtifactService.load(
+                        structure.getArtifactId(),
+                        structure.getArtifactStorageLocation()
+                );
+        Residue selected = findArtifactResidue(
+                artifactStructure.getResidues(),
+                selectedRow
+        );
+        Map<ResidueKey, PocketResidueProjection> rowsByKey =
+                databaseResidues.stream().collect(Collectors.toMap(
+                        this::key,
+                        Function.identity()
+                ));
+
+        List<NeighborDetails> neighbors = PocketGeometry.residueNeighbors(
+                        artifactStructure.getResidues(),
+                        selected,
+                        cutoff
+                ).stream()
+                .map(neighbor -> toNeighbor(
+                        neighbor,
+                        selected,
+                        rowsByKey.get(key(neighbor))
+                ))
+                .filter(neighbor -> neighbor.id() != null)
+                .sorted(Comparator.comparingDouble(
+                        NeighborDetails::distance
+                ))
+                .toList();
+
+        return new ResidueNeighborhood(
+                toResidueDetails(selectedRow),
+                cutoff,
+                neighbors
+        );
+    }
+
+    private Residue findArtifactResidue(
+            List<Residue> residues,
+            PocketResidueProjection selected
+    ) {
+        return residues.stream()
+                .filter(residue -> key(residue).equals(key(selected)))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Residue coordinates not found in structure artifact"
+                ));
+    }
+
+    private NeighborDetails toNeighbor(
+            Residue neighbor,
+            Residue selected,
+            PocketResidueProjection row
+    ) {
+        return new NeighborDetails(
+                row == null ? null : row.getId(),
+                neighbor.getChain(),
+                neighbor.getNumber(),
+                String.valueOf(neighbor.getInsertionCode()),
+                neighbor.getName(),
+                PocketGeometry.calculateDistance(selected, neighbor)
+        );
+    }
+
+    private ResidueKey key(PocketResidueProjection residue) {
+        return new ResidueKey(
+                residue.getChain(),
+                residue.getResidueNumber(),
+                normalizeInsertionCode(residue.getInsertionCode())
+        );
+    }
+
+    private ResidueKey key(Residue residue) {
+        return new ResidueKey(
+                residue.getChain(),
+                residue.getNumber(),
+                normalizeInsertionCode(
+                        String.valueOf(residue.getInsertionCode())
+                )
+        );
+    }
+
+    private String normalizeInsertionCode(String insertionCode) {
+        return insertionCode == null ? "" : insertionCode.trim();
     }
 
     @Transactional(readOnly = true)
@@ -135,6 +263,33 @@ public class StructureService {
             int residueNumber,
             String insertionCode,
             String residueName
+    ) {
+    }
+
+    public record ResidueNeighborhood(
+            ResidueDetails selectedResidue,
+            double cutoff,
+            List<NeighborDetails> neighbors
+    ) {
+        public ResidueNeighborhood {
+            neighbors = List.copyOf(neighbors);
+        }
+    }
+
+    public record NeighborDetails(
+            Long id,
+            String chain,
+            int residueNumber,
+            String insertionCode,
+            String residueName,
+            double distance
+    ) {
+    }
+
+    private record ResidueKey(
+            String chain,
+            int residueNumber,
+            String insertionCode
     ) {
     }
 }
