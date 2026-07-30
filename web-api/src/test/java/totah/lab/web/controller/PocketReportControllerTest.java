@@ -22,7 +22,7 @@ class PocketReportControllerTest {
     void bindsPocketAndDockingRunIdentifiers() throws Exception {
         RecordingReportService service = new RecordingReportService();
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketReportController(service))
+                .standaloneSetup(new PocketReportController(service, null))
                 .build();
 
         mockMvc.perform(get("/api/pockets/11/report?runId=7"))

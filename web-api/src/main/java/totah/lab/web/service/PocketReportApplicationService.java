@@ -9,6 +9,9 @@ import totah.lab.pocket.ResidueRef;
 import totah.lab.report.config.PocketReportConfiguration;
 import totah.lab.report.config.PocketReportServiceFactory;
 import totah.lab.report.model.PocketReport;
+import totah.lab.report.narrative.EvidenceLinkedPocketNarrativeGenerator;
+import totah.lab.report.narrative.PocketNarrative;
+import totah.lab.report.validation.NarrativeEvidenceValidator;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -79,6 +82,17 @@ public class PocketReportApplicationService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public PocketReportDocument generateDocument(long pocketId, long runId)
+            throws IOException {
+        PocketReport report = generate(pocketId, runId);
+        PocketNarrative narrative =
+                new EvidenceLinkedPocketNarrativeGenerator()
+                        .generate(report);
+        new NarrativeEvidenceValidator().validate(report, narrative);
+        return new PocketReportDocument(report, narrative);
+    }
+
     private Pocket toDomainPocket(PocketService.PocketDetails details) {
         Map<String, Object> attributes = new LinkedHashMap<>();
         putIfPresent(attributes, "volume", details.volume());
@@ -125,5 +139,11 @@ public class PocketReportApplicationService {
         if (value != null) {
             attributes.put(name, value);
         }
+    }
+
+    public record PocketReportDocument(
+            PocketReport report,
+            PocketNarrative narrative
+    ) {
     }
 }
