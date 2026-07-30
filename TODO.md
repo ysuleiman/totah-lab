@@ -2,6 +2,12 @@
 
 ## Open
 
+- Connect the pocket Report button to the new database-backed reporting flow.
+  Let the user select a docking run, call
+  `GET /api/pockets/{pocketId}/report?runId={runId}`, present the structured
+  pocket report in the UI, and add a downloadable narrative PDF endpoint.
+  Replace or clearly distinguish the older structure report so the button's
+  behavior is unambiguous.
 - Move `domain-model/src/main/java/totah/lab/docking` to a better-fitting module/package. The torsion tree model is docking/flex-receptor behavior, not core protein domain state; likely homes are `pipeline` for now or a future receptor/prep module after boundaries settle.
 - Decide charge fallback policy for residues/atoms not covered by bundled Amber templates. Current docking prep uses Amber charges and atom types when Amber covers the residue and fails when it does not. We need a scientific design for special residues, ligands, cofactors, metals, modified residues, and missing template atoms before enabling computed charges as a fallback; that design should define when fallback is allowed, which charge model is acceptable, how total charge/protonation is chosen, how AD4 atom typing is assigned, and how the report makes mixed Amber/computed output explicit.
 - Continue validation of explicit TYS support from
