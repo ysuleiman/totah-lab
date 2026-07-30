@@ -37,7 +37,7 @@ These classes translate external pocket formats into the domain model.
 
 ## Application services and exporters
 
-`pocket-api` owns behavior that depends on infrastructure:
+`pipeline` owns behavior that depends on infrastructure:
 
 ```text
 totah.lab.pocket.analysis.PosePocketContactAnalyzer
