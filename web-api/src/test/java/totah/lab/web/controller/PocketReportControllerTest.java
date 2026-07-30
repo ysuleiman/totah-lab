@@ -6,7 +6,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import totah.lab.pocket.PocketSource;
 import totah.lab.report.model.PocketReport;
 import totah.lab.report.model.PocketReportData;
+import totah.lab.report.narrative.PocketNarrative;
 import totah.lab.web.service.PocketReportApplicationService;
+import totah.lab.web.service.PocketReportDocxService;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PocketReportControllerTest {
@@ -32,6 +36,39 @@ class PocketReportControllerTest {
 
         assertEquals(11L, service.pocketId);
         assertEquals(7L, service.runId);
+    }
+
+    @Test
+    void downloadsEditableDocxReport() throws Exception {
+        RecordingReportService service = new RecordingReportService();
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new PocketReportController(
+                        service,
+                        null,
+                        new PocketReportDocxService()
+                ))
+                .build();
+
+        mockMvc.perform(get("/api/pockets/11/report.docx?runId=7"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(
+                        "application/vnd.openxmlformats-officedocument"
+                                + ".wordprocessingml.document"
+                ))
+                .andExpect(header().string(
+                        "Content-Disposition",
+                        "attachment; filename=\""
+                                + "pocket-11-run-7-report.docx\""
+                ))
+                .andExpect(result -> assertEquals(
+                        "PK",
+                        new String(
+                                result.getResponse().getContentAsByteArray(),
+                                0,
+                                2,
+                                java.nio.charset.StandardCharsets.US_ASCII
+                        )
+                ));
     }
 
     private static final class RecordingReportService
@@ -59,6 +96,23 @@ class PocketReportControllerTest {
                             Map.of()
                     ),
                     List.of()
+            );
+        }
+
+        @Override
+        public PocketReportDocument generateDocument(
+                long pocketId,
+                long runId
+        ) {
+            PocketReport report = generate(pocketId, runId);
+            return new PocketReportDocument(
+                    report,
+                    new PocketNarrative(
+                            "Pocket summary.",
+                            List.of(),
+                            "Limitations.",
+                            "Conclusion."
+                    )
             );
         }
     }

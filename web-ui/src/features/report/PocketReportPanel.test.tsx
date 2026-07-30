@@ -75,5 +75,7 @@ describe('PocketReportPanel', () => {
     expect(screen.getByText('1.310×')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Download PDF' }))
       .toHaveAttribute('href', '/api/pockets/1/report.pdf?runId=7')
+    expect(screen.getByRole('link', { name: 'Download for Google Docs' }))
+      .toHaveAttribute('href', '/api/pockets/1/report.docx?runId=7')
   })
 })

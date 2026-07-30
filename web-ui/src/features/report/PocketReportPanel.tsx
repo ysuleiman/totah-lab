@@ -66,6 +66,12 @@ export function PocketReportPanel({
           >
             Download PDF
           </a>
+          <a
+            href={`/api/pockets/${pocketId}/report.docx?runId=${runId}`}
+            download
+          >
+            Download for Google Docs
+          </a>
           <button type="button" onClick={onClose}>Close</button>
         </div>
       </header>
