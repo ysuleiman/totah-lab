@@ -59,24 +59,34 @@ public final class BiohubPocketEvidenceService {
             List<PocketService.ResidueDetails> residues,
             Set<Long> chosenResidueIds
     ) {
-        Map<ResidueKey, Long> residueIds = new HashMap<>();
+        Map<ResidueKey, PocketService.ResidueDetails> residuesByKey =
+                new HashMap<>();
         for (PocketService.ResidueDetails residue : residues) {
-            residueIds.put(
+            residuesByKey.put(
                     new ResidueKey(
                             residue.chain().trim(),
                             residue.residueNumber()
                     ),
-                    residue.id()
+                    residue
             );
         }
         Set<Long> directResidueIds = new HashSet<>();
+        List<PocketService.PocketResidueEvidence> residueEvidence =
+                evidence.residues().stream()
+                        .map(contact -> mapContact(
+                                contact,
+                                residuesByKey,
+                                chosenResidueIds
+                        ))
+                        .toList();
         for (BiohubPocketEvidence.ResidueContact contact
                 : evidence.residues()) {
-            Long residueId = residueIds.get(new ResidueKey(
+            PocketService.ResidueDetails residue = residuesByKey.get(
+                    new ResidueKey(
                     contact.chain(),
                     contact.residueNumber()
             ));
-            if (residueId == null) {
+            if (residue == null) {
                 throw new IllegalStateException(
                         "BioHub residue is not present in pocket membership: "
                                 + contact.chain()
@@ -84,7 +94,7 @@ public final class BiohubPocketEvidenceService {
                 );
             }
             if (contact.directContact()) {
-                directResidueIds.add(residueId);
+                directResidueIds.add(residue.id());
             }
         }
 
@@ -112,7 +122,38 @@ public final class BiohubPocketEvidenceService {
                         .toList(),
                 directResidueIds.stream().sorted().toList(),
                 overlapResidueIds,
-                directOverlapResidueIds
+                directOverlapResidueIds,
+                residueEvidence
+        );
+    }
+
+    private static PocketService.PocketResidueEvidence mapContact(
+            BiohubPocketEvidence.ResidueContact contact,
+            Map<ResidueKey, PocketService.ResidueDetails> residuesByKey,
+            Set<Long> chosenResidueIds
+    ) {
+        PocketService.ResidueDetails residue = residuesByKey.get(
+                new ResidueKey(
+                        contact.chain(),
+                        contact.residueNumber()
+                )
+        );
+        if (residue == null) {
+            throw new IllegalStateException(
+                    "BioHub residue is not present in pocket membership: "
+                            + contact.chain()
+                            + contact.residueNumber()
+            );
+        }
+        return new PocketService.PocketResidueEvidence(
+                residue.id(),
+                residue.chain(),
+                residue.residueNumber(),
+                residue.residueName(),
+                contact.minimumDistance(),
+                contact.contactingAtomPairCount(),
+                contact.directContact(),
+                chosenResidueIds.contains(residue.id())
         );
     }
 

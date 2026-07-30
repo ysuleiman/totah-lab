@@ -193,7 +193,8 @@ public class PocketService {
             List<Long> shellResidueIds,
             List<Long> directContactResidueIds,
             List<Long> chosenPocketOverlapResidueIds,
-            List<Long> directChosenPocketOverlapResidueIds
+            List<Long> directChosenPocketOverlapResidueIds,
+            List<PocketResidueEvidence> residueEvidence
     ) {
         public PocketEvidence {
             shellResidueIds = List.copyOf(shellResidueIds);
@@ -203,7 +204,20 @@ public class PocketService {
                     List.copyOf(chosenPocketOverlapResidueIds);
             directChosenPocketOverlapResidueIds =
                     List.copyOf(directChosenPocketOverlapResidueIds);
+            residueEvidence = List.copyOf(residueEvidence);
         }
+    }
+
+    public record PocketResidueEvidence(
+            long residueId,
+            String chain,
+            int residueNumber,
+            String residueName,
+            double minimumDistance,
+            int contactingAtomPairCount,
+            boolean directContact,
+            boolean chosenPocketMember
+    ) {
     }
 
     public record StructureSummary(

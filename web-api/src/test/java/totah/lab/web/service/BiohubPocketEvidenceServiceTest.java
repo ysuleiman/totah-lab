@@ -38,6 +38,12 @@ class BiohubPocketEvidenceServiceTest {
                 .containsExactly(780L);
         assertThat(evidence.directChosenPocketOverlapResidueIds())
                 .containsExactly(780L);
+        assertThat(evidence.residueEvidence()).first().satisfies(residue -> {
+            assertThat(residue.residueId()).isEqualTo(780L);
+            assertThat(residue.residueNumber()).isEqualTo(78);
+            assertThat(residue.minimumDistance()).isEqualTo(2.7);
+            assertThat(residue.chosenPocketMember()).isTrue();
+        });
     }
 
     private PocketService.ResidueDetails residue(long id, int number) {
