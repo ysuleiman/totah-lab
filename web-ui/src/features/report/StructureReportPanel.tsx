@@ -52,7 +52,15 @@ export function StructureReportPanel({
             {new Date(report.generatedAt).toLocaleString()}
           </small>
         </div>
-        <button type="button" onClick={onClose}>Close</button>
+        <div className="report-actions">
+          <a
+            href={`/api/structures/${report.structureId}/report.pdf`}
+            download
+          >
+            Download PDF
+          </a>
+          <button type="button" onClick={onClose}>Close</button>
+        </div>
       </header>
 
       <p className="report-narrative">{report.narrative}</p>
