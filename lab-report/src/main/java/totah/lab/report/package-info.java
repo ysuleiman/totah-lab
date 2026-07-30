@@ -1,6 +1,6 @@
 /**
- * Reusable scientific report models and analysis services.
+ * Reusable scientific report analysis and output.
  *
- * <p>This package is independent of persistence, HTTP, and output rendering.
+ * <p>This package is independent of persistence and HTTP.
  */
 package totah.lab.report;
