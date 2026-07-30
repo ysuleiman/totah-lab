@@ -94,6 +94,11 @@ public interface DockingAnalysisRepository
                 FROM best_7b score_7b
                 JOIN best_7a score_7a
                   ON score_7a.ligand_id = score_7b.ligand_id
+                WHERE coalesce(
+                          score_7b.ligand_label,
+                          score_7a.ligand_label,
+                          score_7b.ligand_id
+                      ) NOT ILIKE 'WH%'
             )
             SELECT
                 ligand_id AS ligandId,
