@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import type {
   DockingRunSummary,
   PocketDetails,
+  PocketReportDocument,
   PocketSummary,
   Structure,
-  StructureReport,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
@@ -13,7 +13,7 @@ import { PocketPanel } from '../pocket/PocketPanel'
 import { ResiduePanel } from '../residue/ResiduePanel'
 import { useResidueContactAnalysis } from '../residue/hooks/useResidueContactAnalysis'
 import { useResidueEvidence } from '../residue/hooks/useResidueEvidence'
-import { StructureReportPanel } from '../report/StructureReportPanel'
+import { PocketReportPanel } from '../report/PocketReportPanel'
 
 interface Props {
   structureId: number
@@ -46,8 +46,10 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   const effectiveRunId = selectedRunId ?? dockingRunsQuery.data?.[0]?.id ?? null
   const residueAnalysis = useResidueContactAnalysis(effectiveRunId)
   const residueEvidence = useResidueEvidence(structureId)
-  const reportQuery = useApiQuery<StructureReport>(
-    reportRequested ? `/api/structures/${structureId}/report` : null,
+  const reportQuery = useApiQuery<PocketReportDocument>(
+    reportRequested && effectivePocketId && effectiveRunId
+      ? `/api/pockets/${effectivePocketId}/report/document?runId=${effectiveRunId}`
+      : null,
   )
 
   const pocketResidueIds = useMemo(
@@ -94,11 +96,17 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
       <StructureHero
         structure={structure}
         onStructureSubmit={handleStructureSubmit}
-        onReportRequest={() => setReportRequested(true)}
+        onReportRequest={
+          effectivePocketId && effectiveRunId
+            ? () => setReportRequested(true)
+            : undefined
+        }
       />
-      {reportRequested && (
-        <StructureReportPanel
-          report={reportQuery.data}
+      {reportRequested && effectivePocketId && effectiveRunId && (
+        <PocketReportPanel
+          document={reportQuery.data}
+          pocketId={effectivePocketId}
+          runId={effectiveRunId}
           loading={reportQuery.loading}
           error={reportQuery.error}
           onClose={() => setReportRequested(false)}

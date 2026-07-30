@@ -257,3 +257,69 @@ export interface ResidueScoreBand {
   avgLigandMinDistance: number | null
   avgPoseMinDistance: number | null
 }
+
+export interface PocketReportDocument {
+  report: {
+    data: {
+      pocketId: number
+      pocketName: string
+      source: PocketSource
+      geometry: Record<string, unknown>
+      residues: {
+        totalResidues: number
+        residues: PocketReportResidue[]
+      }
+      docking: {
+        runId: number
+        totalLigandCount: number
+        totalPoseCount: number
+        contactScoreThreshold: number
+        residues: PocketReportDockingResidue[]
+      }
+      hotspots: Record<string, unknown>
+    }
+    evidence: PocketReportEvidence[]
+  }
+  narrative: {
+    executiveSummary: string
+    findings: PocketReportFinding[]
+    limitations: string
+    conclusions: string
+  }
+}
+
+export interface PocketReportResidue {
+  chain: string
+  residueNumber: number
+  residueName: string
+  categories: string[]
+  alphaCarbonDistanceToPocketCentroidAngstrom?: number
+}
+
+export interface PocketReportDockingResidue {
+  residueId?: number
+  chain: string
+  residueNumber: number
+  residueName: string
+  contactingLigandCount: number
+  contactingLigandFraction: number
+  contactingPoseCount: number
+  contactingPoseFraction: number
+  scoreFilteredContactingLigandFraction?: number
+  enrichmentRatio?: number
+  closestDistance?: number
+}
+
+export interface PocketReportEvidence {
+  id: string
+  category: string
+  statement: string
+  metrics: Record<string, number>
+}
+
+export interface PocketReportFinding {
+  statement: string
+  type: 'OBSERVATION' | 'INTERPRETATION' | 'LIMITATION' | 'RECOMMENDATION'
+  confidence: 'LOW' | 'MODERATE' | 'HIGH'
+  evidenceIds: string[]
+}

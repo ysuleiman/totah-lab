@@ -68,13 +68,13 @@ export function StructureHero({
           disabled={!onReportRequest}
           title={
             onReportRequest
-              ? 'Generate structure report'
-              : 'Database-backed report generation is coming next'
+              ? 'Generate report for the selected pocket and docking run'
+              : 'Select a pocket and docking run to generate a report'
           }
           onClick={onReportRequest}
         >
           Report
-          <small>{onReportRequest ? 'Generate' : 'Coming next'}</small>
+          <small>{onReportRequest ? 'Generate' : 'Select data'}</small>
         </button>
       </div>
       <dl className="metadata-strip">
