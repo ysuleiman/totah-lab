@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Service
-public final class StructureReportService {
+public class StructureReportService {
 
     public static final double STRONG_CONTACT_CUTOFF = 4.0;
 
