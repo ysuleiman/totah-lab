@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import totah.lab.web.service.DockingAnalysisService;
+import totah.lab.web.service.SelectivityWorkbookService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +20,10 @@ class DockingAnalysisControllerTest {
     void exposesRunScopedResidueAnalysis() throws Exception {
         RecordingService service = new RecordingService();
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new DockingAnalysisController(service))
+                .standaloneSetup(new DockingAnalysisController(
+                        service,
+                        new SelectivityWorkbookService()
+                ))
                 .build();
 
         mockMvc.perform(get("/api/structures/3/docking-runs"))
@@ -53,6 +57,14 @@ class DockingAnalysisControllerTest {
                 .andExpect(jsonPath("$.items[0].ligandLabel")
                         .value("MCULE-1"))
                 .andExpect(jsonPath("$.items[0].delta").value(2.2));
+
+        mockMvc.perform(get("/api/selectivity/scores.xlsx"))
+                .andExpect(status().isOk())
+                .andExpect(result -> assertEquals(
+                        "application/vnd.openxmlformats-officedocument"
+                                + ".spreadsheetml.sheet",
+                        result.getResponse().getContentType()
+                ));
 
         assertEquals(3L, service.structureId);
         assertEquals(7L, service.runId);
@@ -187,6 +199,21 @@ class DockingAnalysisControllerTest {
                     sortBy,
                     direction
             );
+        }
+
+        @Override
+        public List<SelectivityScore> getSelectivityExport(
+                String sortBy,
+                String direction,
+                String search
+        ) {
+            return getSelectivityScores(
+                    sortBy,
+                    direction,
+                    search,
+                    0,
+                    50
+            ).items();
         }
     }
 }

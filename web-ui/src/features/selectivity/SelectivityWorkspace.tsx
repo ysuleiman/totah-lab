@@ -78,6 +78,11 @@ export function SelectivityWorkspace() {
   const totalPages = query.data
     ? Math.max(1, Math.ceil(query.data.total / query.data.size))
     : 1
+  const downloadParameters = new URLSearchParams({
+    sortBy,
+    direction,
+    search,
+  })
 
   return (
     <section className="selectivity-workspace">
@@ -110,11 +115,20 @@ export function SelectivityWorkspace() {
             <button type="submit">Search</button>
           </div>
         </form>
-        <span>
-          {query.data
-            ? `${query.data.total.toLocaleString()} paired ligands`
-            : 'Loading paired ligands'}
-        </span>
+        <div className="selectivity-toolbar-actions">
+          <span>
+            {query.data
+              ? `${query.data.total.toLocaleString()} paired ligands`
+              : 'Loading paired ligands'}
+          </span>
+          <a
+            className="excel-download"
+            href={`/api/selectivity/scores.xlsx?${downloadParameters}`}
+          >
+            <span aria-hidden="true">↓</span>
+            Download Excel
+          </a>
+        </div>
       </div>
 
       <section className="panel selectivity-panel">

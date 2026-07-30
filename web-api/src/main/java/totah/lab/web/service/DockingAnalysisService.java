@@ -101,6 +101,31 @@ public class DockingAnalysisService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<SelectivityScore> getSelectivityExport(
+            String sortBy,
+            String direction,
+            String search
+    ) {
+        String safeSort = switch (sortBy) {
+            case "delta", "score7b", "score7a", "ligandId" -> sortBy;
+            default -> "delta";
+        };
+        String safeDirection = "asc".equalsIgnoreCase(direction)
+                ? "asc"
+                : "desc";
+        String safeSearch = search == null ? "" : search.trim();
+        return repository.findSelectivityScores(
+                        safeSort,
+                        safeDirection,
+                        safeSearch,
+                        10_000,
+                        0
+                ).stream()
+                .map(this::toSelectivityScore)
+                .toList();
+    }
+
     private SelectivityScore toSelectivityScore(
             SelectivityScoreProjection row
     ) {
