@@ -41,4 +41,26 @@ public final class DockingAnalysisController {
     ) {
         return service.getResidueScoreBands(runId, residueId);
     }
+
+    @GetMapping("/selectivity/scores")
+    public DockingAnalysisService.SelectivityPage selectivityScores(
+            @RequestParam(name = "sortBy", defaultValue = "delta")
+            String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc")
+            String direction,
+            @RequestParam(name = "search", defaultValue = "")
+            String search,
+            @RequestParam(name = "page", defaultValue = "0")
+            int page,
+            @RequestParam(name = "size", defaultValue = "50")
+            int size
+    ) {
+        return service.getSelectivityScores(
+                sortBy,
+                direction,
+                search,
+                page,
+                size
+        );
+    }
 }

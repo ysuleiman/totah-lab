@@ -194,6 +194,30 @@ export interface DockingRunSummary {
   totalPoseCount: number
 }
 
+export interface SelectivityScore {
+  ligandId: string
+  ligandLabel: string
+  score7b: number
+  score7a: number
+  delta: number
+  runId7b: number
+  runId7a: number
+  poseId7b: number
+  poseId7a: number
+}
+
+export interface SelectivityPage {
+  items: SelectivityScore[]
+  total: number
+  page: number
+  size: number
+  sortBy: SelectivitySort
+  direction: SortDirection
+}
+
+export type SelectivitySort = 'delta' | 'score7b' | 'score7a' | 'ligandId'
+export type SortDirection = 'asc' | 'desc'
+
 export interface ResidueAnalysis {
   runId: number
   structureId: number

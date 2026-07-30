@@ -11,9 +11,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             <small>Pocket Atlas</small>
           </span>
         </a>
-        <div className="environment">
-          <span className="status-dot" />
-          Local workspace
+        <div className="topbar-actions">
+          <a className="topbar-link" href="/selectivity">7B / 7A scores</a>
+          <div className="environment">
+            <span className="status-dot" />
+            Local workspace
+          </div>
         </div>
       </header>
       <main>{children}</main>

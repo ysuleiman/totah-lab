@@ -52,4 +52,89 @@ public interface DockingAnalysisRepository
             @Param("runId") long runId,
             @Param("residueId") Long residueId
     );
+
+    @Query(value = """
+            WITH best_7b AS (
+                SELECT DISTINCT ON (pose.ligand_id)
+                    pose.ligand_id,
+                    pose.ligand_label,
+                    pose.vina_score,
+                    pose.run_id,
+                    pose.id AS pose_id
+                FROM docking.docking_pose pose
+                WHERE pose.source_system = 'chemflow3'
+                  AND pose.receptor_id = 'Q6UX53'
+                ORDER BY pose.ligand_id, pose.vina_score, pose.id
+            ),
+            best_7a AS (
+                SELECT DISTINCT ON (pose.ligand_id)
+                    pose.ligand_id,
+                    pose.ligand_label,
+                    pose.vina_score,
+                    pose.run_id,
+                    pose.id AS pose_id
+                FROM docking.docking_pose pose
+                WHERE pose.source_system = 'chemflow3'
+                  AND pose.receptor_id = 'Q9H8H3'
+                ORDER BY pose.ligand_id, pose.vina_score, pose.id
+            ),
+            paired_score AS (
+                SELECT
+                    score_7b.ligand_id,
+                    coalesce(score_7b.ligand_label,
+                             score_7a.ligand_label,
+                             score_7b.ligand_id) AS ligand_label,
+                    score_7b.vina_score AS score_7b,
+                    score_7a.vina_score AS score_7a,
+                    score_7a.vina_score - score_7b.vina_score AS delta,
+                    score_7b.run_id AS run_id_7b,
+                    score_7a.run_id AS run_id_7a,
+                    score_7b.pose_id AS pose_id_7b,
+                    score_7a.pose_id AS pose_id_7a
+                FROM best_7b score_7b
+                JOIN best_7a score_7a
+                  ON score_7a.ligand_id = score_7b.ligand_id
+            )
+            SELECT
+                ligand_id AS ligandId,
+                ligand_label AS ligandLabel,
+                score_7b AS score7b,
+                score_7a AS score7a,
+                delta,
+                run_id_7b AS runId7b,
+                run_id_7a AS runId7a,
+                pose_id_7b AS poseId7b,
+                pose_id_7a AS poseId7a,
+                count(*) OVER () AS totalCount
+            FROM paired_score
+            WHERE (:search = ''
+                   OR ligand_id ILIKE '%' || :search || '%'
+                   OR ligand_label ILIKE '%' || :search || '%')
+            ORDER BY
+                CASE WHEN :sortBy = 'delta' AND :direction = 'asc'
+                     THEN delta END ASC,
+                CASE WHEN :sortBy = 'delta' AND :direction = 'desc'
+                     THEN delta END DESC,
+                CASE WHEN :sortBy = 'score7b' AND :direction = 'asc'
+                     THEN score_7b END ASC,
+                CASE WHEN :sortBy = 'score7b' AND :direction = 'desc'
+                     THEN score_7b END DESC,
+                CASE WHEN :sortBy = 'score7a' AND :direction = 'asc'
+                     THEN score_7a END ASC,
+                CASE WHEN :sortBy = 'score7a' AND :direction = 'desc'
+                     THEN score_7a END DESC,
+                CASE WHEN :sortBy = 'ligandId' AND :direction = 'asc'
+                     THEN ligand_id END ASC,
+                CASE WHEN :sortBy = 'ligandId' AND :direction = 'desc'
+                     THEN ligand_id END DESC,
+                ligand_id ASC
+            LIMIT :limit OFFSET :offset
+            """, nativeQuery = true)
+    List<SelectivityScoreProjection> findSelectivityScores(
+            @Param("sortBy") String sortBy,
+            @Param("direction") String direction,
+            @Param("search") String search,
+            @Param("limit") int limit,
+            @Param("offset") long offset
+    );
 }

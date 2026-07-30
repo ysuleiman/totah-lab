@@ -19,7 +19,10 @@ export function useStructureRoute() {
 
   useEffect(() => {
     const canonicalPath = `/structures/${structureId}`
-    if (window.location.pathname !== canonicalPath) {
+    if (
+      window.location.pathname !== '/selectivity'
+      && window.location.pathname !== canonicalPath
+    ) {
       window.history.replaceState(null, '', canonicalPath)
     }
     const handlePopState = () => {

@@ -44,6 +44,16 @@ class DockingAnalysisControllerTest {
                 .andExpect(jsonPath("$[0].contactingLigandCount")
                         .value(30));
 
+        mockMvc.perform(get(
+                        "/api/selectivity/scores"
+                                + "?sortBy=score7b&direction=asc"
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.items[0].ligandLabel")
+                        .value("MCULE-1"))
+                .andExpect(jsonPath("$.items[0].delta").value(2.2));
+
         assertEquals(3L, service.structureId);
         assertEquals(7L, service.runId);
         assertEquals(200L, service.residueId);
@@ -149,6 +159,34 @@ class DockingAnalysisControllerTest {
                     3.0,
                     3.0
             ));
+        }
+
+        @Override
+        public SelectivityPage getSelectivityScores(
+                String sortBy,
+                String direction,
+                String search,
+                int page,
+                int size
+        ) {
+            return new SelectivityPage(
+                    List.of(new SelectivityScore(
+                            "compact-id",
+                            "MCULE-1",
+                            -9.2,
+                            -7.0,
+                            2.2,
+                            11,
+                            12,
+                            101,
+                            102
+                    )),
+                    1,
+                    page,
+                    size,
+                    sortBy,
+                    direction
+            );
         }
     }
 }

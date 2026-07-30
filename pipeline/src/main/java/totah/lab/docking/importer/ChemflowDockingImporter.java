@@ -160,7 +160,8 @@ public final class ChemflowDockingImporter {
                        a.id,
                        a.storage_uri,
                        p.created_at,
-                       c.id
+                       c.id,
+                       c.external_id
                 FROM docking_poses p
                 JOIN docking_runs r ON r.id = p.docking_run_id
                 JOIN target_structures ts ON ts.id = r.target_structure_id
@@ -176,11 +177,14 @@ public final class ChemflowDockingImporter {
                     ligand_id, vina_score, pose_file, created_at,
                     receptor_id, run_id,
                     source_system, source_id, source_artifact_id,
-                    source_compound_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    source_compound_id, ligand_label
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (source_system, source_id)
                     WHERE source_system IS NOT NULL AND source_id IS NOT NULL
-                DO NOTHING
+                DO UPDATE SET
+                    source_artifact_id = EXCLUDED.source_artifact_id,
+                    source_compound_id = EXCLUDED.source_compound_id,
+                    ligand_label = EXCLUDED.ligand_label
                 """;
 
         int imported = 0;
@@ -224,6 +228,7 @@ public final class ChemflowDockingImporter {
                 write.setObject(8, rows.getObject(1));
                 write.setObject(9, rows.getObject(6));
                 write.setObject(10, rows.getObject(9));
+                write.setString(11, rows.getString(10));
                 write.addBatch();
                 pending++;
                 if (pending == BATCH_SIZE) {

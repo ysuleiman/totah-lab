@@ -7,6 +7,7 @@ import totah.lab.web.persistence.DockingAnalysisRepository;
 import totah.lab.web.persistence.DockingRunSummaryProjection;
 import totah.lab.web.persistence.ResidueAnalysisProjection;
 import totah.lab.web.persistence.ResidueScoreBandProjection;
+import totah.lab.web.persistence.SelectivityScoreProjection;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,6 +62,59 @@ public class DockingAnalysisService {
             );
         }
         return bands;
+    }
+
+    @Transactional(readOnly = true)
+    public SelectivityPage getSelectivityScores(
+            String sortBy,
+            String direction,
+            String search,
+            int page,
+            int size
+    ) {
+        String safeSort = switch (sortBy) {
+            case "delta", "score7b", "score7a", "ligandId" -> sortBy;
+            default -> "delta";
+        };
+        String safeDirection = "asc".equalsIgnoreCase(direction)
+                ? "asc"
+                : "desc";
+        int safePage = Math.max(0, page);
+        int safeSize = Math.max(1, Math.min(size, 200));
+        String safeSearch = search == null ? "" : search.trim();
+        List<SelectivityScoreProjection> rows =
+                repository.findSelectivityScores(
+                        safeSort,
+                        safeDirection,
+                        safeSearch,
+                        safeSize,
+                        (long) safePage * safeSize
+                );
+        long total = rows.isEmpty() ? 0 : rows.getFirst().getTotalCount();
+        return new SelectivityPage(
+                rows.stream().map(this::toSelectivityScore).toList(),
+                total,
+                safePage,
+                safeSize,
+                safeSort,
+                safeDirection
+        );
+    }
+
+    private SelectivityScore toSelectivityScore(
+            SelectivityScoreProjection row
+    ) {
+        return new SelectivityScore(
+                row.getLigandId(),
+                row.getLigandLabel(),
+                row.getScore7b(),
+                row.getScore7a(),
+                row.getDelta(),
+                row.getRunId7b(),
+                row.getRunId7a(),
+                row.getPoseId7b(),
+                row.getPoseId7a()
+        );
     }
 
     private DockingRunSummary toRunSummary(
@@ -221,6 +275,29 @@ public class DockingAnalysisService {
             Double closestDistance,
             Double avgLigandMinDistance,
             Double avgPoseMinDistance
+    ) {
+    }
+
+    public record SelectivityPage(
+            List<SelectivityScore> items,
+            long total,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
+    }
+
+    public record SelectivityScore(
+            String ligandId,
+            String ligandLabel,
+            double score7b,
+            double score7a,
+            double delta,
+            long runId7b,
+            long runId7a,
+            long poseId7b,
+            long poseId7a
     ) {
     }
 }
