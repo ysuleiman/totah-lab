@@ -13,6 +13,7 @@ import { useApiQuery } from '../../api/hooks'
 import { AtomDistanceControl } from './components/AtomDistanceControl'
 import { ResidueSequence } from './components/ResidueSequence'
 import { ResidueContactLegend } from './components/ResidueContactLegend'
+import { ResidueGuide } from './components/ResidueGuide'
 import { ResidueDockingAnalysis } from './components/ResidueDockingAnalysis'
 import { ResidueConstraintEvidence } from './components/ResidueConstraintEvidence'
 import { BiohubPocketEvidence } from '../pocket/BiohubPocketEvidence'
@@ -174,6 +175,15 @@ export function ResiduePanel({
       {activePocket?.evidence && (
         <BiohubPocketEvidence evidence={activePocket.evidence} />
       )}
+      <ResidueGuide
+        showChosenPocket={
+          highlightedResidueIds.size > 0 || chosenPocketResidueIds.size > 0
+        }
+        showBiohub={activePocket?.source === 'BIOHUB'}
+        showDocking={residueAnalysis.size > 0}
+        showConstraint={residueEvidence.size > 0}
+        showNeighbors={neighborResidueIds.size > 0}
+      />
       <ResidueSequence
         residues={filtered}
         pocketResidueIds={highlightedResidueIds}
