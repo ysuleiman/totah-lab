@@ -30,6 +30,10 @@ public final class DockingReportAggregateMapper {
         aggregate.put("totalPoseCount", run.totalPoseCount());
         aggregate.put("contactScoreThreshold",
                 first.contactScoreThreshold());
+        aggregate.put("scoreFilteredLigandCount",
+                first.scoreFilteredLigandCount());
+        aggregate.put("scoreFilteredPoseCount",
+                first.scoreFilteredPoseCount());
         aggregate.put("residues", residues.stream()
                 .map(this::mapResidue)
                 .toList());

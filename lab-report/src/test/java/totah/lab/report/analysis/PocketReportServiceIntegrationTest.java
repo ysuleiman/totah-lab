@@ -77,7 +77,6 @@ class PocketReportServiceIntegrationTest {
                         "D-001",
                         "D-R-A-103",
                         "H-001",
-                        "H-002",
                         "H-003"
                 );
     }

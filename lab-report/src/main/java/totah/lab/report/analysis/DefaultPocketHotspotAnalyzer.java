@@ -1,6 +1,7 @@
 package totah.lab.report.analysis;
 
 import totah.lab.report.config.PocketReportConfiguration;
+import totah.lab.report.config.PocketReportThresholds;
 import totah.lab.report.evidence.EvidenceCategory;
 import totah.lab.report.evidence.ReportEvidence;
 
@@ -28,6 +29,18 @@ import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_CONTACT
 public final class DefaultPocketHotspotAnalyzer
         implements PocketHotspotAnalyzer {
 
+    private final PocketReportThresholds thresholds;
+
+    public DefaultPocketHotspotAnalyzer() {
+        this(PocketReportThresholds.defaults());
+    }
+
+    public DefaultPocketHotspotAnalyzer(
+            PocketReportThresholds thresholds
+    ) {
+        this.thresholds = Objects.requireNonNull(thresholds, "thresholds");
+    }
+
     @Override
     public PocketAnalysisResult analyze(
             PocketAnalysisResult residues,
@@ -54,7 +67,7 @@ public final class DefaultPocketHotspotAnalyzer
                                     + "fraction in this pocket"
                     ));
                 });
-        maximum(rows, ENRICHMENT_RATIO)
+        maximumMeaningfulEnrichment(rows)
                 .ifPresent(candidate -> {
                     values.put("enrichmentLeader",
                             candidateValue(candidate));
@@ -66,8 +79,12 @@ public final class DefaultPocketHotspotAnalyzer
                                     + "in this pocket"
                     ));
                 });
-        maximumScoreFilteredIncrease(rows)
-                .ifPresent(candidate -> {
+        Optional<Candidate> filteredIncrease =
+                maximumScoreFilteredIncrease(rows);
+        if (filteredIncrease.isPresent()
+                && filteredIncrease.get().scoreFilteredIncrease()
+                >= thresholds.meaningfulFilteredChange()) {
+            Candidate candidate = filteredIncrease.get();
                     values.put("scoreFilteredContactIncreaseLeader",
                             candidateValue(candidate));
                     double increase = candidate.scoreFilteredIncrease();
@@ -92,13 +109,67 @@ public final class DefaultPocketHotspotAnalyzer
                                             SCORE_FILTERED_CONTACTING_LIGAND_FRACTION)
                             )
                     ));
-                });
-        values.put("roleAssignments", List.of());
-        values.put(
-                "roleAssignmentStatus",
-                "NOT_ASSIGNED_WITHOUT_SCIENTIFIC_POLICY"
-        );
+        } else {
+            values.put("meaningfulScoreFilteredContactIncrease", false);
+            evidence.add(new ReportEvidence(
+                    "H-003",
+                    EvidenceCategory.HOTSPOT,
+                    "No residue showed a meaningful increase in contact "
+                            + "frequency after score filtering.",
+                    Map.of(
+                            "significanceThreshold",
+                            thresholds.meaningfulFilteredChange(),
+                            "maximumObservedIncrease",
+                            filteredIncrease
+                                    .map(Candidate::scoreFilteredIncrease)
+                                    .orElse(0.0)
+                    )
+            ));
+        }
+        values.put("roleAssignments", roleAssignments(rows));
+        values.put("roleAssignmentStatus", "CONFIGURED_THRESHOLDS");
         return new PocketAnalysisResult(values, evidence);
+    }
+
+    private Optional<Candidate> maximumMeaningfulEnrichment(
+            List<Map<String, Object>> rows
+    ) {
+        return rows.stream()
+                .filter(row -> optionalMetric(
+                        row,
+                        CONTACTING_LIGAND_FRACTION
+                ).orElse(0.0) > 0.0)
+                .filter(row -> !Boolean.TRUE.equals(
+                        row.get("enrichmentLowConfidence")
+                ))
+                .filter(row -> optionalMetric(
+                        row,
+                        ENRICHMENT_RATIO
+                ).orElse(0.0) >= thresholds.enrichedRatio())
+                .map(row -> new Candidate(
+                        row,
+                        requiredMetric(row, ENRICHMENT_RATIO),
+                        Double.NaN
+                ))
+                .max(Comparator
+                        .comparingDouble(Candidate::metricValue)
+                        .thenComparing(candidate -> label(candidate.row())));
+    }
+
+    private List<Map<String, Object>> roleAssignments(
+            List<Map<String, Object>> rows
+    ) {
+        return rows.stream()
+                .filter(row -> row.get("roles") instanceof List<?>)
+                .map(row -> {
+                    Map<String, Object> assignment = new LinkedHashMap<>();
+                    assignment.put(CHAIN, row.get(CHAIN));
+                    assignment.put(RESIDUE_NUMBER, row.get(RESIDUE_NUMBER));
+                    assignment.put(RESIDUE_NAME, row.get(RESIDUE_NAME));
+                    assignment.put("roles", row.get("roles"));
+                    return Map.copyOf(assignment);
+                })
+                .toList();
     }
 
     private Optional<Candidate> maximum(

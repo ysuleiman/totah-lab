@@ -3,6 +3,7 @@ package totah.lab.report.analysis;
 import totah.lab.pocket.Pocket;
 import totah.lab.pocket.ResidueRef;
 import totah.lab.report.config.PocketReportConfiguration;
+import totah.lab.report.config.PocketReportThresholds;
 import totah.lab.report.evidence.EvidenceCategory;
 import totah.lab.report.evidence.ReportEvidence;
 import totah.lab.report.model.DockingAggregateKeys;
@@ -34,6 +35,7 @@ import static totah.lab.report.model.DockingAggregateKeys.MEDIAN_CONTACTING_SCOR
 import static totah.lab.report.model.DockingAggregateKeys.RESIDUE_ID;
 import static totah.lab.report.model.DockingAggregateKeys.RESIDUE_NAME;
 import static totah.lab.report.model.DockingAggregateKeys.RESIDUE_NUMBER;
+import static totah.lab.report.model.DockingAggregateKeys.RESIDUE_ROLES;
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_BANDS;
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_CONTACTING_LIGAND_COUNT;
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_CONTACTING_LIGAND_FRACTION;
@@ -41,12 +43,26 @@ import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_CONTACT
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_CONTACTING_POSE_FRACTION;
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_LIGAND_COUNT;
 import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_POSE_COUNT;
+import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_LIGAND_RETENTION;
+import static totah.lab.report.model.DockingAggregateKeys.SCORE_FILTERED_POSE_RETENTION;
 import static totah.lab.report.model.DockingAggregateKeys.TOTAL_LIGAND_COUNT;
 import static totah.lab.report.model.DockingAggregateKeys.TOTAL_POSE_COUNT;
 import static totah.lab.report.model.DockingAggregateKeys.WORST_CONTACTING_SCORE;
 
 public final class DefaultPocketDockingAnalyzer
         implements PocketDockingAnalyzer {
+
+    private final PocketReportThresholds thresholds;
+
+    public DefaultPocketDockingAnalyzer() {
+        this(PocketReportThresholds.defaults());
+    }
+
+    public DefaultPocketDockingAnalyzer(
+            PocketReportThresholds thresholds
+    ) {
+        this.thresholds = Objects.requireNonNull(thresholds, "thresholds");
+    }
 
     private static final List<String> OPTIONAL_RESIDUE_METRICS = List.of(
             RESIDUE_ID,
@@ -102,6 +118,18 @@ public final class DefaultPocketDockingAnalyzer
                 aggregatedDockingData,
                 DockingAggregateKeys.RESIDUES
         );
+        long filteredLigands = totalFromAggregateOrRows(
+                aggregatedDockingData,
+                sourceRows,
+                SCORE_FILTERED_LIGAND_COUNT,
+                totalLigands
+        );
+        long filteredPoses = totalFromAggregateOrRows(
+                aggregatedDockingData,
+                sourceRows,
+                SCORE_FILTERED_POSE_COUNT,
+                totalPoses
+        );
         Set<ResidueKey> pocketResidues = pocketResidues(pocket);
         List<Map<String, Object>> residueRows = new ArrayList<>();
         List<ReportEvidence> evidence = new ArrayList<>();
@@ -112,6 +140,7 @@ public final class DefaultPocketDockingAnalyzer
                 continue;
             }
             Map<String, Object> row = copyResidueMetrics(sourceRow, key);
+            applyEnrichmentAndRoles(row, filteredLigands);
             validateResidueRow(row, totalLigands, totalPoses);
             residueRows.add(row);
             evidence.add(residueEvidence(key, row));
@@ -123,6 +152,24 @@ public final class DefaultPocketDockingAnalyzer
         values.put(TOTAL_LIGAND_COUNT, totalLigands);
         values.put(TOTAL_POSE_COUNT, totalPoses);
         values.put(CONTACT_SCORE_THRESHOLD, scoreThreshold);
+        values.put(SCORE_FILTERED_LIGAND_COUNT, filteredLigands);
+        values.put(SCORE_FILTERED_POSE_COUNT, filteredPoses);
+        values.put(
+                SCORE_FILTERED_LIGAND_RETENTION,
+                fraction(filteredLigands, totalLigands)
+        );
+        values.put(
+                SCORE_FILTERED_POSE_RETENTION,
+                fraction(filteredPoses, totalPoses)
+        );
+        values.put(
+                "filterValidationStatus",
+                filterValidationStatus(
+                        totalLigands,
+                        filteredLigands,
+                        residueRows
+                )
+        );
         values.put("analyzedPocketResidueCount", residueRows.size());
         values.put(DockingAggregateKeys.RESIDUES, List.copyOf(residueRows));
         values.put(SCORE_BANDS, pocketScoreBands(
@@ -133,13 +180,20 @@ public final class DefaultPocketDockingAnalyzer
         evidence.add(0, new ReportEvidence(
                 "D-001",
                 EvidenceCategory.DOCKING,
-                "Docking evidence contains " + totalLigands
-                        + " unique ligands and " + totalPoses
-                        + " poses; score-filtered statistics use scores below "
-                        + decimal(scoreThreshold) + ".",
+                dockingScopeStatement(
+                        totalLigands,
+                        totalPoses,
+                        filteredLigands,
+                        filteredPoses,
+                        scoreThreshold
+                ),
                 Map.of(
                         TOTAL_LIGAND_COUNT, (double) totalLigands,
                         TOTAL_POSE_COUNT, (double) totalPoses,
+                        SCORE_FILTERED_LIGAND_COUNT,
+                        (double) filteredLigands,
+                        SCORE_FILTERED_POSE_COUNT,
+                        (double) filteredPoses,
                         CONTACT_SCORE_THRESHOLD, scoreThreshold
                 )
         ));
@@ -187,7 +241,123 @@ public final class DefaultPocketDockingAnalyzer
         copy.put(RESIDUE_NUMBER, key.number());
         OPTIONAL_RESIDUE_METRICS.forEach(metric ->
                 copyIfPresent(source, copy, metric));
-        return Map.copyOf(copy);
+        return copy;
+    }
+
+    private void applyEnrichmentAndRoles(
+            Map<String, Object> row,
+            long filteredLigands
+    ) {
+        double contactFraction = requiredDouble(
+                row,
+                CONTACTING_LIGAND_FRACTION
+        );
+        java.util.Optional<Double> filteredFraction = optionalDouble(
+                row,
+                SCORE_FILTERED_CONTACTING_LIGAND_FRACTION
+        );
+        row.remove(ENRICHMENT_RATIO);
+        row.remove(LOG2_ENRICHMENT);
+        boolean lowConfidence =
+                filteredLigands < thresholds.minimumFilteredLigands();
+        row.put(
+                DockingAggregateKeys.ENRICHMENT_LOW_CONFIDENCE,
+                lowConfidence
+        );
+        double enrichment = Double.NaN;
+        if (contactFraction > 0.0 && filteredFraction.isPresent()) {
+            enrichment = filteredFraction.get() / contactFraction;
+            row.put(ENRICHMENT_RATIO, enrichment);
+            if (enrichment > 0.0) {
+                row.put(
+                        LOG2_ENRICHMENT,
+                        Math.log(enrichment) / Math.log(2.0)
+                );
+            }
+        }
+
+        List<String> roles = new ArrayList<>();
+        if (contactFraction >= thresholds.coreContactFraction()) {
+            roles.add("CORE_CONTACT");
+        } else if (contactFraction >= thresholds.frequentContactFraction()) {
+            roles.add("FREQUENT_CONTACT");
+        } else if (contactFraction >= thresholds.variableContactFraction()) {
+            roles.add("VARIABLE_CONTACT");
+        } else {
+            roles.add("PERIPHERAL");
+        }
+        if (Double.isFinite(enrichment)
+                && contactFraction > 0.0
+                && enrichment >= thresholds.stronglyEnrichedRatio()) {
+            roles.add("STRONGLY_ENRICHED");
+        } else if (Double.isFinite(enrichment)
+                && contactFraction > 0.0
+                && enrichment >= thresholds.enrichedRatio()) {
+            roles.add("ENRICHED");
+        }
+        if ("CYS".equals(row.get(RESIDUE_NAME))) {
+            roles.add("CYSTEINE");
+        }
+        row.put(RESIDUE_ROLES, List.copyOf(roles));
+    }
+
+    private long totalFromAggregateOrRows(
+            Map<String, Object> aggregate,
+            List<Map<String, Object>> rows,
+            String key,
+            long fallback
+    ) {
+        Object aggregateValue = aggregate.get(key);
+        if (aggregateValue instanceof Number number) {
+            return number.longValue();
+        }
+        if (!rows.isEmpty() && rows.getFirst().get(key)
+                instanceof Number number) {
+            return number.longValue();
+        }
+        return fallback;
+    }
+
+    private double fraction(long count, long total) {
+        return total == 0 ? 0.0 : (double) count / total;
+    }
+
+    private String filterValidationStatus(
+            long totalLigands,
+            long filteredLigands,
+            List<Map<String, Object>> rows
+    ) {
+        if (filteredLigands == totalLigands) {
+            return "ALL_LIGANDS_PASS_THRESHOLD";
+        }
+        boolean identical = rows.stream().allMatch(row ->
+                optionalDouble(row, CONTACTING_LIGAND_FRACTION)
+                        .equals(optionalDouble(
+                                row,
+                                SCORE_FILTERED_CONTACTING_LIGAND_FRACTION
+                        )));
+        return identical
+                ? "FILTERED_AND_OVERALL_FRACTIONS_IDENTICAL"
+                : "FILTER_APPLIED";
+    }
+
+    private String dockingScopeStatement(
+            long totalLigands,
+            long totalPoses,
+            long filteredLigands,
+            long filteredPoses,
+            double threshold
+    ) {
+        String poseScope = totalLigands > 0 && totalPoses == totalLigands
+                ? totalLigands + " docked ligands with 1 pose per ligand"
+                : totalLigands + " unique ligands and " + totalPoses
+                        + " poses";
+        return "Docking evidence contains " + poseScope + "; "
+                + filteredLigands + " ligands and " + filteredPoses
+                + " poses pass the score threshold below "
+                + decimal(threshold) + " ("
+                + percent(fraction(filteredLigands, totalLigands))
+                + " of ligands retained).";
     }
 
     private void validateResidueRow(

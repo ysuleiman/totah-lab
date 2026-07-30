@@ -99,6 +99,8 @@ public class PocketReportApplicationService {
         putIfPresent(attributes, "druggability_score",
                 details.druggabilityScore());
         putIfPresent(attributes, "probability", details.probability());
+        attributes.put("sourcePocketNumber", details.pocketNumber());
+        attributes.put("internalPocketId", details.id());
 
         List<ResidueRef> residueReferences = details.residues().stream()
                 .map(residue -> new ResidueRef(

@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultPocketHotspotAnalyzerTest {
 
     @Test
-    void ranksSignalsWithoutAssigningBiologicalRoles() {
+    void ranksSignalsAndPublishesConfiguredRoleAssignments() {
         PocketAnalysisResult docking = new PocketAnalysisResult(
                 Map.of("residues", List.of(
                         row("PHE", 103, 0.824, 0.86, 1.31),
@@ -47,7 +47,7 @@ class DefaultPocketHotspotAnalyzerTest {
         assertThat(result.values())
                 .containsEntry(
                         "roleAssignmentStatus",
-                        "NOT_ASSIGNED_WITHOUT_SCIENTIFIC_POLICY"
+                        "CONFIGURED_THRESHOLDS"
                 )
                 .containsEntry("roleAssignments", List.of());
         assertThat(result.evidence())
@@ -82,7 +82,9 @@ class DefaultPocketHotspotAnalyzerTest {
                 );
         assertThat(result.evidence())
                 .extracting(evidence -> evidence.id())
-                .containsExactly("H-001");
+                .containsExactly("H-001", "H-003");
+        assertThat(result.evidence().getLast().statement())
+                .contains("No residue showed a meaningful increase");
     }
 
     private Map<String, Object> row(

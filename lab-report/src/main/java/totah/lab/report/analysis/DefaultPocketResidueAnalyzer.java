@@ -164,8 +164,9 @@ public final class DefaultPocketResidueAnalyzer
             Map<ResidueCategory, Integer> counts
     ) {
         Map<String, Integer> named = new LinkedHashMap<>();
-        counts.forEach((category, count) ->
-                named.put(category.name(), count));
+        for (ResidueCategory category : ResidueCategory.values()) {
+            named.put(category.name(), counts.getOrDefault(category, 0));
+        }
         return Map.copyOf(named);
     }
 

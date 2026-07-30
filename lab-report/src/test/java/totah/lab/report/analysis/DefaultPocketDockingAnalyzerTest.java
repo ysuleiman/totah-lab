@@ -57,13 +57,22 @@ class DefaultPocketDockingAnalyzerTest {
                 .containsEntry("runId", 41L)
                 .containsEntry("totalLigandCount", 1000L)
                 .containsEntry("totalPoseCount", 2000L)
+                .containsEntry(
+                        "filterValidationStatus",
+                        "ALL_LIGANDS_PASS_THRESHOLD"
+                )
                 .containsEntry("analyzedPocketResidueCount", 1);
         assertThat(residueRows(result))
                 .singleElement()
                 .satisfies(row -> assertThat(row)
                         .containsEntry("residueNumber", 103)
                         .containsEntry("residueName", "PHE")
-                        .containsEntry("contactingLigandFraction", 0.824));
+                        .containsEntry("contactingLigandFraction", 0.824)
+                        .containsEntry("enrichmentRatio", 1.0)
+                        .containsEntry(
+                                "roles",
+                                List.of("FREQUENT_CONTACT")
+                        ));
         assertThat(result.evidence())
                 .extracting(evidence -> evidence.id())
                 .containsExactly("D-001", "D-R-A-103");
@@ -102,17 +111,21 @@ class DefaultPocketDockingAnalyzerTest {
             long poseCount,
             double poseFraction
     ) {
-        return Map.of(
-                "chain", "A",
-                "residueNumber", number,
-                "residueName", name,
-                "contactingLigandCount", ligandCount,
-                "contactingLigandFraction", ligandFraction,
-                "contactingPoseCount", poseCount,
-                "contactingPoseFraction", poseFraction,
-                "enrichmentRatio", 1.31,
-                "closestDistance", 3.6
-        );
+        Map<String, Object> row = new java.util.LinkedHashMap<>();
+        row.put("chain", "A");
+        row.put("residueNumber", number);
+        row.put("residueName", name);
+        row.put("contactingLigandCount", ligandCount);
+        row.put("contactingLigandFraction", ligandFraction);
+        row.put("contactingPoseCount", poseCount);
+        row.put("contactingPoseFraction", poseFraction);
+        row.put("scoreFilteredContactingLigandCount", ligandCount);
+        row.put("scoreFilteredContactingLigandFraction", ligandFraction);
+        row.put("scoreFilteredContactingPoseCount", poseCount);
+        row.put("scoreFilteredContactingPoseFraction", poseFraction);
+        row.put("enrichmentRatio", 1.31);
+        row.put("closestDistance", 3.6);
+        return Map.copyOf(row);
     }
 
     @SuppressWarnings("unchecked")

@@ -36,6 +36,13 @@ public final class DockingAggregateKeys {
             "scoreFilteredContactingLigandFraction";
     public static final String SCORE_FILTERED_POSE_COUNT =
             "scoreFilteredPoseCount";
+    public static final String SCORE_FILTERED_LIGAND_RETENTION =
+            "scoreFilteredLigandRetention";
+    public static final String SCORE_FILTERED_POSE_RETENTION =
+            "scoreFilteredPoseRetention";
+    public static final String ENRICHMENT_LOW_CONFIDENCE =
+            "enrichmentLowConfidence";
+    public static final String RESIDUE_ROLES = "roles";
     public static final String SCORE_FILTERED_CONTACTING_POSE_COUNT =
             "scoreFilteredContactingPoseCount";
     public static final String SCORE_FILTERED_CONTACTING_POSE_FRACTION =

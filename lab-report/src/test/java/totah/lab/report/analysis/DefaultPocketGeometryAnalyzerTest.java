@@ -58,8 +58,22 @@ class DefaultPocketGeometryAnalyzerTest {
         assertThat((double) result.values().get(
                 "maximumCentroidDistanceAngstrom"))
                 .isCloseTo(Math.sqrt(2.75), within(1.0e-12));
+        assertThat((double) result.values().get(
+                "meanCentroidDistanceAngstrom"))
+                .isCloseTo(
+                        (Math.sqrt(0.75) + 3 * Math.sqrt(2.75)) / 4,
+                        within(1.0e-12)
+                );
+        assertThat((double) result.values().get(
+                "percentile95CentroidDistanceAngstrom"))
+                .isCloseTo(Math.sqrt(2.75), within(1.0e-12));
+        assertThat((double) result.values().get(
+                "maximumPairwiseSpanAngstrom"))
+                .isCloseTo(Math.sqrt(8.0), within(1.0e-12));
         assertThat(result.evidence())
                 .extracting(evidence -> evidence.id())
                 .containsExactly("G-001", "G-002", "G-003");
+        assertThat(result.evidence().getFirst().statement())
+                .contains("estimated cavity volume");
     }
 }

@@ -35,6 +35,20 @@ public final class DefaultPocketGeometryAnalyzer
         double boundingBoxVolume = PocketGeometry.boxVolume(box);
         double maximumCentroidDistance =
                 PocketGeometry.maximumHeavyAtomDistance(resolved, centroid);
+        List<Point3D> heavyAtomPositions =
+                heavyAtomPositions(resolved.getResidues());
+        List<Double> centroidDistances = heavyAtomPositions.stream()
+                .map(position -> distance(position, centroid))
+                .sorted()
+                .toList();
+        double meanCentroidDistance = centroidDistances.stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElseThrow();
+        double percentile95CentroidDistance =
+                percentileNearestRank(centroidDistances, 0.95);
+        double maximumPairwiseSpan =
+                maximumPairwiseDistance(heavyAtomPositions);
         double radiusOfGyration =
                 PocketGeometry.heavyAtomRadiusOfGyration(resolved);
         int heavyAtomCount = heavyAtomCount(resolved.getResidues());
@@ -47,9 +61,27 @@ public final class DefaultPocketGeometryAnalyzer
         values.put("boundingBoxVolumeAngstrom3", boundingBoxVolume);
         values.put("maximumCentroidDistanceAngstrom",
                 maximumCentroidDistance);
+        values.put("meanCentroidDistanceAngstrom", meanCentroidDistance);
+        values.put(
+                "percentile95CentroidDistanceAngstrom",
+                percentile95CentroidDistance
+        );
+        values.put("maximumPairwiseSpanAngstrom", maximumPairwiseSpan);
         values.put("radiusOfGyrationAngstrom", radiusOfGyration);
         values.put("heavyAtomCount", heavyAtomCount);
         values.put("pointCount", sphereCount);
+        copyOptionalMetric(
+                pocket,
+                values,
+                "sourcePocketNumber",
+                "sourcePocketNumber"
+        );
+        copyOptionalMetric(
+                pocket,
+                values,
+                "internalPocketId",
+                "internalPocketId"
+        );
         copyOptionalMetric(
                 pocket,
                 values,
@@ -64,16 +96,20 @@ public final class DefaultPocketGeometryAnalyzer
         );
 
         List<ReportEvidence> evidence = new ArrayList<>();
-        evidence.add(new ReportEvidence(
-                "G-001",
-                EvidenceCategory.GEOMETRY,
-                "The residue-heavy-atom pocket bounding box has a volume of "
-                        + decimal(boundingBoxVolume) + " cubic angstroms.",
-                Map.of(
-                        "boundingBoxVolumeAngstrom3",
-                        boundingBoxVolume
-                )
-        ));
+        java.util.Optional<Double> cavityVolume =
+                numericAttribute(pocket, "volume");
+        cavityVolume.ifPresent(volume ->
+                evidence.add(new ReportEvidence(
+                        "G-001",
+                        EvidenceCategory.GEOMETRY,
+                        "The pocket source reports an estimated cavity volume "
+                                + "of " + decimal(volume)
+                                + " cubic angstroms.",
+                        Map.of("estimatedVolumeAngstrom3", volume)
+                )));
+        if (cavityVolume.isEmpty()) {
+            evidence.add(boundingBoxEvidence("G-001", boundingBoxVolume));
+        }
         evidence.add(new ReportEvidence(
                 "G-002",
                 EvidenceCategory.GEOMETRY,
@@ -82,20 +118,36 @@ public final class DefaultPocketGeometryAnalyzer
                 Map.of(
                         "maximumCentroidDistanceAngstrom",
                         maximumCentroidDistance,
+                        "meanCentroidDistanceAngstrom",
+                        meanCentroidDistance,
+                        "percentile95CentroidDistanceAngstrom",
+                        percentile95CentroidDistance,
+                        "maximumPairwiseSpanAngstrom",
+                        maximumPairwiseSpan,
                         "radiusOfGyrationAngstrom",
                         radiusOfGyration
                 )
         ));
-        numericAttribute(pocket, "volume").ifPresent(volume ->
-                evidence.add(new ReportEvidence(
-                        "G-003",
-                        EvidenceCategory.GEOMETRY,
-                        "The pocket source reports an estimated cavity volume "
-                                + "of " + decimal(volume)
-                                + " cubic angstroms.",
-                        Map.of("estimatedVolumeAngstrom3", volume)
-                )));
+        if (cavityVolume.isPresent()) {
+            evidence.add(boundingBoxEvidence("G-003", boundingBoxVolume));
+        }
         return new PocketAnalysisResult(values, evidence);
+    }
+
+    private ReportEvidence boundingBoxEvidence(
+            String id,
+            double boundingBoxVolume
+    ) {
+        return new ReportEvidence(
+                id,
+                EvidenceCategory.GEOMETRY,
+                "The residue-heavy-atom pocket bounding box has a volume of "
+                        + decimal(boundingBoxVolume) + " cubic angstroms.",
+                Map.of(
+                        "boundingBoxVolumeAngstrom3",
+                        boundingBoxVolume
+                )
+        );
     }
 
     private int heavyAtomCount(List<Residue> residues) {
@@ -103,6 +155,47 @@ public final class DefaultPocketGeometryAnalyzer
                 .flatMap(residue -> residue.getAtoms().stream())
                 .filter(Atom::isHeavyAtom)
                 .count());
+    }
+
+    private List<Point3D> heavyAtomPositions(List<Residue> residues) {
+        return residues.stream()
+                .flatMap(residue -> residue.getAtoms().stream())
+                .filter(Atom::isHeavyAtom)
+                .map(Atom::getPosition)
+                .toList();
+    }
+
+    private double percentileNearestRank(
+            List<Double> sorted,
+            double percentile
+    ) {
+        int index = Math.max(
+                0,
+                (int) Math.ceil(percentile * sorted.size()) - 1
+        );
+        return sorted.get(index);
+    }
+
+    private double maximumPairwiseDistance(List<Point3D> positions) {
+        double maximum = 0.0;
+        for (int first = 0; first < positions.size(); first++) {
+            for (int second = first + 1;
+                 second < positions.size();
+                 second++) {
+                maximum = Math.max(
+                        maximum,
+                        distance(positions.get(first), positions.get(second))
+                );
+            }
+        }
+        return maximum;
+    }
+
+    private double distance(Point3D first, Point3D second) {
+        double x = first.x() - second.x();
+        double y = first.y() - second.y();
+        double z = first.z() - second.z();
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     private int sphereCount(Pocket pocket) {
