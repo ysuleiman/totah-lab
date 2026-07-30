@@ -103,6 +103,68 @@ export interface PocketEvidence {
   directChosenPocketOverlapResidueIds: number[]
 }
 
+export interface StructureReport {
+  structureId: number
+  title: string
+  generatedAt: string
+  uniProtId: string | null
+  geneName: string | null
+  proteinName: string | null
+  chosenPocket: ReportPocket | null
+  chosenPocketResidues: ReportResidue[]
+  ligandEvidence: ReportLigandEvidence[]
+  narrative: string
+}
+
+export interface ReportPocket {
+  id: number
+  source: PocketSource
+  pocketNumber: number
+  score: number | null
+  druggabilityScore: number | null
+  volume: number | null
+  residueCount: number
+}
+
+export interface ReportResidue {
+  id: number
+  chain: string
+  residueNumber: number
+  insertionCode: string | null
+  residueName: string
+  oneLetterCode: string
+}
+
+export interface ReportLigandEvidence {
+  ligandCcd: string
+  model: string
+  ptm: number | null
+  interfacePtm: number | null
+  strongContactCutoff: number
+  directContactCutoff: number
+  contextCutoff: number
+  strongContactCount: number
+  nearContactCount: number
+  directContactCount: number
+  contextResidueCount: number
+  directChosenPocketOverlapCount: number
+  outsideDirectContactCount: number
+  residues: ReportContactResidue[]
+}
+
+export interface ReportContactResidue {
+  id: number
+  chain: string
+  residueNumber: number
+  residueName: string
+  oneLetterCode: string
+  minimumDistance: number
+  contactingAtomPairCount: number
+  classification: 'STRONG' | 'NEAR' | 'CONTEXT'
+  directContact: boolean
+  chosenPocketMember: boolean
+}
+
 export interface ResidueNeighbor extends Residue {
   atomNames: string[]
   distance: number

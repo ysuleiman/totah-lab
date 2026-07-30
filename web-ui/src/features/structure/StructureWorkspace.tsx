@@ -4,6 +4,7 @@ import type {
   PocketDetails,
   PocketSummary,
   Structure,
+  StructureReport,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
@@ -12,6 +13,7 @@ import { PocketPanel } from '../pocket/PocketPanel'
 import { ResiduePanel } from '../residue/ResiduePanel'
 import { useResidueContactAnalysis } from '../residue/hooks/useResidueContactAnalysis'
 import { useResidueEvidence } from '../residue/hooks/useResidueEvidence'
+import { StructureReportPanel } from '../report/StructureReportPanel'
 
 interface Props {
   structureId: number
@@ -27,6 +29,7 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   )
   const [selectedPocketId, setSelectedPocketId] = useState<number | null>(null)
   const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
+  const [reportRequested, setReportRequested] = useState(false)
   const effectivePocketId =
     selectedPocketId ?? structureQuery.data?.chosenPocket?.id ?? null
   const pocketQuery = useApiQuery<PocketDetails>(
@@ -43,6 +46,9 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   const effectiveRunId = selectedRunId ?? dockingRunsQuery.data?.[0]?.id ?? null
   const residueAnalysis = useResidueContactAnalysis(effectiveRunId)
   const residueEvidence = useResidueEvidence(structureId)
+  const reportQuery = useApiQuery<StructureReport>(
+    reportRequested ? `/api/structures/${structureId}/report` : null,
+  )
 
   const pocketResidueIds = useMemo(
     () => new Set(pocketQuery.data?.residues.map((residue) => residue.id) ?? []),
@@ -63,6 +69,7 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
   function handleStructureSubmit(nextId: number) {
     setSelectedPocketId(null)
     setSelectedRunId(null)
+    setReportRequested(false)
     onNavigate(nextId)
   }
 
@@ -87,7 +94,17 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
       <StructureHero
         structure={structure}
         onStructureSubmit={handleStructureSubmit}
+        onReportRequest={() => setReportRequested(true)}
       />
+      {reportRequested && (
+        <StructureReportPanel
+          report={reportQuery.data}
+          loading={reportQuery.loading}
+          error={reportQuery.error}
+          onClose={() => setReportRequested(false)}
+          onRetry={reportQuery.retry}
+        />
+      )}
       <div className="workspace-grid">
         <ResiduePanel
           key={structure.id}
