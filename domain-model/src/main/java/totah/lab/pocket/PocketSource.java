@@ -6,6 +6,7 @@ package totah.lab.pocket;
 public enum PocketSource {
     P2RANK,
     FPOCKET,
+    BIOHUB,
     MANUAL,
     IMPORTED
 }
