@@ -71,11 +71,40 @@ public final class BiohubEsmFold2Client {
         String normalizedSequence = normalizeSequence(sequence);
         String normalizedCcd = requireText(ligandCcd, "ligandCcd")
                 .toUpperCase(Locale.ROOT);
+        return foldProteinLigand(
+                normalizedSequence,
+                normalizedCcd,
+                null,
+                foldingConfig
+        );
+    }
+
+    public MolecularComplexPrediction foldProteinSmiles(
+            String sequence,
+            String ligandId,
+            String smiles,
+            BiohubEsmFold2Config foldingConfig
+    ) throws IOException, InterruptedException {
+        return foldProteinLigand(
+                normalizeSequence(sequence),
+                requireText(ligandId, "ligandId"),
+                requireText(smiles, "smiles"),
+                foldingConfig
+        );
+    }
+
+    private MolecularComplexPrediction foldProteinLigand(
+            String normalizedSequence,
+            String ligandId,
+            String smiles,
+            BiohubEsmFold2Config foldingConfig
+    ) throws IOException, InterruptedException {
         Objects.requireNonNull(foldingConfig, "foldingConfig");
 
         ObjectNode request = createRequest(
                 normalizedSequence,
-                normalizedCcd,
+                ligandId,
+                smiles,
                 foldingConfig
         );
         URI endpoint = clientConfig.baseUri().resolve(
@@ -98,12 +127,13 @@ public final class BiohubEsmFold2Client {
         if (!payload.has("complex") && payload.has("data")) {
             payload = payload.get("data");
         }
-        return parsePrediction(payload, normalizedCcd);
+        return parsePrediction(payload, ligandId);
     }
 
     private ObjectNode createRequest(
             String sequence,
-            String ligandCcd,
+            String ligandId,
+            String smiles,
             BiohubEsmFold2Config config
     ) {
         ObjectNode request = objectMapper.createObjectNode();
@@ -115,9 +145,13 @@ public final class BiohubEsmFold2Client {
         protein.put("type", "protein");
         protein.putNull("msa");
         ObjectNode ligand = sequences.addObject();
-        ligand.putNull("smiles");
         ligand.put("id", "L");
-        ligand.putArray("ccd").add(ligandCcd);
+        if (smiles == null) {
+            ligand.putNull("smiles");
+            ligand.putArray("ccd").add(ligandId);
+        } else {
+            ligand.put("smiles", smiles);
+        }
         ligand.put("type", "ligand");
 
         request.put("model", model);

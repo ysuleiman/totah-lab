@@ -94,6 +94,41 @@ class BiohubEsmFold2ClientTest {
         );
     }
 
+    @Test
+    void foldsProteinWithSmilesLigand() throws Exception {
+        AtomicReference<JsonNode> requestBody = new AtomicReference<>();
+        BiohubHttpTransport transport = (uri, token, timeout, body) -> {
+            requestBody.set(objectMapper.readTree(body));
+            return new BiohubHttpTransport.Response(200, responseBody());
+        };
+        BiohubClientConfig config = new BiohubClientConfig(
+                URI.create("https://biohub.ai"),
+                "secret",
+                "esmc-300m-2024-12",
+                Duration.ofMinutes(10)
+        );
+        BiohubEsmFold2Client client = new BiohubEsmFold2Client(
+                config,
+                BiohubEsmFold2Client.DEFAULT_MODEL,
+                transport,
+                objectMapper,
+                Clock.systemUTC()
+        );
+
+        var prediction = client.foldProteinSmiles(
+                "AC",
+                "MCULE-1",
+                "CCO",
+                BiohubEsmFold2Config.fast()
+        );
+
+        JsonNode ligand = requestBody.get().path("all_atom_input")
+                .path("sequences").get(1);
+        assertEquals("CCO", ligand.path("smiles").asText());
+        assertTrue(!ligand.has("ccd"));
+        assertEquals("MCULE-1", prediction.ligandCcd());
+    }
+
     private String responseBody() {
         return """
                 {
