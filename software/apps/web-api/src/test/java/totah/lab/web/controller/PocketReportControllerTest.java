@@ -3,7 +3,7 @@ package totah.lab.web.controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import totah.lab.pocket.PocketSource;
+import totah.lab.gaia.pocket.PocketSource;
 import totah.lab.report.model.PocketReport;
 import totah.lab.report.model.PocketReportData;
 import totah.lab.report.narrative.PocketNarrative;

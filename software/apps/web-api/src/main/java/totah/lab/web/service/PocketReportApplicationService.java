@@ -3,9 +3,13 @@ package totah.lab.web.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import totah.lab.pocket.Pocket;
-import totah.lab.pocket.PocketSource;
-import totah.lab.pocket.ResidueRef;
+import totah.lab.gaia.geometry.Point3D;
+import totah.lab.gaia.pocket.Pocket;
+import totah.lab.gaia.pocket.PocketId;
+import totah.lab.gaia.pocket.PocketMetric;
+import totah.lab.gaia.pocket.PocketMetricType;
+import totah.lab.gaia.pocket.PocketSource;
+import totah.lab.gaia.structure.ResidueId;
 import totah.lab.report.config.PocketReportConfiguration;
 import totah.lab.report.config.PocketReportServiceFactory;
 import totah.lab.report.model.PocketReport;
@@ -94,30 +98,50 @@ public class PocketReportApplicationService {
     }
 
     private Pocket toDomainPocket(PocketService.PocketDetails details) {
-        Map<String, Object> attributes = new LinkedHashMap<>();
-        putIfPresent(attributes, "volume", details.volume());
-        putIfPresent(attributes, "druggability_score",
-                details.druggabilityScore());
-        putIfPresent(attributes, "probability", details.probability());
-        attributes.put("sourcePocketNumber", details.pocketNumber());
-        attributes.put("internalPocketId", details.id());
+        PocketSource source = source(details.source());
 
-        List<ResidueRef> residueReferences = details.residues().stream()
-                .map(residue -> new ResidueRef(
+        List<PocketMetric> metrics = new java.util.ArrayList<>();
+        putMetric(metrics, PocketMetricType.VOLUME, details.volume());
+        putMetric(metrics, PocketMetricType.FPOCKET_DRUGGABILITY,
+                details.druggabilityScore());
+        putMetric(metrics, PocketMetricType.P2RANK_PROBABILITY,
+                details.probability());
+        if (details.score() != null && Double.isFinite(details.score())) {
+            metrics.add(new PocketMetric(
+                    source == PocketSource.P2RANK
+                            ? PocketMetricType.P2RANK_PROBABILITY
+                            : PocketMetricType.FPOCKET_SCORE,
+                    details.score()
+            ));
+        }
+
+        Map<String, String> metadata = new LinkedHashMap<>();
+        metadata.put("sourcePocketNumber",
+                String.valueOf(details.pocketNumber()));
+        metadata.put("internalPocketId", String.valueOf(details.id()));
+
+        List<ResidueId> residues = details.residues().stream()
+                .map(residue -> new ResidueId(
                         residue.chain(),
                         residue.residueNumber(),
-                        residue.residueName()
+                        insertionCode(residue.insertionCode())
                 ))
                 .toList();
-        return Pocket.builder()
-                .id(details.id())
-                .name(details.source() + " pocket "
-                        + details.pocketNumber())
-                .score(details.score())
-                .source(source(details.source()))
-                .residueRefs(residueReferences)
-                .attributes(attributes)
-                .build();
+
+        return new Pocket(
+                PocketId.of(details.id()),
+                details.source() + " pocket " + details.pocketNumber(),
+                source,
+                // Center is not stored with the source pocket and is not
+                // used by the report analyzers; a fixed origin placeholder
+                // satisfies the gaia model.
+                new Point3D(0.0, 0.0, 0.0),
+                residues,
+                metrics,
+                java.util.Optional.empty(),
+                java.util.Optional.empty(),
+                metadata
+        );
     }
 
     private PocketSource source(String value) {
@@ -133,13 +157,20 @@ public class PocketReportApplicationService {
         }
     }
 
-    private void putIfPresent(
-            Map<String, Object> attributes,
-            String name,
-            Object value
+    private Character insertionCode(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.charAt(0);
+    }
+
+    private void putMetric(
+            List<PocketMetric> metrics,
+            PocketMetricType type,
+            Double value
     ) {
-        if (value != null) {
-            attributes.put(name, value);
+        if (value != null && Double.isFinite(value)) {
+            metrics.add(new PocketMetric(type, value));
         }
     }
 

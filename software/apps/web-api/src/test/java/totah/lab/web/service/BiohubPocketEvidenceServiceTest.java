@@ -2,7 +2,7 @@ package totah.lab.web.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.http.biohub.artifact.BiohubPocketEvidenceReader;
+import totah.lab.hermes.biohub.artifact.BiohubPocketEvidenceReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

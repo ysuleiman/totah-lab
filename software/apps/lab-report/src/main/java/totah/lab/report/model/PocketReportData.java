@@ -1,6 +1,6 @@
 package totah.lab.report.model;
 
-import totah.lab.pocket.PocketSource;
+import totah.lab.gaia.pocket.PocketSource;
 
 import java.util.Map;
 import java.util.Objects;

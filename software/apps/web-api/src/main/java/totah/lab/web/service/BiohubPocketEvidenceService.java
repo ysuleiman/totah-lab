@@ -1,8 +1,8 @@
 package totah.lab.web.service;
 
 import org.springframework.stereotype.Service;
-import totah.lab.http.biohub.artifact.BiohubPocketEvidenceReader;
-import totah.lab.http.biohub.model.BiohubPocketEvidence;
+import totah.lab.hermes.biohub.artifact.BiohubPocketEvidenceReader;
+import totah.lab.hermes.biohub.model.BiohubPocketEvidence;
 import totah.lab.web.persistence.PocketDetailsProjection;
 import totah.lab.web.persistence.PocketRepository;
 

@@ -3,7 +3,7 @@ package totah.lab.web.service;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.junit.jupiter.api.Test;
-import totah.lab.pocket.PocketSource;
+import totah.lab.gaia.pocket.PocketSource;
 import totah.lab.report.evidence.EvidenceCategory;
 import totah.lab.report.evidence.ReportEvidence;
 import totah.lab.report.model.PocketReport;

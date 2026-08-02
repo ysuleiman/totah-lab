@@ -1,7 +1,7 @@
 package totah.lab.report.analysis;
 
 import org.junit.jupiter.api.Test;
-import totah.lab.pocket.Pocket;
+import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;

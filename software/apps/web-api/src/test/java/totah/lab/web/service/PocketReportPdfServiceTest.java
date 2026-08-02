@@ -1,7 +1,7 @@
 package totah.lab.web.service;
 
 import org.junit.jupiter.api.Test;
-import totah.lab.pocket.PocketSource;
+import totah.lab.gaia.pocket.PocketSource;
 import totah.lab.report.model.PocketReport;
 import totah.lab.report.model.PocketReportData;
 import totah.lab.report.narrative.PocketNarrative;

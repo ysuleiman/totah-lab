@@ -1,7 +1,10 @@
 package totah.lab.report.analysis;
 
-import totah.lab.pocket.Pocket;
-import totah.lab.pocket.Sphere;
+import totah.lab.athena.pocket.geometry.PocketResidueGeometry;
+import totah.lab.athena.pocket.geometry.ResidueAtomPocketGeometry;
+import totah.lab.gaia.pocket.Pocket;
+import totah.lab.gaia.pocket.PocketMetricType;
+import totah.lab.gaia.geometry.BoundingBox;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Structure;
@@ -27,8 +30,11 @@ public final class DefaultPocketGeometryAnalyzer
                 PocketAnalysisSupport.resolve(pocket, structure);
         List<Point3D> heavyAtomPositions =
                 heavyAtomPositions(resolved);
-        Point3D centroid = centroid(heavyAtomPositions);
-        Bounds box = bounds(heavyAtomPositions);
+        PocketResidueGeometry pocketGeometry =
+                new ResidueAtomPocketGeometry()
+                        .residueGeometry(structure, pocket);
+        Point3D centroid = pocketGeometry.centroid();
+        BoundingBox box = pocketGeometry.bounds();
         double boundingBoxVolume = box.volume();
         double maximumCentroidDistance = heavyAtomPositions.stream()
                 .mapToDouble(position -> distance(position, centroid))
@@ -161,33 +167,6 @@ public final class DefaultPocketGeometryAnalyzer
                 .toList();
     }
 
-    private Point3D centroid(List<Point3D> positions) {
-        if (positions.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Pocket residues contain no heavy atoms");
-        }
-        return new Point3D(
-                positions.stream().mapToDouble(Point3D::x).average().orElseThrow(),
-                positions.stream().mapToDouble(Point3D::y).average().orElseThrow(),
-                positions.stream().mapToDouble(Point3D::z).average().orElseThrow());
-    }
-
-    private Bounds bounds(List<Point3D> positions) {
-        if (positions.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Pocket residues contain no heavy atoms");
-        }
-        return new Bounds(
-                new Point3D(
-                        positions.stream().mapToDouble(Point3D::x).min().orElseThrow(),
-                        positions.stream().mapToDouble(Point3D::y).min().orElseThrow(),
-                        positions.stream().mapToDouble(Point3D::z).min().orElseThrow()),
-                new Point3D(
-                        positions.stream().mapToDouble(Point3D::x).max().orElseThrow(),
-                        positions.stream().mapToDouble(Point3D::y).max().orElseThrow(),
-                        positions.stream().mapToDouble(Point3D::z).max().orElseThrow()));
-    }
-
     private double percentileNearestRank(
             List<Double> sorted,
             double percentile
@@ -222,31 +201,25 @@ public final class DefaultPocketGeometryAnalyzer
     }
 
     private int sphereCount(Pocket pocket) {
-        List<Sphere> spheres = pocket.getSpheres();
-        return spheres == null ? 0 : spheres.size();
+        return pocket.alphaSphereSet()
+                .map(sphereSet -> sphereSet.spheres().size())
+                .orElse(0);
     }
 
     private Map<String, Double> point(Point3D point) {
         return Map.of("x", point.x(), "y", point.y(), "z", point.z());
     }
 
-    private Map<String, Object> box(Bounds box) {
+    private Map<String, Object> box(BoundingBox box) {
         return Map.of(
                 "min", point(box.min()),
                 "max", point(box.max()),
                 "sizeAngstrom", Map.of(
-                        "x", box.sizeX(),
-                        "y", box.sizeY(),
-                        "z", box.sizeZ()
+                        "x", box.width(),
+                        "y", box.height(),
+                        "z", box.depth()
                 )
         );
-    }
-
-    private record Bounds(Point3D min, Point3D max) {
-        private double sizeX() { return max.x() - min.x(); }
-        private double sizeY() { return max.y() - min.y(); }
-        private double sizeZ() { return max.z() - min.z(); }
-        private double volume() { return sizeX() * sizeY() * sizeZ(); }
     }
 
     private void copyOptionalMetric(
@@ -263,12 +236,39 @@ public final class DefaultPocketGeometryAnalyzer
             Pocket pocket,
             String name
     ) {
-        Object value = pocket.getAttributes().get(name);
-        if (value instanceof Number number) {
-            double result = number.doubleValue();
+        return switch (name) {
+            case "volume" -> metric(pocket, PocketMetricType.VOLUME);
+            case "druggability_score" ->
+                    metric(pocket, PocketMetricType.FPOCKET_DRUGGABILITY);
+            default -> metadataNumber(pocket, name);
+        };
+    }
+
+    private java.util.Optional<Double> metric(
+            Pocket pocket,
+            PocketMetricType type
+    ) {
+        java.util.OptionalDouble value = pocket.metric(type);
+        return value.isPresent()
+                ? java.util.Optional.of(value.getAsDouble())
+                : java.util.Optional.<Double>empty();
+    }
+
+    private java.util.Optional<Double> metadataNumber(
+            Pocket pocket,
+            String name
+    ) {
+        String value = pocket.metadata().get(name);
+        if (value == null) {
+            return java.util.Optional.empty();
+        }
+        try {
+            double result = Double.parseDouble(value);
             if (Double.isFinite(result)) {
                 return java.util.Optional.of(result);
             }
+        } catch (NumberFormatException ignored) {
+            // Non-numeric metadata values are not metrics.
         }
         return java.util.Optional.empty();
     }

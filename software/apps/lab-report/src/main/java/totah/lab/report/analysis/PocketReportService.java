@@ -1,6 +1,6 @@
 package totah.lab.report.analysis;
 
-import totah.lab.pocket.Pocket;
+import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.report.config.PocketReportConfiguration;
 import totah.lab.report.evidence.ReportEvidence;
@@ -85,9 +85,9 @@ public final class PocketReportService {
 
         PocketReport report = new PocketReport(
                 new PocketReportData(
-                        pocket.getId(),
-                        pocket.getName(),
-                        pocket.getSource(),
+                        Long.parseLong(pocket.id().value()),
+                        pocket.name(),
+                        pocket.source(),
                         geometry.values(),
                         residues.values(),
                         docking.values(),

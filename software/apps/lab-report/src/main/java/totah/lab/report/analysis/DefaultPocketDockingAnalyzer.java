@@ -1,7 +1,7 @@
 package totah.lab.report.analysis;
 
-import totah.lab.pocket.Pocket;
-import totah.lab.pocket.ResidueRef;
+import totah.lab.gaia.pocket.Pocket;
+import totah.lab.gaia.structure.ResidueId;
 import totah.lab.report.config.PocketReportConfiguration;
 import totah.lab.report.config.PocketReportThresholds;
 import totah.lab.report.evidence.EvidenceCategory;
@@ -430,8 +430,9 @@ public final class DefaultPocketDockingAnalyzer
 
     private Set<ResidueKey> pocketResidues(Pocket pocket) {
         Set<ResidueKey> keys = new LinkedHashSet<>();
-        for (ResidueRef reference : pocket.getResidueRefs()) {
-            keys.add(new ResidueKey(reference.chain(), reference.number()));
+        for (ResidueId reference : pocket.residues()) {
+            keys.add(new ResidueKey(
+                    reference.chainId(), reference.residueNumber()));
         }
         return Set.copyOf(keys);
     }
