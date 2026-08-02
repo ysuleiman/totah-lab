@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: totah-lab-web-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/totah_lab_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: docking
+
+server:
+  port: ${PORT:8080}
+
+totah:
+  artifacts:
+    root: ${TOTAH_ARTIFACT_ROOT:${TOTAH_LAB_ROOT}/resources/shared-resources/src/main/resources}

@@ -1,0 +1,22 @@
+# Loading parameters for O-tyrosine sulfate
+#  A.H.C.Horn VI/2021
+#
+# source leaprc.tys.ff14SB *after* loading gaff
+
+# Add new atom type
+addatomtypes { { "SO"  "S"  "sp3"} }
+
+# Load additional parameters (converted from gaff2)
+loadamberparams TYS.frcmod
+
+# Load residue templates with
+#  structures (HF/6-31G*) and RESP charges
+# 1, mid-chain  TYS
+loadamberprep MTYS.prepi
+# 2, C-terminal CTYS
+loadamberprep CTYS.prepi
+# 3, N-terminal NTYS
+loadamberprep NTYS.prepi
+
+
+ 
