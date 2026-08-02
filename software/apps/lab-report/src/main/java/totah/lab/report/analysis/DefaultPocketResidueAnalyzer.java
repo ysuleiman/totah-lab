@@ -4,14 +4,14 @@ import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
+import totah.lab.gaia.classification.ResidueCategories;
+import totah.lab.gaia.classification.ResidueCategory;
 import totah.lab.report.config.PocketReportConfiguration;
 import totah.lab.report.evidence.EvidenceCategory;
 import totah.lab.report.evidence.ReportEvidence;
-import totah.lab.report.model.ResidueCategory;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -20,16 +20,6 @@ import java.util.Set;
 
 public final class DefaultPocketResidueAnalyzer
         implements PocketResidueAnalyzer {
-
-    private static final Set<String> HYDROPHOBIC =
-            Set.of("ALA", "VAL", "ILE", "LEU", "MET", "PHE", "TYR", "TRP");
-    private static final Set<String> POLAR =
-            Set.of("SER", "THR", "ASN", "GLN", "CYS");
-    private static final Set<String> POSITIVE =
-            Set.of("LYS", "ARG", "HIS");
-    private static final Set<String> NEGATIVE = Set.of("ASP", "GLU");
-    private static final Set<String> AROMATIC =
-            Set.of("PHE", "TYR", "TRP", "HIS");
 
     @Override
     public PocketAnalysisResult analyze(
@@ -53,7 +43,8 @@ public final class DefaultPocketResidueAnalyzer
                 : resolved) {
             Residue residue = resolvedResidue.residue();
             String name = residue.getName().toUpperCase(Locale.ROOT);
-            Set<ResidueCategory> categories = categories(name);
+            Set<ResidueCategory> categories =
+                    ResidueCategories.classify(name);
             categories.forEach(category -> categoryCounts.merge(
                     category,
                     1,
@@ -124,42 +115,6 @@ public final class DefaultPocketResidueAnalyzer
                     "Geometry centroid has no numeric " + key);
         }
         return number.doubleValue();
-    }
-
-    private Set<ResidueCategory> categories(String name) {
-        EnumSet<ResidueCategory> categories =
-                EnumSet.noneOf(ResidueCategory.class);
-        addIf(categories, HYDROPHOBIC, name, ResidueCategory.HYDROPHOBIC);
-        addIf(categories, POLAR, name, ResidueCategory.POLAR);
-        addIf(categories, POSITIVE, name,
-                ResidueCategory.POSITIVELY_CHARGED);
-        addIf(categories, NEGATIVE, name,
-                ResidueCategory.NEGATIVELY_CHARGED);
-        addIf(categories, AROMATIC, name, ResidueCategory.AROMATIC);
-        if ("CYS".equals(name)) {
-            categories.add(ResidueCategory.CYSTEINE);
-        }
-        if ("GLY".equals(name)) {
-            categories.add(ResidueCategory.GLYCINE);
-        }
-        if ("PRO".equals(name)) {
-            categories.add(ResidueCategory.PROLINE);
-        }
-        if (categories.isEmpty()) {
-            categories.add(ResidueCategory.OTHER);
-        }
-        return Set.copyOf(categories);
-    }
-
-    private void addIf(
-            Set<ResidueCategory> categories,
-            Set<String> names,
-            String name,
-            ResidueCategory category
-    ) {
-        if (names.contains(name)) {
-            categories.add(category);
-        }
     }
 
     private Map<String, Integer> namedCategoryCounts(

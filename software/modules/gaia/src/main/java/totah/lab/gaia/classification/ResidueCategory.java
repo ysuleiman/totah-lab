@@ -1,5 +1,6 @@
-package totah.lab.report.model;
+package totah.lab.gaia.classification;
 
+/** Physicochemical categories used to describe amino-acid composition. */
 public enum ResidueCategory {
     HYDROPHOBIC,
     POLAR,

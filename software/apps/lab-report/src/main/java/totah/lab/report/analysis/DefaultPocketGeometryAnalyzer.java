@@ -1,6 +1,7 @@
 package totah.lab.report.analysis;
 
 import totah.lab.athena.pocket.geometry.PocketResidueGeometry;
+import totah.lab.athena.pocket.geometry.PocketShapeStatistics;
 import totah.lab.athena.pocket.geometry.ResidueAtomPocketGeometry;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.pocket.PocketMetricType;
@@ -36,30 +37,8 @@ public final class DefaultPocketGeometryAnalyzer
         Point3D centroid = pocketGeometry.centroid();
         BoundingBox box = pocketGeometry.bounds();
         double boundingBoxVolume = box.volume();
-        double maximumCentroidDistance = heavyAtomPositions.stream()
-                .mapToDouble(position -> distance(position, centroid))
-                .max()
-                .orElseThrow();
-        List<Double> centroidDistances = heavyAtomPositions.stream()
-                .map(position -> distance(position, centroid))
-                .sorted()
-                .toList();
-        double meanCentroidDistance = centroidDistances.stream()
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElseThrow();
-        double percentile95CentroidDistance =
-                percentileNearestRank(centroidDistances, 0.95);
-        double maximumPairwiseSpan =
-                maximumPairwiseDistance(heavyAtomPositions);
-        double radiusOfGyration = Math.sqrt(heavyAtomPositions.stream()
-                .mapToDouble(position -> {
-                    double distance = distance(position, centroid);
-                    return distance * distance;
-                })
-                .average()
-                .orElseThrow());
-        int heavyAtomCount = heavyAtomPositions.size();
+        PocketShapeStatistics shape =
+                PocketShapeStatistics.of(heavyAtomPositions);
         int sphereCount = sphereCount(pocket);
 
         Map<String, Object> values = new LinkedHashMap<>();
@@ -68,15 +47,18 @@ public final class DefaultPocketGeometryAnalyzer
         values.put("boundingBox", box(box));
         values.put("boundingBoxVolumeAngstrom3", boundingBoxVolume);
         values.put("maximumCentroidDistanceAngstrom",
-                maximumCentroidDistance);
-        values.put("meanCentroidDistanceAngstrom", meanCentroidDistance);
+                shape.maximumCentroidDistance());
+        values.put("meanCentroidDistanceAngstrom",
+                shape.meanCentroidDistance());
         values.put(
                 "percentile95CentroidDistanceAngstrom",
-                percentile95CentroidDistance
+                shape.percentile95CentroidDistance()
         );
-        values.put("maximumPairwiseSpanAngstrom", maximumPairwiseSpan);
-        values.put("radiusOfGyrationAngstrom", radiusOfGyration);
-        values.put("heavyAtomCount", heavyAtomCount);
+        values.put("maximumPairwiseSpanAngstrom",
+                shape.maximumPairwiseSpan());
+        values.put("radiusOfGyrationAngstrom",
+                shape.radiusOfGyration());
+        values.put("heavyAtomCount", shape.heavyAtomCount());
         values.put("pointCount", sphereCount);
         copyOptionalMetric(
                 pocket,
@@ -122,18 +104,19 @@ public final class DefaultPocketGeometryAnalyzer
                 "G-002",
                 EvidenceCategory.GEOMETRY,
                 "The maximum heavy-atom distance from the pocket centroid is "
-                        + decimal(maximumCentroidDistance) + " angstroms.",
+                        + decimal(shape.maximumCentroidDistance())
+                        + " angstroms.",
                 Map.of(
                         "maximumCentroidDistanceAngstrom",
-                        maximumCentroidDistance,
+                        shape.maximumCentroidDistance(),
                         "meanCentroidDistanceAngstrom",
-                        meanCentroidDistance,
+                        shape.meanCentroidDistance(),
                         "percentile95CentroidDistanceAngstrom",
-                        percentile95CentroidDistance,
+                        shape.percentile95CentroidDistance(),
                         "maximumPairwiseSpanAngstrom",
-                        maximumPairwiseSpan,
+                        shape.maximumPairwiseSpan(),
                         "radiusOfGyrationAngstrom",
-                        radiusOfGyration
+                        shape.radiusOfGyration()
                 )
         ));
         if (cavityVolume.isPresent()) {
@@ -165,39 +148,6 @@ public final class DefaultPocketGeometryAnalyzer
                 .filter(Atom::isHeavyAtom)
                 .map(Atom::getPosition)
                 .toList();
-    }
-
-    private double percentileNearestRank(
-            List<Double> sorted,
-            double percentile
-    ) {
-        int index = Math.max(
-                0,
-                (int) Math.ceil(percentile * sorted.size()) - 1
-        );
-        return sorted.get(index);
-    }
-
-    private double maximumPairwiseDistance(List<Point3D> positions) {
-        double maximum = 0.0;
-        for (int first = 0; first < positions.size(); first++) {
-            for (int second = first + 1;
-                 second < positions.size();
-                 second++) {
-                maximum = Math.max(
-                        maximum,
-                        distance(positions.get(first), positions.get(second))
-                );
-            }
-        }
-        return maximum;
-    }
-
-    private double distance(Point3D first, Point3D second) {
-        double x = first.x() - second.x();
-        double y = first.y() - second.y();
-        double z = first.z() - second.z();
-        return Math.sqrt(x * x + y * y + z * z);
     }
 
     private int sphereCount(Pocket pocket) {
