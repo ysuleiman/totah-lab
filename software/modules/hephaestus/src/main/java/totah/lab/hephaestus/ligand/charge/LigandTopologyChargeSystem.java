@@ -4,7 +4,7 @@ import totah.lab.gaia.chemistry.BondOrder;
 import totah.lab.gaia.chemistry.ChemicalBond;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.hephaestus.ligand.topology.LigandTopology;
-import totah.lab.math.charges.ChargeSystem;
+import totah.lab.hephaestus.ligand.charge.ChargeSystem;
 
 import java.util.ArrayList;
 import java.util.List;

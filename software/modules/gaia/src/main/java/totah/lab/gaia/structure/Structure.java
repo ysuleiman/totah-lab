@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Getter
 @ToString(onlyExplicitlyIncluded = true)
-public final class Structure {
+public class Structure {
 
     @ToString.Exclude
     private final List<Chain> chains;

@@ -1,4 +1,4 @@
-package totah.lab.docking;
+package totah.lab.daedalus.docking;
 
 import java.nio.file.Path;
 import java.util.Objects;

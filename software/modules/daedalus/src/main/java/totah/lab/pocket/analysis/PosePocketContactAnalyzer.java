@@ -1,6 +1,6 @@
 package totah.lab.pocket.analysis;
 
-import totah.lab.docking.SimpleKDTree;
+import totah.lab.euclid.spatial.SimpleKDTree;
 
 import java.sql.*;
 import java.util.ArrayList;

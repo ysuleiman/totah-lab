@@ -1,4 +1,4 @@
-package totah.lab.docking.importer;
+package totah.lab.daedalus.docking.importer;
 
 /**
  * Controls how source artifacts are retained when docking data is imported.

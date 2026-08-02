@@ -6,9 +6,9 @@ import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.pocket.AlphaSphere;
 import totah.lab.gaia.pocket.AlphaSphereSet;
 import totah.lab.gaia.pocket.Pocket;
+import totah.lab.gaia.structure.Structure;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Residue;
-import totah.lab.gaia.structure.Structure;
 
 import java.util.List;
 import java.util.Objects;

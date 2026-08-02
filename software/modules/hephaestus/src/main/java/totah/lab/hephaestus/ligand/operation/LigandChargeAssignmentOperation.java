@@ -11,8 +11,8 @@ import totah.lab.hephaestus.ligand.charge.LigandTopologyChargeSystem;
 import totah.lab.hephaestus.ligand.topology.LigandTopology;
 import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.preparation.OperationResult;
-import totah.lab.math.charges.ChargeModel;
-import totah.lab.math.charges.GasteigerModel;
+import totah.lab.hephaestus.ligand.charge.ChargeModel;
+import totah.lab.hephaestus.ligand.charge.GasteigerModel;
 
 import java.util.ArrayList;
 import java.util.List;

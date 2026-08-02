@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
+import totah.lab.daedalus.docking.importer.LocalArtifactUriResolver;
 
 class LocalArtifactUriResolverTest {
 

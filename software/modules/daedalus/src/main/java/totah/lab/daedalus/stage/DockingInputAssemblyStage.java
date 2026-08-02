@@ -1,6 +1,6 @@
 package totah.lab.daedalus.stage;
 
-import totah.lab.docking.DockingInput;
+import totah.lab.daedalus.docking.DockingInput;
 import totah.lab.daedalus.ContextKeys;
 import totah.lab.daedalus.PipelineContext;
 import totah.lab.daedalus.Stage;

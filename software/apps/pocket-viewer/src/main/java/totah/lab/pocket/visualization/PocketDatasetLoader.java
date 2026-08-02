@@ -3,9 +3,10 @@ package totah.lab.pocket.visualization;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.structure.Structure;
+import totah.lab.hermes.file.reader.AutoDetectingPocketReader;
 import totah.lab.hermes.file.reader.BioJavaStructureReader;
+import totah.lab.hermes.file.reader.PocketReader;
 import totah.lab.hermes.file.reader.StructureReader;
-import totah.lab.io.PocketIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,15 +22,25 @@ final class PocketDatasetLoader {
             List.of(".pdb", ".cif", ".mmcif");
 
     private final StructureReader structureReader;
+    private final PocketReader pocketReader;
 
     PocketDatasetLoader() {
-        this(new BioJavaStructureReader());
+        this(new BioJavaStructureReader(), new AutoDetectingPocketReader());
     }
 
     PocketDatasetLoader(StructureReader structureReader) {
+        this(structureReader, new AutoDetectingPocketReader());
+    }
+
+    PocketDatasetLoader(
+            StructureReader structureReader,
+            PocketReader pocketReader) {
         this.structureReader = Objects.requireNonNull(
                 structureReader,
                 "structureReader");
+        this.pocketReader = Objects.requireNonNull(
+                pocketReader,
+                "pocketReader");
     }
 
     PocketDataset load(Path directory) throws IOException {
@@ -42,7 +53,7 @@ final class PocketDatasetLoader {
 
         Path structurePath = findStructure(normalized);
         Structure structure = structureReader.read(structurePath);
-        List<Pocket> pockets = PocketIO.load(normalized);
+        List<Pocket> pockets = pocketReader.read(normalized);
         String id = datasetId(normalized);
         Protein protein = new Protein(
                 id,

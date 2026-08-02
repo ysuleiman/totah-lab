@@ -1,4 +1,4 @@
-package totah.lab.docking.importer;
+package totah.lab.daedalus.docking.importer;
 
 import java.net.URI;
 import java.nio.file.Files;

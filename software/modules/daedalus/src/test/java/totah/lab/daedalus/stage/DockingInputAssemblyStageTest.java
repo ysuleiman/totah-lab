@@ -2,7 +2,7 @@ package totah.lab.daedalus.stage;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.docking.DockingInput;
+import totah.lab.daedalus.docking.DockingInput;
 import totah.lab.daedalus.ContextKeys;
 import totah.lab.daedalus.PipelineContext;
 

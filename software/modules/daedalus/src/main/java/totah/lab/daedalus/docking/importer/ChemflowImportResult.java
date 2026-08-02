@@ -1,4 +1,4 @@
-package totah.lab.docking.importer;
+package totah.lab.daedalus.docking.importer;
 
 public record ChemflowImportResult(
         int runs,

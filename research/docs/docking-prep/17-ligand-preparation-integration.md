@@ -20,7 +20,7 @@ totah.lab.ligand.selection  cleanup candidate selection and orchestration
 ```
 
 `MolecularGraphChargeSystem` is the small-molecule adapter to the generic
-`totah.lab.math.charges.ChargeSystem`. It is deliberately separate from the
+`totah.lab.hephaestus.ligand.charge.ChargeSystem`. It is deliberately separate from the
 receptor adapter: ligand charging uses CCD formal charges, bond orders, and
 aromaticity, while receptor charging remains Amber-template based by default.
 
