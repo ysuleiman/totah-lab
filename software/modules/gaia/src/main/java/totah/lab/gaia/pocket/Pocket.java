@@ -49,12 +49,11 @@ public record Pocket(
             List<T> values,
             String fieldName) {
 
-        List<T> copy = List.copyOf(
-                Objects.requireNonNull(values, fieldName));
-        if (copy.stream().anyMatch(Objects::isNull)) {
+        Objects.requireNonNull(values, fieldName);
+        if (values.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException(
                     fieldName + " must not contain null elements.");
         }
-        return copy;
+        return List.copyOf(values);
     }
 }

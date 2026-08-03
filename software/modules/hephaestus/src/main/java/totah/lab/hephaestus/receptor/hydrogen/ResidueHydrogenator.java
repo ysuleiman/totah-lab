@@ -65,6 +65,12 @@ public final class ResidueHydrogenator {
         Objects.requireNonNull(atoms, "atoms");
         Objects.requireNonNull(context, "context");
 
+        // Monoatomic residues (metal ions) have no side chain to
+        // hydrogenate and intentionally carry no residue state.
+        if (residue.getAtomCount() <= 1) {
+            return;
+        }
+
         String templateName =
                 context.baseTemplateName(chainId, residue);
 

@@ -68,13 +68,57 @@ class BoundingBoxTest {
     }
 
     @Test
-    void shouldIdentifyEmptyBox() {
+    void emptySentinelShouldBeEmpty() {
+        assertTrue(BoundingBox.EMPTY.isEmpty());
+        assertEquals(0.0, BoundingBox.EMPTY.volume(), EPSILON);
+    }
+
+    @Test
+    void locatedZeroThicknessBoxShouldNotBeEmpty() {
         BoundingBox box = new BoundingBox(
                 new Point3D(1.0, 1.0, 1.0),
                 new Point3D(1.0, 2.0, 3.0));
 
-        assertTrue(box.isEmpty());
+        assertFalse(box.isEmpty());
         assertEquals(0.0, box.volume(), EPSILON);
+    }
+
+    @Test
+    void locatedDegenerateBoxShouldContainItsOwnPoint() {
+        Point3D point = new Point3D(4.0, 5.0, 6.0);
+        BoundingBox box = new BoundingBox(point, point);
+
+        assertFalse(box.isEmpty());
+        assertTrue(box.contains(point));
+    }
+
+    @Test
+    void locatedDegenerateBoxShouldKeepPositionInUnion() {
+        Point3D point = new Point3D(4.0, 5.0, 6.0);
+        BoundingBox box = new BoundingBox(point, point);
+
+        assertEquals(
+                new BoundingBox(
+                        new Point3D(0.0, 0.0, 0.0),
+                        point),
+                box.union(unitBox()));
+        assertEquals(
+                new BoundingBox(
+                        new Point3D(0.0, 0.0, 0.0),
+                        point),
+                unitBox().union(box));
+    }
+
+    @Test
+    void locatedDegenerateBoxShouldExpandAroundItsPosition() {
+        Point3D point = new Point3D(4.0, 5.0, 6.0);
+        BoundingBox box = new BoundingBox(point, point);
+
+        assertEquals(
+                new BoundingBox(
+                        new Point3D(3.0, 4.0, 5.0),
+                        new Point3D(5.0, 6.0, 7.0)),
+                box.expand(1.0));
     }
 
     @Test
@@ -131,17 +175,45 @@ class BoundingBoxTest {
     }
 
     @Test
-    void touchingFacesShouldNotCountAsVolumeIntersection() {
+    void touchingFacesShouldIntersectWithZeroVolume() {
         BoundingBox first = unitBox();
 
         BoundingBox second = new BoundingBox(
                 new Point3D(1.0, 0.0, 0.0),
                 new Point3D(2.0, 1.0, 1.0));
 
-        assertFalse(first.intersects(second));
+        assertTrue(first.intersects(second));
+        assertTrue(second.intersects(first));
+
+        BoundingBox intersection =
+                first.intersection(second);
+
+        assertFalse(intersection.isEmpty());
         assertEquals(
-                BoundingBox.EMPTY,
-                first.intersection(second));
+                new BoundingBox(
+                        new Point3D(1.0, 0.0, 0.0),
+                        new Point3D(1.0, 1.0, 1.0)),
+                intersection);
+        assertEquals(
+                0.0,
+                first.intersectionVolume(second),
+                EPSILON);
+    }
+
+    @Test
+    void abuttingBoxesShouldIntersectAtContactPointNotOrigin() {
+        BoundingBox first = new BoundingBox(
+                new Point3D(4.0, 4.0, 4.0),
+                new Point3D(5.0, 5.0, 5.0));
+
+        BoundingBox second = new BoundingBox(
+                new Point3D(5.0, 5.0, 5.0),
+                new Point3D(6.0, 6.0, 6.0));
+
+        assertTrue(first.intersects(second));
+        assertEquals(
+                new Point3D(5.0, 5.0, 5.0),
+                first.intersection(second).center());
     }
 
     @Test

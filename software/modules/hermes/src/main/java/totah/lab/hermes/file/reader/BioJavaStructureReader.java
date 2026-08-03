@@ -14,8 +14,14 @@ import org.biojava.nbio.structure.io.cif.CifStructureConverter;
 import totah.lab.gaia.classification.ResidueClassificationEvidence;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Atom;
+import totah.lab.gaia.structure.AlternateLocationProvenance;
+import totah.lab.gaia.structure.AtomReference;
+import totah.lab.gaia.structure.Bond;
 import totah.lab.gaia.structure.Chain;
+import totah.lab.gaia.structure.ConnectivityMetadata;
+import totah.lab.gaia.structure.ConnectivityProvenance;
 import totah.lab.gaia.chemistry.Element;
+import totah.lab.gaia.chemistry.BondOrder;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.hermes.structure.StructureReaderOptions;
 
@@ -111,6 +117,9 @@ public final class BioJavaStructureReader
 
         Set<Group> convertedGroups = Collections.newSetFromMap(
                 new IdentityHashMap<>());
+        Map<org.biojava.nbio.structure.Atom, AtomReference> atomReferences =
+                new IdentityHashMap<>();
+        List<org.biojava.nbio.structure.Atom> orderedAtoms = new ArrayList<>();
 
         for (org.biojava.nbio.structure.Chain bioChain
                 : bioStructure.getChains()) {
@@ -122,7 +131,19 @@ public final class BioJavaStructureReader
 
             for (Group group : bioChain.getAtomGroups()) {
                 if (convertedGroups.add(group)) {
-                    residues.add(buildResidue(group));
+                    List<org.biojava.nbio.structure.Atom> selectedAtoms =
+                            representativeAtoms(group);
+                    residues.add(buildResidue(group, selectedAtoms));
+                    ResidueNumber number = Objects.requireNonNull(
+                            group.getResidueNumber(), "group residue number");
+                    char insertionCode = number.getInsCode() == null
+                            ? ' '
+                            : number.getInsCode();
+                    for (org.biojava.nbio.structure.Atom atom : selectedAtoms) {
+                        atomReferences.put(atom, new AtomReference(
+                                chainId, number.getSeqNum(), insertionCode, atom.getName()));
+                        orderedAtoms.add(atom);
+                    }
                 }
             }
         }
@@ -135,7 +156,13 @@ public final class BioJavaStructureReader
                         entry.getValue()))
                 .toList();
 
-        Structure structure = new Structure(chains);
+        ConnectivityImport connectivity = importConnectivity(orderedAtoms, atomReferences);
+        if (Files.isRegularFile(path)
+                && path.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".pdb")) {
+            connectivity = importPdbConect(path, orderedAtoms, atomReferences, connectivity);
+        }
+        Structure structure = new Structure(
+                chains, connectivity.bonds(), connectivity.metadata());
 
         if (structure.getResidueCount() == 0) {
             throw new IOException(
@@ -169,7 +196,9 @@ public final class BioJavaStructureReader
                         + fileName);
     }
 
-    private Residue buildResidue(Group group) {
+    private Residue buildResidue(
+            Group group,
+            List<org.biojava.nbio.structure.Atom> selectedAtoms) {
         Objects.requireNonNull(group, "group");
 
         ResidueNumber residueNumber =
@@ -188,7 +217,7 @@ public final class BioJavaStructureReader
                                 residueNumber.getInsCode()))
                 .classificationEvidence(
                         List.of(evidence))
-                .atoms(buildAtoms(group))
+                .atoms(buildAtoms(group, selectedAtoms))
                 .build();
     }
 
@@ -230,21 +259,22 @@ public final class BioJavaStructureReader
                 chemComp.getId());
     }
 
-    private List<Atom> buildAtoms(Group group) {
-        if (group.getAtoms() == null
-                || group.getAtoms().isEmpty()) {
+    private List<Atom> buildAtoms(
+            Group group,
+            List<org.biojava.nbio.structure.Atom> selectedAtoms) {
+        if (selectedAtoms.isEmpty()) {
 
             return List.of();
         }
 
-        return representativeAtoms(group)
-                .stream()
-                .map(this::buildAtom)
+        return selectedAtoms.stream()
+                .map(atom -> buildAtom(atom, group.hasAltLoc()))
                 .toList();
     }
 
     private Atom buildAtom(
-            org.biojava.nbio.structure.Atom bioAtom) {
+            org.biojava.nbio.structure.Atom bioAtom,
+            boolean alternativesPresent) {
 
         org.biojava.nbio.structure.Element bioElement =
                 bioAtom.getElement();
@@ -261,12 +291,151 @@ public final class BioJavaStructureReader
                 .amberType(null)
                 .occupancy(bioAtom.getOccupancy())
                 .bFactor(bioAtom.getTempFactor())
+                .alternateLocationProvenance(
+                        new AlternateLocationProvenance(
+                                normalizeAlternateLocation(bioAtom.getAltLoc()),
+                                alternativesPresent))
                 .element(
                         bioElement == null
                                 ? null
                                 : Element.fromSymbol(
                                 bioElement.name()))
                 .build();
+    }
+
+    private char normalizeAlternateLocation(Character alternateLocation) {
+        return alternateLocation == null ? ' ' : alternateLocation;
+    }
+
+    private ConnectivityImport importConnectivity(
+            List<org.biojava.nbio.structure.Atom> orderedAtoms,
+            Map<org.biojava.nbio.structure.Atom, AtomReference> atomReferences) {
+        Set<org.biojava.nbio.structure.Bond> visited =
+                Collections.newSetFromMap(new IdentityHashMap<>());
+        Map<String, Bond> imported = new LinkedHashMap<>();
+        List<String> diagnostics = new ArrayList<>();
+        int sourceBondCount = 0;
+        int unmappedBondCount = 0;
+
+        // Iterate in structure insertion order so the bond list is deterministic.
+        for (org.biojava.nbio.structure.Atom atom : orderedAtoms) {
+            List<org.biojava.nbio.structure.Bond> sourceBonds = atom.getBonds();
+            if (sourceBonds == null) continue;
+            for (org.biojava.nbio.structure.Bond sourceBond : sourceBonds) {
+                if (sourceBond == null || !visited.add(sourceBond)) continue;
+                sourceBondCount++;
+                AtomReference atom1 = atomReferences.get(sourceBond.getAtomA());
+                AtomReference atom2 = atomReferences.get(sourceBond.getAtomB());
+                if (atom1 == null || atom2 == null) {
+                    unmappedBondCount++;
+                    diagnostics.add("Unmapped BioJava bond endpoint: " + sourceBond);
+                    continue;
+                }
+                Bond bond = new Bond(
+                        atom1, atom2, mapBondOrder(sourceBond.getBondOrder(), diagnostics));
+                String endpointKey = bond.atom1() + "|" + bond.atom2();
+                Bond previous = imported.putIfAbsent(endpointKey, bond);
+                if (previous != null) {
+                    diagnostics.add("Duplicate source bond: " + bond);
+                    if (previous.order() != bond.order()) {
+                        diagnostics.add("Conflicting source bond order retained as UNKNOWN: " + bond);
+                        imported.put(endpointKey,
+                                new Bond(bond.atom1(), bond.atom2(), BondOrder.UNKNOWN));
+                    }
+                }
+            }
+        }
+
+        ConnectivityProvenance provenance;
+        if (sourceBondCount == 0) {
+            provenance = ConnectivityProvenance.ABSENT;
+        } else if (unmappedBondCount > 0) {
+            provenance = ConnectivityProvenance.PARTIAL;
+            diagnostics.add("Connectivity import is partial: " + unmappedBondCount
+                    + " source bond(s) could not be mapped.");
+        } else {
+            provenance = ConnectivityProvenance.EXPLICIT;
+        }
+        return new ConnectivityImport(
+                List.copyOf(imported.values()),
+                new ConnectivityMetadata(provenance, diagnostics));
+    }
+
+    private ConnectivityImport importPdbConect(
+            Path path,
+            List<org.biojava.nbio.structure.Atom> orderedAtoms,
+            Map<org.biojava.nbio.structure.Atom, AtomReference> atomReferences,
+            ConnectivityImport existing) throws IOException {
+        Map<Integer, AtomReference> bySerial = new LinkedHashMap<>();
+        for (org.biojava.nbio.structure.Atom atom : orderedAtoms) {
+            bySerial.putIfAbsent(atom.getPDBserial(), atomReferences.get(atom));
+        }
+        Map<String, Bond> imported = new LinkedHashMap<>();
+        for (Bond bond : existing.bonds()) {
+            imported.put(bond.atom1() + "|" + bond.atom2(), bond);
+        }
+        List<String> diagnostics = new ArrayList<>(existing.metadata().diagnostics());
+        int records = 0;
+        int unmapped = 0;
+        for (String line : Files.readAllLines(path)) {
+            if (!line.startsWith("CONECT")) continue;
+            records++;
+            String[] fields = line.substring(6).trim().split("\\s+");
+            if (fields.length < 2) continue;
+            Integer sourceSerial = parseSerial(fields[0], diagnostics);
+            if (sourceSerial == null) continue;
+            for (int index = 1; index < fields.length; index++) {
+                Integer targetSerial = parseSerial(fields[index], diagnostics);
+                if (targetSerial == null || sourceSerial.equals(targetSerial)) continue;
+                AtomReference atom1 = bySerial.get(sourceSerial);
+                AtomReference atom2 = bySerial.get(targetSerial);
+                if (atom1 == null || atom2 == null) {
+                    unmapped++;
+                    diagnostics.add("Unmapped PDB CONECT endpoint: "
+                            + sourceSerial + "-" + targetSerial);
+                    continue;
+                }
+                Bond bond = new Bond(atom1, atom2, BondOrder.UNKNOWN);
+                imported.putIfAbsent(bond.atom1() + "|" + bond.atom2(), bond);
+            }
+        }
+        if (records == 0) return existing;
+        // A partial earlier import stays partial even when every CONECT maps.
+        ConnectivityProvenance provenance =
+                existing.metadata().provenance() == ConnectivityProvenance.PARTIAL
+                        || unmapped > 0
+                ? ConnectivityProvenance.PARTIAL
+                : ConnectivityProvenance.EXPLICIT;
+        if (unmapped > 0) {
+            diagnostics.add("PDB CONECT import is partial: " + unmapped
+                    + " endpoint pair(s) could not be mapped.");
+        }
+        return new ConnectivityImport(
+                List.copyOf(imported.values()),
+                new ConnectivityMetadata(provenance, diagnostics));
+    }
+
+    private Integer parseSerial(String value, List<String> diagnostics) {
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException exception) {
+            diagnostics.add("Malformed PDB CONECT serial: " + value);
+            return null;
+        }
+    }
+
+    private BondOrder mapBondOrder(int sourceOrder, List<String> diagnostics) {
+        return switch (sourceOrder) {
+            case 1 -> BondOrder.SINGLE;
+            case 2 -> BondOrder.DOUBLE;
+            case 3 -> BondOrder.TRIPLE;
+            case 4 -> BondOrder.AROMATIC;
+            default -> {
+                diagnostics.add("Unsupported BioJava bond order " + sourceOrder
+                        + " preserved as UNKNOWN.");
+                yield BondOrder.UNKNOWN;
+            }
+        };
     }
 
     private List<org.biojava.nbio.structure.Atom>
@@ -424,6 +593,11 @@ public final class BioJavaStructureReader
     private record AtomCandidate(
             org.biojava.nbio.structure.Atom atom,
             int order) {
+    }
+
+    private record ConnectivityImport(
+            List<Bond> bonds,
+            ConnectivityMetadata metadata) {
     }
 
     @Override

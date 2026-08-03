@@ -23,6 +23,50 @@ public final class ChemflowDockingImporter {
     private static final String SOURCE_SYSTEM = "chemflow3";
     private static final int BATCH_SIZE = 2_000;
 
+    static final String POSE_SELECT = """
+            SELECT p.id,
+                   p.docking_run_id,
+                   t.uniprot_id,
+                   replace(c.id::text, '-', ''),
+                   p.score,
+                   a.id,
+                   a.storage_uri,
+                   p.created_at,
+                   c.id,
+                   c.external_id
+            FROM docking_poses p
+            JOIN docking_runs r ON r.id = p.docking_run_id
+            JOIN target_structures ts ON ts.id = r.target_structure_id
+            JOIN targets t ON t.id = ts.target_id
+            JOIN artifacts a ON a.id = p.pose_artifact_id
+            LEFT JOIN compounds c
+              ON c.id::text = p.pose_metadata->>'compound_id'
+            WHERE t.uniprot_id IN ('Q6UX53', 'Q9H8H3')
+            ORDER BY p.id
+            """;
+
+    static final String CONTACT_SELECT = """
+            SELECT c.docking_pose_id,
+                   t.uniprot_id,
+                   tr.chain_id,
+                   tr.residue_number,
+                   coalesce(tr.insertion_code, ''),
+                   count(*)::integer,
+                   min(c.min_distance)
+            FROM docking_pose_contacts c
+            JOIN docking_poses p ON p.id = c.docking_pose_id
+            JOIN docking_runs r ON r.id = p.docking_run_id
+            JOIN target_structures ts ON ts.id = r.target_structure_id
+            JOIN targets t ON t.id = ts.target_id
+            JOIN target_residues tr ON tr.id = c.target_residue_id
+            JOIN compounds comp ON comp.id::text = p.pose_metadata->>'compound_id'
+            WHERE t.uniprot_id IN ('Q6UX53', 'Q9H8H3')
+              AND c.min_distance <= 4.0
+            GROUP BY c.docking_pose_id, t.uniprot_id, tr.chain_id,
+                     tr.residue_number, coalesce(tr.insertion_code, '')
+            ORDER BY c.docking_pose_id
+            """;
+
     private final Path sourceArtifactRoot;
 
     public ChemflowDockingImporter(Path sourceArtifactRoot) {
@@ -39,7 +83,11 @@ public final class ChemflowDockingImporter {
         Objects.requireNonNull(source, "source");
         Objects.requireNonNull(destination, "destination");
 
+        boolean originalSourceAutoCommit = source.getAutoCommit();
         boolean originalAutoCommit = destination.getAutoCommit();
+        // PostgreSQL only honors Statement.setFetchSize inside a transaction,
+        // so stream the source reads with auto-commit disabled.
+        source.setAutoCommit(false);
         destination.setAutoCommit(false);
         try {
             Map<String, DestinationStructure> structures =
@@ -80,6 +128,7 @@ public final class ChemflowDockingImporter {
             throw exception;
         } finally {
             destination.setAutoCommit(originalAutoCommit);
+            source.setAutoCommit(originalSourceAutoCommit);
         }
     }
 
@@ -151,27 +200,7 @@ public final class ChemflowDockingImporter {
             Map<String, DestinationStructure> structures,
             Map<UUID, Long> runIds
     ) throws SQLException {
-        String select = """
-                SELECT p.id,
-                       p.docking_run_id,
-                       t.uniprot_id,
-                       replace(c.id::text, '-', ''),
-                       p.score,
-                       a.id,
-                       a.storage_uri,
-                       p.created_at,
-                       c.id,
-                       c.external_id
-                FROM docking_poses p
-                JOIN docking_runs r ON r.id = p.docking_run_id
-                JOIN target_structures ts ON ts.id = r.target_structure_id
-                JOIN targets t ON t.id = ts.target_id
-                JOIN artifacts a ON a.id = p.pose_artifact_id
-                LEFT JOIN compounds c
-                  ON c.id::text = p.pose_metadata->>'compound_id'
-                WHERE t.uniprot_id IN ('Q6UX53', 'Q9H8H3')
-                ORDER BY p.id
-                """;
+        String select = POSE_SELECT;
         String insert = """
                 INSERT INTO docking.docking_pose (
                     ligand_id, vina_score, pose_file, created_at,
@@ -193,51 +222,52 @@ public final class ChemflowDockingImporter {
         LocalArtifactUriResolver resolver =
                 new LocalArtifactUriResolver(sourceArtifactRoot);
         try (Statement query = source.createStatement();
-             ResultSet rows = query.executeQuery(select);
              PreparedStatement write = destination.prepareStatement(insert)) {
             query.setFetchSize(BATCH_SIZE);
-            while (rows.next()) {
-                String compoundId = rows.getString(4);
-                if (compoundId == null || compoundId.isBlank()) {
-                    rejected++;
-                    continue;
-                }
-                UUID sourceRunId = rows.getObject(2, UUID.class);
-                Long destinationRunId = runIds.get(sourceRunId);
-                if (destinationRunId == null) {
-                    throw new SQLException(
-                            "No destination run for source run " + sourceRunId
-                    );
-                }
-                DestinationStructure structure =
-                        requireStructure(structures, rows.getString(3));
-                Path posePath = resolver.resolve(URI.create(rows.getString(7)));
-                if (!Files.isRegularFile(posePath)) {
-                    throw new SQLException(
-                            "Missing pose artifact " + posePath
-                    );
-                }
+            try (ResultSet rows = query.executeQuery(select)) {
+                while (rows.next()) {
+                    String compoundId = rows.getString(4);
+                    if (compoundId == null || compoundId.isBlank()) {
+                        rejected++;
+                        continue;
+                    }
+                    UUID sourceRunId = rows.getObject(2, UUID.class);
+                    Long destinationRunId = runIds.get(sourceRunId);
+                    if (destinationRunId == null) {
+                        throw new SQLException(
+                                "No destination run for source run " + sourceRunId
+                        );
+                    }
+                    DestinationStructure structure =
+                            requireStructure(structures, rows.getString(3));
+                    Path posePath = resolver.resolve(URI.create(rows.getString(7)));
+                    if (!Files.isRegularFile(posePath)) {
+                        throw new SQLException(
+                                "Missing pose artifact " + posePath
+                        );
+                    }
 
-                write.setString(1, compoundId);
-                write.setDouble(2, rows.getDouble(5));
-                write.setString(3, posePath.toString());
-                write.setTimestamp(4, rows.getTimestamp(8));
-                write.setString(5, structure.uniprotId());
-                write.setLong(6, destinationRunId);
-                write.setString(7, SOURCE_SYSTEM);
-                write.setObject(8, rows.getObject(1));
-                write.setObject(9, rows.getObject(6));
-                write.setObject(10, rows.getObject(9));
-                write.setString(11, rows.getString(10));
-                write.addBatch();
-                pending++;
-                if (pending == BATCH_SIZE) {
-                    imported += sum(write.executeBatch());
-                    pending = 0;
+                    write.setString(1, compoundId);
+                    write.setDouble(2, rows.getDouble(5));
+                    write.setString(3, posePath.toString());
+                    write.setTimestamp(4, rows.getTimestamp(8));
+                    write.setString(5, structure.uniprotId());
+                    write.setLong(6, destinationRunId);
+                    write.setString(7, SOURCE_SYSTEM);
+                    write.setObject(8, rows.getObject(1));
+                    write.setObject(9, rows.getObject(6));
+                    write.setObject(10, rows.getObject(9));
+                    write.setString(11, rows.getString(10));
+                    write.addBatch();
+                    pending++;
+                    if (pending == BATCH_SIZE) {
+                        imported += sum(write.executeBatch());
+                        pending = 0;
+                    }
                 }
-            }
-            if (pending > 0) {
-                imported += sum(write.executeBatch());
+                if (pending > 0) {
+                    imported += sum(write.executeBatch());
+                }
             }
         }
         return new PoseImport(imported, rejected);
@@ -250,27 +280,7 @@ public final class ChemflowDockingImporter {
             Map<UUID, Long> poseIds,
             Map<ResidueKey, Long> residues
     ) throws SQLException {
-        String select = """
-                SELECT c.docking_pose_id,
-                       t.uniprot_id,
-                       tr.chain_id,
-                       tr.residue_number,
-                       coalesce(tr.insertion_code, ''),
-                       count(*)::integer,
-                       min(c.min_distance)
-                FROM docking_pose_contacts c
-                JOIN docking_poses p ON p.id = c.docking_pose_id
-                JOIN docking_runs r ON r.id = p.docking_run_id
-                JOIN target_structures ts ON ts.id = r.target_structure_id
-                JOIN targets t ON t.id = ts.target_id
-                JOIN target_residues tr ON tr.id = c.target_residue_id
-                WHERE t.uniprot_id IN ('Q6UX53', 'Q9H8H3')
-                  AND p.pose_metadata->>'compound_id' IS NOT NULL
-                  AND c.min_distance <= 4.0
-                GROUP BY c.docking_pose_id, t.uniprot_id, tr.chain_id,
-                         tr.residue_number, coalesce(tr.insertion_code, '')
-                ORDER BY c.docking_pose_id
-                """;
+        String select = CONTACT_SELECT;
         String insert = """
                 INSERT INTO docking.pose_residue_contact (
                     pose_id, residue_id, atom_contact_count, min_distance
@@ -283,42 +293,43 @@ public final class ChemflowDockingImporter {
         int count = 0;
         int pending = 0;
         try (Statement query = source.createStatement();
-             ResultSet rows = query.executeQuery(select);
              PreparedStatement write = destination.prepareStatement(insert)) {
             query.setFetchSize(BATCH_SIZE);
-            while (rows.next()) {
-                UUID sourcePoseId = rows.getObject(1, UUID.class);
-                Long poseId = poseIds.get(sourcePoseId);
-                if (poseId == null) {
-                    throw new SQLException(
-                            "No destination pose for source pose " + sourcePoseId
+            try (ResultSet rows = query.executeQuery(select)) {
+                while (rows.next()) {
+                    UUID sourcePoseId = rows.getObject(1, UUID.class);
+                    Long poseId = poseIds.get(sourcePoseId);
+                    if (poseId == null) {
+                        throw new SQLException(
+                                "No destination pose for source pose " + sourcePoseId
+                        );
+                    }
+                    DestinationStructure structure =
+                            requireStructure(structures, rows.getString(2));
+                    ResidueKey key = new ResidueKey(
+                            structure.structureId(),
+                            rows.getString(3),
+                            rows.getInt(4),
+                            rows.getString(5)
                     );
+                    Long residueId = residues.get(key);
+                    if (residueId == null) {
+                        throw new SQLException("No destination residue for " + key);
+                    }
+                    write.setLong(1, poseId);
+                    write.setLong(2, residueId);
+                    write.setInt(3, rows.getInt(6));
+                    write.setDouble(4, rows.getDouble(7));
+                    write.addBatch();
+                    pending++;
+                    if (pending == BATCH_SIZE) {
+                        count += sum(write.executeBatch());
+                        pending = 0;
+                    }
                 }
-                DestinationStructure structure =
-                        requireStructure(structures, rows.getString(2));
-                ResidueKey key = new ResidueKey(
-                        structure.structureId(),
-                        rows.getString(3),
-                        rows.getInt(4),
-                        rows.getString(5)
-                );
-                Long residueId = residues.get(key);
-                if (residueId == null) {
-                    throw new SQLException("No destination residue for " + key);
-                }
-                write.setLong(1, poseId);
-                write.setLong(2, residueId);
-                write.setInt(3, rows.getInt(6));
-                write.setDouble(4, rows.getDouble(7));
-                write.addBatch();
-                pending++;
-                if (pending == BATCH_SIZE) {
+                if (pending > 0) {
                     count += sum(write.executeBatch());
-                    pending = 0;
                 }
-            }
-            if (pending > 0) {
-                count += sum(write.executeBatch());
             }
         }
         return count;

@@ -421,7 +421,12 @@ final class BackboneHydrogenator {
             return false;
         }
 
+        // Same definition as ResidueStateAssignmentOperation
+        // .isSequenceAdjacent: residues sharing a sequence number
+        // (insertion codes, e.g. 10 followed by 10A) are adjacent.
         return current.getNumber()
+                == previous.getNumber()
+                || current.getNumber()
                 == previous.getNumber() + 1;
     }
 

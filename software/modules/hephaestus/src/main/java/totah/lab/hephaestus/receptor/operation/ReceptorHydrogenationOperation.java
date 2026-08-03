@@ -9,6 +9,7 @@ import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.preparation.OperationResult;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOperation;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
+import totah.lab.hephaestus.receptor.cleanup.MetalIonPolicy;
 import totah.lab.hephaestus.receptor.hydrogenation.HydrogenationReport;
 import totah.lab.hephaestus.receptor.hydrogen.ReceptorHydrogenator;
 import totah.lab.hephaestus.receptor.protonation.ProtonationConfig;
@@ -32,6 +33,10 @@ public final class ReceptorHydrogenationOperation
             "disulfide-residues";
 
     private final ReceptorHydrogenator hydrogenator;
+
+    private final MetalIonPolicy metalIonPolicy =
+            new MetalIonPolicy();
+
     public ReceptorHydrogenationOperation(
             ReceptorHydrogenator hydrogenator) {
 
@@ -193,6 +198,11 @@ public final class ReceptorHydrogenationOperation
 
         for (Chain chain : structure.getChains()) {
             for (Residue residue : chain.residues()) {
+                // Monoatomic ions carry no residue state by design.
+                if (metalIonPolicy.isKnownIonResidue(residue)) {
+                    continue;
+                }
+
                 String key =
                         residueKey(chain.id(), residue);
 

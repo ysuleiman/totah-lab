@@ -19,6 +19,8 @@ public final class PocketGeometry {
             new AlphaSpherePocketGeometry();
     private static final PocketGeometryStrategy RESIDUE_ATOM_GEOMETRY =
             new ResidueAtomPocketGeometry();
+    private static final PocketGeometryStrategy REPORTED_CENTER_GEOMETRY =
+            new ReportedCenterPocketGeometry();
 
     private PocketGeometry() {
     }
@@ -117,11 +119,7 @@ public final class PocketGeometry {
             Pocket pocket) {
         Objects.requireNonNull(structure, "structure");
         Objects.requireNonNull(pocket, "pocket");
-        PocketGeometryStrategy strategy = pocket.alphaSphereSet()
-                .filter(set -> !set.spheres().isEmpty())
-                .<PocketGeometryStrategy>map(ignored ->
-                        ALPHA_SPHERE_GEOMETRY)
-                .orElse(RESIDUE_ATOM_GEOMETRY);
+        PocketGeometryStrategy strategy = strategyFor(structure, pocket);
         List<totah.lab.gaia.structure.ResidueId> unresolved =
                 new totah.lab.athena.pocket.selection.PocketResidueSelection()
                         .unresolvedResidues(structure, pocket);
@@ -137,6 +135,12 @@ public final class PocketGeometry {
             PocketGeometryResult second) {
         Objects.requireNonNull(first, "first");
         Objects.requireNonNull(second, "second");
+        if (first.basis() != second.basis()) {
+            throw new IllegalArgumentException(
+                    "Cannot compute overlap between different geometry"
+                            + " bases: " + first.basis()
+                            + " vs " + second.basis());
+        }
         return new PocketOverlapResult(
                 first.bounds().intersectionVolume(second.bounds()),
                 first.bounds().intersectionOverUnion(second.bounds()),
@@ -247,6 +251,24 @@ public final class PocketGeometry {
                 .filter(set -> !set.spheres().isEmpty())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Pocket has no alpha spheres: " + pocket.id()));
+    }
+
+    private static PocketGeometryStrategy strategyFor(
+            Structure structure,
+            Pocket pocket) {
+        if (pocket.alphaSphereSet()
+                .filter(set -> !set.spheres().isEmpty())
+                .isPresent()) {
+            return ALPHA_SPHERE_GEOMETRY;
+        }
+        boolean hasResolvedHeavyAtoms =
+                new totah.lab.athena.pocket.selection.PocketResidueSelection()
+                        .resolvedResidues(structure, pocket).stream()
+                        .flatMap(residue -> residue.getAtoms().stream())
+                        .anyMatch(Atom::isHeavyAtom);
+        return hasResolvedHeavyAtoms
+                ? RESIDUE_ATOM_GEOMETRY
+                : REPORTED_CENTER_GEOMETRY;
     }
 
     private static List<AlphaSphere> requireSpheres(

@@ -78,7 +78,7 @@ public final class PdbAdjacentCysteineParser {
         Optional<Double> chi3 = first.cb().flatMap(firstCb ->
                 first.sg().flatMap(firstSg ->
                         second.sg().flatMap(secondSg ->
-                                second.cb().map(secondCb ->
+                                second.cb().flatMap(secondCb ->
                                         dihedralDegrees(firstCb, firstSg, secondSg, secondCb)))));
 
         return new AdjacentCysteinePair(
@@ -145,15 +145,19 @@ public final class PdbAdjacentCysteineParser {
         return index < value.length() ? value.charAt(index) : ' ';
     }
 
-    private static double dihedralDegrees(Point a, Point b, Point c, Point d) {
+    private static Optional<Double> dihedralDegrees(Point a, Point b, Point c, Point d) {
         Point b1 = b.subtract(a);
         Point b2 = c.subtract(b);
         Point b3 = d.subtract(c);
+        double b2Length = b2.length();
+        if (b2Length == 0.0) {
+            return Optional.empty();
+        }
         Point n1 = b1.cross(b2);
         Point n2 = b2.cross(b3);
         double x = n1.dot(n2);
-        double y = n1.cross(n2).dot(b2) / b2.length();
-        return Math.toDegrees(Math.atan2(y, x));
+        double y = n1.cross(n2).dot(b2) / b2Length;
+        return Optional.of(Math.toDegrees(Math.atan2(y, x)));
     }
 
     private static Map<String, Character> aminoAcidCodes() {

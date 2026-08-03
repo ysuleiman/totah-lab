@@ -33,6 +33,12 @@ public class SparsePCGSolver implements LinearSolver {
         if (bNormSquared == 0.0) {
             return x;
         }
+        if (!Double.isFinite(rsold) || Math.abs(rsold) <= 1e-30) {
+            // A preconditioner that annihilates a nonzero residual (r·z == 0)
+            // makes beta = rsnew / rsold NaN, which evades the breakdown check
+            throw new IllegalStateException(
+                    "Preconditioned conjugate gradient breakdown");
+        }
         double toleranceSquared = residualThreshold
                 * residualThreshold * bNormSquared;
 
@@ -57,6 +63,12 @@ public class SparsePCGSolver implements LinearSolver {
 
             z = preconditioner.apply(r);
             double rsnew = dot(r, z);
+            if (!Double.isFinite(rsnew) || Math.abs(rsnew) <= 1e-30) {
+                // r has not converged but r·z vanished: beta would be NaN and
+                // the loop would burn all remaining iterations on NaN arithmetic
+                throw new IllegalStateException(
+                        "Preconditioned conjugate gradient breakdown");
+            }
             double beta = rsnew / rsold;
 
             for (int i = 0; i < p.length; i++) {

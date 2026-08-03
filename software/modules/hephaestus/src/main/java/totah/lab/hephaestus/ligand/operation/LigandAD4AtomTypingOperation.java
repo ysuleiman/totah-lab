@@ -148,6 +148,8 @@ public final class LigandAD4AtomTypingOperation implements LigandPreparationOper
             case DOUBLE -> 2.0;
             case TRIPLE -> 3.0;
             case AROMATIC -> 1.5;
+            case UNKNOWN -> throw new IllegalArgumentException(
+                    "Cannot assign AD4 ligand types with UNKNOWN bond order");
         }).sum();
     }
 

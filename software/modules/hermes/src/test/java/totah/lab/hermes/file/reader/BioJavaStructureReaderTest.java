@@ -2,6 +2,7 @@ package totah.lab.hermes.file.reader;
 
 import org.biojava.nbio.structure.AminoAcidImpl;
 import org.biojava.nbio.structure.AtomImpl;
+import org.biojava.nbio.structure.BondImpl;
 import org.biojava.nbio.structure.ChainImpl;
 import org.biojava.nbio.structure.Group;
 import org.biojava.nbio.structure.HetatomImpl;
@@ -16,6 +17,8 @@ import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
+import totah.lab.gaia.structure.ConnectivityProvenance;
+import totah.lab.gaia.chemistry.BondOrder;
 import totah.lab.hermes.structure.StructureReaderOptions;
 
 import java.io.IOException;
@@ -186,6 +189,24 @@ class BioJavaStructureReaderTest {
     }
 
     @Test
+    void shouldPreserveDepositedPdbConectConnectivity() throws IOException {
+        Path pdbFile = writePdb("explicit-conect.pdb", """
+                HETATM    1  C1  LIG A 101       1.000   1.000   1.000  1.00 20.00           C
+                HETATM    2  O1  LIG A 101       2.200   1.000   1.000  1.00 20.00           O
+                CONECT    1    2
+                CONECT    2    1
+                END
+                """);
+
+        Structure structure = new BioJavaStructureReader().read(pdbFile);
+
+        assertEquals(1, structure.bonds().size());
+        assertEquals(BondOrder.UNKNOWN, structure.bonds().getFirst().order());
+        assertEquals(ConnectivityProvenance.EXPLICIT,
+                structure.getConnectivityMetadata().provenance());
+    }
+
+    @Test
     void shouldPreserveInsertionCode() throws IOException {
         Path pdbFile = writePdb(
                 "insertion-code.pdb",
@@ -254,12 +275,90 @@ class BioJavaStructureReaderTest {
     }
 
     @Test
+    void shouldImportExplicitBioJavaConnectivity() throws IOException {
+        Group first = bioGroup("CYS", 1, true);
+        Group second = bioGroup("CYS", 2, true);
+        new BondImpl(first.getAtom(0), second.getAtom(0), 1);
+
+        Structure structure = new BioJavaStructureReader().convertStructure(
+                bioStructure(bioChain("A", first, second)),
+                Path.of("synthetic.pdb"));
+
+        assertEquals(1, structure.bonds().size());
+        assertEquals(BondOrder.SINGLE, structure.bonds().getFirst().order());
+        assertEquals(ConnectivityProvenance.EXPLICIT,
+                structure.getConnectivityMetadata().provenance());
+    }
+
+    @Test
+    void shouldImportBondsInAtomInsertionOrder() throws IOException {
+        Group first = bioGroup("ALA", 1, true);
+        Group second = bioGroup("GLY", 2, true);
+        Group third = bioGroup("SER", 3, true);
+        Group fourth = bioGroup("CYS", 4, true);
+        // The later bond is created first; import order must still follow
+        // the structure's atom insertion order, not hash iteration order.
+        new BondImpl(third.getAtom(0), fourth.getAtom(0), 1);
+        new BondImpl(first.getAtom(0), second.getAtom(0), 1);
+
+        Structure structure = new BioJavaStructureReader().convertStructure(
+                bioStructure(bioChain("A", first, second, third, fourth)),
+                Path.of("synthetic.pdb"));
+
+        assertEquals(2, structure.bonds().size());
+        assertEquals(1, structure.bonds().get(0).atom1().residueNumber());
+        assertEquals(2, structure.bonds().get(0).atom2().residueNumber());
+        assertEquals(3, structure.bonds().get(1).atom1().residueNumber());
+        assertEquals(4, structure.bonds().get(1).atom2().residueNumber());
+    }
+
+    @Test
+    void shouldKeepPartialProvenanceWhenConectImportIsComplete()
+            throws IOException {
+        Group first = bioGroup("CYS", 1, true);
+        Group second = bioGroup("CYS", 2, true);
+        AtomImpl external = new AtomImpl();
+        external.setName("SG");
+        external.setCoords(new double[]{5.0, 0.0, 0.0});
+        new BondImpl(first.getAtom(0), external, 1);
+        Path pdbFile = writePdb("partial-conect.pdb", """
+                CONECT    1    2
+                END
+                """);
+
+        Structure structure = new BioJavaStructureReader().convertStructure(
+                bioStructure(bioChain("A", first, second)), pdbFile);
+
+        assertEquals(ConnectivityProvenance.PARTIAL,
+                structure.getConnectivityMetadata().provenance());
+    }
+
+    @Test
+    void shouldReportAbsentAndPartialConnectivityHonestly() throws IOException {
+        Group group = bioGroup("CYS", 1, true);
+        Structure absent = new BioJavaStructureReader().convertStructure(
+                bioStructure(bioChain("A", group)), Path.of("absent.pdb"));
+        assertEquals(ConnectivityProvenance.ABSENT,
+                absent.getConnectivityMetadata().provenance());
+
+        AtomImpl external = new AtomImpl();
+        external.setName("SG");
+        external.setCoords(new double[]{2.0, 0.0, 0.0});
+        new BondImpl(group.getAtom(0), external, 1);
+        Structure partial = new BioJavaStructureReader().convertStructure(
+                bioStructure(bioChain("A", group)), Path.of("partial.pdb"));
+        assertEquals(ConnectivityProvenance.PARTIAL,
+                partial.getConnectivityMetadata().provenance());
+        assertFalse(partial.getConnectivityMetadata().diagnostics().isEmpty());
+    }
+
+    @Test
     void shouldMergePolymerLigandAndWaterPartitionsWithoutLosingOrder()
             throws IOException {
         org.biojava.nbio.structure.Structure bioStructure = bioStructure(
                 bioChain("A", bioGroup("GLY", 1, true)),
-                bioChain("A", bioGroup("LIG", 1, false)),
-                bioChain("A", bioGroup("HOH", 1, false)));
+                bioChain("A", bioGroup("LIG", 2, false)),
+                bioChain("A", bioGroup("HOH", 3, false)));
 
         Structure structure = new BioJavaStructureReader().convertStructure(
                 bioStructure, Path.of("synthetic.pdb"));
@@ -391,6 +490,10 @@ class BioJavaStructureReaderTest {
         assertEquals(8.000, alphaCarbon.getPosition().x(), 1.0e-9);
         assertEquals(8.000, alphaCarbon.getPosition().y(), 1.0e-9);
         assertEquals(8.000, alphaCarbon.getPosition().z(), 1.0e-9);
+        assertEquals('B', alphaCarbon.getAlternateLocationProvenance()
+                .selectedAlternateLocation());
+        assertTrue(alphaCarbon.getAlternateLocationProvenance()
+                .alternativesPresent());
 
         assertEquals(
                 1,
@@ -426,6 +529,10 @@ class BioJavaStructureReaderTest {
                 .orElseThrow();
 
         assertEquals(2.000, alphaCarbon.getPosition().x(), 1.0e-9);
+        assertEquals('A', alphaCarbon.getAlternateLocationProvenance()
+                .selectedAlternateLocation());
+        assertTrue(alphaCarbon.getAlternateLocationProvenance()
+                .alternativesPresent());
     }
 
     @Test

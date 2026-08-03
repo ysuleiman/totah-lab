@@ -28,6 +28,17 @@ class PdbAdjacentCysteineParserTest {
         assertThat(pair.meanPlddt()).isEqualTo(92.0);
     }
 
+    @Test
+    void leavesChi3EmptyWhenBothSgAtomsShareCoordinates() throws Exception {
+        List<AdjacentCysteinePair> pairs = new PdbAdjacentCysteineParser()
+                .parse(resource("/disulfide/degenerate-cysteines.pdb"), 8);
+
+        assertThat(pairs).hasSize(1);
+        AdjacentCysteinePair pair = pairs.getFirst();
+        assertThat(pair.sgDistanceAngstrom()).hasValue(0.0);
+        assertThat(pair.chi3Degrees()).isEmpty();
+    }
+
     private static Path resource(String name) throws URISyntaxException {
         return Path.of(PdbAdjacentCysteineParserTest.class.getResource(name).toURI());
     }

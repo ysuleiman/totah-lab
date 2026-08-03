@@ -89,6 +89,7 @@ public final class HydrogenOptimizer {
                     parent,
                     chainId,
                     residue,
+                    optimized,
                     environment,
                     amberTemplate,
                     environmentTemplates);
@@ -106,6 +107,7 @@ public final class HydrogenOptimizer {
                         parent,
                         chainId,
                         residue,
+                        optimized,
                         environment,
                         amberTemplate,
                         environmentTemplates);
@@ -144,6 +146,7 @@ public final class HydrogenOptimizer {
             Atom parent,
             String chainId,
             Residue residue,
+            List<Atom> optimizedResidueAtoms,
             Structure environment,
             String amberTemplate,
             Map<String, String> environmentTemplates) {
@@ -157,7 +160,14 @@ public final class HydrogenOptimizer {
                 String otherTemplate = environmentTemplates.get(
                         residueKey(chain.id(), otherResidue));
 
-                for (Atom other : otherResidue.getAtoms()) {
+                // The residue being optimized may already contain moved
+                // sibling hydrogens; score against the updated positions,
+                // not the stale ones held by the environment structure.
+                List<Atom> otherAtoms = otherResidue == residue
+                        ? optimizedResidueAtoms
+                        : otherResidue.getAtoms();
+
+                for (Atom other : otherAtoms) {
                     if (other == hydrogen || other == parent) {
                         continue;
                     }

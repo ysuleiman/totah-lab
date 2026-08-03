@@ -9,6 +9,12 @@ public record BoundingBox(
         Point3D min,
         Point3D max) {
 
+    /**
+     * Sentinel for "no box" (unset). This is the only instance for which
+     * {@link #isEmpty()} returns {@code true}; it contains no points,
+     * intersects nothing, and is absorbed by {@link #union} and
+     * {@link #expand}.
+     */
     public static final BoundingBox EMPTY =
             new BoundingBox(
                     new Point3D(0.0, 0.0, 0.0),
@@ -50,10 +56,16 @@ public record BoundingBox(
         return width() * height() * depth();
     }
 
+    /**
+     * Returns {@code true} only for the {@link #EMPTY} sentinel, i.e. a
+     * box that was never located. A located box with zero extent in one
+     * or more dimensions (a single point, a line, or a plane of points)
+     * is not empty: it retains its position, contains its own points,
+     * and participates in {@link #union} and {@link #expand}. Its
+     * {@link #volume()} is still zero.
+     */
     public boolean isEmpty() {
-        return width() <= 0.0
-                || height() <= 0.0
-                || depth() <= 0.0;
+        return this == EMPTY;
     }
 
     public boolean contains(Point3D point) {
@@ -71,6 +83,12 @@ public record BoundingBox(
                 && point.z() <= max.z();
     }
 
+    /**
+     * Inclusive overlap test, consistent with {@link #contains}: boxes
+     * sharing exactly a face, edge, or corner intersect, and their
+     * {@link #intersection} is the degenerate box of the contact region
+     * (never the {@link #EMPTY} sentinel).
+     */
     public boolean intersects(BoundingBox other) {
         Objects.requireNonNull(other, "other");
 
@@ -78,12 +96,12 @@ public record BoundingBox(
             return false;
         }
 
-        return min.x() < other.max.x()
-                && max.x() > other.min.x()
-                && min.y() < other.max.y()
-                && max.y() > other.min.y()
-                && min.z() < other.max.z()
-                && max.z() > other.min.z();
+        return min.x() <= other.max.x()
+                && max.x() >= other.min.x()
+                && min.y() <= other.max.y()
+                && max.y() >= other.min.y()
+                && min.z() <= other.max.z()
+                && max.z() >= other.min.z();
     }
 
     public BoundingBox intersection(BoundingBox other) {

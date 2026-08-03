@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PocketGeometryTest {
     private static final double TOLERANCE = 1.0e-6;
@@ -68,6 +69,60 @@ class PocketGeometryTest {
                 5.0,
                 PocketGeometry.alphaSphereCenterDistance(first, second),
                 TOLERANCE);
+    }
+
+    @Test
+    void overlapRejectsMixedGeometryBases() {
+        PocketGeometryResult spheres = geometryResult(
+                PocketGeometryBasis.ALPHA_SPHERES);
+        PocketGeometryResult residues = geometryResult(
+                PocketGeometryBasis.RESOLVED_RESIDUE_HEAVY_ATOMS);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> PocketGeometry.overlap(spheres, residues));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> PocketGeometry.overlap(residues, spheres));
+    }
+
+    @Test
+    void overlapBetweenSameBasisIsUnchanged() {
+        PocketGeometryResult first = geometryResult(
+                PocketGeometryBasis.ALPHA_SPHERES,
+                new BoundingBox(
+                        new Point3D(0, 0, 0), new Point3D(2, 2, 2)));
+        PocketGeometryResult second = geometryResult(
+                PocketGeometryBasis.ALPHA_SPHERES,
+                new BoundingBox(
+                        new Point3D(1, 1, 1), new Point3D(3, 3, 3)));
+
+        PocketOverlapResult result = PocketGeometry.overlap(first, second);
+
+        assertEquals(1.0, result.intersectionVolume(), TOLERANCE);
+        assertEquals(1.0 / 15.0, result.intersectionOverUnion(), TOLERANCE);
+        assertEquals(
+                PocketGeometryBasis.ALPHA_SPHERES, result.firstBasis());
+        assertEquals(
+                PocketGeometryBasis.ALPHA_SPHERES, result.secondBasis());
+    }
+
+    private static PocketGeometryResult geometryResult(
+            PocketGeometryBasis basis) {
+        return geometryResult(
+                basis,
+                new BoundingBox(
+                        new Point3D(0, 0, 0), new Point3D(2, 2, 2)));
+    }
+
+    private static PocketGeometryResult geometryResult(
+            PocketGeometryBasis basis,
+            BoundingBox bounds) {
+        return new PocketGeometryResult(
+                bounds,
+                bounds.center(),
+                basis,
+                List.of());
     }
 
     private static Pocket pocket(AlphaSphere... spheres) {

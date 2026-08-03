@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import totah.lab.euclid.linear.Preconditioner;
 import totah.lab.euclid.linear.SparseMatrix;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,6 +64,73 @@ public class PreconditionerTest {
         double[] r = {3.0, -2.0};
         assertArrayEquals(r, blockJacobi.apply(r), 1e-12,
                 "singular block must degrade to the identity, not NaN/exception");
+    }
+
+    @Test
+    public void blockJacobiRejectsBlocksWithCoverageGap() {
+        SparseMatrix a = new SparseMatrix(3);
+        a.set(0, 0, 1.0);
+        a.set(1, 1, 1.0);
+        a.set(2, 2, 1.0);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> new BlockJacobiPreconditioner(a, List.of(new int[]{0, 1})),
+                "blocks leaving index 2 uncovered must be rejected");
+        assertTrue(e.getMessage().contains("2"),
+                "the error must name the uncovered index");
+    }
+
+    @Test
+    public void blockJacobiRejectsOutOfRangeAndOverlappingBlocks() {
+        SparseMatrix a = new SparseMatrix(2);
+        a.set(0, 0, 1.0);
+        a.set(1, 1, 1.0);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> new BlockJacobiPreconditioner(a, List.of(new int[]{0, 2})),
+                "out-of-range block index must be rejected");
+        assertThrows(IllegalArgumentException.class,
+                () -> new BlockJacobiPreconditioner(a, List.of(new int[]{0}, new int[]{0, 1})),
+                "an index covered by two blocks must be rejected");
+    }
+
+    @Test
+    public void blockJacobiIsUnaffectedByCallerMutatingBlocksList() {
+        SparseMatrix a = new SparseMatrix(2);
+        a.set(0, 0, 2.0);
+        a.set(1, 1, 4.0);
+
+        List<int[]> blocks = new ArrayList<>();
+        blocks.add(new int[]{0, 1});
+        Preconditioner blockJacobi = new BlockJacobiPreconditioner(a, blocks);
+
+        blocks.get(0)[0] = 1;
+        blocks.clear();
+
+        assertArrayEquals(new double[]{1.0, 2.0},
+                blockJacobi.apply(new double[]{2.0, 8.0}), 1e-12,
+                "later mutation of the caller's blocks list must not corrupt the preconditioner");
+    }
+
+    @Test
+    public void incompleteCholeskyDefaultsMissingDiagonalToOne() {
+        // Row 1 has no explicitly stored diagonal; the 1.0 default must take
+        // effect instead of leaving D[i] and L(i,i) at zero (NaN in PCG)
+        SparseMatrix a = new SparseMatrix(2);
+        a.set(0, 0, 2.0); a.set(0, 1, 1.0);
+        a.set(1, 0, 1.0);
+
+        Preconditioner ic = new IncompleteCholeskyPreconditioner(a, 2);
+
+        // With the implicit 1.0 diagonal, A = [[2,1],[1,1]] has zero fill-in,
+        // so IC(0) is the exact inverse and A·[1,2] = [4,3] must map back
+        double[] z = ic.apply(new double[]{4.0, 3.0});
+        for (double v : z) {
+            assertTrue(Double.isFinite(v),
+                    "missing diagonal must not produce NaN/Infinity");
+        }
+        assertArrayEquals(new double[]{1.0, 2.0}, z, 1e-9,
+                "missing diagonal must fall back to 1.0, not 0.0");
     }
 
     @Test

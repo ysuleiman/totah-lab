@@ -15,10 +15,12 @@ public class BlockJacobiPreconditioner implements Preconditioner {
     private final List<double[][]> invBlocks;
 
     public BlockJacobiPreconditioner(SparseMatrix H, List<int[]> blocks) {
-        this.blocks = blocks;
+        validateCoverage(H.size, blocks);
+        this.blocks = new ArrayList<>(blocks.size());
         this.invBlocks = new ArrayList<>();
 
         for (int[] blockIdx : blocks) {
+            this.blocks.add(blockIdx.clone());
             int size = blockIdx.length;
             double[][] sub = new double[size][size];
             for (int i = 0; i < size; i++) {
@@ -45,6 +47,37 @@ public class BlockJacobiPreconditioner implements Preconditioner {
             }
         }
         return z;
+    }
+
+    /**
+     * Blocks must partition [0, n): an uncovered index would silently stay
+     * zero in apply(), and an overlapping index would be written twice.
+     */
+    private static void validateCoverage(int n, List<int[]> blocks) {
+        boolean[] covered = new boolean[n];
+        for (int[] block : blocks) {
+            for (int idx : block) {
+                if (idx < 0 || idx >= n) {
+                    throw new IllegalArgumentException(
+                            "Block index " + idx + " is out of range [0, " + n + ")");
+                }
+                if (covered[idx]) {
+                    throw new IllegalArgumentException(
+                            "Index " + idx + " is covered by more than one block");
+                }
+                covered[idx] = true;
+            }
+        }
+        List<Integer> missing = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (!covered[i]) {
+                missing.add(i);
+            }
+        }
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Blocks do not cover every index in [0, " + n + "); missing: " + missing);
+        }
     }
 
     private double[][] invertDense(double[][] A) {

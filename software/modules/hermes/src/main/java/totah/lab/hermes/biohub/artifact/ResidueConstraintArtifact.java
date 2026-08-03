@@ -1,6 +1,6 @@
 package totah.lab.hermes.biohub.artifact;
 
-import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
+import totah.lab.hermes.biohub.model.ResidueConstraintAnalysis;
 
 record ResidueConstraintArtifact(
         String schemaVersion,

@@ -68,6 +68,68 @@ class PocketGeometryStrategyTest {
         assertEquals(5.0, result.bounds().max().x(), TOLERANCE);
     }
 
+    @Test
+    void centerOnlyPocketFallsBackToReportedCenterGeometry() {
+        Structure structure = new Structure(List.of());
+        Pocket pocket = pocket(
+                PocketSource.MANUAL,
+                List.of(),
+                Optional.empty());
+
+        PocketGeometryResult result =
+                PocketGeometry.geometry(structure, pocket);
+
+        assertThat(result.basis())
+                .isEqualTo(PocketGeometryBasis.REPORTED_CENTER);
+        assertEquals(100.0, result.centroid().x(), TOLERANCE);
+        assertEquals(100.0, result.centroid().y(), TOLERANCE);
+        assertEquals(100.0, result.centroid().z(), TOLERANCE);
+        assertEquals(100.0, result.bounds().min().x(), TOLERANCE);
+        assertEquals(100.0, result.bounds().max().x(), TOLERANCE);
+        assertThat(result.unresolvedResidues()).isEmpty();
+    }
+
+    @Test
+    void unresolvableResidueIdsAlsoFallBackToReportedCenter() {
+        Structure structure = new Structure(List.of());
+        Pocket pocket = pocket(
+                PocketSource.P2RANK,
+                List.of(new ResidueId("A", 42, null)),
+                Optional.empty());
+
+        PocketGeometryResult result =
+                PocketGeometry.geometry(structure, pocket);
+
+        assertThat(result.basis())
+                .isEqualTo(PocketGeometryBasis.REPORTED_CENTER);
+        assertEquals(100.0, result.centroid().x(), TOLERANCE);
+        assertThat(result.unresolvedResidues())
+                .containsExactly(new ResidueId("A", 42, null));
+    }
+
+    @Test
+    void duplicateResidueIdsDoNotSkewResolvedHeavyAtomCentroid() {
+        Residue first = new Residue(
+                "GLY", 10, List.of(atom(1, new Point3D(0, 0, 0))));
+        Residue second = new Residue(
+                "ALA", 20, List.of(atom(2, new Point3D(10, 0, 0))));
+        Structure structure = new Structure(List.of(
+                new Chain("A", List.of(first, second))));
+        Pocket pocket = pocket(
+                PocketSource.P2RANK,
+                List.of(new ResidueId("A", 10, null),
+                        new ResidueId("A", 10, null),
+                        new ResidueId("A", 20, null)),
+                Optional.empty());
+
+        PocketGeometryResult result =
+                PocketGeometry.geometry(structure, pocket);
+
+        assertThat(result.basis()).isEqualTo(
+                PocketGeometryBasis.RESOLVED_RESIDUE_HEAVY_ATOMS);
+        assertEquals(5.0, result.centroid().x(), TOLERANCE);
+    }
+
     private static Atom atom(int serial, Point3D position) {
         return Atom.builder()
                 .pdbSerial(serial)

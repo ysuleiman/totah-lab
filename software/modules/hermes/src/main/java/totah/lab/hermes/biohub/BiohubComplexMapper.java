@@ -1,7 +1,7 @@
 package totah.lab.hermes.biohub;
 
-import totah.lab.http.biohub.model.ComplexToken;
-import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.hermes.biohub.model.ComplexToken;
+import totah.lab.hermes.biohub.model.MolecularComplexPrediction;
 import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;

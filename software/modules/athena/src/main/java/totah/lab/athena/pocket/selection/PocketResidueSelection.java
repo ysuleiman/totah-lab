@@ -21,10 +21,12 @@ public final class PocketResidueSelection {
             Structure structure,
             Pocket pocket) {
         requireInputs(structure, pocket);
-        return pocket.residues().stream()
-                .map(structure::findResidue)
-                .flatMap(java.util.Optional::stream)
-                .toList();
+        Map<ResidueId, Residue> resolved = new LinkedHashMap<>();
+        for (ResidueId id : pocket.residues()) {
+            structure.findResidue(id).ifPresent(residue ->
+                    resolved.putIfAbsent(id, residue));
+        }
+        return List.copyOf(resolved.values());
     }
 
     public List<ResidueId> unresolvedResidues(

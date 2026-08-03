@@ -1,5 +1,6 @@
 package totah.lab.hephaestus.flexibility;
 
+import totah.lab.gaia.chemistry.Element;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
@@ -72,14 +73,27 @@ public final class FlexibilityModelBuilder {
         for (int i = 0; i < atoms.size(); i++) {
             if (config.includeBackbone() || !BACKBONE.contains(atoms.get(i).getName())) included.add(i);
         }
+        if (!config.includeBackbone()) {
+            // Hydrogens whose only bonded neighbors are excluded backbone
+            // atoms (e.g. the amide H on N) would become orphan fragments
+            // with no parent; exclude them together with the backbone.
+            included.removeIf(i -> atoms.get(i).getElement() == Element.H
+                    && neighbors.get(i).stream().noneMatch(included::contains));
+        }
         List<Set<Integer>> components = components(included, neighbors, cuts);
+        // First assign every fragment id, then emit fragments: parent
+        // resolution must not depend on emission order.
         Map<Integer, String> fragmentByAtom = new HashMap<>();
+        for (int i = 0; i < components.size(); i++) {
+            String id = selected.reference().chainId() + ":"
+                    + selected.reference().residueNumber() + ":fragment-" + i;
+            for (int atom : components.get(i)) fragmentByAtom.put(atom, id);
+        }
         List<RigidFragment> fragments = new ArrayList<>();
         for (int i = 0; i < components.size(); i++) {
             Set<Integer> component = components.get(i);
-            String id = selected.reference().chainId() + ":"
-                    + selected.reference().residueNumber() + ":fragment-" + i;
-            for (int atom : component) fragmentByAtom.put(atom, id);
+            String id = fragmentByAtom.get(component.stream()
+                    .min(Integer::compareTo).orElseThrow());
             int anchor = component.contains(ca) ? ca : component.stream().min(Integer::compareTo).orElseThrow();
             String parentId = parentFragment(component, activeBonds, fragmentByAtom);
             fragments.add(new RigidFragment(id,

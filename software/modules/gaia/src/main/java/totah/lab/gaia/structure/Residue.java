@@ -107,9 +107,7 @@ public final class Residue {
     public int getHeavyAtomCount() {
         return (int) atoms.stream()
                 .filter(Objects::nonNull)
-                .filter(atom -> atom.getElement() != null)
-                .filter(atom -> !"H".equalsIgnoreCase(
-                        atom.getElement().toString()))
+                .filter(Atom::isHeavyAtom)
                 .count();
     }
 

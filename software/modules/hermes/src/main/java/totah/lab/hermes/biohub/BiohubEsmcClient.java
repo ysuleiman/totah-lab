@@ -4,12 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import totah.lab.http.biohub.BiohubClientConfig;
-import totah.lab.http.biohub.BiohubHttpTransport;
-import totah.lab.http.biohub.EsmcResidueConstraintCalculator;
-import totah.lab.http.biohub.JdkBiohubHttpTransport;
-import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
-import totah.lab.http.biohub.model.ResidueConstraintEvidence;
+import totah.lab.hermes.biohub.model.ResidueConstraintAnalysis;
+import totah.lab.hermes.biohub.model.ResidueConstraintEvidence;
 
 import java.io.IOException;
 import java.net.URI;

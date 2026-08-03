@@ -66,8 +66,11 @@ public final class PdbqtFlexibilitySerializer {
 
     private void writeFlexibleResidues(PdbqtFlexibleReceptorInput input, Path flexible) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(flexible, StandardCharsets.UTF_8)) {
+            // Serials continue across residues so BRANCH references stay unique
+            // file-wide, matching Meeko's adapt_pdbqt_for_autodock4_flexres.
+            int nextSerial = 1;
             for (PdbqtFlexibleResidueInput residue : input.flexibleResidues()) {
-                writeResidue(writer, residue);
+                nextSerial = writeResidue(writer, residue, nextSerial);
             }
         }
     }
@@ -90,7 +93,7 @@ public final class PdbqtFlexibilitySerializer {
         try { Files.deleteIfExists(path); } catch (IOException ignored) { }
     }
 
-    private void writeResidue(BufferedWriter writer, PdbqtFlexibleResidueInput residue) throws IOException {
+    private int writeResidue(BufferedWriter writer, PdbqtFlexibleResidueInput residue, int firstSerial) throws IOException {
         Map<String, PdbqtFragmentInput> fragments = new LinkedHashMap<>();
         for (PdbqtFragmentInput fragment : residue.fragments()) {
             if (fragments.put(fragment.fragmentId(), fragment) != null) {
@@ -111,7 +114,7 @@ public final class PdbqtFlexibilitySerializer {
 
         writer.write("BEGIN_RES " + residue.residueName() + " " + residue.chainId() + " "
                 + residue.residueNumber() + insertion(residue.insertionCode())); writer.newLine();
-        Map<Integer, Integer> serialByIndex = assignSerials(residue, root, children, fragments);
+        Map<Integer, Integer> serialByIndex = assignSerials(residue, root, children, fragments, firstSerial);
         Set<String> visited = new HashSet<>();
         writer.write("ROOT"); writer.newLine();
         writeAtoms(writer, root.atoms(), serialByIndex);
@@ -121,17 +124,18 @@ public final class PdbqtFlexibilitySerializer {
         if (visited.size() != fragments.size()) throw new IllegalArgumentException("Fragment graph is disconnected or cyclic.");
         writer.write("END_RES " + residue.residueName() + " " + residue.chainId() + " "
                 + residue.residueNumber() + insertion(residue.insertionCode())); writer.newLine();
+        return firstSerial + serialByIndex.size();
     }
 
     private Map<Integer, Integer> assignSerials(PdbqtFlexibleResidueInput residue,
             PdbqtFragmentInput root, Map<String, List<PdbqtRotatableBondInput>> children,
-            Map<String, PdbqtFragmentInput> fragments) {
+            Map<String, PdbqtFragmentInput> fragments, int firstSerial) {
         List<PdbqtAtomInput> order = new ArrayList<>();
         order.addAll(root.atoms());
         collectAtoms(root.fragmentId(), children, fragments, order, new HashSet<>());
         Map<Integer, Integer> result = new HashMap<>();
         for (int index = 0; index < order.size(); index++) {
-            if (result.put(order.get(index).canonicalAtomIndex(), index + 1) != null)
+            if (result.put(order.get(index).canonicalAtomIndex(), firstSerial + index) != null)
                 throw new IllegalArgumentException("Flexible atom is duplicated.");
         }
         return result;

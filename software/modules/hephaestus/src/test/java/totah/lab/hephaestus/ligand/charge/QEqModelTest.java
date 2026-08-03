@@ -3,6 +3,8 @@ package totah.lab.hephaestus.ligand.charge;
 import org.junit.jupiter.api.Test;
 import totah.lab.euclid.linear.DenseDirectSolver;
 
+import java.nio.file.Path;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -60,5 +62,46 @@ public class QEqModelTest {
         }
         assertFalse(model.hasParameters("Xx"),
                 "unknown elements must not report parameters");
+    }
+
+    @Test
+    public void customParameterFileWithoutCarbonFailsMeaningfully(
+            @org.junit.jupiter.api.io.TempDir Path tempDir)
+            throws java.io.IOException {
+        Path paramFile = tempDir.resolve("qeq.txt");
+        java.nio.file.Files.writeString(paramFile,
+                "N 6.899 11.7600 0.9770\nO 8.741 13.3640 0.8597\n");
+        QEqModel custom = new QEqModel(new DenseDirectSolver(), paramFile);
+
+        ChargeSystem system = TestChargeSystems.of(
+                new String[]{"N", "Xx"},
+                new double[][]{{0.0, 0.0, 0.0}, {1.2, 0.0, 0.0}},
+                new int[][]{{0, 1}});
+
+        IllegalStateException error = assertThrows(
+                IllegalStateException.class,
+                () -> custom.computeCharges(system, 0.0));
+        assertTrue(error.getMessage().contains("'C'"),
+                "exception must name the missing fallback parameter: "
+                        + error.getMessage());
+        assertTrue(error.getMessage().contains("Xx"),
+                "exception must name the unknown element: "
+                        + error.getMessage());
+        assertTrue(error.getMessage().contains(paramFile.toString()),
+                "exception must name the parameter file: "
+                        + error.getMessage());
+    }
+
+    @Test
+    public void coincidentAtomsDoNotProduceNaNCharges() {
+        ChargeSystem coincident = TestChargeSystems.of(
+                new String[]{"H", "H"},
+                new double[][]{{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}},
+                new int[][]{{0, 1}});
+
+        double[] q = model.computeCharges(coincident, 0.0);
+
+        assertTrue(Double.isFinite(q[0]), "charge must be finite: " + q[0]);
+        assertTrue(Double.isFinite(q[1]), "charge must be finite: " + q[1]);
     }
 }

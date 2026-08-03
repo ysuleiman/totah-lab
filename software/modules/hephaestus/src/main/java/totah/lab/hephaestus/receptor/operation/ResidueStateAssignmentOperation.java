@@ -12,6 +12,7 @@ import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.preparation.OperationResult;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOperation;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
+import totah.lab.hephaestus.receptor.cleanup.MetalIonPolicy;
 import totah.lab.hephaestus.receptor.disulfide.DisulfideDetector;
 import totah.lab.hephaestus.receptor.protonation.ProtonationConfig;
 import totah.lab.hephaestus.receptor.residue.ResidueState;
@@ -50,6 +51,9 @@ public final class ResidueStateAssignmentOperation
             Set.of("HID", "HIE", "HIP");
 
     private final AmberResidueTemplateLibrary amberTemplates;
+
+    private final MetalIonPolicy metalIonPolicy =
+            new MetalIonPolicy();
 
     public ResidueStateAssignmentOperation() {
         this(AmberResidueTemplateLibrary.getInstance());
@@ -183,19 +187,24 @@ public final class ResidueStateAssignmentOperation
         for (int index = 0; index < incoming.size(); index++) {
             Residue original = incoming.get(index);
 
+            // Monoatomic metal ions carry no residue state; they flow
+            // through to fixed-ion charge assignment (MetalIonPolicy).
+            if (metalIonPolicy.isKnownIonResidue(original)) {
+                prepared.add(original);
+                continue;
+            }
+
             boolean nTerminus =
                     isNTerminus(incoming, index);
 
             boolean cTerminus =
                     isCTerminus(incoming, index);
 
+            // A single-residue chain is both index 0 and the last
+            // index; no combined N+C terminal template exists, so
+            // treat the residue as N-terminal only.
             if (nTerminus && cTerminus) {
-                throw new IllegalArgumentException(
-                        "Residue "
-                                + residueLabel(chain.id(), original)
-                                + " is both N- and C-terminal; "
-                                + "combined terminal templates are "
-                                + "not supported.");
+                cTerminus = false;
             }
 
             Residue normalized =

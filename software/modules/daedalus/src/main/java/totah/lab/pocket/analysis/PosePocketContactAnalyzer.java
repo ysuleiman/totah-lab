@@ -108,7 +108,6 @@ public class PosePocketContactAnalyzer {
                 ps.addBatch();
             }
             ps.executeBatch();
-            conn.commit();
         }
     }
 

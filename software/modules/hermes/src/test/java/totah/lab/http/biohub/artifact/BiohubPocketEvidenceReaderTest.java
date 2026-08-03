@@ -1,4 +1,4 @@
-package totah.lab.http.biohub.artifact;
+package totah.lab.hermes.biohub.artifact;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

@@ -49,6 +49,19 @@ class PocketResidueSelectionTest {
                 .containsExactly(pocketResidue, insideCutoff);
     }
 
+    @Test
+    void duplicatePocketResidueIdsResolveOnlyOnce() {
+        Residue present = residue("GLY", 1, 0.0);
+        Structure structure = structure(present);
+        ResidueId presentId = new ResidueId("A", 1, null);
+        Pocket pocket = pocket(List.of(presentId, presentId));
+
+        assertThat(selection.resolvedResidues(structure, pocket))
+                .containsExactly(present);
+        assertThat(selection.unresolvedResidues(structure, pocket))
+                .isEmpty();
+    }
+
     private static Structure structure(Residue... residues) {
         return new Structure(List.of(new Chain("A", List.of(residues))));
     }

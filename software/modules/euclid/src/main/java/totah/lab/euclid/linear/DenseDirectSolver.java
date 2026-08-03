@@ -10,6 +10,10 @@ public class DenseDirectSolver implements LinearSolver {
 
     @Override
     public double[] solve(SparseMatrix H, double[] b) {
+        if (H.size != b.length) {
+            throw new IllegalArgumentException(
+                    "Matrix size and right-hand side length must match");
+        }
         int n = b.length;
         double[][] A = H.toDense(n);
 
@@ -23,15 +27,26 @@ public class DenseDirectSolver implements LinearSolver {
             return svdSolve(A, b);
         }
 
-        // Check residual
+        // Check residual, scaled by ||b|| so larger systems are not held to
+        // an absolute threshold their roundoff cannot meet (floor of 1.0
+        // keeps the original behavior for small right-hand sides)
         double resNorm = computeResidualNorm(A, x, b);
-        if (resNorm > RESIDUAL_THRESHOLD || Double.isNaN(resNorm)) {
+        double threshold = RESIDUAL_THRESHOLD * Math.max(vectorNorm(b), 1.0);
+        if (resNorm > threshold || Double.isNaN(resNorm)) {
             System.err.println("DenseDirectSolver: LU residual " + resNorm
-                    + " exceeds threshold " + RESIDUAL_THRESHOLD + ", trying SVD");
+                    + " exceeds threshold " + threshold + ", trying SVD");
             x = svdSolve(A, b);
         }
 
         return x;
+    }
+
+    private double vectorNorm(double[] v) {
+        double norm = 0.0;
+        for (double value : v) {
+            norm += value * value;
+        }
+        return Math.sqrt(norm);
     }
 
     private double[] gaussianElimination(double[][] A, double[] b) {

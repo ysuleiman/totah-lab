@@ -4,5 +4,6 @@ public enum BondOrder {
     SINGLE,
     DOUBLE,
     TRIPLE,
-    AROMATIC
+    AROMATIC,
+    UNKNOWN
 }

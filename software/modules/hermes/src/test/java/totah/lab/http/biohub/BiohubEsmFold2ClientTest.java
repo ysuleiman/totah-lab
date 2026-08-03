@@ -1,4 +1,4 @@
-package totah.lab.http.biohub;
+package totah.lab.hermes.biohub;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -19,6 +19,10 @@ public class HybridSolver implements LinearSolver {
 
     @Override
     public double[] solve(SparseMatrix H, double[] V) {
+        if (H.size != V.length) {
+            throw new IllegalArgumentException(
+                    "Matrix size and right-hand side length must match");
+        }
         int n = V.length;
         if (n <= directMaxSize) {
             return new DenseDirectSolver().solve(H, V);

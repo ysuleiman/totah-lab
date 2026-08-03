@@ -16,7 +16,12 @@ public class P2RankAdapter implements Adapter<Path, Pocket> {
     }
     @Override
     public boolean supports(Path path) {
-        return Files.exists(path.resolve("prank"));
+        if (Files.isRegularFile(path)) {
+            return path.getFileName().toString().equals("prediction.json");
+        }
+        return Files.isRegularFile(path.resolve("prediction.json"))
+                || Files.isRegularFile(
+                        path.resolve("prank").resolve("prediction.json"));
     }
 
     @Override

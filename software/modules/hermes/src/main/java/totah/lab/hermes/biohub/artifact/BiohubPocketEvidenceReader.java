@@ -2,7 +2,7 @@ package totah.lab.hermes.biohub.artifact;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import totah.lab.http.biohub.model.BiohubPocketEvidence;
+import totah.lab.hermes.biohub.model.BiohubPocketEvidence;
 
 import java.io.IOException;
 import java.io.InputStream;

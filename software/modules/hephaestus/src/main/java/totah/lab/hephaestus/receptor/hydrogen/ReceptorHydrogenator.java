@@ -5,10 +5,12 @@ import totah.lab.gaia.chemistry.Element;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
+import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.receptor.disulfide.DisulfideDetector;
 import totah.lab.hephaestus.receptor.protonation.ProtonationConfig;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -55,6 +57,69 @@ public final class ReceptorHydrogenator {
         Objects.requireNonNull(chain, "chain");
         Objects.requireNonNull(config, "config");
 
+        return hydrogenate(
+                chain,
+                config,
+                amberTemplates,
+                detectDisulfideResidueKeys(
+                        chain.id(),
+                        chain.residues(),
+                        config));
+    }
+
+    /**
+     * Hydrogenates one chain of a structure, detecting disulfide bonds
+     * across the whole structure so a cysteine whose disulfide partner is in
+     * another chain is not protonated on SG.
+     *
+     * <p>Only the residues of the named chain are hydrogenated; the other
+     * chains participate solely in disulfide detection.</p>
+     */
+    public List<Residue> hydrogenate(
+            Structure structure,
+            String chainId,
+            ProtonationConfig config,
+            Map<String, String> amberTemplates) {
+
+        Objects.requireNonNull(structure, "structure");
+        Objects.requireNonNull(chainId, "chainId");
+
+        Chain chain = structure.findChain(chainId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Chain '" + chainId + "' not found in structure"));
+
+        return hydrogenate(
+                chain,
+                config,
+                amberTemplates,
+                detectDisulfideResidueKeys(structure, config));
+    }
+
+    /**
+     * Hydrogenates one chain of a structure without residue-state templates.
+     *
+     * <p>Unlike {@link #hydrogenate(Chain, ProtonationConfig)}, disulfide
+     * detection here sees the whole structure, so cross-chain disulfides are
+     * respected.</p>
+     */
+    public List<Residue> hydrogenate(
+            Structure structure,
+            String chainId,
+            ProtonationConfig config) {
+
+        return hydrogenate(
+                structure,
+                chainId,
+                config,
+                Map.of());
+    }
+
+    private List<Residue> hydrogenate(
+            Chain chain,
+            ProtonationConfig config,
+            Map<String, String> amberTemplates,
+            Set<String> disulfideResidueKeys) {
+
         Map<String, String> templates =
                 amberTemplates == null
                         ? Map.of()
@@ -70,12 +135,6 @@ public final class ReceptorHydrogenator {
 
         List<Atom> metalAtoms =
                 findMetalAtoms(residues);
-
-        Set<String> disulfideResidueKeys =
-                detectDisulfideResidueKeys(
-                        chain.id(),
-                        residues,
-                        config);
 
         HydrogenationContext context =
                 new HydrogenationContext(
@@ -135,6 +194,19 @@ public final class ReceptorHydrogenator {
         return List.copyOf(protonated);
     }
 
+    /**
+     * Hydrogenates one chain without residue-state templates.
+     *
+     * <p>Limitation: disulfide detection here only sees this chain, so a
+     * cysteine disulfide-bonded to a different chain is protonated on SG.
+     * Use {@link #hydrogenate(Structure, String, ProtonationConfig)} for
+     * structure-wide disulfide detection. The default pipeline is unaffected:
+     * it runs {@code ResidueStateAssignmentOperation} first, which detects
+     * disulfides across the whole structure and passes CYX templates via
+     * {@link #hydrogenate(Chain, ProtonationConfig, Map)}. Callers needing
+     * cross-chain disulfide handling should supply those templates or use
+     * the preparation pipeline.</p>
+     */
     public List<Residue> hydrogenate(
             Chain chain,
             ProtonationConfig config) {
@@ -245,6 +317,38 @@ public final class ReceptorHydrogenator {
 
         for (Residue residue : detectedResidues) {
             keys.add(residueKey(chainId, residue));
+        }
+
+        return Set.copyOf(keys);
+    }
+
+    private Set<String> detectDisulfideResidueKeys(
+            Structure structure,
+            ProtonationConfig config) {
+
+        if (!config.detectDisulfides()) {
+            return Set.of();
+        }
+
+        List<Residue> allResidues = new ArrayList<>();
+        Map<Residue, String> residueChains = new IdentityHashMap<>();
+
+        for (Chain chain : structure.getChains()) {
+            for (Residue residue : chain.residues()) {
+                allResidues.add(residue);
+                residueChains.put(residue, chain.id());
+            }
+        }
+
+        Set<Residue> detectedResidues =
+                DisulfideDetector.findDisulfideBonds(
+                        allResidues,
+                        config.disulfideCutoff());
+
+        Set<String> keys = new LinkedHashSet<>();
+
+        for (Residue residue : detectedResidues) {
+            keys.add(residueKey(residueChains.get(residue), residue));
         }
 
         return Set.copyOf(keys);

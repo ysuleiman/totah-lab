@@ -9,12 +9,12 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import totah.lab.http.biohub.BiohubClientConfig;
-import totah.lab.http.biohub.BiohubComplexMapper;
-import totah.lab.http.biohub.BiohubEsmFold2Client;
-import totah.lab.http.biohub.BiohubEsmFold2Config;
-import totah.lab.http.biohub.artifact.MolecularComplexPredictionArtifactWriter;
-import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.hermes.biohub.BiohubClientConfig;
+import totah.lab.hermes.biohub.BiohubComplexMapper;
+import totah.lab.hermes.biohub.BiohubEsmFold2Client;
+import totah.lab.hermes.biohub.BiohubEsmFold2Config;
+import totah.lab.hermes.biohub.artifact.MolecularComplexPredictionArtifactWriter;
+import totah.lab.hermes.biohub.model.MolecularComplexPrediction;
 import totah.lab.athena.pocket.geometry.PocketGeometry;
 import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.structure.Residue;
@@ -132,6 +132,8 @@ public final class BiohubCysteineCandidateBatch {
                     sequence,
                     candidate,
                     ligandSmiles,
+                    arguments.residueNumber(),
+                    arguments.residueName(),
                     arguments.outputDirectory()
             ));
             writeManifest(arguments, manifest);
@@ -143,6 +145,8 @@ public final class BiohubCysteineCandidateBatch {
             String sequence,
             Candidate candidate,
             String smiles,
+            int residueNumber,
+            String residueName,
             Path outputDirectory
     ) throws IOException, InterruptedException {
         Path ligandDirectory = outputDirectory.resolve(candidate.ligandId());
@@ -195,13 +199,21 @@ public final class BiohubCysteineCandidateBatch {
                 prediction.ptm(),
                 prediction.interfacePtm(),
                 contacts.size(),
-                contacts.stream().anyMatch(contact ->
-                        contact.residueNumber() == 202
-                                && contact.residueName().equals("CYS")),
+                contactsResidue(contacts, residueNumber, residueName),
                 outputDirectory.relativize(predictionJson).toString(),
                 outputDirectory.relativize(predictionPdb).toString(),
                 outputDirectory.relativize(pocketJson).toString()
         );
+    }
+
+    static boolean contactsResidue(
+            List<Contact> contacts,
+            int residueNumber,
+            String residueName
+    ) {
+        return contacts.stream().anyMatch(contact ->
+                contact.residueNumber() == residueNumber
+                        && contact.residueName().equals(residueName));
     }
 
     private Contact toContact(String chainId, Residue residue, Ligand ligand) {
@@ -373,7 +385,7 @@ public final class BiohubCysteineCandidateBatch {
             Double ptm,
             Double interfacePtm,
             int pocketResidueCount,
-            boolean contactsCys202,
+            boolean contactsTargetResidue,
             String predictionJson,
             String predictionPdb,
             String pocketJson

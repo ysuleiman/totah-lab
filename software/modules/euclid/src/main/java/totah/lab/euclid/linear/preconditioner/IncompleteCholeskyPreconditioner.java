@@ -24,6 +24,7 @@ public class IncompleteCholeskyPreconditioner implements Preconditioner {
             Map<Integer, Double> row = A.rows.get(i);
             double diag = row.getOrDefault(i, 1.0);
             double sum = 0.0;
+            boolean hasExplicitDiagonal = row.containsKey(i);
 
             List<Integer> cols = new ArrayList<>();
             List<Double> vals = new ArrayList<>();
@@ -63,6 +64,19 @@ public class IncompleteCholeskyPreconditioner implements Preconditioner {
                     cols.add(j);
                     vals.add(lij);
                 }
+            }
+
+            // Row without an explicitly stored diagonal: apply the 1.0
+            // default so D[i] and L(i,i) are never left at zero.
+            if (!hasExplicitDiagonal) {
+                for (int k = 0; k < cols.size(); k++) {
+                    double lik = vals.get(k);
+                    sum += lik * lik;
+                }
+                double d = diag - sum;
+                if (d <= 0) d = Math.abs(diag) * 0.001 + 1e-6;
+                D[i] = Math.sqrt(d);
+                L.set(i, i, D[i]);
             }
         }
     }

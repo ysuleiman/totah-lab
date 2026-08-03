@@ -1,6 +1,6 @@
 package totah.lab.hermes.biohub;
 
-import totah.lab.http.biohub.model.ResidueConstraintEvidence;
+import totah.lab.hermes.biohub.model.ResidueConstraintEvidence;
 
 import java.util.ArrayList;
 import java.util.Comparator;

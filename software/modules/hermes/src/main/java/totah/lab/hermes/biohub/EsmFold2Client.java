@@ -2,6 +2,7 @@ package totah.lab.hermes.biohub;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import totah.lab.hermes.biohub.config.EsmHttpClientConfig;
 
 import java.io.IOException;
@@ -35,14 +36,7 @@ public class EsmFold2Client {
      * and returns the raw PDB string content.
      */
     public CompletableFuture<String> predictApoStructureAsync(String sequence) {
-        String jsonPayload = String.format("""
-            {
-                "sequence": "%s",
-                "model_variant": "esmfold2-fast",
-                "compute_budget": "balanced",
-                "return_pocket_features": true
-            }
-            """, sequence);
+        String jsonPayload = buildRequestJson(sequence);
 
         String fullEndpointUrl = config.getApiUrl() + "/api/v1/esmfold2/predict";
 
@@ -64,18 +58,7 @@ public class EsmFold2Client {
                         // Read the response text as a JSON tree structure
                         JsonNode root = objectMapper.readTree(response.body());
 
-                        // 1. Process pocket metrics if returned by the platform layer
-                        if (root.has("pocket_metrics")) {
-                            JsonNode pocket = root.get("pocket_metrics");
-                            double volume = pocket.path("estimated_volume_angstroms").asDouble();
-                            double drugScore = pocket.path("druggability_score").asDouble();
-
-                            System.out.println("\n--- Local Pocket Diagnostics ---");
-                            System.out.printf("Estimated Pocket Volume: %.2f Å³\n", volume);
-                            System.out.printf("Druggability Score: %.2f%%\n", drugScore * 100);
-                        }
-
-                        // 2. Extract and return the underlying 3D coordinate text block
+                        // 1. Extract and return the underlying 3D coordinate text block
                         if (root.has("pdb_string")) {
                             return root.get("pdb_string").asText();
                         } else {
@@ -87,6 +70,19 @@ public class EsmFold2Client {
                         throw new RuntimeException("Failed to decode response JSON structure: " + e.getMessage(), e);
                     }
                 });
+    }
+
+    /**
+     * Builds the request payload with Jackson so sequence characters such as
+     * quotes and backslashes are escaped correctly.
+     */
+    String buildRequestJson(String sequence) {
+        ObjectNode payload = objectMapper.createObjectNode();
+        payload.put("sequence", sequence);
+        payload.put("model_variant", "esmfold2-fast");
+        payload.put("compute_budget", "balanced");
+        payload.put("return_pocket_features", true);
+        return payload.toString();
     }
 
     public static void main(String[] args) {

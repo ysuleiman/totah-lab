@@ -1,7 +1,5 @@
 package totah.lab.hermes.biohub.model;
 
-import totah.lab.http.biohub.model.ResidueConstraintEvidence;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;

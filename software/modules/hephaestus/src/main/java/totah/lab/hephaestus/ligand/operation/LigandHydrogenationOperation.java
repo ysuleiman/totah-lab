@@ -79,7 +79,12 @@ public final class LigandHydrogenationOperation implements LigandPreparationOper
                 case SINGLE -> 1.0;
                 case DOUBLE -> 2.0;
                 case TRIPLE -> 3.0;
-                case AROMATIC -> 1.5;
+                // Aromatic bonds count as one for valence purposes: the
+                // fixed maxima below model the real valence of aromatic
+                // heteroatoms (furan O, pyrrole/imidazole N-H).
+                case AROMATIC -> 1.0;
+                case UNKNOWN -> throw new IllegalArgumentException(
+                        "Cannot hydrogenate a ligand with UNKNOWN bond order");
             };
             sums[bond.atomIndexA()] += order;
             sums[bond.atomIndexB()] += order;

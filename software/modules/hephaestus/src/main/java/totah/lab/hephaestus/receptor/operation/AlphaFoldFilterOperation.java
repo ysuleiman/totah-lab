@@ -5,7 +5,6 @@ import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
-import totah.lab.hephaestus.factory.ProteinFactory;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.preparation.OperationResult;
 import totah.lab.hephaestus.model.PreparationIssue;
@@ -100,7 +99,9 @@ public final class AlphaFoldFilterOperation
                             + "residue; no receptor residues remain.");
         }
 
-        Protein filteredProtein = new ProteinFactory().create(null, filteredStructure);
+        Protein filteredProtein = copyWithStructure(
+                protein,
+                filteredStructure);
 
         AlphaFoldConfidenceReport report =
                 new AlphaFoldConfidenceReport(
@@ -156,6 +157,20 @@ public final class AlphaFoldFilterOperation
         return atomName == null
                 ? ""
                 : atomName.trim();
+    }
+
+    private Protein copyWithStructure(
+            Protein protein,
+            Structure structure) {
+
+        return new Protein(
+                protein.id(),
+                protein.uniProtId().orElse(null),
+                protein.name(),
+                protein.gene().orElse(null),
+                protein.organism().orElse(null),
+                protein.function().orElse(null),
+                structure);
     }
 
     private void validateCutoff(double cutoff) {

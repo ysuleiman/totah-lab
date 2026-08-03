@@ -3,7 +3,7 @@ package totah.lab.hermes.biohub.artifact;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import totah.lab.http.biohub.model.ResidueConstraintAnalysis;
+import totah.lab.hermes.biohub.model.ResidueConstraintAnalysis;
 
 import java.io.IOException;
 import java.io.OutputStream;

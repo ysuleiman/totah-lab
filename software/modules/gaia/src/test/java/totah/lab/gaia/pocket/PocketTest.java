@@ -58,4 +58,58 @@ class PocketTest {
 
         assertTrue(pocket.alphaSphereSet().isEmpty());
     }
+
+    @Test
+    void rejectsNullElementsWithFieldNamedMessage() {
+        List<ResidueId> residues = new ArrayList<>();
+        residues.add(null);
+
+        IllegalArgumentException residuesError = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Pocket(
+                        PocketId.of(1),
+                        "Pocket 1",
+                        PocketSource.FPOCKET,
+                        new Point3D(1, 2, 3),
+                        residues,
+                        List.of(),
+                        Optional.empty(),
+                        Optional.empty(),
+                        Map.of()));
+        assertEquals(
+                "residues must not contain null elements.",
+                residuesError.getMessage());
+
+        List<PocketMetric> metrics = new ArrayList<>();
+        metrics.add(null);
+
+        IllegalArgumentException metricsError = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Pocket(
+                        PocketId.of(1),
+                        "Pocket 1",
+                        PocketSource.FPOCKET,
+                        new Point3D(1, 2, 3),
+                        List.of(),
+                        metrics,
+                        Optional.empty(),
+                        Optional.empty(),
+                        Map.of()));
+        assertEquals(
+                "metrics must not contain null elements.",
+                metricsError.getMessage());
+    }
+
+    @Test
+    void alphaSphereSetRejectsNullSpheres() {
+        List<AlphaSphere> spheres = new ArrayList<>();
+        spheres.add(null);
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> new AlphaSphereSet(spheres));
+        assertEquals(
+                "spheres must not contain null elements.",
+                error.getMessage());
+    }
 }

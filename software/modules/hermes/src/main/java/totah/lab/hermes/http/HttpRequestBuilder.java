@@ -41,10 +41,21 @@ public final class HttpRequestBuilder {
 
     public HttpRequest buildGet() {
         HttpRequest.Builder builder = HttpRequest.newBuilder(uri).GET();
+        configure(builder);
+        return builder.build();
+    }
+
+    public HttpRequest buildPost(HttpRequest.BodyPublisher body) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
+                .POST(Objects.requireNonNull(body, "body"));
+        configure(builder);
+        return builder.build();
+    }
+
+    private void configure(HttpRequest.Builder builder) {
         if (timeout != null) {
             builder.timeout(timeout);
         }
         headers.forEach(builder::header);
-        return builder.build();
     }
 }

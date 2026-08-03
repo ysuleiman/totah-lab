@@ -1,4 +1,4 @@
-package totah.lab.http.biohub;
+package totah.lab.hermes.biohub;
 
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;

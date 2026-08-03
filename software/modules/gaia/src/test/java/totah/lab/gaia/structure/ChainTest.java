@@ -133,6 +133,49 @@ class ChainTest {
     }
 
     @Test
+    void shouldPreferPlainResidueWhenFindingByNumber() {
+        Residue plain =
+                new Residue("SER", 10, null, List.of());
+        Residue inserted =
+                new Residue("SER", 10, 'A', List.of());
+
+        Chain chain = new Chain(
+                "A",
+                List.of(inserted, plain));
+
+        assertEquals(
+                plain,
+                chain.findResidue(10).orElseThrow());
+    }
+
+    @Test
+    void shouldReturnSingleInsertionCodedMatchByNumber() {
+        Residue inserted =
+                new Residue("SER", 10, 'A', List.of());
+
+        Chain chain = new Chain(
+                "A",
+                List.of(inserted));
+
+        assertEquals(
+                inserted,
+                chain.findResidue(10).orElseThrow());
+    }
+
+    @Test
+    void shouldThrowWhenNumberHasOnlyInsertionCodeSiblings() {
+        Chain chain = new Chain(
+                "A",
+                List.of(
+                        new Residue("SER", 10, 'A', List.of()),
+                        new Residue("SER", 10, 'B', List.of())));
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> chain.findResidue(10));
+    }
+
+    @Test
     void shouldUseCanonicalResidueIdentity() {
         Residue residue = new Residue(
                 "SER", 10, 'A', List.of());

@@ -1,13 +1,13 @@
-package totah.lab.http.biohub.artifact;
+package totah.lab.hermes.biohub.artifact;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.http.biohub.model.AtomComplex;
-import totah.lab.http.biohub.model.ComplexToken;
-import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.hermes.biohub.model.AtomComplex;
+import totah.lab.hermes.biohub.model.ComplexToken;
+import totah.lab.hermes.biohub.model.MolecularComplexPrediction;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.chemistry.Element;
 import totah.lab.gaia.geometry.Point3D;

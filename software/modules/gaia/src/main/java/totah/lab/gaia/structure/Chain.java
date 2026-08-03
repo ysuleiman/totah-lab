@@ -22,10 +22,35 @@ public record Chain(
         residues = List.copyOf(residues);
     }
 
+    /**
+     * Finds a residue by sequence number, ignoring insertion codes.
+     * The plain residue (no insertion code) is returned when it exists;
+     * otherwise the single match is returned.
+     *
+     * @throws IllegalStateException if the number is ambiguous, i.e. only
+     *         multiple insertion-code siblings (e.g. 10A and 10B) match;
+     *         use {@link #findResidue(int, Character)} in that case.
+     */
     public Optional<Residue> findResidue(int number) {
-        return residues.stream()
+        List<Residue> matches = residues.stream()
                 .filter(residue -> residue.getNumber() == number)
+                .toList();
+
+        Optional<Residue> plain = matches.stream()
+                .filter(residue -> residue.getInsertionCode() == null)
                 .findFirst();
+        if (plain.isPresent()) {
+            return plain;
+        }
+
+        if (matches.size() > 1) {
+            throw new IllegalStateException(
+                    "Residue number " + number + " in chain " + id
+                            + " is ambiguous: multiple insertion-code "
+                            + "siblings; use findResidue(int, Character).");
+        }
+
+        return matches.stream().findFirst();
     }
 
     public Optional<Residue> findResidue(

@@ -6,6 +6,7 @@ import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.amber.AmberResidueTemplateLibrary;
 import totah.lab.hephaestus.amber.ResidueTemplate;
+import totah.lab.hephaestus.receptor.cleanup.MetalIonPolicy;
 import totah.lab.hephaestus.receptor.residue.ResidueState;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,6 +24,9 @@ public final class AmberTopologyBuilder implements TopologyBuilder {
     private static final double MAX_DISULFIDE_BOND = 2.35;
 
     private final AmberResidueTemplateLibrary templates;
+
+    private final MetalIonPolicy metalIonPolicy =
+            new MetalIonPolicy();
 
     public AmberTopologyBuilder() {
         this(AmberResidueTemplateLibrary.getInstance());
@@ -53,6 +57,16 @@ public final class AmberTopologyBuilder implements TopologyBuilder {
                 String key = residueKey(chain.id(), residue);
                 ResidueState state = residueStates.get(key);
                 if (state == null) {
+                    // Monoatomic ions carry no residue state; they
+                    // contribute their atom but no template bonds.
+                    if (metalIonPolicy.isKnownIonResidue(residue)) {
+                        Map<String, Integer> ionIndices = indexAtoms(
+                                chain.id(), residue, atoms.size());
+                        atoms.addAll(residue.getAtoms());
+                        located.add(new LocatedResidue(
+                                chain.id(), residue, ionIndices));
+                        continue;
+                    }
                     throw new IllegalStateException(
                             "Missing residue state for " + label(chain.id(), residue));
                 }
@@ -160,11 +174,9 @@ public final class AmberTopologyBuilder implements TopologyBuilder {
                 Integer carbon = current.atomIndices().get("C");
                 Integer nitrogen = next.atomIndices().get("N");
                 if (carbon == null || nitrogen == null) {
-                    throw new IllegalStateException(
-                            "Cannot add peptide bond between "
-                                    + label(chain.id(), currentResidue)
-                                    + " and " + label(chain.id(), nextResidue)
-                                    + "; missing C or N.");
+                    // Non-polymer residue pair (water, ion, ligand):
+                    // no peptide bond can exist between them.
+                    continue;
                 }
 
                 double distance = distance(atoms, carbon, nitrogen);

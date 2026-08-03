@@ -3,11 +3,14 @@ package totah.lab.hephaestus.ligand.charge;
 import totah.lab.euclid.linear.SparseMatrix;
 import totah.lab.euclid.linear.LinearSolver;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * QEq: Rappé & Goddard charge equilibration (1991).
@@ -22,6 +25,7 @@ import java.util.*;
  * <p>Built-in fallback parameters cover 103 elements from Open Babel's qeq.txt.
  * Users can override with their own qeq.txt file.
  */
+@Slf4j
 public class QEqModel implements ChargeModel {
 
     // Open Babel qeq.txt format: Element  Eneg(V)  Hardness(V/e)  Radius(A)
@@ -37,8 +41,11 @@ public class QEqModel implements ChargeModel {
     private final LinearSolver solver;
     private final double coulombThreshold;
     private final Map<String, double[]> parameters;
-    // Fallback warnings are emitted once per element, not once per atom
-    private final Set<String> warnedFallback = new HashSet<>();
+    // Describes where the parameters came from, for error messages.
+    private final String parameterSource;
+    // Fallback warnings are emitted once per element, not once per atom.
+    // Concurrent: one QEqModel may be shared by parallel batch pipelines.
+    private final Set<String> warnedFallback = ConcurrentHashMap.newKeySet();
 
     public QEqModel(LinearSolver solver) {
         this(solver, COULOMB_THRESHOLD, null);
@@ -52,6 +59,9 @@ public class QEqModel implements ChargeModel {
         this.solver = solver;
         this.coulombThreshold = coulombThreshold;
         this.parameters = paramFile != null ? loadParameters(paramFile) : DEFAULT_PARAMETERS;
+        this.parameterSource = paramFile != null
+                ? paramFile.toString()
+                : "built-in Open Babel parameters";
     }
 
     @Override
@@ -66,10 +76,17 @@ public class QEqModel implements ChargeModel {
             double[] p = parameters.get(elem);
             if (p == null) {
                 if (warnedFallback.add(elem)) {
-                    System.err.println("QEqModel: No parameters for element '" + elem
-                            + "', using C");
+                    log.warn("QEqModel: No parameters for element '{}', using C", elem);
                 }
                 p = parameters.get("C");
+                if (p == null) {
+                    throw new IllegalStateException(
+                            "QEqModel: no parameters for fallback element 'C' in "
+                                    + parameterSource
+                                    + "; cannot substitute unknown element '"
+                                    + elem
+                                    + "'");
+                }
             }
             // Open Babel converts chi/eta from eV to Hartree so the hardness
             // matrix shares one unit system with the Coulomb integrals (bohr)
@@ -140,6 +157,11 @@ public class QEqModel implements ChargeModel {
 
     private double coulombIntegral(double a, double b, double r) {
         double p = Math.sqrt(a * b / (a + b));
+        // Coincident atoms: erf(p*r)/r is 0/0 at r == 0; use its limit
+        // 2p/sqrt(pi) so degenerate geometries cannot yield NaN charges.
+        if (r < 1.0e-12) {
+            return 2.0 * p / Math.sqrt(Math.PI);
+        }
         return erf(p * r) / r;
     }
 
@@ -176,7 +198,7 @@ public class QEqModel implements ChargeModel {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load QEq parameters from " + file, e);
         }
-        System.out.println("QEqModel: Loaded " + loaded.size() + " parameters from " + file);
+        log.info("QEqModel: Loaded {} parameters from {}", loaded.size(), file);
         return loaded;
     }
 

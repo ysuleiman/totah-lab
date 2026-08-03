@@ -142,12 +142,10 @@ public final class FPocketParser {
         return List.copyOf(spheres);
     }
 
-    private static Point3D centroid(List<AlphaSphere> spheres)
-            throws IOException {
+    private static Point3D centroid(List<AlphaSphere> spheres) {
 
         if (spheres.isEmpty()) {
-            throw new IOException(
-                    "fpocket pocket contains no alpha spheres.");
+            return new Point3D(0.0, 0.0, 0.0);
         }
         double x = 0.0;
         double y = 0.0;

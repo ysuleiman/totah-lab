@@ -18,6 +18,8 @@ public record PreparedProtein(
         FlexibilityModel flexibility,
         Map<String, Object> attributes) {
 
+    public static final String STRUCTURE_CHANGE_ATTRIBUTE = "structure-change";
+
     public PreparedProtein {
         Objects.requireNonNull(protein, "protein");
         attributes = attributes == null ? Map.of() : Map.copyOf(attributes);
@@ -58,6 +60,24 @@ public record PreparedProtein(
                 atomTypes,
                 flexibility,
                 attributes);
+    }
+
+    /**
+     * Replaces molecular structure while discarding every preparation result
+     * derived from the prior atom set, coordinates, residue identities, or bonds.
+     */
+    public PreparedProtein withChangedStructure(
+            Protein changedProtein,
+            StructureChange change) {
+        Objects.requireNonNull(changedProtein, "changedProtein");
+        Objects.requireNonNull(change, "change");
+        return new PreparedProtein(
+                changedProtein,
+                null,
+                null,
+                null,
+                FlexibilityModel.empty(),
+                Map.of(STRUCTURE_CHANGE_ATTRIBUTE, change));
     }
 
     public PreparedProtein withTopology(TopologyModel topology) {

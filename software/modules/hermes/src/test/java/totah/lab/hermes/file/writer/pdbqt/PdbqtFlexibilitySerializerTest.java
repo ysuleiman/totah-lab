@@ -52,6 +52,32 @@ class PdbqtFlexibilitySerializerTest {
     }
 
     @Test
+    void numbersAtomSerialsContinuouslyAcrossFlexibleResidues() throws Exception {
+        var first = new PdbqtFlexibleResidueInput("VAL","A",10,null,0,
+                List.of(fragment("root-0", atom(0,"CA","A",10,null), null),
+                        fragment("side-0", atom(1,"CB","A",10,null), "root-0")),
+                List.of(new PdbqtRotatableBondInput(0,1,"root-0","side-0")));
+        var second = new PdbqtFlexibleResidueInput("LEU","A",11,null,2,
+                List.of(fragment("root-2", atom(2,"CA","A",11,null), null),
+                        fragment("side-2", atom(3,"CB","A",11,null), "root-2")),
+                List.of(new PdbqtRotatableBondInput(2,3,"root-2","side-2")));
+        var input = new PdbqtFlexibleReceptorInput(List.of(), List.of(first, second), 4);
+        Path flex = directory.resolve("serials-flex.pdbqt");
+        new PdbqtFlexibilitySerializer().write(input, directory.resolve("serials-rigid.pdbqt"), flex);
+        List<String> lines = Files.readAllLines(flex);
+
+        List<Integer> serials = lines.stream()
+                .filter(line -> line.startsWith("ATOM"))
+                .map(line -> Integer.valueOf(line.substring(6, 11).trim()))
+                .toList();
+        assertEquals(List.of(1, 2, 3, 4), serials);
+        assertEquals(List.of("BRANCH 1 2", "BRANCH 3 4"), lines.stream()
+                .filter(line -> line.startsWith("BRANCH ")).toList());
+        assertEquals(List.of("ENDBRANCH 1 2", "ENDBRANCH 3 4"), lines.stream()
+                .filter(line -> line.startsWith("ENDBRANCH ")).toList());
+    }
+
+    @Test
     void rejectsAtomPresentInRigidAndFlexibleOutputs() {
         PdbqtAtomInput atom = atom(0,"CA","A",1,null);
         var input = new PdbqtFlexibleReceptorInput(List.of(new PdbqtRigidAtomInput(atom)),

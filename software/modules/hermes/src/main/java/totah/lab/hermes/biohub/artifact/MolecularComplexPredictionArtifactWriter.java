@@ -3,9 +3,9 @@ package totah.lab.hermes.biohub.artifact;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import totah.lab.http.biohub.model.AtomComplex;
-import totah.lab.http.biohub.model.ComplexToken;
-import totah.lab.http.biohub.model.MolecularComplexPrediction;
+import totah.lab.hermes.biohub.model.AtomComplex;
+import totah.lab.hermes.biohub.model.ComplexToken;
+import totah.lab.hermes.biohub.model.MolecularComplexPrediction;
 import totah.lab.gaia.structure.Atom;
 
 import java.io.BufferedWriter;

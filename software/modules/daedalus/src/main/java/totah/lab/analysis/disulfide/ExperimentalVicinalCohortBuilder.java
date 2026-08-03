@@ -86,8 +86,8 @@ public final class ExperimentalVicinalCohortBuilder {
             }
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",", -1);
-                if (values.length < 13) {
+                String[] values = parseCsvLine(line);
+                if (values.length != 13) {
                     throw new IOException("Malformed scan CSV row: " + line);
                 }
                 ScanRow row = new ScanRow(
@@ -97,7 +97,7 @@ public final class ExperimentalVicinalCohortBuilder {
                         Integer.parseInt(values[3]),
                         values[4],
                         Integer.parseInt(values[5]),
-                        Double.parseDouble(values[6]),
+                        values[6].isBlank() ? Double.NaN : Double.parseDouble(values[6]),
                         values[7],
                         values[8].isBlank() ? null : Double.parseDouble(values[8]),
                         Double.parseDouble(values[9]),
@@ -108,6 +108,39 @@ public final class ExperimentalVicinalCohortBuilder {
             }
         }
         return rows;
+    }
+
+    private static String[] parseCsvLine(String line) throws IOException {
+        List<String> values = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        boolean quoted = false;
+        for (int index = 0; index < line.length(); index++) {
+            char character = line.charAt(index);
+            if (quoted) {
+                if (character == '"') {
+                    if (index + 1 < line.length() && line.charAt(index + 1) == '"') {
+                        field.append('"');
+                        index++;
+                    } else {
+                        quoted = false;
+                    }
+                } else {
+                    field.append(character);
+                }
+            } else if (character == '"') {
+                quoted = true;
+            } else if (character == ',') {
+                values.add(field.toString());
+                field.setLength(0);
+            } else {
+                field.append(character);
+            }
+        }
+        if (quoted) {
+            throw new IOException("Unterminated quoted field in scan CSV row: " + line);
+        }
+        values.add(field.toString());
+        return values.toArray(String[]::new);
     }
 
     private static void readExperimentalLabels(
@@ -256,7 +289,9 @@ public final class ExperimentalVicinalCohortBuilder {
         ScanRow left = positive.scan();
         ScanRow right = control.scan();
         double score = Math.abs(left.meanPlddt() - right.meanPlddt()) / 10.0;
-        score += Math.abs(left.sgDistance() - right.sgDistance()) / 2.0;
+        if (!Double.isNaN(left.sgDistance()) && !Double.isNaN(right.sgDistance())) {
+            score += Math.abs(left.sgDistance() - right.sgDistance()) / 2.0;
+        }
         score += Math.abs(positive.relativePosition() - control.relativePosition()) * 3.0;
         score += Math.abs(positive.contextCysteineCount()
                 - control.contextCysteineCount());
@@ -305,15 +340,15 @@ public final class ExperimentalVicinalCohortBuilder {
         ScanRow scan = motif.scan();
         return String.join(",",
                 motif.label(),
-                scan.accession(),
+                csv(scan.accession()),
                 csv(motif.gene()),
                 csv(motif.proteinName()),
                 csv(scan.chain()),
                 Integer.toString(scan.cys1()),
                 Integer.toString(scan.cys2()),
-                scan.sequenceContext(),
+                csv(scan.sequenceContext()),
                 Integer.toString(scan.motifOffset()),
-                format("%.3f", scan.sgDistance()),
+                Double.isNaN(scan.sgDistance()) ? "" : format("%.3f", scan.sgDistance()),
                 scan.distanceClass(),
                 scan.chi3() == null ? "" : format("%.2f", scan.chi3()),
                 format("%.2f", scan.cys1Plddt()),
@@ -323,7 +358,7 @@ public final class ExperimentalVicinalCohortBuilder {
                 format("%.6f", motif.relativePosition()),
                 Long.toString(motif.contextCysteineCount()),
                 csv(motif.evidence()),
-                scan.filename());
+                csv(scan.filename()));
     }
 
     private static String firstWord(String value) {
