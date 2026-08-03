@@ -62,4 +62,9 @@ public interface StructureRepository
     List<PocketResidueProjection> findResiduesByStructureId(
             @Param("structureId") long structureId
     );
+
+    Optional<StructureEntity> findBySourceAndSourceAccession(
+            String source,
+            String sourceAccession
+    );
 }

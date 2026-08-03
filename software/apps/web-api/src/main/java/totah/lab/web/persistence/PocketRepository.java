@@ -3,6 +3,7 @@ package totah.lab.web.persistence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import totah.lab.gaia.pocket.PocketSource;
 
 import java.util.List;
 import java.util.Optional;
@@ -106,5 +107,12 @@ public interface PocketRepository
             """, nativeQuery = true)
     List<Long> findChosenPocketResidueIds(
             @Param("structureId") long structureId
+    );
+
+    Optional<PocketEntity>
+    findByStructureIdAndSourceAndPocketNumber(
+            long structureId,
+            PocketSource source,
+            int pocketNumber
     );
 }

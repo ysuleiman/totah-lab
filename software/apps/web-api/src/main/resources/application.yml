@@ -9,6 +9,10 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+      naming:
+        # Remaps the "public" schema of targets/pipeline_runs when the
+        # totah.hibernate.public-schema system property is set (tests).
+        physical-strategy: totah.lab.web.persistence.SchemaRemappingPhysicalNamingStrategy
     properties:
       hibernate:
         default_schema: docking
