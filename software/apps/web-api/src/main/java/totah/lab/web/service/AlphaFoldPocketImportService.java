@@ -121,18 +121,14 @@ public class AlphaFoldPocketImportService {
                 "fpocketOutputDirectory"
         );
 
-        AlphaFoldIdentity identity = AlphaFoldIdentity.from(compressedPdb);
+        ParsedImport parsed =
+                parseAndValidate(compressedPdb, fpocketOutputDirectory);
 
-        /*
-         * Parse and validate everything before writing any database row.
-         */
-        Structure parsedStructure = readCompressedPdb(compressedPdb);
-        List<Pocket> parsedPockets =
-                FPocketParser.parse(fpocketOutputDirectory);
+        AlphaFoldIdentity identity = parsed.identity();
+        Structure parsedStructure = parsed.structure();
+        List<Pocket> parsedPockets = parsed.pockets();
         Map<Integer, Map<ResidueKey, List<Atom>>> pocketAtoms =
-                readAllPocketAtoms(fpocketOutputDirectory, parsedPockets);
-
-        validate(parsedStructure, parsedPockets, identity);
+                parsed.pocketAtoms();
 
         ReceptorEntity receptor = findOrCreateReceptor(identity);
         TargetEntity target = findOrCreateTarget(identity);
@@ -187,6 +183,41 @@ public class AlphaFoldPocketImportService {
                 importedPockets,
                 importedPocketResidues,
                 importedPocketAtoms
+        );
+    }
+
+    /**
+     * Parses and validates the AlphaFold PDB and the fpocket output
+     * without touching the database. Package-private so the bulk import
+     * runner can reuse exactly the same validation for its dry run;
+     * {@link #importStructure} performs this phase before any DB write.
+     */
+    ParsedImport parseAndValidate(
+            Path compressedPdb,
+            Path fpocketOutputDirectory
+    ) throws IOException {
+
+        Objects.requireNonNull(compressedPdb, "compressedPdb");
+        Objects.requireNonNull(
+                fpocketOutputDirectory,
+                "fpocketOutputDirectory"
+        );
+
+        AlphaFoldIdentity identity = AlphaFoldIdentity.from(compressedPdb);
+
+        Structure parsedStructure = readCompressedPdb(compressedPdb);
+        List<Pocket> parsedPockets =
+                FPocketParser.parse(fpocketOutputDirectory);
+        Map<Integer, Map<ResidueKey, List<Atom>>> pocketAtoms =
+                readAllPocketAtoms(fpocketOutputDirectory, parsedPockets);
+
+        validate(parsedStructure, parsedPockets, identity);
+
+        return new ParsedImport(
+                identity,
+                parsedStructure,
+                parsedPockets,
+                pocketAtoms
         );
     }
 
@@ -662,6 +693,14 @@ public class AlphaFoldPocketImportService {
     private record PocketImportCounts(
             int residues,
             int atoms
+    ) {
+    }
+
+    record ParsedImport(
+            AlphaFoldIdentity identity,
+            Structure structure,
+            List<Pocket> pockets,
+            Map<Integer, Map<ResidueKey, List<Atom>>> pocketAtoms
     ) {
     }
 
