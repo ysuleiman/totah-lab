@@ -3,7 +3,6 @@ import type {
   PocketComparisonDetails,
   PocketSimilarityDiagnosticRow,
   Point3D,
-  RigidTransformView,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
@@ -11,6 +10,7 @@ import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { geometryBasisLabel } from '../similar/geometryBasis'
 import { PointCloudViewer } from './PointCloudViewer'
 import { ResidueCorrespondenceSection } from './ResidueCorrespondenceSection'
+import { interpolateSpheres } from './spheres'
 
 const RANK_LIMIT = 100
 
@@ -49,6 +49,7 @@ function PocketComparisonContent({
   const [showCentroids, setShowCentroids] = useState(true)
   const [showMatchedResidues, setShowMatchedResidues] = useState(true)
   const [alignmentProgress, setAlignmentProgress] = useState(1)
+  const [sphereScale, setSphereScale] = useState(1)
   const [resetKey, setResetKey] = useState(0)
 
   const ranks =
@@ -81,7 +82,6 @@ function PocketComparisonContent({
     candidate,
     alignedCandidatePoints,
     comparison,
-    transform,
     residueCorrespondence,
   } = details.data
 
@@ -91,12 +91,29 @@ function PocketComparisonContent({
     alignmentProgress,
   )
 
+  // Rigid alignment preserves radii; only the sphere centers interpolate.
+  const interpolatedCandidateSpheres = interpolateSpheres(
+    candidate.alphaSpheres,
+    alignedCandidatePoints,
+    alignmentProgress,
+  )
+
+  const hasSpheres =
+    query.alphaSpheres.length > 0 || candidate.alphaSpheres.length > 0
+
+  const geometryNoun = comparison.basis === 'ALPHA_SPHERES'
+    ? 'alpha spheres'
+    : 'residue heavy-atom points'
+
   const matchedQueryResiduePoints = residueCorrespondence?.matches.map(
     (match) => match.query.position,
   )
+  // match.candidate.position is already in the aligned frame: the API
+  // returns candidate residue coordinates after the retained PCA+ICP
+  // transform. Do NOT apply the transform again here.
   const matchedCandidateResiduePoints =
-    residueCorrespondence?.matches.map((match) =>
-      applyTransform(transform, match.candidate.position),
+    residueCorrespondence?.matches.map(
+      (match) => match.candidate.position,
     )
 
   return (
@@ -287,6 +304,22 @@ function PocketComparisonContent({
             />
           </label>
 
+          {hasSpheres && (
+            <label>
+              Sphere scale
+              <input
+                type="range"
+                min={0.25}
+                max={3}
+                step={0.05}
+                value={sphereScale}
+                onChange={(event) =>
+                  setSphereScale(Number(event.target.value))
+                }
+              />
+            </label>
+          )}
+
           <label>
             Alignment
             <input
@@ -357,6 +390,10 @@ function PocketComparisonContent({
           matchedQueryResiduePoints={matchedQueryResiduePoints}
           matchedCandidateResiduePoints={matchedCandidateResiduePoints}
           showMatchedResidues={showMatchedResidues}
+          querySpheres={query.alphaSpheres}
+          candidateSpheres={candidate.alphaSpheres}
+          alignedCandidateSpheres={interpolatedCandidateSpheres}
+          sphereScale={sphereScale}
         />
 
         <div
@@ -394,7 +431,11 @@ function PocketComparisonContent({
         </div>
 
         <p className="muted-note">
-          overallSimilarity combines geometry similarity and point-count
+          Geometry rendered as {geometryNoun}
+          {comparison.basis === 'ALPHA_SPHERES'
+            ? ' (true radii; the aligned candidate reuses the original radii)'
+            : ''}
+          . overallSimilarity combines geometry similarity and point-count
           similarity; raw metrics are shown without quality thresholds.
         </p>
 
@@ -408,6 +449,7 @@ function PocketComparisonContent({
       {residueCorrespondence && (
         <ResidueCorrespondenceSection
           correspondence={residueCorrespondence}
+          keyResidues={details.data.keyResidues ?? []}
         />
       )}
     </div>
@@ -448,30 +490,6 @@ function PocketMetadata({
       </dl>
     </section>
   )
-}
-
-function applyTransform(
-  transform: RigidTransformView,
-  point: Point3D,
-): Point3D {
-  const [r0, r1, r2] = transform.rotation
-  return {
-    x:
-      r0[0] * point.x
-      + r0[1] * point.y
-      + r0[2] * point.z
-      + transform.translation.x,
-    y:
-      r1[0] * point.x
-      + r1[1] * point.y
-      + r1[2] * point.z
-      + transform.translation.y,
-    z:
-      r2[0] * point.x
-      + r2[1] * point.y
-      + r2[2] * point.z
-      + transform.translation.z,
-  }
 }
 
 function interpolatePoints(

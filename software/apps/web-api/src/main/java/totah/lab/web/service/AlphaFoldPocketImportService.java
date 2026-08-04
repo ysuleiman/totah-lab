@@ -1,7 +1,12 @@
 package totah.lab.web.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import totah.lab.gaia.pocket.AlphaSphere;
+import totah.lab.gaia.pocket.AlphaSphereSet;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.pocket.PocketMetricType;
 import totah.lab.gaia.pocket.PocketSource;
@@ -17,6 +22,7 @@ import totah.lab.web.persistence.ArtifactEntity;
 import totah.lab.web.persistence.ArtifactRepository;
 import totah.lab.web.persistence.PipelineRunEntity;
 import totah.lab.web.persistence.PipelineRunRepository;
+import totah.lab.web.persistence.PocketAlphaSphereEntity;
 import totah.lab.web.persistence.PocketAtomEntity;
 import totah.lab.web.persistence.PocketEntity;
 import totah.lab.web.persistence.PocketRepository;
@@ -65,6 +71,9 @@ public class AlphaFoldPocketImportService {
     public static final String STRUCTURE_ARTIFACT_LABEL = "RAW_PDB_FILE";
     public static final String POCKET_ARTIFACT_LABEL = "FPOCKET_POCKET";
 
+    private static final Logger LOG =
+            LoggerFactory.getLogger(AlphaFoldPocketImportService.class);
+
     private static final String DEFAULT_ORGANISM = "Homo sapiens";
     private static final Pattern ALPHAFOLD_FILENAME = Pattern.compile(
             "^AF-([A-Za-z0-9]+)-F(\\d+)-model_v(\\d+)$");
@@ -77,6 +86,14 @@ public class AlphaFoldPocketImportService {
     private final TargetRepository targetRepository;
     private final PipelineRunRepository pipelineRunRepository;
 
+    /*
+     * fpocket pockets with fewer residues than this are garbage (over half
+     * the historical FPOCKET rows) and are skipped entirely: no pocket,
+     * artifact, membership or atom rows. Configurable via
+     * totah.import.min-pocket-residues.
+     */
+    private final int minPocketResidues;
+
     private final StructureReader structureReader =
             new BioJavaStructureReader();
 
@@ -87,7 +104,9 @@ public class AlphaFoldPocketImportService {
             PocketRepository pocketRepository,
             ArtifactRepository artifactRepository,
             TargetRepository targetRepository,
-            PipelineRunRepository pipelineRunRepository
+            PipelineRunRepository pipelineRunRepository,
+            @Value("${totah.import.min-pocket-residues:1}")
+            int minPocketResidues
     ) {
         this.receptorRepository =
                 Objects.requireNonNull(receptorRepository);
@@ -101,6 +120,13 @@ public class AlphaFoldPocketImportService {
         this.targetRepository = Objects.requireNonNull(targetRepository);
         this.pipelineRunRepository =
                 Objects.requireNonNull(pipelineRunRepository);
+        if (minPocketResidues < 1) {
+            throw new IllegalArgumentException(
+                    "minPocketResidues must be at least 1: "
+                            + minPocketResidues
+            );
+        }
+        this.minPocketResidues = minPocketResidues;
     }
 
     /**
@@ -153,11 +179,23 @@ public class AlphaFoldPocketImportService {
                 synchronizeResidues(structure, parsedStructure);
 
         int importedPockets = 0;
+        int skippedPockets = 0;
         int importedPocketResidues = 0;
         int importedPocketAtoms = 0;
 
         for (Pocket pocket : parsedPockets) {
             int pocketNumber = pocketNumber(pocket);
+
+            if (pocket.residues().size() < minPocketResidues) {
+                LOG.info("Skipping fpocket pocket {} of {}: {} residues "
+                                + "below minimum {}",
+                        pocketNumber,
+                        identity.structureAccession(),
+                        pocket.residues().size(),
+                        minPocketResidues);
+                skippedPockets++;
+                continue;
+            }
 
             PocketImportCounts counts = importPocket(
                     receptor,
@@ -181,6 +219,7 @@ public class AlphaFoldPocketImportService {
                 structure.getId(),
                 residues.size(),
                 importedPockets,
+                skippedPockets,
                 importedPocketResidues,
                 importedPocketAtoms
         );
@@ -521,14 +560,16 @@ public class AlphaFoldPocketImportService {
         );
 
         /*
-         * Reimport replaces the membership and atom children: orphan
-         * removal deletes the previous rows, the rebuilt collection is
-         * inserted afterwards, so no duplicates remain. An existing pocket
-         * is flushed right after clearing so the deletes reach the
-         * database before the replacement rows are inserted (the unique
-         * constraints on pocket_residue would otherwise collide).
+         * Reimport replaces the membership, atom and alpha-sphere
+         * children: orphan removal deletes the previous rows, the rebuilt
+         * collections are inserted afterwards, so no duplicates remain.
+         * An existing pocket is flushed right after clearing so the
+         * deletes reach the database before the replacement rows are
+         * inserted (the unique constraints on the child tables would
+         * otherwise collide).
          */
         entity.clearResidues();
+        entity.clearAlphaSpheres();
         if (entity.getId() != null) {
             pocketRepository.saveAndFlush(entity);
         }
@@ -592,15 +633,45 @@ public class AlphaFoldPocketImportService {
             entity.addResidue(membership);
         }
 
+        /*
+         * Alpha spheres come from fpocket output only (the _vert.pqr file
+         * the parser already read); sphere_index is the 0-based parser
+         * order, not the PQR serial. Spheres are never inferred or
+         * fabricated; P2Rank pockets have none by construction.
+         */
+        List<AlphaSphere> spheres = pocket.alphaSphereSet()
+                .map(AlphaSphereSet::spheres)
+                .orElse(List.of());
+        for (int index = 0; index < spheres.size(); index++) {
+            AlphaSphere sphere = spheres.get(index);
+            entity.addAlphaSphere(new PocketAlphaSphereEntity(
+                    index,
+                    sphere.center().x(),
+                    sphere.center().y(),
+                    sphere.center().z(),
+                    sphere.radius()
+            ));
+        }
+
         pocketRepository.save(entity);
 
         int atomCount = entity.getResidues().stream()
                 .mapToInt(membership -> membership.getAtoms().size())
                 .sum();
 
+        LOG.info("Imported pocket {} of {}: source={}, alphaSpheres={}, "
+                        + "residues={}, atoms={}",
+                pocketNumber,
+                structure.getSourceAccession(),
+                PocketSource.FPOCKET,
+                spheres.size(),
+                entity.getResidues().size(),
+                atomCount);
+
         return new PocketImportCounts(
                 entity.getResidues().size(),
-                atomCount
+                atomCount,
+                spheres.size()
         );
     }
 
@@ -683,6 +754,7 @@ public class AlphaFoldPocketImportService {
             long structureId,
             int structureResidues,
             int pockets,
+            int skippedPockets,
             int pocketResidues,
             int pocketAtoms
     ) {
@@ -690,7 +762,8 @@ public class AlphaFoldPocketImportService {
 
     private record PocketImportCounts(
             int residues,
-            int atoms
+            int atoms,
+            int alphaSpheres
     ) {
     }
 

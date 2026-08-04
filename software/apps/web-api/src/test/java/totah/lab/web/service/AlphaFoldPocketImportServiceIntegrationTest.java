@@ -1,26 +1,21 @@
 package totah.lab.web.service;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.jdbc.core.JdbcTemplate;
+import totah.lab.web.persistence.PocketAlphaSphereEntity;
+import totah.lab.web.persistence.PocketAlphaSphereRepository;
 import totah.lab.web.persistence.ReceptorEntity;
 import totah.lab.web.persistence.ReceptorRepository;
-import totah.lab.web.persistence.SchemaRemappingPhysicalNamingStrategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -31,29 +26,28 @@ import static org.assertj.core.api.Assertions.within;
 
 /**
  * Integration test for {@link AlphaFoldPocketImportService} against a
- * throwaway {@code docking_test} schema cloned from the live DDL. The
- * schema is created before the Spring context boots (ddl-auto=validate
- * must find it) and dropped afterwards. The public-side tables
- * (targets, pipeline_runs) are remapped into the test schema via
- * {@link SchemaRemappingPhysicalNamingStrategy}.
+ * throwaway {@code docking_test} schema cloned from the live DDL (see
+ * {@link DockingTestSchemaSupport}).
+ *
+ * The fixture's pocket2 has a single residue, so this class lowers
+ * totah.import.min-pocket-residues to 1 — the fixture details, not the
+ * filter, are the point here. The filter itself is covered by
+ * {@link AlphaFoldPocketFilterIntegrationTest}.
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(properties = {
         "spring.jpa.properties.hibernate.default_schema=docking_test",
-        "totah.artifacts.root=target/test-artifacts"
+        "totah.artifacts.root=target/test-artifacts",
+        "totah.import.min-pocket-residues=1"
 })
-class AlphaFoldPocketImportServiceIntegrationTest {
+class AlphaFoldPocketImportServiceIntegrationTest
+        extends DockingTestSchemaSupport {
 
-    private static final String TEST_SCHEMA = "docking_test";
     private static final String ACCESSION = "P99901";
     private static final String STRUCTURE_ACCESSION =
             "AF-P99901-F1-model_v4";
 
     static {
-        System.setProperty(
-                SchemaRemappingPhysicalNamingStrategy
-                        .PUBLIC_SCHEMA_PROPERTY,
-                TEST_SCHEMA
-        );
         recreateTestSchema();
     }
 
@@ -69,10 +63,14 @@ class AlphaFoldPocketImportServiceIntegrationTest {
     @Autowired
     ReceptorRepository receptorRepository;
 
+    @Autowired
+    PocketAlphaSphereRepository sphereRepository;
+
     @AfterEach
     void truncateTestSchema() {
         jdbc.execute("""
-                TRUNCATE docking_test.pocket_atom,
+                TRUNCATE docking_test.pocket_alpha_sphere,
+                         docking_test.pocket_atom,
                          docking_test.pocket_residue,
                          docking_test.pocket,
                          docking_test.residue,
@@ -83,21 +81,6 @@ class AlphaFoldPocketImportServiceIntegrationTest {
                          docking_test.pipeline_runs
                 RESTART IDENTITY CASCADE
                 """);
-    }
-
-    @AfterAll
-    static void dropTestSchema() throws SQLException {
-        try (Connection connection = testConnection();
-             Statement statement = connection.createStatement()) {
-            statement.execute(
-                    "DROP SCHEMA IF EXISTS docking_test CASCADE"
-            );
-        } finally {
-            System.clearProperty(
-                    SchemaRemappingPhysicalNamingStrategy
-                            .PUBLIC_SCHEMA_PROPERTY
-            );
-        }
     }
 
     // 1. AlphaFold filename parsing -------------------------------------
@@ -140,7 +123,7 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         assertThat(countWhere("docking_test.receptor",
                 "uniprot_id = '" + ACCESSION + "'"))
                 .isEqualTo(1);
-        assertThat(result.structureResidues()).isEqualTo(4);
+        assertThat(result.structureResidues()).isEqualTo(12);
     }
 
     // 2. Insertion-code normalization ------------------------------------
@@ -168,8 +151,8 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         AlphaFoldPocketImportService.ImportResult result = importFixture();
 
         assertThat(result.pockets()).isEqualTo(2);
-        assertThat(result.pocketResidues()).isEqualTo(3);
-        assertThat(result.pocketAtoms()).isEqualTo(13);
+        assertThat(result.pocketResidues()).isEqualTo(9);
+        assertThat(result.pocketAtoms()).isEqualTo(37);
 
         Map<String, Object> receptor = queryOne("""
                 SELECT target_name, uniprot_id, organism
@@ -192,7 +175,7 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         assertThat(structure.get("preparation_state")).isEqualTo("RAW");
 
         assertThat(countWhere("docking_test.residue", "TRUE"))
-                .isEqualTo(4);
+                .isEqualTo(12);
 
         Map<String, Object> pocket = queryOne("""
                 SELECT source::text AS source, pocket_number, fpocket_file,
@@ -239,16 +222,18 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         importFixture();
         AlphaFoldPocketImportService.ImportResult second = importFixture();
 
-        assertThat(second.structureResidues()).isEqualTo(4);
+        assertThat(second.structureResidues()).isEqualTo(12);
         assertThat(countWhere("docking_test.receptor", "TRUE")).isEqualTo(1);
         assertThat(countWhere("docking_test.structure", "TRUE"))
                 .isEqualTo(1);
-        assertThat(countWhere("docking_test.residue", "TRUE")).isEqualTo(4);
+        assertThat(countWhere("docking_test.residue", "TRUE")).isEqualTo(12);
         assertThat(countWhere("docking_test.pocket", "TRUE")).isEqualTo(2);
         assertThat(countWhere("docking_test.pocket_residue", "TRUE"))
-                .isEqualTo(3);
+                .isEqualTo(9);
         assertThat(countWhere("docking_test.pocket_atom", "TRUE"))
-                .isEqualTo(13);
+                .isEqualTo(37);
+        assertThat(countWhere("docking_test.pocket_alpha_sphere", "TRUE"))
+                .isEqualTo(5);
     }
 
     // 6. Resolving pocket residues to canonical residues ------------------
@@ -272,7 +257,7 @@ class AlphaFoldPocketImportServiceIntegrationTest {
                 ORDER BY membership.residue_number
                 """);
 
-        assertThat(memberships).hasSize(2);
+        assertThat(memberships).hasSize(8);
 
         Map<String, Object> ala = memberships.get(0);
         assertThat(ala.get("chain")).isEqualTo("A");
@@ -327,6 +312,7 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         }).isInstanceOf(IllegalStateException.class);
 
         for (String table : List.of(
+                "pocket_alpha_sphere",
                 "pocket_atom",
                 "pocket_residue",
                 "pocket",
@@ -426,9 +412,9 @@ class AlphaFoldPocketImportServiceIntegrationTest {
 
         // No orphans from the first import survive.
         assertThat(countWhere("docking_test.pocket_residue", "TRUE"))
-                .isEqualTo(2);
+                .isEqualTo(8);
         assertThat(countWhere("docking_test.pocket_atom", "TRUE"))
-                .isEqualTo(9);
+                .isEqualTo(33);
         assertThat(countWhere(
                 "docking_test.pocket_residue",
                 "residue_name = 'ALA'"))
@@ -439,7 +425,117 @@ class AlphaFoldPocketImportServiceIntegrationTest {
                 .isEqualTo(1);
     }
 
+    // 11. Alpha-sphere persistence -----------------------------------------
+
+    @Test
+    void persistsAlphaSpheresInParserOrder() throws IOException {
+        importFixture();
+
+        List<Map<String, Object>> pocketOneSpheres = jdbc.queryForList("""
+                SELECT sphere.sphere_index, sphere.center_x,
+                       sphere.center_y, sphere.center_z, sphere.radius
+                FROM docking_test.pocket_alpha_sphere sphere
+                JOIN docking_test.pocket pocket
+                    ON pocket.id = sphere.pocket_id
+                WHERE pocket.pocket_number = 1
+                ORDER BY sphere.sphere_index
+                """);
+
+        assertThat(pocketOneSpheres).hasSize(3);
+        assertThat(pocketOneSpheres)
+                .extracting(row -> (Integer) row.get("sphere_index"))
+                .containsExactly(0, 1, 2);
+
+        // Coordinates and radii match the _vert.pqr fixture exactly.
+        Map<String, Object> first = pocketOneSpheres.get(0);
+        assertThat((Double) first.get("center_x"))
+                .isCloseTo(-3.651, within(1e-9));
+        assertThat((Double) first.get("center_y"))
+                .isCloseTo(14.617, within(1e-9));
+        assertThat((Double) first.get("center_z"))
+                .isCloseTo(4.983, within(1e-9));
+        assertThat((Double) first.get("radius"))
+                .isCloseTo(4.53, within(1e-9));
+        Map<String, Object> third = pocketOneSpheres.get(2);
+        assertThat((Double) third.get("center_x"))
+                .isCloseTo(1.0, within(1e-9));
+        assertThat((Double) third.get("radius"))
+                .isCloseTo(2.5, within(1e-9));
+
+        assertThat(countWhere("""
+                        docking_test.pocket_alpha_sphere sphere
+                        JOIN docking_test.pocket pocket
+                            ON pocket.id = sphere.pocket_id
+                        """,
+                "pocket.pocket_number = 2"))
+                .isEqualTo(2);
+    }
+
+    @Test
+    void loadsSpheresForManyPocketsInOneOrderedQuery() throws IOException {
+        importFixture();
+
+        List<Long> pocketIds = jdbc.queryForList(
+                "SELECT id FROM docking_test.pocket ORDER BY pocket_number",
+                Long.class
+        );
+        assertThat(pocketIds).hasSize(2);
+
+        Map<Long, List<PocketAlphaSphereEntity>> grouped =
+                sphereRepository.findByPocketIdsGrouped(pocketIds);
+
+        assertThat(grouped).hasSize(2);
+        assertThat(grouped.get(pocketIds.get(0)))
+                .hasSize(3)
+                .extracting(PocketAlphaSphereEntity::getSphereIndex)
+                .containsExactly(0, 1, 2);
+        assertThat(grouped.get(pocketIds.get(1)))
+                .hasSize(2)
+                .extracting(PocketAlphaSphereEntity::getSphereIndex)
+                .containsExactly(0, 1);
+    }
+
     // Zero-pocket structures ------------------------------------------------
+
+    @Test
+    void pocketWithoutVertFilePersistsNoSpheresButKeepsAtoms()
+            throws IOException {
+
+        // A pocket whose _vert.pqr yields no spheres (the P2Rank-shaped
+        // case: no alphaSphereSet) must import with zero sphere rows
+        // while its residue-atom fallback stays intact.
+        Path out = copyOutDirectory();
+        Files.writeString(
+                out.resolve("pockets").resolve("pocket2_vert.pqr"),
+                ""
+        );
+
+        importService.importStructure(fixtureCompressedPdb(), out);
+
+        assertThat(countWhere("""
+                        docking_test.pocket_alpha_sphere sphere
+                        JOIN docking_test.pocket pocket
+                            ON pocket.id = sphere.pocket_id
+                        """,
+                "pocket.pocket_number = 2"))
+                .isZero();
+        assertThat(countWhere("""
+                        docking_test.pocket_alpha_sphere sphere
+                        JOIN docking_test.pocket pocket
+                            ON pocket.id = sphere.pocket_id
+                        """,
+                "pocket.pocket_number = 1"))
+                .isEqualTo(3);
+        assertThat(countWhere("""
+                        docking_test.pocket_atom atom
+                        JOIN docking_test.pocket_residue membership
+                            ON membership.id = atom.pocket_residue_id
+                        JOIN docking_test.pocket pocket
+                            ON pocket.id = membership.pocket_id
+                        """,
+                "pocket.pocket_number = 2"))
+                .isEqualTo(5);
+    }
 
     @Test
     void importsStructureWithoutPocketsWhenFpocketFindsNone()
@@ -461,7 +557,7 @@ class AlphaFoldPocketImportServiceIntegrationTest {
         assertThat(countWhere("docking_test.structure", "TRUE"))
                 .isEqualTo(1);
         assertThat(countWhere("docking_test.residue", "TRUE"))
-                .isEqualTo(4);
+                .isEqualTo(12);
         assertThat(countWhere("docking_test.pocket", "TRUE")).isZero();
     }
 
@@ -563,49 +659,5 @@ class AlphaFoldPocketImportServiceIntegrationTest {
                 Long.class
         );
         return count == null ? 0 : count;
-    }
-
-    private static void recreateTestSchema() {
-        String ddl;
-        try (InputStream in =
-                     AlphaFoldPocketImportServiceIntegrationTest.class
-                             .getResourceAsStream(
-                                     "/docking_test_schema.sql")) {
-            if (in == null) {
-                throw new IllegalStateException(
-                        "docking_test_schema.sql not on the classpath"
-                );
-            }
-            ddl = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-
-        try (Connection connection = testConnection();
-             Statement statement = connection.createStatement()) {
-            for (String command : ddl.split(";")) {
-                if (!command.isBlank()) {
-                    statement.execute(command);
-                }
-            }
-        } catch (SQLException exception) {
-            throw new ExceptionInInitializerError(exception);
-        }
-    }
-
-    private static Connection testConnection() throws SQLException {
-        String url = System.getenv().getOrDefault(
-                "DB_URL",
-                "jdbc:postgresql://localhost:5432/totah_lab_db"
-        );
-        String user = System.getenv().getOrDefault(
-                "DB_USERNAME",
-                "postgres"
-        );
-        String password = System.getenv().getOrDefault(
-                "DB_PASSWORD",
-                "admin"
-        );
-        return DriverManager.getConnection(url, user, password);
     }
 }

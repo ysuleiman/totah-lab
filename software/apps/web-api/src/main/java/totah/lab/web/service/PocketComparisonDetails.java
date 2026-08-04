@@ -22,6 +22,7 @@ public record PocketComparisonDetails(
         PocketComparison comparison,
         String aligner,
         ResidueCorrespondenceView residueCorrespondence,
-        TransformView transform
+        TransformView transform,
+        List<String> keyResidues
 ) {
 }

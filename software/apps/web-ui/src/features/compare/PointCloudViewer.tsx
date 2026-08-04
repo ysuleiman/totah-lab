@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Point3D } from '../../api/types'
+import type { AlphaSphereView, Point3D } from '../../api/types'
 
 interface Props {
   queryPoints: Point3D[]
@@ -15,16 +15,25 @@ interface Props {
   matchedQueryResiduePoints?: Point3D[]
   matchedCandidateResiduePoints?: Point3D[]
   showMatchedResidues?: boolean
+  querySpheres?: AlphaSphereView[]
+  candidateSpheres?: AlphaSphereView[]
+  alignedCandidateSpheres?: AlphaSphereView[]
+  sphereScale?: number
 }
 
 interface GlState {
   gl: WebGLRenderingContext
   program: WebGLProgram
   positionLocation: number
+  radiusLocation: number
   mvpLocation: WebGLUniformLocation | null
   colorLocation: WebGLUniformLocation | null
   sizeLocation: WebGLUniformLocation | null
   opacityLocation: WebGLUniformLocation | null
+  sphereScaleLocation: WebGLUniformLocation | null
+  pixelsPerUnitLocation: WebGLUniformLocation | null
+  useRadiusLocation: WebGLUniformLocation | null
+  rimLocation: WebGLUniformLocation | null
   queryBuffer: WebGLBuffer | null
   originalCandidateBuffer: WebGLBuffer | null
   alignedCandidateBuffer: WebGLBuffer | null
@@ -32,12 +41,18 @@ interface GlState {
   matchedQueryBuffer: WebGLBuffer | null
   matchedCandidateBuffer: WebGLBuffer | null
   connectorBuffer: WebGLBuffer | null
+  querySphereBuffer: WebGLBuffer | null
+  candidateSphereBuffer: WebGLBuffer | null
+  alignedSphereBuffer: WebGLBuffer | null
   queryCount: number
   originalCandidateCount: number
   alignedCandidateCount: number
   matchedQueryCount: number
   matchedCandidateCount: number
   connectorCount: number
+  querySphereCount: number
+  candidateSphereCount: number
+  alignedSphereCount: number
   radius: number
 }
 
@@ -51,11 +66,20 @@ const CONNECTOR_COLOR: [number, number, number] = [0.45, 0.48, 0.45]
 
 const VERTEX_SHADER = `
 attribute vec3 aPosition;
+attribute float aRadius;
 uniform mat4 uMvp;
 uniform float uSize;
+uniform float uSphereScale;
+uniform float uPixelsPerUnit;
+uniform float uUseRadius;
 void main() {
   gl_Position = uMvp * vec4(aPosition, 1.0);
-  gl_PointSize = uSize;
+  if (uUseRadius > 0.5) {
+    gl_PointSize = uSphereScale * 2.0 * aRadius * uPixelsPerUnit
+      / gl_Position.w;
+  } else {
+    gl_PointSize = uSize;
+  }
 }
 `
 
@@ -63,12 +87,19 @@ const FRAGMENT_SHADER = `
 precision mediump float;
 uniform vec3 uColor;
 uniform float uOpacity;
+uniform float uRim;
 void main() {
   vec2 offset = gl_PointCoord - vec2(0.5);
-  if (dot(offset, offset) > 0.25) {
+  float dist = length(offset) * 2.0;
+  if (dist > 1.0) {
     discard;
   }
-  gl_FragColor = vec4(uColor, uOpacity);
+  vec3 color = uColor;
+  if (uRim > 0.5) {
+    float rim = smoothstep(0.7, 1.0, dist);
+    color = mix(uColor, uColor * 0.45, rim);
+  }
+  gl_FragColor = vec4(color, uOpacity);
 }
 `
 
@@ -167,6 +198,9 @@ export function PointCloudViewer(props: Props) {
     props.alignedCandidatePoints,
     props.matchedQueryResiduePoints,
     props.matchedCandidateResiduePoints,
+    props.querySpheres,
+    props.candidateSpheres,
+    props.alignedCandidateSpheres,
   ])
 
   useEffect(() => {
@@ -179,6 +213,7 @@ export function PointCloudViewer(props: Props) {
     props.opacity,
     props.showCentroids,
     props.showMatchedResidues,
+    props.sphereScale,
   ])
 
   if (!supported) {
@@ -217,10 +252,15 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     gl,
     program,
     positionLocation: gl.getAttribLocation(program, 'aPosition'),
+    radiusLocation: gl.getAttribLocation(program, 'aRadius'),
     mvpLocation: gl.getUniformLocation(program, 'uMvp'),
     colorLocation: gl.getUniformLocation(program, 'uColor'),
     sizeLocation: gl.getUniformLocation(program, 'uSize'),
     opacityLocation: gl.getUniformLocation(program, 'uOpacity'),
+    sphereScaleLocation: gl.getUniformLocation(program, 'uSphereScale'),
+    pixelsPerUnitLocation: gl.getUniformLocation(program, 'uPixelsPerUnit'),
+    useRadiusLocation: gl.getUniformLocation(program, 'uUseRadius'),
+    rimLocation: gl.getUniformLocation(program, 'uRim'),
     queryBuffer: null,
     originalCandidateBuffer: null,
     alignedCandidateBuffer: null,
@@ -228,12 +268,18 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     matchedQueryBuffer: null,
     matchedCandidateBuffer: null,
     connectorBuffer: null,
+    querySphereBuffer: null,
+    candidateSphereBuffer: null,
+    alignedSphereBuffer: null,
     queryCount: 0,
     originalCandidateCount: 0,
     alignedCandidateCount: 0,
     matchedQueryCount: 0,
     matchedCandidateCount: 0,
     connectorCount: 0,
+    querySphereCount: 0,
+    candidateSphereCount: 0,
+    alignedSphereCount: 0,
     radius: 10,
   }
 }
@@ -248,6 +294,9 @@ function destroyGlState(state: GlState) {
     state.matchedQueryBuffer,
     state.matchedCandidateBuffer,
     state.connectorBuffer,
+    state.querySphereBuffer,
+    state.candidateSphereBuffer,
+    state.alignedSphereBuffer,
   ]) {
     if (buffer) gl.deleteBuffer(buffer)
   }
@@ -314,12 +363,34 @@ function uploadGeometry(state: GlState | null, props: Props) {
   }
   state.connectorBuffer = uploadPoints(gl, state.connectorBuffer, connectors)
 
+  const querySpheres = props.querySpheres ?? []
+  const candidateSpheres = props.candidateSpheres ?? []
+  const alignedSpheres = props.alignedCandidateSpheres ?? []
+  state.querySphereBuffer = uploadSpheres(
+    gl,
+    state.querySphereBuffer,
+    querySpheres,
+  )
+  state.candidateSphereBuffer = uploadSpheres(
+    gl,
+    state.candidateSphereBuffer,
+    candidateSpheres,
+  )
+  state.alignedSphereBuffer = uploadSpheres(
+    gl,
+    state.alignedSphereBuffer,
+    alignedSpheres,
+  )
+
   state.queryCount = props.queryPoints.length
   state.originalCandidateCount = props.originalCandidatePoints.length
   state.alignedCandidateCount = props.alignedCandidatePoints.length
   state.matchedQueryCount = matchedQuery.length
   state.matchedCandidateCount = matchedCandidate.length
   state.connectorCount = connectors.length
+  state.querySphereCount = querySpheres.length
+  state.candidateSphereCount = candidateSpheres.length
+  state.alignedSphereCount = alignedSpheres.length
 
   let radius = 1
   const visiblePoints = [
@@ -328,6 +399,9 @@ function uploadGeometry(state: GlState | null, props: Props) {
     ...props.alignedCandidatePoints,
     ...matchedQuery,
     ...matchedCandidate,
+    ...querySpheres.map((sphere) => sphere.center),
+    ...candidateSpheres.map((sphere) => sphere.center),
+    ...alignedSpheres.map((sphere) => sphere.center),
   ]
   const sceneCenter = centroidOf(visiblePoints)
   for (const point of visiblePoints) {
@@ -349,6 +423,28 @@ function uploadPoints(
   gl.bufferData(
     gl.ARRAY_BUFFER,
     new Float32Array(points.flatMap((point) => [point.x, point.y, point.z])),
+    gl.DYNAMIC_DRAW,
+  )
+  return target
+}
+
+function uploadSpheres(
+  gl: WebGLRenderingContext,
+  buffer: WebGLBuffer | null,
+  spheres: AlphaSphereView[],
+): WebGLBuffer | null {
+  const target = buffer ?? gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, target)
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(
+      spheres.flatMap((sphere) => [
+        sphere.center.x,
+        sphere.center.y,
+        sphere.center.z,
+        sphere.radius,
+      ]),
+    ),
     gl.DYNAMIC_DRAW,
   )
   return target
@@ -422,26 +518,47 @@ function render(
   gl.uniformMatrix4fv(state.mvpLocation, false, new Float32Array(mvp))
   gl.uniform1f(state.sizeLocation, props.pointSize * ratio)
   gl.uniform1f(state.opacityLocation, props.opacity)
+  gl.uniform1f(state.sphereScaleLocation, props.sphereScale ?? 1)
+  // Column-major projection[1][1] is index 5; multiplying by the viewport
+  // height projects a world-space length at depth w to pixels.
+  gl.uniform1f(state.pixelsPerUnitLocation, height * projection[5])
+  gl.uniform1f(state.useRadiusLocation, 0)
+  gl.uniform1f(state.rimLocation, 0)
   gl.enableVertexAttribArray(state.positionLocation)
 
-  if (props.showQuery && state.queryCount > 0) {
-    drawPoints(state, state.queryBuffer, state.queryCount, QUERY_COLOR)
+  if (props.showQuery) {
+    if (state.querySphereCount > 0) {
+      drawSpheres(state, state.querySphereBuffer, state.querySphereCount,
+        QUERY_COLOR)
+    } else if (state.queryCount > 0) {
+      drawPoints(state, state.queryBuffer, state.queryCount, QUERY_COLOR)
+    }
   }
-  if (props.showOriginalCandidate && state.originalCandidateCount > 0) {
-    drawPoints(
-      state,
-      state.originalCandidateBuffer,
-      state.originalCandidateCount,
-      ORIGINAL_COLOR,
-    )
+  if (props.showOriginalCandidate) {
+    if (state.candidateSphereCount > 0) {
+      drawSpheres(state, state.candidateSphereBuffer,
+        state.candidateSphereCount, ORIGINAL_COLOR)
+    } else if (state.originalCandidateCount > 0) {
+      drawPoints(
+        state,
+        state.originalCandidateBuffer,
+        state.originalCandidateCount,
+        ORIGINAL_COLOR,
+      )
+    }
   }
-  if (props.showAlignedCandidate && state.alignedCandidateCount > 0) {
-    drawPoints(
-      state,
-      state.alignedCandidateBuffer,
-      state.alignedCandidateCount,
-      ALIGNED_COLOR,
-    )
+  if (props.showAlignedCandidate) {
+    if (state.alignedSphereCount > 0) {
+      drawSpheres(state, state.alignedSphereBuffer, state.alignedSphereCount,
+        ALIGNED_COLOR)
+    } else if (state.alignedCandidateCount > 0) {
+      drawPoints(
+        state,
+        state.alignedCandidateBuffer,
+        state.alignedCandidateCount,
+        ALIGNED_COLOR,
+      )
+    }
   }
   if (props.showCentroids) {
     gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 2.5)
@@ -485,6 +602,34 @@ function drawPoints(
   gl.vertexAttribPointer(state.positionLocation, 3, gl.FLOAT, false, 0, 0)
   gl.uniform3fv(state.colorLocation, color)
   gl.drawArrays(mode ?? gl.POINTS, 0, count)
+}
+
+function drawSpheres(
+  state: GlState,
+  buffer: WebGLBuffer | null,
+  count: number,
+  color: [number, number, number],
+) {
+  if (!buffer || count <= 0) return
+  const { gl } = state
+  const stride = 4 * Float32Array.BYTES_PER_ELEMENT
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+  gl.vertexAttribPointer(state.positionLocation, 3, gl.FLOAT, false,
+    stride, 0)
+  if (state.radiusLocation >= 0) {
+    gl.enableVertexAttribArray(state.radiusLocation)
+    gl.vertexAttribPointer(state.radiusLocation, 1, gl.FLOAT, false,
+      stride, 3 * Float32Array.BYTES_PER_ELEMENT)
+  }
+  gl.uniform1f(state.useRadiusLocation, 1)
+  gl.uniform1f(state.rimLocation, 1)
+  gl.uniform3fv(state.colorLocation, color)
+  gl.drawArrays(gl.POINTS, 0, count)
+  gl.uniform1f(state.useRadiusLocation, 0)
+  gl.uniform1f(state.rimLocation, 0)
+  if (state.radiusLocation >= 0) {
+    gl.disableVertexAttribArray(state.radiusLocation)
+  }
 }
 
 function perspective(

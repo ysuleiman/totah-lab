@@ -9,7 +9,9 @@ import java.util.List;
  * Identity and full point cloud of one pocket for inspection UI
  * consumption. Points come from the pocket-atom coordinates via
  * {@code PocketGeometryLoader}; centroid and bounds are computed by
- * Athena's {@code PocketPointCloud}.
+ * Athena's {@code PocketPointCloud}. {@code alphaSpheres} carries the
+ * persisted fpocket alpha spheres (with radii) when the basis is
+ * ALPHA_SPHERES and is empty otherwise — radii are never fabricated.
  */
 public record PocketGeometryView(
         long pocketId,
@@ -20,6 +22,7 @@ public record PocketGeometryView(
         Point3D centroid,
         BoundingBox bounds,
         String basis,
-        List<Point3D> points
+        List<Point3D> points,
+        List<AlphaSphereView> alphaSpheres
 ) {
 }

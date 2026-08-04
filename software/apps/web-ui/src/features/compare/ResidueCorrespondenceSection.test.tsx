@@ -108,10 +108,21 @@ function dataRows(): HTMLElement[] {
   return within(table).getAllByRole('row').slice(1)
 }
 
+const TEST_KEY_RESIDUES = [
+  'CYS148',
+  'LEU145',
+  'HIS175',
+  'GLY199',
+  'ASP200',
+  'GLY201',
+  'CYS202',
+  'CYS203',
+]
+
 describe('ResidueCorrespondenceSection', () => {
   it('renders the summary counts, percentages, and distances', () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     const summaryGrid = screen.getByText('Matched residues')
@@ -133,7 +144,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('renders every match with its type and compatibility as text', () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     const table = screen.getAllByRole('table')[0]
@@ -153,7 +164,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('pins key residues to the top with a badge, ordered by distance', () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     const rows = dataRows()
@@ -169,9 +180,31 @@ describe('ResidueCorrespondenceSection', () => {
     expect(within(rows[3]).getByText('A:ALA100')).toBeInTheDocument()
   })
 
+  it('shows no key badges for a query without key configuration', () => {
+    render(
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={[]} />,
+    )
+
+    expect(screen.queryByText('Key residue')).not.toBeInTheDocument()
+    // Matching and statistics are unaffected.
+    expect(dataRows()).toHaveLength(4)
+    expect(screen.getByText('4')).toBeInTheDocument()
+  })
+
+  it('does not let a different query inherit another target’s keys', () => {
+    // METTL7A query: its own configuration contains GLY300 only, so
+    // the METTL7B keys (CYS202, LEU145) produce no badges.
+    render(
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={['GLY300']} />,
+    )
+
+    expect(screen.getAllByText('Key residue')).toHaveLength(1)
+    expect(dataRows()[0]).toHaveTextContent('A:GLY300')
+  })
+
   it('filters to identical matches only', async () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     await userEvent.click(
@@ -185,7 +218,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('filters by maximum distance', async () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     await userEvent.type(
@@ -200,7 +233,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('filters to key residues and by label substring together', async () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     await userEvent.click(
@@ -219,7 +252,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('filters to mismatches only', async () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     await userEvent.click(
@@ -234,7 +267,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('lists unmatched residues in collapsible sections with coordinates', async () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     expect(
@@ -264,7 +297,7 @@ describe('ResidueCorrespondenceSection', () => {
 
   it('states the spatial-correspondence caveat', () => {
     render(
-      <ResidueCorrespondenceSection correspondence={correspondence} />,
+      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
     )
 
     expect(

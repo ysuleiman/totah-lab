@@ -74,6 +74,7 @@ public class PocketSimilarityService {
     private final PocketSummaryRepository pocketSummaryRepository;
     private final PocketPointCloudLoader geometryLoader;
     private final PocketResidueLoader residueLoader;
+    private final KeyResidueConfiguration keyResidueConfiguration;
     private final PocketComparator comparator;
     private final PocketResiduePointTransformer residueTransformer =
             new PocketResiduePointTransformer();
@@ -83,11 +84,13 @@ public class PocketSimilarityService {
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
             PocketPointCloudLoader geometryLoader,
-            PocketResidueLoader residueLoader
+            PocketResidueLoader residueLoader,
+            KeyResidueConfiguration keyResidueConfiguration
     ) {
         this.pocketSummaryRepository = pocketSummaryRepository;
         this.geometryLoader = geometryLoader;
         this.residueLoader = residueLoader;
+        this.keyResidueConfiguration = keyResidueConfiguration;
         this.comparator = new PocketComparator(
                 new CompositePocketAligner(),
                 PocketComparisonOptions.defaults()
@@ -139,12 +142,13 @@ public class PocketSimilarityService {
     public PocketGeometryView getGeometry(long pocketId) {
         PocketSummaryEntity summary = findSummary(pocketId);
 
-        Map<Long, PocketPointCloud> pointClouds =
-                geometryLoader.loadAll(List.of(pocketId));
+        PocketPointCloudLoader.LoadedPointClouds loaded =
+                geometryLoader.loadAllWithSpheres(List.of(pocketId));
 
         return toGeometryView(
                 summary,
-                requireCloud(pointClouds, pocketId)
+                requireCloud(loaded.pointClouds(), pocketId),
+                loaded.alphaSpheres().getOrDefault(pocketId, List.of())
         );
     }
 
@@ -170,10 +174,12 @@ public class PocketSimilarityService {
 
         long geometryStartNanos = System.nanoTime();
 
-        Map<Long, PocketPointCloud> pointClouds =
-                geometryLoader.loadAll(
+        PocketPointCloudLoader.LoadedPointClouds loaded =
+                geometryLoader.loadAllWithSpheres(
                         List.of(queryPocketId, candidatePocketId)
                 );
+
+        Map<Long, PocketPointCloud> pointClouds = loaded.pointClouds();
 
         PocketPointCloud queryCloud =
                 requireCloud(pointClouds, queryPocketId);
@@ -241,8 +247,18 @@ public class PocketSimilarityService {
         );
 
         return new PocketComparisonDetails(
-                toGeometryView(querySummary, queryCloud),
-                toGeometryView(candidateSummary, candidateCloud),
+                toGeometryView(
+                        querySummary,
+                        queryCloud,
+                        loaded.alphaSpheres()
+                                .getOrDefault(queryPocketId, List.of())
+                ),
+                toGeometryView(
+                        candidateSummary,
+                        candidateCloud,
+                        loaded.alphaSpheres()
+                                .getOrDefault(candidatePocketId, List.of())
+                ),
                 alignment.query().points(),
                 alignment.alignedCandidate().points(),
                 comparison,
@@ -251,6 +267,9 @@ public class PocketSimilarityService {
                 new TransformView(
                         alignment.transform().rotation(),
                         alignment.transform().translation()
+                ),
+                keyResidueConfiguration.forUniProtId(
+                        querySummary.getUniProtId()
                 )
         );
 
@@ -311,7 +330,8 @@ public class PocketSimilarityService {
 
     private static PocketGeometryView toGeometryView(
             PocketSummaryEntity summary,
-            PocketPointCloud pointCloud
+            PocketPointCloud pointCloud,
+            List<AlphaSphereView> alphaSpheres
     ) {
         return new PocketGeometryView(
                 summary.getPocketId(),
@@ -322,7 +342,8 @@ public class PocketSimilarityService {
                 pointCloud.centroid(),
                 pointCloud.bounds(),
                 pointCloud.basis().name(),
-                pointCloud.points()
+                pointCloud.points(),
+                alphaSpheres
         );
     }
 
@@ -530,6 +551,7 @@ public class PocketSimilarityService {
                 candidate.structureId(),
                 candidate.sourceAccession(),
                 candidate.pocketNumber(),
+                candidate.alphaSphereCount(),
                 loaded.stageOneRank(),
                 candidate.descriptorDistance(),
                 candidate.volumeDistance(),
@@ -646,6 +668,9 @@ public class PocketSimilarityService {
                 candidate.getStructureId(),
                 candidate.getSourceAccession(),
                 candidate.getPocketNumber(),
+                candidate.getAlphaSphereCount() == null
+                        ? 0
+                        : candidate.getAlphaSphereCount(),
                 descriptorDistance,
                 volumeDistance,
                 residueDistance,
@@ -689,6 +714,7 @@ public class PocketSimilarityService {
             long structureId,
             String sourceAccession,
             int pocketNumber,
+            int alphaSphereCount,
             double descriptorDistance,
             double volumeDistance,
             double residueDistance,

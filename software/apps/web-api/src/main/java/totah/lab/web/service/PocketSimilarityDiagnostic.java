@@ -12,6 +12,7 @@ public record PocketSimilarityDiagnostic(
         long structureId,
         String sourceAccession,
         int pocketNumber,
+        int alphaSphereCount,
         int stageOneRank,
         double descriptorDistance,
         double volumeDistance,

@@ -115,4 +115,49 @@ public interface PocketRepository
             PocketSource source,
             int pocketNumber
     );
+
+    /**
+     * Structures having at least one pocket of the given source with zero
+     * rows in pocket_alpha_sphere (anti-join used by the alpha-sphere
+     * backfill). A null structureAccession selects all structures.
+     */
+    @Query("""
+            SELECT DISTINCT pocket.structure.id
+            FROM PocketEntity pocket
+            WHERE pocket.source = :source
+              AND (:structureAccession IS NULL
+                   OR pocket.structure.sourceAccession = :structureAccession)
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM PocketAlphaSphereEntity sphere
+                  WHERE sphere.pocket = pocket
+              )
+            ORDER BY pocket.structure.id
+            """)
+    List<Long> findStructureIdsWithPocketsMissingSpheres(
+            @Param("source") PocketSource source,
+            @Param("structureAccession") String structureAccession
+    );
+
+    /**
+     * Pockets of one structure with zero rows in pocket_alpha_sphere,
+     * with their artifacts fetched for vert-file resolution.
+     */
+    @Query("""
+            SELECT pocket
+            FROM PocketEntity pocket
+            JOIN FETCH pocket.artifact
+            WHERE pocket.source = :source
+              AND pocket.structure.id = :structureId
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM PocketAlphaSphereEntity sphere
+                  WHERE sphere.pocket = pocket
+              )
+            ORDER BY pocket.pocketNumber
+            """)
+    List<PocketEntity> findPocketsMissingSpheres(
+            @Param("source") PocketSource source,
+            @Param("structureId") long structureId
+    );
 }

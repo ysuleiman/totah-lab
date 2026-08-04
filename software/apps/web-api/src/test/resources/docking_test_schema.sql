@@ -133,6 +133,33 @@ CREATE TABLE docking_test.pocket_residue (
         UNIQUE (pocket_id, chain, residue_number)
 );
 
+CREATE TABLE docking_test.pocket_alpha_sphere (
+    id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    pocket_id bigint NOT NULL
+        REFERENCES docking_test.pocket (id) ON DELETE CASCADE,
+    sphere_index integer NOT NULL,
+    center_x float8 NOT NULL,
+    center_y float8 NOT NULL,
+    center_z float8 NOT NULL,
+    radius float8 NOT NULL,
+    CONSTRAINT pocket_alpha_sphere_unique
+        UNIQUE (pocket_id, sphere_index),
+    CONSTRAINT pocket_alpha_sphere_coords_finite
+        CHECK (
+            center_x <> 'Infinity'::float8
+            AND center_x <> '-Infinity'::float8
+            AND center_y <> 'Infinity'::float8
+            AND center_y <> '-Infinity'::float8
+            AND center_z <> 'Infinity'::float8
+            AND center_z <> '-Infinity'::float8
+        ),
+    CONSTRAINT pocket_alpha_sphere_radius_positive
+        CHECK (radius > 0 AND radius <> 'Infinity'::float8)
+);
+
+CREATE INDEX pocket_alpha_sphere_pocket_idx
+    ON docking_test.pocket_alpha_sphere (pocket_id);
+
 CREATE TABLE docking_test.pocket_atom (
     id bigint NOT NULL DEFAULT nextval('docking_test.pocket_atom_id_seq')
         PRIMARY KEY,

@@ -17,6 +17,7 @@ const geometry: PocketGeometryView = {
   bounds: { min: { x: 0, y: 0, z: 0 }, max: { x: 1, y: 1, z: 1 } },
   basis: 'RESIDUE_ATOMS',
   points: [],
+  alphaSpheres: [],
 }
 
 function makeRow(
@@ -47,6 +48,7 @@ function makeRow(
     queryPointCount: 20,
     candidatePointCount: 21,
     basis: 'RESIDUE_ATOMS',
+    alphaSphereCount: 0,
     uniProtId: 'P12345',
     proteinName: 'Test protein',
     geneName: 'TST',
@@ -221,6 +223,64 @@ describe('SimilarPocketsPage', () => {
       screen.getByRole('button', { name: 'Inspect best match' }),
     )
     expect(onNavigate).toHaveBeenCalledWith('/pockets/7/compare/1000')
+  })
+
+  it('shows the alpha sphere count for sphere pockets and a dash otherwise', async () => {
+    stubFetch([
+      makeRow({
+        pocketId: 1000,
+        sourceAccession: '2AAA',
+        basis: 'ALPHA_SPHERES',
+        alphaSphereCount: 42,
+      }),
+      makeRow({
+        pocketId: 1001,
+        sourceAccession: '2BBB',
+        basis: 'RESIDUE_ATOMS',
+        alphaSphereCount: 0,
+      }),
+    ])
+    render(<SimilarPocketsPage pocketId={7} onNavigate={() => undefined} />)
+
+    const sphereRow = (await screen.findByText('2AAA')).closest('tr')
+    expect(screen.getByRole('button', { name: 'Alpha spheres' }))
+      .toBeInTheDocument()
+    expect(sphereRow).not.toBeNull()
+    expect(within(sphereRow as HTMLElement).getByText('42'))
+      .toBeInTheDocument()
+
+    const residueRow = screen.getByText('2BBB').closest('tr')
+    expect(residueRow).not.toBeNull()
+    expect(within(residueRow as HTMLElement).getByText('—'))
+      .toBeInTheDocument()
+  })
+
+  it('narrows rows with the geometry basis filter', async () => {
+    stubFetch([
+      makeRow({
+        pocketId: 1000,
+        sourceAccession: '2AAA',
+        basis: 'ALPHA_SPHERES',
+        alphaSphereCount: 42,
+      }),
+      makeRow({
+        pocketId: 1001,
+        sourceAccession: '2BBB',
+        basis: 'RESIDUE_ATOMS',
+        alphaSphereCount: 0,
+      }),
+    ])
+    render(<SimilarPocketsPage pocketId={7} onNavigate={() => undefined} />)
+
+    expect(await screen.findByText('2AAA')).toBeInTheDocument()
+    expect(screen.getByText('2BBB')).toBeInTheDocument()
+
+    await userEvent.selectOptions(
+      screen.getByLabelText('Geometry basis'),
+      'ALPHA_SPHERES',
+    )
+    expect(screen.getByText('2AAA')).toBeInTheDocument()
+    expect(screen.queryByText('2BBB')).not.toBeInTheDocument()
   })
 
   it('shows the error state with retry when the request fails', async () => {

@@ -33,7 +33,7 @@ class StructureArtifactServiceTest {
         assertThatThrownBy(() -> service.resolveStorageLocation(
                 artifactRoot.resolve("structure.pdb").toString()))
                 .isInstanceOf(IOException.class)
-                .hasMessageContaining("must be relative");
+                .hasMessageContaining("outside the allowed roots");
         assertThatThrownBy(() -> service.resolveStorageLocation(
                 "../outside.pdb"))
                 .isInstanceOf(IOException.class)

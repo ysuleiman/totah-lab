@@ -24,6 +24,21 @@ function geometryView(
       { x: 0, y: 0, z: 0 },
       { x: 1, y: 1, z: 1 },
     ],
+    alphaSpheres: [],
+  }
+}
+
+function sphereGeometryView(
+  pocketId: number,
+  sourceAccession: string,
+): PocketComparisonDetails['query'] {
+  return {
+    ...geometryView(pocketId, sourceAccession),
+    basis: 'ALPHA_SPHERES',
+    alphaSpheres: [
+      { index: 0, center: { x: 0, y: 0, z: 0 }, radius: 1.2 },
+      { index: 1, center: { x: 1, y: 1, z: 1 }, radius: 0.9 },
+    ],
   }
 }
 
@@ -104,6 +119,14 @@ const details: PocketComparisonDetails = {
       maximumMatchedDistance: 0.8,
     },
   },
+  keyResidues: ['CYS202'],
+}
+
+const sphereDetails: PocketComparisonDetails = {
+  ...details,
+  query: sphereGeometryView(7, '1ABC'),
+  candidate: sphereGeometryView(8, '2XYZ'),
+  comparison: { ...details.comparison, basis: 'ALPHA_SPHERES' },
 }
 
 const diagnosticRow: PocketSimilarityDiagnosticRow = {
@@ -131,6 +154,7 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   queryPointCount: 20,
   candidatePointCount: 21,
   basis: 'RESIDUE_ATOMS',
+  alphaSphereCount: 0,
   uniProtId: 'P12345',
   proteinName: 'Test protein',
   geneName: 'TST',
@@ -318,5 +342,46 @@ describe('PocketComparisonPage', () => {
       screen.queryByRole('checkbox', { name: 'Matched residue points' }),
     ).toBeNull()
     expect(screen.getByText('0.910')).toBeInTheDocument()
+  })
+
+  it('shows the sphere scale control for alpha-sphere geometry', async () => {
+    stubFetch(true, sphereDetails)
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.getByRole('slider', { name: 'Sphere scale' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/Geometry basis: Alpha spheres/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/Geometry rendered as alpha spheres/),
+    ).toBeInTheDocument()
+  })
+
+  it('hides the sphere scale control for residue-atom geometry', async () => {
+    stubFetch(true)
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.queryByRole('slider', { name: 'Sphere scale' }),
+    ).toBeNull()
+    expect(
+      screen.getByText(/Geometry rendered as residue heavy-atom points/),
+    ).toBeInTheDocument()
   })
 })

@@ -5,19 +5,6 @@ import type {
   ResiduePointView,
 } from '../../api/types'
 
-// Key residues for the current METTL7B analysis. Matched by
-// residueName + residueNumber, case-insensitively (e.g. "CYS202").
-const KEY_RESIDUES = [
-  'CYS148',
-  'LEU145',
-  'HIS175',
-  'GLY199',
-  'ASP200',
-  'GLY201',
-  'CYS202',
-  'CYS203',
-]
-
 const MATCH_TYPE_LABELS: Record<ResidueMatchView['matchType'], string> = {
   IDENTICAL: 'Identical',
   CONSERVATIVE: 'Conservative',
@@ -36,9 +23,13 @@ const MATCH_TYPE_CLASSES: Record<ResidueMatchView['matchType'], string> = {
 
 interface Props {
   correspondence: ResidueCorrespondenceView
+  keyResidues: string[]
 }
 
-export function ResidueCorrespondenceSection({ correspondence }: Props) {
+export function ResidueCorrespondenceSection({
+  correspondence,
+  keyResidues,
+}: Props) {
   const [keyOnly, setKeyOnly] = useState(false)
   const [identicalOnly, setIdenticalOnly] = useState(false)
   const [compatibleOnly, setCompatibleOnly] = useState(false)
@@ -60,7 +51,7 @@ export function ResidueCorrespondenceSection({ correspondence }: Props) {
 
     return matches
       .filter((match) => {
-        if (keyOnly && !isKeyResidue(match.query)) return false
+        if (keyOnly && !isKeyResidue(match.query, keyResidues)) return false
         if (identicalOnly && !match.identicalResidue) return false
         if (compatibleOnly && !match.chemistryCompatible) return false
         if (
@@ -94,7 +85,7 @@ export function ResidueCorrespondenceSection({ correspondence }: Props) {
       })
       .sort((a, b) => {
         const keyDiff =
-          Number(isKeyResidue(b.query)) - Number(isKeyResidue(a.query))
+          Number(isKeyResidue(b.query, keyResidues)) - Number(isKeyResidue(a.query, keyResidues))
         if (keyDiff !== 0) return keyDiff
         return a.distanceAngstroms - b.distanceAngstroms
       })
@@ -243,7 +234,7 @@ export function ResidueCorrespondenceSection({ correspondence }: Props) {
                   className={matchClass}
                 >
                   <td>
-                    {isKeyResidue(match.query) ? (
+                    {isKeyResidue(match.query, keyResidues) ? (
                       <span className="key-badge">Key residue</span>
                     ) : (
                       '—'
@@ -294,6 +285,13 @@ export function ResidueCorrespondenceSection({ correspondence }: Props) {
         side-chain heavy-atom centroid (CA fallback when no side-chain
         heavy atoms exist). Maximum correspondence distance is 4.0 Å.
       </p>
+      <p className="muted-note">
+        The aligned pockets show spatial correspondence at several
+        positions, but low residue identity and limited chemistry
+        compatibility. This is consistent with structural divergence at
+        these representative positions, but does not by itself establish
+        catalytic or functional divergence.
+      </p>
     </section>
   )
 }
@@ -330,10 +328,13 @@ function UnmatchedResidueTable({
   )
 }
 
-function isKeyResidue(residue: ResiduePointView): boolean {
+function isKeyResidue(
+  residue: ResiduePointView,
+  keyResidues: string[],
+): boolean {
   const name =
     `${residue.residueName}${residue.residueNumber}`.toUpperCase()
-  return KEY_RESIDUES.includes(name)
+  return keyResidues.includes(name)
 }
 
 function formatPercent(fraction: number): string {

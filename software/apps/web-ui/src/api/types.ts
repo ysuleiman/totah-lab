@@ -373,6 +373,7 @@ export interface PocketSimilarityDiagnosticRow {
   queryPointCount: number
   candidatePointCount: number
   basis: string
+  alphaSphereCount: number
   uniProtId: string | null
   proteinName: string | null
   geneName: string | null
@@ -385,6 +386,12 @@ export interface Point3D {
   z: number
 }
 
+export interface AlphaSphereView {
+  index: number
+  center: Point3D
+  radius: number
+}
+
 export interface PocketGeometryView {
   pocketId: number
   structureId: number | null
@@ -395,6 +402,7 @@ export interface PocketGeometryView {
   bounds: { min: Point3D; max: Point3D }
   basis: string
   points: Point3D[]
+  alphaSpheres: AlphaSphereView[]
 }
 
 export interface PocketComparisonMetrics {
@@ -481,4 +489,5 @@ export interface PocketComparisonDetails {
   alignment?: PocketAlignmentView
   transform: RigidTransformView
   residueCorrespondence: ResidueCorrespondenceView | null
+  keyResidues: string[]
 }

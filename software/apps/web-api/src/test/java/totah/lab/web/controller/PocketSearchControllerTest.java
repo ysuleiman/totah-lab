@@ -38,6 +38,7 @@ class PocketSearchControllerTest {
                 11L,
                 "AF-P12345",
                 3,
+                0,
                 0.8,
                 0.2,
                 0.5,
@@ -99,6 +100,7 @@ class PocketSearchControllerTest {
                 11L,
                 "AF-P12345",
                 3,
+                12,
                 5,
                 0.8,
                 0.2,
@@ -147,6 +149,7 @@ class PocketSearchControllerTest {
                         .value(0.5))
                 .andExpect(jsonPath("$[0].queryPointCount").value(20))
                 .andExpect(jsonPath("$[0].candidatePointCount").value(21))
+                .andExpect(jsonPath("$[0].alphaSphereCount").value(12))
                 .andExpect(jsonPath("$[0].basis").value("RESIDUE_ATOMS"));
 
         assertEquals(42L, service.pocketId);
@@ -174,7 +177,8 @@ class PocketSearchControllerTest {
                         new Point3D(10.0, 0.0, 0.0),
                         new Point3D(0.0, 10.0, 0.0),
                         new Point3D(0.0, 0.0, 10.0)
-                )
+                ),
+                List.of()
         );
 
         MockMvc mockMvc = MockMvcBuilders
@@ -191,6 +195,7 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$.centroid.x").value(2.5))
                 .andExpect(jsonPath("$.points", hasSize(4)))
                 .andExpect(jsonPath("$.points[1].x").value(10.0))
+                .andExpect(jsonPath("$.alphaSpheres", hasSize(0)))
                 .andExpect(jsonPath("$.basis").value("RESIDUE_ATOMS"));
 
         assertEquals(42L, service.pocketId);
@@ -209,7 +214,8 @@ class PocketSearchControllerTest {
                                 new Point3D(10.0, 10.0, 10.0)
                         ),
                         "RESIDUE_ATOMS",
-                        List.of(new Point3D(0.0, 0.0, 0.0))
+                        List.of(new Point3D(0.0, 0.0, 0.0)),
+                        List.of()
                 ),
                 new PocketGeometryView(
                         7L, 1001L, "AF-P12345-F1-model_v6", 3, 4,
@@ -219,7 +225,8 @@ class PocketSearchControllerTest {
                                 new Point3D(5.0, 5.0, 5.0)
                         ),
                         "RESIDUE_ATOMS",
-                        List.of(new Point3D(1.0, 1.0, 1.0))
+                        List.of(new Point3D(1.0, 1.0, 1.0)),
+                        List.of()
                 ),
                 List.of(new Point3D(-2.5, -2.5, -2.5)),
                 List.of(new Point3D(0.0, 0.0, 0.0)),
@@ -266,7 +273,8 @@ class PocketSearchControllerTest {
                                 {0.0, 0.0, 1.0}
                         },
                         new Point3D(3.0, -2.0, 5.0)
-                )
+                ),
+                List.of("CYS148", "CYS202")
         );
 
         MockMvc mockMvc = MockMvcBuilders
@@ -368,7 +376,7 @@ class PocketSearchControllerTest {
         private RuntimeException failure;
 
         private RecordingPocketSimilarityService() {
-            super(null, null, null);
+            super(null, null, null, null);
         }
 
         @Override

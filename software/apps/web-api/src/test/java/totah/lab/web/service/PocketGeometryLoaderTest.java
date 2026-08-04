@@ -1,9 +1,12 @@
 package totah.lab.web.service;
 
 import org.junit.jupiter.api.Test;
+import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.gaia.geometry.Point3D;
+import totah.lab.web.persistence.PocketAlphaSphereRepository;
 import totah.lab.web.persistence.PocketAtomRepository;
+import totah.lab.web.service.PocketPointCloudLoader.LoadedPointClouds;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +25,10 @@ class PocketGeometryLoaderTest {
 
     private final PocketAtomRepository repository =
             mock(PocketAtomRepository.class);
+    private final PocketAlphaSphereRepository sphereRepository =
+            mock(PocketAlphaSphereRepository.class);
     private final PocketPointCloudLoader loader =
-            new PocketPointCloudLoader(repository);
+            new PocketPointCloudLoader(repository, sphereRepository);
 
     @Test
     void loadsAllPocketsWithOneQueryPreservingAtomOrder() {
@@ -50,6 +55,103 @@ class PocketGeometryLoaderTest {
                 clouds.get(1L).points()
         );
         assertEquals(1, clouds.get(2L).size());
+        assertEquals(
+                PocketGeometryBasis.RESIDUE_ATOMS,
+                clouds.get(1L).basis()
+        );
+    }
+
+    @Test
+    void prefersAlphaSpheresOverResidueAtoms() {
+        when(sphereRepository.findPointCloudByPocketIds(List.of(1L, 2L)))
+                .thenReturn(List.of(
+                        sphereRow(1L, 0, 0.0, 0.0, 0.0, 4.5),
+                        sphereRow(1L, 1, 3.0, 0.0, 0.0, 4.0),
+                        sphereRow(1L, 2, 0.0, 4.0, 0.0, 3.5)
+                ));
+        when(repository.findPointCloudByPocketIds(List.of(2L)))
+                .thenReturn(List.of(row(2L, 5.0, 5.0, 5.0)));
+
+        Map<Long, PocketPointCloud> clouds =
+                loader.loadAll(List.of(1L, 2L));
+
+        // One bulk sphere query; the atom query covers only the
+        // sphere-less pocket.
+        verify(sphereRepository, times(1))
+                .findPointCloudByPocketIds(List.of(1L, 2L));
+        verify(repository, times(1))
+                .findPointCloudByPocketIds(List.of(2L));
+
+        assertEquals(2, clouds.size());
+        assertEquals(
+                PocketGeometryBasis.ALPHA_SPHERES,
+                clouds.get(1L).basis()
+        );
+        assertEquals(
+                List.of(
+                        new Point3D(0.0, 0.0, 0.0),
+                        new Point3D(3.0, 0.0, 0.0),
+                        new Point3D(0.0, 4.0, 0.0)
+                ),
+                clouds.get(1L).points()
+        );
+        assertEquals(
+                PocketGeometryBasis.RESIDUE_ATOMS,
+                clouds.get(2L).basis()
+        );
+    }
+
+    @Test
+    void ordersSpherePointsBySphereIndex() {
+        when(sphereRepository.findPointCloudByPocketIds(List.of(1L)))
+                .thenReturn(List.of(
+                        sphereRow(1L, 0, 1.0, 0.0, 0.0, 4.5),
+                        sphereRow(1L, 1, 2.0, 0.0, 0.0, 4.0),
+                        sphereRow(1L, 2, 3.0, 0.0, 0.0, 3.5)
+                ));
+
+        PocketPointCloud cloud = loader.loadAll(List.of(1L)).get(1L);
+
+        assertEquals(
+                List.of(
+                        new Point3D(1.0, 0.0, 0.0),
+                        new Point3D(2.0, 0.0, 0.0),
+                        new Point3D(3.0, 0.0, 0.0)
+                ),
+                cloud.points()
+        );
+    }
+
+    @Test
+    void exposesSphereViewsWithRadiiOnlyForSpherePockets() {
+        when(sphereRepository.findPointCloudByPocketIds(List.of(1L, 2L)))
+                .thenReturn(List.of(
+                        sphereRow(1L, 0, 1.0, 2.0, 3.0, 4.5),
+                        sphereRow(1L, 1, 4.0, 5.0, 6.0, 2.5)
+                ));
+        when(repository.findPointCloudByPocketIds(List.of(2L)))
+                .thenReturn(List.of(row(2L, 5.0, 5.0, 5.0)));
+
+        LoadedPointClouds loaded = loader.loadAllWithSpheres(
+                List.of(1L, 2L)
+        );
+
+        assertEquals(
+                List.of(
+                        new AlphaSphereView(
+                                0,
+                                new Point3D(1.0, 2.0, 3.0),
+                                4.5
+                        ),
+                        new AlphaSphereView(
+                                1,
+                                new Point3D(4.0, 5.0, 6.0),
+                                2.5
+                        )
+                ),
+                loaded.alphaSpheres().get(1L)
+        );
+        assertFalse(loaded.alphaSpheres().containsKey(2L));
     }
 
     @Test
@@ -83,7 +185,7 @@ class PocketGeometryLoaderTest {
     void loadAllWithEmptyInputSkipsTheQuery() {
         assertEquals(Map.of(), loader.loadAll(List.of()));
 
-        verifyNoInteractions(repository);
+        verifyNoInteractions(repository, sphereRepository);
     }
 
     @Test
@@ -93,11 +195,13 @@ class PocketGeometryLoaderTest {
                 () -> loader.loadAll(null)
         );
 
-        verifyNoInteractions(repository);
+        verifyNoInteractions(repository, sphereRepository);
     }
 
     @Test
     void loadAllDeduplicatesPocketIds() {
+        when(sphereRepository.findPointCloudByPocketIds(List.of(1L, 2L)))
+                .thenReturn(List.of());
         when(repository.findPointCloudByPocketIds(List.of(1L, 2L)))
                 .thenReturn(List.of(
                         row(1L, 0.0, 0.0, 0.0),
@@ -107,6 +211,8 @@ class PocketGeometryLoaderTest {
         Map<Long, PocketPointCloud> clouds =
                 loader.loadAll(List.of(1L, 2L, 1L, 2L, 1L));
 
+        verify(sphereRepository, times(1))
+                .findPointCloudByPocketIds(List.of(1L, 2L));
         verify(repository, times(1))
                 .findPointCloudByPocketIds(List.of(1L, 2L));
         assertEquals(2, clouds.size());
@@ -125,9 +231,14 @@ class PocketGeometryLoaderTest {
         when(repository.findPointCloudByPocketIds(List.of(9L)))
                 .thenReturn(List.of());
 
-        assertThrows(
+        IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> loader.load(9L)
+        );
+
+        assertEquals(
+                "Pocket 9 contains no atoms.",
+                exception.getMessage()
         );
     }
 
@@ -156,6 +267,47 @@ class PocketGeometryLoaderTest {
             @Override
             public Double getZ() {
                 return z;
+            }
+        };
+    }
+
+    private static PocketAlphaSphereProjection sphereRow(
+            long pocketId,
+            int sphereIndex,
+            Double centerX,
+            Double centerY,
+            Double centerZ,
+            Double radius
+    ) {
+        return new PocketAlphaSphereProjection() {
+            @Override
+            public Long getPocketId() {
+                return pocketId;
+            }
+
+            @Override
+            public Integer getSphereIndex() {
+                return sphereIndex;
+            }
+
+            @Override
+            public Double getCenterX() {
+                return centerX;
+            }
+
+            @Override
+            public Double getCenterY() {
+                return centerY;
+            }
+
+            @Override
+            public Double getCenterZ() {
+                return centerZ;
+            }
+
+            @Override
+            public Double getRadius() {
+                return radius;
             }
         };
     }

@@ -64,6 +64,12 @@ public class PocketSummaryEntity {
     @Column(name = "atom_count")
     private Integer atomCount;
 
+    @Column(name = "alpha_sphere_count")
+    private Integer alphaSphereCount;
+
+    @Column(name = "geometry_basis")
+    private String geometryBasis;
+
     @Column(name = "cysteine_count")
     private Integer cysteineCount;
 
@@ -169,6 +175,14 @@ public class PocketSummaryEntity {
 
     public Integer getAtomCount() {
         return atomCount;
+    }
+
+    public Integer getAlphaSphereCount() {
+        return alphaSphereCount;
+    }
+
+    public String getGeometryBasis() {
+        return geometryBasis;
     }
 
     public Integer getCysteineCount() {

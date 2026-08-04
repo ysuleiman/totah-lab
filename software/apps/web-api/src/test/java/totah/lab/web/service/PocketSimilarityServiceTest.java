@@ -115,11 +115,14 @@ class PocketSimilarityServiceTest {
             new FakeGeometryLoader();
     private final FakeResidueLoader residueLoader =
             new FakeResidueLoader();
+    private final KeyResidueConfiguration keyResidues =
+            new KeyResidueConfiguration();
     private final PocketSimilarityService service =
             new PocketSimilarityService(
                     repository,
                     geometryLoader,
-                    residueLoader
+                    residueLoader,
+                    keyResidues
             );
 
     @Test
@@ -445,7 +448,157 @@ class PocketSimilarityServiceTest {
         assertEquals(8, view.points().size());
         assertEquals(new Point3D(3.75, 3.0, 2.125), view.centroid());
         assertEquals("RESIDUE_ATOMS", view.basis());
+        assertTrue(view.alphaSpheres().isEmpty());
         assertEquals(1, geometryLoader.loadAllCount());
+    }
+
+    @Test
+    void geometryIncludesAlphaSpheresForSphereBasis() {
+        stubQuerySummary();
+        List<AlphaSphereView> views = List.of(
+                new AlphaSphereView(0, new Point3D(0.0, 0.0, 0.0), 4.5),
+                new AlphaSphereView(1, new Point3D(10.0, 0.0, 0.0), 4.0),
+                new AlphaSphereView(2, new Point3D(0.0, 6.0, 0.0), 3.5),
+                new AlphaSphereView(3, new Point3D(0.0, 0.0, 3.0), 3.0),
+                new AlphaSphereView(4, new Point3D(8.0, 5.0, 2.0), 2.5),
+                new AlphaSphereView(5, new Point3D(2.0, 4.0, 6.0), 2.0),
+                new AlphaSphereView(6, new Point3D(7.0, 1.0, 5.0), 1.5),
+                new AlphaSphereView(7, new Point3D(3.0, 8.0, 1.0), 1.0)
+        );
+        geometryLoader.registerSpheres(
+                QUERY_POCKET_ID,
+                new PocketPointCloud(
+                        views.stream()
+                                .map(AlphaSphereView::center)
+                                .toList(),
+                        PocketGeometryBasis.ALPHA_SPHERES
+                ),
+                views
+        );
+
+        PocketGeometryView view = service.getGeometry(QUERY_POCKET_ID);
+
+        assertEquals("ALPHA_SPHERES", view.basis());
+        assertEquals(8, view.pointCount());
+        assertEquals(views, view.alphaSpheres());
+        assertEquals(1, geometryLoader.loadAllCount());
+    }
+
+    @Test
+    void compareFailsWith422ForMixedBases() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.registerSpheres(
+                1L,
+                new PocketPointCloud(
+                        cloud(IRREGULAR_CLOUD).points(),
+                        PocketGeometryBasis.ALPHA_SPHERES
+                ),
+                List.of()
+        );
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.compareGeometries(QUERY_POCKET_ID, 1L)
+        );
+
+        assertEquals(422, exception.getStatusCode().value());
+        assertTrue(exception.getMessage().contains("RESIDUE_ATOMS"));
+        assertTrue(exception.getMessage().contains("ALPHA_SPHERES"));
+    }
+
+    @Test
+    void findSimilarSkipsMixedBasisCandidatesInStageThree() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.registerSpheres(
+                1L,
+                new PocketPointCloud(
+                        cloud(IRREGULAR_CLOUD).points(),
+                        PocketGeometryBasis.ALPHA_SPHERES
+                ),
+                List.of()
+        );
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        // The mixed-basis candidate is skipped with a WARN in Stage 3
+        // instead of failing the whole request.
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void compareKeepsSphereRadiiUnchangedByAlignment() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+
+        List<Point3D> points = cloud(IRREGULAR_CLOUD).points();
+        List<AlphaSphereView> queryViews = sphereViews(points, 4.0);
+        List<AlphaSphereView> candidateViews = sphereViews(points, 2.5);
+
+        geometryLoader.registerSpheres(
+                QUERY_POCKET_ID,
+                new PocketPointCloud(
+                        points,
+                        PocketGeometryBasis.ALPHA_SPHERES
+                ),
+                queryViews
+        );
+        geometryLoader.registerSpheres(
+                1L,
+                new PocketPointCloud(
+                        points,
+                        PocketGeometryBasis.ALPHA_SPHERES
+                ),
+                candidateViews
+        );
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        assertEquals("ALPHA_SPHERES", details.query().basis());
+        assertEquals("ALPHA_SPHERES", details.candidate().basis());
+        assertEquals(queryViews, details.query().alphaSpheres());
+        assertEquals(candidateViews, details.candidate().alphaSpheres());
+        assertEquals(1, geometryLoader.loadAllCount());
+
+        // The aligned centers still satisfy the transform invariant.
+        List<Point3D> transformed =
+                new PocketComparator(
+                        new CompositePocketAligner(),
+                        PocketComparisonOptions.defaults()
+                )
+                        .align(
+                                new PocketPointCloud(
+                                        points,
+                                        PocketGeometryBasis.ALPHA_SPHERES
+                                ),
+                                new PocketPointCloud(
+                                        points,
+                                        PocketGeometryBasis.ALPHA_SPHERES
+                                )
+                        )
+                        .transform()
+                        .apply(points);
+
+        assertEquals(
+                transformed.size(),
+                details.alignedCandidatePoints().size()
+        );
+        for (int index = 0; index < transformed.size(); index++) {
+            assertEquals(
+                    transformed.get(index).x(),
+                    details.alignedCandidatePoints().get(index).x(),
+                    1e-6
+            );
+        }
     }
 
     @Test
@@ -692,6 +845,79 @@ class PocketSimilarityServiceTest {
     }
 
     @Test
+    void residueMatchCoordinatesShareTheAlignedFrame() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+
+        List<Point3D> movedPoints =
+                KNOWN_TRANSFORM.apply(cloud(IRREGULAR_CLOUD).points());
+
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, new PocketPointCloud(movedPoints, BASIS));
+
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, movedPoints)
+        );
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        // Frame invariant: the candidate residue coordinates in the
+        // response are the transform-applied (aligned) coordinates, so
+        // recomputing the Euclidean distance between the serialized
+        // query and candidate positions must reproduce the reported
+        // match distance exactly. The aligned candidate cloud lives in
+        // the same frame.
+        for (ResidueMatchView match
+                : details.residueCorrespondence().matches()) {
+
+            double recomputed = match.query().position().distance(
+                    match.candidate().position()
+            );
+
+            assertEquals(
+                    match.distanceAngstroms(),
+                    recomputed,
+                    1e-9,
+                    "coordinate frame mismatch for "
+                            + match.query().label()
+                            + " -> "
+                            + match.candidate().label()
+            );
+        }
+
+        // The aligned residue points and the aligned candidate cloud
+        // share a frame: every matched candidate residue sits within
+        // the correspondence cutoff of an aligned-cloud neighbor.
+        for (ResidueMatchView match
+                : details.residueCorrespondence().matches()) {
+
+            double nearest = details.alignedCandidatePoints()
+                    .stream()
+                    .mapToDouble(point ->
+                            match.candidate().position().distance(point))
+                    .min()
+                    .orElseThrow();
+
+            assertTrue(
+                    nearest < 4.0,
+                    "aligned residue point "
+                            + match.candidate().label()
+                            + " is "
+                            + nearest
+                            + " Å from the aligned candidate cloud"
+            );
+        }
+    }
+
+    @Test
     void compareReturnsRetainedTransformAndLoadsResiduesOnce() {
         stubQuerySummary();
         when(repository.findById(1L)).thenReturn(
@@ -730,6 +956,43 @@ class PocketSimilarityServiceTest {
         assertEquals(
                 expected.translation(),
                 details.transform().translation()
+        );
+    }
+
+    @Test
+    void compareReturnsConfiguredKeyResiduesForTheQueryTargetOnly() {
+        keyResidues.getKeyResidues().put(
+                "UP" + QUERY_POCKET_ID,
+                List.of("LEU145", "CYS148", "CYS202")
+        );
+
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+
+        PocketComparisonDetails configured =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        assertEquals(
+                List.of("LEU145", "CYS148", "CYS202"),
+                configured.keyResidues()
+        );
+
+        // A query without configuration gets no key residues; nothing
+        // else about the comparison changes.
+        keyResidues.getKeyResidues().clear();
+
+        PocketComparisonDetails unconfigured =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        assertEquals(List.of(), unconfigured.keyResidues());
+        assertEquals(
+                configured.comparison().overallSimilarity(),
+                unconfigured.comparison().overallSimilarity(),
+                0.0
         );
     }
 
@@ -837,6 +1100,16 @@ class PocketSimilarityServiceTest {
         }
 
         @Override
+        public Integer getAlphaSphereCount() {
+            return 0;
+        }
+
+        @Override
+        public String getGeometryBasis() {
+            return PocketGeometryBasis.RESIDUE_ATOMS.name();
+        }
+
+        @Override
         public Double getHydrophobicFraction() {
             return hydrophobicFraction;
         }
@@ -893,6 +1166,21 @@ class PocketSimilarityServiceTest {
         return new PocketPointCloud(points, BASIS);
     }
 
+    private static List<AlphaSphereView> sphereViews(
+            List<Point3D> centers,
+            double radius
+    ) {
+        List<AlphaSphereView> views = new ArrayList<>();
+        for (int index = 0; index < centers.size(); index++) {
+            views.add(new AlphaSphereView(
+                    index,
+                    centers.get(index),
+                    radius
+            ));
+        }
+        return views;
+    }
+
     private static List<PocketResiduePoint> residuePoints(
             String chainId,
             int firstResidueNumber,
@@ -925,16 +1213,33 @@ class PocketSimilarityServiceTest {
     private static final class FakeGeometryLoader
             extends PocketPointCloudLoader {
         private final Map<Long, PocketPointCloud> clouds = new HashMap<>();
+        private final Map<Long, List<AlphaSphereView>> spheres =
+                new HashMap<>();
         private final Set<Long> failing = new HashSet<>();
         private int loadAllCount;
         private List<Long> requestedPocketIds = List.of();
 
         private FakeGeometryLoader() {
-            super(null);
+            super(null, null);
         }
 
         void register(long pocketId, PocketPointCloud cloud) {
             clouds.put(pocketId, cloud);
+        }
+
+        /**
+         * Registers an ALPHA_SPHERES cloud together with the persisted
+         * sphere views, modelling the sphere preference of the real
+         * loader: a pocket with spheres is loaded with basis
+         * ALPHA_SPHERES and exposes its radii.
+         */
+        void registerSpheres(
+                long pocketId,
+                PocketPointCloud cloud,
+                List<AlphaSphereView> views
+        ) {
+            clouds.put(pocketId, cloud);
+            spheres.put(pocketId, views);
         }
 
         void failOn(long pocketId) {
@@ -950,20 +1255,27 @@ class PocketSimilarityServiceTest {
         }
 
         @Override
-        public Map<Long, PocketPointCloud> loadAll(
+        public LoadedPointClouds loadAllWithSpheres(
                 Collection<Long> pocketIds
         ) {
             loadAllCount++;
             requestedPocketIds = List.copyOf(pocketIds);
 
-            Map<Long, PocketPointCloud> result = new LinkedHashMap<>();
+            Map<Long, PocketPointCloud> resultClouds =
+                    new LinkedHashMap<>();
+            Map<Long, List<AlphaSphereView>> resultSpheres =
+                    new LinkedHashMap<>();
             for (Long pocketId : pocketIds) {
                 PocketPointCloud cloud = clouds.get(pocketId);
                 if (cloud != null && !failing.contains(pocketId)) {
-                    result.put(pocketId, cloud);
+                    resultClouds.put(pocketId, cloud);
+                    List<AlphaSphereView> views = spheres.get(pocketId);
+                    if (views != null) {
+                        resultSpheres.put(pocketId, views);
+                    }
                 }
             }
-            return result;
+            return new LoadedPointClouds(resultClouds, resultSpheres);
         }
     }
 

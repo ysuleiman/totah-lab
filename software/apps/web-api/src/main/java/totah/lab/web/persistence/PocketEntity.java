@@ -89,6 +89,14 @@ public class PocketEntity {
     )
     private final List<PocketResidueEntity> residues = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "pocket",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private final List<PocketAlphaSphereEntity> alphaSpheres =
+            new ArrayList<>();
+
     public PocketEntity() {
     }
 
@@ -194,5 +202,26 @@ public class PocketEntity {
             residue.setPocket(null);
         }
         residues.clear();
+    }
+
+    public List<PocketAlphaSphereEntity> getAlphaSpheres() {
+        return alphaSpheres;
+    }
+
+    public void addAlphaSphere(PocketAlphaSphereEntity sphere) {
+        alphaSpheres.add(sphere);
+        sphere.setPocket(this);
+    }
+
+    /**
+     * Detaches all alpha spheres. With orphanRemoval the previous rows
+     * are deleted on flush, which is how reimports replace pocket
+     * content.
+     */
+    public void clearAlphaSpheres() {
+        for (PocketAlphaSphereEntity sphere : alphaSpheres) {
+            sphere.setPocket(null);
+        }
+        alphaSpheres.clear();
     }
 }

@@ -37,7 +37,8 @@ class AlphaFoldPocketImportServiceDryRunTest {
                     mock(PocketRepository.class),
                     mock(ArtifactRepository.class),
                     mock(TargetRepository.class),
-                    mock(PipelineRunRepository.class)
+                    mock(PipelineRunRepository.class),
+                    8
             );
 
     @Test

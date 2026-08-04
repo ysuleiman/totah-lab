@@ -35,6 +35,7 @@ type SortKey =
   | 'maximumNearestNeighborDistance'
   | 'queryPointCount'
   | 'candidatePointCount'
+  | 'alphaSphereCount'
 
 interface Column {
   key: SortKey
@@ -91,6 +92,13 @@ const COLUMNS: Column[] = [
     label: 'Basis',
     defaultDirection: 'asc',
     value: (row) => geometryBasisLabel(row.basis),
+  },
+  {
+    key: 'alphaSphereCount',
+    label: 'Alpha spheres',
+    defaultDirection: 'desc',
+    value: (row) =>
+      row.basis === 'ALPHA_SPHERES' ? String(row.alphaSphereCount) : '—',
   },
   {
     key: 'descriptorDistance',
