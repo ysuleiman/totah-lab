@@ -8,9 +8,17 @@ import totah.lab.athena.pocket.compare.CompositePocketAligner;
 import totah.lab.athena.pocket.compare.PocketAlignment;
 import totah.lab.athena.pocket.compare.PocketComparator;
 import totah.lab.athena.pocket.compare.PocketComparisonOptions;
+import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
+import totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformer;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistry;
+import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
+import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
+import totah.lab.athena.pocket.compare.residue.ResidueMatch;
+import totah.lab.athena.pocket.compare.residue.ResidueReference;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.gaia.geometry.Point3D;
+import totah.lab.gaia.geometry.RigidTransform;
 import totah.lab.web.persistence.PocketSummaryEntity;
 import totah.lab.web.persistence.PocketSummaryRepository;
 import totah.lab.web.service.PocketSimilarityService.PocketCandidate;
@@ -75,12 +83,44 @@ class PocketSimilarityServiceTest {
     private static final int QUERY_RESIDUE_COUNT = 20;
     private static final double QUERY_HYDROPHOBIC = 0.5;
 
+    // 90 degrees about the z-axis plus a translation.
+    private static final RigidTransform KNOWN_TRANSFORM =
+            new RigidTransform(
+                    new double[][]{
+                            {0.0, -1.0, 0.0},
+                            {1.0, 0.0, 0.0},
+                            {0.0, 0.0, 1.0}
+                    },
+                    new Point3D(3.0, -2.0, 5.0)
+            );
+
+    private static final String[] RESIDUE_NAMES = {
+            "ALA", "PHE", "SER", "LYS", "ASP", "CYS", "GLY", "LEU"
+    };
+
+    private static final ResidueChemistry[] RESIDUE_CHEMISTRIES = {
+            ResidueChemistry.HYDROPHOBIC,
+            ResidueChemistry.AROMATIC,
+            ResidueChemistry.POLAR,
+            ResidueChemistry.POSITIVE,
+            ResidueChemistry.NEGATIVE,
+            ResidueChemistry.CYSTEINE,
+            ResidueChemistry.GLYCINE,
+            ResidueChemistry.HYDROPHOBIC
+    };
+
     private final PocketSummaryRepository repository =
             mock(PocketSummaryRepository.class);
     private final FakeGeometryLoader geometryLoader =
             new FakeGeometryLoader();
+    private final FakeResidueLoader residueLoader =
+            new FakeResidueLoader();
     private final PocketSimilarityService service =
-            new PocketSimilarityService(repository, geometryLoader);
+            new PocketSimilarityService(
+                    repository,
+                    geometryLoader,
+                    residueLoader
+            );
 
     @Test
     void queriesSummaryAndCandidatesExactlyOnce() {
@@ -515,6 +555,202 @@ class PocketSimilarityServiceTest {
         assertEquals(422, exception.getStatusCode().value());
     }
 
+    @Test
+    void compareReturnsResidueCorrespondenceMatchingAthenaCalculator() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+
+        // The candidate cloud and its residue points are moved by a
+        // known rigid transform; the retained alignment must map the
+        // candidate residues back onto the query residues.
+        List<Point3D> movedPoints =
+                KNOWN_TRANSFORM.apply(cloud(IRREGULAR_CLOUD).points());
+
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, new PocketPointCloud(movedPoints, BASIS));
+
+        List<PocketResiduePoint> queryResidues =
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points());
+        List<PocketResiduePoint> candidateResidues =
+                residuePoints("B", 101, movedPoints);
+
+        residueLoader.register(QUERY_POCKET_ID, queryResidues);
+        residueLoader.register(1L, candidateResidues);
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        // Expected values come from the Athena transformer and
+        // calculator on the same inputs, using the same retained
+        // alignment the comparator produces.
+        PocketAlignment alignment = new PocketComparator(
+                new CompositePocketAligner(),
+                PocketComparisonOptions.defaults()
+        ).align(
+                cloud(IRREGULAR_CLOUD),
+                new PocketPointCloud(movedPoints, BASIS)
+        );
+
+        ResidueCorrespondence expected =
+                new ResidueCorrespondenceCalculator().calculate(
+                        queryResidues,
+                        new PocketResiduePointTransformer().transform(
+                                candidateResidues,
+                                alignment.transform()
+                        )
+                );
+
+        ResidueCorrespondenceView view =
+                details.residueCorrespondence();
+
+        assertEquals(expected.matches().size(), view.matches().size());
+        assertEquals(
+                expected.unmatchedQuery().size(),
+                view.unmatchedQuery().size()
+        );
+        assertEquals(
+                expected.unmatchedCandidate().size(),
+                view.unmatchedCandidate().size()
+        );
+
+        for (int index = 0; index < expected.matches().size(); index++) {
+            ResidueMatch expectedMatch = expected.matches().get(index);
+            ResidueMatchView actualMatch = view.matches().get(index);
+
+            assertEquals(
+                    expectedMatch.matchType().name(),
+                    actualMatch.matchType()
+            );
+            assertEquals(
+                    expectedMatch.identicalResidue(),
+                    actualMatch.identicalResidue()
+            );
+            assertEquals(
+                    expectedMatch.chemistryCompatible(),
+                    actualMatch.chemistryCompatible()
+            );
+            assertEquals(
+                    expectedMatch.distanceAngstroms(),
+                    actualMatch.distanceAngstroms(),
+                    1e-9
+            );
+            assertEquals(
+                    expectedMatch.query().reference().residueName(),
+                    actualMatch.query().residueName()
+            );
+            assertEquals(
+                    expectedMatch.candidate().reference().residueName(),
+                    actualMatch.candidate().residueName()
+            );
+        }
+
+        ResidueSummaryView summary = view.summary();
+        assertEquals(queryResidues.size(), summary.queryResidueCount());
+        assertEquals(
+                candidateResidues.size(),
+                summary.candidateResidueCount()
+        );
+        assertEquals(expected.matches().size(), summary.matchedCount());
+        assertEquals(
+                expected.matchedFractionQuery(),
+                summary.matchedFractionQuery(),
+                1e-9
+        );
+        assertEquals(
+                expected.matchedFractionCandidate(),
+                summary.matchedFractionCandidate(),
+                1e-9
+        );
+        assertEquals(
+                expected.identicalFraction(),
+                summary.identicalFraction(),
+                1e-9
+        );
+        assertEquals(
+                expected.chemistryCompatibleFraction(),
+                summary.chemistryCompatibleFraction(),
+                1e-9
+        );
+        assertEquals(
+                expected.meanMatchedDistance(),
+                summary.meanMatchedDistance(),
+                1e-9
+        );
+        assertEquals(
+                expected.maximumMatchedDistance(),
+                summary.maximumMatchedDistance(),
+                1e-9
+        );
+
+        // Every residue matches its identical counterpart near zero
+        // distance once the retained transform is applied.
+        assertEquals(queryResidues.size(), summary.matchedCount());
+        assertTrue(summary.maximumMatchedDistance() < 1.0e-2);
+        assertEquals(1.0, summary.identicalFraction(), 1e-9);
+    }
+
+    @Test
+    void compareReturnsRetainedTransformAndLoadsResiduesOnce() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        assertEquals(1, residueLoader.loadCount(QUERY_POCKET_ID));
+        assertEquals(1, residueLoader.loadCount(1L));
+
+        RigidTransform expected = new PocketComparator(
+                new CompositePocketAligner(),
+                PocketComparisonOptions.defaults()
+        ).align(
+                cloud(IRREGULAR_CLOUD),
+                cloud(IRREGULAR_CLOUD)
+        ).transform();
+
+        double[][] expectedRotation = expected.rotation();
+        double[][] actualRotation = details.transform().rotation();
+
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 3; column++) {
+                assertEquals(
+                        expectedRotation[row][column],
+                        actualRotation[row][column],
+                        0.0
+                );
+            }
+        }
+
+        assertEquals(
+                expected.translation(),
+                details.transform().translation()
+        );
+    }
+
+    @Test
+    void comparePropagatesResidueLoadingFailure() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        residueLoader.failOn(1L);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> service.compareGeometries(QUERY_POCKET_ID, 1L)
+        );
+
+        assertEquals(422, exception.getStatusCode().value());
+    }
+
     private void stubQuerySummary() {
         when(repository.findById(QUERY_POCKET_ID))
                 .thenReturn(Optional.of(new TestPocketSummaryEntity(
@@ -657,6 +893,29 @@ class PocketSimilarityServiceTest {
         return new PocketPointCloud(points, BASIS);
     }
 
+    private static List<PocketResiduePoint> residuePoints(
+            String chainId,
+            int firstResidueNumber,
+            List<Point3D> positions
+    ) {
+        List<PocketResiduePoint> residues = new ArrayList<>();
+
+        for (int index = 0; index < positions.size(); index++) {
+            residues.add(new PocketResiduePoint(
+                    new ResidueReference(
+                            chainId,
+                            firstResidueNumber + index,
+                            ' ',
+                            RESIDUE_NAMES[index]
+                    ),
+                    positions.get(index),
+                    RESIDUE_CHEMISTRIES[index]
+            ));
+        }
+
+        return residues;
+    }
+
     private static List<Long> pocketIds(List<PocketCandidate> candidates) {
         return candidates.stream()
                 .map(PocketCandidate::pocketId)
@@ -665,7 +924,6 @@ class PocketSimilarityServiceTest {
 
     private static final class FakeGeometryLoader
             extends PocketPointCloudLoader {
-
         private final Map<Long, PocketPointCloud> clouds = new HashMap<>();
         private final Set<Long> failing = new HashSet<>();
         private int loadAllCount;
@@ -706,6 +964,47 @@ class PocketSimilarityServiceTest {
                 }
             }
             return result;
+        }
+    }
+
+    private static final class FakeResidueLoader
+            extends PocketResidueLoader {
+
+        private final Map<Long, List<PocketResiduePoint>> residues =
+                new HashMap<>();
+        private final Set<Long> failing = new HashSet<>();
+        private final Map<Long, Integer> loadCounts = new HashMap<>();
+
+        private FakeResidueLoader() {
+            super(null, null, null);
+        }
+
+        void register(long pocketId, List<PocketResiduePoint> points) {
+            residues.put(pocketId, points);
+        }
+
+        void failOn(long pocketId) {
+            failing.add(pocketId);
+        }
+
+        int loadCount(long pocketId) {
+            return loadCounts.getOrDefault(pocketId, 0);
+        }
+
+        @Override
+        public List<PocketResiduePoint> load(long pocketId) {
+            loadCounts.merge(pocketId, 1, Integer::sum);
+
+            if (failing.contains(pocketId)) {
+                throw new ResponseStatusException(
+                        org.springframework.http.HttpStatus
+                                .UNPROCESSABLE_ENTITY,
+                        "Pocket " + pocketId
+                                + " structure artifact cannot be loaded"
+                );
+            }
+
+            return residues.getOrDefault(pocketId, List.of());
         }
     }
 }

@@ -53,6 +53,57 @@ const details: PocketComparisonDetails = {
     basis: 'RESIDUE_ATOMS',
   },
   aligner: 'PCA_ICP',
+  transform: {
+    rotation: [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+    ],
+    translation: { x: 0, y: 0, z: 0 },
+  },
+  residueCorrespondence: {
+    matches: [
+      {
+        query: {
+          chainId: 'A',
+          residueNumber: 202,
+          insertionCode: '',
+          residueName: 'CYS',
+          label: 'A:CYS202',
+          chemistry: 'CYSTEINE',
+          position: { x: 0, y: 0, z: 0 },
+        },
+        candidate: {
+          chainId: 'B',
+          residueNumber: 210,
+          insertionCode: '',
+          residueName: 'CYS',
+          label: 'B:CYS210',
+          chemistry: 'CYSTEINE',
+          position: { x: 0.1, y: 0, z: 0 },
+        },
+        distanceAngstroms: 0.8,
+        matchType: 'CONSERVATIVE',
+        identicalResidue: false,
+        chemistryCompatible: true,
+      },
+    ],
+    unmatchedQuery: [],
+    unmatchedCandidate: [],
+    summary: {
+      queryResidueCount: 2,
+      candidateResidueCount: 2,
+      matchedCount: 1,
+      unmatchedQueryCount: 0,
+      unmatchedCandidateCount: 0,
+      matchedFractionQuery: 0.5,
+      matchedFractionCandidate: 0.5,
+      identicalFraction: 0,
+      chemistryCompatibleFraction: 1,
+      meanMatchedDistance: 0.8,
+      maximumMatchedDistance: 0.8,
+    },
+  },
 }
 
 const diagnosticRow: PocketSimilarityDiagnosticRow = {
@@ -94,7 +145,7 @@ function jsonResponse(body: unknown, status = 200) {
   }
 }
 
-function stubFetch(compareOk: boolean) {
+function stubFetch(compareOk: boolean, comparePayload: unknown = details) {
   vi.stubGlobal(
     'fetch',
     vi.fn((input: RequestInfo | URL) => {
@@ -102,7 +153,7 @@ function stubFetch(compareOk: boolean) {
       if (url.includes('/compare/')) {
         return Promise.resolve(
           compareOk
-            ? jsonResponse(details)
+            ? jsonResponse(comparePayload)
             : jsonResponse({ message: 'boom' }, 500),
         )
       }
@@ -219,5 +270,53 @@ describe('PocketComparisonPage', () => {
       .toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Try again' }))
       .toBeInTheDocument()
+  })
+
+  it('renders the residue correspondence section when present', async () => {
+    stubFetch(true)
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Residue correspondence',
+      }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('A:CYS202')).toBeInTheDocument()
+    expect(screen.getByText('B:CYS210')).toBeInTheDocument()
+    expect(screen.getByText('Key residue')).toBeInTheDocument()
+    expect(
+      screen.getByRole('checkbox', { name: 'Matched residue points' }),
+    ).toBeChecked()
+    // Existing viewer fallback and metrics still render.
+    expect(
+      await screen.findByText('3D viewer unavailable in this browser.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('0.910')).toBeInTheDocument()
+  })
+
+  it('omits the residue section when correspondence is null', async () => {
+    stubFetch(true, { ...details, residueCorrespondence: null })
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.queryByRole('heading', { name: 'Residue correspondence' }),
+    ).toBeNull()
+    expect(
+      screen.queryByRole('checkbox', { name: 'Matched residue points' }),
+    ).toBeNull()
+    expect(screen.getByText('0.910')).toBeInTheDocument()
   })
 })

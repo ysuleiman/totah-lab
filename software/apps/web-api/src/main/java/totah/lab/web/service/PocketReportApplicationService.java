@@ -97,7 +97,12 @@ public class PocketReportApplicationService {
         return new PocketReportDocument(report, narrative);
     }
 
-    private Pocket toDomainPocket(PocketService.PocketDetails details) {
+    /**
+     * Builds the Gaia domain pocket for a loaded pocket. Package-private
+     * and static so other services (for example pairwise comparison)
+     * can construct the identical domain object.
+     */
+    static Pocket toDomainPocket(PocketService.PocketDetails details) {
         PocketSource source = source(details.source());
 
         List<PocketMetric> metrics = new java.util.ArrayList<>();
@@ -144,7 +149,7 @@ public class PocketReportApplicationService {
         );
     }
 
-    private PocketSource source(String value) {
+    private static PocketSource source(String value) {
         try {
             return PocketSource.valueOf(
                     value.trim().toUpperCase(Locale.ROOT));
@@ -157,14 +162,14 @@ public class PocketReportApplicationService {
         }
     }
 
-    private Character insertionCode(String value) {
+    private static Character insertionCode(String value) {
         if (value == null || value.isBlank()) {
             return null;
         }
         return value.charAt(0);
     }
 
-    private void putMetric(
+    private static void putMetric(
             List<PocketMetric> metrics,
             PocketMetricType type,
             Double value

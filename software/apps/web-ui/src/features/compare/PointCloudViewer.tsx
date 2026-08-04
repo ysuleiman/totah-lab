@@ -12,6 +12,9 @@ interface Props {
   opacity: number
   showCentroids: boolean
   resetKey: number
+  matchedQueryResiduePoints?: Point3D[]
+  matchedCandidateResiduePoints?: Point3D[]
+  showMatchedResidues?: boolean
 }
 
 interface GlState {
@@ -26,9 +29,15 @@ interface GlState {
   originalCandidateBuffer: WebGLBuffer | null
   alignedCandidateBuffer: WebGLBuffer | null
   centroidBuffer: WebGLBuffer | null
+  matchedQueryBuffer: WebGLBuffer | null
+  matchedCandidateBuffer: WebGLBuffer | null
+  connectorBuffer: WebGLBuffer | null
   queryCount: number
   originalCandidateCount: number
   alignedCandidateCount: number
+  matchedQueryCount: number
+  matchedCandidateCount: number
+  connectorCount: number
   radius: number
 }
 
@@ -36,6 +45,9 @@ const QUERY_COLOR: [number, number, number] = [0.16, 0.45, 0.9]
 const ORIGINAL_COLOR: [number, number, number] = [0.86, 0.24, 0.18]
 const ALIGNED_COLOR: [number, number, number] = [0.16, 0.66, 0.38]
 const CENTROID_COLOR: [number, number, number] = [0.75, 0.1, 0.35]
+const MATCHED_QUERY_COLOR: [number, number, number] = [0.48, 0.22, 0.78]
+const MATCHED_CANDIDATE_COLOR: [number, number, number] = [0.92, 0.55, 0.1]
+const CONNECTOR_COLOR: [number, number, number] = [0.45, 0.48, 0.45]
 
 const VERTEX_SHADER = `
 attribute vec3 aPosition;
@@ -153,6 +165,8 @@ export function PointCloudViewer(props: Props) {
     props.queryPoints,
     props.originalCandidatePoints,
     props.alignedCandidatePoints,
+    props.matchedQueryResiduePoints,
+    props.matchedCandidateResiduePoints,
   ])
 
   useEffect(() => {
@@ -164,6 +178,7 @@ export function PointCloudViewer(props: Props) {
     props.pointSize,
     props.opacity,
     props.showCentroids,
+    props.showMatchedResidues,
   ])
 
   if (!supported) {
@@ -210,9 +225,15 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     originalCandidateBuffer: null,
     alignedCandidateBuffer: null,
     centroidBuffer: null,
+    matchedQueryBuffer: null,
+    matchedCandidateBuffer: null,
+    connectorBuffer: null,
     queryCount: 0,
     originalCandidateCount: 0,
     alignedCandidateCount: 0,
+    matchedQueryCount: 0,
+    matchedCandidateCount: 0,
+    connectorCount: 0,
     radius: 10,
   }
 }
@@ -224,6 +245,9 @@ function destroyGlState(state: GlState) {
     state.originalCandidateBuffer,
     state.alignedCandidateBuffer,
     state.centroidBuffer,
+    state.matchedQueryBuffer,
+    state.matchedCandidateBuffer,
+    state.connectorBuffer,
   ]) {
     if (buffer) gl.deleteBuffer(buffer)
   }
@@ -269,15 +293,41 @@ function uploadGeometry(state: GlState | null, props: Props) {
   ]
   state.centroidBuffer = uploadPoints(gl, state.centroidBuffer, centroids)
 
+  const matchedQuery = props.matchedQueryResiduePoints ?? []
+  const matchedCandidate = props.matchedCandidateResiduePoints ?? []
+  state.matchedQueryBuffer = uploadPoints(
+    gl,
+    state.matchedQueryBuffer,
+    matchedQuery,
+  )
+  state.matchedCandidateBuffer = uploadPoints(
+    gl,
+    state.matchedCandidateBuffer,
+    matchedCandidate,
+  )
+
+  const connectors: Point3D[] = []
+  if (matchedQuery.length === matchedCandidate.length) {
+    for (let index = 0; index < matchedQuery.length; index++) {
+      connectors.push(matchedQuery[index], matchedCandidate[index])
+    }
+  }
+  state.connectorBuffer = uploadPoints(gl, state.connectorBuffer, connectors)
+
   state.queryCount = props.queryPoints.length
   state.originalCandidateCount = props.originalCandidatePoints.length
   state.alignedCandidateCount = props.alignedCandidatePoints.length
+  state.matchedQueryCount = matchedQuery.length
+  state.matchedCandidateCount = matchedCandidate.length
+  state.connectorCount = connectors.length
 
   let radius = 1
   const visiblePoints = [
     ...props.queryPoints,
     ...props.originalCandidatePoints,
     ...props.alignedCandidatePoints,
+    ...matchedQuery,
+    ...matchedCandidate,
   ]
   const sceneCenter = centroidOf(visiblePoints)
   for (const point of visiblePoints) {
@@ -350,6 +400,8 @@ function render(
     ...props.queryPoints,
     ...props.originalCandidatePoints,
     ...props.alignedCandidatePoints,
+    ...(props.matchedQueryResiduePoints ?? []),
+    ...(props.matchedCandidateResiduePoints ?? []),
   ]
   const center = centroidOf(allPoints)
   const distance = Math.max(1, state.radius) * camera.zoom
@@ -395,6 +447,29 @@ function render(
     gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 2.5)
     drawPoints(state, state.centroidBuffer, 3, CENTROID_COLOR)
   }
+  if (props.showMatchedResidues) {
+    gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 1.8)
+    drawPoints(
+      state,
+      state.matchedQueryBuffer,
+      state.matchedQueryCount,
+      MATCHED_QUERY_COLOR,
+    )
+    drawPoints(
+      state,
+      state.matchedCandidateBuffer,
+      state.matchedCandidateCount,
+      MATCHED_CANDIDATE_COLOR,
+    )
+    gl.uniform1f(state.opacityLocation, 0.6)
+    drawPoints(
+      state,
+      state.connectorBuffer,
+      state.connectorCount,
+      CONNECTOR_COLOR,
+      gl.LINES,
+    )
+  }
 }
 
 function drawPoints(
@@ -402,13 +477,14 @@ function drawPoints(
   buffer: WebGLBuffer | null,
   count: number,
   color: [number, number, number],
+  mode?: number,
 ) {
   if (!buffer || count <= 0) return
   const { gl } = state
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.vertexAttribPointer(state.positionLocation, 3, gl.FLOAT, false, 0, 0)
   gl.uniform3fv(state.colorLocation, color)
-  gl.drawArrays(gl.POINTS, 0, count)
+  gl.drawArrays(mode ?? gl.POINTS, 0, count)
 }
 
 function perspective(

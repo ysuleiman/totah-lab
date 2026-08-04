@@ -426,6 +426,51 @@ export interface PocketAlignmentView {
   converged: boolean
 }
 
+export interface ResiduePointView {
+  chainId: string
+  residueNumber: number
+  insertionCode: string
+  residueName: string
+  label: string
+  chemistry: string
+  position: Point3D
+}
+
+export interface ResidueMatchView {
+  query: ResiduePointView
+  candidate: ResiduePointView
+  distanceAngstroms: number
+  matchType:
+    | 'IDENTICAL'
+    | 'CONSERVATIVE'
+    | 'CHEMISTRY_COMPATIBLE'
+    | 'DIFFERENT'
+    | 'UNMATCHED'
+  identicalResidue: boolean
+  chemistryCompatible: boolean
+}
+
+export interface ResidueSummaryView {
+  queryResidueCount: number
+  candidateResidueCount: number
+  matchedCount: number
+  unmatchedQueryCount: number
+  unmatchedCandidateCount: number
+  matchedFractionQuery: number
+  matchedFractionCandidate: number
+  identicalFraction: number
+  chemistryCompatibleFraction: number
+  meanMatchedDistance: number
+  maximumMatchedDistance: number
+}
+
+export interface ResidueCorrespondenceView {
+  matches: ResidueMatchView[]
+  unmatchedQuery: ResiduePointView[]
+  unmatchedCandidate: ResiduePointView[]
+  summary: ResidueSummaryView
+}
+
 export interface PocketComparisonDetails {
   query: PocketGeometryView
   candidate: PocketGeometryView
@@ -434,4 +479,6 @@ export interface PocketComparisonDetails {
   comparison: PocketComparisonMetrics
   aligner: string
   alignment?: PocketAlignmentView
+  transform: RigidTransformView
+  residueCorrespondence: ResidueCorrespondenceView | null
 }

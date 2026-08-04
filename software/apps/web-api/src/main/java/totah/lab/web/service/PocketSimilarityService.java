@@ -12,6 +12,10 @@ import totah.lab.athena.pocket.compare.PocketAlignment;
 import totah.lab.athena.pocket.compare.PocketComparator;
 import totah.lab.athena.pocket.compare.PocketComparison;
 import totah.lab.athena.pocket.compare.PocketComparisonOptions;
+import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
+import totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformer;
+import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
+import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptor;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptorFactory;
@@ -69,14 +73,21 @@ public class PocketSimilarityService {
 
     private final PocketSummaryRepository pocketSummaryRepository;
     private final PocketPointCloudLoader geometryLoader;
+    private final PocketResidueLoader residueLoader;
     private final PocketComparator comparator;
+    private final PocketResiduePointTransformer residueTransformer =
+            new PocketResiduePointTransformer();
+    private final ResidueCorrespondenceCalculator correspondenceCalculator =
+            new ResidueCorrespondenceCalculator();
 
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
-            PocketPointCloudLoader geometryLoader
+            PocketPointCloudLoader geometryLoader,
+            PocketResidueLoader residueLoader
     ) {
         this.pocketSummaryRepository = pocketSummaryRepository;
         this.geometryLoader = geometryLoader;
+        this.residueLoader = residueLoader;
         this.comparator = new PocketComparator(
                 new CompositePocketAligner(),
                 PocketComparisonOptions.defaults()
@@ -141,17 +152,23 @@ public class PocketSimilarityService {
      * Pairwise comparison of two pockets, for the inspection UI.
      * Metrics come from {@code PocketComparator}; the aligned point
      * clouds come from Athena's {@code PocketAlignment} (the same
-     * centroid alignment the comparator uses). Loads both clouds with
-     * a single bulk call.
+     * centroid alignment the comparator uses); the residue
+     * correspondence is computed with the same retained alignment
+     * transform. Loads both clouds with a single bulk call and each
+     * pocket's residues exactly once.
      */
     @Transactional(readOnly = true)
     public PocketComparisonDetails compareGeometries(
             long queryPocketId,
             long candidatePocketId
     ) {
+        long requestStartNanos = System.nanoTime();
+
         PocketSummaryEntity querySummary = findSummary(queryPocketId);
         PocketSummaryEntity candidateSummary =
                 findSummary(candidatePocketId);
+
+        long geometryStartNanos = System.nanoTime();
 
         Map<Long, PocketPointCloud> pointClouds =
                 geometryLoader.loadAll(
@@ -185,6 +202,43 @@ public class PocketSimilarityService {
                     exception
             );
         }
+        long geometryMs = elapsedMillis(geometryStartNanos);
+
+        long residueExtractionStartNanos = System.nanoTime();
+        List<PocketResiduePoint> queryResidues =
+                residueLoader.load(queryPocketId);
+        List<PocketResiduePoint> candidateResidues =
+                residueLoader.load(candidatePocketId);
+        long residueExtractionMs =
+                elapsedMillis(residueExtractionStartNanos);
+
+        long residueTransformStartNanos = System.nanoTime();
+        List<PocketResiduePoint> alignedCandidateResidues =
+                residueTransformer.transform(
+                        candidateResidues,
+                        alignment.transform()
+                );
+        long residueTransformMs =
+                elapsedMillis(residueTransformStartNanos);
+
+        long residueMatchingStartNanos = System.nanoTime();
+        ResidueCorrespondence correspondence =
+                correspondenceCalculator.calculate(
+                        queryResidues,
+                        alignedCandidateResidues
+                );
+        long residueMatchingMs =
+                elapsedMillis(residueMatchingStartNanos);
+
+        logComparisonTiming(
+                queryPocketId,
+                candidatePocketId,
+                geometryMs,
+                residueExtractionMs,
+                residueTransformMs,
+                residueMatchingMs,
+                elapsedMillis(requestStartNanos)
+        );
 
         return new PocketComparisonDetails(
                 toGeometryView(querySummary, queryCloud),
@@ -192,9 +246,42 @@ public class PocketSimilarityService {
                 alignment.query().points(),
                 alignment.alignedCandidate().points(),
                 comparison,
-                ACTIVE_ALIGNER
+                ACTIVE_ALIGNER,
+                ResidueCorrespondenceViewMapper.toView(correspondence),
+                new TransformView(
+                        alignment.transform().rotation(),
+                        alignment.transform().translation()
+                )
         );
 
+    }
+
+    private void logComparisonTiming(
+            long queryPocketId,
+            long candidatePocketId,
+            long geometryMs,
+            long residueExtractionMs,
+            long residueTransformMs,
+            long residueMatchingMs,
+            long totalMs
+    ) {
+        LOGGER.info(
+                "pocket comparison timing:"
+                        + " queryPocketId={}"
+                        + " candidatePocketId={}"
+                        + " geometryMs={}"
+                        + " residueExtractionMs={}"
+                        + " residueTransformMs={}"
+                        + " residueMatchingMs={}"
+                        + " totalMs={}",
+                queryPocketId,
+                candidatePocketId,
+                geometryMs,
+                residueExtractionMs,
+                residueTransformMs,
+                residueMatchingMs,
+                totalMs
+        );
     }
 
     private PocketSummaryEntity findSummary(long pocketId) {

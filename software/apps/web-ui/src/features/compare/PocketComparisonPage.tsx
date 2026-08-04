@@ -3,12 +3,14 @@ import type {
   PocketComparisonDetails,
   PocketSimilarityDiagnosticRow,
   Point3D,
+  RigidTransformView,
 } from '../../api/types'
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { geometryBasisLabel } from '../similar/geometryBasis'
 import { PointCloudViewer } from './PointCloudViewer'
+import { ResidueCorrespondenceSection } from './ResidueCorrespondenceSection'
 
 const RANK_LIMIT = 100
 
@@ -45,6 +47,7 @@ function PocketComparisonContent({
   const [pointSize, setPointSize] = useState(4)
   const [opacity, setOpacity] = useState(0.85)
   const [showCentroids, setShowCentroids] = useState(true)
+  const [showMatchedResidues, setShowMatchedResidues] = useState(true)
   const [alignmentProgress, setAlignmentProgress] = useState(1)
   const [resetKey, setResetKey] = useState(0)
 
@@ -78,6 +81,8 @@ function PocketComparisonContent({
     candidate,
     alignedCandidatePoints,
     comparison,
+    transform,
+    residueCorrespondence,
   } = details.data
 
   const interpolatedCandidate = interpolatePoints(
@@ -85,6 +90,14 @@ function PocketComparisonContent({
     alignedCandidatePoints,
     alignmentProgress,
   )
+
+  const matchedQueryResiduePoints = residueCorrespondence?.matches.map(
+    (match) => match.query.position,
+  )
+  const matchedCandidateResiduePoints =
+    residueCorrespondence?.matches.map((match) =>
+      applyTransform(transform, match.candidate.position),
+    )
 
   return (
     <div className="compare-page">
@@ -300,6 +313,19 @@ function PocketComparisonContent({
             Centroids
           </label>
 
+          {residueCorrespondence && (
+            <label className="viewer-checkbox">
+              <input
+                type="checkbox"
+                checked={showMatchedResidues}
+                onChange={(event) =>
+                  setShowMatchedResidues(event.target.checked)
+                }
+              />
+              Matched residue points
+            </label>
+          )}
+
           <button
             type="button"
             onClick={() => setResetKey((value) => value + 1)}
@@ -328,6 +354,9 @@ function PocketComparisonContent({
           opacity={opacity}
           showCentroids={showCentroids}
           resetKey={resetKey}
+          matchedQueryResiduePoints={matchedQueryResiduePoints}
+          matchedCandidateResiduePoints={matchedCandidateResiduePoints}
+          showMatchedResidues={showMatchedResidues}
         />
 
         <div
@@ -348,6 +377,20 @@ function PocketComparisonContent({
             <i className="legend-dot aligned-dot" />
             Aligned candidate
           </span>
+
+          {residueCorrespondence && (
+            <>
+              <span>
+                <i className="legend-dot matched-query-dot" />
+                Matched query residues
+              </span>
+
+              <span>
+                <i className="legend-dot matched-candidate-dot" />
+                Matched candidate residues
+              </span>
+            </>
+          )}
         </div>
 
         <p className="muted-note">
@@ -361,6 +404,12 @@ function PocketComparisonContent({
           aligned result.
         </p>
       </section>
+
+      {residueCorrespondence && (
+        <ResidueCorrespondenceSection
+          correspondence={residueCorrespondence}
+        />
+      )}
     </div>
   )
 }
@@ -399,6 +448,30 @@ function PocketMetadata({
       </dl>
     </section>
   )
+}
+
+function applyTransform(
+  transform: RigidTransformView,
+  point: Point3D,
+): Point3D {
+  const [r0, r1, r2] = transform.rotation
+  return {
+    x:
+      r0[0] * point.x
+      + r0[1] * point.y
+      + r0[2] * point.z
+      + transform.translation.x,
+    y:
+      r1[0] * point.x
+      + r1[1] * point.y
+      + r1[2] * point.z
+      + transform.translation.y,
+    z:
+      r2[0] * point.x
+      + r2[1] * point.y
+      + r2[2] * point.z
+      + transform.translation.z,
+  }
 }
 
 function interpolatePoints(

@@ -28,6 +28,7 @@
   A compatibility mode would need an explicit policy for polar hydrogens only,
   Gasteiger-style charges, B-factor zeroing, and Open Babel-like AD4 typing.
 - Revisit full Maven test failures separately from compile checks.
+- Persist and display alpha spheres: pocket atom rows currently store only residue-atom coordinates, so pocket geometry is always RESIDUE_ATOMS. Persist fpocket alpha-sphere centers/radii (import + schema), expose them in the geometry/comparison endpoints, and render sphere overlays in the comparison viewer with an ALPHA_SPHERES basis.
 
 ## Done
 

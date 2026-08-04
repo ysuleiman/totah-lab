@@ -1022,3 +1022,54 @@ h1 { margin: 0; font-size: clamp(38px, 6vw, 72px); letter-spacing: -.055em; line
   .viewer-controls label { width: 100%; justify-content: space-between; }
   .viewer-controls input[type='range'] { width: min(220px, 52vw); }
 }
+
+/* Residue correspondence */
+.correspondence-panel { margin-top: 22px; }
+.correspondence-panel .metrics-grid { max-width: 560px; }
+.correspondence-filters {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
+  margin: 18px 0 14px; color: var(--muted); font-size: 12px;
+}
+.correspondence-filters label { display: flex; flex-direction: column; gap: 5px; }
+.correspondence-filters .viewer-checkbox { flex-direction: row; align-items: center; gap: 8px; }
+.correspondence-filters input[type='number'],
+.correspondence-filters input[type='text'] {
+  padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--paper); color: var(--ink); font-size: 12px;
+}
+.correspondence-table-wrap { overflow: auto; }
+.correspondence-table {
+  width: 100%; border-collapse: collapse; background: var(--paper);
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  font-size: 13px;
+}
+.correspondence-table th {
+  text-align: left; padding: 10px 12px; background: var(--ink); color: white;
+  font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+}
+.correspondence-table td {
+  padding: 9px 12px; border-top: 1px solid var(--line);
+  font-family: 'DM Mono', monospace; font-size: 12px;
+}
+.correspondence-table tbody tr:hover { background: var(--selected); }
+.correspondence-table tbody tr.match-identical { background: #e0f2e2; }
+.correspondence-table tbody tr.match-conservative { background: #ecf5e9; }
+.correspondence-table tbody tr.match-compatible { background: #f3f7ea; }
+.correspondence-table tbody tr.match-different { background: #fbe9e7; }
+.match-label { font-weight: 700; font-family: 'Manrope', sans-serif; }
+.match-label.match-identical { color: #1c7a35; }
+.match-label.match-conservative { color: #3d8a4a; }
+.match-label.match-compatible { color: #6d7a2a; }
+.match-label.match-different { color: #b03a2e; }
+.key-badge {
+  display: inline-block; padding: 3px 8px; border-radius: 9px;
+  background: var(--ink); color: var(--accent);
+  font: 500 11px 'DM Mono', monospace;
+}
+.unmatched-section { margin-top: 14px; }
+.unmatched-section summary {
+  cursor: pointer; color: var(--accent-dark); font-size: 12px; font-weight: 700;
+}
+.unmatched-section .correspondence-table { margin-top: 10px; }
+.matched-query-dot { background: rgb(122, 56, 199); }
+.matched-candidate-dot { background: rgb(235, 140, 26); }

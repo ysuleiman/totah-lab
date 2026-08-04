@@ -13,6 +13,11 @@ import totah.lab.web.service.PocketGeometryView;
 import totah.lab.web.service.PocketSimilarityDiagnostic;
 import totah.lab.web.service.PocketSimilarityService;
 import totah.lab.web.service.PocketSimilarityService.PocketCandidate;
+import totah.lab.web.service.ResidueCorrespondenceView;
+import totah.lab.web.service.ResidueMatchView;
+import totah.lab.web.service.ResiduePointView;
+import totah.lab.web.service.ResidueSummaryView;
+import totah.lab.web.service.TransformView;
 
 import java.util.List;
 
@@ -224,7 +229,44 @@ class PocketSearchControllerTest {
                         4, 4,
                         PocketGeometryBasis.RESIDUE_ATOMS
                 ),
-                "PCA_ICP"
+                "PCA_ICP",
+                new ResidueCorrespondenceView(
+                        List.of(new ResidueMatchView(
+                                new ResiduePointView(
+                                        "A", 202, "", "CYS",
+                                        "A:CYS202", "CYSTEINE",
+                                        new Point3D(1.0, 2.0, 3.0)
+                                ),
+                                new ResiduePointView(
+                                        "B", 145, "A", "CYS",
+                                        "B:CYS145A", "CYSTEINE",
+                                        new Point3D(1.5, 2.0, 3.0)
+                                ),
+                                0.5,
+                                "IDENTICAL",
+                                true,
+                                true
+                        )),
+                        List.of(new ResiduePointView(
+                                "A", 88, "", "LEU",
+                                "A:LEU88", "HYDROPHOBIC",
+                                new Point3D(9.0, 9.0, 9.0)
+                        )),
+                        List.of(),
+                        new ResidueSummaryView(
+                                2, 1, 1, 1, 0,
+                                0.5, 1.0, 1.0, 1.0,
+                                0.5, 0.5
+                        )
+                ),
+                new TransformView(
+                        new double[][]{
+                                {0.0, -1.0, 0.0},
+                                {1.0, 0.0, 0.0},
+                                {0.0, 0.0, 1.0}
+                        },
+                        new Point3D(3.0, -2.0, 5.0)
+                )
         );
 
         MockMvc mockMvc = MockMvcBuilders
@@ -244,7 +286,53 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$.comparison.queryCoverage")
                         .value(0.8))
                 .andExpect(jsonPath("$.comparison.basis")
-                        .value("RESIDUE_ATOMS"));
+                        .value("RESIDUE_ATOMS"))
+                .andExpect(jsonPath("$.residueCorrespondence.matches",
+                        hasSize(1)))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].query.label")
+                        .value("A:CYS202"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].query.chemistry")
+                        .value("CYSTEINE"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].candidate.label")
+                        .value("B:CYS145A"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].candidate.insertionCode")
+                        .value("A"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].distanceAngstroms")
+                        .value(0.5))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].matchType")
+                        .value("IDENTICAL"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].identicalResidue")
+                        .value(true))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.unmatchedQuery",
+                        hasSize(1)))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.unmatchedQuery[0].label")
+                        .value("A:LEU88"))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.summary.matchedCount")
+                        .value(1))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.summary.matchedFractionQuery")
+                        .value(0.5))
+                .andExpect(jsonPath(
+                        "$.residueCorrespondence.summary.identicalFraction")
+                        .value(1.0))
+                .andExpect(jsonPath("$.transform.rotation[0][1]")
+                        .value(-1.0))
+                .andExpect(jsonPath("$.transform.rotation[1][0]")
+                        .value(1.0))
+                .andExpect(jsonPath("$.transform.translation.x")
+                        .value(3.0))
+                .andExpect(jsonPath("$.transform.translation.z")
+                        .value(5.0));
 
         assertEquals(42L, service.pocketId);
         assertEquals(7L, service.candidatePocketId);
@@ -280,7 +368,7 @@ class PocketSearchControllerTest {
         private RuntimeException failure;
 
         private RecordingPocketSimilarityService() {
-            super(null, null);
+            super(null, null, null);
         }
 
         @Override
