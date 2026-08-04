@@ -18,9 +18,10 @@ import { PocketReportPanel } from '../report/PocketReportPanel'
 interface Props {
   structureId: number
   onNavigate: (structureId: number) => void
+  onPocketSelect?: (pocketId: number) => void
 }
 
-export function StructureWorkspace({ structureId, onNavigate }: Props) {
+export function StructureWorkspace({ structureId, onNavigate, onPocketSelect }: Props) {
   const structureQuery = useApiQuery<Structure>(
     `/api/structures/${structureId}`,
   )
@@ -139,7 +140,10 @@ export function StructureWorkspace({ structureId, onNavigate }: Props) {
           selectedPocketId={effectivePocketId}
           loading={pocketsQuery.loading}
           error={pocketsQuery.error}
-          onPocketSelect={setSelectedPocketId}
+          onPocketSelect={(pocketId) => {
+            setSelectedPocketId(pocketId)
+            onPocketSelect?.(pocketId)
+          }}
           onRetry={pocketsQuery.retry}
         />
       </div>

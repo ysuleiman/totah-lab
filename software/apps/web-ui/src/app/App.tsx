@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AppShell } from './AppShell'
-import { useAppRoute } from './useAppRoute'
+import { DEFAULT_POCKET_ID, useAppRoute } from './useAppRoute'
 import { PocketComparisonPage } from '../features/compare/PocketComparisonPage'
 import { SelectivityWorkspace } from '../features/selectivity/SelectivityWorkspace'
 import { SimilarPocketsPage } from '../features/similar/SimilarPocketsPage'
@@ -9,9 +9,20 @@ import { StructureWorkspace } from '../features/structure/StructureWorkspace'
 const STRUCTURE_PATH = /^\/structures\/([1-9]\d*)$/
 const SIMILAR_PATH = /^\/pockets\/([1-9]\d*)\/similar$/
 const COMPARE_PATH = /^\/pockets\/([1-9]\d*)\/compare\/([1-9]\d*)$/
+const POCKET_PATH = /^\/pockets\/([1-9]\d*)\//
 
 export function App() {
   const { pathname, navigate } = useAppRoute()
+
+  // The pocket the user is currently working with: the URL decides on
+  // pocket pages; on structure pages the selected pocket card decides.
+  // The top navigation's "Similar pockets" entry targets this pocket.
+  const [cardPocketId, setCardPocketId] = useState<number | null>(null)
+
+  const pocketMatch = POCKET_PATH.exec(pathname)
+  const currentPocketId = pocketMatch
+    ? Number(pocketMatch[1])
+    : cardPocketId ?? DEFAULT_POCKET_ID
 
   const structureMatch = STRUCTURE_PATH.exec(pathname)
   const similarMatch = SIMILAR_PATH.exec(pathname)
@@ -46,12 +57,17 @@ export function App() {
         structureId={structureId}
         onNavigate={(nextStructureId) =>
           navigate(`/structures/${nextStructureId}`)}
+        onPocketSelect={setCardPocketId}
       />
     )
   }
 
   return (
-    <AppShell pathname={pathname} onNavigate={navigate}>
+    <AppShell
+      pathname={pathname}
+      onNavigate={navigate}
+      currentPocketId={currentPocketId}
+    >
       {content}
     </AppShell>
   )

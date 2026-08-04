@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
-import { DEFAULT_POCKET_ID, DEFAULT_STRUCTURE_ID } from './useAppRoute'
+import { DEFAULT_STRUCTURE_ID } from './useAppRoute'
 
 interface Props {
   children: ReactNode
   pathname: string
   onNavigate: (path: string) => void
+  currentPocketId: number
 }
 
 interface NavigationItem {
@@ -27,14 +28,6 @@ const NAVIGATION: NavigationItem[] = [
     path: `/structures/${DEFAULT_STRUCTURE_ID}`,
     active: (pathname) => pathname.startsWith('/structures/'),
   },
-  {
-    label: 'Similar pockets',
-    description: 'Search and rank pockets',
-    path: `/pockets/${DEFAULT_POCKET_ID}/similar`,
-    active: (pathname) =>
-      pathname.startsWith('/pockets/')
-      && pathname.endsWith('/similar'),
-  },
 ]
 
 function positiveInteger(value: string): number | null {
@@ -42,11 +35,22 @@ function positiveInteger(value: string): number | null {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null
 }
 
-export function AppShell({ children, pathname, onNavigate }: Props) {
+export function AppShell({ children, pathname, onNavigate, currentPocketId }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [structureId, setStructureId] = useState(String(DEFAULT_STRUCTURE_ID))
-  const [pocketId, setPocketId] = useState(String(DEFAULT_POCKET_ID))
   const [jumpError, setJumpError] = useState<string | null>(null)
+
+  const navigation = [
+    ...NAVIGATION,
+    {
+      label: 'Similar pockets',
+      description: 'Search and rank pockets',
+      path: `/pockets/${currentPocketId}/similar`,
+      active: (currentPath: string) =>
+        currentPath.startsWith('/pockets/')
+        && currentPath.endsWith('/similar'),
+    },
+  ]
 
   useEffect(() => {
     setMenuOpen(false)
@@ -55,11 +59,6 @@ export function AppShell({ children, pathname, onNavigate }: Props) {
     const structureMatch = /^\/structures\/(\d+)$/.exec(pathname)
     if (structureMatch) {
       setStructureId(structureMatch[1])
-    }
-
-    const pocketMatch = /^\/pockets\/(\d+)\//.exec(pathname)
-    if (pocketMatch) {
-      setPocketId(pocketMatch[1])
     }
   }, [pathname])
 
@@ -80,7 +79,10 @@ export function AppShell({ children, pathname, onNavigate }: Props) {
 
   const openPocketSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const id = positiveInteger(pocketId)
+    const form = event.currentTarget
+    const value = form.elements.namedItem('pocket-id')
+    const raw = value instanceof HTMLInputElement ? value.value : ''
+    const id = positiveInteger(raw)
     if (id === null) {
       setJumpError('Enter a positive pocket ID.')
       return
@@ -120,7 +122,7 @@ export function AppShell({ children, pathname, onNavigate }: Props) {
           className={`primary-navigation${menuOpen ? ' open' : ''}`}
           aria-label="Primary navigation"
         >
-          {NAVIGATION.map((item) => {
+          {navigation.map((item) => {
             const isActive = item.active(pathname)
             return (
               <button
@@ -172,9 +174,10 @@ export function AppShell({ children, pathname, onNavigate }: Props) {
             <div>
               <input
                 id="menu-pocket-id"
+                name="pocket-id"
                 inputMode="numeric"
-                value={pocketId}
-                onChange={(event) => setPocketId(event.target.value)}
+                key={currentPocketId}
+                defaultValue={currentPocketId}
               />
               <button type="submit">Find similar</button>
             </div>
