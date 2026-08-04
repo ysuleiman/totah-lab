@@ -42,10 +42,15 @@ public class PocketSimilarityService {
     private static final int MINIMUM_STAGE_TWO_LIMIT = 15;
     private static final int STAGE_TWO_MULTIPLIER = 2;
 
-    private static final double MINIMUM_VOLUME_RATIO = 0.60;
-    private static final double MAXIMUM_VOLUME_RATIO = 1.60;
-    private static final double MINIMUM_RESIDUE_RATIO = 0.60;
-    private static final double MAXIMUM_RESIDUE_RATIO = 1.60;
+    // High-recall Stage 1 bands (temporary regression fix): fpocket
+    // may segment homologous binding sites into pockets of very
+    // different size (compact vs merged), so volume/residue ratios
+    // must stay wide sanity gates, not similarity gates. Descriptor-
+    // led retrieval replaces them later.
+    private static final double MINIMUM_VOLUME_RATIO = 0.35;
+    private static final double MAXIMUM_VOLUME_RATIO = 2.75;
+    private static final double MINIMUM_RESIDUE_RATIO = 0.40;
+    private static final double MAXIMUM_RESIDUE_RATIO = 2.75;
 
     private static final Comparator<LoadedCandidate> STAGE_TWO_ORDER =
             Comparator.comparingDouble(LoadedCandidate::shapeDistance)

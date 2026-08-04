@@ -79,6 +79,23 @@ class PocketSimilarityServiceTest {
             {6.0, 16.0, 2.0}
     };
 
+    // A larger "merged" pocket: the query cloud (shifted) embedded in
+    // a conserved region, plus a small adjacent subpocket extending
+    // just past the main cloud's +x edge that the query does not cover.
+    private static final double[][] MERGED_POCKET_CLOUD = {
+            {1.0, 0.5, 0.0},
+            {11.0, 0.5, 0.0},
+            {1.0, 6.5, 0.0},
+            {1.0, 0.5, 3.0},
+            {9.0, 5.5, 2.0},
+            {3.0, 4.5, 6.0},
+            {8.0, 1.5, 5.0},
+            {4.0, 8.5, 1.0},
+            {12.5, 1.0, 1.0},
+            {13.5, 3.0, 2.0},
+            {12.0, 5.0, 1.5}
+    };
+
     private static final double QUERY_VOLUME = 100.0;
     private static final int QUERY_RESIDUE_COUNT = 20;
     private static final double QUERY_HYDROPHOBIC = 0.5;
@@ -139,10 +156,10 @@ class PocketSimilarityServiceTest {
         verify(repository, times(1)).findById(QUERY_POCKET_ID);
         verify(repository, times(1)).findDescriptorCandidates(
                 eq(QUERY_POCKET_ID),
-                eq(0.60),
-                eq(1.60),
-                eq(0.60),
-                eq(1.60),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
                 eq(PageRequest.of(0, 50))
         );
 
@@ -164,20 +181,20 @@ class PocketSimilarityServiceTest {
         service.findSimilar(QUERY_POCKET_ID, 100);
         verify(repository).findDescriptorCandidates(
                 eq(QUERY_POCKET_ID),
-                eq(0.60),
-                eq(1.60),
-                eq(0.60),
-                eq(1.60),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
                 eq(PageRequest.of(0, 500))
         );
 
         service.findSimilar(QUERY_POCKET_ID, 500);
         verify(repository).findDescriptorCandidates(
                 eq(QUERY_POCKET_ID),
-                eq(0.60),
-                eq(1.60),
-                eq(0.60),
-                eq(1.60),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
                 eq(PageRequest.of(0, 2500))
         );
     }
@@ -326,6 +343,62 @@ class PocketSimilarityServiceTest {
     }
 
     @Test
+    void partialPocketCandidateReachesStageThreeWithAsymmetricCoverage() {
+        // Regression fixture for the METTL7A pocket-32 case: a large
+        // merged candidate pocket whose conserved region contains the
+        // entire query cloud, plus an adjacent subpocket the query
+        // does not cover. Stage 2/3 must run and report directional
+        // coverage, not reject the size mismatch.
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(7L, 1520.0, 38, 0.5)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(MERGED_POCKET_CLOUD));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+
+        PocketSimilarityDiagnostic row = rows.get(0);
+        assertEquals(11, row.candidatePointCount());
+        assertTrue(
+                row.queryCoverage() >= 0.6,
+                "forward (query) coverage was " + row.queryCoverage()
+        );
+        assertTrue(
+                row.candidateCoverage() < row.queryCoverage(),
+                "reverse coverage "
+                        + row.candidateCoverage()
+                        + " should be below forward coverage "
+                        + row.queryCoverage()
+        );
+    }
+
+    @Test
+    void unrelatedLargeCandidateDoesNotRankHighly() {
+        // Removing the size gates must not let a mismatched cloud win:
+        // a uniformly inflated pocket fails on alignment quality.
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(7L, 1520.0, 38, 0.5)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_SCALED));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+        assertTrue(
+                rows.get(0).overallSimilarity() < 0.3,
+                "overall similarity was "
+                        + rows.get(0).overallSimilarity()
+        );
+    }
+
+    @Test
     void diagnosticExposesStageRanksAndComparisonMetrics() {
         stubQuerySummary();
         stubCandidates(List.of(
@@ -407,10 +480,10 @@ class PocketSimilarityServiceTest {
         verify(repository, times(1)).findById(QUERY_POCKET_ID);
         verify(repository, times(1)).findDescriptorCandidates(
                 eq(QUERY_POCKET_ID),
-                eq(0.60),
-                eq(1.60),
-                eq(0.60),
-                eq(1.60),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
                 any(Pageable.class)
         );
         assertEquals(1, geometryLoader.loadAllCount());
@@ -1027,10 +1100,10 @@ class PocketSimilarityServiceTest {
     private void stubCandidates(List<PocketSummaryEntity> candidates) {
         when(repository.findDescriptorCandidates(
                 eq(QUERY_POCKET_ID),
-                eq(0.60),
-                eq(1.60),
-                eq(0.60),
-                eq(1.60),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
                 any(Pageable.class)
         )).thenReturn(candidates);
     }
