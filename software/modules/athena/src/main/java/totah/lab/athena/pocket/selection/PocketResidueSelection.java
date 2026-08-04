@@ -14,26 +14,60 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-/** Resolves pocket residue identities and selects their structural lining. */
+/**
+ * Resolves pocket residue identities and selects their structural lining.
+ */
 public final class PocketResidueSelection {
 
-    public List<Residue> resolvedResidues(
+    /**
+     * Returns resolved residues while preserving their complete structural
+     * identity, including chain ID and insertion code.
+     */
+    public List<ResolvedPocketResidue> resolvedPocketResidues(
             Structure structure,
-            Pocket pocket) {
+            Pocket pocket
+    ) {
         requireInputs(structure, pocket);
-        Map<ResidueId, Residue> resolved = new LinkedHashMap<>();
+
+        Map<ResidueId, ResolvedPocketResidue> resolved =
+                new LinkedHashMap<>();
+
         for (ResidueId id : pocket.residues()) {
             structure.findResidue(id).ifPresent(residue ->
-                    resolved.putIfAbsent(id, residue));
+                    resolved.putIfAbsent(
+                            id,
+                            new ResolvedPocketResidue(id, residue)
+                    )
+            );
         }
+
         return List.copyOf(resolved.values());
+    }
+
+    /**
+     * Returns only the resolved Gaia residues.
+     *
+     * <p>Use {@link #resolvedPocketResidues(Structure, Pocket)} when chain and
+     * insertion-code identity must be retained.</p>
+     */
+    public List<Residue> resolvedResidues(
+            Structure structure,
+            Pocket pocket
+    ) {
+        return resolvedPocketResidues(structure, pocket)
+                .stream()
+                .map(ResolvedPocketResidue::residue)
+                .toList();
     }
 
     public List<ResidueId> unresolvedResidues(
             Structure structure,
-            Pocket pocket) {
+            Pocket pocket
+    ) {
         requireInputs(structure, pocket);
-        return pocket.residues().stream()
+
+        return pocket.residues()
+                .stream()
                 .filter(id -> structure.findResidue(id).isEmpty())
                 .toList();
     }
@@ -46,79 +80,137 @@ public final class PocketResidueSelection {
     public List<Residue> liningResidues(
             Structure structure,
             Pocket pocket,
-            double cutoffAngstroms) {
+            double cutoffAngstroms
+    ) {
         requireInputs(structure, pocket);
+
         if (!Double.isFinite(cutoffAngstroms)
                 || cutoffAngstroms <= 0.0) {
             throw new IllegalArgumentException(
-                    "cutoffAngstroms must be finite and positive");
+                    "cutoffAngstroms must be finite and positive"
+            );
         }
 
-        List<Residue> resolved = resolvedResidues(structure, pocket);
-        Map<ResidueId, Residue> lining = new LinkedHashMap<>();
-        for (ResidueId id : pocket.residues()) {
-            structure.findResidue(id).ifPresent(residue ->
-                    lining.putIfAbsent(id, residue));
+        List<Residue> resolved =
+                resolvedResidues(structure, pocket);
+
+        Map<ResidueId, Residue> lining =
+                new LinkedHashMap<>();
+
+        for (ResolvedPocketResidue resolvedResidue :
+                resolvedPocketResidues(structure, pocket)) {
+
+            lining.putIfAbsent(
+                    resolvedResidue.id(),
+                    resolvedResidue.residue()
+            );
         }
 
-        Set<ResidueId> pocketIds = new HashSet<>(pocket.residues());
+        Set<ResidueId> pocketIds =
+                new HashSet<>(pocket.residues());
+
         for (LocatedResidue candidate : allResidues(structure)) {
             if (!pocketIds.contains(candidate.id())
                     && isNeighbor(
-                            candidate.residue(),
-                            resolved,
-                            cutoffAngstroms)) {
-                lining.putIfAbsent(candidate.id(), candidate.residue());
+                    candidate.residue(),
+                    resolved,
+                    cutoffAngstroms
+            )) {
+                lining.putIfAbsent(
+                        candidate.id(),
+                        candidate.residue()
+                );
             }
         }
+
         return List.copyOf(lining.values());
     }
 
     private static boolean isNeighbor(
             Residue candidate,
             List<Residue> pocketResidues,
-            double cutoff) {
+            double cutoff
+    ) {
         double cutoffSquared = cutoff * cutoff;
+
         for (Atom candidateAtom : candidate.getAtoms()) {
-            if (!candidateAtom.isHeavyAtom()) {
+            if (candidateAtom == null
+                    || !candidateAtom.isHeavyAtom()
+                    || candidateAtom.getPosition() == null) {
                 continue;
             }
+
             for (Residue pocketResidue : pocketResidues) {
                 for (Atom pocketAtom : pocketResidue.getAtoms()) {
-                    if (pocketAtom.isHeavyAtom()
-                            && candidateAtom.getPosition().distanceSquared(
-                                    pocketAtom.getPosition())
-                            <= cutoffSquared) {
+                    if (pocketAtom == null
+                            || !pocketAtom.isHeavyAtom()
+                            || pocketAtom.getPosition() == null) {
+                        continue;
+                    }
+
+                    if (candidateAtom.getPosition().distanceSquared(
+                            pocketAtom.getPosition()
+                    ) <= cutoffSquared) {
                         return true;
                     }
                 }
             }
         }
+
         return false;
     }
 
-    private static List<LocatedResidue> allResidues(Structure structure) {
+    private static List<LocatedResidue> allResidues(
+            Structure structure
+    ) {
         List<LocatedResidue> residues = new ArrayList<>();
+
         structure.getChains().forEach(chain ->
-                chain.residues().forEach(residue -> residues.add(
-                        new LocatedResidue(
-                                new ResidueId(
-                                        chain.id(),
-                                        residue.getNumber(),
-                                        residue.getInsertionCode()),
-                                residue))));
-        return residues;
+                chain.residues().forEach(residue ->
+                        residues.add(
+                                new LocatedResidue(
+                                        new ResidueId(
+                                                chain.id(),
+                                                residue.getNumber(),
+                                                residue.getInsertionCode()
+                                        ),
+                                        residue
+                                )
+                        )
+                )
+        );
+
+        return List.copyOf(residues);
     }
 
     private static void requireInputs(
             Structure structure,
-            Pocket pocket) {
+            Pocket pocket
+    ) {
         Objects.requireNonNull(structure, "structure");
         Objects.requireNonNull(pocket, "pocket");
     }
 
+    /**
+     * A resolved Gaia residue together with its complete structural identity.
+     */
+    public record ResolvedPocketResidue(
+            ResidueId id,
+            Residue residue
+    ) {
+        public ResolvedPocketResidue {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(residue, "residue");
+        }
+    }
+
     private record LocatedResidue(
             ResidueId id,
-            Residue residue) {
+            Residue residue
+    ) {
+        private LocatedResidue {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(residue, "residue");
+        }
     }
 }

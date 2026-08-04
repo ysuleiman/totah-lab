@@ -1,7 +1,9 @@
-package totah.lab.gaia.geometry;
+package totah.lab.geometry;
 
 
 import org.junit.jupiter.api.Test;
+import totah.lab.gaia.geometry.BoundingBox;
+import totah.lab.gaia.geometry.Point3D;
 
 import static org.junit.jupiter.api.Assertions.*;
 

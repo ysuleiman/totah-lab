@@ -14,7 +14,6 @@ import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.C_H_SP3;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.N_H_SP2;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.O_H;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.O_H_ANGLE;
-import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.PLANAR_N_H_ANGLE;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.S_H;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.TETRAHEDRAL_ANGLE;
 import static totah.lab.hephaestus.receptor.hydrogen.HydrogenGeometry.TRIGONAL_ANGLE;

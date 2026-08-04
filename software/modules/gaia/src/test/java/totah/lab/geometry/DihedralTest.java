@@ -1,6 +1,9 @@
-package totah.lab.gaia.geometry;
+package totah.lab.geometry;
 
 import org.junit.jupiter.api.Test;
+import totah.lab.gaia.geometry.Dihedral;
+import totah.lab.gaia.geometry.Point3D;
+import totah.lab.gaia.geometry.ZMatrixMath;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

@@ -6,6 +6,7 @@ import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.ResidueId;
 import totah.lab.gaia.structure.Structure;
+import totah.lab.gaia.geometry.Point3D;
 import totah.lab.hephaestus.flexibility.*;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.topology.ProteinTopology;
@@ -57,7 +58,7 @@ class ValidationSubsystemTest {
     private Structure structure(){
         var atom=totah.lab.gaia.structure.Atom.builder().name("CA")
                 .element(totah.lab.gaia.chemistry.Element.C)
-                .position(new totah.lab.gaia.geometry.Point3D(0,0,0)).charge(0)
+                .position(new Point3D(0,0,0)).charge(0)
                 .autoDockType("C").occupancy(1).build();
         return new Structure(List.of(new Chain("A",List.of(new Residue("ALA",1,List.of(atom))))));
     }

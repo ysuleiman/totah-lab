@@ -3,6 +3,7 @@ package totah.lab.hermes.file.pocket;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.gaia.geometry.Point3D;
+import totah.lab.gaia.pocket.AlphaSphere;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.pocket.PocketMetricType;
 import totah.lab.gaia.pocket.PocketSource;
@@ -76,5 +77,23 @@ class FPocketParserTest {
         assertEquals(1, result.get(1).alphaSphereSet()
                 .orElseThrow().spheres().size());
         assertEquals(new Point3D(1.0, 2.0, 3.0), result.get(1).center());
+    }
+
+    @Test
+    void parsesAlphaSpheresWithConcatenatedNegativeCoordinates()
+            throws Exception {
+
+        // Real fpocket output line: y and z run together (no space).
+        Files.writeString(tempDir.resolve("spheres_vert.pqr"),
+                "ATOM      1    C STP    52      74.127 -60.303-100.544"
+                        + "    0.00     4.37\n");
+
+        List<AlphaSphere> spheres = FPocketParser.readAlphaSpheres(
+                tempDir.resolve("spheres_vert.pqr"));
+
+        assertEquals(1, spheres.size());
+        assertEquals(new Point3D(74.127, -60.303, -100.544),
+                spheres.getFirst().center());
+        assertEquals(4.37, spheres.getFirst().radius(), 1.0e-9);
     }
 }

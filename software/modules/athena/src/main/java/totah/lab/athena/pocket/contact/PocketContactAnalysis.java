@@ -1,9 +1,7 @@
 package totah.lab.athena.pocket.contact;
 
 
-import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.molecule.Ligand;
-import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 

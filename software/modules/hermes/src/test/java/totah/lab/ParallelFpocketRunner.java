@@ -1,20 +1,27 @@
 package totah.lab;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 public final class ParallelFpocketRunner {
+
+    private static final String PDB_GZIP_SUFFIX = ".pdb.gz";
 
     private final Path fpocketExecutable;
     private final Path outputDirectory;
@@ -30,7 +37,9 @@ public final class ParallelFpocketRunner {
         this.workerCount = workerCount;
     }
 
-    public void run(Path alphaFoldDirectory) throws IOException, InterruptedException {
+    public void run(Path alphaFoldDirectory)
+            throws IOException, InterruptedException {
+
         Files.createDirectories(outputDirectory);
 
         List<Path> inputs;
@@ -39,6 +48,7 @@ public final class ParallelFpocketRunner {
             inputs = files
                     .filter(Files::isRegularFile)
                     .filter(ParallelFpocketRunner::isPdbGzip)
+                    .sorted()
                     .toList();
         }
 
@@ -48,23 +58,53 @@ public final class ParallelFpocketRunner {
                 workerCount
         );
 
-        ExecutorService executor = Executors.newFixedThreadPool(workerCount);
+        ExecutorService executor =
+                Executors.newFixedThreadPool(workerCount);
+
         CompletionService<FpocketResult> completion =
                 new ExecutorCompletionService<>(executor);
 
-        AtomicInteger submitted = new AtomicInteger();
-
-        for (Path input : inputs) {
-            completion.submit(() -> process(input));
-            submitted.incrementAndGet();
-        }
-
-        int succeeded = 0;
-        int failed = 0;
-        Instant start = Instant.now();
+        int submitted = 0;
+        int skipped = 0;
 
         try {
-            for (int i = 0; i < submitted.get(); i++) {
+            for (Path input : inputs) {
+                String baseName = removeSuffix(
+                        input.getFileName().toString(),
+                        PDB_GZIP_SUFFIX
+                );
+
+                if (hasCompletedOutput(baseName)) {
+                    skipped++;
+
+                    System.out.printf(
+                            "SKIP completed: %s%n",
+                            baseName
+                    );
+
+                    continue;
+                }
+
+                completion.submit(() -> process(input));
+                submitted++;
+            }
+
+            System.out.printf(
+                    "Submitted %,d; skipped %,d completed structures%n",
+                    submitted,
+                    skipped
+            );
+
+            if (submitted == 0) {
+                System.out.println("All structures are already complete.");
+                return;
+            }
+
+            int succeeded = 0;
+            int failed = 0;
+            Instant start = Instant.now();
+
+            for (int i = 0; i < submitted; i++) {
                 Future<FpocketResult> future = completion.take();
 
                 try {
@@ -74,6 +114,7 @@ public final class ParallelFpocketRunner {
                         succeeded++;
                     } else {
                         failed++;
+
                         System.err.printf(
                                 "FAILED %s: %s%n",
                                 result.source().getFileName(),
@@ -83,45 +124,67 @@ public final class ParallelFpocketRunner {
 
                 } catch (ExecutionException e) {
                     failed++;
-                    System.err.println("Worker failed: " + e.getCause());
+
+                    Throwable cause = e.getCause();
+
+                    System.err.println(
+                            "Worker failed: "
+                                    + (cause == null ? e : cause)
+                    );
                 }
 
                 int completed = i + 1;
 
-                if (completed % 100 == 0 || completed == inputs.size()) {
-                    Duration elapsed = Duration.between(start, Instant.now());
+                if (completed % 100 == 0 || completed == submitted) {
+                    Duration elapsed =
+                            Duration.between(start, Instant.now());
 
                     System.out.printf(
-                            "Completed %,d / %,d; success=%,d; failed=%,d; elapsed=%s%n",
+                            "Completed %,d / %,d; "
+                                    + "success=%,d; failed=%,d; "
+                                    + "skipped=%,d; elapsed=%s%n",
                             completed,
-                            inputs.size(),
+                            submitted,
                             succeeded,
                             failed,
+                            skipped,
                             elapsed
                     );
                 }
             }
+
         } finally {
-            executor.shutdownNow();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
+            executor.shutdown();
+
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            }
         }
     }
 
     private FpocketResult process(Path compressedPdb) {
         String baseName = removeSuffix(
                 compressedPdb.getFileName().toString(),
-                ".pdb.gz"
+                PDB_GZIP_SUFFIX
         );
 
         Path workDirectory = null;
 
         try {
+            /*
+             * Files.createTempDirectory appends a random unique suffix:
+             *
+             * AF-P51801-F1-model_v6-123456789...
+             */
             workDirectory = Files.createTempDirectory(
                     outputDirectory,
                     baseName + "-"
             );
 
-            Path temporaryPdb = workDirectory.resolve(baseName + ".pdb");
+            Path temporaryPdb =
+                    workDirectory.resolve(baseName + ".pdb");
+
             decompress(compressedPdb, temporaryPdb);
 
             ProcessBuilder processBuilder = new ProcessBuilder(
@@ -138,15 +201,18 @@ public final class ParallelFpocketRunner {
 
             Process process = processBuilder.start();
 
-            boolean finished = process.waitFor(5, TimeUnit.MINUTES);
+            boolean finished =
+                    process.waitFor(5, TimeUnit.MINUTES);
 
             if (!finished) {
                 process.destroyForcibly();
+                process.waitFor(30, TimeUnit.SECONDS);
 
                 return new FpocketResult(
                         compressedPdb,
                         false,
-                        "fpocket timed out"
+                        "fpocket timed out; work directory: "
+                                + workDirectory
                 );
             }
 
@@ -158,30 +224,27 @@ public final class ParallelFpocketRunner {
                 return new FpocketResult(
                         compressedPdb,
                         false,
-                        "fpocket exited with code " + exitCode
+                        "fpocket exited with code "
+                                + exitCode
+                                + "; see "
+                                + workDirectory.resolve("fpocket.log")
                 );
             }
 
             Path generatedOutput =
                     workDirectory.resolve(baseName + "_out");
 
-            if (!Files.isDirectory(generatedOutput)) {
+            if (!isCompletedFpocketOutput(
+                    generatedOutput,
+                    baseName
+            )) {
                 return new FpocketResult(
                         compressedPdb,
                         false,
-                        "Expected output directory was not created"
+                        "fpocket output is incomplete: "
+                                + generatedOutput
                 );
             }
-
-            /*
-             * Parse generatedOutput here.
-             *
-             * Recommended:
-             * 1. Read <baseName>_info.txt.
-             * 2. Store pocket descriptors in your database.
-             * 3. Retain only pockets needed for later comparison.
-             * 4. Delete large temporary files after ingestion.
-             */
 
             return new FpocketResult(
                     compressedPdb,
@@ -193,21 +256,85 @@ public final class ParallelFpocketRunner {
             return new FpocketResult(
                     compressedPdb,
                     false,
-                    e.getMessage()
+                    e.getMessage() == null
+                            ? e.getClass().getName()
+                            : e.getMessage()
             );
         }
     }
 
-    private static void decompress(Path source, Path destination)
+    /**
+     * Finds any prior timestamped/randomized work directory for this
+     * structure and checks whether it contains a complete fpocket result.
+     */
+    private boolean hasCompletedOutput(String baseName)
             throws IOException {
 
-        try (InputStream fileInput = Files.newInputStream(source);
-             InputStream gzipInput = new GZIPInputStream(fileInput);
-             OutputStream output = Files.newOutputStream(
-                     destination,
-                     StandardOpenOption.CREATE,
-                     StandardOpenOption.TRUNCATE_EXISTING
-             )) {
+        if (!Files.isDirectory(outputDirectory)) {
+            return false;
+        }
+
+        String workDirectoryPrefix = baseName + "-";
+
+        try (Stream<Path> directories =
+                     Files.list(outputDirectory)) {
+
+            return directories
+                    .filter(Files::isDirectory)
+                    .filter(directory ->
+                            directory.getFileName()
+                                    .toString()
+                                    .startsWith(workDirectoryPrefix)
+                    )
+                    .anyMatch(directory -> {
+                        Path generatedOutput =
+                                directory.resolve(baseName + "_out");
+
+                        return isCompletedFpocketOutput(
+                                generatedOutput,
+                                baseName
+                        );
+                    });
+        }
+    }
+
+    /**
+     * Directory existence alone is not enough because a failed run may
+     * leave a partial directory behind.
+     */
+    private static boolean isCompletedFpocketOutput(
+            Path generatedOutput,
+            String baseName
+    ) {
+        if (!Files.isDirectory(generatedOutput)) {
+            return false;
+        }
+
+        Path infoFile =
+                generatedOutput.resolve(baseName + "_info.txt");
+
+        Path pocketsDirectory =
+                generatedOutput.resolve("pockets");
+
+        return Files.isRegularFile(infoFile)
+                && Files.isDirectory(pocketsDirectory);
+    }
+
+    private static void decompress(
+            Path source,
+            Path destination
+    ) throws IOException {
+
+        try (InputStream fileInput =
+                     Files.newInputStream(source);
+             InputStream gzipInput =
+                     new GZIPInputStream(fileInput);
+             OutputStream output =
+                     Files.newOutputStream(
+                             destination,
+                             StandardOpenOption.CREATE,
+                             StandardOpenOption.TRUNCATE_EXISTING
+                     )) {
 
             gzipInput.transferTo(output);
         }
@@ -217,17 +344,23 @@ public final class ParallelFpocketRunner {
         return path.getFileName()
                 .toString()
                 .toLowerCase(Locale.ROOT)
-                .endsWith(".pdb.gz");
+                .endsWith(PDB_GZIP_SUFFIX);
     }
 
-    private static String removeSuffix(String value, String suffix) {
+    private static String removeSuffix(
+            String value,
+            String suffix
+    ) {
         if (!value.endsWith(suffix)) {
             throw new IllegalArgumentException(
                     "Expected suffix " + suffix + ": " + value
             );
         }
 
-        return value.substring(0, value.length() - suffix.length());
+        return value.substring(
+                0,
+                value.length() - suffix.length()
+        );
     }
 
     public record FpocketResult(
@@ -240,14 +373,20 @@ public final class ParallelFpocketRunner {
     public static void main(String[] args)
             throws IOException, InterruptedException {
 
-        Path alphaFoldDirectory =
-                Path.of("/Users/yazan/artifacts/UP000005640_9606_HUMAN_v6");
+        Path alphaFoldDirectory = Path.of(
+                "/Users/yazan/artifacts/"
+                        + "UP000005640_9606_HUMAN_v6"
+        );
 
-        Path outputDirectory =
-                Path.of("/Users/yazan/artifacts/UP000005640_9606_HUMAN_v6_pockets/fpocket-human");
+        Path outputDirectory = Path.of(
+                "/Users/yazan/artifacts/"
+                        + "UP000005640_9606_HUMAN_v6_pockets/"
+                        + "fpocket-human"
+        );
 
-        Path fpocketExecutable =
-                Path.of("/opt/homebrew/Caskroom/miniforge/base/bin/fpocket");
+        Path fpocketExecutable = Path.of(
+                "/opt/homebrew/Caskroom/miniforge/base/bin/fpocket"
+        );
 
         int availableProcessors =
                 Runtime.getRuntime().availableProcessors();

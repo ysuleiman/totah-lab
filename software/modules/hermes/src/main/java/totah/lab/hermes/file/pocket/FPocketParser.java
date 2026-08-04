@@ -128,7 +128,17 @@ public final class FPocketParser {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("ATOM") || line.startsWith("HETATM")) {
-                    String[] tokens = line.trim().split("\\s+");
+                    /*
+                     * fpocket writes coordinates with fixed precision, so
+                     * adjacent negative values can run together without a
+                     * separating space (e.g. "-60.303-100.544"). Insert a
+                     * space between a digit and a following minus sign;
+                     * scientific notation ("1.0E-05") is unaffected because
+                     * its '-' follows 'E', not a digit.
+                     */
+                    String[] tokens = line.trim()
+                            .replaceAll("(\\d)(-)", "$1 $2")
+                            .split("\\s+");
                     spheres.add(new AlphaSphere(
                             Long.parseLong(tokens[1]),
                             new Point3D(

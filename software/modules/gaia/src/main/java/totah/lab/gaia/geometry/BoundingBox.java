@@ -3,8 +3,6 @@ package totah.lab.gaia.geometry;
 
 import java.util.Objects;
 
-import java.util.Objects;
-
 public record BoundingBox(
         Point3D min,
         Point3D max) {
