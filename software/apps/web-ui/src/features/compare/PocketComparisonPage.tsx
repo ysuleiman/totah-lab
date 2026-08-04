@@ -449,6 +449,7 @@ function PocketComparisonContent({
       {residueCorrespondence && (
         <ResidueCorrespondenceSection
           correspondence={residueCorrespondence}
+          comparison={comparison}
           keyResidues={details.data.keyResidues ?? []}
         />
       )}

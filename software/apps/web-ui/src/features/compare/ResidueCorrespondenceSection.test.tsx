@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import type {
+  PocketComparisonMetrics,
   ResidueCorrespondenceView,
   ResidueMatchView,
   ResiduePointView,
@@ -103,9 +104,19 @@ const correspondence: ResidueCorrespondenceView = {
   },
 }
 
-function dataRows(): HTMLElement[] {
-  const table = screen.getAllByRole('table')[0]
-  return within(table).getAllByRole('row').slice(1)
+const comparison: PocketComparisonMetrics = {
+  overallSimilarity: 0.409,
+  geometrySimilarity: 0.348,
+  sizeSimilarity: 0.756,
+  queryCoverage: 0.63,
+  candidateCoverage: 1.0,
+  queryToCandidateMeanDistance: 1.24,
+  candidateToQueryMeanDistance: 1.31,
+  meanBidirectionalDistance: 1.28,
+  maximumNearestNeighborDistance: 4.82,
+  queryPointCount: 78,
+  candidatePointCount: 59,
+  basis: 'ALPHA_SPHERES',
 }
 
 const TEST_KEY_RESIDUES = [
@@ -119,192 +130,191 @@ const TEST_KEY_RESIDUES = [
   'CYS203',
 ]
 
+function renderSection(keyResidues = TEST_KEY_RESIDUES) {
+  return render(
+    <ResidueCorrespondenceSection
+      correspondence={correspondence}
+      comparison={comparison}
+      keyResidues={keyResidues}
+    />,
+  )
+}
+
+function dataRows(): HTMLElement[] {
+  const table = screen.getAllByRole('table')[0]
+  return within(table)
+    .getAllByRole('row')
+    .filter((row) => row.querySelector('td') !== null)
+    .filter((row) => !row.classList.contains('correspondence-detail-row'))
+}
+
+async function selectClassification(label: string) {
+  await userEvent.selectOptions(
+    screen.getByRole('combobox', { name: 'Classification' }),
+    label,
+  )
+}
+
 describe('ResidueCorrespondenceSection', () => {
-  it('renders the summary counts, percentages, and distances', () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
+  it('renders the geometry line and per-class summary counts', () => {
+    renderSection()
 
-    const summaryGrid = screen.getByText('Matched residues')
-      .closest('dl')
-    expect(summaryGrid).not.toBeNull()
-    const summary = within(summaryGrid as HTMLElement)
-
-    expect(summary.getByText('Query residues')).toBeInTheDocument()
-    expect(summary.getByText('Candidate residues'))
+    expect(screen.getByText('Geometry')).toBeInTheDocument()
+    expect(screen.getByText('Good', { exact: false }))
       .toBeInTheDocument()
-    expect(summary.getAllByText('5')).toHaveLength(2)
-    expect(summary.getByText('4')).toBeInTheDocument()
-    expect(summary.getAllByText('80.0%')).toHaveLength(2)
-    expect(summary.getByText('25.0%')).toBeInTheDocument()
-    expect(summary.getByText('75.0%')).toBeInTheDocument()
-    expect(summary.getByText('2.00 Å')).toBeInTheDocument()
-    expect(summary.getByText('3.50 Å')).toBeInTheDocument()
+    expect(screen.getByText(/0\.409 overall similarity/))
+      .toBeInTheDocument()
+    expect(screen.getByText(/1\.28 Å mean distance/))
+      .toBeInTheDocument()
+    expect(screen.getByText(/5 query/)).toBeInTheDocument()
+    expect(screen.getByText(/5 candidate/)).toBeInTheDocument()
+    expect(screen.getByText(/4 spatial correspondences/))
+      .toBeInTheDocument()
+    expect(screen.getByText(/1 query/)).toBeInTheDocument()
+    expect(screen.getByText(/1 candidate/)).toBeInTheDocument()
+    expect(screen.getByText(/mean 2\.00 Å/)).toBeInTheDocument()
+    expect(screen.getByText(/max 3\.50 Å/)).toBeInTheDocument()
   })
 
-  it('renders every match with its type and compatibility as text', () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
-
-    const table = screen.getAllByRole('table')[0]
-    const matches = within(table)
+  it('keeps every correspondence visible by default, including spatial replacements', () => {
+    renderSection()
 
     expect(dataRows()).toHaveLength(4)
-    expect(matches.getByText('Identical')).toBeInTheDocument()
-    expect(matches.getByText('Conservative')).toBeInTheDocument()
-    expect(matches.getByText('Chemistry compatible'))
-      .toBeInTheDocument()
-    expect(matches.getByText('Different')).toBeInTheDocument()
-    expect(matches.getAllByText('yes')).toHaveLength(3)
-    expect(matches.getAllByText('no')).toHaveLength(1)
-    expect(matches.getByText('A:GLY300')).toBeInTheDocument()
-    expect(matches.getByText('B:ASP301')).toBeInTheDocument()
+    const table = within(screen.getAllByRole('table')[0])
+    expect(table.getByText('Identical')).toBeInTheDocument()
+    expect(table.getByText('Conservative')).toBeInTheDocument()
+    expect(table.getByText('Chemistry compatible')).toBeInTheDocument()
+    expect(table.getByText('Spatial replacement')).toBeInTheDocument()
+    expect(table.getByText('A:GLY300')).toBeInTheDocument()
+    expect(table.getByText('B:ASP301')).toBeInTheDocument()
+    expect(table.getAllByText('yes')).toHaveLength(3)
+    expect(table.getAllByText('no')).toHaveLength(1)
   })
 
   it('pins key residues to the top with a badge, ordered by distance', () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
+    renderSection()
 
     const rows = dataRows()
     expect(within(rows[0]).getByText('A:CYS202')).toBeInTheDocument()
     expect(within(rows[1]).getByText('A:LEU145')).toBeInTheDocument()
-    expect(within(rows[0]).getByText('Key residue'))
-      .toBeInTheDocument()
-    expect(within(rows[1]).getByText('Key residue'))
-      .toBeInTheDocument()
     expect(screen.getAllByText('Key residue')).toHaveLength(2)
-    // Non-key matches follow, still ascending by distance.
     expect(within(rows[2]).getByText('A:GLY300')).toBeInTheDocument()
     expect(within(rows[3]).getByText('A:ALA100')).toBeInTheDocument()
   })
 
   it('shows no key badges for a query without key configuration', () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={[]} />,
-    )
+    renderSection([])
 
     expect(screen.queryByText('Key residue')).not.toBeInTheDocument()
-    // Matching and statistics are unaffected.
     expect(dataRows()).toHaveLength(4)
-    expect(screen.getByText('4')).toBeInTheDocument()
   })
 
   it('does not let a different query inherit another target’s keys', () => {
-    // METTL7A query: its own configuration contains GLY300 only, so
-    // the METTL7B keys (CYS202, LEU145) produce no badges.
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={['GLY300']} />,
-    )
+    renderSection(['GLY300'])
 
     expect(screen.getAllByText('Key residue')).toHaveLength(1)
     expect(dataRows()[0]).toHaveTextContent('A:GLY300')
   })
 
-  it('filters to identical matches only', async () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
+  it('filters by classification without losing information permanently', async () => {
+    renderSection()
 
-    await userEvent.click(
-      screen.getByRole('checkbox', { name: 'Identical only' }),
-    )
+    await selectClassification('Identical')
+    expect(dataRows()).toHaveLength(1)
+    expect(dataRows()[0]).toHaveTextContent('A:ALA100')
 
+    await selectClassification('Spatial replacements')
     const rows = dataRows()
     expect(rows).toHaveLength(1)
-    expect(within(rows[0]).getByText('A:ALA100')).toBeInTheDocument()
+    expect(rows[0]).toHaveTextContent('A:GLY300')
+    expect(within(rows[0]).getByText('Spatial replacement'))
+      .toBeInTheDocument()
+
+    await selectClassification('Show all')
+    expect(dataRows()).toHaveLength(4)
   })
 
-  it('filters by maximum distance', async () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
+  it('filters to key residues only via the classification select', async () => {
+    renderSection()
+
+    await selectClassification('Key residues only')
+
+    const rows = dataRows()
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveTextContent('A:CYS202')
+    expect(rows[1]).toHaveTextContent('A:LEU145')
+  })
+
+  it('filters by maximum distance and label text', async () => {
+    renderSection()
 
     await userEvent.type(
       screen.getByRole('spinbutton', { name: 'Max distance (Å)' }),
       '1',
     )
+    expect(dataRows()).toHaveLength(1)
+    expect(dataRows()[0]).toHaveTextContent('A:CYS202')
 
-    const rows = dataRows()
-    expect(rows).toHaveLength(1)
-    expect(within(rows[0]).getByText('A:CYS202')).toBeInTheDocument()
-  })
-
-  it('filters to key residues and by label substring together', async () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
+    await userEvent.clear(
+      screen.getByRole('spinbutton', { name: 'Max distance (Å)' }),
     )
-
-    await userEvent.click(
-      screen.getByRole('checkbox', { name: 'Key residues only' }),
-    )
-    expect(dataRows()).toHaveLength(2)
-
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Query residue' }),
       'leu',
     )
-    const rows = dataRows()
-    expect(rows).toHaveLength(1)
-    expect(within(rows[0]).getByText('A:LEU145')).toBeInTheDocument()
+    expect(dataRows()).toHaveLength(1)
+    expect(dataRows()[0]).toHaveTextContent('A:LEU145')
   })
 
-  it('filters to mismatches only', async () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
+  it('shows only unmatched residues when requested', async () => {
+    renderSection()
 
-    await userEvent.click(
-      screen.getByRole('checkbox', { name: 'Mismatches only' }),
-    )
+    await selectClassification('Unmatched only')
 
-    const rows = dataRows()
-    expect(rows).toHaveLength(1)
-    expect(within(rows[0]).getByText('A:GLY300')).toBeInTheDocument()
-    expect(within(rows[0]).getByText('Different')).toBeInTheDocument()
-  })
-
-  it('lists unmatched residues in collapsible sections with coordinates', async () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
-    )
-
-    expect(
-      screen.getByText('Unmatched query residues (1)'),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('Unmatched candidate residues (1)'),
-    ).toBeInTheDocument()
-
-    await userEvent.click(
-      screen.getByText('Unmatched query residues (1)'),
-    )
+    // Only the two unmatched tables remain visible.
+    expect(screen.getAllByRole('table')).toHaveLength(2)
     expect(screen.getByText('A:SER50')).toBeInTheDocument()
-    expect(screen.getByText('(12.3, -4.5, 7.8)')).toBeInTheDocument()
-
-    await userEvent.click(
-      screen.getByText('Unmatched candidate residues (1)'),
-    )
     expect(screen.getByText('B:THR60')).toBeInTheDocument()
-
-    // Unmatched residues never appear as rows in the main table.
-    for (const row of dataRows()) {
-      expect(within(row).queryByText('A:SER50')).toBeNull()
-      expect(within(row).queryByText('B:THR60')).toBeNull()
-    }
+    expect(screen.queryByText('A:ALA100')).not.toBeInTheDocument()
   })
 
-  it('states the spatial-correspondence caveat', () => {
-    render(
-      <ResidueCorrespondenceSection correspondence={correspondence} keyResidues={TEST_KEY_RESIDUES} />,
+  it('expands a row to show representative coordinates', async () => {
+    renderSection()
+
+    expect(screen.queryByText(/Query position:/)).not.toBeInTheDocument()
+
+    await userEvent.click(
+      screen.getAllByRole('button', { name: 'Show coordinates' })[0],
     )
+
+    expect(screen.getByText(/Query position:/)).toBeInTheDocument()
+    expect(screen.getByText(/Candidate position:/)).toBeInTheDocument()
+  })
+
+  it('explains why each unmatched residue is unmatched', () => {
+    renderSection()
+
+    // A:SER50 sits ~15 Å from every candidate residue.
+    expect(
+      screen.getByText(/no candidate residue within 4\.0 Å/),
+    ).toBeInTheDocument()
+    // B:THR60 sits on top of already-matched query residues.
+    expect(
+      screen.getByText(/already matched by a closer residue/),
+    ).toBeInTheDocument()
+  })
+
+  it('states the spatial-correspondence and divergence caveats', () => {
+    renderSection()
 
     expect(
       screen.getByText(/Matches are spatial correspondences/),
     ).toBeInTheDocument()
     expect(
       screen.getByText(/Maximum correspondence distance is 4\.0 Å/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/does not by itself establish/),
     ).toBeInTheDocument()
   })
 })
