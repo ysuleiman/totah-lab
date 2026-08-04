@@ -21,6 +21,7 @@ export function useStructureRoute() {
     const canonicalPath = `/structures/${structureId}`
     if (
       window.location.pathname !== '/selectivity'
+      && !window.location.pathname.startsWith('/pockets/')
       && window.location.pathname !== canonicalPath
     ) {
       window.history.replaceState(null, '', canonicalPath)

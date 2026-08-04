@@ -373,10 +373,6 @@ export interface PocketSimilarityDiagnosticRow {
   queryPointCount: number
   candidatePointCount: number
   basis: string
-  uniProtId: string | null
-  proteinName: string | null
-  geneName: string | null
-  organism: string | null
 }
 
 export interface Point3D {
@@ -412,26 +408,10 @@ export interface PocketComparisonMetrics {
   basis: string
 }
 
-export interface RigidTransformView {
-  rotation: number[][]
-  translation: Point3D
-}
-
-export interface PocketAlignmentView {
-  query: PocketGeometryView
-  alignedCandidate: PocketGeometryView
-  transform: RigidTransformView
-  rmsd: number
-  iterations: number
-  converged: boolean
-}
-
 export interface PocketComparisonDetails {
   query: PocketGeometryView
   candidate: PocketGeometryView
   alignedQueryPoints: Point3D[]
   alignedCandidatePoints: Point3D[]
   comparison: PocketComparisonMetrics
-  aligner: string
-  alignment?: PocketAlignmentView
 }

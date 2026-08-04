@@ -131,60 +131,55 @@ function PocketCard({
 }: PocketCardProps) {
   const evidence = pocket.evidence
   return (
-    <div className="pocket-card-row">
-      <button
-        className={`pocket-card${selected ? ' selected' : ''}`}
-        type="button"
-        aria-pressed={selected}
-        onClick={() => onSelect(pocket.id)}
-      >
-        <span className="pocket-index">
-          {evidence?.ligandCcd
-            ?? pocket.pocketNumber.toString().padStart(2, '0')}
-        </span>
-        <span className="pocket-copy">
-          <strong>
-            {evidence
-              ? `${evidence.ligandCcd} contact evidence`
-              : pocket.source}
-          </strong>
-          <small>
-            {evidence
-              ? `${evidence.shellResidueCount} wall · `
-                + `${evidence.directContactResidueCount} direct`
-              : pocket.volume == null
-                ? 'volume unavailable'
-                : `volume ${pocket.volume.toFixed(1)} Å³`}
-          </small>
-          {evidence && (
-            <small>
-              {evidence.chosenPocketOverlapCount}
-              /{evidence.shellResidueCount} wall overlap with chosen fpocket
-            </small>
-          )}
-        </span>
-        <span className="pocket-score">
+    <button
+      className={`pocket-card${selected ? ' selected' : ''}`}
+      type="button"
+      aria-pressed={selected}
+      onClick={() => onSelect(pocket.id)}
+    >
+      <span className="pocket-index">
+        {evidence?.ligandCcd
+          ?? pocket.pocketNumber.toString().padStart(2, '0')}
+      </span>
+      <span className="pocket-copy">
+        <strong>
           {evidence
-            ? formatMetric(evidence.interfacePtm)
-            : formatMetric(pocket.score)}
-          <small>{evidence ? 'interface pTM' : 'score'}</small>
-          <small className="secondary-score">
-            {evidence
-              ? `${evidence.directChosenPocketOverlapCount}`
-                + `/${evidence.directContactResidueCount} direct consensus`
-              : pocket.source === 'P2RANK'
-                ? `probability ${formatMetric(pocket.probability)}`
-                : `druggability ${formatMetric(
-                  pocket.druggabilityScore,
-                )}`}
+            ? `${evidence.ligandCcd} contact evidence`
+            : pocket.source}
+        </strong>
+        <small>
+          {evidence
+            ? `${evidence.shellResidueCount} wall · `
+              + `${evidence.directContactResidueCount} direct`
+            : pocket.volume == null
+              ? 'volume unavailable'
+              : `volume ${pocket.volume.toFixed(1)} Å³`}
+        </small>
+        {evidence && (
+          <small>
+            {evidence.chosenPocketOverlapCount}
+            /{evidence.shellResidueCount} wall overlap with chosen fpocket
           </small>
-        </span>
-        {chosen && <span className="chosen-tag">Chosen</span>}
-      </button>
-      <a className="compare-link" href={`/pockets/${pocket.id}/similar`}>
-        Find similar
-      </a>
-    </div>
+        )}
+      </span>
+      <span className="pocket-score">
+        {evidence
+          ? formatMetric(evidence.interfacePtm)
+          : formatMetric(pocket.score)}
+        <small>{evidence ? 'interface pTM' : 'score'}</small>
+        <small className="secondary-score">
+          {evidence
+            ? `${evidence.directChosenPocketOverlapCount}`
+              + `/${evidence.directContactResidueCount} direct consensus`
+            : pocket.source === 'P2RANK'
+              ? `probability ${formatMetric(pocket.probability)}`
+              : `druggability ${formatMetric(
+                pocket.druggabilityScore,
+              )}`}
+        </small>
+      </span>
+      {chosen && <span className="chosen-tag">Chosen</span>}
+    </button>
   )
 }
 
