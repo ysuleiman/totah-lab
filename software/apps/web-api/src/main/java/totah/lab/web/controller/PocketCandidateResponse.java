@@ -1,4 +1,13 @@
 package totah.lab.web.controller;
 
-public class PocketCandidateResponse {
+public record PocketCandidateResponse(
+        long pocketId,
+        long structureId,
+        String sourceAccession,
+        int pocketNumber,
+        double descriptorDistance,
+        double volumeDistance,
+        double residueDistance,
+        double chemistryDistance
+) {
 }

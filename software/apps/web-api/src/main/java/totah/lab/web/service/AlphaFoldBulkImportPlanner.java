@@ -62,6 +62,36 @@ final class AlphaFoldBulkImportPlanner {
         List<Path> incompleteRunDirectories = new ArrayList<>();
         List<Path> pairedInMultipleRoots = new ArrayList<>();
 
+        /*
+         * Index run directories once by base name (the random numeric
+         * suffix after the last '-' is stripped), instead of listing every
+         * root once per PDB file. Root order is preserved within each
+         * bucket, so the first complete match across the roots still wins.
+         */
+        java.util.Map<String, List<Path>> runDirectoriesByBase =
+                new java.util.HashMap<>();
+        for (Path root : fpocketRoots) {
+            if (!Files.isDirectory(root)) {
+                continue;
+            }
+            try (Stream<Path> stream = Files.list(root)) {
+                for (Path runDirectory : stream
+                        .filter(Files::isDirectory)
+                        .toList()) {
+                    String name = runDirectory.getFileName().toString();
+                    int lastDash = name.lastIndexOf('-');
+                    if (lastDash < 0) {
+                        continue;
+                    }
+                    runDirectoriesByBase
+                            .computeIfAbsent(
+                                    name.substring(0, lastDash),
+                                    key -> new ArrayList<>())
+                            .add(runDirectory);
+                }
+            }
+        }
+
         for (Path pdbFile : pdbFiles) {
             String filename = pdbFile.getFileName().toString();
             String baseName = filename.substring(
@@ -71,26 +101,15 @@ final class AlphaFoldBulkImportPlanner {
 
             List<Path> completeOutDirectories = new ArrayList<>();
 
-            for (Path root : fpocketRoots) {
-                if (!Files.isDirectory(root)) {
-                    continue;
-                }
-                try (Stream<Path> stream = Files.list(root)) {
-                    for (Path runDirectory : stream
-                            .filter(Files::isDirectory)
-                            .filter(path -> path.getFileName()
-                                    .toString()
-                                    .startsWith(baseName + "-"))
-                            .toList()) {
+            for (Path runDirectory : runDirectoriesByBase
+                    .getOrDefault(baseName, List.of())) {
 
-                        Path outDirectory =
-                                runDirectory.resolve(baseName + "_out");
-                        if (isComplete(outDirectory, baseName)) {
-                            completeOutDirectories.add(outDirectory);
-                        } else {
-                            incompleteRunDirectories.add(runDirectory);
-                        }
-                    }
+                Path outDirectory =
+                        runDirectory.resolve(baseName + "_out");
+                if (isComplete(outDirectory, baseName)) {
+                    completeOutDirectories.add(outDirectory);
+                } else {
+                    incompleteRunDirectories.add(runDirectory);
                 }
             }
 

@@ -1,4 +1,12 @@
 package totah.lab.web.service;
 
-public class PocketAtomProjection {
+public interface PocketAtomProjection {
+
+    Long getPocketId();
+
+    Double getX();
+
+    Double getY();
+
+    Double getZ();
 }

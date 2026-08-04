@@ -439,6 +439,32 @@ class AlphaFoldPocketImportServiceIntegrationTest {
                 .isEqualTo(1);
     }
 
+    // Zero-pocket structures ------------------------------------------------
+
+    @Test
+    void importsStructureWithoutPocketsWhenFpocketFindsNone()
+            throws IOException {
+
+        Path out = Files.createTempDirectory("zero-pocket-out");
+        Files.createDirectory(out.resolve("pockets"));
+        Files.writeString(
+                out.resolve(STRUCTURE_ACCESSION + "_info.txt"),
+                "fpocket header only, no pocket sections\n"
+        );
+
+        AlphaFoldPocketImportService.ImportResult result =
+                importService.importStructure(fixtureCompressedPdb(), out);
+
+        assertThat(result.pockets()).isZero();
+        assertThat(result.pocketResidues()).isZero();
+        assertThat(result.pocketAtoms()).isZero();
+        assertThat(countWhere("docking_test.structure", "TRUE"))
+                .isEqualTo(1);
+        assertThat(countWhere("docking_test.residue", "TRUE"))
+                .isEqualTo(4);
+        assertThat(countWhere("docking_test.pocket", "TRUE")).isZero();
+    }
+
     // helpers ---------------------------------------------------------------
 
     private AlphaFoldPocketImportService.ImportResult importFixture()

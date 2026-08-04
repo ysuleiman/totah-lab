@@ -1,4 +1,4 @@
-package totah.lab.web.persistence;
+package totah.lab.web.service;
 
 
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.gaia.geometry.Point3D;
-import totah.lab.web.service.PocketAtomProjection;
+import totah.lab.web.persistence.PocketAtomRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import totah.lab.web.persistence.StructureRepository;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,13 +57,16 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
     private static final int MAX_DEFAULT_WORKERS = 8;
 
     private final AlphaFoldPocketImportService importService;
+    private final StructureRepository structureRepository;
     private final Path pdbDirectory;
     private final List<Path> fpocketRoots;
     private final boolean dryRun;
+    private final boolean skipExisting;
     private final int workers;
 
     public AlphaFoldBulkImportRunner(
             AlphaFoldPocketImportService importService,
+            StructureRepository structureRepository,
             @Value("${totah.bulk-import.pdb-dir:"
                     + "/Users/yazan/artifacts"
                     + "/UP000005640_9606_HUMAN_v6}")
@@ -72,16 +76,27 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
                     + "/UP000005640_9606_HUMAN_v6/fpocket-human"
                     + ",/Users/yazan/artifacts"
                     + "/UP000005640_9606_HUMAN_v6_pockets/fpocket-human}")
-            List<Path> fpocketRoots,
+            String fpocketRootsValue,
             @Value("${totah.bulk-import.dry-run:true}") boolean dryRun,
+            @Value("${totah.bulk-import.skip-existing:false}")
+            boolean skipExisting,
             @Value("${totah.bulk-import.workers:0}") int workers
     ) {
         this.importService = Objects.requireNonNull(importService);
+        this.structureRepository =
+                Objects.requireNonNull(structureRepository);
         this.pdbDirectory = Objects.requireNonNull(pdbDirectory);
         this.fpocketRoots = List.copyOf(
-                Objects.requireNonNull(fpocketRoots)
+                java.util.Arrays.stream(
+                                Objects.requireNonNull(fpocketRootsValue)
+                                        .split(","))
+                        .map(String::trim)
+                        .filter(value -> !value.isEmpty())
+                        .map(Path::of)
+                        .toList()
         );
         this.dryRun = dryRun;
+        this.skipExisting = skipExisting;
         this.workers = workers;
     }
 
@@ -144,6 +159,7 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
 
         AtomicInteger completed = new AtomicInteger();
         AtomicInteger succeeded = new AtomicInteger();
+        AtomicInteger skippedAlreadyImported = new AtomicInteger();
         Queue<Failure> failures = new ConcurrentLinkedQueue<>();
         Instant started = Instant.now();
 
@@ -151,6 +167,10 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
                      Executors.newFixedThreadPool(threadCount)) {
             for (AlphaFoldBulkImportPlanner.StructurePair pair
                     : plan.pairs()) {
+                if (skipExisting && isAlreadyImported(pair)) {
+                    skippedAlreadyImported.incrementAndGet();
+                    continue;
+                }
                 pool.submit(() -> {
                     try {
                         if (dryRun) {
@@ -208,11 +228,13 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
                     Duration.between(started, Instant.now()));
         } else {
             LOG.info("Bulk import summary: processed={}, succeeded={}, "
-                            + "failed={}, skipped={}, elapsed={}",
+                            + "failed={}, skipped={}, "
+                            + "skippedAlreadyImported={}, elapsed={}",
                     total,
                     succeeded.get(),
                     failures.size(),
                     skipped,
+                    skippedAlreadyImported.get(),
                     Duration.between(started, Instant.now()));
         }
 
@@ -235,6 +257,28 @@ public class AlphaFoldBulkImportRunner implements CommandLineRunner {
         return exception.getMessage() == null
                 ? exception.getClass().getSimpleName()
                 : exception.getMessage();
+    }
+
+    /*
+     * A structure counts as already imported when its row exists — the
+     * import is transactional per structure, so an existing row always
+     * represents a complete import (a mid-import kill rolls back).
+     */
+    private boolean isAlreadyImported(
+            AlphaFoldBulkImportPlanner.StructurePair pair
+    ) {
+        String filename = pair.compressedPdb().getFileName().toString();
+        String structureAccession = filename.substring(
+                0,
+                filename.length()
+                        - AlphaFoldBulkImportPlanner.PDB_SUFFIX.length()
+        );
+        return structureRepository
+                .findBySourceAndSourceAccession(
+                        AlphaFoldPocketImportService.STRUCTURE_SOURCE,
+                        structureAccession
+                )
+                .isPresent();
     }
 
     private record Failure(

@@ -295,13 +295,11 @@ public class AlphaFoldPocketImportService {
             );
         }
 
-        if (pockets.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "No fpocket pockets found for "
-                            + identity.structureAccession()
-            );
-        }
-
+        /*
+         * An empty pocket list is valid: fpocket legitimately reports zero
+         * pockets for tiny proteins/peptides. Such structures are imported
+         * (receptor, structure, residues) with no pocket rows.
+         */
         Set<Integer> pocketNumbers = new HashSet<>();
         for (Pocket pocket : pockets) {
             if (!pocketNumbers.add(pocketNumber(pocket))) {
