@@ -5,7 +5,11 @@ import org.junit.jupiter.api.io.TempDir;
 import totah.lab.hephaestus.client.HephaestusCapabilities;
 import totah.lab.hephaestus.client.HephaestusCapability;
 import totah.lab.hephaestus.client.HephaestusClient;
+import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.molecule.Protein;
+import totah.lab.hephaestus.ligand.LigandPreparationOptions;
+import totah.lab.hephaestus.ligand.LigandPreparationResult;
+import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
 import totah.lab.hephaestus.receptor.ReceptorPreparationResult;
@@ -194,6 +198,36 @@ class HephaestusCliTest {
         @Override
         public ValidationReport validatePreparedProtein(
                 PreparedProtein preparedProtein) {
+            throw new UnsupportedOperationException("not needed by this test");
+        }
+
+        @Override
+        public LigandPreparationResult prepareLigand(
+                Ligand ligand, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException("not needed by this test");
+        }
+
+        @Override
+        public LigandPreparationResult prepareLigand(
+                Path sdfInput, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException("not needed by this test");
+        }
+
+        @Override
+        public Path prepareAndWriteLigand(
+                Path sdfInput, Path output, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException("not needed by this test");
+        }
+
+        @Override
+        public Path writePreparedLigand(
+                PreparedLigand preparedLigand, Path output) {
+            throw new UnsupportedOperationException("not needed by this test");
+        }
+
+        @Override
+        public ValidationReport validatePreparedLigand(
+                PreparedLigand preparedLigand) {
             throw new UnsupportedOperationException("not needed by this test");
         }
 

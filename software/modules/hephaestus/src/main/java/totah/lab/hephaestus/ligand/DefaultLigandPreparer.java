@@ -6,9 +6,11 @@ import totah.lab.hephaestus.ligand.operation.LigandChargeAssignmentOperation;
 import totah.lab.hephaestus.ligand.operation.LigandHydrogenationOperation;
 import totah.lab.hephaestus.ligand.operation.LigandTopologyOperation;
 import totah.lab.hephaestus.ligand.operation.LigandTorsionOperation;
+import totah.lab.hephaestus.ligand.operation.SdfLigandTopologyOperation;
 import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.preparation.OperationResult;
 import totah.lab.hephaestus.model.PreparationIssue;
+import totah.lab.hermes.file.reader.SdfLigand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,21 @@ public final class DefaultLigandPreparer
         Objects.requireNonNull(chemCompProvider, "chemCompProvider");
         return new DefaultLigandPreparer(List.of(
                 new LigandTopologyOperation(chemCompProvider),
+                new LigandHydrogenationOperation(),
+                new LigandChargeAssignmentOperation(),
+                new LigandAD4AtomTypingOperation(),
+                new LigandTorsionOperation()));
+    }
+
+    /**
+     * Preparation pipeline for SDF input: topology comes from the parsed
+     * bond table instead of the CCD. The SDF must carry explicit
+     * hydrogens and 3D coordinates.
+     */
+    public static DefaultLigandPreparer sdf(SdfLigand source) {
+        Objects.requireNonNull(source, "source");
+        return new DefaultLigandPreparer(List.of(
+                new SdfLigandTopologyOperation(source),
                 new LigandHydrogenationOperation(),
                 new LigandChargeAssignmentOperation(),
                 new LigandAD4AtomTypingOperation(),

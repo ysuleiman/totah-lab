@@ -50,4 +50,25 @@ class PdbqtValidationTest {
         assertTrue(report.issues().stream().anyMatch(i->i.code()==PdbqtValidationCode.BRANCH_UNBALANCED));
         assertTrue(report.issues().stream().anyMatch(i->i.code()==PdbqtValidationCode.RIGID_FLEXIBLE_OVERLAP));
     }
+
+    @Test
+    void ligandFileValidatorAcceptsBalancedLigandPdbqt() throws Exception {
+        Path file=directory.resolve("ligand.pdbqt");
+        String first="ATOM      1 C1   LIG L   1       0.000   0.000   0.000  1.00  0.00    +0.0000  C";
+        String second="ATOM      2 C2   LIG L   1       1.500   0.000   0.000  1.00  0.00    +0.0000  C";
+        Files.write(file,List.of("ROOT",first,"ENDROOT","BRANCH 1 2",second,"ENDBRANCH 1 2","TORSDOF 1"));
+        PdbqtValidationReport report=new PdbqtValidator().validateLigandPdbqt(file);
+        assertTrue(report.valid());
+    }
+
+    @Test
+    void ligandFileValidatorFlagsTorsdofMismatchAndUnbalancedBranches() throws Exception {
+        Path file=directory.resolve("ligand-bad.pdbqt");
+        String first="ATOM      1 C1   LIG L   1       0.000   0.000   0.000  1.00  0.00    +0.0000  C";
+        String second="ATOM      2 C2   LIG L   1       1.500   0.000   0.000  1.00  0.00    +0.0000  C";
+        Files.write(file,List.of("ROOT",first,"ENDROOT","BRANCH 1 2",second,"ENDBRANCH 1 2","TORSDOF 3"));
+        PdbqtValidationReport report=new PdbqtValidator().validateLigandPdbqt(file);
+        assertTrue(report.hasErrors());
+        assertTrue(report.issues().stream().anyMatch(i->i.code()==PdbqtValidationCode.TORSDOF_MISMATCH));
+    }
 }

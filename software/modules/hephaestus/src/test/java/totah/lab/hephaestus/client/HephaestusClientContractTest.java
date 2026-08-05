@@ -1,6 +1,9 @@
 package totah.lab.hephaestus.client;
 
 import org.junit.jupiter.api.Test;
+import totah.lab.gaia.molecule.Ligand;
+import totah.lab.hephaestus.ligand.LigandPreparationOptions;
+import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
@@ -34,6 +37,18 @@ class HephaestusClientContractTest {
         HephaestusClient.class.getMethod(
                 "validateFlexiblePdbqt", Path.class, Path.class);
 
-        assertEquals(7, HephaestusClient.class.getDeclaredMethods().length);
+        HephaestusClient.class.getMethod(
+                "prepareLigand", Path.class, LigandPreparationOptions.class);
+        HephaestusClient.class.getMethod(
+                "prepareLigand", Ligand.class, LigandPreparationOptions.class);
+        HephaestusClient.class.getMethod(
+                "prepareAndWriteLigand", Path.class, Path.class,
+                LigandPreparationOptions.class);
+        HephaestusClient.class.getMethod(
+                "writePreparedLigand", PreparedLigand.class, Path.class);
+        HephaestusClient.class.getMethod(
+                "validatePreparedLigand", PreparedLigand.class);
+
+        assertEquals(12, HephaestusClient.class.getDeclaredMethods().length);
     }
 }

@@ -2,11 +2,15 @@ package totah.lab.daedalus.stage;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.client.HephaestusClient;
+import totah.lab.hephaestus.ligand.LigandPreparationOptions;
+import totah.lab.hephaestus.ligand.LigandPreparationResult;
+import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
 import totah.lab.hephaestus.receptor.ReceptorPreparationResult;
@@ -88,6 +92,36 @@ class ReceptorPreparationStageTest {
         public ValidationReport validatePreparedProtein(
                 PreparedProtein preparedProtein) {
             return ValidationReport.validReport();
+        }
+
+        @Override
+        public LigandPreparationResult prepareLigand(
+                Ligand ligand, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public LigandPreparationResult prepareLigand(
+                Path sdfInput, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Path prepareAndWriteLigand(
+                Path sdfInput, Path output, LigandPreparationOptions options) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Path writePreparedLigand(
+                PreparedLigand preparedLigand, Path output) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ValidationReport validatePreparedLigand(
+                PreparedLigand preparedLigand) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

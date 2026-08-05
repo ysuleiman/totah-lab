@@ -19,6 +19,15 @@ public final class PdbqtValidator implements FileValidator<PdbqtValidationReport
     public PdbqtValidationReport validatePdbqt(Path pdbqtFile)throws IOException{
         return structureValidator.validate(read(pdbqtFile),false);
     }
+    /** Validates a standalone ligand PDBQT (ROOT/BRANCH/TORSDOF, no BEGIN_RES blocks). */
+    public PdbqtValidationReport validateLigandPdbqt(Path pdbqtFile)throws IOException{
+        List<String>lines=read(pdbqtFile);List<PdbqtValidationIssue>issues=new ArrayList<>();
+        issues.addAll(structureValidator.validate(lines,true).issues());
+        List<String>wrapped=new ArrayList<>();wrapped.add("BEGIN_RES LIG");
+        wrapped.addAll(lines);wrapped.add("END_RES LIG");
+        issues.addAll(flexibilityValidator.validate(wrapped).issues());
+        return new PdbqtValidationReport(issues);
+    }
     public PdbqtValidationReport validateFlexiblePdbqt(Path rigidFile,Path flexibleFile)throws IOException{
         List<String>rigid=read(rigidFile),flexible=read(flexibleFile);List<PdbqtValidationIssue>issues=new ArrayList<>();
         issues.addAll(structureValidator.validate(rigid,false).issues());

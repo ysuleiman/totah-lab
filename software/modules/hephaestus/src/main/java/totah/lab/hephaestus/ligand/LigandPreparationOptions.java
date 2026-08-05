@@ -7,7 +7,8 @@ public record LigandPreparationOptions(
         boolean assignCharges,
         boolean assignAtomTypes,
         boolean generateConformers,
-        int maximumConformers) {
+        int maximumConformers,
+        boolean selectLargestFragment) {
 
     public LigandPreparationOptions {
         if (maximumConformers < 1) {
@@ -16,8 +17,21 @@ public record LigandPreparationOptions(
         }
     }
 
+    public LigandPreparationOptions(
+            boolean addHydrogens,
+            boolean generateProtonationStates,
+            boolean generateTautomers,
+            boolean assignCharges,
+            boolean assignAtomTypes,
+            boolean generateConformers,
+            int maximumConformers) {
+        this(addHydrogens, generateProtonationStates, generateTautomers,
+                assignCharges, assignAtomTypes, generateConformers,
+                maximumConformers, false);
+    }
+
     public static LigandPreparationOptions defaults() {
         return new LigandPreparationOptions(
-                true, false, false, true, true, false, 20);
+                true, false, false, true, true, false, 20, false);
     }
 }
