@@ -161,16 +161,20 @@ public final class PocketShapeDescriptorFactory {
         double middleExtent = extents[1];
         double majorExtent = extents[2];
 
+        // Shape ratios are normalized to [0, 1] at construction:
+        // middle/major and minor/major, 0.0 when the pocket has no
+        // measurable major extent. This keeps descriptor consumers
+        // free of unbounded ratios (planar clouds included).
         double elongation =
-                safeRatio(
-                        majorExtent,
-                        middleExtent
+                normalizedRatio(
+                        middleExtent,
+                        majorExtent
                 );
 
         double flatness =
-                safeRatio(
-                        middleExtent,
-                        minorExtent
+                normalizedRatio(
+                        minorExtent,
+                        majorExtent
                 );
 
         double[] radialHistogram =
@@ -355,14 +359,12 @@ public final class PocketShapeDescriptorFactory {
         return histogram;
     }
 
-    private static double safeRatio(
+    private static double normalizedRatio(
             double numerator,
             double denominator
     ) {
         if (denominator == 0.0) {
-            return numerator == 0.0
-                    ? 1.0
-                    : Double.POSITIVE_INFINITY;
+            return 0.0;
         }
 
         return numerator / denominator;
