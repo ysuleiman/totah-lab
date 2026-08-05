@@ -135,6 +135,7 @@ const details: PocketComparisonDetails = {
     },
   },
   keyResidues: [],
+  chemistryAssessment: null,
 }
 
 function stubFetch() {

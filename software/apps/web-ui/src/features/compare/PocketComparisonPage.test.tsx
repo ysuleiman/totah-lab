@@ -132,6 +132,23 @@ const details: PocketComparisonDetails = {
     },
   },
   keyResidues: ['CYS202'],
+  chemistryAssessment: {
+    chemistrySimilarity: 0.72,
+    chemistryCoverageAdjustedSimilarity: 0.64,
+    compatibleMatchedFraction: 0.75,
+    spatialReplacementFraction: 0.25,
+    identicalCount: 2,
+    conservativeCount: 1,
+    chemistryCompatibleCount: 1,
+    spatialReplacementCount: 1,
+    matchedResidueCount: 4,
+    queryResidueCount: 8,
+    candidateResidueCount: 9,
+    keyResidueChemistrySimilarity: 0.95,
+    keyMatchedCount: 2,
+    classification: 'MODERATE_SIMILARITY',
+    finalSimilarity: 0.81,
+  },
 }
 
 const sphereDetails: PocketComparisonDetails = {
@@ -154,7 +171,7 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   stageTwoRank: 2,
   shapeDistance: 0.2,
   stageThreeRank: 1,
-  overallSimilarity: 0.91,
+  geometricOverallSimilarity: 0.91,
   geometrySimilarity: 0.88,
   sizeSimilarity: 0.97,
   queryCoverage: 0.8,
@@ -167,6 +184,18 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   candidatePointCount: 21,
   basis: 'RESIDUE_ATOMS',
   alphaSphereCount: 0,
+  chemistrySimilarity: 0.72,
+  chemistryCoverageAdjustedSimilarity: 0.64,
+  compatibleMatchedFraction: 0.75,
+  spatialReplacementFraction: 0.25,
+  identicalCount: 2,
+  conservativeCount: 1,
+  chemistryCompatibleCount: 1,
+  spatialReplacementCount: 1,
+  matchedResidueCount: 4,
+  keyResidueChemistrySimilarity: 0.95,
+  classification: 'MODERATE_SIMILARITY',
+  finalSimilarity: 0.81,
   uniProtId: 'P12345',
   proteinName: 'Test protein',
   geneName: 'TST',
@@ -376,6 +405,55 @@ describe('PocketComparisonPage', () => {
     expect(
       screen.getByText(/Geometry rendered as alpha spheres/),
     ).toBeInTheDocument()
+  })
+
+  it('renders the chemistry assessment card when present', async () => {
+    stubFetch(true)
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.getByRole('heading', { name: 'Chemistry assessment' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Moderate similarity'))
+      .toHaveClass('cls-moderate')
+    expect(screen.getByText('0.810')).toBeInTheDocument()
+    expect(screen.getByText('0.720')).toBeInTheDocument()
+    expect(screen.getByText('0.640')).toBeInTheDocument()
+    // Compatible correspondences: 2 identical + 1 conservative
+    // + 1 chemistry-compatible = 4 of 4 matched residues.
+    expect(screen.getByText('4 / 4')).toBeInTheDocument()
+    expect(screen.getByText('1 / 4')).toBeInTheDocument()
+    expect(screen.getByText('0.950 · 2 matched')).toBeInTheDocument()
+    expect(screen.getByText('4 / 8 / 9')).toBeInTheDocument()
+    expect(screen.getByText('Geometric similarity score'))
+      .toBeInTheDocument()
+  })
+
+  it('omits the chemistry card when chemistryAssessment is null', async () => {
+    stubFetch(true, { ...details, chemistryAssessment: null })
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.queryByRole('heading', { name: 'Chemistry assessment' }),
+    ).toBeNull()
+    expect(screen.queryByText('Moderate similarity')).toBeNull()
+    expect(screen.getByText('Geometric similarity score'))
+      .toBeInTheDocument()
+    expect(screen.getByText('0.910')).toBeInTheDocument()
   })
 
   it('hides the sphere scale control for residue-atom geometry', async () => {

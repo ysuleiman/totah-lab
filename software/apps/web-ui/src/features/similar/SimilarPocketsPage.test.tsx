@@ -42,7 +42,7 @@ function makeRow(
     stageTwoRank: 1,
     shapeDistance: 0.2,
     stageThreeRank: 1,
-    overallSimilarity: 0.9,
+    geometricOverallSimilarity: 0.9,
     geometrySimilarity: 0.85,
     sizeSimilarity: 0.95,
     queryCoverage: 0.8,
@@ -55,6 +55,18 @@ function makeRow(
     candidatePointCount: 21,
     basis: 'RESIDUE_ATOMS',
     alphaSphereCount: 0,
+    chemistrySimilarity: 0.8,
+    chemistryCoverageAdjustedSimilarity: 0.7,
+    compatibleMatchedFraction: 0.6,
+    spatialReplacementFraction: 0.2,
+    identicalCount: 3,
+    conservativeCount: 2,
+    chemistryCompatibleCount: 1,
+    spatialReplacementCount: 2,
+    matchedResidueCount: 10,
+    keyResidueChemistrySimilarity: 0.9,
+    classification: 'STRONG_SIMILARITY',
+    finalSimilarity: 0.88,
     uniProtId: 'P12345',
     proteinName: 'Test protein',
     geneName: 'TST',
@@ -287,6 +299,42 @@ describe('SimilarPocketsPage', () => {
     )
     expect(screen.getByText('2AAA')).toBeInTheDocument()
     expect(screen.queryByText('2BBB')).not.toBeInTheDocument()
+  })
+
+  it('renders classification labels with their classes', async () => {
+    stubFetch([
+      makeRow({
+        pocketId: 1000,
+        sourceAccession: '2AAA',
+        stageThreeRank: 101,
+        classification: 'STRONG_SIMILARITY',
+      }),
+      makeRow({
+        pocketId: 1001,
+        sourceAccession: '2BBB',
+        stageThreeRank: 102,
+        classification: 'SHAPE_ONLY_NEIGHBOR',
+      }),
+      makeRow({
+        pocketId: 1002,
+        sourceAccession: '2CCC',
+        stageThreeRank: 103,
+        classification: 'REJECTED',
+      }),
+    ])
+    render(<SimilarPocketsPage pocketId={7} onNavigate={() => undefined} />)
+
+    expect(await screen.findByText('Strong similarity'))
+      .toHaveClass('cls-strong')
+    expect(screen.getByText('Shape-only neighbor'))
+      .toHaveClass('cls-shape-only')
+    expect(screen.getByText('Rejected')).toHaveClass('cls-rejected')
+    expect(
+      screen.getByRole('button', { name: 'Geometric similarity' }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Final similarity' }),
+    ).toBeInTheDocument()
   })
 
   it('shows the error state with retry when the request fails', async () => {

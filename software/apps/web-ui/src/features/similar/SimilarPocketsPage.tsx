@@ -6,6 +6,10 @@ import type {
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { geometryBasisLabel } from './geometryBasis'
+import {
+  classificationClass,
+  classificationLabel,
+} from './chemistryClassification'
 
 const RESULT_LIMIT = 100
 const PAGE_SIZE = 20
@@ -24,7 +28,9 @@ type SortKey =
   | 'basis'
   | 'descriptorDistance'
   | 'shapeDistance'
-  | 'overallSimilarity'
+  | 'geometricOverallSimilarity'
+  | 'finalSimilarity'
+  | 'classification'
   | 'geometrySimilarity'
   | 'sizeSimilarity'
   | 'queryCoverage'
@@ -42,6 +48,7 @@ interface Column {
   label: string
   defaultDirection: SortDirection
   value: (row: PocketSimilarityDiagnosticRow) => string
+  cellClass?: (row: PocketSimilarityDiagnosticRow) => string
 }
 
 const COLUMNS: Column[] = [
@@ -113,10 +120,23 @@ const COLUMNS: Column[] = [
     value: (row) => row.shapeDistance.toFixed(3),
   },
   {
-    key: 'overallSimilarity',
-    label: 'Overall similarity',
+    key: 'geometricOverallSimilarity',
+    label: 'Geometric similarity',
     defaultDirection: 'desc',
-    value: (row) => row.overallSimilarity.toFixed(3),
+    value: (row) => row.geometricOverallSimilarity.toFixed(3),
+  },
+  {
+    key: 'finalSimilarity',
+    label: 'Final similarity',
+    defaultDirection: 'desc',
+    value: (row) => row.finalSimilarity.toFixed(3),
+  },
+  {
+    key: 'classification',
+    label: 'Classification',
+    defaultDirection: 'asc',
+    value: (row) => classificationLabel(row.classification),
+    cellClass: (row) => classificationClass(row.classification),
   },
   {
     key: 'geometrySimilarity',
@@ -185,7 +205,7 @@ interface Filters {
   proteinName: string
   geneName: string
   basis: string
-  minOverallSimilarity: string
+  minGeometricSimilarity: string
   minCoverage: string
 }
 
@@ -194,7 +214,7 @@ const EMPTY_FILTERS: Filters = {
   proteinName: '',
   geneName: '',
   basis: '',
-  minOverallSimilarity: '',
+  minGeometricSimilarity: '',
   minCoverage: '',
 }
 
@@ -403,13 +423,13 @@ export function SimilarPocketsPage({ pocketId, onNavigate }: Props) {
               </select>
             </label>
             <label>
-              Min overall similarity
+              Min geometric similarity
               <input
                 type="number"
                 step="any"
-                value={filters.minOverallSimilarity}
+                value={filters.minGeometricSimilarity}
                 onChange={(event) =>
-                  updateFilter('minOverallSimilarity', event.target.value)
+                  updateFilter('minGeometricSimilarity', event.target.value)
                 }
               />
             </label>
@@ -456,7 +476,12 @@ export function SimilarPocketsPage({ pocketId, onNavigate }: Props) {
                   {pageRows.map((row) => (
                     <tr key={row.pocketId}>
                       {COLUMNS.map((column) => (
-                        <td key={column.key}>{column.value(row)}</td>
+                        <td
+                          key={column.key}
+                          className={column.cellClass?.(row)}
+                        >
+                          {column.value(row)}
+                        </td>
                       ))}
                       <td>
                         <button
@@ -566,8 +591,16 @@ function ProteinCard({
         <dt>Shape distance</dt>
         <dd>{best.shapeDistance.toFixed(3)}</dd>
 
-        <dt>Overall similarity</dt>
-        <dd>{best.overallSimilarity.toFixed(3)}</dd>
+        <dt>Geometric similarity</dt>
+        <dd>{best.geometricOverallSimilarity.toFixed(3)}</dd>
+
+        <dt>Final similarity</dt>
+        <dd>{best.finalSimilarity.toFixed(3)}</dd>
+
+        <dt>Classification</dt>
+        <dd className={classificationClass(best.classification)}>
+          {classificationLabel(best.classification)}
+        </dd>
 
         <dt>Geometry similarity</dt>
         <dd>{best.geometrySimilarity.toFixed(3)}</dd>
@@ -591,7 +624,9 @@ function ProteinCard({
               <th>Source accession</th>
               <th>Pocket #</th>
               <th>Rank</th>
-              <th>Overall similarity</th>
+              <th>Geometric similarity</th>
+              <th>Final similarity</th>
+              <th>Classification</th>
             </tr>
           </thead>
           <tbody>
@@ -601,7 +636,11 @@ function ProteinCard({
                 <td>{row.sourceAccession}</td>
                 <td>{row.pocketNumber}</td>
                 <td>{row.stageThreeRank}</td>
-                <td>{row.overallSimilarity.toFixed(3)}</td>
+                <td>{row.geometricOverallSimilarity.toFixed(3)}</td>
+                <td>{row.finalSimilarity.toFixed(3)}</td>
+                <td className={classificationClass(row.classification)}>
+                  {classificationLabel(row.classification)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -646,8 +685,13 @@ function matchesFilters(
   if (!containsIgnoreCase(row.geneName, filters.geneName)) return false
   if (filters.basis && row.basis !== filters.basis) return false
 
-  const minOverall = parseOptionalNumber(filters.minOverallSimilarity)
-  if (minOverall !== null && row.overallSimilarity < minOverall) return false
+  const minGeometric = parseOptionalNumber(filters.minGeometricSimilarity)
+  if (
+    minGeometric !== null
+    && row.geometricOverallSimilarity < minGeometric
+  ) {
+    return false
+  }
 
   const minCoverage = parseOptionalNumber(filters.minCoverage)
   if (

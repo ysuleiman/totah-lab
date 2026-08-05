@@ -8,6 +8,10 @@ import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { geometryBasisLabel } from '../similar/geometryBasis'
+import {
+  classificationClass,
+  classificationLabel,
+} from '../similar/chemistryClassification'
 import { PointCloudViewer } from './PointCloudViewer'
 import { ResidueCorrespondenceSection } from './ResidueCorrespondenceSection'
 import { interpolateSpheres } from './spheres'
@@ -83,6 +87,7 @@ function PocketComparisonContent({
     alignedCandidatePoints,
     comparison,
     residueCorrespondence,
+    chemistryAssessment,
   } = details.data
 
   const interpolatedCandidate = interpolatePoints(
@@ -187,7 +192,7 @@ function PocketComparisonContent({
           <h2>Comparison metrics</h2>
 
           <dl className="metrics-grid">
-            <dt>Overall similarity</dt>
+            <dt>Geometric similarity score</dt>
             <dd>{formatNumber(comparison.overallSimilarity, 3)}</dd>
 
             <dt>Geometry similarity</dt>
@@ -239,6 +244,74 @@ function PocketComparisonContent({
             </dd>
           </dl>
         </section>
+
+        {chemistryAssessment && (
+          <section className="panel metrics-card chemistry-assessment-card">
+            <h2>Chemistry assessment</h2>
+
+            <dl className="metrics-grid">
+              <dt>Classification</dt>
+              <dd
+                className={classificationClass(
+                  chemistryAssessment.classification,
+                )}
+              >
+                {classificationLabel(chemistryAssessment.classification)}
+              </dd>
+
+              <dt>Final similarity</dt>
+              <dd>{formatNumber(chemistryAssessment.finalSimilarity, 3)}</dd>
+
+              <dt>Chemistry similarity</dt>
+              <dd>
+                {formatNumber(chemistryAssessment.chemistrySimilarity, 3)}
+              </dd>
+
+              <dt>Chemistry with residue coverage</dt>
+              <dd>
+                {formatNumber(
+                  chemistryAssessment.chemistryCoverageAdjustedSimilarity,
+                  3,
+                )}
+              </dd>
+
+              <dt>Compatible correspondences</dt>
+              <dd>
+                {chemistryAssessment.identicalCount
+                  + chemistryAssessment.conservativeCount
+                  + chemistryAssessment.chemistryCompatibleCount}
+                {' / '}
+                {chemistryAssessment.matchedResidueCount}
+              </dd>
+
+              <dt>Spatial replacements</dt>
+              <dd>
+                {chemistryAssessment.spatialReplacementCount}
+                {' / '}
+                {chemistryAssessment.matchedResidueCount}
+              </dd>
+
+              <dt>Key-residue chemistry</dt>
+              <dd>
+                {formatNumber(
+                  chemistryAssessment.keyResidueChemistrySimilarity,
+                  3,
+                )}
+                {' · '}
+                {chemistryAssessment.keyMatchedCount} matched
+              </dd>
+
+              <dt>Matched / query / candidate residues</dt>
+              <dd>
+                {chemistryAssessment.matchedResidueCount}
+                {' / '}
+                {chemistryAssessment.queryResidueCount}
+                {' / '}
+                {chemistryAssessment.candidateResidueCount}
+              </dd>
+            </dl>
+          </section>
+        )}
       </div>
 
       <section className="panel viewer-panel">

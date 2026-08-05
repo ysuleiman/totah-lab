@@ -361,7 +361,7 @@ export interface PocketSimilarityDiagnosticRow {
   stageTwoRank: number
   shapeDistance: number
   stageThreeRank: number
-  overallSimilarity: number
+  geometricOverallSimilarity: number
   geometrySimilarity: number
   sizeSimilarity: number
   queryCoverage: number
@@ -374,6 +374,18 @@ export interface PocketSimilarityDiagnosticRow {
   candidatePointCount: number
   basis: string
   alphaSphereCount: number
+  chemistrySimilarity: number
+  chemistryCoverageAdjustedSimilarity: number
+  compatibleMatchedFraction: number
+  spatialReplacementFraction: number
+  identicalCount: number
+  conservativeCount: number
+  chemistryCompatibleCount: number
+  spatialReplacementCount: number
+  matchedResidueCount: number
+  keyResidueChemistrySimilarity: number
+  classification: string
+  finalSimilarity: number
   uniProtId: string | null
   proteinName: string | null
   geneName: string | null
@@ -485,6 +497,24 @@ export interface ResidueCorrespondenceView {
   summary: ResidueSummaryView
 }
 
+export interface ChemistryAssessmentView {
+  chemistrySimilarity: number
+  chemistryCoverageAdjustedSimilarity: number
+  compatibleMatchedFraction: number
+  spatialReplacementFraction: number
+  identicalCount: number
+  conservativeCount: number
+  chemistryCompatibleCount: number
+  spatialReplacementCount: number
+  matchedResidueCount: number
+  queryResidueCount: number
+  candidateResidueCount: number
+  keyResidueChemistrySimilarity: number
+  keyMatchedCount: number
+  classification: string
+  finalSimilarity: number
+}
+
 export interface PocketComparisonDetails {
   query: PocketGeometryView
   candidate: PocketGeometryView
@@ -496,4 +526,5 @@ export interface PocketComparisonDetails {
   transform: RigidTransformView
   residueCorrespondence: ResidueCorrespondenceView | null
   keyResidues: string[]
+  chemistryAssessment: ChemistryAssessmentView | null
 }
