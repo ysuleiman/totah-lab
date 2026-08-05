@@ -24,6 +24,7 @@ public record PocketComparisonDetails(
         ResidueCorrespondenceView residueCorrespondence,
         TransformView transform,
         List<String> keyResidues,
-        ChemistryAssessmentView chemistryAssessment
+        ChemistryAssessmentView chemistryAssessment,
+        AlignmentMetadataView alignment
 ) {
 }

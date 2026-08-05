@@ -7,27 +7,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import totah.lab.athena.pocket.compare.CompositePocketAligner;
+import totah.lab.athena.pocket.compare.MultiHypothesisPocketAligner;
 import totah.lab.athena.pocket.compare.PocketAlignment;
-import totah.lab.athena.pocket.compare.PocketComparator;
+import totah.lab.athena.pocket.compare.PocketAlignmentResult;
 import totah.lab.athena.pocket.compare.PocketComparison;
-import totah.lab.athena.pocket.compare.PocketComparisonOptions;
 import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
-import totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformer;
 import totah.lab.athena.pocket.compare.residue.PocketSimilarityClassification;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistryAssessment;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
-import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptor;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptorFactory;
 import totah.lab.athena.pocket.similar.PocketShapeDistance;
+import totah.lab.athena.sequence.SequenceAlignment;
 import totah.lab.web.persistence.PocketSummaryEntity;
 import totah.lab.web.persistence.PocketSummaryRepository;
+import totah.lab.web.pocketmatch.PocketMatchCandidateProvider;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -103,11 +103,10 @@ public class PocketSimilarityService {
     private final PocketPointCloudLoader geometryLoader;
     private final PocketResidueLoader residueLoader;
     private final KeyResidueConfiguration keyResidueConfiguration;
-    private final PocketComparator comparator;
-    private final PocketResiduePointTransformer residueTransformer =
-            new PocketResiduePointTransformer();
-    private final ResidueCorrespondenceCalculator correspondenceCalculator =
-            new ResidueCorrespondenceCalculator();
+    private final ProteinSequenceAlignmentService sequenceAlignmentService;
+    private final PocketMatchCandidateProvider pocketMatchCandidates;
+    private final MultiHypothesisPocketAligner multiHypothesisAligner =
+            new MultiHypothesisPocketAligner();
     private final ResidueChemistryScorer chemistryScorer =
             new ResidueChemistryScorer();
 
@@ -115,16 +114,16 @@ public class PocketSimilarityService {
             PocketSummaryRepository pocketSummaryRepository,
             PocketPointCloudLoader geometryLoader,
             PocketResidueLoader residueLoader,
-            KeyResidueConfiguration keyResidueConfiguration
+            KeyResidueConfiguration keyResidueConfiguration,
+            ProteinSequenceAlignmentService sequenceAlignmentService,
+            PocketMatchCandidateProvider pocketMatchCandidates
     ) {
         this.pocketSummaryRepository = pocketSummaryRepository;
         this.geometryLoader = geometryLoader;
         this.residueLoader = residueLoader;
         this.keyResidueConfiguration = keyResidueConfiguration;
-        this.comparator = new PocketComparator(
-                new CompositePocketAligner(),
-                PocketComparisonOptions.defaults()
-        );
+        this.sequenceAlignmentService = sequenceAlignmentService;
+        this.pocketMatchCandidates = pocketMatchCandidates;
     }
 
     @Transactional(readOnly = true)
@@ -193,12 +192,13 @@ public class PocketSimilarityService {
     }
 
     /**
-     * Pairwise comparison of two pockets, for the inspection UI.
-     * Metrics come from {@code PocketComparator}; the aligned point
-     * clouds come from Athena's {@code PocketAlignment} (the same
-     * centroid alignment the comparator uses); the residue
-     * correspondence is computed with the same retained alignment
-     * transform. Loads both clouds with a single bulk call and each
+     * Pairwise comparison of two pockets, for the inspection UI. The
+     * alignment is selected by Athena's {@code
+     * MultiHypothesisPocketAligner} (PCA+ICP, or a sequence-seeded
+     * Kabsch when the receptors' cached protein sequence alignment
+     * provides a usable seed); metrics, the aligned point clouds, and
+     * the residue correspondence all come from the selected
+     * hypothesis. Loads both clouds with a single bulk call and each
      * pocket's residues exactly once.
      */
     @Transactional(readOnly = true)
@@ -226,17 +226,30 @@ public class PocketSimilarityService {
         PocketPointCloud candidateCloud =
                 requireCloud(pointClouds, candidatePocketId);
 
-        final PocketAlignment alignment;
-        final PocketComparison comparison;
+        long residueExtractionStartNanos = System.nanoTime();
+        List<PocketResiduePoint> queryResidues =
+                residueLoader.load(queryPocketId);
+        List<PocketResiduePoint> candidateResidues =
+                residueLoader.load(candidatePocketId);
+        long residueExtractionMs =
+                elapsedMillis(residueExtractionStartNanos);
+
+        final PocketAlignmentResult alignmentResult;
 
         try {
-            alignment = comparator.align(
-                    queryCloud,
-                    candidateCloud
-            );
+            SequenceAlignment sequenceAlignment =
+                    sequenceAlignmentFor(
+                            querySummary.getReceptorId(),
+                            candidateSummary.getReceptorId(),
+                            new HashMap<>()
+                    );
 
-            comparison = comparator.compareAligned(
-                    alignment
+            alignmentResult = multiHypothesisAligner.align(
+                    queryCloud,
+                    candidateCloud,
+                    queryResidues,
+                    candidateResidues,
+                    sequenceAlignment
             );
         } catch (RuntimeException exception) {
             throw new ResponseStatusException(
@@ -250,31 +263,10 @@ public class PocketSimilarityService {
         }
         long geometryMs = elapsedMillis(geometryStartNanos);
 
-        long residueExtractionStartNanos = System.nanoTime();
-        List<PocketResiduePoint> queryResidues =
-                residueLoader.load(queryPocketId);
-        List<PocketResiduePoint> candidateResidues =
-                residueLoader.load(candidatePocketId);
-        long residueExtractionMs =
-                elapsedMillis(residueExtractionStartNanos);
-
-        long residueTransformStartNanos = System.nanoTime();
-        List<PocketResiduePoint> alignedCandidateResidues =
-                residueTransformer.transform(
-                        candidateResidues,
-                        alignment.transform()
-                );
-        long residueTransformMs =
-                elapsedMillis(residueTransformStartNanos);
-
-        long residueMatchingStartNanos = System.nanoTime();
+        PocketAlignment alignment = alignmentResult.alignment();
+        PocketComparison comparison = alignmentResult.comparison();
         ResidueCorrespondence correspondence =
-                correspondenceCalculator.calculate(
-                        queryResidues,
-                        alignedCandidateResidues
-                );
-        long residueMatchingMs =
-                elapsedMillis(residueMatchingStartNanos);
+                alignmentResult.correspondence();
 
         List<String> keyResidues =
                 keyResidueConfiguration.forUniProtId(
@@ -296,8 +288,6 @@ public class PocketSimilarityService {
                 candidatePocketId,
                 geometryMs,
                 residueExtractionMs,
-                residueTransformMs,
-                residueMatchingMs,
                 elapsedMillis(requestStartNanos)
         );
 
@@ -331,7 +321,8 @@ public class PocketSimilarityService {
                                 finalSimilarity
                         ),
                         finalSimilarity
-                )
+                ),
+                AlignmentMetadataView.toView(alignmentResult)
         );
 
     }
@@ -341,8 +332,6 @@ public class PocketSimilarityService {
             long candidatePocketId,
             long geometryMs,
             long residueExtractionMs,
-            long residueTransformMs,
-            long residueMatchingMs,
             long totalMs
     ) {
         LOGGER.info(
@@ -351,15 +340,11 @@ public class PocketSimilarityService {
                         + " candidatePocketId={}"
                         + " geometryMs={}"
                         + " residueExtractionMs={}"
-                        + " residueTransformMs={}"
-                        + " residueMatchingMs={}"
                         + " totalMs={}",
                 queryPocketId,
                 candidatePocketId,
                 geometryMs,
                 residueExtractionMs,
-                residueTransformMs,
-                residueMatchingMs,
                 totalMs
         );
     }
@@ -442,11 +427,25 @@ public class PocketSimilarityService {
         );
 
         long stageOneStartNanos = System.nanoTime();
+        List<PocketSummaryEntity> stageOneSummaries =
+                unionPocketMatchCandidates(
+                        querySummary,
+                        findStageOneCandidates(querySummary, stageOneLimit)
+                );
+
+        Map<Long, Long> candidateReceptorIds =
+                new HashMap<>(stageOneSummaries.size());
+        for (PocketSummaryEntity summary : stageOneSummaries) {
+            candidateReceptorIds.put(
+                    summary.getPocketId(),
+                    summary.getReceptorId()
+            );
+        }
+
         List<PocketCandidate> stageOneCandidates =
-                findStageOneCandidates(querySummary, stageOneLimit)
-                .stream()
-                .map(summary -> toCandidate(querySummary, summary))
-                .toList();
+                stageOneSummaries.stream()
+                        .map(summary -> toCandidate(querySummary, summary))
+                        .toList();
         long stageOneQueryMs = elapsedMillis(stageOneStartNanos);
 
         if (stageOneCandidates.isEmpty()) {
@@ -494,7 +493,7 @@ public class PocketSimilarityService {
         long stageTwoMs = elapsedMillis(stageTwoStartNanos);
 
         LOGGER.info(
-                "PocketComparator comparing {} candidates",
+                "Multi-hypothesis alignment comparing {} candidates",
                 stageTwoSurvivors.size()
         );
 
@@ -508,30 +507,43 @@ public class PocketSimilarityService {
                 )
         );
 
+        // One cached protein sequence alignment per receptor pair: at
+        // most one computation per pair per request (usually a single
+        // persisted-cache lookup).
+        Map<Long, SequenceAlignment> sequenceAlignments =
+                new HashMap<>();
+
         List<ComparedCandidate> compared = new ArrayList<>();
 
         for (LoadedCandidate loaded : stageTwoSurvivors) {
             try {
-                PocketAlignment alignment = comparator.align(
-                        queryCloud,
-                        loaded.pointCloud()
-                );
-                PocketComparison comparison =
-                        comparator.compareAligned(alignment);
-
                 List<PocketResiduePoint> candidateResidues =
                         residueLoader.load(
                                 loaded.candidate().pocketId()
                         );
 
-                ResidueCorrespondence correspondence =
-                        correspondenceCalculator.calculate(
-                                queryResidues,
-                                residueTransformer.transform(
-                                        candidateResidues,
-                                        alignment.transform()
-                                )
+                SequenceAlignment sequenceAlignment =
+                        sequenceAlignmentFor(
+                                querySummary.getReceptorId(),
+                                candidateReceptorIds.get(
+                                        loaded.candidate().pocketId()
+                                ),
+                                sequenceAlignments
                         );
+
+                PocketAlignmentResult alignmentResult =
+                        multiHypothesisAligner.align(
+                                queryCloud,
+                                loaded.pointCloud(),
+                                queryResidues,
+                                candidateResidues,
+                                sequenceAlignment
+                        );
+
+                PocketComparison comparison =
+                        alignmentResult.comparison();
+                ResidueCorrespondence correspondence =
+                        alignmentResult.correspondence();
 
                 ResidueChemistryAssessment assessment =
                         chemistryScorer.assess(
@@ -552,7 +564,8 @@ public class PocketSimilarityService {
                         chemistryScorer.classify(
                                 assessment,
                                 finalSimilarity
-                        )
+                        ),
+                        alignmentResult.initialization().name()
                 ));
             } catch (RuntimeException exception) {
                 LOGGER.warn(
@@ -633,6 +646,59 @@ public class PocketSimilarityService {
                 queryHistogram[11],
                 page
         );
+    }
+
+    /**
+     * Experimental PocketMatch candidate union
+     * ({@code pocket.search.pocket-match.enabled}, disabled by default).
+     * PocketMatch-only candidates are appended after the Stage 1 list;
+     * Stage 2 reranking and Stage 3 alignment are unchanged. When the
+     * channel is disabled the Stage 1 list is returned unchanged.
+     */
+    private List<PocketSummaryEntity> unionPocketMatchCandidates(
+            PocketSummaryEntity querySummary,
+            List<PocketSummaryEntity> stageOneSummaries
+    ) {
+        if (!pocketMatchCandidates.isEnabled()) {
+            return stageOneSummaries;
+        }
+
+        List<Long> pocketMatchIds =
+                pocketMatchCandidates.topCandidates(
+                        querySummary.getPocketId()
+                );
+        if (pocketMatchIds.isEmpty()) {
+            return stageOneSummaries;
+        }
+
+        Set<Long> present = new HashSet<>();
+        present.add(querySummary.getPocketId());
+        for (PocketSummaryEntity summary : stageOneSummaries) {
+            present.add(summary.getPocketId());
+        }
+
+        List<Long> missing = pocketMatchIds.stream()
+                .filter(pocketId -> !present.contains(pocketId))
+                .toList();
+        if (missing.isEmpty()) {
+            return stageOneSummaries;
+        }
+
+        Map<Long, PocketSummaryEntity> byId = new HashMap<>();
+        for (PocketSummaryEntity summary :
+                pocketSummaryRepository.findAllById(missing)) {
+            byId.put(summary.getPocketId(), summary);
+        }
+
+        List<PocketSummaryEntity> union =
+                new ArrayList<>(stageOneSummaries);
+        for (Long pocketId : pocketMatchIds) {
+            PocketSummaryEntity summary = byId.get(pocketId);
+            if (summary != null && !present.contains(pocketId)) {
+                union.add(summary);
+            }
+        }
+        return union;
     }
 
     private List<LoadedCandidate> selectByShapeDistance(
@@ -751,7 +817,8 @@ public class PocketSimilarityService {
                 candidate.uniProtId(),
                 candidate.proteinName(),
                 candidate.geneName(),
-                candidate.organism()
+                candidate.organism(),
+                compared.alignmentInitialization()
         );
     }
 
@@ -796,8 +863,52 @@ public class PocketSimilarityService {
         return (System.nanoTime() - startNanos) / 1_000_000L;
     }
 
-    private PocketCandidate toCandidate(
-            PocketSummaryEntity query,
+    /**
+     * The cached protein sequence alignment for one query/candidate
+     * receptor pair, or {@code null} when no sequence seed can exist
+     * (missing receptor ids) or the alignment cannot be obtained; in
+     * both cases the pocket alignment falls back to PCA+ICP, which is
+     * byte-identical to the pre-seed behavior. Lookups are memoized
+     * per request so each receptor pair costs at most one cache
+     * access.
+     */
+    private SequenceAlignment sequenceAlignmentFor(
+            Long queryReceptorId,
+            Long candidateReceptorId,
+            Map<Long, SequenceAlignment> requestCache
+    ) {
+        if (queryReceptorId == null || candidateReceptorId == null) {
+            return null;
+        }
+
+        if (requestCache.containsKey(candidateReceptorId)) {
+            return requestCache.get(candidateReceptorId);
+        }
+
+        SequenceAlignment alignment;
+
+        try {
+            alignment = sequenceAlignmentService.alignmentFor(
+                    queryReceptorId,
+                    candidateReceptorId
+            );
+        } catch (RuntimeException exception) {
+            LOGGER.warn(
+                    "Sequence alignment for receptors {} -> {}"
+                            + " unavailable; falling back to PCA+ICP: {}",
+                    queryReceptorId,
+                    candidateReceptorId,
+                    exception.getMessage()
+            );
+            alignment = null;
+        }
+
+        requestCache.put(candidateReceptorId, alignment);
+
+        return alignment;
+    }
+
+    private PocketCandidate toCandidate(            PocketSummaryEntity query,
             PocketSummaryEntity candidate
     ) {
         double volumeDistance =
@@ -927,7 +1038,8 @@ public class PocketSimilarityService {
             PocketComparison comparison,
             ResidueChemistryAssessment assessment,
             double finalSimilarity,
-            PocketSimilarityClassification classification
+            PocketSimilarityClassification classification,
+            String alignmentInitialization
     ) {
     }
 }

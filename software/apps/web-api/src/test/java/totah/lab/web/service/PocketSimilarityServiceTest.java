@@ -19,11 +19,19 @@ import totah.lab.athena.pocket.compare.residue.ResidueMatch;
 import totah.lab.athena.pocket.compare.residue.ResidueReference;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
+import totah.lab.athena.sequence.AlignedResiduePair;
+import totah.lab.athena.sequence.SequenceAlignment;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.geometry.RigidTransform;
 import totah.lab.web.persistence.PocketSummaryEntity;
 import totah.lab.web.persistence.PocketSummaryRepository;
+import totah.lab.web.pocketmatch.PocketMatchCandidateProvider;
+import totah.lab.web.pocketmatch.PocketMatchProperties;
+import totah.lab.web.pocketmatch.PocketMatchSignatureLoader;
 import totah.lab.web.service.PocketSimilarityService.PocketCandidate;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Proxy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -137,13 +146,39 @@ class PocketSimilarityServiceTest {
             new FakeResidueLoader();
     private final KeyResidueConfiguration keyResidues =
             new KeyResidueConfiguration();
+    private final FakeSequenceAlignmentService sequenceAlignmentService =
+            new FakeSequenceAlignmentService();
     private final PocketSimilarityService service =
             new PocketSimilarityService(
                     repository,
                     geometryLoader,
                     residueLoader,
-                    keyResidues
+                    keyResidues,
+                    sequenceAlignmentService,
+                    // disabled by default; a real instance is used
+                    // because Mockito cannot instrument this class on
+                    // the current JDK
+                    new PocketMatchCandidateProvider(
+                            new PocketMatchProperties(),
+                            new PocketMatchSignatureLoader(
+                                    unusedDataSource(),
+                                    System.getProperty("java.io.tmpdir"),
+                                    ""
+                            )
+                    )
             );
+
+    private static DataSource unusedDataSource() {
+        return (DataSource) Proxy.newProxyInstance(
+                PocketSimilarityServiceTest.class.getClassLoader(),
+                new Class<?>[]{DataSource.class},
+                (proxy, method, arguments) -> {
+                    throw new UnsupportedOperationException(
+                            "DataSource must not be used in this test"
+                    );
+                }
+        );
+    }
 
     @Test
     void queriesSummaryAndCandidatesExactlyOnce() {
@@ -1666,13 +1701,203 @@ class PocketSimilarityServiceTest {
         assertEquals("STRONG_SIMILARITY", view.classification());
     }
 
+    @Test
+    void seededAlignmentFlowsThroughStageThreeWithMetadata() {
+        // Octahedron clouds: the seeded transform (90 degrees about z)
+        // is a cloud symmetry, so PCA and the seed tie on geometry and
+        // the sequence-consistent frame wins Stage 3.
+        stubQuerySummary(100L);
+        stubCandidates(List.of(
+                candidateSummary(7L, 120.0, 20, 0.5, 200L)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(OCTAHEDRON_CLOUD));
+        geometryLoader.register(7L, cloud(OCTAHEDRON_CLOUD));
+        residueLoader.register(QUERY_POCKET_ID, octahedronQueryResidues());
+        residueLoader.register(7L, octahedronCandidateResidues());
+        sequenceAlignmentService.register(
+                100L, 200L, octahedronSequenceAlignment()
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+
+        PocketSimilarityDiagnostic row = rows.get(0);
+
+        assertTrue(
+                row.alignmentInitialization()
+                        .startsWith("SEQUENCE_SEEDED_KABSCH"),
+                "initialization was " + row.alignmentInitialization()
+        );
+        // The seeded frame matches all four residue pairs, all
+        // identical; the PCA frame matches only three, two of them
+        // mismatched.
+        assertEquals(4, row.matchedResidueCount());
+        assertEquals(1.0, row.chemistrySimilarity(), 1e-9);
+        assertEquals(1.0, row.geometricOverallSimilarity(), 1e-6);
+
+        assertEquals(
+                1,
+                sequenceAlignmentService.callCount(100L, 200L)
+        );
+    }
+
+    @Test
+    void sequenceAlignmentIsFetchedOncePerReceptorPair() {
+        stubQuerySummary(100L);
+        stubCandidates(List.of(
+                candidateSummary(7L, 120.0, 20, 0.5, 200L),
+                candidateSummary(8L, 121.0, 20, 0.5, 200L)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(8L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                7L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                8L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        sequenceAlignmentService.register(
+                100L, 200L, SequenceAlignment.empty()
+        );
+
+        service.findSimilar(QUERY_POCKET_ID, 10);
+
+        // Both candidates belong to receptor 200: one lookup total.
+        assertEquals(
+                1,
+                sequenceAlignmentService.callCount(100L, 200L)
+        );
+    }
+
+    @Test
+    void sequenceAlignmentFailureFallsBackToPca() {
+        stubQuerySummary(100L);
+        stubCandidates(List.of(
+                candidateSummary(7L, 120.0, 10, 0.4, 200L)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                7L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        sequenceAlignmentService.failOn(100L, 200L);
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+        assertEquals(
+                "PCA_ICP",
+                rows.get(0).alignmentInitialization()
+        );
+        assertEquals(
+                1.0,
+                rows.get(0).geometricOverallSimilarity(),
+                1e-9
+        );
+    }
+
+    @Test
+    void compareCarriesAlignmentMetadata() {
+        stubQuerySummary(100L);
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(
+                        1L, 110.0, 20, 0.5, 200L
+                ))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(OCTAHEDRON_CLOUD));
+        geometryLoader.register(1L, cloud(OCTAHEDRON_CLOUD));
+        residueLoader.register(QUERY_POCKET_ID, octahedronQueryResidues());
+        residueLoader.register(1L, octahedronCandidateResidues());
+        sequenceAlignmentService.register(
+                100L, 200L, octahedronSequenceAlignment()
+        );
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        AlignmentMetadataView alignment = details.alignment();
+
+        assertTrue(
+                alignment.initialization()
+                        .startsWith("SEQUENCE_SEEDED_KABSCH"),
+                "initialization was " + alignment.initialization()
+        );
+        assertEquals(3, alignment.sequenceSeedPairCount());
+        assertEquals(
+                3,
+                alignment.sequenceConsistentCorrespondenceCount()
+        );
+        assertEquals(
+                0.75,
+                alignment.sequenceConsistentCorrespondenceFraction(),
+                1e-9
+        );
+        assertTrue(alignment.sequenceSeedAvailable());
+        assertFalse(alignment.sequenceSeedDegenerate());
+        assertEquals(
+                1.0,
+                details.comparison().overallSimilarity(),
+                1e-6
+        );
+    }
+
+    @Test
+    void compareWithoutSequenceSeedReportsPcaMetadata() {
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        AlignmentMetadataView alignment = details.alignment();
+
+        assertEquals("PCA_ICP", alignment.initialization());
+        assertEquals(0, alignment.sequenceSeedPairCount());
+        assertFalse(alignment.sequenceSeedAvailable());
+        assertFalse(alignment.sequenceSeedDegenerate());
+
+        assertEquals(0, sequenceAlignmentService.totalCalls());
+    }
+
     private void stubQuerySummary() {
+        stubQuerySummary(null);
+    }
+
+    private void stubQuerySummary(Long receptorId) {
         when(repository.findById(QUERY_POCKET_ID))
                 .thenReturn(Optional.of(new TestPocketSummaryEntity(
                         QUERY_POCKET_ID,
                         QUERY_VOLUME,
                         QUERY_RESIDUE_COUNT,
-                        QUERY_HYDROPHOBIC
+                        QUERY_HYDROPHOBIC,
+                        receptorId
                 )));
     }
 
@@ -1705,6 +1930,97 @@ class PocketSimilarityServiceTest {
         );
     }
 
+    private static PocketSummaryEntity candidateSummary(
+            long pocketId,
+            double volume,
+            int residueCount,
+            double hydrophobicFraction,
+            Long receptorId
+    ) {
+        return new TestPocketSummaryEntity(
+                pocketId,
+                volume,
+                residueCount,
+                hydrophobicFraction,
+                receptorId
+        );
+    }
+
+    // Regular octahedron: invariant under 90-degree rotations about
+    // any axis, so PCA and the seeded frame tie on geometry.
+    private static final double[][] OCTAHEDRON_CLOUD = {
+            {10.0, 0.0, 0.0},
+            {-10.0, 0.0, 0.0},
+            {0.0, 10.0, 0.0},
+            {0.0, -10.0, 0.0},
+            {0.0, 0.0, 10.0},
+            {0.0, 0.0, -10.0}
+    };
+
+    private static List<PocketResiduePoint> octahedronQueryResidues() {
+        return List.of(
+                residuePoint("A", 1, "ALA",
+                        ResidueChemistry.HYDROPHOBIC,
+                        new Point3D(10.0, 0.0, 0.0)),
+                residuePoint("A", 2, "LEU",
+                        ResidueChemistry.HYDROPHOBIC,
+                        new Point3D(0.0, 10.0, 0.0)),
+                residuePoint("A", 3, "SER",
+                        ResidueChemistry.POLAR,
+                        new Point3D(0.0, 0.0, 10.0)),
+                residuePoint("A", 4, "CYS",
+                        ResidueChemistry.CYSTEINE,
+                        new Point3D(-10.0, 0.0, 0.0))
+        );
+    }
+
+    /**
+     * The query residues rotated 90 degrees about z; the sequence
+     * alignment maps residues 1-3 onto candidates 11-13, so the
+     * seeded Kabsch recovers exactly that rotation.
+     */
+    private static List<PocketResiduePoint> octahedronCandidateResidues() {
+        return List.of(
+                residuePoint("A", 11, "ALA",
+                        ResidueChemistry.HYDROPHOBIC,
+                        new Point3D(0.0, 10.0, 0.0)),
+                residuePoint("A", 12, "LEU",
+                        ResidueChemistry.HYDROPHOBIC,
+                        new Point3D(-10.0, 0.0, 0.0)),
+                residuePoint("A", 13, "SER",
+                        ResidueChemistry.POLAR,
+                        new Point3D(0.0, 0.0, 10.0)),
+                residuePoint("A", 14, "CYS",
+                        ResidueChemistry.CYSTEINE,
+                        new Point3D(0.0, -10.0, 0.0))
+        );
+    }
+
+    private static SequenceAlignment octahedronSequenceAlignment() {
+        return new SequenceAlignment(
+                1.0,
+                List.of(
+                        new AlignedResiduePair(1, 11, "ALA", "ALA"),
+                        new AlignedResiduePair(2, 12, "LEU", "LEU"),
+                        new AlignedResiduePair(3, 13, "SER", "SER")
+                )
+        );
+    }
+
+    private static PocketResiduePoint residuePoint(
+            String chainId,
+            int residueNumber,
+            String residueName,
+            ResidueChemistry chemistry,
+            Point3D position
+    ) {
+        return new PocketResiduePoint(
+                new ResidueReference(chainId, residueNumber, ' ', residueName),
+                position,
+                chemistry
+        );
+    }
+
     private static class TestPocketSummaryEntity
             extends PocketSummaryEntity {
 
@@ -1712,6 +2028,7 @@ class PocketSimilarityServiceTest {
         private final double volume;
         private final int residueCount;
         private final double hydrophobicFraction;
+        private final Long receptorId;
 
         TestPocketSummaryEntity(
                 long pocketId,
@@ -1719,15 +2036,31 @@ class PocketSimilarityServiceTest {
                 int residueCount,
                 double hydrophobicFraction
         ) {
+            this(pocketId, volume, residueCount, hydrophobicFraction, null);
+        }
+
+        TestPocketSummaryEntity(
+                long pocketId,
+                double volume,
+                int residueCount,
+                double hydrophobicFraction,
+                Long receptorId
+        ) {
             this.pocketId = pocketId;
             this.volume = volume;
             this.residueCount = residueCount;
             this.hydrophobicFraction = hydrophobicFraction;
+            this.receptorId = receptorId;
         }
 
         @Override
         public Long getPocketId() {
             return pocketId;
+        }
+
+        @Override
+        public Long getReceptorId() {
+            return receptorId;
         }
 
         @Override
@@ -2116,9 +2449,78 @@ class PocketSimilarityServiceTest {
         }
     }
 
+    /**
+     * Serves registered protein sequence alignments per ordered
+     * receptor pair. Unregistered pairs return {@code null}, which the
+     * service treats as "no sequence seed" (PCA+ICP fallback).
+     */
+    private static final class FakeSequenceAlignmentService
+            extends ProteinSequenceAlignmentService {
+
+        private final Map<String, SequenceAlignment> alignments =
+                new HashMap<>();
+        private final Set<String> failing = new HashSet<>();
+        private final Map<String, Integer> calls = new HashMap<>();
+
+        private FakeSequenceAlignmentService() {
+            super(null, null, null, null, null);
+        }
+
+        void register(
+                long queryReceptorId,
+                long candidateReceptorId,
+                SequenceAlignment alignment
+        ) {
+            alignments.put(
+                    key(queryReceptorId, candidateReceptorId),
+                    alignment
+            );
+        }
+
+        void failOn(long queryReceptorId, long candidateReceptorId) {
+            failing.add(key(queryReceptorId, candidateReceptorId));
+        }
+
+        int callCount(long queryReceptorId, long candidateReceptorId) {
+            return calls.getOrDefault(
+                    key(queryReceptorId, candidateReceptorId),
+                    0
+            );
+        }
+
+        int totalCalls() {
+            return calls.values()
+                    .stream()
+                    .mapToInt(Integer::intValue)
+                    .sum();
+        }
+
+        @Override
+        public SequenceAlignment alignmentFor(
+                long queryReceptorId,
+                long candidateReceptorId
+        ) {
+            String key = key(queryReceptorId, candidateReceptorId);
+
+            calls.merge(key, 1, Integer::sum);
+
+            if (failing.contains(key)) {
+                throw new ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND,
+                        "Receptor not found: " + candidateReceptorId
+                );
+            }
+
+            return alignments.get(key);
+        }
+
+        private static String key(long queryReceptorId, long candidateReceptorId) {
+            return queryReceptorId + "->" + candidateReceptorId;
+        }
+    }
+
     private static final class FakeResidueLoader
             extends PocketResidueLoader {
-
         private final Map<Long, List<PocketResiduePoint>> residues =
                 new HashMap<>();
         private final Set<Long> failing = new HashSet<>();

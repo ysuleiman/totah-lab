@@ -8,6 +8,7 @@ import totah.lab.athena.pocket.compare.PocketComparison;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.gaia.geometry.BoundingBox;
 import totah.lab.gaia.geometry.Point3D;
+import totah.lab.web.service.AlignmentMetadataView;
 import totah.lab.web.service.ChemistryAssessmentView;
 import totah.lab.web.service.PocketComparisonDetails;
 import totah.lab.web.service.PocketGeometryView;
@@ -137,7 +138,8 @@ class PocketSearchControllerTest {
                 "P12345",
                 "Test protein",
                 "GENE1",
-                "Homo sapiens"
+                "Homo sapiens",
+                "SEQUENCE_SEEDED_KABSCH"
         ));
 
         MockMvc mockMvc = MockMvcBuilders
@@ -174,7 +176,9 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$[0].queryPointCount").value(20))
                 .andExpect(jsonPath("$[0].candidatePointCount").value(21))
                 .andExpect(jsonPath("$[0].alphaSphereCount").value(12))
-                .andExpect(jsonPath("$[0].basis").value("RESIDUE_ATOMS"));
+                .andExpect(jsonPath("$[0].basis").value("RESIDUE_ATOMS"))
+                .andExpect(jsonPath("$[0].alignmentInitialization")
+                        .value("SEQUENCE_SEEDED_KABSCH"));
 
         assertEquals(42L, service.pocketId);
         assertEquals(5, service.limit);
@@ -333,6 +337,14 @@ class PocketSearchControllerTest {
                         1,
                         "STRONG_SIMILARITY",
                         0.88
+                ),
+                new AlignmentMetadataView(
+                        "SEQUENCE_SEEDED_KABSCH",
+                        31,
+                        31,
+                        1.0,
+                        true,
+                        false
                 )
         );
 
@@ -407,7 +419,21 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$.chemistryAssessment.classification")
                         .value("STRONG_SIMILARITY"))
                 .andExpect(jsonPath("$.chemistryAssessment.finalSimilarity")
-                        .value(0.88));
+                        .value(0.88))
+                .andExpect(jsonPath("$.alignment.initialization")
+                        .value("SEQUENCE_SEEDED_KABSCH"))
+                .andExpect(jsonPath("$.alignment.sequenceSeedPairCount")
+                        .value(31))
+                .andExpect(jsonPath(
+                        "$.alignment.sequenceConsistentCorrespondenceCount")
+                        .value(31))
+                .andExpect(jsonPath(
+                        "$.alignment.sequenceConsistentCorrespondenceFraction")
+                        .value(1.0))
+                .andExpect(jsonPath("$.alignment.sequenceSeedAvailable")
+                        .value(true))
+                .andExpect(jsonPath("$.alignment.sequenceSeedDegenerate")
+                        .value(false));
 
         assertEquals(42L, service.pocketId);
         assertEquals(7L, service.candidatePocketId);
@@ -443,7 +469,7 @@ class PocketSearchControllerTest {
         private RuntimeException failure;
 
         private RecordingPocketSimilarityService() {
-            super(null, null, null, null);
+            super(null, null, null, null, null, null);
         }
 
         @Override

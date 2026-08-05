@@ -50,6 +50,7 @@ public record PocketSimilarityDiagnostic(
         String uniProtId,
         String proteinName,
         String geneName,
-        String organism
+        String organism,
+        String alignmentInitialization
 ) {
 }
