@@ -56,6 +56,7 @@ class DockingAnalysisControllerTest {
                 .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.items[0].ligandLabel")
                         .value("MCULE-1"))
+                .andExpect(jsonPath("$.items[0].smiles").value("CCO"))
                 .andExpect(jsonPath("$.items[0].delta").value(2.2));
 
         mockMvc.perform(get("/api/selectivity/scores.xlsx"))
@@ -185,6 +186,7 @@ class DockingAnalysisControllerTest {
                     List.of(new SelectivityScore(
                             "compact-id",
                             "MCULE-1",
+                            "CCO",
                             -9.2,
                             -7.0,
                             2.2,

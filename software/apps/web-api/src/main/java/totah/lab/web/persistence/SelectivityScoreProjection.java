@@ -6,6 +6,8 @@ public interface SelectivityScoreProjection {
 
     String getLigandLabel();
 
+    String getSmiles();
+
     Double getScore7b();
 
     Double getScore7a();

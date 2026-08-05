@@ -132,6 +132,7 @@ public class DockingAnalysisService {
         return new SelectivityScore(
                 row.getLigandId(),
                 row.getLigandLabel(),
+                row.getSmiles(),
                 row.getScore7b(),
                 row.getScore7a(),
                 row.getDelta(),
@@ -316,6 +317,7 @@ public class DockingAnalysisService {
     public record SelectivityScore(
             String ligandId,
             String ligandLabel,
+            String smiles,
             double score7b,
             double score7a,
             double delta,

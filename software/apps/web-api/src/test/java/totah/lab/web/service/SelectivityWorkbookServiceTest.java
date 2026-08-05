@@ -18,6 +18,7 @@ class SelectivityWorkbookServiceTest {
                 new DockingAnalysisService.SelectivityScore(
                         "compact-id",
                         "MCULE-1",
+                        "CCO",
                         -9.2,
                         -7.0,
                         2.2,

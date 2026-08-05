@@ -101,20 +101,23 @@ public interface DockingAnalysisRepository
                       ) NOT ILIKE 'WH%'
             )
             SELECT
-                ligand_id AS ligandId,
-                ligand_label AS ligandLabel,
-                score_7b AS score7b,
-                score_7a AS score7a,
-                delta,
-                run_id_7b AS runId7b,
-                run_id_7a AS runId7a,
-                pose_id_7b AS poseId7b,
-                pose_id_7a AS poseId7a,
+                paired_score.ligand_id AS ligandId,
+                paired_score.ligand_label AS ligandLabel,
+                ligand.smiles AS smiles,
+                paired_score.score_7b AS score7b,
+                paired_score.score_7a AS score7a,
+                paired_score.delta,
+                paired_score.run_id_7b AS runId7b,
+                paired_score.run_id_7a AS runId7a,
+                paired_score.pose_id_7b AS poseId7b,
+                paired_score.pose_id_7a AS poseId7a,
                 count(*) OVER () AS totalCount
             FROM paired_score
+            LEFT JOIN docking.ligand ligand
+              ON ligand.id = paired_score.ligand_id
             WHERE (:search = ''
-                   OR ligand_id ILIKE '%' || :search || '%'
-                   OR ligand_label ILIKE '%' || :search || '%')
+                   OR paired_score.ligand_id ILIKE '%' || :search || '%'
+                   OR paired_score.ligand_label ILIKE '%' || :search || '%')
             ORDER BY
                 CASE WHEN :sortBy = 'delta' AND :direction = 'asc'
                      THEN delta END ASC,
