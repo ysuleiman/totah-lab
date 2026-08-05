@@ -160,4 +160,55 @@ public interface PocketRepository
             @Param("source") PocketSource source,
             @Param("structureId") long structureId
     );
+
+    /**
+     * Structures having at least one pocket of the given source with
+     * persisted alpha spheres but no row in pocket_shape_descriptor
+     * (anti-join used by the shape-descriptor backfill).
+     */
+    @Query("""
+            SELECT DISTINCT pocket.structure.id
+            FROM PocketEntity pocket
+            WHERE pocket.source = :source
+              AND EXISTS (
+                  SELECT 1
+                  FROM PocketAlphaSphereEntity sphere
+                  WHERE sphere.pocket = pocket
+              )
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM PocketShapeDescriptorEntity descriptor
+                  WHERE descriptor.pocketId = pocket.id
+              )
+            ORDER BY pocket.structure.id
+            """)
+    List<Long> findStructureIdsWithPocketsMissingDescriptors(
+            @Param("source") PocketSource source
+    );
+
+    /**
+     * Pockets of one structure that have persisted alpha spheres but no
+     * row in pocket_shape_descriptor.
+     */
+    @Query("""
+            SELECT pocket.id
+            FROM PocketEntity pocket
+            WHERE pocket.source = :source
+              AND pocket.structure.id = :structureId
+              AND EXISTS (
+                  SELECT 1
+                  FROM PocketAlphaSphereEntity sphere
+                  WHERE sphere.pocket = pocket
+              )
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM PocketShapeDescriptorEntity descriptor
+                  WHERE descriptor.pocketId = pocket.id
+              )
+            ORDER BY pocket.id
+            """)
+    List<Long> findPocketIdsMissingDescriptors(
+            @Param("source") PocketSource source,
+            @Param("structureId") long structureId
+    );
 }

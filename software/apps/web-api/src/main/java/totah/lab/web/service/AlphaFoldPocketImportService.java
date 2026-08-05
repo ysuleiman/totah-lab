@@ -85,6 +85,7 @@ public class AlphaFoldPocketImportService {
     private final ArtifactRepository artifactRepository;
     private final TargetRepository targetRepository;
     private final PipelineRunRepository pipelineRunRepository;
+    private final PocketShapeDescriptorService shapeDescriptorService;
 
     /*
      * fpocket pockets with fewer residues than this are garbage (over half
@@ -105,6 +106,7 @@ public class AlphaFoldPocketImportService {
             ArtifactRepository artifactRepository,
             TargetRepository targetRepository,
             PipelineRunRepository pipelineRunRepository,
+            PocketShapeDescriptorService shapeDescriptorService,
             @Value("${totah.import.min-pocket-residues:1}")
             int minPocketResidues
     ) {
@@ -120,6 +122,8 @@ public class AlphaFoldPocketImportService {
         this.targetRepository = Objects.requireNonNull(targetRepository);
         this.pipelineRunRepository =
                 Objects.requireNonNull(pipelineRunRepository);
+        this.shapeDescriptorService =
+                Objects.requireNonNull(shapeDescriptorService);
         if (minPocketResidues < 1) {
             throw new IllegalArgumentException(
                     "minPocketResidues must be at least 1: "
@@ -654,6 +658,21 @@ public class AlphaFoldPocketImportService {
         }
 
         pocketRepository.save(entity);
+
+        /*
+         * The Stage 1 shape descriptor is computed from the in-memory
+         * spheres just persisted (no extra database reads) so newly
+         * imported pockets are immediately retrievable by shape. P2Rank
+         * pockets have no spheres and stay descriptor-less.
+         */
+        if (!spheres.isEmpty()) {
+            shapeDescriptorService.computeAndPersistFromCenters(
+                    entity.getId(),
+                    spheres.stream()
+                            .map(AlphaSphere::center)
+                            .toList()
+            );
+        }
 
         int atomCount = entity.getResidues().stream()
                 .mapToInt(membership -> membership.getAtoms().size())

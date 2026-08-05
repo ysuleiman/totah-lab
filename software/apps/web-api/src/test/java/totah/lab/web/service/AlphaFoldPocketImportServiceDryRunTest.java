@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.web.persistence.ArtifactRepository;
 import totah.lab.web.persistence.PipelineRunRepository;
+import totah.lab.web.persistence.PocketAlphaSphereRepository;
 import totah.lab.web.persistence.PocketRepository;
+import totah.lab.web.persistence.PocketShapeDescriptorRepository;
 import totah.lab.web.persistence.ReceptorRepository;
 import totah.lab.web.persistence.ResidueRepository;
 import totah.lab.web.persistence.StructureRepository;
@@ -38,6 +40,11 @@ class AlphaFoldPocketImportServiceDryRunTest {
                     mock(ArtifactRepository.class),
                     mock(TargetRepository.class),
                     mock(PipelineRunRepository.class),
+                    new PocketShapeDescriptorService(
+                            mock(PocketRepository.class),
+                            mock(PocketAlphaSphereRepository.class),
+                            mock(PocketShapeDescriptorRepository.class)
+                    ),
                     8
             );
 

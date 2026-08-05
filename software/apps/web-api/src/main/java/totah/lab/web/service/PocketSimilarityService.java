@@ -380,15 +380,8 @@ public class PocketSimilarityService {
         );
 
         long stageOneStartNanos = System.nanoTime();
-        List<PocketCandidate> stageOneCandidates = pocketSummaryRepository
-                .findDescriptorCandidates(
-                        queryPocketId,
-                        MINIMUM_VOLUME_RATIO,
-                        MAXIMUM_VOLUME_RATIO,
-                        MINIMUM_RESIDUE_RATIO,
-                        MAXIMUM_RESIDUE_RATIO,
-                        PageRequest.of(0, stageOneLimit)
-                )
+        List<PocketCandidate> stageOneCandidates =
+                findStageOneCandidates(querySummary, stageOneLimit)
                 .stream()
                 .map(summary -> toCandidate(querySummary, summary))
                 .toList();
@@ -475,6 +468,62 @@ public class PocketSimilarityService {
         );
 
         return compared;
+    }
+
+    /**
+     * Stage 1 retrieval: ordered by the precomputed shape-descriptor
+     * distance evaluated in SQL. Query pockets without a precomputed
+     * descriptor (legacy rows) fall back to the legacy volume/residue/
+     * chemistry ordering.
+     */
+    private List<PocketSummaryEntity> findStageOneCandidates(
+            PocketSummaryEntity querySummary,
+            int stageOneLimit
+    ) {
+        PageRequest page = PageRequest.of(0, stageOneLimit);
+
+        double[] queryHistogram = querySummary.getRadialHistogram();
+
+        if (querySummary.getRadiusOfGyration() == null
+                || querySummary.getExtentMajor() == null
+                || querySummary.getElongation() == null
+                || querySummary.getFlatness() == null
+                || queryHistogram == null) {
+            return pocketSummaryRepository
+                    .findDescriptorCandidatesLegacyOrder(
+                            querySummary.getPocketId(),
+                            MINIMUM_VOLUME_RATIO,
+                            MAXIMUM_VOLUME_RATIO,
+                            MINIMUM_RESIDUE_RATIO,
+                            MAXIMUM_RESIDUE_RATIO,
+                            page
+                    );
+        }
+
+        return pocketSummaryRepository.findDescriptorCandidates(
+                querySummary.getPocketId(),
+                MINIMUM_VOLUME_RATIO,
+                MAXIMUM_VOLUME_RATIO,
+                MINIMUM_RESIDUE_RATIO,
+                MAXIMUM_RESIDUE_RATIO,
+                querySummary.getRadiusOfGyration(),
+                querySummary.getExtentMajor(),
+                querySummary.getElongation(),
+                querySummary.getFlatness(),
+                queryHistogram[0],
+                queryHistogram[1],
+                queryHistogram[2],
+                queryHistogram[3],
+                queryHistogram[4],
+                queryHistogram[5],
+                queryHistogram[6],
+                queryHistogram[7],
+                queryHistogram[8],
+                queryHistogram[9],
+                queryHistogram[10],
+                queryHistogram[11],
+                page
+        );
     }
 
     private List<LoadedCandidate> selectByShapeDistance(

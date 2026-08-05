@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -160,6 +161,10 @@ class PocketSimilarityServiceTest {
                 eq(2.75),
                 eq(0.40),
                 eq(2.75),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 eq(PageRequest.of(0, 50))
         );
 
@@ -185,6 +190,10 @@ class PocketSimilarityServiceTest {
                 eq(2.75),
                 eq(0.40),
                 eq(2.75),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 eq(PageRequest.of(0, 500))
         );
 
@@ -195,6 +204,10 @@ class PocketSimilarityServiceTest {
                 eq(2.75),
                 eq(0.40),
                 eq(2.75),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 eq(PageRequest.of(0, 2500))
         );
     }
@@ -269,6 +282,57 @@ class PocketSimilarityServiceTest {
                 any(Double.class),
                 any(Double.class),
                 any(Double.class),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                any(Pageable.class)
+        );
+    }
+
+    @Test
+    void fallsBackToLegacyOrderingWhenQueryHasNoDescriptor() {
+        when(repository.findById(QUERY_POCKET_ID))
+                .thenReturn(Optional.of(
+                        new DescriptorlessTestPocketSummaryEntity(
+                                QUERY_POCKET_ID,
+                                QUERY_VOLUME,
+                                QUERY_RESIDUE_COUNT,
+                                QUERY_HYDROPHOBIC
+                        )
+                ));
+        when(repository.findDescriptorCandidatesLegacyOrder(
+                eq(QUERY_POCKET_ID),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
+                any(Pageable.class)
+        )).thenReturn(List.of(candidateSummary(7L, 120.0, 10, 0.4)));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+
+        List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, result.size());
+        verify(repository, times(1)).findDescriptorCandidatesLegacyOrder(
+                eq(QUERY_POCKET_ID),
+                eq(0.35),
+                eq(2.75),
+                eq(0.40),
+                eq(2.75),
+                eq(PageRequest.of(0, 50))
+        );
+        verify(repository, never()).findDescriptorCandidates(
+                any(Long.class),
+                any(Double.class),
+                any(Double.class),
+                any(Double.class),
+                any(Double.class),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 any(Pageable.class)
         );
     }
@@ -484,6 +548,10 @@ class PocketSimilarityServiceTest {
                 eq(2.75),
                 eq(0.40),
                 eq(2.75),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 any(Pageable.class)
         );
         assertEquals(1, geometryLoader.loadAllCount());
@@ -1104,6 +1172,10 @@ class PocketSimilarityServiceTest {
                 eq(2.75),
                 eq(0.40),
                 eq(2.75),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 any(Pageable.class)
         )).thenReturn(candidates);
     }
@@ -1225,6 +1297,105 @@ class PocketSimilarityServiceTest {
         @Override
         public String getOrganism() {
             return "Homo sapiens";
+        }
+
+        @Override
+        public Integer getShapePointCount() {
+            return 8;
+        }
+
+        @Override
+        public Double getRadiusOfGyration() {
+            return 10.0;
+        }
+
+        @Override
+        public Double getExtentMajor() {
+            return 20.0;
+        }
+
+        @Override
+        public Double getExtentMiddle() {
+            return 12.0;
+        }
+
+        @Override
+        public Double getExtentMinor() {
+            return 4.0;
+        }
+
+        @Override
+        public Double getElongation() {
+            return 0.6;
+        }
+
+        @Override
+        public Double getFlatness() {
+            return 0.2;
+        }
+
+        @Override
+        public Integer getDescriptorVersion() {
+            return 1;
+        }
+
+        @Override
+        public double[] getRadialHistogram() {
+            double[] histogram = new double[12];
+            Arrays.fill(histogram, 1.0 / 12);
+            return histogram;
+        }
+    }
+
+    /**
+     * A summary row without precomputed descriptor columns (legacy row),
+     * exercising the legacy Stage 1 ordering fallback.
+     */
+    private static final class DescriptorlessTestPocketSummaryEntity
+            extends TestPocketSummaryEntity {
+
+        DescriptorlessTestPocketSummaryEntity(
+                long pocketId,
+                double volume,
+                int residueCount,
+                double hydrophobicFraction
+        ) {
+            super(pocketId, volume, residueCount, hydrophobicFraction);
+        }
+
+        @Override
+        public Integer getShapePointCount() {
+            return null;
+        }
+
+        @Override
+        public Double getRadiusOfGyration() {
+            return null;
+        }
+
+        @Override
+        public Double getExtentMajor() {
+            return null;
+        }
+
+        @Override
+        public Double getElongation() {
+            return null;
+        }
+
+        @Override
+        public Double getFlatness() {
+            return null;
+        }
+
+        @Override
+        public Integer getDescriptorVersion() {
+            return null;
+        }
+
+        @Override
+        public double[] getRadialHistogram() {
+            return null;
         }
     }
 

@@ -160,6 +160,31 @@ CREATE TABLE docking_test.pocket_alpha_sphere (
 CREATE INDEX pocket_alpha_sphere_pocket_idx
     ON docking_test.pocket_alpha_sphere (pocket_id);
 
+CREATE TABLE docking_test.pocket_shape_descriptor (
+    pocket_id bigint PRIMARY KEY
+        REFERENCES docking_test.pocket (id) ON DELETE CASCADE,
+    point_count integer NOT NULL,
+    radius_of_gyration float8 NOT NULL,
+    extent_major float8 NOT NULL,
+    extent_middle float8 NOT NULL,
+    extent_minor float8 NOT NULL,
+    elongation float8 NOT NULL,
+    flatness float8 NOT NULL,
+    h0 float8 NOT NULL,
+    h1 float8 NOT NULL,
+    h2 float8 NOT NULL,
+    h3 float8 NOT NULL,
+    h4 float8 NOT NULL,
+    h5 float8 NOT NULL,
+    h6 float8 NOT NULL,
+    h7 float8 NOT NULL,
+    h8 float8 NOT NULL,
+    h9 float8 NOT NULL,
+    h10 float8 NOT NULL,
+    h11 float8 NOT NULL,
+    descriptor_version integer NOT NULL
+);
+
 CREATE TABLE docking_test.pocket_atom (
     id bigint NOT NULL DEFAULT nextval('docking_test.pocket_atom_id_seq')
         PRIMARY KEY,
