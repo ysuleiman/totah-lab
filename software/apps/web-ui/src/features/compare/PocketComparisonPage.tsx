@@ -486,6 +486,31 @@ function PocketMetadata({
         <dt>Points</dt>
         <dd>{geometry.pointCount}</dd>
 
+        <dt>Volume</dt>
+        <dd>
+          {geometry.volume == null
+            ? '—'
+            : `${geometry.volume.toFixed(1)} Å³`}
+        </dd>
+
+        <dt>Score</dt>
+        <dd>{geometry.score == null ? '—' : geometry.score.toFixed(3)}</dd>
+
+        <dt>Druggability</dt>
+        <dd>
+          {geometry.druggabilityScore == null
+            ? '—'
+            : geometry.druggabilityScore.toFixed(3)}
+        </dd>
+
+        <dt>Residues / atoms</dt>
+        <dd>
+          {geometry.residueCount ?? '—'} / {geometry.atomCount ?? '—'}
+        </dd>
+
+        <dt>Alpha spheres</dt>
+        <dd>{geometry.alphaSphereCount ?? '—'}</dd>
+
         <dt>Basis</dt>
         <dd>{geometry.basis}</dd>
       </dl>

@@ -18,6 +18,12 @@ const geometry: PocketGeometryView = {
   basis: 'RESIDUE_ATOMS',
   points: [],
   alphaSpheres: [],
+  volume: 691.9,
+  score: 0.5,
+  druggabilityScore: 0.6,
+  residueCount: 16,
+  atomCount: 20,
+  alphaSphereCount: 78,
 }
 
 function makeRow(

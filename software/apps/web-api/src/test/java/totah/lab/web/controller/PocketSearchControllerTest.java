@@ -178,7 +178,13 @@ class PocketSearchControllerTest {
                         new Point3D(0.0, 10.0, 0.0),
                         new Point3D(0.0, 0.0, 10.0)
                 ),
-                List.of()
+                List.of(),
+                691.9,
+                0.5,
+                0.6,
+                16,
+                20,
+                78
         );
 
         MockMvc mockMvc = MockMvcBuilders
@@ -215,7 +221,13 @@ class PocketSearchControllerTest {
                         ),
                         "RESIDUE_ATOMS",
                         List.of(new Point3D(0.0, 0.0, 0.0)),
-                        List.of()
+                        List.of(),
+                        691.9,
+                        0.5,
+                        0.6,
+                        16,
+                        20,
+                        78
                 ),
                 new PocketGeometryView(
                         7L, 1001L, "AF-P12345-F1-model_v6", 3, 4,
@@ -226,7 +238,13 @@ class PocketSearchControllerTest {
                         ),
                         "RESIDUE_ATOMS",
                         List.of(new Point3D(1.0, 1.0, 1.0)),
-                        List.of()
+                        List.of(),
+                        300.0,
+                        0.4,
+                        0.5,
+                        14,
+                        18,
+                        0
                 ),
                 List.of(new Point3D(-2.5, -2.5, -2.5)),
                 List.of(new Point3D(0.0, 0.0, 0.0)),

@@ -299,11 +299,21 @@ export function SimilarPocketsPage({ pocketId, onNavigate }: Props) {
               : `Pocket ${pocketId}`}
           </h1>
           {query && (
-            <p className="similar-subtitle">
-              pocket {query.pocketNumber ?? '—'} · {query.pointCount} points ·
-              {' '}{geometryBasisLabel(query.basis)} · structure{' '}
-              {query.structureId ?? '—'}
-            </p>
+            <div className="similar-subtitle">
+              <p>
+                pocket {query.pocketNumber ?? '—'} · {query.pointCount}{' '}
+                points · {geometryBasisLabel(query.basis)} · structure{' '}
+                {query.structureId ?? '—'}
+              </p>
+              <p>
+                volume {formatMetric(query.volume, 1, ' Å³')} · score{' '}
+                {formatMetric(query.score, 3)} · druggability{' '}
+                {formatMetric(query.druggabilityScore, 3)} ·{' '}
+                {query.residueCount ?? '—'} residues ·{' '}
+                {query.atomCount ?? '—'} atoms ·{' '}
+                {query.alphaSphereCount ?? '—'} alpha spheres
+              </p>
+            </div>
           )}
         </div>
         {diagnostic.data && (
@@ -699,4 +709,12 @@ function groupByProtein(
   }).sort((first, second) =>
     first.best.stageThreeRank - second.best.stageThreeRank
   )
+}
+
+function formatMetric(
+  value: number | null,
+  digits: number,
+  suffix = '',
+): string {
+  return value == null ? '—' : `${value.toFixed(digits)}${suffix}`
 }

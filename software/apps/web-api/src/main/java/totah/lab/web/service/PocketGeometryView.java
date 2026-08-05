@@ -23,6 +23,12 @@ public record PocketGeometryView(
         BoundingBox bounds,
         String basis,
         List<Point3D> points,
-        List<AlphaSphereView> alphaSpheres
+        List<AlphaSphereView> alphaSpheres,
+        Double volume,
+        Double score,
+        Double druggabilityScore,
+        Integer residueCount,
+        Integer atomCount,
+        Integer alphaSphereCount
 ) {
 }

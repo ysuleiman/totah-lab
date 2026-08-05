@@ -25,6 +25,12 @@ function geometryView(
       { x: 1, y: 1, z: 1 },
     ],
     alphaSpheres: [],
+    volume: 691.9,
+    score: 0.5,
+    druggabilityScore: 0.6,
+    residueCount: 16,
+    atomCount: 20,
+    alphaSphereCount: 78,
   }
 }
 
@@ -39,6 +45,12 @@ function sphereGeometryView(
       { index: 0, center: { x: 0, y: 0, z: 0 }, radius: 1.2 },
       { index: 1, center: { x: 1, y: 1, z: 1 }, radius: 0.9 },
     ],
+    volume: 691.9,
+    score: 0.5,
+    druggabilityScore: 0.6,
+    residueCount: 16,
+    atomCount: 20,
+    alphaSphereCount: 78,
   }
 }
 

@@ -403,6 +403,12 @@ export interface PocketGeometryView {
   basis: string
   points: Point3D[]
   alphaSpheres: AlphaSphereView[]
+  volume: number | null
+  score: number | null
+  druggabilityScore: number | null
+  residueCount: number | null
+  atomCount: number | null
+  alphaSphereCount: number | null
 }
 
 export interface PocketComparisonMetrics {

@@ -348,7 +348,13 @@ public class PocketSimilarityService {
                 pointCloud.bounds(),
                 pointCloud.basis().name(),
                 pointCloud.points(),
-                alphaSpheres
+                alphaSpheres,
+                summary.getVolume(),
+                summary.getScore(),
+                summary.getDruggabilityScore(),
+                summary.getResidueCount(),
+                summary.getAtomCount(),
+                summary.getAlphaSphereCount()
         );
     }
 
