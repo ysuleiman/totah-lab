@@ -9,10 +9,11 @@ import java.util.Map;
 
 /**
  * Query-specific key residues, configured per UniProt accession
- * (property {@code totah.key-residues.<uniProtId>}). Used only to
- * highlight residues in the comparison UI; never affects alignment,
- * correspondence, or scoring. Queries without configuration get an
- * empty list.
+ * (property {@code totah.key-residues.<uniProtId>}). Used to
+ * highlight residues in the comparison UI and to score key-residue
+ * chemistry in Stage 3 similarity ranking; never affects alignment
+ * or correspondence. Queries without configuration get an empty
+ * list.
  */
 @Component
 @ConfigurationProperties(prefix = "totah")

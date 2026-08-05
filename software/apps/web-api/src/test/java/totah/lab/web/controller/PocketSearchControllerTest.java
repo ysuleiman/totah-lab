@@ -8,6 +8,7 @@ import totah.lab.athena.pocket.compare.PocketComparison;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.gaia.geometry.BoundingBox;
 import totah.lab.gaia.geometry.Point3D;
+import totah.lab.web.service.ChemistryAssessmentView;
 import totah.lab.web.service.PocketComparisonDetails;
 import totah.lab.web.service.PocketGeometryView;
 import totah.lab.web.service.PocketSimilarityDiagnostic;
@@ -121,6 +122,18 @@ class PocketSearchControllerTest {
                 20,
                 21,
                 "RESIDUE_ATOMS",
+                0.88,
+                0.77,
+                0.9,
+                0.1,
+                15,
+                2,
+                1,
+                2,
+                20,
+                1.0,
+                "STRONG_SIMILARITY",
+                0.89,
                 "P12345",
                 "Test protein",
                 "GENE1",
@@ -140,7 +153,18 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$[0].stageTwoRank").value(2))
                 .andExpect(jsonPath("$[0].stageThreeRank").value(1))
                 .andExpect(jsonPath("$[0].shapeDistance").value(0.04))
-                .andExpect(jsonPath("$[0].overallSimilarity").value(0.95))
+                .andExpect(jsonPath("$[0].geometricOverallSimilarity")
+                        .value(0.95))
+                .andExpect(jsonPath("$[0].overallSimilarity")
+                        .doesNotExist())
+                .andExpect(jsonPath("$[0].chemistrySimilarity")
+                        .value(0.88))
+                .andExpect(jsonPath("$[0].chemistryCoverageAdjustedSimilarity")
+                        .value(0.77))
+                .andExpect(jsonPath("$[0].matchedResidueCount").value(20))
+                .andExpect(jsonPath("$[0].classification")
+                        .value("STRONG_SIMILARITY"))
+                .andExpect(jsonPath("$[0].finalSimilarity").value(0.89))
                 .andExpect(jsonPath("$[0].queryCoverage").value(0.87))
                 .andExpect(jsonPath("$[0].candidateCoverage").value(0.91))
                 .andExpect(jsonPath("$[0].queryToCandidateMeanDistance")
@@ -292,7 +316,24 @@ class PocketSearchControllerTest {
                         },
                         new Point3D(3.0, -2.0, 5.0)
                 ),
-                List.of("CYS148", "CYS202")
+                List.of("CYS148", "CYS202"),
+                new ChemistryAssessmentView(
+                        1.0,
+                        0.5,
+                        1.0,
+                        0.0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        1,
+                        2,
+                        1,
+                        1.0,
+                        1,
+                        "STRONG_SIMILARITY",
+                        0.88
+                )
         );
 
         MockMvc mockMvc = MockMvcBuilders
@@ -358,7 +399,15 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$.transform.translation.x")
                         .value(3.0))
                 .andExpect(jsonPath("$.transform.translation.z")
-                        .value(5.0));
+                        .value(5.0))
+                .andExpect(jsonPath("$.chemistryAssessment.chemistrySimilarity")
+                        .value(1.0))
+                .andExpect(jsonPath("$.chemistryAssessment.keyMatchedCount")
+                        .value(1))
+                .andExpect(jsonPath("$.chemistryAssessment.classification")
+                        .value("STRONG_SIMILARITY"))
+                .andExpect(jsonPath("$.chemistryAssessment.finalSimilarity")
+                        .value(0.88));
 
         assertEquals(42L, service.pocketId);
         assertEquals(7L, service.candidatePocketId);

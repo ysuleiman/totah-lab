@@ -23,6 +23,7 @@ public record PocketComparisonDetails(
         String aligner,
         ResidueCorrespondenceView residueCorrespondence,
         TransformView transform,
-        List<String> keyResidues
+        List<String> keyResidues,
+        ChemistryAssessmentView chemistryAssessment
 ) {
 }

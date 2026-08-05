@@ -11,6 +11,8 @@ import totah.lab.athena.pocket.compare.PocketComparisonOptions;
 import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
 import totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformer;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistry;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistryAssessment;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
 import totah.lab.athena.pocket.compare.residue.ResidueMatch;
@@ -151,6 +153,14 @@ class PocketSimilarityServiceTest {
         )));
         geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                7L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
 
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
 
@@ -244,6 +254,14 @@ class PocketSimilarityServiceTest {
         geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
         geometryLoader.failOn(2L);
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
 
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
 
@@ -311,6 +329,14 @@ class PocketSimilarityServiceTest {
         )).thenReturn(List.of(candidateSummary(7L, 120.0, 10, 0.4)));
         geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                7L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
 
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
 
@@ -352,6 +378,28 @@ class PocketSimilarityServiceTest {
         geometryLoader.register(2L, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(3L, cloud(IRREGULAR_SCALED));
 
+        // Both candidates carry the query's residues; candidate 3's
+        // are placed at the pre-image of the query residues under the
+        // alignment, so the chemistry gate passes for both and only
+        // the geometric similarity separates them.
+        List<PocketResiduePoint> queryResidues =
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points());
+        residueLoader.register(QUERY_POCKET_ID, queryResidues);
+        residueLoader.register(
+                2L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                3L,
+                preimageResidues(
+                        queryResidues,
+                        alignmentTransform(
+                                cloud(IRREGULAR_CLOUD),
+                                cloud(IRREGULAR_SCALED)
+                        )
+                )
+        );
+
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
 
         assertEquals(List.of(2L, 3L), pocketIds(result));
@@ -370,9 +418,21 @@ class PocketSimilarityServiceTest {
                     pocketId, volume, QUERY_RESIDUE_COUNT, QUERY_HYDROPHOBIC
             ));
             geometryLoader.register(pocketId, cloud(IRREGULAR_CLOUD));
+            residueLoader.register(
+                    pocketId,
+                    residuePoints(
+                            "B",
+                            101,
+                            cloud(IRREGULAR_CLOUD).points()
+                    )
+            );
         }
         stubCandidates(summaries);
         geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
 
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 10);
 
@@ -400,6 +460,20 @@ class PocketSimilarityServiceTest {
         geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(2L, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(3L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        for (long pocketId = 1L; pocketId <= 3L; pocketId++) {
+            residueLoader.register(
+                    pocketId,
+                    residuePoints(
+                            "B",
+                            101,
+                            cloud(IRREGULAR_CLOUD).points()
+                    )
+            );
+        }
 
         List<PocketCandidate> result = service.findSimilar(QUERY_POCKET_ID, 2);
 
@@ -456,9 +530,9 @@ class PocketSimilarityServiceTest {
 
         assertEquals(1, rows.size());
         assertTrue(
-                rows.get(0).overallSimilarity() < 0.3,
+                rows.get(0).geometricOverallSimilarity() < 0.3,
                 "overall similarity was "
-                        + rows.get(0).overallSimilarity()
+                        + rows.get(0).geometricOverallSimilarity()
         );
     }
 
@@ -474,6 +548,18 @@ class PocketSimilarityServiceTest {
         geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
         geometryLoader.register(2L, cloud(IRREGULAR_SCALED));
         geometryLoader.register(3L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                3L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
 
         List<PocketSimilarityDiagnostic> rows =
                 service.diagnoseSimilar(QUERY_POCKET_ID, 10);
@@ -499,7 +585,7 @@ class PocketSimilarityServiceTest {
         assertEquals(1, first.stageThreeRank());
         assertEquals(0.1, first.descriptorDistance(), 1e-9);
         assertEquals(0.0, first.shapeDistance(), 1e-9);
-        assertEquals(1.0, first.overallSimilarity(), 1e-9);
+        assertEquals(1.0, first.geometricOverallSimilarity(), 1e-9);
         assertEquals(1.0, first.queryCoverage(), 1e-9);
         assertEquals(1.0, first.candidateCoverage(), 1e-9);
         assertEquals(0.0, first.queryToCandidateMeanDistance(), 1e-9);
@@ -512,6 +598,25 @@ class PocketSimilarityServiceTest {
         assertEquals("GENE1", first.geneName());
         assertEquals("Homo sapiens", first.organism());
 
+        // The identical residue sets give a perfect chemistry
+        // assessment: final = 0.45 * 1.0 + 0.40 * 1.0 + 0.15 * 0.0.
+        assertEquals(1.0, first.chemistrySimilarity(), 1e-9);
+        assertEquals(
+                1.0,
+                first.chemistryCoverageAdjustedSimilarity(),
+                1e-9
+        );
+        assertEquals(1.0, first.compatibleMatchedFraction(), 1e-9);
+        assertEquals(0.0, first.spatialReplacementFraction(), 1e-9);
+        assertEquals(8, first.identicalCount());
+        assertEquals(0, first.conservativeCount());
+        assertEquals(0, first.chemistryCompatibleCount());
+        assertEquals(0, first.spatialReplacementCount());
+        assertEquals(8, first.matchedResidueCount());
+        assertEquals(0.0, first.keyResidueChemistrySimilarity(), 1e-9);
+        assertEquals("STRONG_SIMILARITY", first.classification());
+        assertEquals(0.85, first.finalSimilarity(), 1e-9);
+
         PocketSimilarityDiagnostic second = rows.get(1);
         assertEquals(3L, second.pocketId());
         assertEquals(3, second.stageOneRank());
@@ -523,9 +628,13 @@ class PocketSimilarityServiceTest {
         assertEquals(2, third.stageOneRank());
         assertEquals(3, third.stageTwoRank());
         assertEquals(3, third.stageThreeRank());
-        assertTrue(third.overallSimilarity() < 1.0);
+        assertTrue(third.geometricOverallSimilarity() < 1.0);
         assertEquals(0.0, third.queryCoverage(), 1e-9);
         assertEquals(0.0, third.candidateCoverage(), 1e-9);
+        assertEquals(
+                "SHAPE_ONLY_NEIGHBOR",
+                third.classification()
+        );
     }
 
     @Test
@@ -555,6 +664,9 @@ class PocketSimilarityServiceTest {
                 any(Pageable.class)
         );
         assertEquals(1, geometryLoader.loadAllCount());
+        assertEquals(1, residueLoader.loadCount(QUERY_POCKET_ID));
+        assertEquals(1, residueLoader.loadCount(1L));
+        assertEquals(1, residueLoader.loadCount(2L));
     }
 
     @Test
@@ -1155,6 +1267,405 @@ class PocketSimilarityServiceTest {
         assertEquals(422, exception.getStatusCode().value());
     }
 
+    @Test
+    void findSimilarExcludesShapeOnlyNeighborsButDiagnosticKeepsThem() {
+        // Candidate 7 has the best possible geometric score (identical
+        // cloud) but no residue chemistry support; candidate 8 is
+        // identical both geometrically and chemically.
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(7L, 110.0, 20, 0.5),
+                candidateSummary(8L, 120.0, 20, 0.5)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(8L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                8L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(List.of(8L), pocketIds(result));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(
+                List.of(8L, 7L),
+                rows.stream()
+                        .map(PocketSimilarityDiagnostic::pocketId)
+                        .toList()
+        );
+
+        PocketSimilarityDiagnostic shapeOnly = rows.get(1);
+        assertEquals(7L, shapeOnly.pocketId());
+        assertEquals(
+                1.0,
+                shapeOnly.geometricOverallSimilarity(),
+                1e-9
+        );
+        assertEquals(0, shapeOnly.matchedResidueCount());
+        assertEquals(
+                "SHAPE_ONLY_NEIGHBOR",
+                shapeOnly.classification()
+        );
+    }
+
+    @Test
+    void findSimilarOrdersByFinalSimilarityNotStageOneOrder() {
+        // Candidate 5 has the better Stage 1 descriptor distance but
+        // one spatial replacement (final 0.80); candidate 6 is fully
+        // identical (final 0.85) and must rank first.
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(5L, 110.0, 20, 0.5),
+                candidateSummary(6L, 130.0, 20, 0.5)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(5L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(6L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                5L,
+                withResidue(
+                        residuePoints(
+                                "B",
+                                101,
+                                cloud(IRREGULAR_CLOUD).points()
+                        ),
+                        0,
+                        "ASP",
+                        ResidueChemistry.NEGATIVE
+                )
+        );
+        residueLoader.register(
+                6L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(List.of(6L, 5L), pocketIds(result));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(
+                "STRONG_SIMILARITY",
+                rows.get(0).classification()
+        );
+        assertEquals(0.85, rows.get(0).finalSimilarity(), 1e-9);
+        assertEquals(
+                "STRONG_SIMILARITY",
+                rows.get(1).classification()
+        );
+        assertEquals(0.80, rows.get(1).finalSimilarity(), 1e-9);
+        assertEquals(1, rows.get(1).spatialReplacementCount());
+    }
+
+    @Test
+    void keyResidueChemistryBreaksTowardConfiguredKeys() {
+        // The query key residue CYS6 (chain A, CYS at sequence offset
+        // 6) is preserved identically by candidate 9 but replaced in
+        // candidate 10, so candidate 9 wins the key-similarity term
+        // despite the worse Stage 1 descriptor distance.
+        keyResidues.getKeyResidues().put(
+                "UP" + QUERY_POCKET_ID,
+                List.of("CYS6")
+        );
+
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(10L, 110.0, 20, 0.5),
+                candidateSummary(9L, 130.0, 20, 0.5)
+        ));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(9L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(10L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                9L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                10L,
+                withResidue(
+                        residuePoints(
+                                "B",
+                                101,
+                                cloud(IRREGULAR_CLOUD).points()
+                        ),
+                        5,
+                        "ASP",
+                        ResidueChemistry.NEGATIVE
+                )
+        );
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(List.of(9L, 10L), pocketIds(result));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(
+                1.0,
+                rows.get(0).keyResidueChemistrySimilarity(),
+                1e-9
+        );
+        assertEquals(1.0, rows.get(0).finalSimilarity(), 1e-9);
+        assertEquals(
+                0.0,
+                rows.get(1).keyResidueChemistrySimilarity(),
+                1e-9
+        );
+        assertEquals(0.80, rows.get(1).finalSimilarity(), 1e-9);
+    }
+
+    @Test
+    void chemistryPassingCandidateWithLowFinalSimilarityIsRejected() {
+        // Candidate 11 passes the chemistry gate (half identical,
+        // half spatial replacements) but its scaled cloud drags the
+        // final similarity below the moderate threshold.
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(11L, 1520.0, 38, 0.5)));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(11L, cloud(IRREGULAR_SCALED));
+
+        List<PocketResiduePoint> queryResidues =
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points());
+        residueLoader.register(QUERY_POCKET_ID, queryResidues);
+
+        List<PocketResiduePoint> candidateResidues = preimageResidues(
+                queryResidues,
+                alignmentTransform(
+                        cloud(IRREGULAR_CLOUD),
+                        cloud(IRREGULAR_SCALED)
+                )
+        );
+        candidateResidues = withResidue(
+                candidateResidues, 0, "ASP", ResidueChemistry.NEGATIVE
+        );
+        candidateResidues = withResidue(
+                candidateResidues, 1, "LYS", ResidueChemistry.POSITIVE
+        );
+        candidateResidues = withResidue(
+                candidateResidues, 2, "ASP", ResidueChemistry.NEGATIVE
+        );
+        candidateResidues = withResidue(
+                candidateResidues, 3, "PHE", ResidueChemistry.AROMATIC
+        );
+        residueLoader.register(11L, candidateResidues);
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertTrue(result.isEmpty());
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+
+        PocketSimilarityDiagnostic rejected = rows.get(0);
+        assertEquals(0.5, rejected.chemistrySimilarity(), 1e-9);
+        assertEquals(0.5, rejected.compatibleMatchedFraction(), 1e-9);
+        assertEquals(0.5, rejected.spatialReplacementFraction(), 1e-9);
+        assertTrue(
+                rejected.geometricOverallSimilarity() < 0.3,
+                "overall similarity was "
+                        + rejected.geometricOverallSimilarity()
+        );
+        assertTrue(
+                rejected.finalSimilarity() < 0.40,
+                "final similarity was " + rejected.finalSimilarity()
+        );
+        assertEquals("REJECTED", rejected.classification());
+    }
+
+    @Test
+    void moderateCandidatePassesTheDefaultFilter() {
+        // Candidate 12 is geometrically weak (scaled cloud) but
+        // chemically identical, landing between the moderate and
+        // strong thresholds.
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(12L, 1520.0, 38, 0.5)));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(12L, cloud(IRREGULAR_SCALED));
+
+        List<PocketResiduePoint> queryResidues =
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points());
+        residueLoader.register(QUERY_POCKET_ID, queryResidues);
+        residueLoader.register(
+                12L,
+                preimageResidues(
+                        queryResidues,
+                        alignmentTransform(
+                                cloud(IRREGULAR_CLOUD),
+                                cloud(IRREGULAR_SCALED)
+                        )
+                )
+        );
+
+        List<PocketCandidate> result =
+                service.findSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(List.of(12L), pocketIds(result));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+        assertEquals(
+                "MODERATE_SIMILARITY",
+                rows.get(0).classification()
+        );
+        assertTrue(
+                rows.get(0).finalSimilarity() >= 0.40
+                        && rows.get(0).finalSimilarity() < 0.60,
+                "final similarity was " + rows.get(0).finalSimilarity()
+        );
+    }
+
+    @Test
+    void compareIncludesChemistryAssessmentMatchingScorer() {
+        keyResidues.getKeyResidues().put(
+                "UP" + QUERY_POCKET_ID,
+                List.of("CYS6")
+        );
+
+        stubQuerySummary();
+        when(repository.findById(1L)).thenReturn(
+                Optional.of(new TestPocketSummaryEntity(1L, 110.0, 20, 0.5))
+        );
+
+        List<Point3D> movedPoints =
+                KNOWN_TRANSFORM.apply(cloud(IRREGULAR_CLOUD).points());
+
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, new PocketPointCloud(movedPoints, BASIS));
+
+        List<PocketResiduePoint> queryResidues =
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points());
+        List<PocketResiduePoint> candidateResidues =
+                residuePoints("B", 101, movedPoints);
+
+        residueLoader.register(QUERY_POCKET_ID, queryResidues);
+        residueLoader.register(1L, candidateResidues);
+
+        PocketComparisonDetails details =
+                service.compareGeometries(QUERY_POCKET_ID, 1L);
+
+        // The expected assessment comes straight from the Athena
+        // scorer over the same correspondence the endpoint computes.
+        PocketAlignment alignment = new PocketComparator(
+                new CompositePocketAligner(),
+                PocketComparisonOptions.defaults()
+        ).align(
+                cloud(IRREGULAR_CLOUD),
+                new PocketPointCloud(movedPoints, BASIS)
+        );
+
+        ResidueCorrespondence correspondence =
+                new ResidueCorrespondenceCalculator().calculate(
+                        queryResidues,
+                        new PocketResiduePointTransformer().transform(
+                                candidateResidues,
+                                alignment.transform()
+                        )
+                );
+
+        ResidueChemistryScorer scorer = new ResidueChemistryScorer();
+        ResidueChemistryAssessment expected = scorer.assess(
+                correspondence,
+                Set.of("CYS6")
+        );
+        double expectedFinal = ResidueChemistryScorer.finalSimilarity(
+                details.comparison().overallSimilarity(),
+                expected
+        );
+
+        ChemistryAssessmentView view = details.chemistryAssessment();
+
+        assertEquals(
+                expected.chemistrySimilarity(),
+                view.chemistrySimilarity(),
+                1e-9
+        );
+        assertEquals(
+                expected.chemistryCoverageAdjustedSimilarity(),
+                view.chemistryCoverageAdjustedSimilarity(),
+                1e-9
+        );
+        assertEquals(
+                expected.compatibleMatchedFraction(),
+                view.compatibleMatchedFraction(),
+                1e-9
+        );
+        assertEquals(
+                expected.spatialReplacementFraction(),
+                view.spatialReplacementFraction(),
+                1e-9
+        );
+        assertEquals(expected.identicalCount(), view.identicalCount());
+        assertEquals(
+                expected.conservativeCount(),
+                view.conservativeCount()
+        );
+        assertEquals(
+                expected.chemistryCompatibleCount(),
+                view.chemistryCompatibleCount()
+        );
+        assertEquals(
+                expected.spatialReplacementCount(),
+                view.spatialReplacementCount()
+        );
+        assertEquals(
+                expected.matchedResidueCount(),
+                view.matchedResidueCount()
+        );
+        assertEquals(
+                expected.queryResidueCount(),
+                view.queryResidueCount()
+        );
+        assertEquals(
+                expected.candidateResidueCount(),
+                view.candidateResidueCount()
+        );
+        assertEquals(
+                expected.keyResidueChemistrySimilarity(),
+                view.keyResidueChemistrySimilarity(),
+                1e-9
+        );
+        assertEquals(expected.keyMatchedCount(), view.keyMatchedCount());
+        assertEquals(
+                scorer.classify(expected, expectedFinal).name(),
+                view.classification()
+        );
+        assertEquals(expectedFinal, view.finalSimilarity(), 1e-9);
+
+        // The fixture is a fully identical correspondence with the
+        // key cysteine preserved.
+        assertEquals(8, view.matchedResidueCount());
+        assertEquals(1, view.keyMatchedCount());
+        assertEquals("STRONG_SIMILARITY", view.classification());
+    }
+
     private void stubQuerySummary() {
         when(repository.findById(QUERY_POCKET_ID))
                 .thenReturn(Optional.of(new TestPocketSummaryEntity(
@@ -1448,10 +1959,92 @@ class PocketSimilarityServiceTest {
         return residues;
     }
 
+    private static RigidTransform alignmentTransform(
+            PocketPointCloud queryCloud,
+            PocketPointCloud candidateCloud
+    ) {
+        return new PocketComparator(
+                new CompositePocketAligner(),
+                PocketComparisonOptions.defaults()
+        ).align(queryCloud, candidateCloud).transform();
+    }
+
+    /**
+     * Residue points placed so that the given alignment transform maps
+     * them exactly onto the query residues: the pre-image under the
+     * rigid transform (transposed rotation, translation removed
+     * first). Used to give a geometrically distant candidate a
+     * controlled, fully matched residue correspondence.
+     */
+    private static List<PocketResiduePoint> preimageResidues(
+            List<PocketResiduePoint> queryResidues,
+            RigidTransform transform
+    ) {
+        double[][] rotation = transform.rotation();
+        Point3D translation = transform.translation();
+
+        List<PocketResiduePoint> residues = new ArrayList<>();
+
+        for (PocketResiduePoint queryResidue : queryResidues) {
+            Point3D position = queryResidue.position();
+            double dx = position.x() - translation.x();
+            double dy = position.y() - translation.y();
+            double dz = position.z() - translation.z();
+
+            residues.add(new PocketResiduePoint(
+                    queryResidue.reference(),
+                    new Point3D(
+                            rotation[0][0] * dx
+                                    + rotation[1][0] * dy
+                                    + rotation[2][0] * dz,
+                            rotation[0][1] * dx
+                                    + rotation[1][1] * dy
+                                    + rotation[2][1] * dz,
+                            rotation[0][2] * dx
+                                    + rotation[1][2] * dy
+                                    + rotation[2][2] * dz
+                    ),
+                    queryResidue.chemistry()
+            ));
+        }
+
+        return residues;
+    }
+
     private static List<Long> pocketIds(List<PocketCandidate> candidates) {
         return candidates.stream()
                 .map(PocketCandidate::pocketId)
                 .toList();
+    }
+
+    /**
+     * Returns a copy of the residue list with one residue replaced by
+     * a different name and chemistry at the same position, producing
+     * a spatial replacement ({@code MatchType.DIFFERENT}) once
+     * matched.
+     */
+    private static List<PocketResiduePoint> withResidue(
+            List<PocketResiduePoint> residues,
+            int index,
+            String residueName,
+            ResidueChemistry chemistry
+    ) {
+        List<PocketResiduePoint> replaced = new ArrayList<>(residues);
+        PocketResiduePoint original = replaced.get(index);
+        ResidueReference reference = original.reference();
+
+        replaced.set(index, new PocketResiduePoint(
+                new ResidueReference(
+                        reference.chainId(),
+                        reference.residueNumber(),
+                        reference.insertionCode(),
+                        residueName
+                ),
+                original.position(),
+                chemistry
+        ));
+
+        return replaced;
     }
 
     private static final class FakeGeometryLoader

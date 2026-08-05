@@ -14,6 +14,9 @@ import totah.lab.athena.pocket.compare.PocketComparison;
 import totah.lab.athena.pocket.compare.PocketComparisonOptions;
 import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
 import totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformer;
+import totah.lab.athena.pocket.compare.residue.PocketSimilarityClassification;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistryAssessment;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
@@ -25,8 +28,11 @@ import totah.lab.web.persistence.PocketSummaryRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.ToDoubleFunction;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
@@ -61,14 +67,31 @@ public class PocketSimilarityService {
 
     private static final Comparator<ComparedCandidate> STAGE_THREE_ORDER =
             Comparator.comparingDouble((ComparedCandidate compared) ->
-                            compared.comparison().overallSimilarity())
+                            compared.finalSimilarity())
                     .reversed()
+                    .thenComparing(descending(compared ->
+                            compared.assessment()
+                                    .chemistryCoverageAdjustedSimilarity()))
+                    .thenComparing(descending(compared ->
+                            compared.assessment()
+                                    .compatibleMatchedFraction()))
+                    .thenComparing(descending(compared ->
+                            compared.assessment()
+                                    .keyResidueChemistrySimilarity()))
+                    .thenComparing(descending(compared ->
+                            compared.comparison().overallSimilarity()))
                     .thenComparingDouble(compared ->
                             compared.loaded().shapeDistance())
                     .thenComparingDouble(compared ->
                             compared.loaded().candidate().descriptorDistance())
                     .thenComparingLong(compared ->
                             compared.loaded().candidate().pocketId());
+
+    private static Comparator<ComparedCandidate> descending(
+            ToDoubleFunction<ComparedCandidate> key
+    ) {
+        return Comparator.comparingDouble(key).reversed();
+    }
 
     /**
      * The aligner used for Stage 3 and pairwise comparison. Reported
@@ -85,6 +108,8 @@ public class PocketSimilarityService {
             new PocketResiduePointTransformer();
     private final ResidueCorrespondenceCalculator correspondenceCalculator =
             new ResidueCorrespondenceCalculator();
+    private final ResidueChemistryScorer chemistryScorer =
+            new ResidueChemistryScorer();
 
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
@@ -107,7 +132,15 @@ public class PocketSimilarityService {
             long queryPocketId,
             int limit
     ) {
+        // The default result set is chemistry-gated: only candidates
+        // classified STRONG_SIMILARITY or MODERATE_SIMILARITY are
+        // returned; shape-only neighbors and rejected candidates are
+        // visible through diagnoseSimilar.
         return rankCandidates(queryPocketId, limit).stream()
+                .filter(compared -> compared.classification()
+                        == PocketSimilarityClassification.STRONG_SIMILARITY
+                        || compared.classification()
+                        == PocketSimilarityClassification.MODERATE_SIMILARITY)
                 .limit(limit)
                 .map(compared -> compared.loaded().candidate())
                 .toList();
@@ -115,9 +148,11 @@ public class PocketSimilarityService {
 
     /**
      * Development diagnostic: same pipeline as {@link #findSimilar},
-     * but returns the intermediate stage ranks and the full
-     * {@link PocketComparison} metrics instead of the production
-     * response shape. Does not alter ranking.
+     * but returns every evaluated candidate (including shape-only
+     * neighbors and rejected ones) with the intermediate stage ranks,
+     * the full {@link PocketComparison} metrics, and the chemistry
+     * assessment instead of the production response shape. Does not
+     * alter ranking.
      */
     @Transactional(readOnly = true)
     public List<PocketSimilarityDiagnostic> diagnoseSimilar(
@@ -241,6 +276,21 @@ public class PocketSimilarityService {
         long residueMatchingMs =
                 elapsedMillis(residueMatchingStartNanos);
 
+        List<String> keyResidues =
+                keyResidueConfiguration.forUniProtId(
+                        querySummary.getUniProtId()
+                );
+        ResidueChemistryAssessment assessment =
+                chemistryScorer.assess(
+                        correspondence,
+                        new HashSet<>(keyResidues)
+                );
+        double finalSimilarity =
+                ResidueChemistryScorer.finalSimilarity(
+                        comparison.overallSimilarity(),
+                        assessment
+                );
+
         logComparisonTiming(
                 queryPocketId,
                 candidatePocketId,
@@ -273,8 +323,14 @@ public class PocketSimilarityService {
                         alignment.transform().rotation(),
                         alignment.transform().translation()
                 ),
-                keyResidueConfiguration.forUniProtId(
-                        querySummary.getUniProtId()
+                keyResidues,
+                ChemistryAssessmentView.toView(
+                        assessment,
+                        chemistryScorer.classify(
+                                assessment,
+                                finalSimilarity
+                        ),
+                        finalSimilarity
                 )
         );
 
@@ -443,13 +499,60 @@ public class PocketSimilarityService {
         );
 
         long stageThreeStartNanos = System.nanoTime();
+
+        List<PocketResiduePoint> queryResidues =
+                residueLoader.load(queryPocketId);
+        Set<String> keyResidues = new HashSet<>(
+                keyResidueConfiguration.forUniProtId(
+                        querySummary.getUniProtId()
+                )
+        );
+
         List<ComparedCandidate> compared = new ArrayList<>();
 
         for (LoadedCandidate loaded : stageTwoSurvivors) {
             try {
+                PocketAlignment alignment = comparator.align(
+                        queryCloud,
+                        loaded.pointCloud()
+                );
+                PocketComparison comparison =
+                        comparator.compareAligned(alignment);
+
+                List<PocketResiduePoint> candidateResidues =
+                        residueLoader.load(
+                                loaded.candidate().pocketId()
+                        );
+
+                ResidueCorrespondence correspondence =
+                        correspondenceCalculator.calculate(
+                                queryResidues,
+                                residueTransformer.transform(
+                                        candidateResidues,
+                                        alignment.transform()
+                                )
+                        );
+
+                ResidueChemistryAssessment assessment =
+                        chemistryScorer.assess(
+                                correspondence,
+                                keyResidues
+                        );
+                double finalSimilarity =
+                        ResidueChemistryScorer.finalSimilarity(
+                                comparison.overallSimilarity(),
+                                assessment
+                        );
+
                 compared.add(new ComparedCandidate(
                         loaded,
-                        comparator.compare(queryCloud, loaded.pointCloud())
+                        comparison,
+                        assessment,
+                        finalSimilarity,
+                        chemistryScorer.classify(
+                                assessment,
+                                finalSimilarity
+                        )
                 ));
             } catch (RuntimeException exception) {
                 LOGGER.warn(
@@ -605,6 +708,7 @@ public class PocketSimilarityService {
         LoadedCandidate loaded = compared.loaded();
         PocketCandidate candidate = loaded.candidate();
         PocketComparison comparison = compared.comparison();
+        ResidueChemistryAssessment assessment = compared.assessment();
 
         return new PocketSimilarityDiagnostic(
                 candidate.pocketId(),
@@ -632,6 +736,18 @@ public class PocketSimilarityService {
                 comparison.queryPointCount(),
                 comparison.candidatePointCount(),
                 comparison.basis().name(),
+                assessment.chemistrySimilarity(),
+                assessment.chemistryCoverageAdjustedSimilarity(),
+                assessment.compatibleMatchedFraction(),
+                assessment.spatialReplacementFraction(),
+                assessment.identicalCount(),
+                assessment.conservativeCount(),
+                assessment.chemistryCompatibleCount(),
+                assessment.spatialReplacementCount(),
+                assessment.matchedResidueCount(),
+                assessment.keyResidueChemistrySimilarity(),
+                compared.classification().name(),
+                compared.finalSimilarity(),
                 candidate.uniProtId(),
                 candidate.proteinName(),
                 candidate.geneName(),
@@ -808,7 +924,10 @@ public class PocketSimilarityService {
 
     private record ComparedCandidate(
             LoadedCandidate loaded,
-            PocketComparison comparison
+            PocketComparison comparison,
+            ResidueChemistryAssessment assessment,
+            double finalSimilarity,
+            PocketSimilarityClassification classification
     ) {
     }
 }
