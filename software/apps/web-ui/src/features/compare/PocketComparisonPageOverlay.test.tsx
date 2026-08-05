@@ -83,6 +83,14 @@ const details: PocketComparisonDetails = {
     basis: 'RESIDUE_ATOMS',
   },
   aligner: 'PCA_ICP',
+  alignment: {
+    initialization: 'PCA_ICP',
+    sequenceSeedPairCount: 0,
+    sequenceConsistentCorrespondenceCount: 0,
+    sequenceConsistentCorrespondenceFraction: 0,
+    sequenceSeedAvailable: false,
+    sequenceSeedDegenerate: false,
+  },
   transform: {
     rotation: [
       [0, -1, 0],

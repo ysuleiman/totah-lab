@@ -55,6 +55,7 @@ function makeRow(
     candidatePointCount: 21,
     basis: 'RESIDUE_ATOMS',
     alphaSphereCount: 0,
+    alignmentInitialization: 'SEQUENCE_SEEDED_KABSCH',
     chemistrySimilarity: 0.8,
     chemistryCoverageAdjustedSimilarity: 0.7,
     compatibleMatchedFraction: 0.6,
@@ -126,6 +127,9 @@ describe('SimilarPocketsPage', () => {
     expect(screen.getAllByText('Residue heavy atoms').length)
       .toBeGreaterThan(0)
     expect(screen.getByText('P12345')).toBeInTheDocument()
+    // Final-rank cell exposes the alignment initialization as a tooltip.
+    expect(screen.getByTitle('sequence-seeded Kabsch'))
+      .toHaveTextContent('1')
   })
 
   it('paginates without refetching and keeps server rank values', async () => {

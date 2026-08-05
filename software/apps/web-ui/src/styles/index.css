@@ -148,6 +148,23 @@ button { cursor: pointer; }
 .evidence-cell { color: var(--muted); font: 8px 'DM Mono', monospace; }
 .evidence-cell span { display: block; }
 .evidence-cell span + span { margin-top: 4px; }
+.ligand-identity { display: inline-block; }
+.ligand-identity[tabindex] { cursor: help; }
+.ligand-identity:focus-visible {
+  outline: 2px solid var(--accent-dark); outline-offset: 2px; border-radius: 4px;
+}
+.ligand-hover-card {
+  position: fixed; z-index: 30; width: 300px; padding: 14px 16px 16px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(23, 36, 33, .18);
+  pointer-events: none;
+}
+.ligand-hover-card > strong { display: block; font-size: 13px; }
+.ligand-depiction { display: flex; justify-content: center; margin-top: 8px; }
+.ligand-depiction-fallback {
+  display: block; margin-top: 8px; color: var(--muted);
+  font: 11px 'DM Mono', monospace; word-break: break-all;
+}
 .selectivity-pagination {
   display: flex; justify-content: center; align-items: center; gap: 18px;
   padding: 14px; border-top: 1px solid var(--line);

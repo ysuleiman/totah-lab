@@ -3,6 +3,20 @@ import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
 import { SelectivityWorkspace } from './SelectivityWorkspace'
 
+vi.mock('smiles-drawer', () => ({
+  default: {
+    SvgDrawer: class {
+      draw() {
+        return document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+      }
+    },
+    parse: (
+      _smiles: string,
+      onSuccess: (tree: unknown) => void,
+    ) => onSuccess({}),
+  },
+}))
+
 vi.mock('../../api/hooks', () => ({
   useApiQuery: () => ({
     loading: false,
@@ -12,6 +26,7 @@ vi.mock('../../api/hooks', () => ({
       items: [{
         ligandId: 'compact-id',
         ligandLabel: 'MCULE-1',
+        smiles: 'CCO',
         score7b: -9.2,
         score7a: -7,
         delta: 2.2,
@@ -39,4 +54,20 @@ test('shows paired scores and explains positive delta', async () => {
   expect(screen.getByText('Positive = 7B favored')).toBeInTheDocument()
 
   await user.click(screen.getByRole('button', { name: 'Sort by METTL7B' }))
+})
+
+test('shows the ligand structure while hovering the ligand cell', async () => {
+  const user = userEvent.setup()
+  render(<SelectivityWorkspace />)
+
+  expect(screen.queryByRole('img')).not.toBeInTheDocument()
+
+  const cell = screen.getByText('MCULE-1')
+  await user.hover(cell)
+  expect(
+    await screen.findByRole('img', { name: '2D structure of MCULE-1' }),
+  ).toBeInTheDocument()
+
+  await user.unhover(cell)
+  expect(screen.queryByRole('img')).not.toBeInTheDocument()
 })

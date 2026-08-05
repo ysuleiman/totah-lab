@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import { useApiQuery } from '../../api/hooks'
 import type {
   SelectivityPage,
+  SelectivityScore,
   SelectivitySort,
   SortDirection,
 } from '../../api/types'
 import { AsyncState } from '../../components/AsyncState'
+import { LigandDepiction } from './LigandDepiction'
 
 const PAGE_SIZE = 50
 
@@ -46,6 +48,25 @@ export function SelectivityWorkspace() {
   const [page, setPage] = useState(0)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [hover, setHover] = useState<{
+    score: SelectivityScore
+    top: number
+    left: number
+  } | null>(null)
+
+  function showLigand(
+    event: React.SyntheticEvent<HTMLElement>,
+    score: SelectivityScore,
+  ) {
+    if (!score.smiles) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const cardWidth = 300
+    const left = rect.right + 14 + cardWidth > window.innerWidth
+      ? Math.max(8, rect.left - 14 - cardWidth)
+      : rect.right + 14
+    const top = Math.min(rect.top, Math.max(8, window.innerHeight - 300))
+    setHover({ score, top, left })
+  }
 
   const path = useMemo(() => {
     const parameters = new URLSearchParams({
@@ -195,8 +216,17 @@ export function SelectivityWorkspace() {
                   {query.data.items.map((score) => (
                     <tr key={score.ligandId}>
                       <td>
-                        <strong>{score.ligandLabel}</strong>
-                        <small>{score.ligandId}</small>
+                        <span
+                          className="ligand-identity"
+                          tabIndex={score.smiles ? 0 : undefined}
+                          onMouseEnter={(event) => showLigand(event, score)}
+                          onMouseLeave={() => setHover(null)}
+                          onFocus={(event) => showLigand(event, score)}
+                          onBlur={() => setHover(null)}
+                        >
+                          <strong>{score.ligandLabel}</strong>
+                          <small>{score.ligandId}</small>
+                        </span>
                       </td>
                       <td className="score-cell">
                         {formatScore(score.score7b)}
@@ -239,6 +269,19 @@ export function SelectivityWorkspace() {
           </>
         )}
       </section>
+
+      {hover && hover.score.smiles && (
+        <div
+          className="ligand-hover-card"
+          style={{ top: hover.top, left: hover.left }}
+        >
+          <strong>{hover.score.ligandLabel}</strong>
+          <LigandDepiction
+            smiles={hover.score.smiles}
+            label={hover.score.ligandLabel}
+          />
+        </div>
+      )}
     </section>
   )
 }

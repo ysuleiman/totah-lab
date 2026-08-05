@@ -80,6 +80,14 @@ const details: PocketComparisonDetails = {
     basis: 'RESIDUE_ATOMS',
   },
   aligner: 'PCA_ICP',
+  alignment: {
+    initialization: 'SEQUENCE_SEEDED_KABSCH_ICP',
+    sequenceSeedPairCount: 4,
+    sequenceConsistentCorrespondenceCount: 3,
+    sequenceConsistentCorrespondenceFraction: 0.75,
+    sequenceSeedAvailable: true,
+    sequenceSeedDegenerate: false,
+  },
   transform: {
     rotation: [
       [1, 0, 0],
@@ -184,6 +192,7 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   candidatePointCount: 21,
   basis: 'RESIDUE_ATOMS',
   alphaSphereCount: 0,
+  alignmentInitialization: 'SEQUENCE_SEEDED_KABSCH_ICP',
   chemistrySimilarity: 0.72,
   chemistryCoverageAdjustedSimilarity: 0.64,
   compatibleMatchedFraction: 0.75,
@@ -405,6 +414,52 @@ describe('PocketComparisonPage', () => {
     expect(
       screen.getByText(/Geometry rendered as alpha spheres/),
     ).toBeInTheDocument()
+  })
+
+  it('shows the readable alignment initialization and sequence consistency', async () => {
+    stubFetch(true)
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.getByText(/Initialization: sequence-seeded Kabsch \+ ICP/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Sequence-consistent correspondences'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('3 / 4 (75%)')).toBeInTheDocument()
+  })
+
+  it('falls back to the raw initialization for unknown values and hides the seed line', async () => {
+    stubFetch(true, {
+      ...details,
+      alignment: {
+        ...details.alignment,
+        initialization: 'FROB_NORM',
+        sequenceSeedAvailable: false,
+      },
+    })
+    render(
+      <PocketComparisonPage
+        queryPocketId={7}
+        candidatePocketId={8}
+        onNavigate={() => undefined}
+      />,
+    )
+
+    await screen.findByRole('heading', { name: '1ABC vs 2XYZ' })
+    expect(
+      screen.getByText(/Initialization: FROB_NORM/),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('Sequence-consistent correspondences'),
+    ).toBeNull()
   })
 
   it('renders the chemistry assessment card when present', async () => {

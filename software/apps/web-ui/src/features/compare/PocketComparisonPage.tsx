@@ -8,6 +8,7 @@ import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { ErrorBoundary } from '../../components/ErrorBoundary'
 import { geometryBasisLabel } from '../similar/geometryBasis'
+import { alignmentInitializationLabel } from '../similar/alignmentInitialization'
 import {
   classificationClass,
   classificationLabel,
@@ -137,6 +138,11 @@ function PocketComparisonContent({
             Geometry basis: {geometryBasisLabel(comparison.basis)}
             {' · '}
             Aligner: {details.data.aligner}
+            {' · '}
+            Initialization:{' '}
+            {alignmentInitializationLabel(
+              details.data.alignment.initialization,
+            )}
             {' · '}
             query {comparison.queryPointCount} points
             {' · '}
@@ -309,6 +315,26 @@ function PocketComparisonContent({
                 {' / '}
                 {chemistryAssessment.candidateResidueCount}
               </dd>
+
+              {details.data.alignment.sequenceSeedAvailable && (
+                <>
+                  <dt>Sequence-consistent correspondences</dt>
+                  <dd>
+                    {
+                      details.data.alignment
+                        .sequenceConsistentCorrespondenceCount
+                    }
+                    {' / '}
+                    {details.data.alignment.sequenceSeedPairCount}
+                    {' ('}
+                    {Math.round(
+                      details.data.alignment
+                        .sequenceConsistentCorrespondenceFraction * 100,
+                    )}
+                    {'%)'}
+                  </dd>
+                </>
+              )}
             </dl>
           </section>
         )}

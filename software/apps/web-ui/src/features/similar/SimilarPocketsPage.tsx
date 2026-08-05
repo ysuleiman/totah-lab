@@ -6,6 +6,7 @@ import type {
 import { useApiQuery } from '../../api/hooks'
 import { AsyncState } from '../../components/AsyncState'
 import { geometryBasisLabel } from './geometryBasis'
+import { alignmentInitializationLabel } from './alignmentInitialization'
 import {
   classificationClass,
   classificationLabel,
@@ -49,6 +50,7 @@ interface Column {
   defaultDirection: SortDirection
   value: (row: PocketSimilarityDiagnosticRow) => string
   cellClass?: (row: PocketSimilarityDiagnosticRow) => string
+  cellTitle?: (row: PocketSimilarityDiagnosticRow) => string
 }
 
 const COLUMNS: Column[] = [
@@ -57,6 +59,8 @@ const COLUMNS: Column[] = [
     label: 'Rank',
     defaultDirection: 'asc',
     value: (row) => String(row.stageThreeRank),
+    cellTitle: (row) =>
+      alignmentInitializationLabel(row.alignmentInitialization),
   },
   {
     key: 'pocketId',
@@ -479,6 +483,7 @@ export function SimilarPocketsPage({ pocketId, onNavigate }: Props) {
                         <td
                           key={column.key}
                           className={column.cellClass?.(row)}
+                          title={column.cellTitle?.(row)}
                         >
                           {column.value(row)}
                         </td>

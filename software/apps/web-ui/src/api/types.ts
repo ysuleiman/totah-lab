@@ -197,6 +197,7 @@ export interface DockingRunSummary {
 export interface SelectivityScore {
   ligandId: string
   ligandLabel: string
+  smiles: string | null
   score7b: number
   score7a: number
   delta: number
@@ -374,6 +375,7 @@ export interface PocketSimilarityDiagnosticRow {
   candidatePointCount: number
   basis: string
   alphaSphereCount: number
+  alignmentInitialization: string
   chemistrySimilarity: number
   chemistryCoverageAdjustedSimilarity: number
   compatibleMatchedFraction: number
@@ -443,13 +445,13 @@ export interface RigidTransformView {
   translation: Point3D
 }
 
-export interface PocketAlignmentView {
-  query: PocketGeometryView
-  alignedCandidate: PocketGeometryView
-  transform: RigidTransformView
-  rmsd: number
-  iterations: number
-  converged: boolean
+export interface AlignmentMetadataView {
+  initialization: string
+  sequenceSeedPairCount: number
+  sequenceConsistentCorrespondenceCount: number
+  sequenceConsistentCorrespondenceFraction: number
+  sequenceSeedAvailable: boolean
+  sequenceSeedDegenerate: boolean
 }
 
 export interface ResiduePointView {
@@ -522,7 +524,7 @@ export interface PocketComparisonDetails {
   alignedCandidatePoints: Point3D[]
   comparison: PocketComparisonMetrics
   aligner: string
-  alignment?: PocketAlignmentView
+  alignment: AlignmentMetadataView
   transform: RigidTransformView
   residueCorrespondence: ResidueCorrespondenceView | null
   keyResidues: string[]
