@@ -294,6 +294,59 @@ public final class ResidueCorrespondenceCalculator {
                 || chemistry == ResidueChemistry.GLYCINE;
     }
 
+    /**
+     * Classifies a residue-name pair into a {@link MatchType} using
+     * exactly the rules applied to spatially matched pairs:
+     * cysteine/glycine pairs are only ever IDENTICAL or DIFFERENT;
+     * identical names yield IDENTICAL; names sharing a conservative
+     * set yield CONSERVATIVE; equal broad chemistry yields
+     * CHEMISTRY_COMPATIBLE; anything else is DIFFERENT.
+     *
+     * <p>Exposed for alignment-driven reports (for example ligand
+     * contact conservation) that classify aligned residue pairs
+     * without spatial matching.</p>
+     */
+    public static MatchType matchTypeOf(
+            String queryResidueName,
+            String candidateResidueName
+    ) {
+        String queryName = normalize(
+                Objects.requireNonNull(queryResidueName,
+                        "queryResidueName")
+        );
+        String candidateName = normalize(
+                Objects.requireNonNull(candidateResidueName,
+                        "candidateResidueName")
+        );
+
+        ResidueChemistryClassifier classifier =
+                new ResidueChemistryClassifier();
+        ResidueChemistry queryChemistry =
+                classifier.classifyName(queryName);
+        ResidueChemistry candidateChemistry =
+                classifier.classifyName(candidateName);
+
+        if (isSpecial(queryChemistry) || isSpecial(candidateChemistry)) {
+            return queryName.equals(candidateName)
+                    ? MatchType.IDENTICAL
+                    : MatchType.DIFFERENT;
+        }
+
+        if (queryName.equals(candidateName)) {
+            return MatchType.IDENTICAL;
+        }
+
+        if (inSameConservativeSet(queryName, candidateName)) {
+            return MatchType.CONSERVATIVE;
+        }
+
+        if (queryChemistry == candidateChemistry) {
+            return MatchType.CHEMISTRY_COMPATIBLE;
+        }
+
+        return MatchType.DIFFERENT;
+    }
+
     private static boolean inSameConservativeSet(
             String queryName,
             String candidateName

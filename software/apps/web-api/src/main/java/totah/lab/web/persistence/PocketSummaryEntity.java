@@ -9,7 +9,7 @@ import org.hibernate.annotations.Immutable;
 
 @Entity
 @Immutable
-@Table(name = "pocket_summary_mv", schema = "docking")
+@Table(name = "pocket_summary_mv")
 public class PocketSummaryEntity {
 
     @Id

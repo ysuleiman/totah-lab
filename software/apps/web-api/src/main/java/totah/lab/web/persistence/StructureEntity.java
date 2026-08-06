@@ -18,10 +18,11 @@ import java.util.Objects;
 /**
  * Maps docking.structure.
  *
- * chosen_pocket_id is deliberately not mapped: it participates in a
- * composite foreign key (chosen_pocket_id, id) -> pocket(id, structure_id)
- * that JPA cannot express on the owning side, and the importer never sets
- * it. The column stays NULL on rows inserted by this application.
+ * chosen_pocket_id is mapped as a plain scalar (read-mostly; the
+ * importer never sets it). Its composite foreign key
+ * (chosen_pocket_id, id) -> pocket(id, structure_id) cannot be
+ * expressed on the owning side in JPA, so it is intentionally not
+ * modeled as a relationship.
  */
 @Entity
 @Table(name = "structure")
@@ -67,6 +68,13 @@ public class StructureEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artifact_id", nullable = false)
     private ArtifactEntity artifact;
+
+    /*
+     * Scalar-only mapping of the chosen pocket reference (see class
+     * javadoc); rows inserted by this application leave it NULL.
+     */
+    @Column(name = "chosen_pocket_id")
+    private Long chosenPocketId;
 
     public StructureEntity() {
     }
@@ -149,5 +157,13 @@ public class StructureEntity {
 
     public void setArtifact(ArtifactEntity artifact) {
         this.artifact = Objects.requireNonNull(artifact, "artifact");
+    }
+
+    public Long getChosenPocketId() {
+        return chosenPocketId;
+    }
+
+    public void setChosenPocketId(Long chosenPocketId) {
+        this.chosenPocketId = chosenPocketId;
     }
 }

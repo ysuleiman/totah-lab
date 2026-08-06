@@ -75,4 +75,19 @@ public interface StructureRepository
             String source,
             String sourceAccession
     );
+
+    /**
+     * The chosen pocket ids of every structure of one receptor
+     * (including the query structure's own chosen pocket), for the
+     * chosen-reference retrieval channel.
+     */
+    @Query("""
+            SELECT structure.chosenPocketId
+            FROM StructureEntity structure
+            WHERE structure.receptor.id = :receptorId
+              AND structure.chosenPocketId IS NOT NULL
+            """)
+    List<Long> findChosenPocketIdsByReceptorId(
+            @Param("receptorId") long receptorId
+    );
 }

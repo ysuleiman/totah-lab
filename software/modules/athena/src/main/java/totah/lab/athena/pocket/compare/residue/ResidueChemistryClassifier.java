@@ -17,9 +17,17 @@ public final class ResidueChemistryClassifier {
     public ResidueChemistry classify(Residue residue) {
         Objects.requireNonNull(residue, "residue");
 
-        String residueName = normalize(residue.getName());
+        return classifyName(residue.getName());
+    }
 
-        return switch (residueName) {
+    /**
+     * Classifies a three-letter residue name directly, for callers
+     * that work from residue identity rather than structure objects.
+     */
+    public ResidueChemistry classifyName(String residueName) {
+        String normalized = normalize(residueName);
+
+        return switch (normalized) {
             case "CYS" -> ResidueChemistry.CYSTEINE;
             case "GLY" -> ResidueChemistry.GLYCINE;
 

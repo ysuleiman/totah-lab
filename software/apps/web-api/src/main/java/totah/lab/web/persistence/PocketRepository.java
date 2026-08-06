@@ -211,4 +211,20 @@ public interface PocketRepository
             @Param("source") PocketSource source,
             @Param("structureId") long structureId
     );
+
+    /**
+     * Artifact storage locations of one structure's pockets of the
+     * given source (for example BIOHUB ligand-contact evidence
+     * artifacts), for structure-keyed evidence lookups.
+     */
+    @Query("""
+            SELECT pocket.artifact.storageLocation
+            FROM PocketEntity pocket
+            WHERE pocket.structure.id = :structureId
+              AND pocket.source = :source
+            """)
+    List<String> findArtifactStorageLocations(
+            @Param("structureId") long structureId,
+            @Param("source") PocketSource source
+    );
 }
