@@ -50,7 +50,8 @@ class HephaestusCliTest {
         HephaestusCli cli = cli(new StubClient());
 
         assertEquals(Set.of("prepare-receptor", "prepare-ligand",
-                "validate-pdbqt", "validate-flex-pdbqt", "version", "help"),
+                "validate-pdbqt", "validate-ligand-pdbqt",
+                "validate-flex-pdbqt", "version", "help"),
                 cli.registry().names());
         for (String command : cli.registry().names()) {
             assertTrue(cli.topLevelHelp().contains("    " + command + "\n"));
@@ -132,6 +133,12 @@ class HephaestusCliTest {
         assertEquals(CliExitCode.VALIDATION_ERROR,
                 run(cli(client), "validate-pdbqt", "--input", "a.pdbqt",
                         "--strict").exitCode());
+        assertEquals(CliExitCode.SUCCESS,
+                run(cli(client), "validate-ligand-pdbqt", "--input",
+                        "a.pdbqt").exitCode());
+        assertEquals(CliExitCode.VALIDATION_ERROR,
+                run(cli(client), "validate-ligand-pdbqt", "--input",
+                        "a.pdbqt", "--strict").exitCode());
     }
 
     @Test
@@ -149,6 +156,7 @@ class HephaestusCliTest {
                 HephaestusCapability.PREPARE_RIGID_RECEPTOR,
                 HephaestusCapability.VALIDATE_PREPARED_PROTEIN,
                 HephaestusCapability.VALIDATE_PDBQT,
+                HephaestusCapability.VALIDATE_LIGAND_PDBQT,
                 HephaestusCapability.VALIDATE_FLEXIBLE_PDBQT,
                 HephaestusCapability.PREPARE_LIGAND),
                 HephaestusCapabilities.supported());
@@ -344,6 +352,11 @@ class HephaestusCliTest {
 
         @Override
         public PdbqtValidationReport validatePdbqt(Path input) {
+            return pdbqtReport;
+        }
+
+        @Override
+        public PdbqtValidationReport validateLigandPdbqt(Path input) {
             return pdbqtReport;
         }
 

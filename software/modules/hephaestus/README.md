@@ -35,6 +35,7 @@ The active CLI commands are generated from the command registry:
 prepare-receptor
 prepare-ligand
 validate-pdbqt
+validate-ligand-pdbqt
 validate-flex-pdbqt
 version
 help
@@ -45,14 +46,16 @@ command contract.
 
 ## Standalone CLI
 
-`mvn package` builds a runnable jar (maven-shade; no extra runtime
-dependencies to install):
+`mvn package` builds a thin library jar plus a runnable standalone jar
+(maven-shade; no extra runtime dependencies to install):
 
 ```bash
-java -jar target/hephaestus-1.0-SNAPSHOT.jar prepare-ligand \
+java -jar target/hephaestus-1.0-SNAPSHOT-standalone.jar prepare-ligand \
     --input ligand.sdf --output ligand.pdbqt
-java -jar target/hephaestus-1.0-SNAPSHOT.jar prepare-receptor \
+java -jar target/hephaestus-1.0-SNAPSHOT-standalone.jar prepare-receptor \
     --input receptor.pdb --output receptor.pdbqt
+java -jar target/hephaestus-1.0-SNAPSHOT-standalone.jar \
+    validate-ligand-pdbqt --input ligand.pdbqt
 ```
 
 ## Planned

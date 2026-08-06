@@ -34,6 +34,7 @@ class HephaestusClientContractTest {
         HephaestusClient.class.getMethod(
                 "writePreparedReceptor", PreparedProtein.class, Path.class);
         HephaestusClient.class.getMethod("validatePdbqt", Path.class);
+        HephaestusClient.class.getMethod("validateLigandPdbqt", Path.class);
         HephaestusClient.class.getMethod(
                 "validateFlexiblePdbqt", Path.class, Path.class);
 
@@ -49,6 +50,6 @@ class HephaestusClientContractTest {
         HephaestusClient.class.getMethod(
                 "validatePreparedLigand", PreparedLigand.class);
 
-        assertEquals(12, HephaestusClient.class.getDeclaredMethods().length);
+        assertEquals(13, HephaestusClient.class.getDeclaredMethods().length);
     }
 }

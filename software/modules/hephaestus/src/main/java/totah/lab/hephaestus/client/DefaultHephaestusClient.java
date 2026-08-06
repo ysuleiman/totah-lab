@@ -270,6 +270,12 @@ public final class DefaultHephaestusClient
     }
 
     @Override
+    public PdbqtValidationReport validateLigandPdbqt(Path input)
+            throws IOException {
+        return pdbqtValidator.validateLigandPdbqt(input);
+    }
+
+    @Override
     public PdbqtValidationReport validateFlexiblePdbqt(
             Path rigidInput,
             Path flexibleInput) throws IOException {

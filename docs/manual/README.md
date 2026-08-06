@@ -22,9 +22,9 @@ API, React web UI, PostgreSQL.
 - **hephaestus** — molecular preparation and validation for docking
   (Meeko/Open Babel-compatible behavior where possible). Includes a
   standalone CLI (`mvn package`, then
-  `java -jar hephaestus-1.0-SNAPSHOT.jar <command>`) with
+  `java -jar hephaestus-1.0-SNAPSHOT-standalone.jar <command>`) with
   `prepare-receptor`, `prepare-ligand`, `validate-pdbqt`,
-  `validate-flex-pdbqt`, `version`, `help`.
+  `validate-ligand-pdbqt`, `validate-flex-pdbqt`, `version`, `help`.
 - **daedalus** — docking-workflow orchestration (receptor preparation
   through pose analysis); no chemistry or serialization of its own.
 - **athena** — structural analysis: pocket shape descriptors,

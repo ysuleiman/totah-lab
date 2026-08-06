@@ -130,6 +130,11 @@ class ReceptorPreparationStageTest {
         }
 
         @Override
+        public PdbqtValidationReport validateLigandPdbqt(Path input) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public PdbqtValidationReport validateFlexiblePdbqt(
                 Path rigidInput, Path flexibleInput) {
             throw new UnsupportedOperationException();

@@ -5,7 +5,10 @@ The project sources are designed to compile against:
 Main-source compilation is validated separately against minimal compatibility stubs.
 
 CLI validation (2026-08): the shaded standalone jar
-(target/hephaestus-1.0-SNAPSHOT.jar) was exercised manually:
-`version`, `help`, `prepare-ligand --help`, and
+(target/hephaestus-1.0-SNAPSHOT-standalone.jar) was exercised manually:
+`version`, `help`, `prepare-ligand --help`,
 `prepare-ligand --input methanol.sdf --output methanol.pdbqt`
-(6 atoms, Gasteiger charges, AD4 types, TORSDOF 0, validated output).
+(6 atoms, Gasteiger charges, AD4 types, TORSDOF 0, validated output), and
+`validate-ligand-pdbqt --input methanol.pdbqt` (VALID, exit 0).
+The main jar stays thin for library consumers; the CLI jar carries the
+"standalone" classifier.

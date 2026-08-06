@@ -155,6 +155,27 @@ public final class HephaestusCli {
                     Print command help.
             """;
 
+    private static final String VALIDATE_LIGAND_HELP = """
+            USAGE
+
+                hephaestus validate-ligand-pdbqt
+                    --input <file>
+                    [options]
+
+            OPTIONS
+                --input <file>
+                    Ligand PDBQT file to validate.
+
+                --report <file>
+                    Optional validation report output.
+
+                --strict
+                    Treat warnings as validation failure.
+
+                --help
+                    Print command help.
+            """;
+
     private static final String VALIDATE_FLEX_HELP = """
             USAGE
 
@@ -198,6 +219,9 @@ public final class HephaestusCli {
                 command("validate-pdbqt",
                         "Validate an existing PDBQT file.",
                         VALIDATE_HELP, this::validatePdbqt),
+                command("validate-ligand-pdbqt",
+                        "Validate an existing ligand PDBQT file.",
+                        VALIDATE_LIGAND_HELP, this::validateLigandPdbqt),
                 command("validate-flex-pdbqt",
                         "Validate a rigid/flexible PDBQT file pair.",
                         VALIDATE_FLEX_HELP, this::validateFlexiblePdbqt),
@@ -419,6 +443,19 @@ public final class HephaestusCli {
                 Set.of("input", "report"), Set.of("strict"));
         try {
             return validationResult(client.validatePdbqt(
+                    parsed.requiredPath("input")), parsed, out);
+        } catch (IOException exception) {
+            err.println("Input/output failure: " + exception.getMessage());
+            return CliExitCode.IO_FAILURE;
+        }
+    }
+
+    private int validateLigandPdbqt(
+            String[] arguments, PrintWriter out, PrintWriter err) {
+        Arguments parsed = Arguments.parse(arguments,
+                Set.of("input", "report"), Set.of("strict"));
+        try {
+            return validationResult(client.validateLigandPdbqt(
                     parsed.requiredPath("input")), parsed, out);
         } catch (IOException exception) {
             err.println("Input/output failure: " + exception.getMessage());

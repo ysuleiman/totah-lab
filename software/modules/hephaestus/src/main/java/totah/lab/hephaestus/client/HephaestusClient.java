@@ -67,6 +67,10 @@ public interface HephaestusClient {
             Path input)
             throws IOException;
 
+    PdbqtValidationReport validateLigandPdbqt(
+            Path input)
+            throws IOException;
+
     PdbqtValidationReport validateFlexiblePdbqt(
             Path rigidInput,
             Path flexibleInput)

@@ -11,6 +11,7 @@ public final class HephaestusCapabilities {
                 HephaestusCapability.PREPARE_RIGID_RECEPTOR,
                 HephaestusCapability.VALIDATE_PREPARED_PROTEIN,
                 HephaestusCapability.VALIDATE_PDBQT,
+                HephaestusCapability.VALIDATE_LIGAND_PDBQT,
                 HephaestusCapability.VALIDATE_FLEXIBLE_PDBQT,
                 HephaestusCapability.PREPARE_LIGAND);
     }
