@@ -1,11 +1,14 @@
 package totah.lab.athena.pocket.evidence;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
  * Config-owned thresholds and rules that turn a preserved
  * {@link PocketComparisonEvidence} bundle into a
- * {@link PocketComparisonAssessment}. The rules never combine the
+ * {@link PocketAssessmentVerdict}: the classification plus a
+ * human-readable reason naming the deciding dimensions and their
+ * values. The rules never combine the
  * evidence dimensions into a score; they compare each preserved
  * dimension against its own threshold.
  *
@@ -148,19 +151,61 @@ public record PocketAssessmentRules(
         );
     }
 
-    public PocketComparisonAssessment assess(
+    /**
+     * Assesses a preserved evidence bundle. The rules read only the
+     * alignment, residue and functional dimensions — never the
+     * retrieval provenance or a previously stored verdict.
+     */
+    public PocketAssessmentVerdict assess(
             PocketComparisonEvidence evidence
     ) {
         Objects.requireNonNull(evidence, "evidence");
 
-        AlignmentHypothesisEvidence selected =
-                evidence.alignment().selectedHypothesis();
-        PocketResidueEvidence residues = evidence.residues();
+        return assess(
+                evidence.alignment(),
+                evidence.residues(),
+                evidence.functional()
+        );
+    }
 
-        if (!selected.available()
-                || residues.matchedResidueCount()
-                        < minimumCorrespondenceCount) {
-            return PocketComparisonAssessment.INSUFFICIENT_EVIDENCE;
+    /**
+     * Assesses the evidence dimensions directly, without a wrapper
+     * bundle — the assembly path uses this overload to obtain the
+     * verdict BEFORE the bundle exists. Every returned verdict
+     * carries a reason naming the deciding dimensions and their
+     * values; the rule order is first match wins.
+     */
+    public PocketAssessmentVerdict assess(
+            PocketAlignmentEvidence alignment,
+            PocketResidueEvidence residues,
+            PocketFunctionalEvidence functional
+    ) {
+        Objects.requireNonNull(alignment, "alignment");
+        Objects.requireNonNull(residues, "residues");
+        Objects.requireNonNull(functional, "functional");
+
+        AlignmentHypothesisEvidence selected =
+                alignment.selectedHypothesis();
+
+        if (!selected.available()) {
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.INSUFFICIENT_EVIDENCE,
+                    "INSUFFICIENT_EVIDENCE: the selected alignment"
+                            + " hypothesis is unavailable"
+            );
+        }
+
+        if (residues.matchedResidueCount() < minimumCorrespondenceCount) {
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.INSUFFICIENT_EVIDENCE,
+                    String.format(
+                            Locale.ROOT,
+                            "INSUFFICIENT_EVIDENCE: %d matched residue"
+                                    + " pairs, below the minimum of %d",
+                            residues.matchedResidueCount(),
+                            minimumCorrespondenceCount
+                    )
+            );
         }
 
         double geometry = selected.geometrySimilarity();
@@ -172,20 +217,63 @@ public record PocketAssessmentRules(
         boolean chemistryHigh = chemistry >= highChemistrySimilarity;
 
         if (!geometryAcceptable && chemistryPoor) {
-            return PocketComparisonAssessment.REJECTED;
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.REJECTED,
+                    String.format(
+                            Locale.ROOT,
+                            "REJECTED: geometry %.3f below the"
+                                    + " acceptable threshold %.2f and"
+                                    + " residue chemistry %.3f below the"
+                                    + " poor threshold %.2f",
+                            geometry,
+                            geometryAcceptableSimilarity,
+                            chemistry,
+                            poorChemistrySimilarity
+                    )
+            );
         }
 
         boolean geometryStrong = geometry >= strongGeometrySimilarity;
 
-        if ((geometryStrong && chemistryPoor)
-                || (!geometryAcceptable && chemistryHigh)) {
-            return PocketComparisonAssessment.CONFLICTING_EVIDENCE;
+        if (geometryStrong && chemistryPoor) {
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.CONFLICTING_EVIDENCE,
+                    String.format(
+                            Locale.ROOT,
+                            "CONFLICTING_EVIDENCE: strong geometry"
+                                    + " %.3f (>= %.2f) conflicts with"
+                                    + " poor residue chemistry %.3f"
+                                    + " (< %.2f)",
+                            geometry,
+                            strongGeometrySimilarity,
+                            chemistry,
+                            poorChemistrySimilarity
+                    )
+            );
+        }
+
+        if (!geometryAcceptable && chemistryHigh) {
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.CONFLICTING_EVIDENCE,
+                    String.format(
+                            Locale.ROOT,
+                            "CONFLICTING_EVIDENCE: unacceptable geometry"
+                                    + " %.3f (< %.2f) conflicts with"
+                                    + " high residue chemistry %.3f"
+                                    + " (>= %.2f)",
+                            geometry,
+                            geometryAcceptableSimilarity,
+                            chemistry,
+                            highChemistrySimilarity
+                    )
+            );
         }
 
         boolean sequenceEvidenceExists = sequenceEvidenceExists(
-                evidence
+                alignment,
+                residues
         );
-        boolean ligandEvidenceExists = ligandEvidenceExists(evidence);
+        boolean ligandEvidenceExists = ligandEvidenceExists(functional);
 
         boolean sequenceHigh = !sequenceEvidenceExists
                 || residues.sequenceConsistentFraction()
@@ -194,7 +282,7 @@ public record PocketAssessmentRules(
                 || residues.sequenceConsistentFraction()
                         >= moderateSequenceConsistentFraction;
 
-        double contactConservation = contactConservation(evidence);
+        double contactConservation = contactConservation(functional);
 
         boolean contactsHigh = !ligandEvidenceExists
                 || contactConservation >= highContactConservation;
@@ -207,21 +295,148 @@ public record PocketAssessmentRules(
                         >= highSubstitutionSimilarity
                 && sequenceHigh
                 && contactsHigh) {
-            return PocketComparisonAssessment.STRONG_FUNCTIONAL_MATCH;
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.STRONG_FUNCTIONAL_MATCH,
+                    String.format(
+                            Locale.ROOT,
+                            "STRONG_FUNCTIONAL_MATCH: acceptable"
+                                    + " geometry %.3f (>= %.2f), high"
+                                    + " residue chemistry %.3f (>= %.2f),"
+                                    + " substitution similarity %.3f"
+                                    + " (>= %.2f), %s, %s",
+                            geometry,
+                            geometryAcceptableSimilarity,
+                            chemistry,
+                            highChemistrySimilarity,
+                            residues.substitutionSimilarity(),
+                            highSubstitutionSimilarity,
+                            sequenceDimension(
+                                    sequenceEvidenceExists,
+                                    residues.sequenceConsistentFraction(),
+                                    highSequenceConsistentFraction
+                            ),
+                            contactDimension(
+                                    ligandEvidenceExists,
+                                    contactConservation,
+                                    highContactConservation
+                            )
+                    )
+            );
         }
 
         if (geometryAcceptable
                 && !chemistryPoor
                 && sequenceModerate
                 && contactsModerate) {
-            return PocketComparisonAssessment.PROBABLE_FUNCTIONAL_MATCH;
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.PROBABLE_FUNCTIONAL_MATCH,
+                    String.format(
+                            Locale.ROOT,
+                            "PROBABLE_FUNCTIONAL_MATCH: acceptable"
+                                    + " geometry %.3f (>= %.2f), residue"
+                                    + " chemistry %.3f not poor"
+                                    + " (>= %.2f), %s, %s",
+                            geometry,
+                            geometryAcceptableSimilarity,
+                            chemistry,
+                            poorChemistrySimilarity,
+                            sequenceDimension(
+                                    sequenceEvidenceExists,
+                                    residues.sequenceConsistentFraction(),
+                                    moderateSequenceConsistentFraction
+                            ),
+                            contactDimension(
+                                    ligandEvidenceExists,
+                                    contactConservation,
+                                    moderateContactConservation
+                            )
+                    )
+            );
         }
 
         if (geometryAcceptable) {
-            return PocketComparisonAssessment.GEOMETRIC_MATCH_ONLY;
+            return new PocketAssessmentVerdict(
+                    PocketComparisonAssessment.GEOMETRIC_MATCH_ONLY,
+                    String.format(
+                            Locale.ROOT,
+                            "GEOMETRIC_MATCH_ONLY: acceptable geometry"
+                                    + " %.3f (>= %.2f) but residue and"
+                                    + " functional agreement below the"
+                                    + " functional-match bars (chemistry"
+                                    + " %.3f, %s, %s)",
+                            geometry,
+                            geometryAcceptableSimilarity,
+                            chemistry,
+                            sequenceDimension(
+                                    sequenceEvidenceExists,
+                                    residues.sequenceConsistentFraction(),
+                                    moderateSequenceConsistentFraction
+                            ),
+                            contactDimension(
+                                    ligandEvidenceExists,
+                                    contactConservation,
+                                    moderateContactConservation
+                            )
+                    )
+            );
         }
 
-        return PocketComparisonAssessment.CONFLICTING_EVIDENCE;
+        return new PocketAssessmentVerdict(
+                PocketComparisonAssessment.CONFLICTING_EVIDENCE,
+                String.format(
+                        Locale.ROOT,
+                        "CONFLICTING_EVIDENCE: unacceptable geometry"
+                                + " %.3f (< %.2f) with moderate residue"
+                                + " chemistry %.3f",
+                        geometry,
+                        geometryAcceptableSimilarity,
+                        chemistry
+                )
+        );
+    }
+
+    /**
+     * The sequence-consistency dimension of a reason: its value and
+     * the applied threshold when sequence evidence exists, an
+     * explicit absence note otherwise.
+     */
+    private static String sequenceDimension(
+            boolean sequenceEvidenceExists,
+            double sequenceConsistentFraction,
+            double threshold
+    ) {
+        if (!sequenceEvidenceExists) {
+            return "no sequence evidence";
+        }
+
+        return String.format(
+                Locale.ROOT,
+                "sequence consistency %.3f (>= %.2f)",
+                sequenceConsistentFraction,
+                threshold
+        );
+    }
+
+    /**
+     * The ligand-contact dimension of a reason: its value and the
+     * applied threshold when ligand evidence exists, an explicit
+     * absence note otherwise.
+     */
+    private static String contactDimension(
+            boolean ligandEvidenceExists,
+            double contactConservation,
+            double threshold
+    ) {
+        if (!ligandEvidenceExists) {
+            return "no ligand-contact evidence";
+        }
+
+        return String.format(
+                Locale.ROOT,
+                "contact conservation %.3f (>= %.2f)",
+                contactConservation,
+                threshold
+        );
     }
 
     /**
@@ -230,27 +445,27 @@ public record PocketAssessmentRules(
      * sequence-consistent pairs.
      */
     private static boolean sequenceEvidenceExists(
-            PocketComparisonEvidence evidence
+            PocketAlignmentEvidence alignment,
+            PocketResidueEvidence residues
     ) {
-        return evidence.alignment().sequenceSeeded().available()
-                || evidence.alignment().pcaIcp()
-                        .sequenceConsistentPairCount() > 0
-                || evidence.residues().sequenceConsistentPairCount() > 0;
+        return alignment.sequenceSeeded().available()
+                || alignment.pcaIcp().sequenceConsistentPairCount() > 0
+                || residues.sequenceConsistentPairCount() > 0;
     }
 
     private static boolean ligandEvidenceExists(
-            PocketComparisonEvidence evidence
+            PocketFunctionalEvidence functional
     ) {
-        return evidence.functional().ligandContacts()
+        return functional.ligandContacts()
                 .filter(contacts ->
                         contacts.queryContactResidueCount() > 0)
                 .isPresent();
     }
 
     private static double contactConservation(
-            PocketComparisonEvidence evidence
+            PocketFunctionalEvidence functional
     ) {
-        return evidence.functional().ligandContacts()
+        return functional.ligandContacts()
                 .map(contacts -> {
                     if (contacts.queryContactResidueCount() == 0) {
                         return 0.0;

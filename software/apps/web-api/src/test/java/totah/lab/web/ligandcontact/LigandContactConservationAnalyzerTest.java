@@ -2,6 +2,9 @@ package totah.lab.web.ligandcontact;
 
 import org.junit.jupiter.api.Test;
 import totah.lab.athena.pocket.compare.residue.MatchType;
+import totah.lab.athena.pocket.evidence.LigandContact;
+import totah.lab.athena.pocket.evidence.LigandContactStatus;
+import totah.lab.athena.pocket.evidence.LigandContactType;
 import totah.lab.athena.sequence.AlignedResiduePair;
 import totah.lab.athena.sequence.SequenceAlignment;
 import totah.lab.hermes.biohub.model.BiohubPocketEvidence;
@@ -177,6 +180,45 @@ class LigandContactConservationAnalyzerTest {
         ));
         assertFalse(LigandContactConservationAnalyzer
                 .equivalent(sam, shifted, 0.01));
+    }
+
+    @Test
+    void populatesCanonicalContactsFromBiohubEvidence() {
+        LigandContactConservationReport report = analyzer.analyze(
+                "7A",
+                "7B",
+                queryEvidence(),
+                candidateEvidence(),
+                alignment()
+        );
+
+        // 5 query + 5 candidate evidence residues, in side order.
+        assertEquals(10, report.contacts().size());
+
+        LigandContact asp = report.contacts().get(0);
+        assertEquals(LigandContactStatus.AVAILABLE, asp.status());
+        assertEquals("7A", asp.pocketReference());
+        assertEquals("SAM", asp.ligandCcd());
+        assertEquals("A", asp.residue().chainId());
+        assertEquals(98, asp.residue().residueNumber());
+        assertEquals("ASP", asp.residue().residueName());
+        assertEquals(2.54, asp.minimumDistance());
+        assertEquals(LigandContactType.DIRECT, asp.contactType());
+        assertEquals("BIOHUB", asp.evidenceSource());
+
+        // The shell member (beyond the direct-contact cutoff) is a
+        // SHELL contact, not a direct one.
+        LigandContact shell = report.contacts().stream()
+                .filter(contact ->
+                        contact.residue().residueNumber() == 200)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(LigandContactType.SHELL, shell.contactType());
+        assertEquals(5.0, shell.minimumDistance());
+
+        LigandContact candidateSide = report.contacts().get(5);
+        assertEquals("7B", candidateSide.pocketReference());
+        assertEquals("SAM", candidateSide.ligandCcd());
     }
 
     private static Row rowAt(

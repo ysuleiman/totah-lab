@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import totah.lab.web.service.PocketComparisonDetails;
+import totah.lab.web.service.PocketComparisonReportService;
+import totah.lab.web.service.PocketComparisonReportView;
 import totah.lab.web.service.PocketGeometryView;
 import totah.lab.web.service.PocketSimilarityDiagnostic;
 import totah.lab.web.service.PocketSimilarityService;
@@ -21,11 +23,15 @@ public class PocketSearchController {
     private static final int MAX_LIMIT = 500;
 
     private final PocketSimilarityService pocketSimilarityService;
+    private final PocketComparisonReportService pocketComparisonReportService;
 
     public PocketSearchController(
-            PocketSimilarityService pocketSimilarityService
+            PocketSimilarityService pocketSimilarityService,
+            PocketComparisonReportService pocketComparisonReportService
     ) {
         this.pocketSimilarityService = pocketSimilarityService;
+        this.pocketComparisonReportService =
+                pocketComparisonReportService;
     }
 
     @GetMapping("/{pocketId}/similar")
@@ -82,6 +88,23 @@ public class PocketSearchController {
     ) {
 
         return pocketSimilarityService.compareGeometries(
+                queryPocketId,
+                candidatePocketId
+        );
+    }
+
+    /**
+     * The structured evidence report of the same pairwise comparison:
+     * the seven sections assembled from the live comparison path,
+     * with the rules verdict and its reason as the interpretation.
+     */
+    @GetMapping("/{queryPocketId}/compare/{candidatePocketId}/report")
+    public PocketComparisonReportView comparisonReport(
+            @PathVariable("queryPocketId") long queryPocketId,
+            @PathVariable("candidatePocketId") long candidatePocketId
+    ) {
+
+        return pocketComparisonReportService.report(
                 queryPocketId,
                 candidatePocketId
         );

@@ -3,6 +3,9 @@ package totah.lab.web.ligandcontact;
 import totah.lab.athena.pocket.compare.residue.MatchType;
 import totah.lab.athena.pocket.compare.residue
         .ResidueCorrespondenceCalculator;
+import totah.lab.athena.pocket.compare.residue.ResidueReference;
+import totah.lab.athena.pocket.evidence.LigandContact;
+import totah.lab.athena.pocket.evidence.LigandContactType;
 import totah.lab.athena.sequence.AlignedResiduePair;
 import totah.lab.athena.sequence.SequenceAlignment;
 import totah.lab.hermes.biohub.model.BiohubPocketEvidence;
@@ -34,6 +37,11 @@ import java.util.Objects;
  * high candidate coverage with lower query coverage.</p>
  */
 public final class LigandContactConservationAnalyzer {
+
+    /**
+     * The evidence source recorded on the canonical contact records.
+     */
+    public static final String BIOHUB_EVIDENCE_SOURCE = "BIOHUB";
 
     /**
      * One report row: an aligned residue pair (or a single-sided row
@@ -104,6 +112,13 @@ public final class LigandContactConservationAnalyzer {
     ) {
     }
 
+    /**
+     * The full conservation report: the aligned rows, the directional
+     * aggregate, and the canonical {@link LigandContact} records of
+     * every evidence residue on both sides (contact strength, minimum
+     * distance, CCD code and evidence source populated from the
+     * BioHub evidence).
+     */
     public record LigandContactConservationReport(
             String queryLabel,
             String candidateLabel,
@@ -112,10 +127,12 @@ public final class LigandContactConservationAnalyzer {
             double directContactCutoff,
             double alignmentIdentity,
             List<Row> rows,
-            Aggregate aggregate
+            Aggregate aggregate,
+            List<LigandContact> contacts
     ) {
         public LigandContactConservationReport {
             rows = List.copyOf(rows);
+            contacts = List.copyOf(contacts);
         }
     }
 
@@ -187,7 +204,75 @@ public final class LigandContactConservationAnalyzer {
                         rows,
                         queryEvidence.residues(),
                         candidateEvidence.residues()
+                ),
+                canonicalContacts(
+                        queryLabel,
+                        queryEvidence,
+                        candidateLabel,
+                        candidateEvidence
                 )
+        );
+    }
+
+    /**
+     * The canonical contact records of both sides' evidence residues:
+     * the free-form CCD code, the residue reference (chain, number,
+     * name), the minimum ligand distance and the contact strength
+     * (DIRECT within the direct-contact cutoff, SHELL beyond it),
+     * sourced from the BioHub pocket evidence. The labels stand in as
+     * the pocket references of the two compared structures.
+     */
+    private static List<LigandContact> canonicalContacts(
+            String queryLabel,
+            BiohubPocketEvidence queryEvidence,
+            String candidateLabel,
+            BiohubPocketEvidence candidateEvidence
+    ) {
+        List<LigandContact> contacts = new ArrayList<>();
+
+        for (ResidueContact contact : queryEvidence.residues()) {
+            contacts.add(canonicalContact(
+                    queryLabel,
+                    queryEvidence.ligandCcd(),
+                    contact
+            ));
+        }
+        for (ResidueContact contact : candidateEvidence.residues()) {
+            contacts.add(canonicalContact(
+                    candidateLabel,
+                    candidateEvidence.ligandCcd(),
+                    contact
+            ));
+        }
+
+        return contacts;
+    }
+
+    /**
+     * The canonical contact record of one BioHub evidence residue:
+     * free-form CCD code, residue reference, minimum distance and
+     * contact strength (DIRECT within the direct-contact cutoff,
+     * SHELL beyond it), sourced from the BioHub pocket evidence.
+     */
+    public static LigandContact canonicalContact(
+            String pocketReference,
+            String ligandCcd,
+            ResidueContact contact
+    ) {
+        return LigandContact.available(
+                pocketReference,
+                ligandCcd,
+                new ResidueReference(
+                        contact.chain(),
+                        contact.residueNumber(),
+                        ' ',
+                        contact.residueName()
+                ),
+                contact.minimumDistance(),
+                contact.directContact()
+                        ? LigandContactType.DIRECT
+                        : LigandContactType.SHELL,
+                BIOHUB_EVIDENCE_SOURCE
         );
     }
 

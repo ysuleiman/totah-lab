@@ -15,15 +15,15 @@ import java.util.Objects;
  *                   selected alignment
  * @param functional functional (key-residue and ligand-contact)
  *                   evidence
- * @param assessment the verdict derived from the evidence by
- *                   {@link PocketAssessmentRules}
+ * @param assessment the verdict (classification and reason) derived
+ *                   from the evidence by {@link PocketAssessmentRules}
  */
 public record PocketComparisonEvidence(
         PocketRetrievalEvidence retrieval,
         PocketAlignmentEvidence alignment,
         PocketResidueEvidence residues,
         PocketFunctionalEvidence functional,
-        PocketComparisonAssessment assessment
+        PocketAssessmentVerdict assessment
 ) {
 
     public PocketComparisonEvidence {

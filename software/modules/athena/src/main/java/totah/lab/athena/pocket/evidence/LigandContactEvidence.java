@@ -11,7 +11,9 @@ import java.util.Objects;
  * residues. Fractions are {@code 0.0} when their denominator is
  * empty.
  *
- * @param ligandName          name of the ligand under evaluation
+ * @param ligandName          free-form CCD code of the ligand under
+ *                            evaluation (a String, not an enum — for
+ *                            example {@code "SAM"})
  * @param queryContactResidueCount query pocket residues annotated as
  *                            contacting the ligand
  * @param matchedQueryContactResidueCount annotated query contacts

@@ -11,6 +11,8 @@ import totah.lab.gaia.geometry.Point3D;
 import totah.lab.web.service.AlignmentMetadataView;
 import totah.lab.web.service.ChemistryAssessmentView;
 import totah.lab.web.service.PocketComparisonDetails;
+import totah.lab.web.service.PocketComparisonReportService;
+import totah.lab.web.service.PocketComparisonReportView;
 import totah.lab.web.service.PocketGeometryView;
 import totah.lab.web.service.PocketSimilarityDiagnostic;
 import totah.lab.web.service.PocketSimilarityService;
@@ -30,6 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PocketSearchControllerTest {
+
+    private final StubPocketComparisonReportService reportService =
+            new StubPocketComparisonReportService();
 
     @Test
     void returnsOnlyTheExistingResponseFields() throws Exception {
@@ -52,7 +57,7 @@ class PocketSearchControllerTest {
         ));
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/42/similar")
@@ -82,7 +87,7 @@ class PocketSearchControllerTest {
                 new RecordingPocketSimilarityService();
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/42/similar"))
@@ -147,7 +152,7 @@ class PocketSearchControllerTest {
         ));
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/42/similar/diagnostic")
@@ -228,7 +233,7 @@ class PocketSearchControllerTest {
         );
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/42/geometry"))
@@ -364,7 +369,7 @@ class PocketSearchControllerTest {
         );
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/42/compare/7"))
@@ -472,16 +477,134 @@ class PocketSearchControllerTest {
         );
 
         MockMvc mockMvc = MockMvcBuilders
-                .standaloneSetup(new PocketSearchController(service))
+                .standaloneSetup(new PocketSearchController(service, reportService))
                 .build();
 
         mockMvc.perform(get("/api/pockets/99/geometry"))
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void reportEndpointReturnsTheStructuredReport() throws Exception {
+        RecordingPocketSimilarityService service =
+                new RecordingPocketSimilarityService();
+        reportService.report = new PocketComparisonReportView(
+                42L,
+                7L,
+                new PocketComparisonReportView.RetrievalSection(
+                        false,
+                        List.of(),
+                        false,
+                        null,
+                        null,
+                        false,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ),
+                new PocketComparisonReportView.AlignmentSection(
+                        "PCA_ICP",
+                        "PCA_ICP selected: no usable sequence seed",
+                        0,
+                        0,
+                        0.0,
+                        false,
+                        false,
+                        new PocketComparisonReportView.HypothesisView(
+                                true, true, 1.0, 1.0, 1.0,
+                                0.0, 0.0, 0.0, 0.0, 0, 8
+                        ),
+                        new PocketComparisonReportView.HypothesisView(
+                                false, false, 0.0, 0.0, 0.0,
+                                0.0, 0.0, 0.0, 0.0, 0, 0
+                        )
+                ),
+                new PocketComparisonReportView.ResidueComparisonSection(
+                        8, 8, 8, 0, 0, 8, 0, 0, 0,
+                        1.0, 0.63, 1.0, 1.0, 0.0, 1.0, 1.0, 0, 0.0,
+                        List.of()
+                ),
+                new ChemistryAssessmentView(
+                        1.0, 1.0, 1.0, 0.0, 8, 0, 0, 0, 8, 8, 8,
+                        0.0, 0, "STRONG_SIMILARITY", 0.85, 0.63, 1.0
+                ),
+                new PocketComparisonReportView.KeyResidueSection(
+                        List.of(), 0, 0, 0, 0
+                ),
+                new PocketComparisonReportView.LigandContactSection(
+                        "NOT_AVAILABLE",
+                        null, null, null, null, null, null, null, null,
+                        null, null, null, null, null, null,
+                        List.of()
+                ),
+                new PocketComparisonReportView.InterpretationSection(
+                        "STRONG_FUNCTIONAL_MATCH",
+                        "STRONG_FUNCTIONAL_MATCH: acceptable geometry"
+                                + " 1.000 (>= 0.25)"
+                )
+        );
+
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new PocketSearchController(service, reportService))
+                .build();
+
+        mockMvc.perform(get("/api/pockets/42/compare/7/report"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.queryPocketId").value(42))
+                .andExpect(jsonPath("$.candidatePocketId").value(7))
+                .andExpect(jsonPath("$.retrieval.globalShapeEvaluated")
+                        .value(false))
+                .andExpect(jsonPath("$.alignment.selectedInitialization")
+                        .value("PCA_ICP"))
+                .andExpect(jsonPath("$.alignment.selectionReason")
+                        .isNotEmpty())
+                .andExpect(jsonPath(
+                        "$.residueComparison.matchedResidueCount")
+                        .value(8))
+                .andExpect(jsonPath(
+                        "$.chemistryComparison.classification")
+                        .value("STRONG_SIMILARITY"))
+                .andExpect(jsonPath(
+                        "$.ligandContactConservation.status")
+                        .value("NOT_AVAILABLE"))
+                .andExpect(jsonPath(
+                        "$.ligandContactConservation.ligandCcd")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.interpretation.verdict")
+                        .value("STRONG_FUNCTIONAL_MATCH"))
+                .andExpect(jsonPath("$.interpretation.reason")
+                        .isNotEmpty());
+
+        assertEquals(42L, reportService.queryPocketId);
+        assertEquals(7L, reportService.candidatePocketId);
+    }
+
+    private static final class StubPocketComparisonReportService
+            extends PocketComparisonReportService {
+
+        private long queryPocketId;
+        private long candidatePocketId;
+        private PocketComparisonReportView report;
+
+        private StubPocketComparisonReportService() {
+            super(null, null, null);
+        }
+
+        @Override
+        public PocketComparisonReportView report(
+                long queryPocketId,
+                long candidatePocketId
+        ) {
+            this.queryPocketId = queryPocketId;
+            this.candidatePocketId = candidatePocketId;
+            return report;
+        }
+    }
+
     private static final class RecordingPocketSimilarityService
             extends PocketSimilarityService {
-
         private long pocketId;
         private long candidatePocketId;
         private int limit;

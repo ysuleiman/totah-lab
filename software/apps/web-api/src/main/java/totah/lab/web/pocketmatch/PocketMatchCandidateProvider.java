@@ -19,9 +19,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.function.ToDoubleFunction;
 
 /**
  * Experimental PocketMatch candidate channel: scores the query pocket
@@ -63,12 +66,36 @@ public class PocketMatchCandidateProvider {
      * One PocketMatch candidate with its query-coverage score and its
      * 1-based rank in the channel's top-N ordering (ordered by the
      * configured {@code pocket.search.pocket-match.ranking} metric).
+     *
+     * <p>The remaining fields are the channel's full retrieval
+     * evidence: the symmetric score, the candidate-side coverage, the
+     * natural ranks of BOTH channel orderings (symmetric score and
+     * query coverage) and the matching tolerance — kept separate from
+     * other channels' scales, never blended. They are {@code null}
+     * when only the legacy ranking triple is known.</p>
      */
     public record PocketMatchCandidate(
             long pocketId,
             double queryCoverage,
-            int rank
+            int rank,
+            Double symmetricScore,
+            Double candidateCoverage,
+            Integer symmetricRank,
+            Integer queryCoverageRank,
+            double toleranceAngstroms
     ) {
+        /**
+         * Legacy construction with only the ranking triple (evidence
+         * fields {@code null} / {@code 0.0}).
+         */
+        public PocketMatchCandidate(
+                long pocketId,
+                double queryCoverage,
+                int rank
+        ) {
+            this(pocketId, queryCoverage, rank,
+                    null, null, null, null, 0.0);
+        }
     }
 
     public boolean isEnabled() {
@@ -139,6 +166,8 @@ public class PocketMatchCandidateProvider {
                     best.add(new ScoredPocket(
                             record.pocketId(),
                             comparison.firstCoverage(),
+                            comparison.secondCoverage(),
+                            comparison.symmetricScore(),
                             rankingScore
                     ));
                 } else if (!best.isEmpty()
@@ -147,6 +176,8 @@ public class PocketMatchCandidateProvider {
                     best.add(new ScoredPocket(
                             record.pocketId(),
                             comparison.firstCoverage(),
+                            comparison.secondCoverage(),
+                            comparison.symmetricScore(),
                             rankingScore
                     ));
                 }
@@ -163,6 +194,13 @@ public class PocketMatchCandidateProvider {
                         ScoredPocket::rankingScore).reversed())
                 .toList();
 
+        // The channel's two natural orderings, independent of the
+        // configured ranking metric that selected the top N.
+        Map<Long, Integer> symmetricRanks =
+                naturalRanks(ordered, ScoredPocket::symmetricScore);
+        Map<Long, Integer> queryCoverageRanks =
+                naturalRanks(ordered, ScoredPocket::queryCoverage);
+
         List<PocketMatchCandidate> candidates =
                 new ArrayList<>(ordered.size());
         for (int index = 0; index < ordered.size(); index++) {
@@ -170,10 +208,31 @@ public class PocketMatchCandidateProvider {
             candidates.add(new PocketMatchCandidate(
                     scored.pocketId(),
                     scored.queryCoverage(),
-                    index + 1
+                    index + 1,
+                    scored.symmetricScore(),
+                    scored.candidateCoverage(),
+                    symmetricRanks.get(scored.pocketId()),
+                    queryCoverageRanks.get(scored.pocketId()),
+                    properties.getDistanceTolerance()
             ));
         }
         return candidates;
+    }
+
+    private static Map<Long, Integer> naturalRanks(
+            List<ScoredPocket> ordered,
+            ToDoubleFunction<ScoredPocket> score
+    ) {
+        List<ScoredPocket> ranked = ordered.stream()
+                .sorted(Comparator.comparingDouble(score).reversed()
+                        .thenComparingLong(ScoredPocket::pocketId))
+                .toList();
+
+        Map<Long, Integer> ranks = new HashMap<>(ranked.size());
+        for (int index = 0; index < ranked.size(); index++) {
+            ranks.put(ranked.get(index).pocketId(), index + 1);
+        }
+        return ranks;
     }
 
     private double rankingScore(PocketMatchComparison comparison) {
@@ -186,6 +245,8 @@ public class PocketMatchCandidateProvider {
     private record ScoredPocket(
             long pocketId,
             double queryCoverage,
+            double candidateCoverage,
+            double symmetricScore,
             double rankingScore
     ) {
     }

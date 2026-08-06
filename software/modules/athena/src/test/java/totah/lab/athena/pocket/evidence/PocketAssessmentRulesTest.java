@@ -10,6 +10,8 @@ import java.util.OptionalInt;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PocketAssessmentRulesTest {
 
@@ -28,9 +30,15 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.INSUFFICIENT_EVIDENCE,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("matched residue pairs"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -46,9 +54,19 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.REJECTED,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("geometry"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("chemistry"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -64,9 +82,19 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.CONFLICTING_EVIDENCE,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("strong geometry"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("poor residue chemistry"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -82,9 +110,19 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.CONFLICTING_EVIDENCE,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("geometry"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("high residue chemistry"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -100,9 +138,27 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.STRONG_FUNCTIONAL_MATCH,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("geometry 0.500"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("chemistry 0.800"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("substitution similarity 0.800"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("sequence consistency 1.000"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -111,18 +167,24 @@ class PocketAssessmentRulesTest {
         LigandContactEvidence conserved = contacts(4, 4, 2, 1, 1, 0);
         LigandContactEvidence lost = contacts(4, 2, 2, 0, 0, 2);
 
+        PocketAssessmentVerdict strong = rules.assess(evidence(
+                0.50,
+                20,
+                0.80,
+                0.80,
+                1.0,
+                true,
+                conserved
+        ));
         assertEquals(
                 PocketComparisonAssessment.STRONG_FUNCTIONAL_MATCH,
-                rules.assess(evidence(
-                        0.50,
-                        20,
-                        0.80,
-                        0.80,
-                        1.0,
-                        true,
-                        conserved
-                ))
+                strong.verdict()
         );
+        assertTrue(
+                strong.reason().contains("contact conservation 1.000"),
+                "reason was: " + strong.reason()
+        );
+
         assertEquals(
                 PocketComparisonAssessment.GEOMETRIC_MATCH_ONLY,
                 rules.assess(evidence(
@@ -133,21 +195,26 @@ class PocketAssessmentRulesTest {
                         0.0,
                         false,
                         lost
-                ))
+                )).verdict()
         );
 
         // Chemistry high but contact conservation lost: probable.
+        PocketAssessmentVerdict probable = rules.assess(evidence(
+                0.50,
+                20,
+                0.80,
+                0.80,
+                1.0,
+                true,
+                lost
+        ));
         assertEquals(
                 PocketComparisonAssessment.PROBABLE_FUNCTIONAL_MATCH,
-                rules.assess(evidence(
-                        0.50,
-                        20,
-                        0.80,
-                        0.80,
-                        1.0,
-                        true,
-                        lost
-                ))
+                probable.verdict()
+        );
+        assertTrue(
+                probable.reason().contains("contact conservation 0.500"),
+                "reason was: " + probable.reason()
         );
     }
 
@@ -164,9 +231,15 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.PROBABLE_FUNCTIONAL_MATCH,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("sequence consistency 0.600"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -182,9 +255,15 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.PROBABLE_FUNCTIONAL_MATCH,
-                rules.assess(evidence)
+                verdict.verdict()
+        );
+        assertTrue(
+                verdict.reason().contains("chemistry 0.500"),
+                "reason was: " + verdict.reason()
         );
     }
 
@@ -200,10 +279,57 @@ class PocketAssessmentRulesTest {
                 null
         );
 
+        PocketAssessmentVerdict verdict = rules.assess(evidence);
+
         assertEquals(
                 PocketComparisonAssessment.GEOMETRIC_MATCH_ONLY,
-                rules.assess(evidence)
+                verdict.verdict()
         );
+        assertTrue(
+                verdict.reason().contains("geometry 0.500"),
+                "reason was: " + verdict.reason()
+        );
+        assertTrue(
+                verdict.reason().contains("chemistry 0.200"),
+                "reason was: " + verdict.reason()
+        );
+    }
+
+    @Test
+    void everyVerdictCarriesANonBlankReason() {
+        double[][] scenarios = {
+                // geometry, chemistry, substitution
+                {0.10, 0.20, 0.10},   // rejected
+                {0.80, 0.20, 0.10},   // conflicting (strong geometry)
+                {0.10, 0.80, 0.80},   // conflicting (high chemistry)
+                {0.50, 0.80, 0.80},   // strong
+                {0.50, 0.50, 0.50},   // probable
+                {0.50, 0.20, 0.10}    // geometric only
+        };
+
+        for (double[] scenario : scenarios) {
+            PocketAssessmentVerdict verdict = rules.assess(evidence(
+                    scenario[0],
+                    20,
+                    scenario[1],
+                    scenario[2],
+                    1.0,
+                    true,
+                    null
+            ));
+
+            assertFalse(
+                    verdict.reason().isBlank(),
+                    "blank reason for " + verdict.verdict()
+            );
+            assertTrue(
+                    verdict.reason().startsWith(
+                            verdict.verdict().name() + ":"
+                    ),
+                    "reason does not name the verdict: "
+                            + verdict.reason()
+            );
+        }
     }
 
     private static PocketComparisonEvidence evidence(
@@ -287,12 +413,17 @@ class PocketAssessmentRulesTest {
                         new KeyResidueEvidence(0, 0, 0, 0)
                 );
 
+        // The placeholder verdict is never read by the rules: they
+        // assess the evidence dimensions only.
         return new PocketComparisonEvidence(
                 retrieval(),
                 alignment,
                 residues,
                 functional,
-                PocketComparisonAssessment.INSUFFICIENT_EVIDENCE
+                new PocketAssessmentVerdict(
+                        PocketComparisonAssessment.INSUFFICIENT_EVIDENCE,
+                        "placeholder"
+                )
         );
     }
 

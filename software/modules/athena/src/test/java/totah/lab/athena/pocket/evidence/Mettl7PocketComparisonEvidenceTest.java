@@ -116,22 +116,21 @@ class Mettl7PocketComparisonEvidenceTest {
                 )
         );
 
-        // The assessment is derived from the preserved bundle; the
-        // placeholder verdict below is never read by the rules.
-        PocketComparisonEvidence bundle = new PocketComparisonEvidence(
-                retrieval,
-                alignment,
-                residues,
-                functional,
-                PocketComparisonAssessment.INSUFFICIENT_EVIDENCE
-        );
+        // The verdict is derived from the preserved dimensions by the
+        // rules; the bundle carries it together with its reason.
+        PocketAssessmentVerdict assessment =
+                PocketAssessmentRules.defaults().assess(
+                        alignment,
+                        residues,
+                        functional
+                );
 
         PocketComparisonEvidence evidence = new PocketComparisonEvidence(
                 retrieval,
                 alignment,
                 residues,
                 functional,
-                PocketAssessmentRules.defaults().assess(bundle)
+                assessment
         );
 
         // The discarded PCA+ICP hypothesis is preserved with its
@@ -194,16 +193,23 @@ class Mettl7PocketComparisonEvidenceTest {
         // The assessment reflects the functional agreement.
         assertNotEquals(
                 PocketComparisonAssessment.GEOMETRIC_MATCH_ONLY,
-                evidence.assessment()
+                evidence.assessment().verdict()
         );
         assertTrue(
-                evidence.assessment()
+                evidence.assessment().verdict()
                         == PocketComparisonAssessment
                                 .STRONG_FUNCTIONAL_MATCH
-                        || evidence.assessment()
+                        || evidence.assessment().verdict()
                                 == PocketComparisonAssessment
                                         .PROBABLE_FUNCTIONAL_MATCH,
-                "assessment was " + evidence.assessment()
+                "assessment was " + evidence.assessment().verdict()
+        );
+        assertFalse(evidence.assessment().reason().isBlank());
+        assertTrue(
+                evidence.assessment().reason().startsWith(
+                        evidence.assessment().verdict().name() + ":"
+                ),
+                "reason was: " + evidence.assessment().reason()
         );
     }
 

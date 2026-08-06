@@ -248,6 +248,30 @@ class PocketFunctionalEvidenceFactoryTest {
         );
     }
 
+    @Test
+    void freeFormCcdCodeSelectsTheAnnotationSets() {
+        ResidueMatch match = match(
+                145, "LEU", ResidueChemistry.HYDROPHOBIC,
+                500, "LEU", ResidueChemistry.HYDROPHOBIC,
+                MatchType.IDENTICAL
+        );
+
+        LigandContactEvidence evidence = factory.ligandContacts(
+                correspondence(List.of(match), List.of(), List.of()),
+                null,
+                Set.of(reference(145, "LEU")),
+                Set.of(reference(500, "LEU")),
+                "ATP"
+        );
+
+        assertEquals("ATP", evidence.ligandName());
+        assertEquals(1, evidence.queryContactResidueCount());
+        assertEquals(1, evidence.matchedQueryContactResidueCount());
+        assertEquals(1, evidence.identicalContactCount());
+        assertEquals(1, evidence.sharedContactAnnotationCount());
+        assertEquals(1.0, evidence.contactCoverage(), TOLERANCE);
+    }
+
     private static LigandContactProvider provider(
             Map<String, Set<ResidueReference>> contacts
     ) {

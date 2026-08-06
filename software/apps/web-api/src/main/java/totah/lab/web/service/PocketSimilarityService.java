@@ -3,6 +3,7 @@ package totah.lab.web.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,11 @@ import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
 import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionAssessment;
 import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorer;
+import totah.lab.athena.pocket.evidence.GlobalShapeRetrievalEvidence;
+import totah.lab.athena.pocket.evidence.PocketCandidateSource;
+import totah.lab.athena.pocket.evidence.PocketComparisonEvidence;
+import totah.lab.athena.pocket.evidence.PocketMatchRetrievalEvidence;
+import totah.lab.athena.pocket.evidence.PocketRetrievalEvidence;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptor;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptorFactory;
@@ -29,14 +35,19 @@ import totah.lab.web.persistence.StructureRepository;
 import totah.lab.web.pocketmatch.PocketMatchCandidateProvider;
 import totah.lab.web.pocketmatch.PocketMatchCandidateProvider
         .PocketMatchCandidate;
+import totah.lab.web.pocketmatch.PocketSearchProperties;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
 
@@ -112,6 +123,14 @@ public class PocketSimilarityService {
     private final KeyResidueConfiguration keyResidueConfiguration;
     private final ProteinSequenceAlignmentService sequenceAlignmentService;
     private final PocketMatchCandidateProvider pocketMatchCandidates;
+    private final PocketSearchProperties searchProperties;
+
+    /*
+     * Null in legacy (test) construction: diagnostics then carry no
+     * evidence-pipeline assessment and Stage 3 skips evidence assembly.
+     */
+    private final PocketComparisonEvidenceAssembler evidenceAssembler;
+
     private final MultiHypothesisPocketAligner multiHypothesisAligner =
             new MultiHypothesisPocketAligner();
     private final ResidueChemistryScorer chemistryScorer =
@@ -119,6 +138,13 @@ public class PocketSimilarityService {
     private final ResidueSubstitutionScorer substitutionScorer =
             new ResidueSubstitutionScorer();
 
+    /**
+     * Legacy construction without retrieval-channel configuration or
+     * evidence assembly: the global-shape channel is enabled and
+     * uncapped, chosen references are always included, and no
+     * evidence-pipeline assessment is computed. Preserves the exact
+     * pre-configuration pipeline behavior.
+     */
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
             StructureRepository structureRepository,
@@ -128,6 +154,37 @@ public class PocketSimilarityService {
             ProteinSequenceAlignmentService sequenceAlignmentService,
             PocketMatchCandidateProvider pocketMatchCandidates
     ) {
+        this(pocketSummaryRepository,
+                structureRepository,
+                geometryLoader,
+                residueLoader,
+                keyResidueConfiguration,
+                sequenceAlignmentService,
+                pocketMatchCandidates,
+                legacySearchProperties(),
+                null);
+    }
+
+    private static PocketSearchProperties legacySearchProperties() {
+        PocketSearchProperties properties = new PocketSearchProperties();
+        properties.getGlobalShape().setEnabled(true);
+        properties.getGlobalShape().setLimit(Integer.MAX_VALUE);
+        properties.setIncludeChosenReferences(true);
+        return properties;
+    }
+
+    @Autowired
+    public PocketSimilarityService(
+            PocketSummaryRepository pocketSummaryRepository,
+            StructureRepository structureRepository,
+            PocketPointCloudLoader geometryLoader,
+            PocketResidueLoader residueLoader,
+            KeyResidueConfiguration keyResidueConfiguration,
+            ProteinSequenceAlignmentService sequenceAlignmentService,
+            PocketMatchCandidateProvider pocketMatchCandidates,
+            PocketSearchProperties searchProperties,
+            PocketComparisonEvidenceAssembler evidenceAssembler
+    ) {
         this.pocketSummaryRepository = pocketSummaryRepository;
         this.structureRepository = structureRepository;
         this.geometryLoader = geometryLoader;
@@ -135,6 +192,8 @@ public class PocketSimilarityService {
         this.keyResidueConfiguration = keyResidueConfiguration;
         this.sequenceAlignmentService = sequenceAlignmentService;
         this.pocketMatchCandidates = pocketMatchCandidates;
+        this.searchProperties = searchProperties;
+        this.evidenceAssembler = evidenceAssembler;
     }
 
     @Transactional(readOnly = true)
@@ -217,6 +276,62 @@ public class PocketSimilarityService {
             long queryPocketId,
             long candidatePocketId
     ) {
+        ComparisonRun run = compareRun(queryPocketId, candidatePocketId);
+
+        PocketAlignment alignment = run.alignmentResult().alignment();
+
+        return new PocketComparisonDetails(
+                toGeometryView(
+                        run.querySummary(),
+                        run.queryCloud(),
+                        run.queryAlphaSpheres()
+                ),
+                toGeometryView(
+                        run.candidateSummary(),
+                        run.candidateCloud(),
+                        run.candidateAlphaSpheres()
+                ),
+                alignment.query().points(),
+                alignment.alignedCandidate().points(),
+                run.alignmentResult().comparison(),
+                ACTIVE_ALIGNER,
+                ResidueCorrespondenceViewMapper.toView(
+                        run.alignmentResult().correspondence(),
+                        run.substitutionAssessment()
+                ),
+                new TransformView(
+                        alignment.transform().rotation(),
+                        alignment.transform().translation()
+                ),
+                run.keyResidues(),
+                ChemistryAssessmentView.toView(
+                        run.chemistryAssessment(),
+                        run.substitutionAssessment(),
+                        chemistryScorer.classify(
+                                run.chemistryAssessment(),
+                                run.finalSimilarity()
+                        ),
+                        run.finalSimilarity()
+                ),
+                AlignmentMetadataView.toView(run.alignmentResult())
+        );
+
+    }
+
+    /**
+     * The shared live comparison path behind
+     * {@link #compareGeometries}: loads both pockets exactly once,
+     * runs the multi-hypothesis alignment (with the cached protein
+     * sequence alignment as the seed source) and derives the
+     * chemistry/substitution assessments of the SELECTED hypothesis.
+     * Also used by the comparison-report service, which assembles the
+     * athena evidence bundle from the same run — no alignment or
+     * metric is recomputed per caller.
+     */
+    ComparisonRun compareRun(
+            long queryPocketId,
+            long candidatePocketId
+    ) {
         long requestStartNanos = System.nanoTime();
 
         PocketSummaryEntity querySummary = findSummary(queryPocketId);
@@ -245,15 +360,15 @@ public class PocketSimilarityService {
         long residueExtractionMs =
                 elapsedMillis(residueExtractionStartNanos);
 
+        final SequenceAlignment sequenceAlignment;
         final PocketAlignmentResult alignmentResult;
 
         try {
-            SequenceAlignment sequenceAlignment =
-                    sequenceAlignmentFor(
-                            querySummary.getReceptorId(),
-                            candidateSummary.getReceptorId(),
-                            new HashMap<>()
-                    );
+            sequenceAlignment = sequenceAlignmentFor(
+                    querySummary.getReceptorId(),
+                    candidateSummary.getReceptorId(),
+                    new HashMap<>()
+            );
 
             alignmentResult = multiHypothesisAligner.align(
                     queryCloud,
@@ -274,7 +389,6 @@ public class PocketSimilarityService {
         }
         long geometryMs = elapsedMillis(geometryStartNanos);
 
-        PocketAlignment alignment = alignmentResult.alignment();
         PocketComparison comparison = alignmentResult.comparison();
         ResidueCorrespondence correspondence =
                 alignmentResult.correspondence();
@@ -304,44 +418,21 @@ public class PocketSimilarityService {
                 elapsedMillis(requestStartNanos)
         );
 
-        return new PocketComparisonDetails(
-                toGeometryView(
-                        querySummary,
-                        queryCloud,
-                        loaded.alphaSpheres()
-                                .getOrDefault(queryPocketId, List.of())
-                ),
-                toGeometryView(
-                        candidateSummary,
-                        candidateCloud,
-                        loaded.alphaSpheres()
-                                .getOrDefault(candidatePocketId, List.of())
-                ),
-                alignment.query().points(),
-                alignment.alignedCandidate().points(),
-                comparison,
-                ACTIVE_ALIGNER,
-                ResidueCorrespondenceViewMapper.toView(
-                        correspondence,
-                        substitutionAssessment
-                ),
-                new TransformView(
-                        alignment.transform().rotation(),
-                        alignment.transform().translation()
-                ),
+        return new ComparisonRun(
+                querySummary,
+                candidateSummary,
+                queryCloud,
+                candidateCloud,
+                loaded.alphaSpheres().getOrDefault(queryPocketId, List.of()),
+                loaded.alphaSpheres()
+                        .getOrDefault(candidatePocketId, List.of()),
+                sequenceAlignment,
+                alignmentResult,
                 keyResidues,
-                ChemistryAssessmentView.toView(
-                        assessment,
-                        substitutionAssessment,
-                        chemistryScorer.classify(
-                                assessment,
-                                finalSimilarity
-                        ),
-                        finalSimilarity
-                ),
-                AlignmentMetadataView.toView(alignmentResult)
+                assessment,
+                substitutionAssessment,
+                finalSimilarity
         );
-
     }
 
     private void logComparisonTiming(
@@ -431,9 +522,12 @@ public class PocketSimilarityService {
                 ));
         long summaryLookupMs = elapsedMillis(summaryStartNanos);
 
-        int stageOneLimit = Math.max(
-                MINIMUM_STAGE_ONE_LIMIT,
-                limit * STAGE_ONE_MULTIPLIER
+        int stageOneLimit = Math.min(
+                Math.max(
+                        MINIMUM_STAGE_ONE_LIMIT,
+                        limit * STAGE_ONE_MULTIPLIER
+                ),
+                searchProperties.getGlobalShape().getLimit()
         );
         int stageTwoLimit = Math.min(
                 Math.max(
@@ -446,22 +540,37 @@ public class PocketSimilarityService {
         long stageOneStartNanos = System.nanoTime();
         StageOneSelection stageOne = unionStageOneCandidates(
                 querySummary,
-                findStageOneCandidates(querySummary, stageOneLimit)
+                searchProperties.getGlobalShape().isEnabled()
+                        ? findStageOneCandidates(
+                                querySummary,
+                                stageOneLimit
+                        )
+                        : List.of()
         );
         List<PocketSummaryEntity> stageOneSummaries = stageOne.summaries();
 
         Map<Long, Long> candidateReceptorIds =
+                new HashMap<>(stageOneSummaries.size());
+        Map<Long, PocketSummaryEntity> candidateSummaries =
                 new HashMap<>(stageOneSummaries.size());
         for (PocketSummaryEntity summary : stageOneSummaries) {
             candidateReceptorIds.put(
                     summary.getPocketId(),
                     summary.getReceptorId()
             );
+            candidateSummaries.put(summary.getPocketId(), summary);
         }
 
         List<PocketCandidate> stageOneCandidates =
                 stageOneSummaries.stream()
-                        .map(summary -> toCandidate(querySummary, summary))
+                        .map(summary -> toCandidate(querySummary, summary)
+                                .withCandidateSources(
+                                        stageOne.candidateSources()
+                                                .getOrDefault(
+                                                        summary.getPocketId(),
+                                                        Set.of()
+                                                )
+                                ))
                         .toList();
         long stageOneQueryMs = elapsedMillis(stageOneStartNanos);
 
@@ -576,6 +685,22 @@ public class PocketSimilarityService {
                                 assessment
                         );
 
+                String evidenceAssessment = null;
+                if (evidenceAssembler != null) {
+                    PocketComparisonEvidence evidence =
+                            evidenceAssembler.assemble(
+                                    querySummary,
+                                    candidateSummaries.get(
+                                            loaded.candidate().pocketId()
+                                    ),
+                                    alignmentResult,
+                                    sequenceAlignment,
+                                    retrievalEvidence(loaded, stageOne)
+                            );
+                    evidenceAssessment =
+                            evidence.assessment().verdict().name();
+                }
+
                 compared.add(new ComparedCandidate(
                         loaded,
                         comparison,
@@ -586,7 +711,8 @@ public class PocketSimilarityService {
                                 assessment,
                                 finalSimilarity
                         ),
-                        alignmentResult.initialization().name()
+                        alignmentResult.initialization().name(),
+                        evidenceAssessment
                 ));
             } catch (RuntimeException exception) {
                 LOGGER.warn(
@@ -684,6 +810,7 @@ public class PocketSimilarityService {
             List<PocketSummaryEntity> summaries,
             Map<Long, Integer> stageOneRanks,
             Map<Long, CandidateProvenance> provenance,
+            Map<Long, Set<PocketCandidateSource>> candidateSources,
             Set<Long> chosenPocketIds,
             Map<Long, PocketMatchCandidate> pocketMatchEvidence
     ) {
@@ -742,9 +869,14 @@ public class PocketSimilarityService {
             pocketMatchEvidence.put(candidate.pocketId(), candidate);
         }
 
-        Set<Long> chosenPocketIds = new LinkedHashSet<>(
-                structureRepository.findAllChosenPocketIds()
-        );
+        // pocket.search.include-chosen-references gates the
+        // chosen-reference channel (default on).
+        Set<Long> chosenPocketIds = new LinkedHashSet<>();
+        if (searchProperties.isIncludeChosenReferences()) {
+            chosenPocketIds.addAll(
+                    structureRepository.findAllChosenPocketIds()
+            );
+        }
         chosenPocketIds.remove(querySummary.getPocketId());
 
         // Union-added candidates need their summary rows; one bulk
@@ -796,13 +928,124 @@ public class PocketSimilarityService {
             }
         }
 
+        // Channel membership of every unioned candidate (dual
+        // membership preserved, independent of first-surfaced
+        // provenance).
+        Set<Long> pocketMatchIds = new HashSet<>();
+        for (PocketMatchCandidate candidate : pocketMatch) {
+            pocketMatchIds.add(candidate.pocketId());
+        }
+
+        Map<Long, Set<PocketCandidateSource>> candidateSources =
+                new HashMap<>();
+        for (PocketSummaryEntity summary : union) {
+            long pocketId = summary.getPocketId();
+            Set<PocketCandidateSource> sources =
+                    EnumSet.noneOf(PocketCandidateSource.class);
+            if (stageOneRanks.containsKey(pocketId)) {
+                sources.add(PocketCandidateSource.GLOBAL_SHAPE);
+            }
+            if (pocketMatchIds.contains(pocketId)) {
+                sources.add(PocketCandidateSource.POCKET_MATCH);
+            }
+            if (chosenPocketIds.contains(pocketId)) {
+                sources.add(PocketCandidateSource.CHOSEN_REFERENCE);
+            }
+            candidateSources.put(pocketId, sources);
+        }
+
         return new StageOneSelection(
                 union,
                 stageOneRanks,
                 provenance,
+                candidateSources,
                 chosenPocketIds,
                 pocketMatchEvidence
         );
+    }
+
+    /**
+     * The retrieval provenance of one Stage 3 candidate as athena
+     * evidence: the global-shape rank/distance for SQL-retrieved
+     * candidates, the full PocketMatch channel evidence when that
+     * channel surfaced the candidate, and the chosen-reference flag.
+     * Channels that never saw the candidate report
+     * {@code evaluated = false} — ranks and scores are never
+     * invented.
+     */
+    private static PocketRetrievalEvidence retrievalEvidence(
+            LoadedCandidate loaded,
+            StageOneSelection stageOne
+    ) {
+        long pocketId = loaded.candidate().pocketId();
+
+        GlobalShapeRetrievalEvidence globalShape = loaded.stageOneRank() > 0
+                ? new GlobalShapeRetrievalEvidence(
+                        true,
+                        OptionalInt.of(loaded.stageOneRank()),
+                        OptionalDouble.of(
+                                loaded.candidate().descriptorDistance()
+                        )
+                )
+                : GlobalShapeRetrievalEvidence.notEvaluated();
+
+        PocketMatchCandidate pocketMatch =
+                stageOne.pocketMatchEvidence().get(pocketId);
+        PocketMatchRetrievalEvidence pocketMatchEvidence =
+                pocketMatch == null
+                        ? PocketMatchRetrievalEvidence.notEvaluated()
+                        : new PocketMatchRetrievalEvidence(
+                                true,
+                                optionalRank(pocketMatch.symmetricRank()),
+                                optionalRank(
+                                        pocketMatch.queryCoverageRank()
+                                ),
+                                optionalScore(
+                                        pocketMatch.symmetricScore()
+                                ),
+                                OptionalDouble.of(
+                                        pocketMatch.queryCoverage()
+                                ),
+                                optionalScore(
+                                        pocketMatch.candidateCoverage()
+                                ),
+                                pocketMatch.toleranceAngstroms()
+                        );
+
+        boolean chosenReference =
+                stageOne.chosenPocketIds().contains(pocketId);
+
+        Set<PocketCandidateSource> sources =
+                stageOne.candidateSources().get(pocketId);
+        if (sources == null) {
+            // Not expected (every Stage 3 candidate comes from the
+            // union): fall back to the first-surfaced provenance.
+            sources = EnumSet.of(switch (loaded.provenance()) {
+                case GLOBAL_SHAPE -> PocketCandidateSource.GLOBAL_SHAPE;
+                case POCKET_MATCH -> PocketCandidateSource.POCKET_MATCH;
+                case CHOSEN_REFERENCE ->
+                        PocketCandidateSource.CHOSEN_REFERENCE;
+            });
+        }
+
+        return new PocketRetrievalEvidence(
+                globalShape,
+                pocketMatchEvidence,
+                chosenReference,
+                sources
+        );
+    }
+
+    private static OptionalInt optionalRank(Integer rank) {
+        return rank == null
+                ? OptionalInt.empty()
+                : OptionalInt.of(rank);
+    }
+
+    private static OptionalDouble optionalScore(Double score) {
+        return score == null
+                ? OptionalDouble.empty()
+                : OptionalDouble.of(score);
     }
 
     private List<LoadedCandidate> selectByShapeDistance(
@@ -862,7 +1105,13 @@ public class PocketSimilarityService {
                                 : pocketMatch.queryCoverage(),
                         pocketMatch == null
                                 ? null
-                                : pocketMatch.rank()
+                                : pocketMatch.rank(),
+                        pocketMatch == null
+                                ? null
+                                : pocketMatch.symmetricRank(),
+                        pocketMatch == null
+                                ? null
+                                : pocketMatch.queryCoverageRank()
                 ));
             } catch (RuntimeException exception) {
                 LOGGER.warn(
@@ -1153,8 +1402,63 @@ public class PocketSimilarityService {
             String uniProtId,
             String proteinName,
             String geneName,
-            String organism
+            String organism,
+            Set<PocketCandidateSource> candidateSources
     ) {
+        /**
+         * Legacy construction without retrieval provenance
+         * (equivalent to an empty source set).
+         */
+        public PocketCandidate(
+                long pocketId,
+                long structureId,
+                String sourceAccession,
+                int pocketNumber,
+                int alphaSphereCount,
+                double descriptorDistance,
+                double volumeDistance,
+                double residueDistance,
+                double chemistryDistance,
+                String uniProtId,
+                String proteinName,
+                String geneName,
+                String organism
+        ) {
+            this(pocketId, structureId, sourceAccession, pocketNumber,
+                    alphaSphereCount, descriptorDistance, volumeDistance,
+                    residueDistance, chemistryDistance, uniProtId,
+                    proteinName, geneName, organism, Set.of());
+        }
+
+        public PocketCandidate {
+            candidateSources = Set.copyOf(
+                    Objects.requireNonNull(
+                            candidateSources,
+                            "candidateSources"
+                    )
+            );
+        }
+
+        private PocketCandidate withCandidateSources(
+                Set<PocketCandidateSource> sources
+        ) {
+            return new PocketCandidate(
+                    pocketId,
+                    structureId,
+                    sourceAccession,
+                    pocketNumber,
+                    alphaSphereCount,
+                    descriptorDistance,
+                    volumeDistance,
+                    residueDistance,
+                    chemistryDistance,
+                    uniProtId,
+                    proteinName,
+                    geneName,
+                    organism,
+                    sources
+            );
+        }
     }
 
     private record LoadedCandidate(
@@ -1166,7 +1470,9 @@ public class PocketSimilarityService {
             int stageTwoRank,
             CandidateProvenance provenance,
             Double pocketMatchQueryCoverage,
-            Integer pocketMatchRank
+            Integer pocketMatchRank,
+            Integer pocketMatchSymmetricRank,
+            Integer pocketMatchQueryCoverageRank
     ) {
         private LoadedCandidate withStageTwoRank(int stageTwoRank) {
             return new LoadedCandidate(
@@ -1178,9 +1484,36 @@ public class PocketSimilarityService {
                     stageTwoRank,
                     provenance,
                     pocketMatchQueryCoverage,
-                    pocketMatchRank
+                    pocketMatchRank,
+                    pocketMatchSymmetricRank,
+                    pocketMatchQueryCoverageRank
             );
         }
+    }
+
+    /**
+     * The raw outcome of the shared comparison path: everything
+     * {@link #compareGeometries} and the comparison-report service
+     * need, loaded and computed exactly once.
+     *
+     * @param sequenceAlignment the cached protein sequence alignment
+     *                          of the receptor pair, or {@code null}
+     *                          when no sequence seed could exist
+     */
+    record ComparisonRun(
+            PocketSummaryEntity querySummary,
+            PocketSummaryEntity candidateSummary,
+            PocketPointCloud queryCloud,
+            PocketPointCloud candidateCloud,
+            List<AlphaSphereView> queryAlphaSpheres,
+            List<AlphaSphereView> candidateAlphaSpheres,
+            SequenceAlignment sequenceAlignment,
+            PocketAlignmentResult alignmentResult,
+            List<String> keyResidues,
+            ResidueChemistryAssessment chemistryAssessment,
+            ResidueSubstitutionAssessment substitutionAssessment,
+            double finalSimilarity
+    ) {
     }
 
     private record ComparedCandidate(
@@ -1190,7 +1523,8 @@ public class PocketSimilarityService {
             ResidueSubstitutionAssessment substitutionAssessment,
             double finalSimilarity,
             PocketSimilarityClassification classification,
-            String alignmentInitialization
+            String alignmentInitialization,
+            String evidenceAssessment
     ) {
     }
 }

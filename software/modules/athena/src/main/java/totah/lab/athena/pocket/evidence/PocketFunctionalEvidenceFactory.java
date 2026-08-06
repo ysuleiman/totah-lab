@@ -142,10 +142,6 @@ public final class PocketFunctionalEvidenceFactory {
             String candidateStructureKey,
             FunctionalLigand ligand
     ) {
-        Objects.requireNonNull(
-                selectedCorrespondence,
-                "selectedCorrespondence"
-        );
         Objects.requireNonNull(provider, "provider");
         Objects.requireNonNull(queryStructureKey, "queryStructureKey");
         Objects.requireNonNull(
@@ -154,18 +150,44 @@ public final class PocketFunctionalEvidenceFactory {
         );
         Objects.requireNonNull(ligand, "ligand");
 
-        Set<String> queryContactKeys = contactKeys(
-                provider.contacts(queryStructureKey, ligand)
+        return ligandContacts(
+                selectedCorrespondence,
+                sequenceAlignment,
+                provider.contacts(queryStructureKey, ligand),
+                provider.contacts(candidateStructureKey, ligand),
+                ligand.name()
         );
-        Set<String> candidateContactKeys = contactKeys(
-                provider.contacts(candidateStructureKey, ligand)
+    }
+
+    /**
+     * Ligand-contact conservation evidence for one ligand named by
+     * its free-form CCD code (a String, not an enum, so ligands
+     * beyond the {@link FunctionalLigand} values are representable).
+     * The contact annotation sets are matched to pocket residues by
+     * chain id, residue number and insertion code.
+     *
+     * @param sequenceAlignment the protein sequence alignment, or
+     *                          {@code null} when no sequence evidence
+     *                          exists
+     */
+    public LigandContactEvidence ligandContacts(
+            ResidueCorrespondence selectedCorrespondence,
+            SequenceAlignment sequenceAlignment,
+            Set<ResidueReference> queryContacts,
+            Set<ResidueReference> candidateContacts,
+            String ligandCcd
+    ) {
+        Objects.requireNonNull(
+                selectedCorrespondence,
+                "selectedCorrespondence"
         );
-        Set<String> queryContactLabels = contactLabels(
-                provider.contacts(queryStructureKey, ligand)
-        );
-        Set<String> candidateContactLabels = contactLabels(
-                provider.contacts(candidateStructureKey, ligand)
-        );
+        Objects.requireNonNull(ligandCcd, "ligandCcd");
+
+        Set<String> queryContactKeys = contactKeys(queryContacts);
+        Set<String> candidateContactKeys = contactKeys(candidateContacts);
+        Set<String> queryContactLabels = contactLabels(queryContacts);
+        Set<String> candidateContactLabels =
+                contactLabels(candidateContacts);
 
         List<FunctionalResidueCorrespondence> correspondences =
                 new ArrayList<>();
@@ -258,7 +280,7 @@ public final class PocketFunctionalEvidenceFactory {
                 matchedContactCount + unmatchedContactCount;
 
         return new LigandContactEvidence(
-                ligand.name(),
+                ligandCcd,
                 queryContactCount,
                 matchedContactCount,
                 identicalCount,
