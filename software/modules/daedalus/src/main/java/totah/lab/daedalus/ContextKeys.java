@@ -23,6 +23,10 @@ public class ContextKeys {
     public static final String LIGAND_AD4_TYPING_RESULT = "ligand_ad4_typing_result";
     public static final String LIGAND_TORSION_TREE_RESULT = "ligand_torsion_tree_result";
     public static final String LIGAND_PREPARATION_RESULT = "ligand_preparation_result";
+    public static final String LIGAND_PREPARATION_OPTIONS =
+            "ligand_preparation_options";
+    public static final String VINA_DOCKING_OPTIONS = "vina_docking_options";
+    public static final String DOCKING_RESULT = "docking_result";
     public static final String CHEM_COMP_PROVIDER = "chem_comp_provider";
     public static final String DOCKING_INPUT = "docking_input";
     public static final String RUN_DIRECTORY = "run_directory";

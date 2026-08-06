@@ -7,6 +7,9 @@ Hermes owns file parsing, PDBQT serialization, and PDBQT document validation.
 ## Implemented
 
 - Rigid receptor preparation from PDB or mmCIF
+- Ligand preparation from SDF (V2000, explicit hydrogens, 3D
+  coordinates): topology from the parsed bond table, hydrogenation,
+  Gasteiger charges, AD4 typing, torsion tree, validated PDBQT export
 - Prepared-protein validation through the Java client
 - Rigid receptor PDBQT writing
 - Rigid PDBQT file validation
@@ -30,6 +33,7 @@ The active CLI commands are generated from the command registry:
 
 ```text
 prepare-receptor
+prepare-ligand
 validate-pdbqt
 validate-flex-pdbqt
 version
@@ -39,13 +43,27 @@ help
 Run `hephaestus --help` or `hephaestus <command> --help` for the current
 command contract.
 
+## Standalone CLI
+
+`mvn package` builds a runnable jar (maven-shade; no extra runtime
+dependencies to install):
+
+```bash
+java -jar target/hephaestus-1.0-SNAPSHOT.jar prepare-ligand \
+    --input ligand.sdf --output ligand.pdbqt
+java -jar target/hephaestus-1.0-SNAPSHOT.jar prepare-receptor \
+    --input receptor.pdb --output receptor.pdbqt
+```
+
 ## Planned
 
 The flexibility domain model and flexible serializer exist, but flexible
-receptor preparation is not exposed as an end-to-end CLI command yet. Ligand
-preparation is available through the Java API but is not yet an active CLI
-capability. Prepared-state loading, inspect, and generic conversion are also
-not active CLI capabilities.
+receptor preparation is not exposed as an end-to-end CLI command yet.
+Prepared-state loading, inspect, and generic conversion are also
+not active CLI capabilities. Ligand preparation is available on both the
+Java API and the CLI; protonation-state enumeration, tautomer
+enumeration, and conformer generation are not implemented for ligands,
+and requesting them fails explicitly.
 
 ## Build
 

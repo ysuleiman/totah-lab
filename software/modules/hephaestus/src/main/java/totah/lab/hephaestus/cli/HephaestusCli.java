@@ -4,6 +4,9 @@ import totah.lab.hephaestus.client.DefaultHephaestusClient;
 import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.client.HephaestusClients;
 import totah.lab.hephaestus.factory.ProteinFactory;
+import totah.lab.hephaestus.ligand.LigandPreparationOptions;
+import totah.lab.hephaestus.ligand.LigandPreparationResult;
+import totah.lab.hephaestus.model.PreparationIssue;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
 import totah.lab.hephaestus.receptor.ReceptorPreparationResult;
 import totah.lab.hephaestus.receptor.ReceptorPreparer;
@@ -90,6 +93,46 @@ public final class HephaestusCli {
                     Print command help.
             """;
 
+    private static final String PREPARE_LIGAND_HELP = """
+            USAGE
+
+                hephaestus prepare-ligand
+                    --input <file>
+                    --output <file>
+                    [options]
+
+            REQUIRED
+
+                --input <file>
+                    Input ligand SDF (V2000, single molecule, explicit
+                    hydrogens and 3D coordinates).
+
+                --output <file>
+                    Output ligand PDBQT file.
+
+            OPTIONS
+
+                --largest-fragment
+                    Keep only the largest fragment (salt stripping).
+
+                --no-hydrogens
+                    Do not add hydrogens (default: hydrogens are added).
+
+                --no-charges
+                    Do not assign Gasteiger charges (default: charges
+                    are assigned).
+
+                --no-atom-types
+                    Do not assign AutoDock4 atom types (default: types
+                    are assigned).
+
+                --overwrite
+                    Replace an existing output file.
+
+                --help
+                    Print command help.
+            """;
+
     private static final String VALIDATE_HELP = """
             USAGE
 
@@ -149,6 +192,9 @@ public final class HephaestusCli {
                 command("prepare-receptor",
                         "Prepare a receptor and write rigid PDBQT output.",
                         PREPARE_HELP, this::prepareReceptor),
+                command("prepare-ligand",
+                        "Prepare an SDF ligand and write PDBQT output.",
+                        PREPARE_LIGAND_HELP, this::prepareLigand),
                 command("validate-pdbqt",
                         "Validate an existing PDBQT file.",
                         VALIDATE_HELP, this::validatePdbqt),
@@ -282,6 +328,92 @@ public final class HephaestusCli {
         }
     }
 
+    private int prepareLigand(String[] arguments, PrintWriter out, PrintWriter err) {
+        Arguments parsed = Arguments.parse(arguments,
+                Set.of("input", "output"),
+                Set.of("largest-fragment", "no-hydrogens", "no-charges",
+                        "no-atom-types", "overwrite"));
+        Path input = parsed.requiredPath("input");
+        Path output = parsed.requiredPath("output");
+        if (Files.exists(output) && !parsed.flag("overwrite")) {
+            err.println("Output already exists; use --overwrite: " + output);
+            return CliExitCode.EXPORT_FAILURE;
+        }
+        LigandPreparationOptions defaults = LigandPreparationOptions.defaults();
+        LigandPreparationOptions options = new LigandPreparationOptions(
+                !parsed.flag("no-hydrogens") && defaults.addHydrogens(),
+                defaults.generateProtonationStates(),
+                defaults.generateTautomers(),
+                !parsed.flag("no-charges") && defaults.assignCharges(),
+                !parsed.flag("no-atom-types") && defaults.assignAtomTypes(),
+                defaults.generateConformers(),
+                defaults.maximumConformers(),
+                parsed.flag("largest-fragment")
+                        || defaults.selectLargestFragment());
+        final LigandPreparationResult preparation;
+        try {
+            preparation = client.prepareLigand(input, options);
+        } catch (IOException exception) {
+            err.println("Input/output failure: " + exception.getMessage());
+            return CliExitCode.IO_FAILURE;
+        } catch (RuntimeException exception) {
+            err.println("Preparation failure: " + exception.getMessage());
+            return CliExitCode.PREPARATION_FAILURE;
+        }
+        if (preparation.hasErrors()) {
+            preparation.issues().forEach(issue -> err.println(
+                    issue.severity() + " " + issue.code() + ": " + issue.message()));
+            return CliExitCode.PREPARATION_FAILURE;
+        }
+        writeReportIssues(preparation.issues(), out);
+        final Path written;
+        try {
+            written = client.writePreparedLigand(
+                    preparation.preparedLigand(), output);
+        } catch (IOException exception) {
+            err.println("Export failure: " + exception.getMessage());
+            return CliExitCode.EXPORT_FAILURE;
+        } catch (RuntimeException exception) {
+            err.println("Export failure: " + exception.getMessage());
+            return CliExitCode.EXPORT_FAILURE;
+        }
+        try {
+            printLigandSummary(preparation, written, out);
+        } catch (IOException exception) {
+            err.println("Export failure: " + exception.getMessage());
+            return CliExitCode.EXPORT_FAILURE;
+        }
+        out.println("Wrote ligand PDBQT: "
+                + written.toAbsolutePath().normalize());
+        return CliExitCode.SUCCESS;
+    }
+
+    /*
+     * Summary from the validated artifact itself: ATOM records and the
+     * TORSDOF torsion count are read back from the written PDBQT.
+     */
+    private void printLigandSummary(
+            LigandPreparationResult preparation, Path pdbqt,
+            PrintWriter out) throws IOException {
+        long atoms = 0;
+        int torsions = 0;
+        try (var lines = Files.lines(pdbqt)) {
+            for (String line : lines.toList()) {
+                if (line.startsWith("ATOM")) {
+                    atoms++;
+                } else if (line.startsWith("TORSDOF")) {
+                    torsions = Integer.parseInt(line.substring(7).trim());
+                }
+            }
+        }
+        out.println("Ligand atoms: " + atoms);
+        preparation.preparedLigand().chargesOptional().ifPresent(charges ->
+                out.println("Total charge: " + String.format(
+                        java.util.Locale.ROOT, "%.3f",
+                        charges.totalCharge())));
+        out.println("Rotatable bonds: " + torsions);
+    }
+
     private int validatePdbqt(String[] arguments, PrintWriter out, PrintWriter err) {
         Arguments parsed = Arguments.parse(arguments,
                 Set.of("input", "report"), Set.of("strict"));
@@ -375,6 +507,13 @@ public final class HephaestusCli {
                 defaults.assignAtomTypes(), protonation,
                 defaults.residueProtonationOverrides(),
                 defaults.flexibilityConfig(), null);
+    }
+
+    private void writeReportIssues(
+            List<PreparationIssue> issues, PrintWriter out) {
+        issues.forEach(issue -> out.println(
+                issue.severity() + " " + issue.code() + ": "
+                        + issue.message()));
     }
 
     private void writeReport(ValidationReport report, PrintWriter out) {
