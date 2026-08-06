@@ -148,7 +148,11 @@ class PocketSearchControllerTest {
                 "SEQUENCE_SEEDED_KABSCH",
                 "GLOBAL_SHAPE",
                 0.87,
-                902
+                902,
+                null,
+                null,
+                List.of("GLOBAL_SHAPE"),
+                null
         ));
 
         MockMvc mockMvc = MockMvcBuilders

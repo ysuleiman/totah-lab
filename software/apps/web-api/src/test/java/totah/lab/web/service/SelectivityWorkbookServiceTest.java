@@ -42,7 +42,9 @@ class SelectivityWorkbookServiceTest {
                     );
                     assertTrue(xml.contains("MCULE-1"));
                     assertTrue(xml.contains("Delta = METTL7A − METTL7B"));
-                    assertTrue(xml.contains("<autoFilter ref=\"A4:I5\"/>"));
+                    assertTrue(xml.contains("<autoFilter ref=\"A4:J5\"/>"));
+                    assertTrue(xml.contains(">SMILES<"));
+                    assertTrue(xml.contains(">CCO<"));
                     foundWorksheet = true;
                 }
             }

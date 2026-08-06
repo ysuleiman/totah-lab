@@ -54,6 +54,7 @@ public final class SelectivityWorkbookService {
                     <col min="2" max="2" width="35" customWidth="1"/>
                     <col min="3" max="5" width="14" customWidth="1"/>
                     <col min="6" max="9" width="14" customWidth="1"/>
+                    <col min="10" max="10" width="45" customWidth="1"/>
                   </cols>
                   <sheetData>
                 """);
@@ -82,7 +83,8 @@ public final class SelectivityWorkbookService {
                 textCell("F4", "7B run", 3),
                 textCell("G4", "7B pose", 3),
                 textCell("H4", "7A run", 3),
-                textCell("I4", "7A pose", 3)
+                textCell("I4", "7A pose", 3),
+                textCell("J4", "SMILES", 3)
         ));
 
         int rowNumber = 5;
@@ -97,13 +99,14 @@ public final class SelectivityWorkbookService {
                     numberCell("F" + rowNumber, score.runId7b(), 6),
                     numberCell("G" + rowNumber, score.poseId7b(), 6),
                     numberCell("H" + rowNumber, score.runId7a(), 6),
-                    numberCell("I" + rowNumber, score.poseId7a(), 6)
+                    numberCell("I" + rowNumber, score.poseId7a(), 6),
+                    textCell("J" + rowNumber, score.smiles(), 0)
             ));
             rowNumber++;
         }
         xml.append("</sheetData>");
-        xml.append("<mergeCells count=\"1\"><mergeCell ref=\"A1:I1\"/></mergeCells>");
-        xml.append("<autoFilter ref=\"A4:I").append(lastRow).append("\"/>");
+        xml.append("<mergeCells count=\"1\"><mergeCell ref=\"A1:J1\"/></mergeCells>");
+        xml.append("<autoFilter ref=\"A4:J").append(lastRow).append("\"/>");
         xml.append("""
                 <conditionalFormatting sqref="E5:E1048576">
                   <cfRule type="cellIs" dxfId="0" priority="1" operator="greaterThanOrEqual">

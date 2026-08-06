@@ -1211,7 +1211,14 @@ public class PocketSimilarityService {
                 compared.alignmentInitialization(),
                 loaded.provenance().name(),
                 loaded.pocketMatchQueryCoverage(),
-                loaded.pocketMatchRank()
+                loaded.pocketMatchRank(),
+                loaded.pocketMatchSymmetricRank(),
+                loaded.pocketMatchQueryCoverageRank(),
+                candidate.candidateSources().stream()
+                        .map(Enum::name)
+                        .sorted()
+                        .toList(),
+                compared.evidenceAssessment()
         );
     }
 

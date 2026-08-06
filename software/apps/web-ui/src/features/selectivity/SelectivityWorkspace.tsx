@@ -209,6 +209,7 @@ export function SelectivityWorkspace() {
                         Delta
                       </SortButton>
                     </th>
+                    <th>SMILES</th>
                     <th>Evidence</th>
                   </tr>
                 </thead>
@@ -241,6 +242,17 @@ export function SelectivityWorkspace() {
                           {score.delta > 0 ? '+' : ''}
                           {formatScore(score.delta)}
                         </span>
+                      </td>
+                      <td className="smiles-cell">
+                        {score.smiles
+                          ? (
+                            <code title={score.smiles}>
+                              {score.smiles.length > 40
+                                ? `${score.smiles.slice(0, 40)}…`
+                                : score.smiles}
+                            </code>
+                          )
+                          : '—'}
                       </td>
                       <td className="evidence-cell">
                         <span>7B run {score.runId7b} · pose {score.poseId7b}</span>

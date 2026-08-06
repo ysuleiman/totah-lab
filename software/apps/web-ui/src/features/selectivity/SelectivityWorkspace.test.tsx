@@ -52,6 +52,8 @@ test('shows paired scores and explains positive delta', async () => {
   expect(screen.getByText('-9.200')).toBeInTheDocument()
   expect(screen.getByText('+2.200')).toBeInTheDocument()
   expect(screen.getByText('Positive = 7B favored')).toBeInTheDocument()
+  expect(screen.getByText('SMILES')).toBeInTheDocument()
+  expect(screen.getByTitle('CCO')).toBeInTheDocument()
 
   await user.click(screen.getByRole('button', { name: 'Sort by METTL7B' }))
 })

@@ -1,5 +1,7 @@
 package totah.lab.web.service;
 
+import java.util.List;
+
 /**
  * Development diagnostic row for one ranked candidate: the Stage 1
  * candidate information, the intermediate stage ranks, the Stage 2
@@ -16,7 +18,12 @@ package totah.lab.web.service;
  * PocketMatch channel's own evidence — they are never blended into the
  * descriptor distances or the Stage 3 ordering — and are {@code null}
  * when the channel is disabled or the candidate is not in the
- * channel's top-N.</p>
+ * channel's top-N. {@code pocketMatchSymmetricRank} and
+ * {@code pocketMatchQueryCoverageRank} are the channel's two natural
+ * orderings; {@code candidateSources} is the unioned channel
+ * membership (a candidate can arrive through several channels);
+ * {@code assessment} is the evidence-pipeline verdict name, or
+ * {@code null} when evidence assembly is not wired.</p>
  */
 public record PocketSimilarityDiagnostic(
         long pocketId,
@@ -64,6 +71,10 @@ public record PocketSimilarityDiagnostic(
         String alignmentInitialization,
         String provenance,
         Double pocketMatchQueryCoverage,
-        Integer pocketMatchRank
+        Integer pocketMatchRank,
+        Integer pocketMatchSymmetricRank,
+        Integer pocketMatchQueryCoverageRank,
+        List<String> candidateSources,
+        String assessment
 ) {
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import totah.lab.web.service.PocketComparisonDetails;
+import totah.lab.web.service.PocketComparisonReportMarkdown;
 import totah.lab.web.service.PocketComparisonReportService;
 import totah.lab.web.service.PocketComparisonReportView;
 import totah.lab.web.service.PocketGeometryView;
@@ -107,6 +108,45 @@ public class PocketSearchController {
         return pocketComparisonReportService.report(
                 queryPocketId,
                 candidatePocketId
+        );
+    }
+
+    /**
+     * The same structured evidence bundle at the evidence-pipeline
+     * path: retrieval, alignment, residues, functional and assessment
+     * sections as clean web DTOs (no athena types in the JSON).
+     */
+    @GetMapping("/{queryPocketId}/compare/{candidatePocketId}/evidence")
+    public PocketComparisonReportView comparisonEvidence(
+            @PathVariable("queryPocketId") long queryPocketId,
+            @PathVariable("candidatePocketId") long candidatePocketId
+    ) {
+
+        return pocketComparisonReportService.report(
+                queryPocketId,
+                candidatePocketId
+        );
+    }
+
+    /**
+     * The evidence bundle as a human-readable Markdown report
+     * (Retrieval / Alignment / Residue / Functional / Assessment).
+     */
+    @GetMapping(
+            value = "/{queryPocketId}/compare/{candidatePocketId}"
+                    + "/evidence/report.md",
+            produces = "text/markdown"
+    )
+    public String comparisonEvidenceReport(
+            @PathVariable("queryPocketId") long queryPocketId,
+            @PathVariable("candidatePocketId") long candidatePocketId
+    ) {
+
+        return PocketComparisonReportMarkdown.render(
+                pocketComparisonReportService.report(
+                        queryPocketId,
+                        candidatePocketId
+                )
         );
     }
 
