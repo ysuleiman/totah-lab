@@ -312,6 +312,41 @@ class PocketComparisonReportServiceTest {
     }
 
     /**
+     * Only the query structure carries BioHub SAM evidence: the
+     * ligand section is AVAILABLE with the query-side annotation
+     * preserved and no fabricated candidate-side annotation.
+     */
+    @Test
+    void oneSidedBiohubAnnotationIsPreserved() {
+        stubIdenticalPair(100L, 200L);
+
+        reportService.register(
+                1000L + QUERY_POCKET_ID,
+                biohubEvidence(List.of(
+                        contact(1, "ALA", 2.5, 30, true),
+                        contact(2, "PHE", 3.1, 20, true)
+                ))
+        );
+
+        LigandContactSection section = reportService
+                .report(QUERY_POCKET_ID, CANDIDATE_POCKET_ID)
+                .ligandContactConservation();
+
+        assertEquals(
+                LigandContactStatus.AVAILABLE.name(),
+                section.status()
+        );
+        assertEquals("SAM", section.ligandCcd());
+        assertEquals(2, section.queryContactResidueCount());
+        assertEquals(2, section.matchedQueryContactResidueCount());
+        assertEquals(0, section.sharedContactAnnotationCount());
+        assertEquals(2, section.contacts().size());
+        assertTrue(section.contacts().stream()
+                .allMatch(contact -> contact.pocketReference()
+                        .equals(String.valueOf(QUERY_POCKET_ID))));
+    }
+
+    /**
      * The METTL7A/METTL7B regression fixture assembled through the
      * service-level path (fake loaders serve the fixture clouds,
      * residues and the Needleman-Wunsch sequence alignment): the

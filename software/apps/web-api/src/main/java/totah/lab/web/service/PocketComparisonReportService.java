@@ -49,12 +49,14 @@ import java.util.Set;
  * {@link PocketComparisonReportView} renders the seven sections. No
  * alignment or metric is recomputed here.
  *
- * <p>Ligand-contact conservation is included when both structures
- * carry BioHub pocket evidence for a common ligand CCD code
- * (free-form String, matched case-insensitively on lookup); when no
- * common ligand evidence exists, the section reports
- * {@code NOT_AVAILABLE} — never zeroed counts. The assessment rules
- * are the documented, uncalibrated defaults of
+ * <p>Ligand-contact conservation is included when at least one
+ * structure carries BioHub pocket evidence for a ligand CCD code
+ * (free-form String, matched case-insensitively on lookup); a
+ * ligand annotated on only one side is evaluated with an empty
+ * contact set on the other (one-sided annotation is preserved, never
+ * dropped). Only when neither structure has any ligand evidence does
+ * the section report {@code NOT_AVAILABLE} — never zeroed counts.
+ * The assessment rules are the documented, uncalibrated defaults of
  * {@link PocketAssessmentRules#defaults()}.</p>
  *
  * <p>A direct pairwise report does not pass through the retrieval
@@ -213,12 +215,13 @@ public class PocketComparisonReportService {
     }
 
     /**
-     * Ligand-contact conservation for the pair: when both structures
-     * carry BioHub evidence for a common ligand, the athena
-     * ligand-contact evidence under the selected alignment plus the
-     * canonical per-residue contact records; an empty Optional and an
-     * empty contact list otherwise (absence is reported, never
-     * fabricated).
+     * Ligand-contact conservation for the pair: when either structure
+     * carries BioHub evidence for a ligand, the athena ligand-contact
+     * evidence under the selected alignment plus the canonical
+     * per-residue contact records (a side without annotation
+     * contributes an empty contact set); an empty Optional and an
+     * empty contact list only when neither side has ligand evidence
+     * (absence is reported, never fabricated).
      */
     private LigandContactSelection ligandContacts(
             PocketSimilarityService.ComparisonRun run,
@@ -232,7 +235,7 @@ public class PocketComparisonReportService {
                 biohubEvidence(run.candidateSummary().getStructureId())
         );
 
-        Optional<String> ligandCcd = preferredCommonLigand(
+        Optional<String> ligandCcd = preferredLigand(
                 queryByLigand.keySet(),
                 candidateByLigand.keySet()
         );
@@ -244,6 +247,9 @@ public class PocketComparisonReportService {
             );
         }
 
+        // One-sided annotation is preserved: the side without BioHub
+        // evidence contributes an empty contact set, and the athena
+        // evidence keeps the annotated side's residues visible.
         BiohubPocketEvidence query = queryByLigand.get(ligandCcd.get());
         BiohubPocketEvidence candidate =
                 candidateByLigand.get(ligandCcd.get());
@@ -252,8 +258,12 @@ public class PocketComparisonReportService {
                 functionalFactory.ligandContacts(
                         run.alignmentResult().correspondence(),
                         run.sequenceAlignment(),
-                        directContacts(query),
-                        directContacts(candidate),
+                        query == null
+                                ? Set.of()
+                                : directContacts(query),
+                        candidate == null
+                                ? Set.of()
+                                : directContacts(candidate),
                         ligandCcd.get()
                 );
 
@@ -261,23 +271,27 @@ public class PocketComparisonReportService {
         String queryReference = String.valueOf(queryPocketId);
         String candidateReference = String.valueOf(candidatePocketId);
 
-        for (BiohubPocketEvidence.ResidueContact contact
-                : query.residues()) {
-            contacts.add(LigandContactConservationAnalyzer
-                    .canonicalContact(
-                            queryReference,
-                            query.ligandCcd(),
-                            contact
-                    ));
+        if (query != null) {
+            for (BiohubPocketEvidence.ResidueContact contact
+                    : query.residues()) {
+                contacts.add(LigandContactConservationAnalyzer
+                        .canonicalContact(
+                                queryReference,
+                                ligandCcd.get(),
+                                contact
+                        ));
+            }
         }
-        for (BiohubPocketEvidence.ResidueContact contact
-                : candidate.residues()) {
-            contacts.add(LigandContactConservationAnalyzer
-                    .canonicalContact(
-                            candidateReference,
-                            candidate.ligandCcd(),
-                            contact
-                    ));
+        if (candidate != null) {
+            for (BiohubPocketEvidence.ResidueContact contact
+                    : candidate.residues()) {
+                contacts.add(LigandContactConservationAnalyzer
+                        .canonicalContact(
+                                candidateReference,
+                                ligandCcd.get(),
+                                contact
+                        ));
+            }
         }
 
         return new LigandContactSelection(
@@ -289,9 +303,12 @@ public class PocketComparisonReportService {
     /**
      * The ligand to evaluate: SAM when both sides annotate it (the
      * report runner's preference), otherwise the first common CCD
-     * code in sorted order — deterministic either way.
+     * code in sorted order; when no ligand is annotated on both
+     * sides, the annotated side's ligand (SAM preferred, then sorted)
+     * so one-sided annotation is preserved — deterministic either
+     * way.
      */
-    private static Optional<String> preferredCommonLigand(
+    private static Optional<String> preferredLigand(
             Set<String> queryLigands,
             Set<String> candidateLigands
     ) {
@@ -303,8 +320,18 @@ public class PocketComparisonReportService {
         if (common.contains("SAM")) {
             return Optional.of("SAM");
         }
+        if (!common.isEmpty()) {
+            return Optional.of(common.get(0));
+        }
 
-        return common.stream().findFirst();
+        Set<String> either = new HashSet<>(queryLigands);
+        either.addAll(candidateLigands);
+
+        if (either.contains("SAM")) {
+            return Optional.of("SAM");
+        }
+
+        return either.stream().sorted().findFirst();
     }
 
     private static Map<String, BiohubPocketEvidence> byLigandCcd(

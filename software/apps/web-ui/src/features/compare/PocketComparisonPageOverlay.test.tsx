@@ -151,6 +151,9 @@ function stubFetch() {
     'fetch',
     vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input)
+      if (url.includes('/evidence')) {
+        return { ok: false, status: 404, json: async () => ({}) } as Response
+      }
       if (url.includes('/compare/')) {
         return { ok: true, json: async () => details } as Response
       }

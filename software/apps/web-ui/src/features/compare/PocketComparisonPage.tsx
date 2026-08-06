@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type {
   PocketComparisonDetails,
+  PocketComparisonReportView,
   PocketSimilarityDiagnosticRow,
   Point3D,
 } from '../../api/types'
@@ -13,6 +14,7 @@ import {
   classificationClass,
   classificationLabel,
 } from '../similar/chemistryClassification'
+import { EvidenceReportSection } from './EvidenceReportSection'
 import { PointCloudViewer } from './PointCloudViewer'
 import { ResidueCorrespondenceSection } from './ResidueCorrespondenceSection'
 import { interpolateSpheres } from './spheres'
@@ -44,6 +46,11 @@ function PocketComparisonContent({
 
   const diagnostic = useApiQuery<PocketSimilarityDiagnosticRow[]>(
     `/api/pockets/${queryPocketId}/similar/diagnostic?limit=${RANK_LIMIT}`,
+  )
+
+  const evidence = useApiQuery<PocketComparisonReportView>(
+    `/api/pockets/${queryPocketId}/compare/`
+      + `${candidatePocketId}/evidence`,
   )
 
   const [showQuery, setShowQuery] = useState(true)
@@ -161,6 +168,17 @@ function PocketComparisonContent({
         </button>
       </header>
 
+      {evidence.loading ? (
+        <p className="muted-note">Loading evidence report…</p>
+      ) : evidence.data ? (
+        <EvidenceReportSection report={evidence.data} />
+      ) : (
+        <p className="muted-note">
+          Evidence report unavailable
+          {evidence.error ? `: ${evidence.error.message}` : ''}
+        </p>
+      )}
+
       <div className="compare-grid">
         <PocketMetadata title="Query" geometry={query} />
         <PocketMetadata title="Candidate" geometry={candidate} />
@@ -198,7 +216,7 @@ function PocketComparisonContent({
           <h2>Comparison metrics</h2>
 
           <dl className="metrics-grid">
-            <dt>Geometric similarity score</dt>
+            <dt>Blended overall similarity</dt>
             <dd>{formatNumber(comparison.overallSimilarity, 3)}</dd>
 
             <dt>Geometry similarity</dt>
@@ -249,6 +267,12 @@ function PocketComparisonContent({
               Å
             </dd>
           </dl>
+
+          <p className="muted-note">
+            The blended similarity is a geometric convenience metric,
+            not the verdict — the assessment card above is the
+            rule-based interpretation of the preserved evidence.
+          </p>
         </section>
 
         {chemistryAssessment && (

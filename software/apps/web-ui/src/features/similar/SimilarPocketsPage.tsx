@@ -8,6 +8,10 @@ import { AsyncState } from '../../components/AsyncState'
 import { geometryBasisLabel } from './geometryBasis'
 import { alignmentInitializationLabel } from './alignmentInitialization'
 import {
+  assessmentClass,
+  assessmentLabel,
+} from './comparisonAssessment'
+import {
   classificationClass,
   classificationLabel,
 } from './chemistryClassification'
@@ -18,37 +22,18 @@ const PAGE_SIZE = 20
 type SortDirection = 'asc' | 'desc'
 type ViewMode = 'pockets' | 'proteins'
 
-type SortKey =
-  | 'stageThreeRank'
-  | 'pocketId'
-  | 'uniProtId'
-  | 'sourceAccession'
-  | 'proteinName'
-  | 'geneName'
-  | 'pocketNumber'
-  | 'basis'
-  | 'descriptorDistance'
-  | 'shapeDistance'
-  | 'geometricOverallSimilarity'
-  | 'finalSimilarity'
-  | 'classification'
-  | 'geometrySimilarity'
-  | 'sizeSimilarity'
-  | 'queryCoverage'
-  | 'candidateCoverage'
-  | 'queryToCandidateMeanDistance'
-  | 'candidateToQueryMeanDistance'
-  | 'meanBidirectionalDistance'
-  | 'maximumNearestNeighborDistance'
-  | 'queryPointCount'
-  | 'candidatePointCount'
-  | 'alphaSphereCount'
+type SortKey = string
 
 interface Column {
-  key: SortKey
+  key: string
   label: string
   defaultDirection: SortDirection
   value: (row: PocketSimilarityDiagnosticRow) => string
+  // Custom sort key for computed columns; without it the column sorts
+  // by the row field named like `key`.
+  sortValue?: (
+    row: PocketSimilarityDiagnosticRow
+  ) => string | number | null
   cellClass?: (row: PocketSimilarityDiagnosticRow) => string
   cellTitle?: (row: PocketSimilarityDiagnosticRow) => string
 }
@@ -141,6 +126,87 @@ const COLUMNS: Column[] = [
     defaultDirection: 'asc',
     value: (row) => classificationLabel(row.classification),
     cellClass: (row) => classificationClass(row.classification),
+  },
+  {
+    key: 'chosenReference',
+    label: 'Chosen',
+    defaultDirection: 'desc',
+    value: (row) =>
+      row.candidateSources?.includes('CHOSEN_REFERENCE')
+        ? 'Yes'
+        : 'No',
+    sortValue: (row) =>
+      row.candidateSources?.includes('CHOSEN_REFERENCE') ? 1 : 0,
+    cellTitle: (row) =>
+      row.candidateSources?.includes('CHOSEN_REFERENCE')
+        ? 'Chosen reference: guaranteed evaluation, no ranking bonus'
+        : '',
+  },
+  {
+    key: 'candidateSources',
+    label: 'Sources',
+    defaultDirection: 'asc',
+    value: (row) =>
+      row.candidateSources?.length
+        ? row.candidateSources.join(', ')
+        : '—',
+    sortValue: (row) => (row.candidateSources ?? []).join(','),
+  },
+  {
+    key: 'stageOneRank',
+    label: 'Global rank',
+    defaultDirection: 'asc',
+    value: (row) =>
+      row.stageOneRank > 0 ? String(row.stageOneRank) : '—',
+    cellTitle: (row) =>
+      row.stageOneRank > 0
+        ? ''
+        : 'Not retrieved by the global-shape channel',
+  },
+  {
+    key: 'pocketMatchRank',
+    label: 'PocketMatch rank',
+    defaultDirection: 'asc',
+    value: (row) =>
+      row.pocketMatchRank == null ? '—' : String(row.pocketMatchRank),
+  },
+  {
+    key: 'residueIdentity',
+    label: 'Residue identity',
+    defaultDirection: 'desc',
+    value: (row) =>
+      row.matchedResidueCount > 0
+        ? `${row.identicalCount} / ${row.matchedResidueCount}`
+        : '—',
+    sortValue: (row) =>
+      row.matchedResidueCount > 0
+        ? row.identicalCount / row.matchedResidueCount
+        : null,
+  },
+  {
+    key: 'chemistrySimilarity',
+    label: 'Chemistry',
+    defaultDirection: 'desc',
+    value: (row) => row.chemistrySimilarity.toFixed(3),
+  },
+  {
+    key: 'samConservation',
+    label: 'SAM conservation',
+    defaultDirection: 'desc',
+    // The diagnostic rows carry no per-row SAM metric; the pairwise
+    // comparison page shows the full ligand-contact evidence.
+    value: () => '—',
+    cellTitle: () =>
+      'SAM-contact conservation is available on the comparison page',
+  },
+  {
+    key: 'assessment',
+    label: 'Assessment',
+    defaultDirection: 'asc',
+    value: (row) =>
+      row.assessment == null ? '—' : assessmentLabel(row.assessment),
+    cellClass: (row) =>
+      row.assessment == null ? '' : assessmentClass(row.assessment),
   },
   {
     key: 'geometrySimilarity',
@@ -260,10 +326,18 @@ export function SimilarPocketsPage({ pocketId, onNavigate }: Props) {
   )
 
   const sortedRows = useMemo(() => {
+    const activeColumn =
+      COLUMNS.find((column) => column.key === sortKey)
+    const extract = activeColumn?.sortValue
+      ?? ((row: PocketSimilarityDiagnosticRow) =>
+          row[sortKey as keyof PocketSimilarityDiagnosticRow] as
+            | string
+            | number
+            | null)
     const sorted = filteredRows.slice()
     sorted.sort((first, second) => {
-      const firstValue = first[sortKey]
-      const secondValue = second[sortKey]
+      const firstValue = extract(first)
+      const secondValue = extract(second)
       const order = typeof firstValue === 'string'
         || firstValue === null
         || typeof secondValue === 'string'

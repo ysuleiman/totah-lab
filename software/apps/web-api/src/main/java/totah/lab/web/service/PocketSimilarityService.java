@@ -45,12 +45,20 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
-import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.ToDoubleFunction;
 
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
@@ -115,6 +123,12 @@ public class PocketSimilarityService {
      * in the comparison response so the UI can display it.
      */
     public static final String ACTIVE_ALIGNER = "PCA_ICP";
+
+    /**
+     * Bounded worker count for Stage 3 comparisons, which are
+     * independent and CPU-bound per candidate.
+     */
+    private static final int STAGE_THREE_PARALLELISM = 8;
 
     private final PocketSummaryRepository pocketSummaryRepository;
     private final StructureRepository structureRepository;
@@ -636,90 +650,71 @@ public class PocketSimilarityService {
 
         // One cached protein sequence alignment per receptor pair: at
         // most one computation per pair per request (usually a single
-        // persisted-cache lookup).
-        Map<Long, SequenceAlignment> sequenceAlignments =
-                new HashMap<>();
+        // persisted-cache lookup). Optional wrapper because the cache
+        // forbids null values.
+        Map<Long, Optional<SequenceAlignment>> sequenceAlignments =
+                new ConcurrentHashMap<>();
 
-        List<ComparedCandidate> compared = new ArrayList<>();
+        StageThreeContext context = new StageThreeContext(
+                querySummary,
+                queryCloud,
+                queryResidues,
+                keyResidues,
+                candidateReceptorIds,
+                candidateSummaries,
+                sequenceAlignments,
+                stageOne
+        );
 
-        for (LoadedCandidate loaded : stageTwoSurvivors) {
+        List<ComparedCandidate> compared;
+        if (stageTwoSurvivors.size() <= 1) {
+            compared = stageTwoSurvivors.stream()
+                    .map(loaded ->
+                            compareStageThreeCandidate(loaded, context))
+                    .filter(Objects::nonNull)
+                    .toList();
+        } else {
+            // The per-candidate work (multi-hypothesis alignment,
+            // correspondence, chemistry) is independent and CPU-bound;
+            // it dominates request time at larger Stage 2 sizes.
+            ExecutorService executor = Executors.newFixedThreadPool(
+                    Math.min(
+                            STAGE_THREE_PARALLELISM,
+                            stageTwoSurvivors.size()
+                    )
+            );
             try {
-                List<PocketResiduePoint> candidateResidues =
-                        residueLoader.load(
-                                loaded.candidate().pocketId()
-                        );
+                List<Callable<ComparedCandidate>> tasks =
+                        stageTwoSurvivors.stream()
+                                .<Callable<ComparedCandidate>>map(loaded ->
+                                        () -> compareStageThreeCandidate(
+                                                loaded,
+                                                context
+                                        ))
+                                .toList();
 
-                SequenceAlignment sequenceAlignment =
-                        sequenceAlignmentFor(
-                                querySummary.getReceptorId(),
-                                candidateReceptorIds.get(
-                                        loaded.candidate().pocketId()
-                                ),
-                                sequenceAlignments
-                        );
-
-                PocketAlignmentResult alignmentResult =
-                        multiHypothesisAligner.align(
-                                queryCloud,
-                                loaded.pointCloud(),
-                                queryResidues,
-                                candidateResidues,
-                                sequenceAlignment
-                        );
-
-                PocketComparison comparison =
-                        alignmentResult.comparison();
-                ResidueCorrespondence correspondence =
-                        alignmentResult.correspondence();
-
-                ResidueChemistryAssessment assessment =
-                        chemistryScorer.assess(
-                                correspondence,
-                                keyResidues
-                        );
-                ResidueSubstitutionAssessment substitutionAssessment =
-                        substitutionScorer.assess(correspondence);
-                double finalSimilarity =
-                        ResidueChemistryScorer.finalSimilarity(
-                                comparison.overallSimilarity(),
-                                assessment
-                        );
-
-                String evidenceAssessment = null;
-                if (evidenceAssembler != null) {
-                    PocketComparisonEvidence evidence =
-                            evidenceAssembler.assemble(
-                                    querySummary,
-                                    candidateSummaries.get(
-                                            loaded.candidate().pocketId()
-                                    ),
-                                    alignmentResult,
-                                    sequenceAlignment,
-                                    retrievalEvidence(loaded, stageOne)
-                            );
-                    evidenceAssessment =
-                            evidence.assessment().verdict().name();
+                compared = new ArrayList<>();
+                for (Future<ComparedCandidate> future :
+                        executor.invokeAll(tasks)) {
+                    compared.add(future.get());
                 }
-
-                compared.add(new ComparedCandidate(
-                        loaded,
-                        comparison,
-                        assessment,
-                        substitutionAssessment,
-                        finalSimilarity,
-                        chemistryScorer.classify(
-                                assessment,
-                                finalSimilarity
-                        ),
-                        alignmentResult.initialization().name(),
-                        evidenceAssessment
-                ));
-            } catch (RuntimeException exception) {
-                LOGGER.warn(
-                        "Skipping pocket {} during detailed comparison: {}",
-                        loaded.candidate().pocketId(),
-                        exception.getMessage()
+                compared.removeIf(Objects::isNull);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new ResponseStatusException(
+                        INTERNAL_SERVER_ERROR,
+                        "Stage 3 comparison interrupted",
+                        exception
                 );
+            } catch (ExecutionException exception) {
+                throw new ResponseStatusException(
+                        INTERNAL_SERVER_ERROR,
+                        "Stage 3 comparison failed: "
+                                + exception.getCause().getMessage(),
+                        exception
+                );
+            } finally {
+                executor.shutdown();
             }
         }
 
@@ -737,6 +732,106 @@ public class PocketSimilarityService {
         );
 
         return compared;
+    }
+
+    private ComparedCandidate compareStageThreeCandidate(
+            LoadedCandidate loaded,
+            StageThreeContext context
+    ) {
+        try {
+            List<PocketResiduePoint> candidateResidues =
+                    residueLoader.load(
+                            loaded.candidate().pocketId()
+                    );
+
+            SequenceAlignment sequenceAlignment =
+                    sequenceAlignmentFor(
+                            context.querySummary().getReceptorId(),
+                            context.candidateReceptorIds().get(
+                                    loaded.candidate().pocketId()
+                            ),
+                            context.sequenceAlignments()
+                    );
+
+            PocketAlignmentResult alignmentResult =
+                    multiHypothesisAligner.align(
+                            context.queryCloud(),
+                            loaded.pointCloud(),
+                            context.queryResidues(),
+                            candidateResidues,
+                            sequenceAlignment
+                    );
+
+            PocketComparison comparison =
+                    alignmentResult.comparison();
+            ResidueCorrespondence correspondence =
+                    alignmentResult.correspondence();
+
+            ResidueChemistryAssessment assessment =
+                    chemistryScorer.assess(
+                            correspondence,
+                            context.keyResidues()
+                    );
+            ResidueSubstitutionAssessment substitutionAssessment =
+                    substitutionScorer.assess(correspondence);
+            double finalSimilarity =
+                    ResidueChemistryScorer.finalSimilarity(
+                            comparison.overallSimilarity(),
+                            assessment
+                    );
+
+            String evidenceAssessment = null;
+            if (evidenceAssembler != null) {
+                PocketComparisonEvidence evidence =
+                        evidenceAssembler.assemble(
+                                context.querySummary(),
+                                context.candidateSummaries().get(
+                                        loaded.candidate().pocketId()
+                                ),
+                                alignmentResult,
+                                sequenceAlignment,
+                                retrievalEvidence(
+                                        loaded,
+                                        context.stageOne()
+                                )
+                        );
+                evidenceAssessment =
+                        evidence.assessment().verdict().name();
+            }
+
+            return new ComparedCandidate(
+                    loaded,
+                    comparison,
+                    assessment,
+                    substitutionAssessment,
+                    finalSimilarity,
+                    chemistryScorer.classify(
+                            assessment,
+                            finalSimilarity
+                    ),
+                    alignmentResult.initialization().name(),
+                    evidenceAssessment
+            );
+        } catch (RuntimeException exception) {
+            LOGGER.warn(
+                    "Skipping pocket {} during detailed comparison: {}",
+                    loaded.candidate().pocketId(),
+                    exception.getMessage()
+            );
+            return null;
+        }
+    }
+
+    private record StageThreeContext(
+            PocketSummaryEntity querySummary,
+            PocketPointCloud queryCloud,
+            List<PocketResiduePoint> queryResidues,
+            Set<String> keyResidues,
+            Map<Long, Long> candidateReceptorIds,
+            Map<Long, PocketSummaryEntity> candidateSummaries,
+            Map<Long, Optional<SequenceAlignment>> sequenceAlignments,
+            StageOneSelection stageOne
+    ) {
     }
 
     /**
@@ -1275,37 +1370,34 @@ public class PocketSimilarityService {
     private SequenceAlignment sequenceAlignmentFor(
             Long queryReceptorId,
             Long candidateReceptorId,
-            Map<Long, SequenceAlignment> requestCache
+            Map<Long, Optional<SequenceAlignment>> requestCache
     ) {
         if (queryReceptorId == null || candidateReceptorId == null) {
             return null;
         }
 
-        if (requestCache.containsKey(candidateReceptorId)) {
-            return requestCache.get(candidateReceptorId);
-        }
-
-        SequenceAlignment alignment;
-
-        try {
-            alignment = sequenceAlignmentService.alignmentFor(
-                    queryReceptorId,
-                    candidateReceptorId
-            );
-        } catch (RuntimeException exception) {
-            LOGGER.warn(
-                    "Sequence alignment for receptors {} -> {}"
-                            + " unavailable; falling back to PCA+ICP: {}",
-                    queryReceptorId,
-                    candidateReceptorId,
-                    exception.getMessage()
-            );
-            alignment = null;
-        }
-
-        requestCache.put(candidateReceptorId, alignment);
-
-        return alignment;
+        return requestCache.computeIfAbsent(
+                candidateReceptorId,
+                receptorId -> {
+                    try {
+                        return Optional.ofNullable(
+                                sequenceAlignmentService.alignmentFor(
+                                        queryReceptorId,
+                                        candidateReceptorId
+                                )
+                        );
+                    } catch (RuntimeException exception) {
+                        LOGGER.warn(
+                                "Sequence alignment for receptors {} -> {}"
+                                        + " unavailable; falling back to PCA+ICP: {}",
+                                queryReceptorId,
+                                candidateReceptorId,
+                                exception.getMessage()
+                        );
+                        return Optional.empty();
+                    }
+                }
+        ).orElse(null);
     }
 
     private PocketCandidate toCandidate(            PocketSummaryEntity query,

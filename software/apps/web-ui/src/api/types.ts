@@ -86,6 +86,17 @@ export interface PocketDetails {
   evidence: PocketEvidence | null
 }
 
+export interface PocketResidueEvidence {
+  residueId: number
+  chain: string
+  residueNumber: number
+  residueName: string
+  minimumDistance: number
+  contactingAtomPairCount: number
+  directContact: boolean
+  chosenPocketMember: boolean
+}
+
 export interface PocketEvidence {
   ligandCcd: string
   model: string
@@ -101,6 +112,7 @@ export interface PocketEvidence {
   directContactResidueIds: number[]
   chosenPocketOverlapResidueIds: number[]
   directChosenPocketOverlapResidueIds: number[]
+  residueEvidence: PocketResidueEvidence[]
 }
 
 export interface StructureReport {
@@ -395,6 +407,10 @@ export interface PocketSimilarityDiagnosticRow {
   provenance: string
   pocketMatchQueryCoverage: number | null
   pocketMatchRank: number | null
+  pocketMatchSymmetricRank: number | null
+  pocketMatchQueryCoverageRank: number | null
+  candidateSources: string[]
+  assessment: PocketComparisonAssessment | null
 }
 
 export interface Point3D {
@@ -518,6 +534,8 @@ export interface ChemistryAssessmentView {
   keyMatchedCount: number
   classification: string
   finalSimilarity: number
+  meanSubstitutionSimilarity: number
+  identityFraction: number
 }
 
 export interface PocketComparisonDetails {
@@ -532,4 +550,159 @@ export interface PocketComparisonDetails {
   residueCorrespondence: ResidueCorrespondenceView | null
   keyResidues: string[]
   chemistryAssessment: ChemistryAssessmentView | null
+}
+
+// --- Pairwise evidence report (GET .../compare/{c}/report|evidence) ---
+// Mirrors PocketComparisonReportView and its section records in web-api.
+
+export type PocketComparisonAssessment =
+  | 'STRONG_FUNCTIONAL_MATCH'
+  | 'PROBABLE_FUNCTIONAL_MATCH'
+  | 'GEOMETRIC_MATCH_ONLY'
+  | 'CONFLICTING_EVIDENCE'
+  | 'INSUFFICIENT_EVIDENCE'
+  | 'REJECTED'
+
+export interface RetrievalSectionView {
+  chosenReference: boolean
+  candidateSources: string[]
+  globalShapeEvaluated: boolean
+  globalShapeRank: number | null
+  globalShapeDistance: number | null
+  pocketMatchEvaluated: boolean
+  pocketMatchSymmetricRank: number | null
+  pocketMatchQueryCoverageRank: number | null
+  pocketMatchSymmetricScore: number | null
+  pocketMatchQueryCoverage: number | null
+  pocketMatchCandidateCoverage: number | null
+}
+
+export interface AlignmentHypothesisView {
+  available: boolean
+  accepted: boolean
+  geometrySimilarity: number
+  forwardCoverage: number
+  reverseCoverage: number
+  forwardMeanDistance: number
+  reverseMeanDistance: number
+  bidirectionalDistance: number
+  maximumNearestNeighborDistance: number
+  sequenceConsistentPairCount: number
+  residueCorrespondenceCount: number
+}
+
+export interface AlignmentSectionView {
+  selectedInitialization: string
+  selectionReason: string
+  sequenceSeedPairCount: number
+  sequenceConsistentCorrespondenceCount: number
+  sequenceConsistentCorrespondenceFraction: number
+  sequenceSeedAvailable: boolean
+  sequenceSeedDegenerate: boolean
+  pcaIcp: AlignmentHypothesisView
+  sequenceSeeded: AlignmentHypothesisView
+}
+
+export interface ResiduePairEvidenceView {
+  queryChainId: string
+  queryResidueNumber: number
+  queryInsertionCode: string
+  queryResidueName: string
+  candidateChainId: string
+  candidateResidueNumber: number
+  candidateInsertionCode: string
+  candidateResidueName: string
+  distanceAngstroms: number
+  sequenceAlignedPair: boolean
+  identical: boolean
+  conservativeSubstitution: boolean
+  matchType: string
+  chemistryScore: number
+  substitutionScore: number
+  queryKeyResidue: boolean
+  queryLigandContact: boolean
+  candidateLigandContact: boolean
+}
+
+export interface ResidueComparisonSectionView {
+  queryResidueCount: number
+  candidateResidueCount: number
+  matchedResidueCount: number
+  unmatchedQueryResidueCount: number
+  unmatchedCandidateResidueCount: number
+  identicalCount: number
+  conservativeSubstitutionCount: number
+  chemistryCompatibleCount: number
+  incompatibleReplacementCount: number
+  identityFraction: number
+  substitutionSimilarity: number
+  chemistrySimilarity: number
+  compatibleMatchedFraction: number
+  replacementFraction: number
+  queryResidueCoverage: number
+  candidateResidueCoverage: number
+  sequenceConsistentPairCount: number
+  sequenceConsistentFraction: number
+  correspondences: ResiduePairEvidenceView[]
+}
+
+export interface KeyResidueSectionView {
+  configuredKeyResidues: string[]
+  totalKeyResidueCount: number
+  matchedKeyResidueCount: number
+  identicalKeyResidueCount: number
+  chemistryCompatibleKeyResidueCount: number
+}
+
+export interface LigandContactResidueView {
+  chainId: string
+  residueNumber: number
+  insertionCode: string
+  residueName: string
+}
+
+export interface LigandContactView {
+  status: string
+  pocketReference: string
+  ligandCcd: string
+  residue: LigandContactResidueView
+  minimumDistance: number | null
+  contactType: 'DIRECT' | 'SHELL' | null
+  evidenceSource: string
+}
+
+export interface LigandContactSectionView {
+  status: string
+  ligandCcd: string | null
+  evidenceSource: string | null
+  queryContactResidueCount: number | null
+  matchedQueryContactResidueCount: number | null
+  identicalContactCount: number | null
+  conservativeContactCount: number | null
+  chemistryCompatibleContactCount: number | null
+  incompatibleContactCount: number | null
+  unmatchedContactCount: number | null
+  sharedContactAnnotationCount: number | null
+  contactCoverage: number | null
+  contactIdentityFraction: number | null
+  contactSubstitutionSimilarity: number | null
+  contactChemistrySimilarity: number | null
+  contacts: LigandContactView[]
+}
+
+export interface InterpretationSectionView {
+  verdict: PocketComparisonAssessment
+  reason: string
+}
+
+export interface PocketComparisonReportView {
+  queryPocketId: number
+  candidatePocketId: number
+  retrieval: RetrievalSectionView
+  alignment: AlignmentSectionView
+  residueComparison: ResidueComparisonSectionView
+  chemistryComparison: ChemistryAssessmentView
+  keyResidueComparison: KeyResidueSectionView
+  ligandContactConservation: LigandContactSectionView
+  interpretation: InterpretationSectionView
 }

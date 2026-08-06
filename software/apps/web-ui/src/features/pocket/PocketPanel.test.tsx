@@ -80,6 +80,7 @@ describe('PocketPanel', () => {
       directContactResidueIds: [1],
       chosenPocketOverlapResidueIds: [1],
       directChosenPocketOverlapResidueIds: [1],
+      residueEvidence: [],
     }
     render(
       <PocketPanel

@@ -156,6 +156,8 @@ const details: PocketComparisonDetails = {
     keyMatchedCount: 2,
     classification: 'MODERATE_SIMILARITY',
     finalSimilarity: 0.81,
+    meanSubstitutionSimilarity: 0.66,
+    identityFraction: 0.5,
   },
 }
 
@@ -212,6 +214,10 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   provenance: 'GLOBAL_SHAPE',
   pocketMatchQueryCoverage: null,
   pocketMatchRank: null,
+  pocketMatchSymmetricRank: null,
+  pocketMatchQueryCoverageRank: null,
+  candidateSources: ['GLOBAL_SHAPE'],
+  assessment: null,
 }
 
 function jsonResponse(body: unknown, status = 200) {
@@ -227,6 +233,9 @@ function stubFetch(compareOk: boolean, comparePayload: unknown = details) {
     'fetch',
     vi.fn((input: RequestInfo | URL) => {
       const url = String(input)
+      if (url.includes('/evidence')) {
+        return Promise.resolve(jsonResponse(null, 404))
+      }
       if (url.includes('/compare/')) {
         return Promise.resolve(
           compareOk
@@ -490,7 +499,7 @@ describe('PocketComparisonPage', () => {
     expect(screen.getByText('1 / 4')).toBeInTheDocument()
     expect(screen.getByText('0.950 · 2 matched')).toBeInTheDocument()
     expect(screen.getByText('4 / 8 / 9')).toBeInTheDocument()
-    expect(screen.getByText('Geometric similarity score'))
+    expect(screen.getByText('Blended overall similarity'))
       .toBeInTheDocument()
   })
 
@@ -509,7 +518,7 @@ describe('PocketComparisonPage', () => {
       screen.queryByRole('heading', { name: 'Chemistry assessment' }),
     ).toBeNull()
     expect(screen.queryByText('Moderate similarity')).toBeNull()
-    expect(screen.getByText('Geometric similarity score'))
+    expect(screen.getByText('Blended overall similarity'))
       .toBeInTheDocument()
     expect(screen.getByText('0.910')).toBeInTheDocument()
   })

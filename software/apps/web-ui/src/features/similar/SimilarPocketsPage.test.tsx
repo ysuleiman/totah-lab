@@ -75,6 +75,10 @@ function makeRow(
     provenance: 'GLOBAL_SHAPE',
     pocketMatchQueryCoverage: null,
     pocketMatchRank: null,
+    pocketMatchSymmetricRank: null,
+    pocketMatchQueryCoverageRank: null,
+    candidateSources: ['GLOBAL_SHAPE'],
+    assessment: null,
     ...overrides,
   }
 }
@@ -276,8 +280,8 @@ describe('SimilarPocketsPage', () => {
 
     const residueRow = screen.getByText('2BBB').closest('tr')
     expect(residueRow).not.toBeNull()
-    expect(within(residueRow as HTMLElement).getByText('—'))
-      .toBeInTheDocument()
+    expect(within(residueRow as HTMLElement).getAllByText('—').length)
+      .toBeGreaterThanOrEqual(1)
   })
 
   it('narrows rows with the geometry basis filter', async () => {
