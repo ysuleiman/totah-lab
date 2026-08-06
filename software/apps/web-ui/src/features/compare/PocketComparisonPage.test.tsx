@@ -209,6 +209,9 @@ const diagnosticRow: PocketSimilarityDiagnosticRow = {
   proteinName: 'Test protein',
   geneName: 'TST',
   organism: 'Homo sapiens',
+  provenance: 'GLOBAL_SHAPE',
+  pocketMatchQueryCoverage: null,
+  pocketMatchRank: null,
 }
 
 function jsonResponse(body: unknown, status = 200) {

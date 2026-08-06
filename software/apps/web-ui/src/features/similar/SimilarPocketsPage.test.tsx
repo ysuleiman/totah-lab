@@ -72,6 +72,9 @@ function makeRow(
     proteinName: 'Test protein',
     geneName: 'TST',
     organism: 'Homo sapiens',
+    provenance: 'GLOBAL_SHAPE',
+    pocketMatchQueryCoverage: null,
+    pocketMatchRank: null,
     ...overrides,
   }
 }

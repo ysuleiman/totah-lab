@@ -392,6 +392,9 @@ export interface PocketSimilarityDiagnosticRow {
   proteinName: string | null
   geneName: string | null
   organism: string | null
+  provenance: string
+  pocketMatchQueryCoverage: number | null
+  pocketMatchRank: number | null
 }
 
 export interface Point3D {
