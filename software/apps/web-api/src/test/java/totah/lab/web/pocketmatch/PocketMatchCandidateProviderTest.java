@@ -48,6 +48,13 @@ class PocketMatchCandidateProviderTest {
         assertEquals(true, provider.isEnabled());
     }
 
+    @Test
+    void defaultsToQueryCoverageRanking() {
+        assertEquals(1000, properties.getLimit());
+        assertEquals(PocketMatchRanking.QUERY_COVERAGE,
+                properties.getRanking());
+    }
+
     /*
      * Mockito's inline mock maker cannot instrument JDK interfaces on
      * this JDK, so the disabled-path tests use a counting proxy.

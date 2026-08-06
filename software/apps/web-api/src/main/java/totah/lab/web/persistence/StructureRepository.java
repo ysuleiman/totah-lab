@@ -63,6 +63,14 @@ public interface StructureRepository
             @Param("structureId") long structureId
     );
 
+    @Query(value = """
+            SELECT DISTINCT s.chosen_pocket_id
+            FROM docking.structure s
+            WHERE s.chosen_pocket_id IS NOT NULL
+            ORDER BY s.chosen_pocket_id
+            """, nativeQuery = true)
+    List<Long> findAllChosenPocketIds();
+
     Optional<StructureEntity> findBySourceAndSourceAccession(
             String source,
             String sourceAccession

@@ -23,12 +23,16 @@ import totah.lab.athena.pocket.similar.PocketShapeDistance;
 import totah.lab.athena.sequence.SequenceAlignment;
 import totah.lab.web.persistence.PocketSummaryEntity;
 import totah.lab.web.persistence.PocketSummaryRepository;
+import totah.lab.web.persistence.StructureRepository;
 import totah.lab.web.pocketmatch.PocketMatchCandidateProvider;
+import totah.lab.web.pocketmatch.PocketMatchCandidateProvider
+        .PocketMatchCandidate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,6 +104,7 @@ public class PocketSimilarityService {
     public static final String ACTIVE_ALIGNER = "PCA_ICP";
 
     private final PocketSummaryRepository pocketSummaryRepository;
+    private final StructureRepository structureRepository;
     private final PocketPointCloudLoader geometryLoader;
     private final PocketResidueLoader residueLoader;
     private final KeyResidueConfiguration keyResidueConfiguration;
@@ -112,6 +117,7 @@ public class PocketSimilarityService {
 
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
+            StructureRepository structureRepository,
             PocketPointCloudLoader geometryLoader,
             PocketResidueLoader residueLoader,
             KeyResidueConfiguration keyResidueConfiguration,
@@ -119,6 +125,7 @@ public class PocketSimilarityService {
             PocketMatchCandidateProvider pocketMatchCandidates
     ) {
         this.pocketSummaryRepository = pocketSummaryRepository;
+        this.structureRepository = structureRepository;
         this.geometryLoader = geometryLoader;
         this.residueLoader = residueLoader;
         this.keyResidueConfiguration = keyResidueConfiguration;
@@ -427,11 +434,11 @@ public class PocketSimilarityService {
         );
 
         long stageOneStartNanos = System.nanoTime();
-        List<PocketSummaryEntity> stageOneSummaries =
-                unionPocketMatchCandidates(
-                        querySummary,
-                        findStageOneCandidates(querySummary, stageOneLimit)
-                );
+        StageOneSelection stageOne = unionStageOneCandidates(
+                querySummary,
+                findStageOneCandidates(querySummary, stageOneLimit)
+        );
+        List<PocketSummaryEntity> stageOneSummaries = stageOne.summaries();
 
         Map<Long, Long> candidateReceptorIds =
                 new HashMap<>(stageOneSummaries.size());
@@ -488,7 +495,8 @@ public class PocketSimilarityService {
                 stageOneCandidates,
                 pointClouds,
                 queryDescriptor,
-                stageTwoLimit
+                stageTwoLimit,
+                stageOne
         );
         long stageTwoMs = elapsedMillis(stageTwoStartNanos);
 
@@ -649,69 +657,152 @@ public class PocketSimilarityService {
     }
 
     /**
-     * Experimental PocketMatch candidate union
-     * ({@code pocket.search.pocket-match.enabled}, disabled by default).
-     * PocketMatch-only candidates are appended after the Stage 1 list;
-     * Stage 2 reranking and Stage 3 alignment are unchanged. When the
-     * channel is disabled the Stage 1 list is returned unchanged.
+     * The Stage 1 candidate set with its per-candidate retrieval
+     * metadata: the unioned summaries in channel order (SQL global
+     * top N, then PocketMatch top N, then chosen), the 1-based SQL
+     * retrieval ranks (SQL candidates only — union-added candidates
+     * have no Stage 1 rank, reported as {@code 0}), the provenance of
+     * the channel that first surfaced each candidate, the chosen
+     * pocket ids (for the Stage 2 truncation guarantee), and the
+     * PocketMatch channel evidence (kept separate from the descriptor
+     * distances; never blended).
      */
-    private List<PocketSummaryEntity> unionPocketMatchCandidates(
-            PocketSummaryEntity querySummary,
-            List<PocketSummaryEntity> stageOneSummaries
+    private record StageOneSelection(
+            List<PocketSummaryEntity> summaries,
+            Map<Long, Integer> stageOneRanks,
+            Map<Long, CandidateProvenance> provenance,
+            Set<Long> chosenPocketIds,
+            Map<Long, PocketMatchCandidate> pocketMatchEvidence
     ) {
-        if (!pocketMatchCandidates.isEnabled()) {
-            return stageOneSummaries;
-        }
+    }
 
-        List<Long> pocketMatchIds =
-                pocketMatchCandidates.topCandidates(
-                        querySummary.getPocketId()
-                );
-        if (pocketMatchIds.isEmpty()) {
-            return stageOneSummaries;
-        }
+    /**
+     * Builds the Stage 1 candidate set as a union of up to three
+     * channels, in order: the SQL global-shape retrieval, the
+     * experimental PocketMatch channel
+     * ({@code pocket.search.pocket-match.enabled}, disabled by
+     * default), and the chosen-reference guarantee
+     * ({@code docking.structure.chosen_pocket_id}).
+     *
+     * <p>The union only ADDS candidates; it never restricts the SQL
+     * search space. A candidate present in several channels is
+     * deduplicated and keeps the provenance — and, for SQL members,
+     * the natural retrieval rank — of the first channel that surfaced
+     * it (a chosen pocket that is also in the SQL list keeps {@code
+     * GLOBAL_SHAPE}; the dual membership is intentional, no combined
+     * flag).</p>
+     *
+     * <p>Chosen semantics: a chosen pocket is guaranteed downstream
+     * evaluation — it is included even when it falls outside the SQL
+     * result limit and it survives the Stage 2 truncation (see
+     * {@link #selectByShapeDistance}). Chosen is not automatic
+     * similarity and carries no ranking bonus: its Stage 3 position
+     * comes from its own scores only.</p>
+     */
+    private StageOneSelection unionStageOneCandidates(
+            PocketSummaryEntity querySummary,
+            List<PocketSummaryEntity> sqlSummaries
+    ) {
+        Map<Long, Integer> stageOneRanks = new HashMap<>();
+        Map<Long, CandidateProvenance> provenance = new HashMap<>();
+        Map<Long, PocketMatchCandidate> pocketMatchEvidence =
+                new HashMap<>();
 
         Set<Long> present = new HashSet<>();
         present.add(querySummary.getPocketId());
-        for (PocketSummaryEntity summary : stageOneSummaries) {
-            present.add(summary.getPocketId());
-        }
-
-        List<Long> missing = pocketMatchIds.stream()
-                .filter(pocketId -> !present.contains(pocketId))
-                .toList();
-        if (missing.isEmpty()) {
-            return stageOneSummaries;
-        }
-
-        Map<Long, PocketSummaryEntity> byId = new HashMap<>();
-        for (PocketSummaryEntity summary :
-                pocketSummaryRepository.findAllById(missing)) {
-            byId.put(summary.getPocketId(), summary);
-        }
 
         List<PocketSummaryEntity> union =
-                new ArrayList<>(stageOneSummaries);
-        for (Long pocketId : pocketMatchIds) {
-            PocketSummaryEntity summary = byId.get(pocketId);
-            if (summary != null && !present.contains(pocketId)) {
+                new ArrayList<>(sqlSummaries);
+        for (int index = 0; index < sqlSummaries.size(); index++) {
+            long pocketId = sqlSummaries.get(index).getPocketId();
+            stageOneRanks.put(pocketId, index + 1);
+            provenance.put(pocketId, CandidateProvenance.GLOBAL_SHAPE);
+            present.add(pocketId);
+        }
+
+        List<PocketMatchCandidate> pocketMatch =
+                pocketMatchCandidates.isEnabled()
+                        ? pocketMatchCandidates.topCandidates(
+                                querySummary.getPocketId())
+                        : List.of();
+        for (PocketMatchCandidate candidate : pocketMatch) {
+            pocketMatchEvidence.put(candidate.pocketId(), candidate);
+        }
+
+        Set<Long> chosenPocketIds = new LinkedHashSet<>(
+                structureRepository.findAllChosenPocketIds()
+        );
+        chosenPocketIds.remove(querySummary.getPocketId());
+
+        // Union-added candidates need their summary rows; one bulk
+        // fetch for both channels, appended in channel order.
+        List<Long> missing = new ArrayList<>();
+        for (PocketMatchCandidate candidate : pocketMatch) {
+            if (!present.contains(candidate.pocketId())) {
+                missing.add(candidate.pocketId());
+                present.add(candidate.pocketId());
+            }
+        }
+        List<Long> missingChosen = new ArrayList<>();
+        for (Long chosenPocketId : chosenPocketIds) {
+            if (!present.contains(chosenPocketId)) {
+                missingChosen.add(chosenPocketId);
+                present.add(chosenPocketId);
+            }
+        }
+        missing.addAll(missingChosen);
+
+        Map<Long, PocketSummaryEntity> byId = new HashMap<>();
+        if (!missing.isEmpty()) {
+            for (PocketSummaryEntity summary :
+                    pocketSummaryRepository.findAllById(missing)) {
+                byId.put(summary.getPocketId(), summary);
+            }
+        }
+
+        for (PocketMatchCandidate candidate : pocketMatch) {
+            PocketSummaryEntity summary = byId.get(candidate.pocketId());
+            if (summary != null
+                    && !provenance.containsKey(candidate.pocketId())) {
+                provenance.put(
+                        candidate.pocketId(),
+                        CandidateProvenance.POCKET_MATCH
+                );
                 union.add(summary);
             }
         }
-        return union;
+        for (Long chosenPocketId : missingChosen) {
+            PocketSummaryEntity summary = byId.get(chosenPocketId);
+            if (summary != null
+                    && !provenance.containsKey(chosenPocketId)) {
+                provenance.put(
+                        chosenPocketId,
+                        CandidateProvenance.CHOSEN_REFERENCE
+                );
+                union.add(summary);
+            }
+        }
+
+        return new StageOneSelection(
+                union,
+                stageOneRanks,
+                provenance,
+                chosenPocketIds,
+                pocketMatchEvidence
+        );
     }
 
     private List<LoadedCandidate> selectByShapeDistance(
             List<PocketCandidate> candidates,
             Map<Long, PocketPointCloud> pointClouds,
             PocketShapeDescriptor queryDescriptor,
-            int stageTwoLimit
+            int stageTwoLimit,
+            StageOneSelection stageOne
     ) {
         List<LoadedCandidate> loaded =
                 new ArrayList<>(candidates.size());
 
-        for (int index = 0; index < candidates.size(); index++) {
-            PocketCandidate candidate = candidates.get(index);
+        for (PocketCandidate candidate : candidates) {
             PocketPointCloud pointCloud =
                     pointClouds.get(candidate.pocketId());
             if (pointCloud == null) {
@@ -734,13 +825,31 @@ public class PocketSimilarityService {
                         queryDescriptor,
                         shapeDescriptor
                 );
+                // SQL-retrieved candidates keep their natural Stage 1
+                // rank; union-added candidates (PocketMatch-only,
+                // chosen-only) have no Stage 1 rank, reported as 0.
+                PocketMatchCandidate pocketMatch = stageOne
+                        .pocketMatchEvidence()
+                        .get(candidate.pocketId());
                 loaded.add(new LoadedCandidate(
                         candidate,
                         pointCloud,
                         shapeDescriptor,
                         shapeDistance,
-                        index + 1,
-                        0
+                        stageOne.stageOneRanks()
+                                .getOrDefault(candidate.pocketId(), 0),
+                        0,
+                        stageOne.provenance()
+                                .getOrDefault(
+                                        candidate.pocketId(),
+                                        CandidateProvenance.GLOBAL_SHAPE
+                                ),
+                        pocketMatch == null
+                                ? null
+                                : pocketMatch.queryCoverage(),
+                        pocketMatch == null
+                                ? null
+                                : pocketMatch.rank()
                 ));
             } catch (RuntimeException exception) {
                 LOGGER.warn(
@@ -751,10 +860,27 @@ public class PocketSimilarityService {
             }
         }
 
-        List<LoadedCandidate> survivors = loaded.stream()
+        List<LoadedCandidate> sorted = loaded.stream()
                 .sorted(STAGE_TWO_ORDER)
-                .limit(stageTwoLimit)
                 .toList();
+
+        // Chosen-reference candidates are guaranteed Stage 2
+        // evaluation: they survive the truncation regardless of
+        // stageTwoLimit and do not consume non-chosen slots. Their
+        // Stage 2 rank still comes from their shape distance only.
+        List<LoadedCandidate> survivors = new ArrayList<>();
+        int retainedNonChosen = 0;
+        for (LoadedCandidate candidate : sorted) {
+            boolean chosen = stageOne.chosenPocketIds()
+                    .contains(candidate.candidate().pocketId());
+            if (!chosen) {
+                if (retainedNonChosen >= stageTwoLimit) {
+                    continue;
+                }
+                retainedNonChosen++;
+            }
+            survivors.add(candidate);
+        }
 
         List<LoadedCandidate> ranked =
                 new ArrayList<>(survivors.size());
@@ -818,7 +944,10 @@ public class PocketSimilarityService {
                 candidate.proteinName(),
                 candidate.geneName(),
                 candidate.organism(),
-                compared.alignmentInitialization()
+                compared.alignmentInitialization(),
+                loaded.provenance().name(),
+                loaded.pocketMatchQueryCoverage(),
+                loaded.pocketMatchRank()
         );
     }
 
@@ -1019,7 +1148,10 @@ public class PocketSimilarityService {
             PocketShapeDescriptor shapeDescriptor,
             double shapeDistance,
             int stageOneRank,
-            int stageTwoRank
+            int stageTwoRank,
+            CandidateProvenance provenance,
+            Double pocketMatchQueryCoverage,
+            Integer pocketMatchRank
     ) {
         private LoadedCandidate withStageTwoRank(int stageTwoRank) {
             return new LoadedCandidate(
@@ -1028,7 +1160,10 @@ public class PocketSimilarityService {
                     shapeDescriptor,
                     shapeDistance,
                     stageOneRank,
-                    stageTwoRank
+                    stageTwoRank,
+                    provenance,
+                    pocketMatchQueryCoverage,
+                    pocketMatchRank
             );
         }
     }

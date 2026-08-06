@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
  *
  * <pre>
  * pocket.search.pocket-match.enabled=false
- * pocket.search.pocket-match.limit=500
+ * pocket.search.pocket-match.limit=1000
+ * pocket.search.pocket-match.ranking=QUERY_COVERAGE
  * pocket.search.pocket-match.distance-tolerance=0.50
  * pocket.search.pocket-match.signature-store=...
  * pocket.search.pocket-match.benchmark-enabled=false
@@ -37,7 +38,12 @@ public class PocketMatchProperties {
     /**
      * Maximum number of PocketMatch candidates unioned into Stage 1.
      */
-    private int limit = 500;
+    private int limit = 1000;
+
+    /**
+     * Ranking metric for the candidate channel.
+     */
+    private PocketMatchRanking ranking = PocketMatchRanking.QUERY_COVERAGE;
 
     /**
      * Distance-list matching tolerance in angstroms.
@@ -86,6 +92,14 @@ public class PocketMatchProperties {
 
     public void setLimit(int limit) {
         this.limit = limit;
+    }
+
+    public PocketMatchRanking getRanking() {
+        return ranking;
+    }
+
+    public void setRanking(PocketMatchRanking ranking) {
+        this.ranking = ranking;
     }
 
     public double getDistanceTolerance() {

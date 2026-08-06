@@ -139,7 +139,10 @@ class PocketSearchControllerTest {
                 "Test protein",
                 "GENE1",
                 "Homo sapiens",
-                "SEQUENCE_SEEDED_KABSCH"
+                "SEQUENCE_SEEDED_KABSCH",
+                "GLOBAL_SHAPE",
+                0.87,
+                902
         ));
 
         MockMvc mockMvc = MockMvcBuilders
@@ -178,7 +181,13 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$[0].alphaSphereCount").value(12))
                 .andExpect(jsonPath("$[0].basis").value("RESIDUE_ATOMS"))
                 .andExpect(jsonPath("$[0].alignmentInitialization")
-                        .value("SEQUENCE_SEEDED_KABSCH"));
+                        .value("SEQUENCE_SEEDED_KABSCH"))
+                .andExpect(jsonPath("$[0].provenance")
+                        .value("GLOBAL_SHAPE"))
+                .andExpect(jsonPath("$[0].pocketMatchQueryCoverage")
+                        .value(0.87))
+                .andExpect(jsonPath("$[0].pocketMatchRank")
+                        .value(902));
 
         assertEquals(42L, service.pocketId);
         assertEquals(5, service.limit);
@@ -469,7 +478,7 @@ class PocketSearchControllerTest {
         private RuntimeException failure;
 
         private RecordingPocketSimilarityService() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null, null, null);
         }
 
         @Override

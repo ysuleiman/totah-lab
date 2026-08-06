@@ -25,7 +25,10 @@ import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.geometry.RigidTransform;
 import totah.lab.web.persistence.PocketSummaryEntity;
 import totah.lab.web.persistence.PocketSummaryRepository;
+import totah.lab.web.persistence.StructureRepository;
 import totah.lab.web.pocketmatch.PocketMatchCandidateProvider;
+import totah.lab.web.pocketmatch.PocketMatchCandidateProvider
+        .PocketMatchCandidate;
 import totah.lab.web.pocketmatch.PocketMatchProperties;
 import totah.lab.web.pocketmatch.PocketMatchSignatureLoader;
 import totah.lab.web.service.PocketSimilarityService.PocketCandidate;
@@ -140,6 +143,8 @@ class PocketSimilarityServiceTest {
 
     private final PocketSummaryRepository repository =
             mock(PocketSummaryRepository.class);
+    private final StructureRepository structureRepository =
+            mock(StructureRepository.class);
     private final FakeGeometryLoader geometryLoader =
             new FakeGeometryLoader();
     private final FakeResidueLoader residueLoader =
@@ -148,25 +153,42 @@ class PocketSimilarityServiceTest {
             new KeyResidueConfiguration();
     private final FakeSequenceAlignmentService sequenceAlignmentService =
             new FakeSequenceAlignmentService();
+    private final PocketMatchCandidateProvider disabledPocketMatch =
+            // disabled by default; a real instance is used
+            // because Mockito cannot instrument this class on
+            // the current JDK
+            new PocketMatchCandidateProvider(
+                    new PocketMatchProperties(),
+                    new PocketMatchSignatureLoader(
+                            unusedDataSource(),
+                            System.getProperty("java.io.tmpdir"),
+                            ""
+                    )
+            );
     private final PocketSimilarityService service =
             new PocketSimilarityService(
                     repository,
+                    structureRepository,
                     geometryLoader,
                     residueLoader,
                     keyResidues,
                     sequenceAlignmentService,
-                    // disabled by default; a real instance is used
-                    // because Mockito cannot instrument this class on
-                    // the current JDK
-                    new PocketMatchCandidateProvider(
-                            new PocketMatchProperties(),
-                            new PocketMatchSignatureLoader(
-                                    unusedDataSource(),
-                                    System.getProperty("java.io.tmpdir"),
-                                    ""
-                            )
-                    )
+                    disabledPocketMatch
             );
+
+    private PocketSimilarityService serviceWith(
+            PocketMatchCandidateProvider pocketMatchProvider
+    ) {
+        return new PocketSimilarityService(
+                repository,
+                structureRepository,
+                geometryLoader,
+                residueLoader,
+                keyResidues,
+                sequenceAlignmentService,
+                pocketMatchProvider
+        );
+    }
 
     private static DataSource unusedDataSource() {
         return (DataSource) Proxy.newProxyInstance(
@@ -720,6 +742,340 @@ class PocketSimilarityServiceTest {
         assertEquals(
                 2,
                 service.diagnoseSimilar(QUERY_POCKET_ID, 2).size()
+        );
+    }
+
+    @Test
+    void chosenPocketOutsideSqlResultsReachesStageThree() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        stubChosenPockets(7L);
+        stubFindAllById(candidateSummary(7L, 120.0, 10, 0.4));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                7L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        // The chosen-only pocket is evaluated through Stage 2 and
+        // Stage 3 like any other candidate; its Stage 3 position comes
+        // from its scores only (here: identical geometry, worse
+        // descriptor distance than pocket 1).
+        assertEquals(
+                List.of(1L, 7L),
+                rows.stream()
+                        .map(PocketSimilarityDiagnostic::pocketId)
+                        .toList()
+        );
+
+        PocketSimilarityDiagnostic chosen = rows.get(1);
+        assertEquals(7L, chosen.pocketId());
+        assertEquals("CHOSEN_REFERENCE", chosen.provenance());
+        // Chosen-only candidates have no Stage 1 rank: reported as 0.
+        assertEquals(0, chosen.stageOneRank());
+        assertEquals(2, chosen.stageTwoRank());
+        assertEquals(2, chosen.stageThreeRank());
+        assertEquals(null, chosen.pocketMatchQueryCoverage());
+        assertEquals(null, chosen.pocketMatchRank());
+
+        PocketSimilarityDiagnostic sqlRow = rows.get(0);
+        assertEquals("GLOBAL_SHAPE", sqlRow.provenance());
+        assertEquals(1, sqlRow.stageOneRank());
+    }
+
+    @Test
+    void chosenPocketInSqlResultsKeepsNaturalRankAndGlobalProvenance() {
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(1L, 110.0, 20, 0.5),
+                candidateSummary(7L, 120.0, 20, 0.5)
+        ));
+        stubChosenPockets(7L);
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        // Dual membership (SQL + chosen) is not a combined flag: the
+        // row keeps GLOBAL_SHAPE provenance and its natural Stage 1
+        // rank, and it appears exactly once.
+        List<PocketSimilarityDiagnostic> chosenRows = rows.stream()
+                .filter(row -> row.pocketId() == 7L)
+                .toList();
+        assertEquals(1, chosenRows.size());
+        assertEquals("GLOBAL_SHAPE", chosenRows.get(0).provenance());
+        assertEquals(2, chosenRows.get(0).stageOneRank());
+    }
+
+    @Test
+    void chosenPocketSurvivesStageTwoTruncation() {
+        stubQuerySummary();
+
+        // 35 SQL candidates with identical geometry: with a Stage 2
+        // limit of 20, pockets 21-35 are cut before Stage 3. The
+        // chosen-only pocket 99 has the worst shape distance and must
+        // still survive the truncation. Its Stage 3 row falls outside
+        // the diagnostic output limit, so survival is observed through
+        // the Stage 3 residue load instead.
+        List<PocketSummaryEntity> summaries = new ArrayList<>();
+        for (long pocketId = 1L; pocketId <= 35L; pocketId++) {
+            summaries.add(candidateSummary(
+                    pocketId, QUERY_VOLUME + pocketId,
+                    QUERY_RESIDUE_COUNT, QUERY_HYDROPHOBIC
+            ));
+            geometryLoader.register(pocketId, cloud(IRREGULAR_CLOUD));
+        }
+        stubCandidates(summaries);
+        stubChosenPockets(99L);
+        stubFindAllById(candidateSummary(99L, 10100.0, 38, 0.5));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(99L, cloud(IRREGULAR_SCALED));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        // The chosen candidate was unioned into Stage 1 (geometry
+        // requested) and reached Stage 3 (residues loaded) despite
+        // ranking 21st by shape distance.
+        assertTrue(
+                geometryLoader.requestedPocketIds().contains(99L)
+        );
+        assertEquals(1, residueLoader.loadCount(99L));
+
+        // The guarantee does not consume non-chosen slots: the top 20
+        // non-chosen candidates still survive, exactly as without a
+        // chosen pocket.
+        assertEquals(10, rows.size());
+        assertTrue(
+                rows.stream().allMatch(row -> row.pocketId() <= 20L)
+        );
+    }
+
+    @Test
+    void unionDeduplicatesAcrossChannels() {
+        stubQuerySummary();
+        stubCandidates(List.of(
+                candidateSummary(1L, 110.0, 20, 0.5),
+                candidateSummary(7L, 120.0, 20, 0.5)
+        ));
+        stubChosenPockets(7L);
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(7L, cloud(IRREGULAR_CLOUD));
+
+        PocketSimilarityService pocketMatchService = serviceWith(
+                new StubPocketMatchCandidateProvider(List.of(
+                        new PocketMatchCandidate(7L, 0.9, 1)
+                ))
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                pocketMatchService.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        // Pocket 7 is surfaced by all three channels: it is evaluated
+        // exactly once, keeps GLOBAL_SHAPE provenance (first channel),
+        // and still exposes its PocketMatch evidence.
+        List<PocketSimilarityDiagnostic> chosenRows = rows.stream()
+                .filter(row -> row.pocketId() == 7L)
+                .toList();
+        assertEquals(1, chosenRows.size());
+        assertEquals("GLOBAL_SHAPE", chosenRows.get(0).provenance());
+        assertEquals(2, chosenRows.get(0).stageOneRank());
+        assertEquals(0.9, chosenRows.get(0).pocketMatchQueryCoverage());
+        assertEquals(1, chosenRows.get(0).pocketMatchRank());
+        assertEquals(
+                List.of(QUERY_POCKET_ID, 1L, 7L),
+                geometryLoader.requestedPocketIds()
+        );
+    }
+
+    @Test
+    void disabledPocketMatchChannelLeavesNoTraceInDiagnostics() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+
+        List<PocketSimilarityDiagnostic> rows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(1, rows.size());
+        assertEquals("GLOBAL_SHAPE", rows.get(0).provenance());
+        assertEquals(null, rows.get(0).pocketMatchQueryCoverage());
+        assertEquals(null, rows.get(0).pocketMatchRank());
+        verify(repository, never()).findAllById(any());
+    }
+
+    @Test
+    void pocketMatchChannelAddsCandidatesWithProvenanceAndRank() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        stubFindAllById(candidateSummary(3L, 120.0, 20, 0.5));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(3L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                3L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        PocketSimilarityService pocketMatchService = serviceWith(
+                new StubPocketMatchCandidateProvider(List.of(
+                        new PocketMatchCandidate(3L, 0.9, 1)
+                ))
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                pocketMatchService.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(2, rows.size());
+
+        PocketSimilarityDiagnostic pocketMatchRow = rows.stream()
+                .filter(row -> row.pocketId() == 3L)
+                .findFirst()
+                .orElseThrow();
+        assertEquals("POCKET_MATCH", pocketMatchRow.provenance());
+        // PocketMatch-only candidates have no Stage 1 rank: 0.
+        assertEquals(0, pocketMatchRow.stageOneRank());
+        assertEquals(0.9, pocketMatchRow.pocketMatchQueryCoverage());
+        assertEquals(1, pocketMatchRow.pocketMatchRank());
+
+        PocketSimilarityDiagnostic sqlRow = rows.stream()
+                .filter(row -> row.pocketId() == 1L)
+                .findFirst()
+                .orElseThrow();
+        assertEquals("GLOBAL_SHAPE", sqlRow.provenance());
+        assertEquals(1, sqlRow.stageOneRank());
+        assertEquals(null, sqlRow.pocketMatchQueryCoverage());
+        assertEquals(null, sqlRow.pocketMatchRank());
+    }
+
+    /**
+     * Regression for the METTL7A pocket 32 corpus evidence: the
+     * homologous METTL7B pocket 3 sits at global-descriptor rank 6840
+     * (far outside any Stage 1 limit) but at PocketMatch
+     * query-coverage rank 902. With the channel enabled, the union
+     * must surface it and carry it through Stage 3 with its
+     * PocketMatch provenance and rank recorded.
+     */
+    @Test
+    void pocketMatchOnlyHomologFlowsToStageThreeWithItsRank() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        stubFindAllById(candidateSummary(3L, 120.0, 20, 0.5));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(3L, cloud(IRREGULAR_CLOUD));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                3L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        PocketSimilarityService pocketMatchService = serviceWith(
+                new StubPocketMatchCandidateProvider(List.of(
+                        new PocketMatchCandidate(3L, 0.62, 902)
+                ))
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                pocketMatchService.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        PocketSimilarityDiagnostic homolog = rows.stream()
+                .filter(row -> row.pocketId() == 3L)
+                .findFirst()
+                .orElseThrow();
+        assertEquals("POCKET_MATCH", homolog.provenance());
+        assertEquals(902, homolog.pocketMatchRank());
+        assertEquals(0.62, homolog.pocketMatchQueryCoverage());
+        assertTrue(homolog.stageThreeRank() >= 1);
+
+        // The same query with the channel disabled (the default)
+        // never sees the PocketMatch-only candidate.
+        List<PocketSimilarityDiagnostic> disabledRows =
+                service.diagnoseSimilar(QUERY_POCKET_ID, 10);
+        assertTrue(
+                disabledRows.stream()
+                        .noneMatch(row -> row.pocketId() == 3L)
+        );
+    }
+
+    @Test
+    void pocketMatchEvidenceIsNotBlendedIntoDistancesOrRanking() {
+        stubQuerySummary();
+        stubCandidates(List.of(candidateSummary(1L, 110.0, 20, 0.5)));
+        stubFindAllById(candidateSummary(3L, 1520.0, 38, 0.5));
+        geometryLoader.register(QUERY_POCKET_ID, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(1L, cloud(IRREGULAR_CLOUD));
+        geometryLoader.register(3L, cloud(IRREGULAR_SCALED));
+        residueLoader.register(
+                QUERY_POCKET_ID,
+                residuePoints("A", 1, cloud(IRREGULAR_CLOUD).points())
+        );
+        residueLoader.register(
+                1L,
+                residuePoints("B", 101, cloud(IRREGULAR_CLOUD).points())
+        );
+
+        // A near-perfect PocketMatch coverage must not buy the
+        // geometrically poor candidate any Stage 2/3 advantage.
+        PocketSimilarityService pocketMatchService = serviceWith(
+                new StubPocketMatchCandidateProvider(List.of(
+                        new PocketMatchCandidate(3L, 0.99, 1)
+                ))
+        );
+
+        List<PocketSimilarityDiagnostic> rows =
+                pocketMatchService.diagnoseSimilar(QUERY_POCKET_ID, 10);
+
+        assertEquals(
+                List.of(1L, 3L),
+                rows.stream()
+                        .map(PocketSimilarityDiagnostic::pocketId)
+                        .toList()
+        );
+
+        PocketSimilarityDiagnostic pocketMatchRow = rows.get(1);
+        // The descriptor distance comes from the summary row only:
+        // |100-1520|/100 + |20-38|/20 + 0 chemistry = 15.1.
+        assertEquals(15.1, pocketMatchRow.descriptorDistance(), 1e-9);
+        assertTrue(
+                pocketMatchRow.geometricOverallSimilarity()
+                        < rows.get(0).geometricOverallSimilarity()
         );
     }
 
@@ -1914,6 +2270,53 @@ class PocketSimilarityServiceTest {
                 anyDouble(), anyDouble(), anyDouble(), anyDouble(),
                 any(Pageable.class)
         )).thenReturn(candidates);
+    }
+
+    private void stubChosenPockets(Long... pocketIds) {
+        when(structureRepository.findAllChosenPocketIds())
+                .thenReturn(List.of(pocketIds));
+    }
+
+    private void stubFindAllById(PocketSummaryEntity... summaries) {
+        when(repository.findAllById(any()))
+                .thenReturn(List.of(summaries));
+    }
+
+    /**
+     * Enabled PocketMatch channel serving a fixed candidate list, in
+     * place of the real signature store. Extends the concrete provider
+     * because Mockito cannot instrument it on the current JDK.
+     */
+    private static final class StubPocketMatchCandidateProvider
+            extends PocketMatchCandidateProvider {
+
+        private final List<PocketMatchCandidate> candidates;
+
+        private StubPocketMatchCandidateProvider(
+                List<PocketMatchCandidate> candidates
+        ) {
+            super(
+                    new PocketMatchProperties(),
+                    new PocketMatchSignatureLoader(
+                            unusedDataSource(),
+                            System.getProperty("java.io.tmpdir"),
+                            ""
+                    )
+            );
+            this.candidates = candidates;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        @Override
+        public List<PocketMatchCandidate> topCandidates(
+                long queryPocketId
+        ) {
+            return candidates;
+        }
     }
 
     private static PocketSummaryEntity candidateSummary(
