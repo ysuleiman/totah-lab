@@ -4,7 +4,9 @@ import totah.lab.athena.pocket.compare.residue.PocketResiduePoint;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
 import totah.lab.athena.pocket.compare.residue.ResidueMatch;
 import totah.lab.athena.pocket.compare.residue.ResidueReference;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionAssessment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,13 +21,11 @@ final class ResidueCorrespondenceViewMapper {
     }
 
     static ResidueCorrespondenceView toView(
-            ResidueCorrespondence correspondence
+            ResidueCorrespondence correspondence,
+            ResidueSubstitutionAssessment substitutionAssessment
     ) {
         return new ResidueCorrespondenceView(
-                correspondence.matches()
-                        .stream()
-                        .map(ResidueCorrespondenceViewMapper::toView)
-                        .toList(),
+                toMatchViews(correspondence, substitutionAssessment),
                 toPointViews(correspondence.unmatchedQuery()),
                 toPointViews(correspondence.unmatchedCandidate()),
                 new ResidueSummaryView(
@@ -47,14 +47,38 @@ final class ResidueCorrespondenceViewMapper {
         );
     }
 
-    private static ResidueMatchView toView(ResidueMatch match) {
+    private static List<ResidueMatchView> toMatchViews(
+            ResidueCorrespondence correspondence,
+            ResidueSubstitutionAssessment substitutionAssessment
+    ) {
+        List<ResidueMatchView> views = new ArrayList<>(
+                correspondence.matches().size()
+        );
+
+        for (int index = 0;
+             index < correspondence.matches().size();
+             index++) {
+            views.add(toView(
+                    correspondence.matches().get(index),
+                    substitutionAssessment.matchSimilarities().get(index)
+            ));
+        }
+
+        return views;
+    }
+
+    private static ResidueMatchView toView(
+            ResidueMatch match,
+            double substitutionSimilarity
+    ) {
         return new ResidueMatchView(
                 toView(match.query()),
                 toView(match.candidate()),
                 match.distanceAngstroms(),
                 match.matchType().name(),
                 match.identicalResidue(),
-                match.chemistryCompatible()
+                match.chemistryCompatible(),
+                substitutionSimilarity
         );
     }
 

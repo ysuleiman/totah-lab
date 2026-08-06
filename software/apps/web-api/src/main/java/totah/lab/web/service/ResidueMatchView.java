@@ -10,6 +10,7 @@ public record ResidueMatchView(
         double distanceAngstroms,
         String matchType,
         boolean identicalResidue,
-        boolean chemistryCompatible
+        boolean chemistryCompatible,
+        double substitutionSimilarity
 ) {
 }

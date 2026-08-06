@@ -133,6 +133,7 @@ class PocketSearchControllerTest {
                 2,
                 20,
                 1.0,
+                0.83,
                 "STRONG_SIMILARITY",
                 0.89,
                 "P12345",
@@ -167,6 +168,8 @@ class PocketSearchControllerTest {
                 .andExpect(jsonPath("$[0].chemistryCoverageAdjustedSimilarity")
                         .value(0.77))
                 .andExpect(jsonPath("$[0].matchedResidueCount").value(20))
+                .andExpect(jsonPath("$[0].meanSubstitutionSimilarity")
+                        .value(0.83))
                 .andExpect(jsonPath("$[0].classification")
                         .value("STRONG_SIMILARITY"))
                 .andExpect(jsonPath("$[0].finalSimilarity").value(0.89))
@@ -307,7 +310,8 @@ class PocketSearchControllerTest {
                                 0.5,
                                 "IDENTICAL",
                                 true,
-                                true
+                                true,
+                                0.87
                         )),
                         List.of(new ResiduePointView(
                                 "A", 88, "", "LEU",
@@ -345,7 +349,9 @@ class PocketSearchControllerTest {
                         1.0,
                         1,
                         "STRONG_SIMILARITY",
-                        0.88
+                        0.88,
+                        0.87,
+                        1.0
                 ),
                 new AlignmentMetadataView(
                         "SEQUENCE_SEEDED_KABSCH",
@@ -399,6 +405,9 @@ class PocketSearchControllerTest {
                         "$.residueCorrespondence.matches[0].identicalResidue")
                         .value(true))
                 .andExpect(jsonPath(
+                        "$.residueCorrespondence.matches[0].substitutionSimilarity")
+                        .value(0.87))
+                .andExpect(jsonPath(
                         "$.residueCorrespondence.unmatchedQuery",
                         hasSize(1)))
                 .andExpect(jsonPath(
@@ -429,6 +438,11 @@ class PocketSearchControllerTest {
                         .value("STRONG_SIMILARITY"))
                 .andExpect(jsonPath("$.chemistryAssessment.finalSimilarity")
                         .value(0.88))
+                .andExpect(jsonPath(
+                        "$.chemistryAssessment.meanSubstitutionSimilarity")
+                        .value(0.87))
+                .andExpect(jsonPath("$.chemistryAssessment.identityFraction")
+                        .value(1.0))
                 .andExpect(jsonPath("$.alignment.initialization")
                         .value("SEQUENCE_SEEDED_KABSCH"))
                 .andExpect(jsonPath("$.alignment.sequenceSeedPairCount")

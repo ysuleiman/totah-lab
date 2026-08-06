@@ -16,6 +16,8 @@ import totah.lab.athena.pocket.compare.residue.PocketSimilarityClassification;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistryAssessment;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionAssessment;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorer;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptor;
 import totah.lab.athena.pocket.similar.PocketShapeDescriptorFactory;
@@ -114,6 +116,8 @@ public class PocketSimilarityService {
             new MultiHypothesisPocketAligner();
     private final ResidueChemistryScorer chemistryScorer =
             new ResidueChemistryScorer();
+    private final ResidueSubstitutionScorer substitutionScorer =
+            new ResidueSubstitutionScorer();
 
     public PocketSimilarityService(
             PocketSummaryRepository pocketSummaryRepository,
@@ -284,6 +288,8 @@ public class PocketSimilarityService {
                         correspondence,
                         new HashSet<>(keyResidues)
                 );
+        ResidueSubstitutionAssessment substitutionAssessment =
+                substitutionScorer.assess(correspondence);
         double finalSimilarity =
                 ResidueChemistryScorer.finalSimilarity(
                         comparison.overallSimilarity(),
@@ -315,7 +321,10 @@ public class PocketSimilarityService {
                 alignment.alignedCandidate().points(),
                 comparison,
                 ACTIVE_ALIGNER,
-                ResidueCorrespondenceViewMapper.toView(correspondence),
+                ResidueCorrespondenceViewMapper.toView(
+                        correspondence,
+                        substitutionAssessment
+                ),
                 new TransformView(
                         alignment.transform().rotation(),
                         alignment.transform().translation()
@@ -323,6 +332,7 @@ public class PocketSimilarityService {
                 keyResidues,
                 ChemistryAssessmentView.toView(
                         assessment,
+                        substitutionAssessment,
                         chemistryScorer.classify(
                                 assessment,
                                 finalSimilarity
@@ -558,6 +568,8 @@ public class PocketSimilarityService {
                                 correspondence,
                                 keyResidues
                         );
+                ResidueSubstitutionAssessment substitutionAssessment =
+                        substitutionScorer.assess(correspondence);
                 double finalSimilarity =
                         ResidueChemistryScorer.finalSimilarity(
                                 comparison.overallSimilarity(),
@@ -568,6 +580,7 @@ public class PocketSimilarityService {
                         loaded,
                         comparison,
                         assessment,
+                        substitutionAssessment,
                         finalSimilarity,
                         chemistryScorer.classify(
                                 assessment,
@@ -938,6 +951,8 @@ public class PocketSimilarityService {
                 assessment.spatialReplacementCount(),
                 assessment.matchedResidueCount(),
                 assessment.keyResidueChemistrySimilarity(),
+                compared.substitutionAssessment()
+                        .meanSubstitutionSimilarity(),
                 compared.classification().name(),
                 compared.finalSimilarity(),
                 candidate.uniProtId(),
@@ -1172,6 +1187,7 @@ public class PocketSimilarityService {
             LoadedCandidate loaded,
             PocketComparison comparison,
             ResidueChemistryAssessment assessment,
+            ResidueSubstitutionAssessment substitutionAssessment,
             double finalSimilarity,
             PocketSimilarityClassification classification,
             String alignmentInitialization

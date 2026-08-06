@@ -17,6 +17,8 @@ import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculator;
 import totah.lab.athena.pocket.compare.residue.ResidueMatch;
 import totah.lab.athena.pocket.compare.residue.ResidueReference;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionAssessment;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorer;
 import totah.lab.athena.pocket.geometry.PocketGeometryBasis;
 import totah.lab.athena.pocket.geometry.PocketPointCloud;
 import totah.lab.athena.sequence.AlignedResiduePair;
@@ -1399,6 +1401,9 @@ class PocketSimilarityServiceTest {
                         )
                 );
 
+        ResidueSubstitutionAssessment expectedSubstitution =
+                new ResidueSubstitutionScorer().assess(expected);
+
         ResidueCorrespondenceView view =
                 details.residueCorrespondence();
 
@@ -1440,6 +1445,11 @@ class PocketSimilarityServiceTest {
             assertEquals(
                     expectedMatch.candidate().reference().residueName(),
                     actualMatch.candidate().residueName()
+            );
+            assertEquals(
+                    expectedSubstitution.matchSimilarities().get(index),
+                    actualMatch.substitutionSimilarity(),
+                    1e-9
             );
         }
 
@@ -1986,6 +1996,8 @@ class PocketSimilarityServiceTest {
                 correspondence,
                 Set.of("CYS6")
         );
+        ResidueSubstitutionAssessment expectedSubstitution =
+                new ResidueSubstitutionScorer().assess(correspondence);
         double expectedFinal = ResidueChemistryScorer.finalSimilarity(
                 details.comparison().overallSimilarity(),
                 expected
@@ -2045,6 +2057,16 @@ class PocketSimilarityServiceTest {
         );
         assertEquals(expected.keyMatchedCount(), view.keyMatchedCount());
         assertEquals(
+                expectedSubstitution.meanSubstitutionSimilarity(),
+                view.meanSubstitutionSimilarity(),
+                1e-9
+        );
+        assertEquals(
+                expectedSubstitution.identicalFraction(),
+                view.identityFraction(),
+                1e-9
+        );
+        assertEquals(
                 scorer.classify(expected, expectedFinal).name(),
                 view.classification()
         );
@@ -2054,6 +2076,7 @@ class PocketSimilarityServiceTest {
         // key cysteine preserved.
         assertEquals(8, view.matchedResidueCount());
         assertEquals(1, view.keyMatchedCount());
+        assertEquals(1.0, view.identityFraction(), 1e-9);
         assertEquals("STRONG_SIMILARITY", view.classification());
     }
 
@@ -2092,6 +2115,15 @@ class PocketSimilarityServiceTest {
         assertEquals(4, row.matchedResidueCount());
         assertEquals(1.0, row.chemistrySimilarity(), 1e-9);
         assertEquals(1.0, row.geometricOverallSimilarity(), 1e-6);
+
+        // Graded substitution similarity of the four identical pairs
+        // (ALA, LEU, SER, CYS): normalized BLOSUM62 self-scores
+        // (8/15, 8/15, 8/15, 13/15), mean 37/60.
+        assertEquals(
+                37.0 / 60.0,
+                row.meanSubstitutionSimilarity(),
+                1e-9
+        );
 
         assertEquals(
                 1,

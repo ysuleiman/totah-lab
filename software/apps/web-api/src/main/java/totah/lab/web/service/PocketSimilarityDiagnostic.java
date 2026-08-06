@@ -5,8 +5,9 @@ package totah.lab.web.service;
  * candidate information, the intermediate stage ranks, the Stage 2
  * shape distance, the full Stage 3 {@code PocketComparison} metrics
  * as produced by Athena, and the Stage 3 chemistry assessment with
- * the resulting classification and final similarity, plus the Stage 1
- * provenance and the PocketMatch channel evidence. Field names mirror
+ * the resulting classification and final similarity, plus the graded
+ * BLOSUM62 substitution similarity (which never feeds the ranking),
+ * the Stage 1 provenance and the PocketMatch channel evidence. Field names mirror
  * the Athena accessors one-to-one; no metric is recomputed in web-api.
  *
  * <p>{@code provenance} is the {@code CandidateProvenance} name of the
@@ -53,6 +54,7 @@ public record PocketSimilarityDiagnostic(
         int spatialReplacementCount,
         int matchedResidueCount,
         double keyResidueChemistrySimilarity,
+        double meanSubstitutionSimilarity,
         String classification,
         double finalSimilarity,
         String uniProtId,

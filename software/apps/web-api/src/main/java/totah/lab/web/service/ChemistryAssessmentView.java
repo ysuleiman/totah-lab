@@ -2,11 +2,17 @@ package totah.lab.web.service;
 
 import totah.lab.athena.pocket.compare.residue.PocketSimilarityClassification;
 import totah.lab.athena.pocket.compare.residue.ResidueChemistryAssessment;
+import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionAssessment;
 
 /**
  * Serializable view of Athena's {@link ResidueChemistryAssessment}
  * plus the classification and blended final similarity derived from
  * it, for the comparison UI. No metric is recomputed in web-api.
+ *
+ * <p>The substitution fields mirror Athena's
+ * {@link ResidueSubstitutionAssessment}: a graded BLOSUM62-based
+ * similarity that complements — never replaces — the discrete
+ * chemistry metrics.</p>
  */
 public record ChemistryAssessmentView(
         double chemistrySimilarity,
@@ -23,11 +29,14 @@ public record ChemistryAssessmentView(
         double keyResidueChemistrySimilarity,
         int keyMatchedCount,
         String classification,
-        double finalSimilarity
+        double finalSimilarity,
+        double meanSubstitutionSimilarity,
+        double identityFraction
 ) {
 
     static ChemistryAssessmentView toView(
             ResidueChemistryAssessment assessment,
+            ResidueSubstitutionAssessment substitutionAssessment,
             PocketSimilarityClassification classification,
             double finalSimilarity
     ) {
@@ -46,7 +55,9 @@ public record ChemistryAssessmentView(
                 assessment.keyResidueChemistrySimilarity(),
                 assessment.keyMatchedCount(),
                 classification.name(),
-                finalSimilarity
+                finalSimilarity,
+                substitutionAssessment.meanSubstitutionSimilarity(),
+                substitutionAssessment.identicalFraction()
         );
     }
 }
