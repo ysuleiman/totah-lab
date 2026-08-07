@@ -66,6 +66,11 @@ export function ResidueSequence({
               && !inChosenPocket
             ? 'biohub-only'
             : '',
+          biohubSelected
+              && directContactResidueIds.has(residue.id)
+              && inChosenPocket
+            ? 'biohub-direct-inside'
+            : '',
           directContactResidueIds.has(residue.id)
             ? 'biohub-direct-contact'
             : '',

@@ -22,6 +22,10 @@ export function ResidueGuide({
       )}
       {showBiohub && (
         <>
+          <GuideItem
+            signal="biohub-inside"
+            label="BioHub contact in pocket"
+          />
           <GuideItem signal="biohub-direct" label="BioHub direct contact" />
           <GuideItem
             signal="biohub-outside"
