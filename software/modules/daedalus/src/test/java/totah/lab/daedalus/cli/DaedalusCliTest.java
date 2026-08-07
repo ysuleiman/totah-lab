@@ -24,7 +24,7 @@ class DaedalusCliTest {
         DaedalusCli cli = new DaedalusCli();
 
         assertEquals(Set.of("dock-prep", "compare-ligand-prep",
-                "version", "help"),
+                "diagnose-ad4-typing", "version", "help"),
                 cli.registry().names());
         for (String command : cli.registry().names()) {
             assertTrue(cli.topLevelHelp().contains("    " + command + "\n"));
@@ -159,7 +159,7 @@ class DaedalusCliTest {
                 .find("compare-ligand-prep").orElseThrow().help();
 
         for (String option : List.of("--count", "--report",
-                "--source-db", "--artifact-root", "--help")) {
+                "--reference-dir", "--help")) {
             assertTrue(help.contains(option), option);
         }
     }

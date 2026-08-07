@@ -1,27 +1,44 @@
 # Ligand preparation comparison: hephaestus vs Meeko
 
-Validation of the hephaestus ligand-preparation path against the
-existing Meeko (`mk_prepare_ligand.py`) reference preparations in
-chemflow3, run with:
+Validation of the hephaestus ligand-preparation path against Meeko
+(`mk_prepare_ligand.py`) reference preparations that **we generate
+locally** — no database and no external artifact store involved. Run
+with:
 
 ```bash
-PGPASSWORD=… java -cp <daedalus classes + deps> \
+java -cp <daedalus classes + deps> \
     totah.lab.daedalus.cli.DaedalusCli compare-ligand-prep --count 100
 ```
 
 (see `software/modules/daedalus/readme.md` for the exact classpath
-invocation; report written 2026-08-07).
+invocation; latest report from 2026-08-07).
 
-## Sampling
+## Reference oracle (built by us, locally)
 
-Deterministic: compounds having a `prepared_ligand` PDBQT artifact with
-`artifact_metadata->>'command' LIKE '%mk_prepare_ligand.py'`, joined to
-its source SDF artifact via `artifact_metadata->>'source_artifact_id'`
-(exact pairing — a compound can have several SDF inputs), ordered by
-compound id then prepared-artifact id, LIMIT 100. 2,399 such pairs
-exist in chemflow3. Because sampling is per artifact pair, a compound
-can appear more than once (the worst-mismatch list below shows this).
-Read-only DB access; hephaestus outputs went to `work-*/` here.
+`prepare-reference.py` (this directory) builds the oracle:
+
+1. Recursively collects the SDFs under `/Users/yazan/artifacts/ligands`
+   (44 files: naphthalene, SAM, PubChem CID 439155, DCMB, and 20+20
+   DiffDock conformers of DCMB under `dcmb/`). Only single-molecule
+   V2000 SDFs with a conformer are kept.
+2. Adds explicit hydrogens with RDKit (`AddHs`) where the SDF lacks
+   them (the 40 DiffDock poses; recorded as `h_added` in the manifest)
+   and strips carried-over property blocks (our SDF reader is strict
+   about them).
+3. Runs the locally installed Meeko `mk_prepare_ligand.py` on each SDF.
+
+Output: `/Users/yazan/artifacts/ligands/meeko-prepared/` with
+`manifest.tsv` (id, name, h_added), `<id>.sdf`, and
+`<id>.meeko.pdbqt` per ligand. Environment used:
+`python3 -m venv /tmp/meeko-venv`, `pip install meeko rdkit==2025.9.6
+scipy numpy gemmi` (meeko 0.7.1; rdkit pinned because 2026.03 removed
+`rdDetermineBonds`, which meeko imports).
+
+Sampling is deterministic: the first `--count` manifest rows sorted by
+id. The set is small and low-diversity (4 unique molecules, one of
+them in 40 conformations) — it exercises the full pipeline but says
+little about coverage; add SDFs to `/Users/yazan/artifacts/ligands`
+and re-run `prepare-reference.py` to grow it.
 
 ## Methodology
 
@@ -29,7 +46,7 @@ Read-only DB access; hephaestus outputs went to `work-*/` here.
   table topology, hydrogenation, Gasteiger charges, AD4 typing,
   torsion tree, validated PDBQT export).
 - Both PDBQTs are parsed (`PdbqtLigandReader`: name, coordinates,
-  charge, AD4 type, TORSDOF).
+  charge, AD4 type, TORSDOF, BRANCH records).
 - **Atom alignment is by coordinates**, not file order: both writers
   emit atoms in torsion-tree order and the trees differ, but both
   preserve the SDF coordinates at 3-decimal precision, so each heavy
@@ -39,53 +56,102 @@ Read-only DB access; hephaestus outputs went to `work-*/` here.
   the explicit SDF hydrogens).
 - Metrics per ligand: heavy-atom counts and matched count, total
   charge delta, mean per-atom |Δcharge| (matched pairs), AD4 type
-  agreement fraction, TORSDOF delta, max coordinate delta (sanity:
-  should equal rounding, ≤ ~0.001 Å).
+  agreement fraction, TORSDOF delta, rotatable-bond identity sets
+  (BRANCH bonds compared by endpoint coordinates, order-independent),
+  max coordinate delta (sanity: rounding, ≤ ~0.001 Å).
 - Known limitation recorded, not fatal: the hephaestus SDF path
-  requires explicit hydrogens and refuses to add them.
+  requires explicit hydrogens and refuses to add them. The oracle
+  build hydrogenates upstream with RDKit, so no reference ligand
+  currently hits it.
 
-## Headline results (count = 100)
+## Headline results (local oracle, 2026-08-07)
+
+All 44 reference ligands, `report-20260807-105506.csv`: 44 compared,
+0 failed. Atom counts match everywhere; every heavy atom matched by
+coordinates; max coordinate delta mean 0.0008 Å (rounding only).
 
 | Metric | Value |
 |---|---|
-| Sampled / compared OK | 100 / 99 |
-| Failed | 1 (`missing-hydrogens`) |
-| Heavy-atom count mismatches | 2 |
-| Heavy atoms unmatched by coordinates | 4 (of ~2,900) |
-| Max coordinate delta | mean 0.0010 Å (pure rounding — alignment sound) |
-| Charge mean-abs-delta | mean 0.0573 e, median 0.0543 e, min 0.0341 e |
-| AD4 type agreement | mean 64.2%, median 66.7%, min 30.0% |
-| TORSDOF delta | mean 0.58, median 0 |
+| AD4 type agreement (mean / median / min) | 1.0000 / 1.0000 / 1.0000 |
+| Charge mean-abs-delta (mean / median) | 0.0301 / 0.0287 |
+| TORSDOF delta (mean / median) | 1.14 / 1 |
+| Rotor-set mismatches (same count, different bonds) | 43 of 44 |
 
-## Findings
+The TORSDOF deltas and rotor-set mismatches are the documented
+terminal-rotation rule difference below: Meeko counts terminal
+rotations such as C–OH (ribose hydroxyls drive SAM's delta of 4),
+hephaestus requires heavy-degree ≥ 2 on both ends.
 
-1. **Coordinates and connectivity are sound**: matched atoms agree to
-   rounding precision, and total charge agrees to ~0.001 e. The
-   torsion tree is close (median TORSDOF delta 0, mean 0.58).
-2. **Gasteiger charges diverge moderately and systematically** (mean
-   per-atom |Δ| ≈ 0.057 e). Both are "Gasteiger" but the
-   implementations differ (iteration/damping details, hydrogen
-   bookkeeping); the spread is consistent across the sample, not a few
-   outliers.
-3. **AD4 typing is the weakest dimension** (mean 64% exact-match).
-   Inspection of the worst cases (top of the CSV; e.g. type agreement
-   0.30–0.44) shows divergence concentrated on aromatic carbons (C vs
-   A), hydrogen-bond acceptor/donor distinctions (N vs NA, O vs OA),
-   and sulfur typing. Likely causes: Meeko types from RDKit
-   hybridization/ring aromaticity while hephaestus types from its own
-   bond-table/geometry rules.
-4. The single hard failure is the documented explicit-hydrogen
-   limitation; the 2 count mismatches and 4 unmatched atoms are
-   fragment/protonation differences worth individual inspection (see
-   CSV).
+## Root causes found and fixed (2026-08-07)
 
-Next candidates if closer parity is wanted: align the AD4 typing rules
-for aromatic C (A vs C) and acceptor/donor typing with Meeko's
-`atom_typer`, and diff the Gasteiger parameter iteration against
-Meeko's `compute_gasteiger_charges`.
+The oracle for these fixes was Meeko's own rulebook:
+`meeko/data/params/ad4_types.json` (ordered SMARTS rules; later rules
+override), plus RDKit's hybridization and aromaticity perception,
+which Meeko inherits. (The corpus used at the time was an earlier,
+larger set of Meeko preparations harvested from the chemflow3 artifact
+store; that source is superseded by the local oracle above and the
+chemflow3 database is no longer used.)
+
+1. **AD4 typing — aromaticity perception (the dominant cluster,
+   ~96% of mismatched atoms).** Hephaestus typed carbons aromatic only
+   when the SDF carried bond type 4; Kekulé-encoded SDFs (alternating
+   single/double bonds) got `C` instead of `A`. Fixed by adding Kekulé
+   aromaticity perception (`KekuleAromaticity`, hephaestus
+   ligand.topology): smallest 5/6-cycles through each bond, Hückel
+   counting per cycle (2 e⁻ per in-cycle double, 2 per N/O/S
+   lone-pair donor, fusion atoms only top up to the sextet), validated
+   offline against RDKit's `GetIsAromatic()`. Deliberate divergence:
+   rings >6 (tropylium, azulene) are not perceived.
+2. **Nitrogen donor/acceptor.** Now Meeko's exact rules: default `NA`;
+   `N` only for charged N (`[#7+]`) or neutral X3v3 N attached to an
+   aromatic atom (aniline/pyrrole), a carbonyl-type carbon
+   (`[#6X3v4]`), or a triazene N.
+3. **Oxygen.** Meeko types every oxygen `OA` (no override rules);
+   hephaestus' `formalCharge > 0 → O` branch was removed.
+4. **Sulfur.** `SA` only for aliphatic two-connected sulfur (Meeko's
+   `[SX2]` does not match aromatic S — thiophene stays `S`);
+   everything else is `S`. (This also changed disulfides from S to
+   SA, matching Meeko.)
+5. **Hydrogen.** `HD` for H on N/O/F/P/S (F and P parents added).
+6. **Gasteiger charges — hybridization of lone-pair heteroatoms.**
+   The remaining charge offset was not iteration math (damping,
+   denominators and parameters match RDKit's
+   `GasteigerCharges.cpp`/`GasteigerParams.h`: DAMP 0.5, scale 0.5,
+   receiver-side chi(+1) denominators) but **hybridization
+   assignment**: RDKit assigns sp2 to single-bonded O/N adjacent to an
+   sp2 center (anisole O: a=17.07 vs sp3 a=14.18; amide N likewise).
+   hephaestus assigned sp3 unless the atom itself was aromatic or
+   double-bonded. Fixed in `GasteigerModel.isSp2`.
+
+## Rotatable-bond rule difference (documented, not changed)
+
+Meeko keeps terminal rotations when the terminal side moves more than
+one atom after non-polar-H merging — e.g. aryl–CF3 (C+3F move) and
+aryl–OH (polar H stays) are rotatable; plain methyls are not (merged
+Hs move with the carbon, so nothing moves). Hephaestus requires
+heavy-degree ≥ 2 on both ends, excluding all terminal groups. Result:
+identical TORSDOF in ~55% of ligands, Meeko higher in the rest; the
+rotor identity sets differ on most ligands (per-ligand rotor columns
+are in the CSV). Changing the production rule is a docking-semantics
+decision and was deliberately left out of scope.
+
+## Remaining known divergences
+
+- Residual charge delta (~0.03 e mean) after the hybridization fix:
+  sulfur `so`/`so2` parameter modes and small iteration-schedule
+  differences (6 vs 12 iterations) are possible further causes.
+- The terminal-rotation rule difference above (torsions).
+- Rings >6 are not aromaticity-perceived (deliberate, see above).
 
 ## Artifacts
 
-- `report-20260807-064728.csv` — per-ligand rows (100).
-- `work-20260807-064728/` — the 99 hephaestus-written PDBQTs compared
-  in this run.
+- `prepare-reference.py` — rebuilds the local Meeko oracle (see
+  above).
+- `report-<timestamp>.csv` — per-ligand rows.
+- `work-<timestamp>/` — the hephaestus-written PDBQTs of the run.
+- `ad4-diagnosis.md` — generated mismatch grouping with chemical
+  context (regenerate with `diagnose-ad4-typing`).
+- `report-20260807-094749.csv` — archived run over the earlier
+  chemflow3-harvested corpus (2,250 of 2,399 pairs compared; type
+  agreement mean 0.9959 / median 1.0000). Superseded by the local
+  oracle; kept for the diversity of its corpus.

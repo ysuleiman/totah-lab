@@ -55,21 +55,23 @@ daedalus dock-prep --target <receptor.pdb> --ligand <ligand.sdf> --out <runs-dir
     [--vina <path-to-vina-binary>]
     [--overwrite] [--help]
 daedalus compare-ligand-prep [--count 100] [--report <csv>]
-    [--source-db <jdbc-url>] [--artifact-root <path>]
+    [--reference-dir <dir>]
 daedalus version
 daedalus help
 ```
 
 `compare-ligand-prep` validates hephaestus ligand preparation against
-Meeko (`mk_prepare_ligand.py`) reference PDBQTs from chemflow3: it
-samples compounds that have a prepared_ligand artifact linked to its
-source SDF (`artifact_metadata.source_artifact_id`), re-prepares each
-SDF with hephaestus, and compares heavy-atom counts, Gasteiger charge
-deltas, AD4 type agreement and torsion counts. Failures (for example
-SDFs without explicit hydrogens) are recorded with their reason, not
-fatal. Database access is read-only: `--source-db` (default the local
-chemflow3), `DB_USERNAME` (default postgres), `PGPASSWORD` (required,
-no default). Reports land in `analysis/ligand-prep-comparison/`.
+locally generated Meeko (`mk_prepare_ligand.py`) reference PDBQTs: the
+reference directory holds a `manifest.tsv` (id, name, h_added) plus,
+per row, `<id>.sdf` and `<id>.meeko.pdbqt`, built from the SDFs under
+`/Users/yazan/artifacts/ligands` by
+`analysis/ligand-prep-comparison/prepare-reference.py` (default
+`--reference-dir` is `/Users/yazan/artifacts/ligands/meeko-prepared`).
+It re-prepares each SDF with hephaestus and compares heavy-atom counts,
+Gasteiger charge deltas, AD4 type agreement and torsion counts.
+Failures (for example SDFs without explicit hydrogens) are recorded
+with their reason, not fatal. Reports land in
+`analysis/ligand-prep-comparison/`.
 
 The search box is explicit (`--box`) or derived from a `docking.pocket`
 row (`--pocket-id`, via `PocketGridBoxLoader`): alpha spheres are

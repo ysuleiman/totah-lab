@@ -29,20 +29,18 @@
   A compatibility mode would need an explicit policy for polar hydrogens only,
   Gasteiger-style charges, B-factor zeroing, and Open Babel-like AD4 typing.
 - Revisit full Maven test failures separately from compile checks.
-- PRODUCTION BLOCKER — relocate or delete the ad-hoc batch/importer entry
-  points in daedalus main sources. `ChemflowImportCommand`,
-  `BiohubCysteineCandidateBatch`, `BiohubAtlasClusterDownloader`,
-  `BiohubSelectedLigandBatch`, `AdjacentCysteineScan`, and
-  `ExperimentalVicinalCohortBuilder` are `main()`-driven one-offs with
-  `System.out` diagnostics; they should become gated runners/CLI commands
-  or be removed before production. Until then, they carry hardcoded
-  environment assumptions.
+- PRODUCTION BLOCKER — relocate or delete the ad-hoc batch entry
+  points in daedalus main sources. `BiohubCysteineCandidateBatch`,
+  `BiohubAtlasClusterDownloader`, `BiohubSelectedLigandBatch`,
+  `AdjacentCysteineScan`, and `ExperimentalVicinalCohortBuilder` are
+  `main()`-driven one-offs with `System.out` diagnostics; they should
+  become gated runners/CLI commands or be removed before production.
+  Until then, they carry hardcoded environment assumptions.
 - PRODUCTION BLOCKER — remove hardcoded database config.
-  `ChemflowImportCommand` defaults the DB password to `"admin"` when
-  `PGPASSWORD` is unset and hardcodes `jdbc:postgresql://localhost:5432/chemflow3`
-  and `.../totah_lab_db`; `BiohubCysteineCandidateBatch` hardcodes
-  `jdbc:postgresql://localhost:5432/totah_lab_db`. Connection details and
-  credentials must come from configuration/environment with no defaults.
+  `BiohubCysteineCandidateBatch` hardcodes
+  `jdbc:postgresql://localhost:5432/totah_lab_db`. Connection details
+  and credentials must come from configuration/environment with no
+  defaults.
 - Persist and display alpha spheres: pocket atom rows currently store only residue-atom coordinates, so pocket geometry is always RESIDUE_ATOMS. Persist fpocket alpha-sphere centers/radii (import + schema), expose them in the geometry/comparison endpoints, and render sphere overlays in the comparison viewer with an ALPHA_SPHERES basis.
 
 ## Done

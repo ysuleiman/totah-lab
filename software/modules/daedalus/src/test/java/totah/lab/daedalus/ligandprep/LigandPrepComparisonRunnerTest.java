@@ -2,7 +2,6 @@ package totah.lab.daedalus.ligandprep;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import totah.lab.daedalus.docking.importer.LocalArtifactUriResolver;
 import totah.lab.daedalus.ligandprep.LigandPrepComparisonRunner.Outcome;
 import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.molecule.Protein;
@@ -35,9 +34,9 @@ class LigandPrepComparisonRunnerTest {
 
     @Test
     void comparesPreparedLigandAgainstMeekoReference() throws Exception {
-        Path artifactRoot = Files.createDirectories(
-                temporaryDirectory.resolve("artifact-storage"));
-        Path meeko = artifactRoot.resolve("meeko.pdbqt");
+        Path reference = Files.createDirectories(
+                temporaryDirectory.resolve("reference"));
+        Path meeko = reference.resolve("meeko.pdbqt");
         Files.writeString(meeko, String.join("\n",
                 "ROOT",
                 atomLine(1, "C", 0, 0, 0, 0.04, "C"),
@@ -45,18 +44,15 @@ class LigandPrepComparisonRunnerTest {
                 "ENDROOT",
                 "TORSDOF 3"));
 
-        Path sdf = artifactRoot.resolve("ligand.sdf");
+        Path sdf = reference.resolve("ligand.sdf");
         Files.writeString(sdf, "fake sdf");
 
         LigandPrepSample sample = new LigandPrepSample(
-                "compound-1", "CO",
-                "local://artifact-storage/ligand.sdf",
-                "local://artifact-storage/meeko.pdbqt");
+                "compound-1", "CO", sdf, meeko);
 
         List<Outcome> outcomes = new LigandPrepComparisonRunner(
                 count -> List.of(sample),
                 new StubClient(),
-                new LocalArtifactUriResolver(artifactRoot),
                 temporaryDirectory.resolve("work")
         ).run(1);
 
@@ -80,17 +76,17 @@ class LigandPrepComparisonRunnerTest {
 
     @Test
     void hydrogenFailuresAreRecordedNotFatal() throws Exception {
-        Path artifactRoot = Files.createDirectories(
-                temporaryDirectory.resolve("artifact-storage"));
-        Files.writeString(artifactRoot.resolve("ligand.sdf"), "fake");
-        Files.writeString(artifactRoot.resolve("meeko.pdbqt"),
+        Path reference = Files.createDirectories(
+                temporaryDirectory.resolve("reference"));
+        Path sdf = reference.resolve("ligand.sdf");
+        Files.writeString(sdf, "fake");
+        Path meeko = reference.resolve("meeko.pdbqt");
+        Files.writeString(meeko,
                 "ROOT\n" + atomLine(1, "C", 0, 0, 0, 0.0, "C")
                         + "\nENDROOT\nTORSDOF 0\n");
 
         LigandPrepSample sample = new LigandPrepSample(
-                "compound-2", "C",
-                "local://artifact-storage/ligand.sdf",
-                "local://artifact-storage/meeko.pdbqt");
+                "compound-2", "C", sdf, meeko);
 
         StubClient client = new StubClient();
         client.prepareFailure = new IllegalArgumentException(
@@ -99,7 +95,6 @@ class LigandPrepComparisonRunnerTest {
         List<Outcome> outcomes = new LigandPrepComparisonRunner(
                 count -> List.of(sample),
                 client,
-                new LocalArtifactUriResolver(artifactRoot),
                 temporaryDirectory.resolve("work")
         ).run(1);
 

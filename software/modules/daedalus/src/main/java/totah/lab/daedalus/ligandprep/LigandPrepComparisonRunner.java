@@ -1,13 +1,11 @@
 package totah.lab.daedalus.ligandprep;
 
-import totah.lab.daedalus.docking.importer.LocalArtifactUriResolver;
 import totah.lab.daedalus.ligandprep.LigandPrepComparator.LigandPrepComparison;
 import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandPreparationResult;
 import totah.lab.hephaestus.model.PreparationIssue;
 
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,7 +18,7 @@ import java.util.Objects;
 
 /**
  * Runs the hephaestus-vs-Meeko ligand preparation comparison over a
- * sample of chemflow3 compounds: prepares each source SDF with
+ * sample of reference ligands: prepares each source SDF with
  * hephaestus (into a scratch directory), parses both PDBQTs and
  * compares them. Per-ligand failures are recorded with their reason —
  * the known explicit-hydrogen limitation of the SDF path included —
@@ -45,18 +43,15 @@ public final class LigandPrepComparisonRunner {
 
     private final LigandPrepSampler sampler;
     private final HephaestusClient hephaestus;
-    private final LocalArtifactUriResolver artifacts;
     private final Path workDirectory;
 
     public LigandPrepComparisonRunner(
             LigandPrepSampler sampler,
             HephaestusClient hephaestus,
-            LocalArtifactUriResolver artifacts,
             Path workDirectory
     ) {
         this.sampler = Objects.requireNonNull(sampler, "sampler");
         this.hephaestus = Objects.requireNonNull(hephaestus, "hephaestus");
-        this.artifacts = Objects.requireNonNull(artifacts, "artifacts");
         this.workDirectory = Objects.requireNonNull(
                 workDirectory, "workDirectory");
     }
@@ -76,12 +71,8 @@ public final class LigandPrepComparisonRunner {
 
     private Outcome process(LigandPrepSample sample, int index) {
         try {
-            Path sdf = artifacts.resolve(URI.create(sample.sdfUri()));
-            Path meekoPath =
-                    artifacts.resolve(URI.create(sample.meekoPdbqtUri()));
-
             LigandPreparationResult preparation = hephaestus.prepareLigand(
-                    sdf, LigandPreparationOptions.defaults());
+                    sample.sdf(), LigandPreparationOptions.defaults());
             if (!preparation.successful()) {
                 return failure(sample, "preparation",
                         preparation.issues().stream()
@@ -99,7 +90,7 @@ public final class LigandPrepComparisonRunner {
             PdbqtLigandReader.PdbqtLigand ours =
                     PdbqtLigandReader.read(ourPdbqt);
             PdbqtLigandReader.PdbqtLigand meeko =
-                    PdbqtLigandReader.read(meekoPath);
+                    PdbqtLigandReader.read(sample.meekoPdbqt());
 
             return new Outcome(sample, STATUS_OK, null, null,
                     LigandPrepComparator.compare(ours, meeko));
@@ -147,24 +138,25 @@ public final class LigandPrepComparisonRunner {
 
     public static String csv(List<Outcome> outcomes) {
         StringBuilder csv = new StringBuilder(
-                "compound_id,smiles,status,failure_category,"
+                "id,name,status,failure_category,"
                         + "failure_detail,our_heavy,meeko_heavy,"
                         + "matched_heavy,atoms_match,our_total_charge,"
                         + "meeko_total_charge,total_charge_delta,"
                         + "charge_mad,type_agreement,torsdof_ours,"
-                        + "torsdof_meeko,torsdof_delta,max_coord_delta\n");
+                        + "torsdof_meeko,torsdof_delta,rotors_ours,"
+                        + "rotors_meeko,rotors_matched,max_coord_delta\n");
         for (Outcome outcome : outcomes) {
             LigandPrepComparison comparison = outcome.comparison();
             List<String> fields = new ArrayList<>(List.of(
-                    outcome.sample().compoundId(),
-                    outcome.sample().smiles(),
+                    outcome.sample().id(),
+                    outcome.sample().name(),
                     outcome.status(),
                     outcome.failureCategory() == null
                             ? "" : outcome.failureCategory(),
                     outcome.failureDetail() == null
                             ? "" : outcome.failureDetail()));
             if (comparison == null) {
-                for (int index = 0; index < 13; index++) {
+                for (int index = 0; index < 16; index++) {
                     fields.add("");
                 }
             } else {
@@ -180,6 +172,9 @@ public final class LigandPrepComparisonRunner {
                 fields.add(String.valueOf(comparison.ourTorsdof()));
                 fields.add(String.valueOf(comparison.meekoTorsdof()));
                 fields.add(String.valueOf(comparison.torsdofDelta()));
+                fields.add(String.valueOf(comparison.rotorsOurs()));
+                fields.add(String.valueOf(comparison.rotorsMeeko()));
+                fields.add(String.valueOf(comparison.rotorsMatched()));
                 fields.add(format(comparison.maxCoordinateDelta()));
             }
             csv.append(String.join(",",
@@ -237,6 +232,13 @@ public final class LigandPrepComparisonRunner {
                     comparisons.stream()
                             .map(c -> (double) c.torsdofDelta())
                             .toList());
+            out.append("Rotor-set mismatches (same count, different"
+                            + " bonds): ")
+                    .append(comparisons.stream()
+                            .filter(LigandPrepComparator
+                                    ::rotorSetsDiffer)
+                            .count())
+                    .append('\n');
             statistics(out, "Max coordinate delta",
                     comparisons.stream()
                             .map(LigandPrepComparison::maxCoordinateDelta)
@@ -247,9 +249,9 @@ public final class LigandPrepComparisonRunner {
             worst(outcomes).forEach(outcome -> {
                 LigandPrepComparison c = outcome.comparison();
                 out.append("  ")
-                        .append(outcome.sample().compoundId())
+                        .append(outcome.sample().id())
                         .append(' ')
-                        .append(outcome.sample().smiles())
+                        .append(outcome.sample().name())
                         .append("  type=")
                         .append(format(c.ad4TypeAgreement()))
                         .append(" chargeMAD=")

@@ -50,10 +50,12 @@ public final class PdbqtLigandReader {
 
     public record PdbqtLigand(
             List<PdbqtAtom> atoms,
-            int torsdof
+            int torsdof,
+            List<int[]> rotatableBondSerials
     ) {
         public PdbqtLigand {
             atoms = List.copyOf(atoms);
+            rotatableBondSerials = List.copyOf(rotatableBondSerials);
         }
 
         public List<PdbqtAtom> heavyAtoms() {
@@ -75,11 +77,19 @@ public final class PdbqtLigandReader {
 
     static PdbqtLigand parse(List<String> lines) throws IOException {
         List<PdbqtAtom> atoms = new ArrayList<>();
+        List<int[]> rotatableBonds = new ArrayList<>();
         int torsdof = 0;
 
         for (String line : lines) {
             if (line.startsWith("ATOM") || line.startsWith("HETATM")) {
                 atoms.add(parseAtom(line));
+            } else if (line.startsWith("BRANCH")) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length == 3) {
+                    rotatableBonds.add(new int[]{
+                            Integer.parseInt(parts[1]),
+                            Integer.parseInt(parts[2])});
+                }
             } else if (line.startsWith("TORSDOF")) {
                 torsdof = Integer.parseInt(line.substring(7).trim());
             }
@@ -88,7 +98,7 @@ public final class PdbqtLigandReader {
         if (atoms.isEmpty()) {
             throw new IOException("PDBQT contains no atoms");
         }
-        return new PdbqtLigand(atoms, torsdof);
+        return new PdbqtLigand(atoms, torsdof, rotatableBonds);
     }
 
     private static PdbqtAtom parseAtom(String line) throws IOException {

@@ -7,6 +7,7 @@ import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtLigand;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static totah.lab.daedalus.ligandprep.PdbqtLigandReaderTest.atomLine;
@@ -107,6 +108,66 @@ class LigandPrepComparatorTest {
         assertNull(comparison.ad4TypeAgreement());
         assertNull(comparison.maxCoordinateDelta());
         assertTrue(comparison.atomCountsMatch());
+    }
+
+    @Test
+    void identicalTorsdofWithDifferentRotorBondsIsAMismatch() {
+        // Same TORSDOF (1), but the rotatable bond is a different bond:
+        // identity sets must catch it even though the counts agree.
+        LigandPrepComparison comparison = LigandPrepComparator.compare(
+                ligandWithBranches(List.of(
+                        atomLine(1, "C1", 0, 0, 0, 0.0, "C"),
+                        atomLine(2, "C2", 1.5, 0, 0, 0.0, "C"),
+                        atomLine(3, "C3", 3.0, 0, 0, 0.0, "C")),
+                        List.of(new int[]{1, 2}), 1),
+                ligandWithBranches(List.of(
+                        atomLine(1, "C1", 0, 0, 0, 0.0, "C"),
+                        atomLine(2, "C2", 1.5, 0, 0, 0.0, "C"),
+                        atomLine(3, "C3", 3.0, 0, 0, 0.0, "C")),
+                        List.of(new int[]{2, 3}), 1)
+        );
+
+        assertEquals(0, comparison.torsdofDelta());
+        assertEquals(1, comparison.rotorsOurs());
+        assertEquals(1, comparison.rotorsMeeko());
+        assertEquals(0, comparison.rotorsMatched());
+        assertTrue(LigandPrepComparator.rotorSetsDiffer(comparison));
+    }
+
+    @Test
+    void identicalRotorSetsMatchAcrossFileOrder() {
+        LigandPrepComparison comparison = LigandPrepComparator.compare(
+                ligandWithBranches(List.of(
+                        atomLine(1, "C1", 0, 0, 0, 0.0, "C"),
+                        atomLine(2, "C2", 1.5, 0, 0, 0.0, "C")),
+                        List.of(new int[]{1, 2}), 1),
+                // Same bond, reversed serial order in the other file.
+                ligandWithBranches(List.of(
+                        atomLine(1, "C2", 1.5, 0, 0, 0.0, "C"),
+                        atomLine(2, "C1", 0, 0, 0, 0.0, "C")),
+                        List.of(new int[]{1, 2}), 1)
+        );
+
+        assertEquals(1, comparison.rotorsMatched());
+        assertFalse(LigandPrepComparator.rotorSetsDiffer(comparison));
+    }
+
+    private static PdbqtLigand ligandWithBranches(
+            List<String> atomLines, List<int[]> branches, int torsdof) {
+        try {
+            List<String> lines = new java.util.ArrayList<>();
+            lines.add("ROOT");
+            lines.addAll(atomLines);
+            lines.add("ENDROOT");
+            for (int[] branch : branches) {
+                lines.add("BRANCH " + branch[0] + " " + branch[1]);
+                lines.add("ENDBRANCH " + branch[0] + " " + branch[1]);
+            }
+            lines.add("TORSDOF " + torsdof);
+            return PdbqtLigandReader.parse(lines);
+        } catch (java.io.IOException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     private static PdbqtLigand ligand(List<String> atomLines, int torsdof) {

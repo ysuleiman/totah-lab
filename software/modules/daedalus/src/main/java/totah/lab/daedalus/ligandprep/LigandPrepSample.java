@@ -1,20 +1,23 @@
 package totah.lab.daedalus.ligandprep;
 
+import java.nio.file.Path;
 import java.util.Objects;
 
 /**
- * One sampled chemflow3 compound with its source SDF and Meeko
- * prepared-ligand PDBQT artifact URIs.
+ * One reference ligand: the source SDF and the Meeko
+ * (mk_prepare_ligand.py) prepared-ligand PDBQT we generated locally
+ * from it.
  */
 public record LigandPrepSample(
-        String compoundId,
-        String smiles,
-        String sdfUri,
-        String meekoPdbqtUri
+        String id,
+        String name,
+        Path sdf,
+        Path meekoPdbqt
 ) {
     public LigandPrepSample {
-        Objects.requireNonNull(compoundId, "compoundId");
-        Objects.requireNonNull(sdfUri, "sdfUri");
-        Objects.requireNonNull(meekoPdbqtUri, "meekoPdbqtUri");
+        Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(sdf, "sdf");
+        Objects.requireNonNull(meekoPdbqt, "meekoPdbqt");
     }
 }

@@ -4,7 +4,8 @@ import java.util.List;
 
 /**
  * Deterministic sample of Meeko-prepared ligands with their source
- * SDFs. Factored behind an interface so tests never touch a database.
+ * SDFs. Factored behind an interface so tests can stub the file
+ * system.
  */
 public interface LigandPrepSampler {
 

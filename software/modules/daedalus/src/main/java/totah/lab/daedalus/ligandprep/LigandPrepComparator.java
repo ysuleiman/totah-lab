@@ -4,6 +4,7 @@ import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtAtom;
 import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtLigand;
 import totah.lab.gaia.geometry.Point3D;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,8 +38,21 @@ public final class LigandPrepComparator {
             int ourTorsdof,
             int meekoTorsdof,
             int torsdofDelta,
+            int rotorsOurs,
+            int rotorsMeeko,
+            int rotorsMatched,
             Double maxCoordinateDelta
     ) {
+    }
+
+    /**
+     * True when the rotatable-bond identity sets differ, even if the
+     * torsion counts agree.
+     */
+    static boolean rotorSetsDiffer(LigandPrepComparison comparison) {
+        return comparison.rotorsMatched() != comparison.rotorsOurs()
+                || comparison.rotorsMatched()
+                != comparison.rotorsMeeko();
     }
 
     public static LigandPrepComparison compare(
@@ -51,13 +65,89 @@ public final class LigandPrepComparator {
         double ourTotal = ours.totalCharge();
         double meekoTotal = meeko.totalCharge();
 
-        boolean[] matchedOurs = new boolean[ourHeavy.size()];
-        int matched = 0;
-        double chargeDeltaSum = 0.0;
-        int typeAgreements = 0;
-        double maxDelta = 0.0;
+        List<int[]> matches = matchHeavyAtoms(ourHeavy, meekoHeavy);
 
-        for (PdbqtAtom meekoAtom : meekoHeavy) {
+        int typeAgreements = 0;
+        double chargeDeltaSum = 0.0;
+        double maxDelta = 0.0;
+        for (int[] match : matches) {
+            PdbqtAtom ourAtom = ourHeavy.get(match[0]);
+            PdbqtAtom meekoAtom = meekoHeavy.get(match[1]);
+            chargeDeltaSum += Math.abs(
+                    ourAtom.charge() - meekoAtom.charge());
+            if (ourAtom.ad4Type().equals(meekoAtom.ad4Type())) {
+                typeAgreements++;
+            }
+            maxDelta = Math.max(maxDelta, match[2] / 1000.0);
+        }
+
+        java.util.Set<String> ourRotors = rotorKeys(ours);
+        java.util.Set<String> meekoRotors = rotorKeys(meeko);
+        int rotorsOurs = ourRotors.size();
+        int rotorsMeeko = meekoRotors.size();
+        int rotorsMatched = (int) ourRotors.stream()
+                .filter(meekoRotors::contains)
+                .count();
+
+        int matched = matches.size();
+        return new LigandPrepComparison(
+                ourHeavy.size(),
+                meekoHeavy.size(),
+                matched,
+                ourHeavy.size() == meekoHeavy.size(),
+                ourTotal,
+                meekoTotal,
+                Math.abs(ourTotal - meekoTotal),
+                matched == 0 ? null : chargeDeltaSum / matched,
+                matched == 0 ? null : (double) typeAgreements / matched,
+                ours.torsdof(),
+                meeko.torsdof(),
+                Math.abs(ours.torsdof() - meeko.torsdof()),
+                rotorsOurs,
+                rotorsMeeko,
+                rotorsMatched,
+                matched == 0 ? null : maxDelta
+        );
+    }
+
+    /*
+     * Rotatable-bond identity: each BRANCH bond becomes a key of its
+     * two atoms' coordinates (both writers preserve source
+     * coordinates), so the sets compare order-independently.
+     */
+    private static java.util.Set<String> rotorKeys(PdbqtLigand ligand) {
+        java.util.Set<String> keys = new java.util.HashSet<>();
+        for (int[] bond : ligand.rotatableBondSerials()) {
+            Point3D first = ligand.atoms().get(bond[0] - 1).position();
+            Point3D second = ligand.atoms().get(bond[1] - 1).position();
+            String a = key(first);
+            String b = key(second);
+            keys.add(a.compareTo(b) <= 0 ? a + "|" + b : b + "|" + a);
+        }
+        return keys;
+    }
+
+    private static String key(Point3D point) {
+        return String.format(java.util.Locale.ROOT,
+                "%.3f,%.3f,%.3f", point.x(), point.y(), point.z());
+    }
+
+    /**
+     * Greedy unique nearest-coordinate matching of heavy atoms
+     * (both pipelines preserve source coordinates at PDBQT
+     * precision). Each entry is {ourIndex, meekoIndex,
+     * distanceInMilliAngstrom}.
+     */
+    public static List<int[]> matchHeavyAtoms(
+            List<PdbqtAtom> ourHeavy,
+            List<PdbqtAtom> meekoHeavy
+    ) {
+        boolean[] matchedOurs = new boolean[ourHeavy.size()];
+        List<int[]> matches = new ArrayList<>();
+
+        for (int meekoIndex = 0; meekoIndex < meekoHeavy.size();
+                meekoIndex++) {
+            PdbqtAtom meekoAtom = meekoHeavy.get(meekoIndex);
             int best = -1;
             double bestDistance = MATCH_TOLERANCE_ANGSTROMS;
             for (int index = 0; index < ourHeavy.size(); index++) {
@@ -72,36 +162,16 @@ public final class LigandPrepComparator {
                     best = index;
                 }
             }
-            if (best < 0) {
-                continue;
+            if (best >= 0) {
+                matchedOurs[best] = true;
+                matches.add(new int[]{
+                        best,
+                        meekoIndex,
+                        (int) Math.round(bestDistance * 1000.0)
+                });
             }
-
-            matchedOurs[best] = true;
-            matched++;
-            PdbqtAtom ourAtom = ourHeavy.get(best);
-            chargeDeltaSum += Math.abs(
-                    ourAtom.charge() - meekoAtom.charge());
-            if (ourAtom.ad4Type().equals(meekoAtom.ad4Type())) {
-                typeAgreements++;
-            }
-            maxDelta = Math.max(maxDelta, bestDistance);
         }
-
-        return new LigandPrepComparison(
-                ourHeavy.size(),
-                meekoHeavy.size(),
-                matched,
-                ourHeavy.size() == meekoHeavy.size(),
-                ourTotal,
-                meekoTotal,
-                Math.abs(ourTotal - meekoTotal),
-                matched == 0 ? null : chargeDeltaSum / matched,
-                matched == 0 ? null : (double) typeAgreements / matched,
-                ours.torsdof(),
-                meeko.torsdof(),
-                Math.abs(ours.torsdof() - meeko.torsdof()),
-                matched == 0 ? null : maxDelta
-        );
+        return matches;
     }
 
     private static double distance(Point3D first, Point3D second) {

@@ -10,8 +10,8 @@ import totah.lab.daedalus.docking.PocketGridBox;
 import totah.lab.daedalus.docking.PocketGridBoxLoader;
 import totah.lab.daedalus.docking.VinaDockingOptions;
 import totah.lab.daedalus.docking.VinaDockingResult;
-import totah.lab.daedalus.docking.importer.LocalArtifactUriResolver;
-import totah.lab.daedalus.ligandprep.ChemflowLigandPrepSampler;
+import totah.lab.daedalus.ligandprep.Ad4TypingDiagnosis;
+import totah.lab.daedalus.ligandprep.FileLigandPrepSampler;
 import totah.lab.daedalus.ligandprep.LigandPrepComparisonRunner;
 import totah.lab.hephaestus.client.HephaestusClients;
 
@@ -106,28 +106,22 @@ public final class DaedalusCli {
             OPTIONS
 
                 --count <n>
-                    Number of sampled compounds. Default: 100.
+                    Number of sampled ligands. Default: 100.
 
                 --report <file>
                     CSV report destination. Default:
                     analysis/ligand-prep-comparison/report-<timestamp>.csv
                     (relative to the current directory).
 
-                --source-db <jdbc-url>
-                    chemflow3 database. Default:
-                    jdbc:postgresql://localhost:5432/chemflow3
-
-                --artifact-root <dir>
-                    Chemflow artifact store root. Default:
-                    /Users/yazan/projects/chemflow/backend/artifact-storage
+                --reference-dir <dir>
+                    Directory of locally prepared reference ligands:
+                    a manifest.tsv (id, name, h_added) plus, per row,
+                    <id>.sdf and <id>.meeko.pdbqt produced by a local
+                    Meeko mk_prepare_ligand.py run. Default:
+                    /Users/yazan/artifacts/ligands/meeko-prepared
 
                 --help
                     Print command help.
-
-            DATABASE
-
-                DB_USERNAME (default postgres) and PGPASSWORD
-                (required, no default) are read from the environment.
 
             The comparison prepares each sampled source SDF with
             hephaestus and compares the result with the Meeko
@@ -150,6 +144,10 @@ public final class DaedalusCli {
                         "Compare hephaestus ligand preparation against"
                                 + " Meeko reference preparations.",
                         COMPARE_LIGAND_PREP_HELP, this::compareLigandPrep),
+                command("diagnose-ad4-typing",
+                        "Group AD4 typing mismatches with Meeko by rule"
+                                + " pair with chemical context.",
+                        COMPARE_LIGAND_PREP_HELP, this::diagnoseAd4Typing),
                 command("version", "Print version information.",
                         "USAGE\n\n    daedalus version\n",
                         this::version),
@@ -417,18 +415,15 @@ public final class DaedalusCli {
     private int compareLigandPrep(
             String[] arguments, PrintWriter out, PrintWriter err) {
         Arguments parsed = Arguments.parse(arguments,
-                Set.of("count", "report", "source-db", "artifact-root"),
+                Set.of("count", "report", "reference-dir"),
                 Set.of());
 
         int count = (int) parsed.doubleValue(
                 "count", 100, 1, Double.POSITIVE_INFINITY);
-        String url = parsed.has("source-db")
-                ? parsed.values().get("source-db")
-                : ChemflowLigandPrepSampler.DEFAULT_URL;
-        Path artifactRoot = parsed.has("artifact-root")
-                ? Path.of(parsed.values().get("artifact-root"))
-                : Path.of("/Users/yazan/projects/chemflow/backend"
-                        + "/artifact-storage");
+        Path referenceDirectory = parsed.has("reference-dir")
+                ? Path.of(parsed.values().get("reference-dir"))
+                : Path.of("/Users/yazan/artifacts/ligands"
+                        + "/meeko-prepared");
         Path report = parsed.optionalPath("report");
         if (report == null) {
             report = Path.of("analysis", "ligand-prep-comparison",
@@ -436,34 +431,19 @@ public final class DaedalusCli {
                             java.time.LocalDateTime.now()) + ".csv");
         }
 
-        String password = System.getenv("PGPASSWORD");
-        if (password == null || password.isBlank()) {
-            err.println("PGPASSWORD is not set; the database password is"
-                    + " read from PGPASSWORD with no default");
-            return CliExitCode.INVALID_ARGUMENTS;
-        }
-
-        String username = System.getenv("DB_USERNAME") == null
-                ? "postgres"
-                : System.getenv("DB_USERNAME");
-
         Path workDirectory = report.toAbsolutePath().normalize()
                 .getParent()
                 .resolve("work-" + RUN_ID_FORMAT.format(
                         java.time.LocalDateTime.now()));
 
         LigandPrepComparisonRunner runner = new LigandPrepComparisonRunner(
-                new ChemflowLigandPrepSampler(url, username, password),
+                new FileLigandPrepSampler(referenceDirectory),
                 HephaestusClients.createDefault(),
-                new LocalArtifactUriResolver(artifactRoot),
                 workDirectory);
 
         final List<LigandPrepComparisonRunner.Outcome> outcomes;
         try {
             outcomes = runner.run(count);
-        } catch (SQLException exception) {
-            err.println("Database failure: " + exception.getMessage());
-            return CliExitCode.IO_FAILURE;
         } catch (IOException exception) {
             err.println("Input/output failure: " + exception.getMessage());
             return CliExitCode.IO_FAILURE;
@@ -486,6 +466,56 @@ public final class DaedalusCli {
         out.println("Report: "
                 + report.toAbsolutePath().normalize());
         out.println("Prepared PDBQTs: " + workDirectory);
+        return CliExitCode.SUCCESS;
+    }
+
+    private int diagnoseAd4Typing(
+            String[] arguments, PrintWriter out, PrintWriter err) {
+        Arguments parsed = Arguments.parse(arguments,
+                Set.of("count", "report", "reference-dir"),
+                Set.of());
+
+        int count = (int) parsed.doubleValue(
+                "count", 100, 1, Double.POSITIVE_INFINITY);
+        Path referenceDirectory = parsed.has("reference-dir")
+                ? Path.of(parsed.values().get("reference-dir"))
+                : Path.of("/Users/yazan/artifacts/ligands"
+                        + "/meeko-prepared");
+        Path report = parsed.optionalPath("report");
+        if (report == null) {
+            report = Path.of("analysis", "ligand-prep-comparison",
+                    "ad4-diagnosis.md");
+        }
+
+        Path workDirectory = report.toAbsolutePath().normalize()
+                .getParent()
+                .resolve("diag-work-" + RUN_ID_FORMAT.format(
+                        java.time.LocalDateTime.now()));
+
+        String markdown;
+        try {
+            markdown = new Ad4TypingDiagnosis(
+                    new FileLigandPrepSampler(referenceDirectory),
+                    HephaestusClients.createDefault(),
+                    workDirectory).diagnose(count);
+        } catch (IOException exception) {
+            err.println("Input/output failure: " + exception.getMessage());
+            return CliExitCode.IO_FAILURE;
+        } catch (Exception exception) {
+            err.println("Internal failure: " + exception.getMessage());
+            return CliExitCode.INTERNAL_FAILURE;
+        }
+
+        try {
+            Files.createDirectories(report.toAbsolutePath()
+                    .normalize().getParent());
+            Files.writeString(report, markdown);
+        } catch (IOException exception) {
+            err.println("Export failure: " + exception.getMessage());
+            return CliExitCode.EXPORT_FAILURE;
+        }
+
+        out.println("Diagnosis: " + report.toAbsolutePath().normalize());
         return CliExitCode.SUCCESS;
     }
 
