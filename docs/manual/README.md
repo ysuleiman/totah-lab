@@ -81,6 +81,14 @@ VinaDockingStage only when `vinaExecutable` is configured, and the stage
 requires `vina_docking_options` (search box) in the config map;
 execution failures surface as stage errors.
 
+The `daedalus` CLI runs the pipeline end to end:
+`dock-prep --target <pdb> --ligand <sdf> --out <runs-dir>` with an
+explicit `--box` or a pocket-derived box (`--pocket-id`, spheres-first
+with atom fallback, centroid center, extent+radii+2×padding size, DB
+config from `DB_URL`/`DB_USERNAME`/`PGPASSWORD`), and optional `--vina
+<binary>` execution. There is no packaged launcher yet — run it on the
+Maven classpath (see `modules/daedalus/readme.md`).
+
 ## Running the bulk imports
 
 All runners are `CommandLineRunner`s gated by properties (never active
