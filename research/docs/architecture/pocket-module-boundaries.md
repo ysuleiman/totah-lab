@@ -40,11 +40,15 @@ These classes translate external pocket formats into the domain model.
 `pipeline` owns behavior that depends on infrastructure:
 
 ```text
-totah.lab.pocket.analysis.PosePocketContactAnalyzer
 totah.lab.pocket.export.PyMolExporter
 ```
 
 Database analysis and file export must not be moved into `domain-model`.
+
+Note: `PosePocketContactAnalyzer` was removed (2026-08) — it targeted the
+`docking.pose_atom` / `docking.pose_atom_contact` tables dropped on
+2026-07-29 when contact analysis moved to residue level
+(`docking.pose_residue_contact`).
 
 ## Removed legacy API module
 
