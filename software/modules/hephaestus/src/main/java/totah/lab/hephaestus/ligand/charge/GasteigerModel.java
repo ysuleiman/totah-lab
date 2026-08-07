@@ -134,8 +134,25 @@ public class GasteigerModel implements ChargeModel {
     }
 
     private boolean isSp2(ChargeSystem system, int atomIndex) {
-        return system.isAromatic(atomIndex)
-                || maximumBondOrder(system, atomIndex) >= 1.5;
+        if (system.isAromatic(atomIndex)
+                || maximumBondOrder(system, atomIndex) >= 1.5) {
+            return true;
+        }
+        // Conjugated lone-pair heteroatoms: RDKit's hybridization
+        // assigns sp2 to a single-bonded O or N adjacent to an sp2
+        // center (e.g. the anisole oxygen or an amide nitrogen); the
+        // sp2 Gasteiger parameters differ materially (O a=17.07 vs
+        // 14.18).
+        String element = system.getElement(atomIndex);
+        if (element.equals("O") || element.equals("N")) {
+            for (int neighbor : system.getNeighbors(atomIndex)) {
+                if (system.isAromatic(neighbor)
+                        || maximumBondOrder(system, neighbor) >= 1.5) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private double maximumBondOrder(ChargeSystem system, int atomIndex) {

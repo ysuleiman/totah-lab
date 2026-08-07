@@ -10,6 +10,7 @@ import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandUnsupportedReason;
 import totah.lab.hephaestus.ligand.UnsupportedLigandException;
 import totah.lab.hephaestus.ligand.topology.CcdAtomCoordinates;
+import totah.lab.hephaestus.ligand.topology.KekuleAromaticity;
 import totah.lab.hephaestus.ligand.topology.LigandAtomProperties;
 import totah.lab.hephaestus.ligand.topology.LigandTopology;
 import totah.lab.hephaestus.model.PreparationIssue;
@@ -158,6 +159,13 @@ public final class SdfLigandTopologyOperation implements LigandPreparationOperat
                 aromatic[bond.atomIndexA()] = true;
                 aromatic[bond.atomIndexB()] = true;
             }
+        }
+        // Kekulé-encoded rings carry no aromatic bond flags; perceive
+        // them so typing matches RDKit/Meeko semantics.
+        boolean[] perceived = KekuleAromaticity.perceive(
+                atoms.size(), bonds, atoms);
+        for (int index = 0; index < aromatic.length; index++) {
+            aromatic[index] = aromatic[index] || perceived[index];
         }
         List<LigandAtomProperties> properties = new ArrayList<>();
         List<CcdAtomCoordinates> coordinates = new ArrayList<>();

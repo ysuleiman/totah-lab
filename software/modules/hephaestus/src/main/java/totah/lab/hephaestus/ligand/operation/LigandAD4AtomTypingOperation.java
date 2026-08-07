@@ -63,7 +63,9 @@ public final class LigandAD4AtomTypingOperation implements LigandPreparationOper
             case "H" -> hydrogenType(atoms, adjacency, index);
             case "C" -> aromatic(topology, adjacency, index) ? "A" : "C";
             case "N" -> nitrogenType(topology, atoms, adjacency, index);
-            case "O" -> formalCharge(topology, index) > 0 ? "O" : "OA";
+            // Meeko's ad4_types.json types every oxygen OA; there is no
+            // oxygen override rule.
+            case "O" -> "OA";
             case "S" -> sulfurType(topology, atoms, adjacency, index);
             case "P" -> "P";
             case "F", "Cl", "Br", "I" -> element;
@@ -83,46 +85,60 @@ public final class LigandAD4AtomTypingOperation implements LigandPreparationOper
             throw new IllegalStateException("Hydrogen must have exactly one bonded parent.");
         }
         String parent = atoms.get(adjacency.get(index).getFirst().atomIndex()).getElement().symbol();
-        return Set.of("N", "O", "S").contains(parent) ? "HD" : "H";
+        // Meeko: HD when the parent is N, O, F, P or S.
+        return Set.of("N", "O", "S", "F", "P").contains(parent) ? "HD" : "H";
     }
 
+    /*
+     * Meeko ad4_types.json nitrogen rules (later rules win):
+     * default NA (acceptor); N (donor) only for [#7+1] charged
+     * nitrogens or neutral [#7X3v3] nitrogens attached to an aromatic
+     * atom (aniline, pyrrole), a [#6X3v4] carbon (amide and friends),
+     * or an [NX2]=[*] nitrogen (triazene).
+     */
     private String nitrogenType(
             LigandTopology topology, List<Atom> atoms,
             List<List<BondedAtom>> adjacency, int index) {
-        if (formalCharge(topology, index) > 0 || amideNitrogen(atoms, adjacency, index)) {
+        if (formalCharge(topology, index) > 0) {
             return "N";
         }
-        if (aromatic(topology, adjacency, index)
-                && hasNeighborElement(atoms, adjacency, index, "H")) {
-            return "N";
-        }
-        return valence(adjacency.get(index)) >= 4.0 ? "N" : "NA";
-    }
-
-    private boolean amideNitrogen(
-            List<Atom> atoms, List<List<BondedAtom>> adjacency, int nitrogen) {
-        for (BondedAtom carbon : adjacency.get(nitrogen)) {
-            if (carbon.bond().order() != BondOrder.SINGLE
-                    || !"C".equals(atoms.get(carbon.atomIndex()).getElement().symbol())) {
-                continue;
-            }
-            for (BondedAtom neighbor : adjacency.get(carbon.atomIndex())) {
-                String element = atoms.get(neighbor.atomIndex()).getElement().symbol();
-                if (neighbor.atomIndex() != nitrogen && neighbor.bond().order() == BondOrder.DOUBLE
-                        && Set.of("O", "S").contains(element)) {
-                    return true;
+        List<BondedAtom> neighbors = adjacency.get(index);
+        if (neighbors.size() == 3 && valence(neighbors) == 3.0) {
+            for (BondedAtom neighbor : neighbors) {
+                int neighborIndex = neighbor.atomIndex();
+                if (aromatic(topology, adjacency, neighborIndex)) {
+                    return "N";
+                }
+                String element = atoms.get(neighborIndex)
+                        .getElement().symbol();
+                if ("C".equals(element)
+                        && adjacency.get(neighborIndex).size() == 3
+                        && valence(adjacency.get(neighborIndex)) == 4.0) {
+                    return "N";
+                }
+                if ("N".equals(element)
+                        && adjacency.get(neighborIndex).size() == 2
+                        && valence(adjacency.get(neighborIndex)) == 3.0) {
+                    return "N";
                 }
             }
         }
-        return false;
+        return "NA";
     }
 
+    /*
+     * Meeko ad4_types.json sulfur rules: SA only for ALIPHATIC
+     * two-connected sulfur (SMARTS [SX2] does not match aromatic
+     * sulfur); everything else — aromatic S (thiophene), sulfoxides,
+     * sulfones, charged sulfur — is S.
+     */
     private String sulfurType(
             LigandTopology topology, List<Atom> atoms,
             List<List<BondedAtom>> adjacency, int index) {
-        return formalCharge(topology, index) > 0
-                || hasNeighborElement(atoms, adjacency, index, "S")
-                || valence(adjacency.get(index)) > 2.0 ? "S" : "SA";
+        if (aromatic(topology, adjacency, index)) {
+            return "S";
+        }
+        return adjacency.get(index).size() == 2 ? "SA" : "S";
     }
 
     private boolean aromatic(
@@ -132,22 +148,21 @@ public final class LigandAD4AtomTypingOperation implements LigandPreparationOper
                 || bonded.bond().order() == BondOrder.AROMATIC);
     }
 
-    private boolean hasNeighborElement(
-            List<Atom> atoms, List<List<BondedAtom>> adjacency, int index, String element) {
-        return adjacency.get(index).stream().anyMatch(neighbor -> element.equals(
-                atoms.get(neighbor.atomIndex()).getElement().symbol()));
-    }
-
     private int formalCharge(LigandTopology topology, int index) {
         return topology.atomProperties().get(index).formalCharge();
     }
 
+    /*
+     * Effective valence for the Meeko connectivity tests ([#7X3v3],
+     * [#6X3v4], [NX2]): aromatic bonds count 1.0, matching RDKit's
+     * valence of aromatic-perceived atoms (pyrrole N = 3).
+     */
     private double valence(List<BondedAtom> atoms) {
         return atoms.stream().mapToDouble(atom -> switch (atom.bond().order()) {
             case SINGLE -> 1.0;
             case DOUBLE -> 2.0;
             case TRIPLE -> 3.0;
-            case AROMATIC -> 1.5;
+            case AROMATIC -> 1.0;
             case UNKNOWN -> throw new IllegalArgumentException(
                     "Cannot assign AD4 ligand types with UNKNOWN bond order");
         }).sum();
