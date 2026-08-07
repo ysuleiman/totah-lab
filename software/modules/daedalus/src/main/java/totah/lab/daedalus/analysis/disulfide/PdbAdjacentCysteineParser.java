@@ -1,4 +1,4 @@
-package totah.lab.analysis.disulfide;
+package totah.lab.daedalus.analysis.disulfide;
 
 import java.io.BufferedReader;
 import java.io.IOException;

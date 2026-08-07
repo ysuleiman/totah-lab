@@ -1,4 +1,4 @@
-package totah.lab.biohub.batch;
+package totah.lab.daedalus.biohub.batch;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

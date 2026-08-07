@@ -1,4 +1,4 @@
-package totah.lab.analysis.disulfide;
+package totah.lab.daedalus.analysis.disulfide;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

@@ -1,4 +1,4 @@
-package totah.lab.biohub.batch;
+package totah.lab.daedalus.biohub.batch;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

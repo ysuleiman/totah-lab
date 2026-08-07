@@ -1,4 +1,4 @@
-package totah.lab.biohub.batch;
+package totah.lab.daedalus.biohub.batch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

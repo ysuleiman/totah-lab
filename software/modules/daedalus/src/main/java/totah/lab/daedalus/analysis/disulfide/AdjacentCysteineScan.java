@@ -1,6 +1,6 @@
-package totah.lab.analysis.disulfide;
+package totah.lab.daedalus.analysis.disulfide;
 
-import totah.lab.analysis.disulfide.PdbAdjacentCysteineParser.AdjacentCysteinePair;
+import totah.lab.daedalus.analysis.disulfide.PdbAdjacentCysteineParser.AdjacentCysteinePair;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -1,7 +1,7 @@
-package totah.lab.analysis.disulfide;
+package totah.lab.daedalus.analysis.disulfide;
 
 import org.junit.jupiter.api.Test;
-import totah.lab.analysis.disulfide.PdbAdjacentCysteineParser.AdjacentCysteinePair;
+import totah.lab.daedalus.analysis.disulfide.PdbAdjacentCysteineParser.AdjacentCysteinePair;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
