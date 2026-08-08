@@ -96,4 +96,38 @@ class FPocketParserTest {
                 spheres.getFirst().center());
         assertEquals(4.37, spheres.getFirst().radius(), 1.0e-9);
     }
+
+    @Test
+    void readsResiduesFromFpocketMmcifAtomFile() throws Exception {
+        Path atomFile = tempDir.resolve("pocket1_atm.cif");
+        Files.writeString(atomFile, """
+                data_pocket
+                loop_
+                _atom_site.group_PDB
+                _atom_site.id
+                _atom_site.type_symbol
+                _atom_site.label_atom_id
+                _atom_site.label_alt_id
+                _atom_site.label_comp_id
+                _atom_site.label_asym_id
+                _atom_site.label_seq_id
+                _atom_site.pdbx_PDB_ins_code
+                _atom_site.Cartn_x
+                _atom_site.Cartn_y
+                _atom_site.Cartn_z
+                _atom_site.occupancy
+                _atom_site.pdbx_formal_charge
+                _atom_site.auth_seq_id
+                _atom_site.auth_asym_id
+                ATOM 1 C CA ? ALA A 1 ? 1.0 2.0 3.0 1.0 0 42 A
+                ATOM 2 C CB ? ALA A 1 ? 2.0 2.0 3.0 1.0 0 42 A
+                #
+                """);
+
+        var residues = FPocketParser.readPocketResidues(atomFile);
+
+        assertEquals(1, residues.size());
+        assertEquals("A", residues.getFirst().chainId());
+        assertEquals(42, residues.getFirst().residueNumber());
+    }
 }

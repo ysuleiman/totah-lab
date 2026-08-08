@@ -37,8 +37,7 @@ public final class FPocketParser {
             long pocketNumber = entry.getKey();
             Path sourceDirectory = pocketsDirectory.resolve("pockets");
             List<ResidueId> residues = readPocketResidues(
-                    sourceDirectory.resolve(
-                            "pocket" + pocketNumber + "_atm.pdb"));
+                    findPocketAtomFile(sourceDirectory, pocketNumber));
             List<AlphaSphere> spheres = readAlphaSpheres(
                     sourceDirectory.resolve(
                             "pocket" + pocketNumber + "_vert.pqr"));
@@ -99,6 +98,11 @@ public final class FPocketParser {
     public static List<ResidueId> readPocketResidues(Path atomFile)
             throws IOException {
 
+        if (atomFile.getFileName().toString().toLowerCase(Locale.ROOT)
+                .endsWith(".cif")) {
+            return readMmcifPocketResidues(atomFile);
+        }
+
         Set<ResidueId> residues = new LinkedHashSet<>();
         try (BufferedReader reader = Files.newBufferedReader(atomFile)) {
             String line;
@@ -118,6 +122,144 @@ public final class FPocketParser {
             }
         }
         return List.copyOf(residues);
+    }
+
+    private static List<ResidueId> readMmcifPocketResidues(Path atomFile)
+            throws IOException {
+        Set<ResidueId> residues = new LinkedHashSet<>();
+        try (BufferedReader reader = Files.newBufferedReader(atomFile)) {
+            String line;
+            List<String> columns = null;
+            List<String> tokens = new ArrayList<>();
+            boolean loop = false;
+            while ((line = reader.readLine()) != null) {
+                String value = line.trim();
+                if (columns == null) {
+                    if ("loop_".equals(value)) {
+                        loop = true;
+                    } else if (loop && value.startsWith("_atom_site.")) {
+                        columns = new ArrayList<>();
+                        columns.add(value.split("\\s+", 2)[0]);
+                    } else if (!value.isEmpty() && !value.startsWith("#")) {
+                        loop = false;
+                    }
+                    continue;
+                }
+                if (value.startsWith("_atom_site.")) {
+                    columns.add(value.split("\\s+", 2)[0]);
+                    continue;
+                }
+                if (value.isEmpty()) {
+                    continue;
+                }
+                if (value.startsWith("#") || value.startsWith("_")
+                        || value.equals("loop_") || value.startsWith("data_")) {
+                    emitMmcifResidues(columns, tokens, residues, atomFile);
+                    break;
+                }
+                tokens.addAll(tokenizeMmcif(value));
+                emitMmcifResidues(columns, tokens, residues, atomFile);
+            }
+            if (columns != null) {
+                emitMmcifResidues(columns, tokens, residues, atomFile);
+            }
+            if (!tokens.isEmpty()) {
+                throw new IOException("Incomplete _atom_site row in " + atomFile);
+            }
+        }
+        return List.copyOf(residues);
+    }
+
+    private static void emitMmcifResidues(List<String> columns,
+            List<String> tokens, Set<ResidueId> residues, Path path)
+            throws IOException {
+        while (tokens.size() >= columns.size()) {
+            List<String> row = new ArrayList<>(tokens.subList(0, columns.size()));
+            tokens.subList(0, columns.size()).clear();
+            String group = cifValue(columns, row, "_atom_site.group_PDB");
+            if (!"ATOM".equals(group) && !"HETATM".equals(group)) {
+                continue;
+            }
+            String chain = firstDefined(
+                    cifValue(columns, row, "_atom_site.auth_asym_id"),
+                    cifValue(columns, row, "_atom_site.label_asym_id"));
+            String number = firstDefined(
+                    cifValue(columns, row, "_atom_site.auth_seq_id"),
+                    cifValue(columns, row, "_atom_site.label_seq_id"));
+            if (chain == null || number == null) {
+                throw new IOException("Missing residue identity in " + path);
+            }
+            String insertion = cifValue(columns, row,
+                    "_atom_site.pdbx_PDB_ins_code");
+            try {
+                residues.add(new ResidueId(chain, Integer.parseInt(number),
+                        insertion == null || insertion.isBlank()
+                                ? null : insertion.charAt(0)));
+            } catch (NumberFormatException e) {
+                throw new IOException("Invalid residue number in " + path
+                        + ": " + number, e);
+            }
+        }
+    }
+
+    private static String cifValue(List<String> columns, List<String> row,
+            String column) {
+        int index = columns.indexOf(column);
+        if (index < 0) {
+            return null;
+        }
+        String value = row.get(index);
+        return value.equals(".") || value.equals("?") ? null : value;
+    }
+
+    private static String firstDefined(String first, String second) {
+        return first == null ? second : first;
+    }
+
+    private static List<String> tokenizeMmcif(String line) throws IOException {
+        List<String> result = new ArrayList<>();
+        for (int index = 0; index < line.length();) {
+            while (index < line.length()
+                    && Character.isWhitespace(line.charAt(index))) {
+                index++;
+            }
+            if (index >= line.length() || line.charAt(index) == '#') {
+                break;
+            }
+            char quote = line.charAt(index);
+            if (quote == '\'' || quote == '"') {
+                int end = line.indexOf(quote, index + 1);
+                if (end < 0) {
+                    throw new IOException("Unterminated mmCIF quote: " + line);
+                }
+                result.add(line.substring(index + 1, end));
+                index = end + 1;
+            } else {
+                int end = index;
+                while (end < line.length()
+                        && !Character.isWhitespace(line.charAt(end))) {
+                    end++;
+                }
+                result.add(line.substring(index, end));
+                index = end;
+            }
+        }
+        return result;
+    }
+
+    private static Path findPocketAtomFile(Path sourceDirectory,
+            long pocketNumber) throws IOException {
+        String stem = "pocket" + pocketNumber + "_atm";
+        Path pdb = sourceDirectory.resolve(stem + ".pdb");
+        if (Files.isRegularFile(pdb)) {
+            return pdb;
+        }
+        Path cif = sourceDirectory.resolve(stem + ".cif");
+        if (Files.isRegularFile(cif)) {
+            return cif;
+        }
+        throw new IOException("No PDB or mmCIF atom file for pocket "
+                + pocketNumber + " in " + sourceDirectory);
     }
 
     public static List<AlphaSphere> readAlphaSpheres(Path vertexFile)
