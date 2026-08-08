@@ -37,4 +37,8 @@ public interface PocketDetailsProjection {
     String getArtifactLabel();
 
     String getArtifactStorageLocation();
+
+    Long getStructureArtifactId();
+
+    String getStructureArtifactStorageLocation();
 }

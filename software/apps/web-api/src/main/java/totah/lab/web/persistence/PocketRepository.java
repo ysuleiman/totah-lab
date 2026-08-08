@@ -31,6 +31,8 @@ public interface PocketRepository
                 a.filename AS artifactFilename,
                 a.label AS artifactLabel,
                 a.storage_location AS artifactStorageLocation
+                , structure_artifact.id AS structureArtifactId
+                , structure_artifact.storage_location AS structureArtifactStorageLocation
             FROM docking.pocket p
             JOIN docking.structure s
                 ON s.id = p.structure_id
@@ -38,6 +40,8 @@ public interface PocketRepository
                 ON r.id = s.receptor_id
             JOIN docking.artifacts a
                 ON a.id = p.artifact_id
+            JOIN docking.artifacts structure_artifact
+                ON structure_artifact.id = s.artifact_id
             WHERE p.id = :pocketId
             """, nativeQuery = true)
     Optional<PocketDetailsProjection> findPocketDetails(
@@ -64,6 +68,8 @@ public interface PocketRepository
                 a.filename AS artifactFilename,
                 a.label AS artifactLabel,
                 a.storage_location AS artifactStorageLocation
+                , structure_artifact.id AS structureArtifactId
+                , structure_artifact.storage_location AS structureArtifactStorageLocation
             FROM docking.pocket p
             JOIN docking.structure s
                 ON s.id = p.structure_id
@@ -71,6 +77,8 @@ public interface PocketRepository
                 ON r.id = s.receptor_id
             JOIN docking.artifacts a
                 ON a.id = p.artifact_id
+            JOIN docking.artifacts structure_artifact
+                ON structure_artifact.id = s.artifact_id
             WHERE p.structure_id = :structureId
             ORDER BY p.source, p.pocket_number
             """, nativeQuery = true)
