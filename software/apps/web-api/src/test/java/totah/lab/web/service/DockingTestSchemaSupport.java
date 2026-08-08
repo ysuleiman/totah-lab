@@ -28,7 +28,7 @@ import java.sql.Statement;
  * and every test class truncates all tables after each test. The empty
  * schema remains in the dev database after the run.
  */
-abstract class DockingTestSchemaSupport {
+public abstract class DockingTestSchemaSupport {
 
     protected static final String TEST_SCHEMA = "docking_test";
 
@@ -55,6 +55,21 @@ abstract class DockingTestSchemaSupport {
                 );
             }
             ddl = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+
+        try (InputStream in = DockingTestSchemaSupport.class
+                .getResourceAsStream("/experimental-assembly.sql")) {
+            if (in == null) {
+                throw new IllegalStateException(
+                        "experimental-assembly.sql not on the classpath");
+            }
+            String assemblyDdl = new String(in.readAllBytes(),
+                    StandardCharsets.UTF_8)
+                    .replace("docking.", TEST_SCHEMA + ".")
+                    .replace("public.targets", TEST_SCHEMA + ".targets");
+            ddl = ddl + System.lineSeparator() + assemblyDdl;
         } catch (IOException exception) {
             throw new ExceptionInInitializerError(exception);
         }

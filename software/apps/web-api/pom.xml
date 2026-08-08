@@ -58,7 +58,22 @@
 
         <dependency>
             <groupId>totah.lab</groupId>
+            <artifactId>daedalus</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>totah.lab</groupId>
+            <artifactId>euclid</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>totah.lab</groupId>
             <artifactId>lab-report</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>totah.lab</groupId>
+            <artifactId>proteus</artifactId>
         </dependency>
 
         <dependency>
@@ -69,6 +84,17 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+            <testResource>
+                <directory>../../../tools/scripts/sql/docking</directory>
+                <includes>
+                    <include>experimental-assembly.sql</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
