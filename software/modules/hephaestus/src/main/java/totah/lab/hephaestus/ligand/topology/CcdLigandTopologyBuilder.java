@@ -1,13 +1,13 @@
 package totah.lab.hephaestus.ligand.topology;
 
 import org.biojava.nbio.structure.chem.ChemComp;
-import org.biojava.nbio.structure.chem.ChemCompAtom;
-import org.biojava.nbio.structure.chem.ChemCompBond;
-import totah.lab.gaia.chemistry.BondOrder;
 import totah.lab.gaia.chemistry.ChemicalBond;
-import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Residue;
+import totah.lab.hermes.ccd.BioJavaCcdComponentMapper;
+import totah.lab.hermes.ccd.CcdComponent;
+import totah.lab.hermes.ccd.CcdComponentAtom;
+import totah.lab.hermes.ccd.CcdComponentBond;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,24 +22,24 @@ import java.util.Set;
 public final class CcdLigandTopologyBuilder {
 
     public LigandTopology build(Residue residue, ChemComp chemComp) {
+        return build(residue, new BioJavaCcdComponentMapper().map(chemComp));
+    }
+
+    public LigandTopology build(Residue residue, CcdComponent component) {
         Objects.requireNonNull(residue, "residue");
-        Objects.requireNonNull(chemComp, "chemComp");
+        Objects.requireNonNull(component, "component");
         if (residue.isEmpty()) {
             throw new IllegalArgumentException("Cannot build topology for an empty ligand.");
         }
-        if (chemComp.getAtoms() == null || chemComp.getAtoms().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Complete CCD entry is required for " + residue.getName());
-        }
 
-        Map<String, ChemCompAtom> ccdAtoms = indexCcdAtoms(chemComp);
+        Map<String, CcdComponentAtom> ccdAtoms = indexCcdAtoms(component);
         Map<String, Integer> deposited = indexDepositedAtoms(residue);
         List<String> missingHeavy = new ArrayList<>();
         List<String> extraHeavy = new ArrayList<>();
-        for (ChemCompAtom atom : ccdAtoms.values()) {
-            if (!deposited.containsKey(normalize(atom.getAtomId()))
-                    && !isHydrogen(atom.getTypeSymbol())) {
-                missingHeavy.add(atom.getAtomId());
+        for (CcdComponentAtom atom : ccdAtoms.values()) {
+            if (!deposited.containsKey(normalize(atom.atomId()))
+                    && !isHydrogen(atom.element())) {
+                missingHeavy.add(atom.atomId());
             }
         }
         for (Atom atom : residue.getAtoms()) {
@@ -49,7 +49,7 @@ public final class CcdLigandTopologyBuilder {
         }
         if (!missingHeavy.isEmpty() || !extraHeavy.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Ligand does not match CCD " + chemComp.getId()
+                    "Ligand does not match CCD " + component.componentId()
                             + "; missing heavy atoms=" + missingHeavy
                             + ", extra heavy atoms=" + extraHeavy);
         }
@@ -58,29 +58,28 @@ public final class CcdLigandTopologyBuilder {
         List<CcdAtomCoordinates> coordinates = new ArrayList<>();
         for (int index = 0; index < residue.getAtomCount(); index++) {
             Atom depositedAtom = residue.getAtoms().get(index);
-            ChemCompAtom ccdAtom = ccdAtoms.get(normalize(depositedAtom.getName()));
+            CcdComponentAtom ccdAtom = ccdAtoms.get(normalize(depositedAtom.getName()));
             if (ccdAtom == null) {
                 throw new IllegalArgumentException(
                         "Deposited atom is absent from CCD: " + depositedAtom.getName());
             }
             properties.add(new LigandAtomProperties(
-                    ccdAtom.getAtomId(), ccdAtom.getCharge(),
-                    yes(ccdAtom.getPdbxAromaticFlag()),
-                    yes(ccdAtom.getPdbxLeavingAtomFlag())));
+                    ccdAtom.atomId(), ccdAtom.formalCharge(),
+                    ccdAtom.aromatic(), ccdAtom.leavingAtom()));
             coordinates.add(new CcdAtomCoordinates(
-                    index, modelPosition(ccdAtom), idealPosition(ccdAtom)));
+                    index, ccdAtom.modelPosition(), ccdAtom.idealPosition()));
         }
 
         return new LigandTopology(
-                chemComp.getId(), residue.getAtomCount(),
-                buildBonds(chemComp, deposited), properties,
-                missingHydrogens(chemComp, ccdAtoms, deposited), coordinates);
+                component.componentId(), residue.getAtomCount(),
+                buildBonds(component, deposited), properties,
+                missingHydrogens(component, ccdAtoms, deposited), coordinates);
     }
 
-    private Map<String, ChemCompAtom> indexCcdAtoms(ChemComp chemComp) {
-        Map<String, ChemCompAtom> result = new LinkedHashMap<>();
-        for (ChemCompAtom atom : chemComp.getAtoms()) {
-            String key = normalize(atom.getAtomId());
+    private Map<String, CcdComponentAtom> indexCcdAtoms(CcdComponent component) {
+        Map<String, CcdComponentAtom> result = new LinkedHashMap<>();
+        for (CcdComponentAtom atom : component.atoms()) {
+            String key = normalize(atom.atomId());
             if (key.isEmpty() || result.putIfAbsent(key, atom) != null) {
                 throw new IllegalArgumentException("CCD has a blank or duplicate atom id.");
             }
@@ -101,15 +100,12 @@ public final class CcdLigandTopologyBuilder {
     }
 
     private List<ChemicalBond> buildBonds(
-            ChemComp chemComp, Map<String, Integer> deposited) {
+            CcdComponent component, Map<String, Integer> deposited) {
         List<ChemicalBond> result = new ArrayList<>();
         Set<Long> endpoints = new HashSet<>();
-        if (chemComp.getBonds() == null) {
-            return result;
-        }
-        for (ChemCompBond bond : chemComp.getBonds()) {
-            Integer first = deposited.get(normalize(bond.getAtomId1()));
-            Integer second = deposited.get(normalize(bond.getAtomId2()));
+        for (CcdComponentBond bond : component.bonds()) {
+            Integer first = deposited.get(normalize(bond.atomIdA()));
+            Integer second = deposited.get(normalize(bond.atomIdB()));
             if (first == null || second == null) {
                 continue;
             }
@@ -119,79 +115,47 @@ public final class CcdLigandTopologyBuilder {
             if (!endpoints.add(key)) {
                 throw new IllegalArgumentException("CCD has duplicate bond endpoints.");
             }
-            BondOrder order = bondOrder(bond);
-            result.add(new ChemicalBond(first, second, order,
-                    yes(bond.getPdbxAromaticFlag()) || order == BondOrder.AROMATIC));
+            result.add(new ChemicalBond(first, second, bond.order(), bond.aromatic()));
         }
         return result;
     }
 
     private List<MissingLigandHydrogen> missingHydrogens(
-            ChemComp chemComp,
-            Map<String, ChemCompAtom> ccdAtoms,
+            CcdComponent component,
+            Map<String, CcdComponentAtom> ccdAtoms,
             Map<String, Integer> deposited) {
         List<MissingLigandHydrogen> result = new ArrayList<>();
-        for (ChemCompAtom atom : ccdAtoms.values()) {
-            String atomId = normalize(atom.getAtomId());
-            if (!isHydrogen(atom.getTypeSymbol()) || deposited.containsKey(atomId)) {
+        for (CcdComponentAtom atom : ccdAtoms.values()) {
+            String atomId = normalize(atom.atomId());
+            if (!isHydrogen(atom.element()) || deposited.containsKey(atomId)) {
                 continue;
             }
-            List<ChemCompBond> bonds = chemComp.getBonds() == null ? List.of()
-                    : chemComp.getBonds().stream()
-                    .filter(bond -> atomId.equals(normalize(bond.getAtomId1()))
-                            || atomId.equals(normalize(bond.getAtomId2())))
+            List<CcdComponentBond> bonds = component.bonds().stream()
+                    .filter(bond -> atomId.equals(normalize(bond.atomIdA()))
+                            || atomId.equals(normalize(bond.atomIdB())))
                     .toList();
             if (bonds.size() != 1) {
                 throw new IllegalArgumentException(
-                        "CCD hydrogen " + atom.getAtomId() + " must have exactly one bond.");
+                        "CCD hydrogen " + atom.atomId() + " must have exactly one bond.");
             }
-            ChemCompBond bond = bonds.getFirst();
-            String parentId = atomId.equals(normalize(bond.getAtomId1()))
-                    ? normalize(bond.getAtomId2()) : normalize(bond.getAtomId1());
+            CcdComponentBond bond = bonds.getFirst();
+            String parentId = atomId.equals(normalize(bond.atomIdA()))
+                    ? normalize(bond.atomIdB()) : normalize(bond.atomIdA());
             Integer parentIndex = deposited.get(parentId);
             if (parentIndex == null) {
                 throw new IllegalArgumentException(
-                        "CCD hydrogen " + atom.getAtomId() + " has a missing parent.");
+                        "CCD hydrogen " + atom.atomId() + " has a missing parent.");
             }
             result.add(new MissingLigandHydrogen(
-                    atom.getAtomId(), parentIndex, bondOrder(bond), atom.getCharge(),
-                    yes(atom.getPdbxAromaticFlag()), yes(atom.getPdbxLeavingAtomFlag()),
-                    modelPosition(atom), idealPosition(atom)));
+                    atom.atomId(), parentIndex, bond.order(), atom.formalCharge(),
+                    atom.aromatic(), atom.leavingAtom(),
+                    atom.modelPosition(), atom.idealPosition()));
         }
         return result;
     }
 
-    private BondOrder bondOrder(ChemCompBond bond) {
-        return switch (normalize(bond.getValueOrder())) {
-            case "SING" -> BondOrder.SINGLE;
-            case "DOUB" -> BondOrder.DOUBLE;
-            case "TRIP" -> BondOrder.TRIPLE;
-            case "AROM" -> BondOrder.AROMATIC;
-            default -> throw new IllegalArgumentException(
-                    "Unsupported CCD bond order: " + bond.getValueOrder());
-        };
-    }
-
-    private Point3D modelPosition(ChemCompAtom atom) {
-        return point(atom.getModelCartnX(), atom.getModelCartnY(), atom.getModelCartnZ());
-    }
-
-    private Point3D idealPosition(ChemCompAtom atom) {
-        return point(atom.getPdbxModelCartnXIdeal(), atom.getPdbxModelCartnYIdeal(),
-                atom.getPdbxModelCartnZIdeal());
-    }
-
-    private Point3D point(double x, double y, double z) {
-        return Double.isFinite(x) && Double.isFinite(y) && Double.isFinite(z)
-                ? new Point3D(x, y, z) : null;
-    }
-
     private boolean isHydrogen(String symbol) {
         return "H".equalsIgnoreCase(symbol == null ? "" : symbol.trim());
-    }
-
-    private boolean yes(String value) {
-        return "Y".equalsIgnoreCase(value == null ? "" : value.trim());
     }
 
     private String normalize(String value) {
