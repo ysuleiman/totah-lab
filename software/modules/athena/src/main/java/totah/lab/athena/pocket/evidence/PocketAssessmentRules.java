@@ -169,6 +169,25 @@ public record PocketAssessmentRules(
     }
 
     /**
+     * Applies these comparison rules and wraps the result in the versioned
+     * assessment contract. This does not make the comparison rules applicable
+     * to a single-pocket {@link PocketEvidence} aggregate.
+     */
+    public PocketAssessment<PocketComparisonAssessment> assessVersioned(
+            PocketComparisonEvidence evidence,
+            String rulesetVersion
+    ) {
+        PocketAssessmentVerdict result = assess(evidence);
+        return new PocketAssessment<>(
+                result.verdict(),
+                java.util.List.of(new AssessmentReason(
+                        result.verdict().name(),
+                        "POCKET_COMPARISON",
+                        result.reason())),
+                rulesetVersion);
+    }
+
+    /**
      * Assesses the evidence dimensions directly, without a wrapper
      * bundle — the assembly path uses this overload to obtain the
      * verdict BEFORE the bundle exists. Every returned verdict

@@ -19,6 +19,22 @@ class PocketAssessmentRulesTest {
             PocketAssessmentRules.defaults();
 
     @Test
+    void versionedAssessmentPreservesExistingVerdictAndReason() {
+        PocketComparisonEvidence evidence = evidence(
+                0.10, 20, 0.20, 0.10, 0.0, false, null);
+
+        PocketAssessment<PocketComparisonAssessment> assessment =
+                rules.assessVersioned(evidence, "comparison-rules/1");
+
+        assertEquals(PocketComparisonAssessment.REJECTED, assessment.verdict());
+        assertEquals("comparison-rules/1", assessment.rulesetVersion());
+        assertEquals("POCKET_COMPARISON",
+                assessment.reasons().getFirst().dimension());
+        assertTrue(assessment.reasons().getFirst().explanation()
+                .contains("geometry"));
+    }
+
+    @Test
     void insufficientEvidenceWhenTooFewCorrespondences() {
         PocketComparisonEvidence evidence = evidence(
                 0.50,
