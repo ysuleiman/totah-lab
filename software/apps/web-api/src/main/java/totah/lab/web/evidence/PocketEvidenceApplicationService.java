@@ -7,7 +7,7 @@ import totah.lab.daedalus.evidence.DefaultPocketEvidenceAssembler;
 import java.io.IOException;
 
 @Service
-public final class PocketEvidenceApplicationService implements PocketEvidenceQuery {
+public class PocketEvidenceApplicationService implements PocketEvidenceQuery {
     private final PersistedPocketEvidenceRequestProvider requestProvider;
     private final PocketEvidenceViewMapper viewMapper;
     private final DefaultPocketEvidenceAssembler assembler;
