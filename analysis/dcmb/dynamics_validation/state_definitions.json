@@ -1,0 +1,26 @@
+{
+  "frozen_before_trajectory_analysis": true,
+  "coordinate_frame": "Every frame is unwrapped and least-squares aligned to the starting receptor CA atoms before classification.",
+  "homologous_superpocket": "Accepted METTL7B FPOCKET pocket 2 (1690.538 A3, 197 alpha spheres), rigidly CA-transferred to METTL7A.",
+  "metrics": {
+    "superpocket_fraction": "fraction of ligand heavy atoms within 4.0 A of any homologous-superpocket alpha sphere",
+    "nearest_superpocket_distance_A": "minimum ligand-heavy-atom to alpha-sphere-center distance",
+    "productive_TSL_envelope_fraction": "fraction of ligand heavy atoms within 1.7 A of the union of the pre-existing productive TSL states",
+    "mouth_projection_A": "ligand centroid displacement projected from the sphere centroid toward its most peripheral sphere"
+  },
+  "states_in_priority_order": [
+    {"state": "INNER", "rule": "superpocket_fraction >= 0.70 AND productive_TSL_envelope_fraction > 0"},
+    {"state": "ESCAPE", "rule": "superpocket_fraction >= 0.70 AND productive_TSL_envelope_fraction == 0"},
+    {"state": "MOUTH", "rule": "not INNER/ESCAPE AND (superpocket_fraction >= 0.25 OR nearest_superpocket_distance_A <= 6.0)"},
+    {"state": "OUTSIDE", "rule": "superpocket_fraction < 0.25 AND nearest_superpocket_distance_A > 6.0"}
+  ],
+  "event_persistence": {
+    "minimum_consecutive_frames": 5,
+    "planned_output_interval_ps": 2.0,
+    "minimum_persistent_duration_ps": 10.0,
+    "rule": "A transition is recorded only after the new raw state persists for five consecutive saved frames; boundary flickers are relabeled to the preceding persistent state."
+  },
+  "recapture": "A persistent MOUTH or ESCAPE state followed by persistent INNER; OUTSIDE-to-INNER is separately labeled REENTRY_FROM_OUTSIDE.",
+  "irreversible_escape_within_window": "Final persistent state is ESCAPE or OUTSIDE and remains so through the final saved frame.",
+  "not_estimated": ["Kd", "kon", "koff", "physical residence time", "binding free energy"]
+}
