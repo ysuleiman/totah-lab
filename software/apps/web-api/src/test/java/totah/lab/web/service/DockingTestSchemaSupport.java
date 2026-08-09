@@ -88,6 +88,19 @@ public abstract class DockingTestSchemaSupport {
             throw new ExceptionInInitializerError(exception);
         }
 
+        try (InputStream in = DockingTestSchemaSupport.class
+                .getResourceAsStream("/experimental-binding-site.sql")) {
+            if (in == null) {
+                throw new IllegalStateException(
+                        "experimental-binding-site.sql not on classpath");
+            }
+            String siteDdl = new String(in.readAllBytes(), StandardCharsets.UTF_8)
+                    .replace("docking.", TEST_SCHEMA + ".");
+            ddl = ddl + System.lineSeparator() + siteDdl;
+        } catch (IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+
         try (Connection connection = testConnection();
              Statement statement = connection.createStatement()) {
             for (String command : ddl.split(";")) {

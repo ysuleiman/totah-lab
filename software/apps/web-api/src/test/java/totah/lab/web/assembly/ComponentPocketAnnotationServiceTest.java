@@ -61,8 +61,15 @@ class ComponentPocketAnnotationServiceTest extends DockingTestSchemaSupport {
                     """, Long.class, id);
             jdbc.update("""
                     INSERT INTO assembly_pocket(assembly_id,artifact_id,
-                        pocket_number,fpocket_rank) VALUES (?, ?, 1, 1)
-                    """, id, artifact);
+                        pocket_number,fpocket_rank) VALUES (?, ?, 1, 1),
+                        (?, ?, 2, 2)
+                    """, id, artifact, id, artifact);
+            jdbc.update("""
+                    INSERT INTO assembly_pocket_alpha_sphere
+                        (pocket_id,sphere_number,x,y,z,radius)
+                    SELECT id,1,CASE pocket_number WHEN 1 THEN 0 ELSE 5 END,
+                           0,0,2 FROM assembly_pocket WHERE assembly_id=?
+                    """, id);
             jdbc.update("""
                     INSERT INTO assembly_component_occurrence(assembly_id,
                         component_id,label_asym_id,auth_asym_id,
@@ -81,9 +88,9 @@ class ComponentPocketAnnotationServiceTest extends DockingTestSchemaSupport {
 
         transactions.executeWithoutResult(status -> {
             jdbc.execute("SET LOCAL search_path TO " + TEST_SCHEMA + ", public");
-            assertEquals(2, count("component_pocket_annotation"));
+            assertEquals(3, count("component_pocket_annotation"));
             assertEquals(3, count("assembly_component_atom"));
-            assertEquals(1, count("assembly_pocket_atom"));
+            assertEquals(2, count("assembly_pocket_atom"));
             assertEquals(1, jdbc.queryForObject("""
                     SELECT count(*) FROM component_pocket_annotation a
                     JOIN assembly_component_occurrence o ON o.id=a.occurrence_id
@@ -97,6 +104,27 @@ class ComponentPocketAnnotationServiceTest extends DockingTestSchemaSupport {
                       AND a.relationship_class='NOT_ASSOCIATED'
                     """, Integer.class));
         });
+
+        var analysis = new ExperimentalBindingSiteAnalysisService(jdbc,
+                TEST_SCHEMA);
+        var persistence = new ExperimentalBindingSitePersistenceService(jdbc,
+                new ObjectMapper(), analysis, TEST_SCHEMA);
+        var sam = analysis.meaningfulOccurrences(List.of(), List.of("SAM"))
+                .getFirst();
+        transactions.executeWithoutResult(status -> persistence.persist(sam));
+        long stableSiteId = jdbc.queryForObject("SELECT id FROM " + TEST_SCHEMA
+                + ".experimental_binding_site", Long.class);
+        transactions.executeWithoutResult(status -> persistence.persist(sam));
+
+        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM " + TEST_SCHEMA
+                + ".experimental_binding_site", Integer.class));
+        assertEquals(stableSiteId, jdbc.queryForObject("SELECT id FROM "
+                + TEST_SCHEMA + ".experimental_binding_site", Long.class));
+        assertEquals(2, jdbc.queryForObject("SELECT count(*) FROM " + TEST_SCHEMA
+                + ".experimental_binding_site_candidate WHERE disposition='CONTRIBUTING'",
+                Integer.class));
+        assertEquals(1, jdbc.queryForObject("SELECT count(*) FROM " + TEST_SCHEMA
+                + ".experimental_binding_site_pocket_pair", Integer.class));
     }
 
     private int count(String table) {
@@ -133,7 +161,11 @@ class ComponentPocketAnnotationServiceTest extends DockingTestSchemaSupport {
             return List.of(new PocketSource(1, List.of(
                     new FpocketAtomObservation("1", "CA", "C", "A", 10,
                             null, "ALA", new Point3D(3, 0, 0))),
-                    List.of(new PocketSphere(new Point3D(0, 0, 0), 2))));
+                    List.of(new PocketSphere(new Point3D(0, 0, 0), 2))),
+                    new PocketSource(2, List.of(
+                            new FpocketAtomObservation("2", "CB", "C", "A", 11,
+                                    null, "VAL", new Point3D(4, 0, 0))),
+                            List.of(new PocketSphere(new Point3D(5, 0, 0), 2))));
         }
     }
 }
