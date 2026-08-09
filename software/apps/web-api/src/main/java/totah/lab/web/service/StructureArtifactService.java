@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import totah.lab.gaia.structure.Structure;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.api.StructureReader;
 
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class StructureArtifactService {
     private final Path artifactRoot;
     private final Path externalRoot;
     private final StructureReader structureReader =
-            new BioJavaStructureReader();
+            new PdbReader();
 
     private final ConcurrentMap<Long, CachedStructure> cache =
             new ConcurrentHashMap<>();

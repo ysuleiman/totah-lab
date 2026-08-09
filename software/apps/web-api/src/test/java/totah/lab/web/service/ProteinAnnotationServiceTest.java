@@ -333,5 +333,10 @@ class ProteinAnnotationServiceTest {
                     )
             );
         }
+
+        @Override
+        public List<UniProtAnnotation> search(String query) {
+            return List.of();
+        }
     }
 }

@@ -11,7 +11,7 @@ import totah.lab.gaia.pocket.PocketId;
 import totah.lab.gaia.pocket.PocketSource;
 import totah.lab.gaia.structure.ResidueId;
 import totah.lab.gaia.structure.Structure;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -125,7 +125,7 @@ public class PocketMatchSignatureLoader {
             throws IOException {
         Path path = resolveStorageLocation(storageLocation);
         if (!path.getFileName().toString().endsWith(".gz")) {
-            return new BioJavaStructureReader().read(path);
+            return new PdbReader().read(path);
         }
 
         Path decompressed = Files.createTempFile(
@@ -137,7 +137,7 @@ public class PocketMatchSignatureLoader {
                          decompressed)) {
                 input.transferTo(output);
             }
-            return new BioJavaStructureReader().read(decompressed);
+            return new PdbReader().read(decompressed);
         } finally {
             Files.deleteIfExists(decompressed);
         }

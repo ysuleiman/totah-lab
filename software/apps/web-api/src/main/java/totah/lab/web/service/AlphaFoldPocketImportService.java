@@ -16,8 +16,8 @@ import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.ResidueId;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hermes.file.pocket.FPocketParser;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.api.StructureReader;
 import totah.lab.web.persistence.ArtifactEntity;
 import totah.lab.web.persistence.ArtifactRepository;
 import totah.lab.web.persistence.PipelineRunEntity;
@@ -96,7 +96,7 @@ public class AlphaFoldPocketImportService {
     private final int minPocketResidues;
 
     private final StructureReader structureReader =
-            new BioJavaStructureReader();
+            new PdbReader();
 
     public AlphaFoldPocketImportService(
             ReceptorRepository receptorRepository,
@@ -265,7 +265,7 @@ public class AlphaFoldPocketImportService {
     }
 
     /*
-     * BioJavaStructureReader works on plain .pdb files, so the gzip stream
+     * PdbReader works on plain .pdb files, so the gzip stream
      * is decompressed to a temporary file first (PDB parser, not mmCIF).
      */
     private Structure readCompressedPdb(Path compressedPdb)
