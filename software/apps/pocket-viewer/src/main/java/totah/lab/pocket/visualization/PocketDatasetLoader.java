@@ -3,10 +3,10 @@ package totah.lab.pocket.visualization;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.structure.Structure;
-import totah.lab.hermes.file.reader.AutoDetectingPocketReader;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.reader.PocketReader;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.pocket.reader.AutoDetectingPocketReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.pocket.reader.PocketReader;
+import totah.lab.hermes.file.api.StructureReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,7 +25,7 @@ final class PocketDatasetLoader {
     private final PocketReader pocketReader;
 
     PocketDatasetLoader() {
-        this(new BioJavaStructureReader(), new AutoDetectingPocketReader());
+        this(new PdbReader(), new AutoDetectingPocketReader());
     }
 
     PocketDatasetLoader(StructureReader structureReader) {

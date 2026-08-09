@@ -5,8 +5,8 @@ import org.junit.jupiter.api.io.TempDir;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.structure.Structure;
-import totah.lab.hermes.file.reader.PocketReader;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.pocket.reader.PocketReader;
+import totah.lab.hermes.file.api.StructureReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
