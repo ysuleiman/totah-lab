@@ -1,9 +1,11 @@
 package totah.lab.athena.pocket.compare.residue;
 
+import totah.lab.gaia.classification.ResidueCategories;
+import totah.lab.gaia.classification.ResidueCategory;
 import totah.lab.gaia.structure.Residue;
 
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Classifies amino-acid residues into broad physicochemical classes
@@ -25,43 +27,36 @@ public final class ResidueChemistryClassifier {
      * that work from residue identity rather than structure objects.
      */
     public ResidueChemistry classifyName(String residueName) {
-        String normalized = normalize(residueName);
-
-        return switch (normalized) {
-            case "CYS" -> ResidueChemistry.CYSTEINE;
-            case "GLY" -> ResidueChemistry.GLYCINE;
-
-            case "PHE", "TYR", "TRP" ->
-                    ResidueChemistry.AROMATIC;
-
-            case "ALA", "VAL", "LEU", "ILE", "MET", "PRO" ->
-                    ResidueChemistry.HYDROPHOBIC;
-
-            case "SER", "THR", "ASN", "GLN" ->
-                    ResidueChemistry.POLAR;
-
-            case "LYS", "ARG", "HIS" ->
-                    ResidueChemistry.POSITIVE;
-
-            case "ASP", "GLU" ->
-                    ResidueChemistry.NEGATIVE;
-
-            default -> ResidueChemistry.OTHER;
-        };
-    }
-
-    private static String normalize(String residueName) {
         Objects.requireNonNull(residueName, "residue.name");
-
-        String normalized =
-                residueName.trim().toUpperCase(Locale.ROOT);
-
-        if (normalized.isEmpty()) {
+        if (residueName.isBlank()) {
             throw new IllegalArgumentException(
                     "Residue name must not be blank"
             );
         }
-
-        return normalized;
+        Set<ResidueCategory> categories =
+                ResidueCategories.classify(residueName);
+        if (categories.contains(ResidueCategory.CYSTEINE)) {
+            return ResidueChemistry.CYSTEINE;
+        }
+        if (categories.contains(ResidueCategory.GLYCINE)) {
+            return ResidueChemistry.GLYCINE;
+        }
+        if (categories.contains(ResidueCategory.POSITIVELY_CHARGED)) {
+            return ResidueChemistry.POSITIVE;
+        }
+        if (categories.contains(ResidueCategory.NEGATIVELY_CHARGED)) {
+            return ResidueChemistry.NEGATIVE;
+        }
+        if (categories.contains(ResidueCategory.AROMATIC)) {
+            return ResidueChemistry.AROMATIC;
+        }
+        if (categories.contains(ResidueCategory.HYDROPHOBIC)
+                || categories.contains(ResidueCategory.PROLINE)) {
+            return ResidueChemistry.HYDROPHOBIC;
+        }
+        if (categories.contains(ResidueCategory.POLAR)) {
+            return ResidueChemistry.POLAR;
+        }
+        return ResidueChemistry.OTHER;
     }
 }
