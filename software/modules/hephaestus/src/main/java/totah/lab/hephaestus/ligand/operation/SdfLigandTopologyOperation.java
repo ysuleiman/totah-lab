@@ -17,7 +17,7 @@ import totah.lab.hephaestus.model.PreparationIssue;
 import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.model.Severity;
 import totah.lab.hephaestus.preparation.OperationResult;
-import totah.lab.hermes.file.reader.SdfLigand;
+import totah.lab.hermes.file.sdf.SdfLigand;
 
 import java.util.ArrayList;
 import java.util.Comparator;

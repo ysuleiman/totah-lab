@@ -20,7 +20,7 @@ import totah.lab.hephaestus.typing.AD4AtomTypingReport;
 import totah.lab.hephaestus.typing.AtomTypeAssignment;
 import totah.lab.hephaestus.typing.AssignedAtomType;
 import totah.lab.hephaestus.topology.ProteinTopology;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteOptions;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteOptions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

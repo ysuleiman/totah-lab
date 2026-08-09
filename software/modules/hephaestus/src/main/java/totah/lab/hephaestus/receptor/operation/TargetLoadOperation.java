@@ -5,7 +5,7 @@ import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.receptor.load.TargetLoadRequest;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.api.StructureReader;
 import totah.lab.hephaestus.factory.ProteinFactory;
 
 import java.io.IOException;

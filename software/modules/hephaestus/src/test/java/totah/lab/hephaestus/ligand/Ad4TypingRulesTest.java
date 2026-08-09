@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.hephaestus.ligand.operation.SdfLigandTopologyOperation;
-import totah.lab.hermes.file.reader.SdfLigand;
-import totah.lab.hermes.file.reader.SdfLigandReader;
+import totah.lab.hermes.file.sdf.SdfLigand;
+import totah.lab.hermes.file.sdf.reader.SdfLigandReader;
 
 import java.io.IOException;
 import java.nio.file.Files;

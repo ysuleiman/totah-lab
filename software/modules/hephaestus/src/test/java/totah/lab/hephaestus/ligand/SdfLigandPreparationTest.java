@@ -9,9 +9,9 @@ import totah.lab.hephaestus.ligand.operation.LigandPdbqtExportOperation;
 import totah.lab.hephaestus.ligand.operation.SdfLigandTopologyOperation;
 import totah.lab.hephaestus.ligand.topology.LigandTopology;
 import totah.lab.hephaestus.model.Severity;
-import totah.lab.hermes.file.reader.SdfLigand;
-import totah.lab.hermes.file.reader.SdfLigandReader;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidator;
+import totah.lab.hermes.file.sdf.SdfLigand;
+import totah.lab.hermes.file.sdf.reader.SdfLigandReader;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidator;
 
 import java.io.IOException;
 import java.nio.file.Files;

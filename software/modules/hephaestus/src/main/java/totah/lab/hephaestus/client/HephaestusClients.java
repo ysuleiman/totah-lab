@@ -12,9 +12,9 @@ import totah.lab.hephaestus.receptor.operation.ReceptorHydrogenationOperation;
 import totah.lab.hephaestus.receptor.operation.ResidueStateAssignmentOperation;
 import totah.lab.hephaestus.receptor.operation.StructureCleanupOperation;
 import totah.lab.hephaestus.receptor.operation.TopologyBuilderOperation;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriter;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidator;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.pdbqt.writer.PdbqtWriter;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidator;
 
 public final class HephaestusClients {
     private HephaestusClients() {
@@ -33,7 +33,7 @@ public final class HephaestusClients {
                 .add(new AD4AtomTypingOperation())
                 .build();
         return new DefaultHephaestusClient(
-                new BioJavaStructureReader(),
+                new PdbReader(),
                 new ProteinFactory(),
                 preparer,
                 new PdbqtWriter(),

@@ -9,8 +9,8 @@ import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandPreparationResult;
 import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.validation.ValidationException;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidator;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,7 +59,7 @@ class HephaestusClientLigandTest {
     @Test
     void refusesToWriteUnpreparedLigand() throws Exception {
         Path sdf = writeEthanolSdf();
-        Ligand ligand = new totah.lab.hermes.file.reader.SdfLigandReader().read(sdf);
+        Ligand ligand = new totah.lab.hermes.file.sdf.reader.SdfLigandReader().read(sdf);
 
         assertThrows(ValidationException.class, () -> client.writePreparedLigand(
                 PreparedLigand.of(ligand), temporaryDirectory.resolve("raw.pdbqt")));
@@ -69,7 +69,7 @@ class HephaestusClientLigandTest {
     void preparesCcdBackedLigandThroughLigandOverload() throws Exception {
         Path pdb = Path.of(getClass().getResource(
                 "/ligand/4E1J-glycerol-panel.pdb").toURI());
-        var residue = new BioJavaStructureReader().read(pdb)
+        var residue = new PdbReader().read(pdb)
                 .findResidue("A", 601).orElseThrow();
         Ligand ligand = new Ligand("GOL-A-601", "Glycerol", "GOL", null, null, null,
                 new Structure(List.of(new Chain("A", List.of(residue)))));

@@ -1,6 +1,6 @@
 package totah.lab.hephaestus.export;
 
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteOptions;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteOptions;
 
 import java.nio.file.Path;
 import java.util.Objects;

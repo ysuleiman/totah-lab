@@ -10,8 +10,8 @@ import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.ligand.DefaultLigandPreparer;
 import totah.lab.hephaestus.ligand.LigandPreparationRequest;
 import totah.lab.hephaestus.model.PreparedLigand;
-import totah.lab.hermes.file.reader.SdfLigand;
-import totah.lab.hermes.file.reader.SdfLigandReader;
+import totah.lab.hermes.file.sdf.SdfLigand;
+import totah.lab.hermes.file.sdf.reader.SdfLigandReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

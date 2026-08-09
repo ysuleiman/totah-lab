@@ -23,11 +23,11 @@ import totah.lab.hephaestus.receptor.operation.TopologyBuilderOperation;
 import totah.lab.hephaestus.receptor.protonation.HistidineState;
 import totah.lab.hephaestus.receptor.protonation.ProtonationConfig;
 import totah.lab.hephaestus.validation.ValidationReport;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteOptions;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriter;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidationReport;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidator;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteOptions;
+import totah.lab.hermes.file.pdbqt.writer.PdbqtWriter;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidationReport;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidator;
 
 import java.io.IOException;
 import java.io.PrintWriter;

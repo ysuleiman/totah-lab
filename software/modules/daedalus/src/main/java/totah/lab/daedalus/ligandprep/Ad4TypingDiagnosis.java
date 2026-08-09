@@ -1,14 +1,16 @@
 package totah.lab.daedalus.ligandprep;
 
-import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtAtom;
-import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtLigand;
+import totah.lab.hermes.file.pdbqt.PdbqtModel;
+import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
+import totah.lab.hermes.file.pdbqt.PdbqtAtom;
+import totah.lab.hermes.file.pdbqt.PdbqtModel;
 import totah.lab.gaia.chemistry.ChemicalBond;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandPreparationResult;
-import totah.lab.hermes.file.reader.SdfLigand;
-import totah.lab.hermes.file.reader.SdfLigandReader;
+import totah.lab.hermes.file.sdf.SdfLigand;
+import totah.lab.hermes.file.sdf.reader.SdfLigandReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,8 +108,8 @@ public final class Ad4TypingDiagnosis {
         hephaestus.writePreparedLigand(
                 preparation.preparedLigand(), ourPath);
 
-        PdbqtLigand ours = PdbqtLigandReader.read(ourPath);
-        PdbqtLigand meeko = PdbqtLigandReader.read(sample.meekoPdbqt());
+        PdbqtModel ours = new PdbqtReader().read(ourPath).firstModel();
+        PdbqtModel meeko = new PdbqtReader().read(sample.meekoPdbqt()).firstModel();
 
         List<PdbqtAtom> ourHeavy = ours.heavyAtoms();
         List<PdbqtAtom> meekoHeavy = meeko.heavyAtoms();
@@ -119,7 +121,7 @@ public final class Ad4TypingDiagnosis {
                 ourHeavy, meekoHeavy)) {
             PdbqtAtom ourAtom = ourHeavy.get(match[0]);
             PdbqtAtom meekoAtom = meekoHeavy.get(match[1]);
-            if (ourAtom.ad4Type().equals(meekoAtom.ad4Type())) {
+            if (ourAtom.autodockType().equals(meekoAtom.autodockType())) {
                 continue;
             }
 
@@ -128,7 +130,7 @@ public final class Ad4TypingDiagnosis {
                     sdf, sdfAtoms, sdfIndex, sample, ourAtom,
                     meekoAtom);
             groups.computeIfAbsent(
-                    ourAtom.ad4Type() + " -> " + meekoAtom.ad4Type(),
+                    ourAtom.autodockType() + " -> " + meekoAtom.autodockType(),
                     key -> new Group()).examples.add(context);
         }
     }
@@ -160,7 +162,7 @@ public final class Ad4TypingDiagnosis {
             PdbqtAtom meekoAtom
     ) {
         if (sdfIndex < 0) {
-            return sample.id() + " atom " + ourAtom.name()
+            return sample.id() + " atom " + ourAtom.atomName()
                     + ": no SDF atom matched (coordinate lookup failed)";
         }
 

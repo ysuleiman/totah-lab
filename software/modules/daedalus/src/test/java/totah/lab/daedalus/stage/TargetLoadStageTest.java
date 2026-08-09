@@ -6,7 +6,7 @@ import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.factory.ProteinFactory;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.api.StructureReader;
 import totah.lab.daedalus.ContextKeys;
 import totah.lab.daedalus.PipelineContext;
 

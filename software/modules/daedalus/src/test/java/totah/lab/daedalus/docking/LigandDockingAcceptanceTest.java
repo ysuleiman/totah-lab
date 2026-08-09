@@ -7,7 +7,7 @@ import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.client.HephaestusClients;
 import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandPreparationResult;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidator;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

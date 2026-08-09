@@ -2,7 +2,9 @@ package totah.lab.daedalus.ligandprep;
 
 import org.junit.jupiter.api.Test;
 import totah.lab.daedalus.ligandprep.LigandPrepComparator.LigandPrepComparison;
-import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtLigand;
+import totah.lab.hermes.file.pdbqt.PdbqtModel;
+import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
+
 
 import java.util.List;
 
@@ -10,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static totah.lab.daedalus.ligandprep.PdbqtLigandReaderTest.atomLine;
 
 class LigandPrepComparatorTest {
 
@@ -152,34 +153,54 @@ class LigandPrepComparatorTest {
         assertFalse(LigandPrepComparator.rotorSetsDiffer(comparison));
     }
 
-    private static PdbqtLigand ligandWithBranches(
+    private static PdbqtModel ligandWithBranches(
             List<String> atomLines, List<int[]> branches, int torsdof) {
+        List<String> lines = new java.util.ArrayList<>();
+        lines.add("ROOT");
+        lines.addAll(atomLines);
+        lines.add("ENDROOT");
+        for (int[] branch : branches) {
+            lines.add("BRANCH " + branch[0] + " " + branch[1]);
+            lines.add("ENDBRANCH " + branch[0] + " " + branch[1]);
+        }
+        lines.add("TORSDOF " + torsdof);
+        return readModel(lines);
+    }
+
+    private static PdbqtModel ligand(List<String> atomLines, int torsdof) {
+        List<String> lines = new java.util.ArrayList<>();
+        lines.add("ROOT");
+        lines.addAll(atomLines);
+        lines.add("ENDROOT");
+        lines.add("TORSDOF " + torsdof);
+        return readModel(lines);
+    }
+
+    private static PdbqtModel readModel(List<String> lines) {
         try {
-            List<String> lines = new java.util.ArrayList<>();
-            lines.add("ROOT");
-            lines.addAll(atomLines);
-            lines.add("ENDROOT");
-            for (int[] branch : branches) {
-                lines.add("BRANCH " + branch[0] + " " + branch[1]);
-                lines.add("ENDBRANCH " + branch[0] + " " + branch[1]);
-            }
-            lines.add("TORSDOF " + torsdof);
-            return PdbqtLigandReader.parse(lines);
+            return new PdbqtReader()
+                    .read(new java.io.StringReader(
+                            String.join("\n", lines)))
+                    .firstModel();
         } catch (java.io.IOException exception) {
             throw new IllegalStateException(exception);
         }
     }
 
-    private static PdbqtLigand ligand(List<String> atomLines, int torsdof) {
-        try {
-            List<String> lines = new java.util.ArrayList<>();
-            lines.add("ROOT");
-            lines.addAll(atomLines);
-            lines.add("ENDROOT");
-            lines.add("TORSDOF " + torsdof);
-            return PdbqtLigandReader.parse(lines);
-        } catch (java.io.IOException exception) {
-            throw new IllegalStateException(exception);
-        }
+    static String atomLine(
+            int serial,
+            String name,
+            double x,
+            double y,
+            double z,
+            double charge,
+            String ad4Type
+    ) {
+        return String.format(
+                java.util.Locale.ROOT,
+                "ATOM  %5d %-4s %3s %1s%4d    "
+                        + "%8.3f%8.3f%8.3f%6.2f%6.2f    %6.3f %-2s",
+                serial, name, "LIG", "L", 1,
+                x, y, z, 1.0, 0.0, charge, ad4Type);
     }
 }

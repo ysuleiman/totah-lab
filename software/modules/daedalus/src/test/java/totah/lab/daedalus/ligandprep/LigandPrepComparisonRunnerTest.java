@@ -16,8 +16,8 @@ import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
 import totah.lab.hephaestus.receptor.ReceptorPreparationResult;
 import totah.lab.hephaestus.validation.ValidationReport;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteResult;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidationReport;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteResult;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidationReport;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static totah.lab.daedalus.ligandprep.PdbqtLigandReaderTest.atomLine;
 
 class LigandPrepComparisonRunnerTest {
     @TempDir
@@ -203,5 +202,22 @@ class LigandPrepComparisonRunnerTest {
                 Path rigidInput, Path flexibleInput) {
             throw new UnsupportedOperationException();
         }
+    }
+
+    static String atomLine(
+            int serial,
+            String name,
+            double x,
+            double y,
+            double z,
+            double charge,
+            String ad4Type
+    ) {
+        return String.format(
+                java.util.Locale.ROOT,
+                "ATOM  %5d %-4s %3s %1s%4d    "
+                        + "%8.3f%8.3f%8.3f%6.2f%6.2f    %6.3f %-2s",
+                serial, name, "LIG", "L", 1,
+                x, y, z, 1.0, 0.0, charge, ad4Type);
     }
 }

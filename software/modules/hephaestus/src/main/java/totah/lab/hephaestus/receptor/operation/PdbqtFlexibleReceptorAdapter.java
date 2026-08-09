@@ -11,12 +11,12 @@ import totah.lab.hephaestus.validation.ValidationException;
 import totah.lab.hephaestus.validation.ValidationReport;
 import totah.lab.hephaestus.validation.internal.CanonicalAtomRecord;
 import totah.lab.hephaestus.validation.internal.CanonicalAtomResolver;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtAtomInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtFlexibleReceptorInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtFlexibleResidueInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtFragmentInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtRigidAtomInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtRotatableBondInput;
+import totah.lab.hermes.file.pdbqt.PdbqtAtomReference;
+import totah.lab.hermes.file.pdbqt.PdbqtFlexibleReceptor;
+import totah.lab.hermes.file.pdbqt.PdbqtFlexibleResidue;
+import totah.lab.hermes.file.pdbqt.PdbqtFragment;
+import totah.lab.hermes.file.pdbqt.PdbqtRigidAtom;
+import totah.lab.hermes.file.pdbqt.PdbqtRotatableBond;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,23 +24,23 @@ import java.util.List;
 import java.util.Set;
 
 final class PdbqtFlexibleReceptorAdapter {
-    PdbqtFlexibleReceptorInput adapt(
+    PdbqtFlexibleReceptor adapt(
             PreparedProtein preparedProtein,
             FlexibilityModel flexibilityModel) {
         CanonicalAtomResolver resolver = new CanonicalAtomResolver(
                 preparedProtein.protein().structure());
         List<CanonicalAtomRecord> canonical = resolver.atoms();
         Set<Integer> flexibleIndices = new HashSet<>();
-        List<PdbqtFlexibleResidueInput> flexibleResidues = new ArrayList<>();
+        List<PdbqtFlexibleResidue> flexibleResidues = new ArrayList<>();
 
         for (var flexible : flexibilityModel.flexibleResidues()) {
-            List<PdbqtFragmentInput> fragments = new ArrayList<>();
+            List<PdbqtFragment> fragments = new ArrayList<>();
             for (var fragment : flexible.fragments()) {
-                List<PdbqtAtomInput> atoms = fragment.atoms().stream()
+                List<PdbqtAtomReference> atoms = fragment.atoms().stream()
                         .map(reference -> resolve(reference, resolver, flexibleIndices))
                         .map(this::input).toList();
                 validateReference(fragment.anchor(), resolver);
-                fragments.add(new PdbqtFragmentInput(
+                fragments.add(new PdbqtFragment(
                         fragment.id(), atoms, fragment.anchor().atomIndex(), fragment.parentFragmentId()));
             }
             validateReference(flexible.anchorAtom(), resolver);
@@ -48,24 +48,24 @@ final class PdbqtFlexibleReceptorAdapter {
             ResidueId identity = flexible.residue();
             if (!identity.equals(residueAtom.reference().residue()))
                 throw new IllegalArgumentException("Flexible residue identity does not match its anchor.");
-            List<PdbqtRotatableBondInput> bonds = flexible.rotatableBonds().stream().map(bond -> {
+            List<PdbqtRotatableBond> bonds = flexible.rotatableBonds().stream().map(bond -> {
                 validateReference(bond.parentAtom(), resolver);
                 validateReference(bond.childAtom(), resolver);
-                return new PdbqtRotatableBondInput(
+                return new PdbqtRotatableBond(
                         bond.parentAtom().atomIndex(), bond.childAtom().atomIndex(),
                         bond.parentFragmentId(), bond.childFragmentId());
             }).toList();
-            flexibleResidues.add(new PdbqtFlexibleResidueInput(
+            flexibleResidues.add(new PdbqtFlexibleResidue(
                     residueAtom.residueName(), identity.chainId(), identity.residueNumber(),
                     identity.insertionCode(), flexible.anchorAtom().atomIndex(), fragments, bonds));
         }
 
-        List<PdbqtRigidAtomInput> rigid = canonical.stream()
+        List<PdbqtRigidAtom> rigid = canonical.stream()
                 .filter(atom -> !flexibleIndices.contains(atom.reference().atomIndex()))
-                .map(this::input).map(PdbqtRigidAtomInput::new).toList();
+                .map(this::input).map(PdbqtRigidAtom::new).toList();
         if (rigid.size() + flexibleIndices.size() != canonical.size())
             throw new IllegalArgumentException("Rigid/flexible partition is incomplete.");
-        return new PdbqtFlexibleReceptorInput(rigid, flexibleResidues, canonical.size());
+        return new PdbqtFlexibleReceptor(rigid, flexibleResidues, canonical.size());
     }
 
     private CanonicalAtomRecord resolve(
@@ -84,10 +84,10 @@ final class PdbqtFlexibleReceptorAdapter {
         return resolution.atom();
     }
 
-    private PdbqtAtomInput input(CanonicalAtomRecord resolved) {
+    private PdbqtAtomReference input(CanonicalAtomRecord resolved) {
         Atom atom = resolved.atom();
         ResidueId residue = resolved.reference().residue();
-        return new PdbqtAtomInput(
+        return new PdbqtAtomReference(
                 resolved.reference().atomIndex(), resolved.reference().atomIndex() + 1,
                 atom.getName(), resolved.residueName(), residue.chainId(),
                 residue.residueNumber(), residue.insertionCode(), atom.getPosition(),

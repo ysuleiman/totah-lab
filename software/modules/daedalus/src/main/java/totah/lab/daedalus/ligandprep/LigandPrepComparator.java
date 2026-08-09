@@ -1,7 +1,7 @@
 package totah.lab.daedalus.ligandprep;
 
-import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtAtom;
-import totah.lab.daedalus.ligandprep.PdbqtLigandReader.PdbqtLigand;
+import totah.lab.hermes.file.pdbqt.PdbqtAtom;
+import totah.lab.hermes.file.pdbqt.PdbqtModel;
 import totah.lab.gaia.geometry.Point3D;
 
 import java.util.ArrayList;
@@ -56,8 +56,8 @@ public final class LigandPrepComparator {
     }
 
     public static LigandPrepComparison compare(
-            PdbqtLigand ours,
-            PdbqtLigand meeko
+            PdbqtModel ours,
+            PdbqtModel meeko
     ) {
         List<PdbqtAtom> ourHeavy = ours.heavyAtoms();
         List<PdbqtAtom> meekoHeavy = meeko.heavyAtoms();
@@ -74,8 +74,8 @@ public final class LigandPrepComparator {
             PdbqtAtom ourAtom = ourHeavy.get(match[0]);
             PdbqtAtom meekoAtom = meekoHeavy.get(match[1]);
             chargeDeltaSum += Math.abs(
-                    ourAtom.charge() - meekoAtom.charge());
-            if (ourAtom.ad4Type().equals(meekoAtom.ad4Type())) {
+                    ourAtom.partialCharge() - meekoAtom.partialCharge());
+            if (ourAtom.autodockType().equals(meekoAtom.autodockType())) {
                 typeAgreements++;
             }
             maxDelta = Math.max(maxDelta, match[2] / 1000.0);
@@ -115,7 +115,7 @@ public final class LigandPrepComparator {
      * two atoms' coordinates (both writers preserve source
      * coordinates), so the sets compare order-independently.
      */
-    private static java.util.Set<String> rotorKeys(PdbqtLigand ligand) {
+    private static java.util.Set<String> rotorKeys(PdbqtModel ligand) {
         java.util.Set<String> keys = new java.util.HashSet<>();
         for (int[] bond : ligand.rotatableBondSerials()) {
             Point3D first = ligand.atoms().get(bond[0] - 1).position();

@@ -12,7 +12,7 @@ import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.ligand.flexibility.LigandFlexibilityModel;
 import totah.lab.hephaestus.ligand.operation.LigandPdbqtExportOperation;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,7 +60,7 @@ class NativeLigandRegressionTest {
     @EnabledIfEnvironmentVariable(named = "RUN_ONLINE_CCD_TESTS", matches = "true")
     void preparesOneA4wQweThroughNativePipeline() throws Exception {
         Path pdb = copiedResource("/pipeline/1A4W.pdb");
-        Residue qwe = new BioJavaStructureReader().read(pdb)
+        Residue qwe = new PdbReader().read(pdb)
                 .findResidue("H", 373).orElseThrow();
         assertEquals("QWE", qwe.getName());
         DownloadChemCompProvider provider =
@@ -81,7 +81,7 @@ class NativeLigandRegressionTest {
     private Residue glycerol() throws Exception {
         Path fixture = Path.of(getClass().getResource(
                 "/ligand/4E1J-glycerol-panel.pdb").toURI());
-        return new BioJavaStructureReader().read(fixture)
+        return new PdbReader().read(fixture)
                 .findResidue("A", 601).orElseThrow();
     }
 

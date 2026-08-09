@@ -8,9 +8,9 @@ import totah.lab.hephaestus.model.PreparedLigand;
 import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
 import totah.lab.hephaestus.receptor.ReceptorPreparationResult;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteResult;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteResult;
 import totah.lab.hephaestus.validation.ValidationReport;
-import totah.lab.hermes.file.writer.pdbqt.validation.PdbqtValidationReport;
+import totah.lab.hermes.file.pdbqt.validation.PdbqtValidationReport;
 
 import java.io.IOException;
 import java.nio.file.Path;

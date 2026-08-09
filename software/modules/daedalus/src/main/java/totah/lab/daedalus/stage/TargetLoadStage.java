@@ -3,8 +3,8 @@ package totah.lab.daedalus.stage;
 import totah.lab.gaia.molecule.Protein;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.factory.ProteinFactory;
-import totah.lab.hermes.file.reader.BioJavaStructureReader;
-import totah.lab.hermes.file.reader.StructureReader;
+import totah.lab.hermes.file.pdb.reader.PdbReader;
+import totah.lab.hermes.file.api.StructureReader;
 import totah.lab.hermes.structure.StructureReaderOptions;
 import totah.lab.daedalus.ContextKeys;
 import totah.lab.daedalus.PipelineContext;
@@ -58,7 +58,7 @@ public final class TargetLoadStage implements Stage {
         boolean online = parseBoolean(
                 context.get(ContextKeys.CCD_ONLINE_LOOKUP), false);
         Path cache = online ? ccdCacheDirectory(context) : null;
-        return new BioJavaStructureReader(
+        return new PdbReader(
                 new StructureReaderOptions(online, cache));
     }
 

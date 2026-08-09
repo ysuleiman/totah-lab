@@ -6,10 +6,10 @@ import totah.lab.hephaestus.model.PreparedProtein;
 import totah.lab.hephaestus.preparation.OperationResult;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOperation;
 import totah.lab.hephaestus.receptor.ReceptorPreparationOptions;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteResult;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriter;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtFlexibleReceptorInput;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtFlexibilitySerializer;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteResult;
+import totah.lab.hermes.file.pdbqt.writer.PdbqtWriter;
+import totah.lab.hermes.file.pdbqt.PdbqtFlexibleReceptor;
+import totah.lab.hermes.file.pdbqt.writer.PdbqtFlexibilityWriter;
 import totah.lab.hephaestus.validation.PdbqtExportValidator;
 import totah.lab.hephaestus.validation.ValidationException;
 import totah.lab.hephaestus.validation.ValidationReport;
@@ -27,22 +27,22 @@ public final class PdbqtExportOperation
             "pdbqt-export-validation-report";
 
     private final PdbqtWriter writer;
-    private final PdbqtFlexibilitySerializer flexibilitySerializer;
+    private final PdbqtFlexibilityWriter flexibilitySerializer;
     private final PdbqtFlexibleReceptorAdapter flexibilityAdapter;
     private final PdbqtExportValidator exportValidator;
 
     public PdbqtExportOperation() {
-        this(new PdbqtWriter(), new PdbqtFlexibilitySerializer(),
+        this(new PdbqtWriter(), new PdbqtFlexibilityWriter(),
                 new PdbqtFlexibleReceptorAdapter(), new PdbqtExportValidator());
     }
 
     public PdbqtExportOperation(PdbqtWriter writer) {
-        this(writer, new PdbqtFlexibilitySerializer(),
+        this(writer, new PdbqtFlexibilityWriter(),
                 new PdbqtFlexibleReceptorAdapter(), new PdbqtExportValidator());
     }
 
     PdbqtExportOperation(PdbqtWriter writer,
-            PdbqtFlexibilitySerializer flexibilitySerializer,
+            PdbqtFlexibilityWriter flexibilitySerializer,
             PdbqtFlexibleReceptorAdapter flexibilityAdapter,
             PdbqtExportValidator exportValidator) {
         this.writer = Objects.requireNonNull(writer, "writer");
@@ -71,7 +71,7 @@ public final class PdbqtExportOperation
 
         try {
             if (!validatedProtein.flexibility().isEmpty()) {
-                PdbqtFlexibleReceptorInput input = flexibilityAdapter.adapt(
+                PdbqtFlexibleReceptor input = flexibilityAdapter.adapt(
                         validatedProtein, validatedProtein.flexibility());
                 var result = flexibilitySerializer.write(
                         input, export.outputPath(), export.flexibleOutputPath());

@@ -1,6 +1,8 @@
 package totah.lab.daedalus.ligandprep;
 
 import totah.lab.daedalus.ligandprep.LigandPrepComparator.LigandPrepComparison;
+import totah.lab.hermes.file.pdbqt.PdbqtModel;
+import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
 import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.ligand.LigandPreparationOptions;
 import totah.lab.hephaestus.ligand.LigandPreparationResult;
@@ -87,10 +89,10 @@ public final class LigandPrepComparisonRunner {
             hephaestus.writePreparedLigand(
                     preparation.preparedLigand(), ourPdbqt);
 
-            PdbqtLigandReader.PdbqtLigand ours =
-                    PdbqtLigandReader.read(ourPdbqt);
-            PdbqtLigandReader.PdbqtLigand meeko =
-                    PdbqtLigandReader.read(sample.meekoPdbqt());
+            PdbqtModel ours =
+                    new PdbqtReader().read(ourPdbqt).firstModel();
+            PdbqtModel meeko =
+                    new PdbqtReader().read(sample.meekoPdbqt()).firstModel();
 
             return new Outcome(sample, STATUS_OK, null, null,
                     LigandPrepComparator.compare(ours, meeko));
