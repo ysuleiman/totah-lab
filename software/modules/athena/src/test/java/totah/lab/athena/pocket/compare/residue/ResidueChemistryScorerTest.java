@@ -206,6 +206,20 @@ class ResidueChemistryScorerTest {
     }
 
     @Test
+    void exposesCanonicalPerPairChemistryWeights() {
+        assertEquals(1.0, ResidueChemistryScorer.chemistryWeight(
+                MatchType.IDENTICAL));
+        assertEquals(0.7, ResidueChemistryScorer.chemistryWeight(
+                MatchType.CONSERVATIVE));
+        assertEquals(0.8, ResidueChemistryScorer.chemistryWeight(
+                MatchType.CHEMISTRY_COMPATIBLE));
+        assertEquals(0.0, ResidueChemistryScorer.chemistryWeight(
+                MatchType.DIFFERENT));
+        assertEquals(0.0, ResidueChemistryScorer.chemistryWeight(
+                MatchType.UNMATCHED));
+    }
+
+    @Test
     void rejectsOutOfRangeAssessmentValues() {
         assertThrows(
                 IllegalArgumentException.class,

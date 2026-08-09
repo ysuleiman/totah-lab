@@ -2,6 +2,7 @@ package totah.lab.athena.pocket.evidence;
 
 import totah.lab.athena.pocket.compare.residue.MatchType;
 import totah.lab.athena.pocket.compare.residue.ResidueCorrespondence;
+import totah.lab.athena.pocket.compare.residue.ResidueChemistryScorer;
 import totah.lab.athena.pocket.compare.residue.ResidueMatch;
 import totah.lab.athena.pocket.compare.residue.ResidueReference;
 import totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorer;
@@ -38,13 +39,6 @@ import java.util.Set;
  * same convention as {@code ResidueChemistryScorer}.</p>
  */
 public final class PocketResidueEvidenceFactory {
-
-    // Chemistry weights of ResidueChemistryScorer, duplicated to keep
-    // the per-pair scores consistent with its aggregate chemistry
-    // similarity.
-    private static final double IDENTICAL_WEIGHT = 1.00;
-    private static final double CONSERVATIVE_WEIGHT = 0.70;
-    private static final double CHEMISTRY_COMPATIBLE_WEIGHT = 0.80;
 
     private final ResidueSubstitutionScorer substitutionScorer;
 
@@ -233,12 +227,7 @@ public final class PocketResidueEvidenceFactory {
      * 0.00 (the weights of {@code ResidueChemistryScorer}).
      */
     public static double chemistryWeight(MatchType matchType) {
-        return switch (matchType) {
-            case IDENTICAL -> IDENTICAL_WEIGHT;
-            case CONSERVATIVE -> CONSERVATIVE_WEIGHT;
-            case CHEMISTRY_COMPATIBLE -> CHEMISTRY_COMPATIBLE_WEIGHT;
-            default -> 0.0;
-        };
+        return ResidueChemistryScorer.chemistryWeight(matchType);
     }
 
     /**

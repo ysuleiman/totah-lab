@@ -77,7 +77,7 @@ public final class ResidueChemistryScorer {
         int keyMatchedCount = 0;
 
         for (ResidueMatch match : correspondence.matches()) {
-            double weight = weight(match.matchType());
+            double weight = chemistryWeight(match.matchType());
 
             switch (match.matchType()) {
                 case IDENTICAL -> identicalCount++;
@@ -210,7 +210,12 @@ public final class ResidueChemistryScorer {
                         * assessment.keyResidueChemistrySimilarity();
     }
 
-    private static double weight(MatchType matchType) {
+    /**
+     * Canonical per-pair chemistry contribution used by aggregate and
+     * evidence calculations.
+     */
+    public static double chemistryWeight(MatchType matchType) {
+        Objects.requireNonNull(matchType, "matchType");
         return switch (matchType) {
             case IDENTICAL -> IDENTICAL_WEIGHT;
             case CONSERVATIVE -> CONSERVATIVE_WEIGHT;
