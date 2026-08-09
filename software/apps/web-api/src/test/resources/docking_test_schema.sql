@@ -15,6 +15,8 @@ CREATE SEQUENCE docking_test.residue_id_seq;
 CREATE SEQUENCE docking_test.pocket_id_seq;
 CREATE SEQUENCE docking_test.pocket_residue_id_seq;
 CREATE SEQUENCE docking_test.pocket_atom_id_seq;
+CREATE SEQUENCE docking_test.docking_run_id_seq;
+CREATE SEQUENCE docking_test.docking_pose_id_seq;
 
 -- Test copy of public.targets (inside this schema).
 CREATE TABLE docking_test.targets (
@@ -269,4 +271,54 @@ CREATE TABLE docking_test.pocket_summary_mv (
     h0 float8, h1 float8, h2 float8, h3 float8, h4 float8, h5 float8,
     h6 float8, h7 float8, h8 float8, h9 float8, h10 float8, h11 float8,
     descriptor_version integer
+);
+
+CREATE TABLE docking_test.docking_run (
+    id bigint NOT NULL DEFAULT nextval('docking_test.docking_run_id_seq')
+        PRIMARY KEY,
+    receptor_id bigint REFERENCES docking_test.receptor (id),
+    grid_center_x float8,
+    grid_center_y float8,
+    grid_center_z float8,
+    grid_size_x float8,
+    grid_size_y float8,
+    grid_size_z float8,
+    vina_version varchar(50),
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    structure_id bigint NOT NULL
+        REFERENCES docking_test.structure (id) ON DELETE RESTRICT,
+    source_system varchar(64),
+    source_id uuid,
+    source_metadata jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE docking_test.docking_pose (
+    id bigint NOT NULL DEFAULT nextval('docking_test.docking_pose_id_seq')
+        PRIMARY KEY,
+    ligand_id varchar(32) NOT NULL,
+    vina_score float8 NOT NULL,
+    pose_file text NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    receptor_id varchar(50),
+    run_id bigint NOT NULL
+        REFERENCES docking_test.docking_run (id),
+    source_system varchar(64),
+    source_id uuid,
+    source_artifact_id uuid,
+    source_compound_id uuid,
+    ligand_label varchar(128)
+);
+
+CREATE TABLE docking_test.pose_residue_contact (
+    pose_id bigint NOT NULL
+        REFERENCES docking_test.docking_pose (id) ON DELETE CASCADE,
+    residue_id bigint NOT NULL
+        REFERENCES docking_test.residue (id) ON DELETE RESTRICT,
+    atom_contact_count integer NOT NULL,
+    min_distance float8 NOT NULL,
+    PRIMARY KEY (pose_id, residue_id),
+    CONSTRAINT pose_residue_contact_atom_count_check
+        CHECK (atom_contact_count > 0),
+    CONSTRAINT pose_residue_contact_distance_check
+        CHECK (min_distance >= 0.0 AND min_distance <= 4.0)
 );
