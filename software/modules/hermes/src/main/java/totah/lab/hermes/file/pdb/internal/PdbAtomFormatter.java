@@ -18,8 +18,22 @@ public final class PdbAtomFormatter {
             String chainId, int residueNumber, Character insertionCode,
             Point3D position, double occupancy, double bFactor,
             String elementSymbol) {
+        return format("ATOM", serial, atomName, residueName, chainId,
+                residueNumber, insertionCode, position, occupancy, bFactor,
+                elementSymbol);
+    }
+
+    public String format(String recordName, int serial, String atomName,
+            String residueName, String chainId, int residueNumber,
+            Character insertionCode, Point3D position, double occupancy,
+            double bFactor, String elementSymbol) {
+        if (!"ATOM".equals(recordName) && !"HETATM".equals(recordName)) {
+            throw new IllegalArgumentException(
+                    "PDB atom record must be ATOM or HETATM: "
+                            + recordName);
+        }
         StringBuilder line = new StringBuilder(80);
-        left(line, "ATOM", 6);
+        left(line, recordName, 6);
         integer(line, serial, 5);
         line.append(' ');
         line.append(atomName(atomName, elementSymbol));

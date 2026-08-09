@@ -6,6 +6,7 @@ import totah.lab.hermes.file.pdb.internal.PdbAtomFormatter;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
+import totah.lab.gaia.structure.ResidueId;
 import totah.lab.gaia.structure.Structure;
 
 import java.io.BufferedWriter;
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Writes a gaia {@link Structure} as a standard fixed-column PDB file:
@@ -31,6 +33,17 @@ public final class PdbWriter {
             Structure structure,
             Path output,
             PdbWriteOptions options) throws IOException {
+        return write(structure, output, options, Set.of());
+    }
+
+    /**
+     * Writes a structure while emitting selected residues as HETATM records.
+     */
+    public PdbWriteResult write(
+            Structure structure,
+            Path output,
+            PdbWriteOptions options,
+            Set<ResidueId> heteroResidues) throws IOException {
         Objects.requireNonNull(output, "output");
         Path normalized = output.toAbsolutePath().normalize();
         Path parent = normalized.getParent();
@@ -39,7 +52,8 @@ public final class PdbWriter {
         }
         try (BufferedWriter writer = Files.newBufferedWriter(
                 normalized, StandardCharsets.UTF_8)) {
-            PdbWriteResult result = write(structure, writer, options);
+            PdbWriteResult result = write(
+                    structure, writer, options, heteroResidues);
             return new PdbWriteResult(normalized, result.atomCount());
         }
     }
@@ -48,15 +62,36 @@ public final class PdbWriter {
             Structure structure,
             Writer writer,
             PdbWriteOptions options) throws IOException {
+        return write(structure, writer, options, Set.of());
+    }
+
+    /**
+     * Writes a structure while emitting selected residues as HETATM records.
+     */
+    public PdbWriteResult write(
+            Structure structure,
+            Writer writer,
+            PdbWriteOptions options,
+            Set<ResidueId> heteroResidues) throws IOException {
         Objects.requireNonNull(structure, "structure");
         Objects.requireNonNull(writer, "writer");
+        heteroResidues = Set.copyOf(Objects.requireNonNull(
+                heteroResidues, "heteroResidues"));
         options = options == null ? PdbWriteOptions.defaults() : options;
 
         int serial = 1;
         for (Chain chain : structure.getChains()) {
             for (Residue residue : chain.residues()) {
+                ResidueId residueId = new ResidueId(
+                        chain.id(),
+                        residue.getNumber(),
+                        residue.getInsertionCode());
+                String recordName = heteroResidues.contains(residueId)
+                        ? "HETATM"
+                        : "ATOM";
                 for (Atom atom : residue.getAtoms()) {
                     writer.write(formatter.format(
+                            recordName,
                             serial++,
                             atom.getName(),
                             residue.getName(),
