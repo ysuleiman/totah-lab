@@ -9,6 +9,7 @@ VINA=Path('/Users/yazan/bin/vina'); SEEDS=(1,7,42); EXHAUSTIVENESS=16; MODES=12;
 BOX={'7A':(1.8020,-3.9254,-6.7763,28.452,22.0,26.506),'7B':(2.8444,-2.1005,-4.2105,25.334,22.0,23.923)}
 RECEPTORS={p:ROOT/f'analysis/dcmb/sar_experiment/prepared_receptors/{p}_SAM.pdbqt' for p in ('7A','7B')}
 LIGANDS={c:ROOT/f'analysis/dcmb/sar_experiment/ligands/{c}.pdbqt' for c in ('BA','DCMB_R','DCMB_S','24DCMB_R','24DCMB_S')}
+LIGANDS.update({c:HERE/f'ligands/{c}.pdbqt' for c in ('CONH_R','CONH_S')})
 
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 
