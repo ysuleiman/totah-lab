@@ -85,6 +85,102 @@ class ProteinMutationOperationTest {
     }
 
     @Test
+    void alanineToTryptophanBuildsFusedIndoleSideChain() {
+        MutationResult result = new ProteinMutationOperation().apply(
+                structure(),
+                new Mutation(new ResidueId("A", 1, null), "ALA", "TRP"),
+                MutationContext.defaults());
+
+        assertThat(result.appliedMutation()).isPresent();
+        Residue mutated = result.structure().residue(new ResidueId("A", 1, null));
+        assertThat(mutated.getName()).isEqualTo("TRP");
+        // Four backbone atoms plus the ten TRP side-chain atoms of the
+        // fused indole (CB, CG, the CD1-NE1 five-membered ring and the
+        // CD2-CE3-CZ3-CH2-CZ2-CE2 benzene ring).
+        assertThat(mutated.getAtoms())
+                .extracting(Atom::getName)
+                .containsExactly("N", "CA", "C", "O",
+                        "CB", "CG", "CD1", "CD2", "NE1", "CE2",
+                        "CE3", "CZ3", "CH2", "CZ2");
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CA", "CB"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CB", "CG"));
+        assertEquals(BondOrder.AROMATIC,
+                orderOf(result.structure().bonds(), "CG", "CD1"));
+        assertEquals(BondOrder.AROMATIC,
+                orderOf(result.structure().bonds(), "CD1", "NE1"));
+        assertEquals(BondOrder.AROMATIC,
+                orderOf(result.structure().bonds(), "NE1", "CE2"));
+        assertEquals(BondOrder.AROMATIC,
+                orderOf(result.structure().bonds(), "CZ2", "CE2"));
+    }
+
+    @Test
+    void alanineToValineBuildsBranchedSideChain() {
+        MutationResult result = new ProteinMutationOperation().apply(
+                structure(),
+                new Mutation(new ResidueId("A", 1, null), "ALA", "VAL"),
+                MutationContext.defaults());
+
+        assertThat(result.appliedMutation()).isPresent();
+        Residue mutated = result.structure().residue(new ResidueId("A", 1, null));
+        assertThat(mutated.getName()).isEqualTo("VAL");
+        // Four backbone atoms plus the three VAL side-chain atoms.
+        assertThat(mutated.getAtoms())
+                .extracting(Atom::getName)
+                .containsExactly("N", "CA", "C", "O", "CB", "CG1", "CG2");
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CB", "CG1"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CB", "CG2"));
+    }
+
+    @Test
+    void alanineToMethionineBuildsThioetherSideChain() {
+        MutationResult result = new ProteinMutationOperation().apply(
+                structure(),
+                new Mutation(new ResidueId("A", 1, null), "ALA", "MET"),
+                MutationContext.defaults());
+
+        assertThat(result.appliedMutation()).isPresent();
+        Residue mutated = result.structure().residue(new ResidueId("A", 1, null));
+        assertThat(mutated.getName()).isEqualTo("MET");
+        // Four backbone atoms plus the four MET side-chain atoms.
+        assertThat(mutated.getAtoms())
+                .extracting(Atom::getName)
+                .containsExactly("N", "CA", "C", "O", "CB", "CG", "SD", "CE");
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CB", "CG"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CG", "SD"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "SD", "CE"));
+    }
+
+    @Test
+    void alanineToLeucineBuildsBranchedSideChain() {
+        MutationResult result = new ProteinMutationOperation().apply(
+                structure(),
+                new Mutation(new ResidueId("A", 1, null), "ALA", "LEU"),
+                MutationContext.defaults());
+
+        assertThat(result.appliedMutation()).isPresent();
+        Residue mutated = result.structure().residue(new ResidueId("A", 1, null));
+        assertThat(mutated.getName()).isEqualTo("LEU");
+        // Four backbone atoms plus the four LEU side-chain atoms.
+        assertThat(mutated.getAtoms())
+                .extracting(Atom::getName)
+                .containsExactly("N", "CA", "C", "O", "CB", "CG", "CD1", "CD2");
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CB", "CG"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CG", "CD1"));
+        assertEquals(BondOrder.SINGLE,
+                orderOf(result.structure().bonds(), "CG", "CD2"));
+    }
+
+    @Test
     void singleSubstitutionPreservesBackboneAndResidueIdentity() {
         Structure source = insertionCodedStructure();
         Residue original = source.residue(new ResidueId("A", 1, 'A'));
