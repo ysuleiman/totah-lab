@@ -1,8 +1,9 @@
 package totah.lab.hermes.file.writer;
 
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteOptions;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriteResult;
-import totah.lab.hermes.file.writer.pdbqt.PdbqtWriter;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteOptions;
+import totah.lab.hermes.file.pdbqt.PdbqtWriteResult;
+import totah.lab.hermes.file.pdbqt.PdbqtGaiaMapper;
+import totah.lab.hermes.file.pdbqt.writer.PdbqtWriter;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -25,6 +26,24 @@ class PdbqtWriterTest {
 
     @TempDir
     Path temporaryDirectory;
+
+    @Test
+    void canonicalModelPathMatchesRigidStructureWriter() throws Exception {
+        Structure structure = new Structure(List.of(
+                new Chain("A", List.of(new Residue(
+                        "ALA", 1, List.of(atom("CA", Element.C, "C", -0.1))))),
+                new Chain("B", List.of(new Residue(
+                        "GLY", 2, List.of(atom("H", Element.H, "HD", 0.1)))))));
+        PdbqtWriteOptions options = new PdbqtWriteOptions(true, true);
+        Path direct = temporaryDirectory.resolve("direct.pdbqt");
+        Path canonical = temporaryDirectory.resolve("canonical.pdbqt");
+
+        PdbqtWriter writer = new PdbqtWriter();
+        writer.write(structure, direct, options);
+        writer.write(PdbqtGaiaMapper.fromStructure(structure), canonical, options);
+
+        assertEquals(Files.readString(direct), Files.readString(canonical));
+    }
 
     @Test
     void writesMultipleChainsInOriginalOrderWithExplicitIdentity()

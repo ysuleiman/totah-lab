@@ -3,11 +3,13 @@ package totah.lab.hermes.uniprot;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import totah.lab.hermes.http.HttpClientFactory;
 import totah.lab.hermes.http.HttpRequestBuilder;
+import totah.lab.hermes.http.HttpTransport;
+import totah.lab.hermes.http.JdkHttpTransport;
+import totah.lab.hermes.http.RetryingHttpTransport;
+import totah.lab.hermes.http.RemoteEndpoints;
 import totah.lab.hermes.uniprot.internal.UniProtJsonParser;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -23,18 +25,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * UniProt REST client with two retrieval strategies behind one
- * abstraction: full single-entry JSON via {@link #fetch(String)}, and
+ * UniProt REST client with three retrieval strategies behind one
+ * abstraction: full single-entry JSON via {@link #fetch(String)},
  * compact bulk annotations via the TSV stream endpoint through
- * {@link #fetchAnnotations(Collection)}.
+ * {@link #fetchAnnotations(Collection)}, and query-based search via
+ * {@link #search(String)} against the same TSV stream endpoint.
  */
 public final class RestUniProtClient implements UniProtClient {
 
     public static final URI DEFAULT_BASE_URI =
-            URI.create("https://rest.uniprot.org/uniprotkb/");
+            RemoteEndpoints.uri("uniprot.entry");
 
     public static final URI DEFAULT_STREAM_URI =
-            URI.create("https://rest.uniprot.org/uniprotkb/stream");
+            RemoteEndpoints.uri("uniprot.stream");
 
     public static final Duration DEFAULT_TIMEOUT =
             Duration.ofSeconds(30);
@@ -57,7 +60,7 @@ public final class RestUniProtClient implements UniProtClient {
 
     private static final int ANNOTATION_COLUMN_COUNT = 12;
 
-    private final HttpClient httpClient;
+    private final HttpTransport transport;
     private final UniProtJsonParser parser;
     private final URI baseUri;
     private final URI streamUri;
@@ -107,8 +110,10 @@ public final class RestUniProtClient implements UniProtClient {
             Duration requestTimeout,
             int annotationChunkSize
     ) {
-        this.httpClient =
-                Objects.requireNonNull(httpClient, "httpClient");
+        Objects.requireNonNull(httpClient, "httpClient");
+        this.transport = new RetryingHttpTransport(
+                new JdkHttpTransport(httpClient), MAX_ATTEMPTS,
+                Duration.ofMillis(INITIAL_RETRY_DELAY_MILLIS));
 
         this.parser = new UniProtJsonParser(
                 Objects.requireNonNull(objectMapper, "objectMapper")
@@ -151,7 +156,8 @@ public final class RestUniProtClient implements UniProtClient {
         final HttpResponse<String> response;
 
         try {
-            response = sendWithRetry(request);
+            response = transport.send(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new UniProtException(
                     "Unable to retrieve UniProt accession " + normalized,
@@ -211,11 +217,29 @@ public final class RestUniProtClient implements UniProtClient {
         return List.copyOf(annotations);
     }
 
+    @Override
+    public List<UniProtAnnotation> search(String query)
+            throws UniProtException, InterruptedException {
+
+        Objects.requireNonNull(query, "query");
+
+        if (query.isBlank()) {
+            throw new IllegalArgumentException("query must not be blank");
+        }
+
+        return parseTsv(streamTsv(query.trim()));
+    }
+
     private String fetchChunk(List<String> chunk)
             throws UniProtException, InterruptedException {
 
-        String query =
-                "accession:(" + String.join(" OR ", chunk) + ")";
+        return streamTsv(
+                "accession:(" + String.join(" OR ", chunk) + ")"
+        );
+    }
+
+    private String streamTsv(String query)
+            throws UniProtException, InterruptedException {
 
         URI uri = URI.create(
                 streamUri
@@ -237,7 +261,8 @@ public final class RestUniProtClient implements UniProtClient {
         final HttpResponse<String> response;
 
         try {
-            response = sendWithRetry(request);
+            response = transport.send(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new UniProtException(
                     "Unable to retrieve UniProt annotations", e
@@ -253,72 +278,6 @@ public final class RestUniProtClient implements UniProtClient {
         }
 
         return response.body();
-    }
-
-    private HttpResponse<String> sendWithRetry(HttpRequest request)
-            throws IOException, InterruptedException {
-
-        IOException lastFailure = null;
-
-        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            try {
-                return httpClient.send(
-                        request,
-                        HttpResponse.BodyHandlers.ofString(
-                                StandardCharsets.UTF_8
-                        )
-                );
-            } catch (IOException e) {
-                if (!isRetryableTransportFailure(e)) {
-                    throw e;
-                }
-
-                lastFailure = e;
-
-                if (attempt < MAX_ATTEMPTS) {
-                    sleepBeforeRetry(attempt);
-                }
-            }
-        }
-
-        throw Objects.requireNonNull(
-                lastFailure,
-                "Retry loop completed without a recorded failure"
-        );
-    }
-
-    private static void sleepBeforeRetry(int attempt)
-            throws InterruptedException {
-
-        long delayMillis =
-                INITIAL_RETRY_DELAY_MILLIS * attempt;
-
-        try {
-            Thread.sleep(delayMillis);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw e;
-        }
-    }
-
-    private static boolean isRetryableTransportFailure(IOException exception) {
-        if (exception instanceof EOFException
-                || exception instanceof SocketException) {
-            return true;
-        }
-
-        Throwable cause = exception.getCause();
-
-        while (cause != null) {
-            if (cause instanceof EOFException
-                    || cause instanceof SocketException) {
-                return true;
-            }
-
-            cause = cause.getCause();
-        }
-
-        return false;
     }
 
     static List<UniProtAnnotation> parseTsv(String tsv)

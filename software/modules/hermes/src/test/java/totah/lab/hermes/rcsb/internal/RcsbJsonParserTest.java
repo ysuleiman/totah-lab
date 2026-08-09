@@ -60,4 +60,45 @@ class RcsbJsonParserTest {
     void rejectsResponsesWithoutAnEntryId() {
         assertThrows(RcsbException.class, () -> parser.parse("{}"));
     }
+
+    @Test
+    void parsesEntrySummary() throws Exception {
+        var summary = parser.parseSummary("""
+                {
+                  "rcsb_id": "1EH6",
+                  "struct": {"title": "HUMAN O6-ALKYLGUANINE-DNA ALKYLTRANSFERASE"},
+                  "rcsb_entry_info": {
+                    "experimental_method": "X-ray",
+                    "resolution_combined": [2.0],
+                    "nonpolymer_bound_components": ["ZN"],
+                    "polymer_entity_count": 1,
+                    "deposited_polymer_entity_instance_count": 2,
+                    "assembly_count": 1
+                  }
+                }
+                """);
+
+        assertEquals("1EH6", summary.pdbId());
+        assertEquals("HUMAN O6-ALKYLGUANINE-DNA ALKYLTRANSFERASE",
+                summary.title());
+        assertEquals("X-ray", summary.experimentalMethod());
+        assertEquals(List.of(2.0), summary.resolutions());
+        assertEquals(List.of("ZN"), summary.ligandComponentIds());
+        assertEquals(1, summary.polymerEntityCount());
+        assertEquals(2, summary.chainCount());
+        assertEquals(1, summary.assemblyCount());
+    }
+
+    @Test
+    void parsesSummaryWithMissingOptionalFields() throws Exception {
+        var summary = parser.parseSummary("{\"rcsb_id\":\"12YI\"}");
+
+        assertEquals("12YI", summary.pdbId());
+        assertEquals(List.of(), summary.resolutions());
+        assertEquals(List.of(), summary.ligandComponentIds());
+        assertEquals(0, summary.chainCount());
+        assertThrows(UnsupportedOperationException.class,
+                () -> summary.ligandComponentIds().add("ATP"));
+        assertThrows(RcsbException.class, () -> parser.parseSummary("{}"));
+    }
 }

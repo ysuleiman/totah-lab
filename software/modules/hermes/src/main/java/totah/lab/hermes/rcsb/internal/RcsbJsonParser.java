@@ -3,6 +3,7 @@ package totah.lab.hermes.rcsb.internal;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import totah.lab.hermes.rcsb.RcsbEntry;
+import totah.lab.hermes.rcsb.RcsbEntrySummary;
 import totah.lab.hermes.rcsb.RcsbException;
 
 import java.io.IOException;
@@ -40,6 +41,41 @@ public final class RcsbJsonParser {
         } catch (IOException | RuntimeException e) {
             throw new RcsbException("Unable to parse RCSB response", e);
         }
+    }
+
+    public RcsbEntrySummary parseSummary(String json) throws RcsbException {
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            String pdbId = required(text(root.path("rcsb_id")), "rcsb_id");
+            JsonNode entryInfo = root.path("rcsb_entry_info");
+            return new RcsbEntrySummary(
+                    pdbId,
+                    text(root.path("struct").path("title")),
+                    text(entryInfo.path("experimental_method")),
+                    doubles(entryInfo.path("resolution_combined")),
+                    texts(entryInfo.path("nonpolymer_bound_components")),
+                    entryInfo.path("polymer_entity_count").asInt(0),
+                    entryInfo.path("deposited_polymer_entity_instance_count").asInt(0),
+                    entryInfo.path("assembly_count").asInt(0));
+        } catch (RcsbException e) {
+            throw e;
+        } catch (IOException | RuntimeException e) {
+            throw new RcsbException("Unable to parse RCSB response", e);
+        }
+    }
+
+    private static List<String> texts(JsonNode array) {
+        if (!array.isArray()) {
+            return List.of();
+        }
+        List<String> values = new ArrayList<>();
+        for (JsonNode node : array) {
+            String value = text(node);
+            if (value != null && !values.contains(value)) {
+                values.add(value);
+            }
+        }
+        return List.copyOf(values);
     }
 
     private static List<String> texts(JsonNode array, String field) {

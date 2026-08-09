@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.gaia.pocket.Pocket;
 import totah.lab.gaia.pocket.PocketSource;
-import totah.lab.hermes.file.reader.AutoDetectingPocketReader;
+import totah.lab.hermes.file.pocket.reader.AutoDetectingPocketReader;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

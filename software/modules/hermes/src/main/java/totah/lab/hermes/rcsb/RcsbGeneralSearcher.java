@@ -3,6 +3,7 @@ package totah.lab.hermes.rcsb;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import totah.lab.hermes.rcsb.internal.RcsbJsonParser;
+import totah.lab.hermes.http.RemoteEndpoints;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -51,10 +52,8 @@ public class RcsbGeneralSearcher {
     }
 
     private List<String> executeSearchQuery(ObjectNode payload) throws Exception {
-        String url = "https://search.rcsb.org/rcsbsearch/v2/query";
-
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+                .uri(RemoteEndpoints.uri("rcsb.search"))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(payload.toString()))
                 .build();
@@ -83,8 +82,8 @@ public class RcsbGeneralSearcher {
     }
 
     private String fetchEntryMetadata(String pdbId) throws Exception {
-        String url = "https://data.rcsb.org/rest/v1/core/entry/" + pdbId;
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        URI uri = RemoteEndpoints.uri("rcsb.entry").resolve(pdbId);
+        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
         HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import totah.lab.hermes.rcsb.RcsbAttributeCondition;
+import totah.lab.hermes.rcsb.RcsbAttributeSearch;
 import totah.lab.hermes.rcsb.RcsbException;
 import totah.lab.hermes.rcsb.RcsbResidue;
 import totah.lab.hermes.rcsb.RcsbSearchCriteria;
@@ -33,6 +35,9 @@ public final class RcsbSearchJson {
         } else if (criteria instanceof RcsbStructureMotifSearch motif) {
             root.set("query", motifQuery(motif));
             root.put("return_type", "assembly");
+        } else if (criteria instanceof RcsbAttributeSearch attribute) {
+            root.set("query", attributeQuery(attribute));
+            root.put("return_type", "entry");
         } else {
             throw new IllegalArgumentException("Unsupported search criteria: "
                     + criteria.getClass().getName());
@@ -105,6 +110,43 @@ public final class RcsbSearchJson {
             parameters.remove("exchanges");
         }
         return query;
+    }
+
+    private ObjectNode attributeQuery(RcsbAttributeSearch search) {
+        ObjectNode group = objectMapper.createObjectNode();
+        group.put("type", "group");
+        group.put("logical_operator", "and");
+        ArrayNode nodes = group.putArray("nodes");
+        for (RcsbAttributeCondition condition : search.conditions()) {
+            ObjectNode terminal = terminal("text");
+            ObjectNode parameters = terminal.putObject("parameters");
+            parameters.put("attribute", condition.attribute());
+            parameters.put("operator", condition.operator());
+            if (condition.value() != null) {
+                putValue(parameters, condition.operator(), condition.value());
+            }
+            nodes.add(terminal);
+        }
+        return group;
+    }
+
+    // Comparison operators address numeric attributes and need JSON
+    // numbers; everything else (taxonomy ids, EC numbers, method names)
+    // is sent as text, matching the RCSB Search API expectations.
+    private static void putValue(
+            ObjectNode parameters, String operator, String value) {
+        boolean numeric = switch (operator) {
+            case "less", "less_or_equal", "greater", "greater_or_equal" ->
+                    true;
+            default -> false;
+        };
+        if (numeric && value.matches("-?[0-9]+")) {
+            parameters.put("value", Long.parseLong(value));
+        } else if (numeric && value.matches("-?[0-9]+\\.[0-9]+")) {
+            parameters.put("value", Double.parseDouble(value));
+        } else {
+            parameters.put("value", value);
+        }
     }
 
     private ObjectNode terminal(String service) {

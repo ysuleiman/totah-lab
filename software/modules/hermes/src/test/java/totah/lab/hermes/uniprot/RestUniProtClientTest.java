@@ -280,6 +280,61 @@ class RestUniProtClientTest {
         );
     }
 
+    // ----- query search -----
+
+    @Test
+    void searchPassesQueryThroughAndParsesRows() throws Exception {
+        httpClient.respond(200, TSV_HEADER + "\n"
+                + "Q9H8H3\treviewed\tProtein-lysine methyltransferase"
+                + "\t2.1.1.43;\tMethyltransferase\t\t\t\t\t\t\t8ABC;\n");
+
+        List<UniProtAnnotation> result = client.search(
+                "protein_name:methyltransferase AND organism_id:9606"
+                        + " AND reviewed:true"
+        );
+
+        assertEquals(1, result.size());
+        assertEquals("Q9H8H3", result.get(0).accession());
+        assertEquals("8ABC;", result.get(0).pdbIds());
+
+        assertEquals(1, httpClient.requests.size());
+        String uri = httpClient.requests.get(0).uri().toString();
+        assertTrue(uri.startsWith(STREAM_URI + "?query="));
+        assertTrue(uri.contains(
+                "protein_name%3Amethyltransferase+AND+organism_id%3A9606"
+                        + "+AND+reviewed%3Atrue"
+        ));
+        assertTrue(uri.contains("format=tsv"));
+    }
+
+    @Test
+    void searchRejectsBlankQueryWithoutHttp() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> client.search("  ")
+        );
+        assertEquals(0, httpClient.requests.size());
+    }
+
+    @Test
+    void searchFailsForNonSuccessfulResponses() {
+        httpClient.respond(400, "Invalid query");
+
+        assertThrows(
+                UniProtException.class,
+                () -> client.search("not:a:valid:query")
+        );
+    }
+
+    @Test
+    void searchRetriesTransportFailures() throws Exception {
+        httpClient.fail(new SocketException("connection reset"));
+        httpClient.respond(200, TSV_HEADER + "\n");
+
+        assertEquals(List.of(), client.search("organism_id:9606"));
+        assertEquals(2, httpClient.requests.size());
+    }
+
     private static int countOccurrences(String value, String needle) {
         int count = 0;
         int from = 0;

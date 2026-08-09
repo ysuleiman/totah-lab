@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import totah.lab.hermes.http.RemoteEndpoints;
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,7 +28,7 @@ public final class BiohubAtlasClient {
     private final ObjectMapper objectMapper;
 
     public BiohubAtlasClient() {
-        this(URI.create("https://biohub.ai"));
+        this(RemoteEndpoints.uri("biohub.base"));
     }
 
     public BiohubAtlasClient(URI baseUri) {

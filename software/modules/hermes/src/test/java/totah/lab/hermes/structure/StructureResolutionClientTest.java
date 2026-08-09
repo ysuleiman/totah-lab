@@ -1,12 +1,13 @@
 package totah.lab.hermes.structure;
 
 import org.junit.jupiter.api.Test;
-import totah.lab.hermes.http.DefaultStructureResolutionClient;
+import org.junit.jupiter.api.Tag;
 import totah.lab.hermes.uniprot.RestUniProtClient;
 
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+@Tag("integration")
 public class StructureResolutionClientTest {
 
     @Test

@@ -1,5 +1,7 @@
 package totah.lab.hermes.biohub;
 
+import totah.lab.hermes.http.RemoteEndpoints;
+
 import java.net.URI;
 import java.time.Duration;
 import java.util.Objects;
@@ -41,7 +43,7 @@ public record BiohubClientConfig(
             );
         }
         return new BiohubClientConfig(
-                URI.create("https://biohub.ai"),
+                RemoteEndpoints.uri("biohub.base"),
                 token,
                 "esmc-300m-2024-12",
                 Duration.ofMinutes(3)

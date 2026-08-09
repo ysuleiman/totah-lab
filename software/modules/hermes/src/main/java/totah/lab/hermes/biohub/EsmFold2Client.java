@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import totah.lab.hermes.biohub.config.EsmHttpClientConfig;
+import totah.lab.hermes.http.RemoteEndpoints;
 
 import java.io.IOException;
 import java.net.URI;
@@ -95,7 +96,9 @@ public class EsmFold2Client {
         String configuredApiToken = apiToken;
         EsmHttpClientConfig mockConfig = new EsmHttpClientConfig() {
             @Override
-            public String getApiUrl() { return "https://biohub.ai"; }
+            public String getApiUrl() {
+                return RemoteEndpoints.uri("biohub.base").toString();
+            }
             @Override
             public String getApiKey() { return configuredApiToken; }
         };

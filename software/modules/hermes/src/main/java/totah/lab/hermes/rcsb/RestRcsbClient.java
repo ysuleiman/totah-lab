@@ -3,6 +3,9 @@ package totah.lab.hermes.rcsb;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import totah.lab.hermes.http.HttpClientFactory;
 import totah.lab.hermes.http.HttpRequestBuilder;
+import totah.lab.hermes.http.HttpTransport;
+import totah.lab.hermes.http.JdkHttpTransport;
+import totah.lab.hermes.http.RemoteEndpoints;
 import totah.lab.hermes.rcsb.internal.RcsbJsonParser;
 import totah.lab.hermes.rcsb.internal.RcsbSearchJson;
 
@@ -17,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,15 +29,15 @@ import java.util.List;
 public final class RestRcsbClient implements RcsbClient {
 
     public static final URI DEFAULT_BASE_URI =
-            URI.create("https://data.rcsb.org/rest/v1/core/entry/");
+            RemoteEndpoints.uri("rcsb.entry");
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);
     public static final URI DEFAULT_SEARCH_URI =
-            URI.create("https://search.rcsb.org/rcsbsearch/v2/query");
+            RemoteEndpoints.uri("rcsb.search");
     public static final URI DEFAULT_DOWNLOAD_BASE_URI =
-            URI.create("https://files.rcsb.org/download/");
+            RemoteEndpoints.uri("rcsb.download");
     private static final String USER_AGENT = "Totah-Lab-Hermes/1.0";
 
-    private final HttpClient httpClient;
+    private final HttpTransport transport;
     private final RcsbJsonParser parser;
     private final RcsbSearchJson searchJson;
     private final URI baseUri;
@@ -61,7 +65,8 @@ public final class RestRcsbClient implements RcsbClient {
     public RestRcsbClient(HttpClient httpClient, ObjectMapper objectMapper,
                           URI baseUri, URI searchUri, URI downloadBaseUri,
                           Duration requestTimeout) {
-        this.httpClient = Objects.requireNonNull(httpClient, "httpClient");
+        this.transport = new JdkHttpTransport(
+                Objects.requireNonNull(httpClient, "httpClient"));
         this.parser = new RcsbJsonParser(
                 Objects.requireNonNull(objectMapper, "objectMapper"));
         this.searchJson = new RcsbSearchJson(objectMapper);
@@ -86,7 +91,7 @@ public final class RestRcsbClient implements RcsbClient {
                 .buildPost(HttpRequest.BodyPublishers.ofString(
                         requestBody, StandardCharsets.UTF_8));
         try {
-            HttpResponse<String> response = httpClient.send(
+            HttpResponse<String> response = transport.send(
                     request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() == 200) {
                 return searchJson.response(response.body());
@@ -116,7 +121,7 @@ public final class RestRcsbClient implements RcsbClient {
                 .header("User-Agent", USER_AGENT)
                 .buildGet();
         try {
-            HttpResponse<byte[]> response = httpClient.send(
+            HttpResponse<byte[]> response = transport.send(
                     request, HttpResponse.BodyHandlers.ofByteArray());
             if (response.statusCode() != 200) {
                 throw new RcsbException("RCSB coordinate download failed for PDB ID "
@@ -140,18 +145,43 @@ public final class RestRcsbClient implements RcsbClient {
     @Override
     public Optional<RcsbEntry> fetch(String pdbId)
             throws RcsbException, InterruptedException {
-        String normalized = normalizePdbId(pdbId);
+        String body = fetchEntryBody(normalizePdbId(pdbId));
+        return body == null ? Optional.empty() : Optional.of(parser.parse(body));
+    }
+
+    @Override
+    public Optional<RcsbEntrySummary> fetchSummary(String pdbId)
+            throws RcsbException, InterruptedException {
+        String body = fetchEntryBody(normalizePdbId(pdbId));
+        return body == null
+                ? Optional.empty() : Optional.of(parser.parseSummary(body));
+    }
+
+    @Override
+    public List<RcsbEntrySummary> searchEntries(RcsbAttributeSearch criteria)
+            throws RcsbException, InterruptedException {
+        List<RcsbEntrySummary> summaries = new ArrayList<>();
+        for (RcsbSearchHit hit : search(criteria)) {
+            String pdbId = hit.pdbId().orElse(hit.identifier());
+            fetchSummary(pdbId).ifPresent(summaries::add);
+        }
+        return List.copyOf(summaries);
+    }
+
+    /** Entry core JSON body, or null when the entry does not exist. */
+    private String fetchEntryBody(String normalized)
+            throws RcsbException, InterruptedException {
         HttpRequest request = HttpRequestBuilder.forUri(requestUri(normalized))
                 .timeout(requestTimeout)
                 .header("Accept", "application/json")
                 .header("User-Agent", USER_AGENT)
                 .buildGet();
         try {
-            HttpResponse<String> response = httpClient.send(
+            HttpResponse<String> response = transport.send(
                     request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             return switch (response.statusCode()) {
-                case 200 -> Optional.of(parser.parse(response.body()));
-                case 404 -> Optional.empty();
+                case 200 -> response.body();
+                case 404 -> null;
                 default -> throw new RcsbException("RCSB request failed for PDB ID "
                         + normalized + ": HTTP " + response.statusCode()
                         + responseMessage(response.body()));

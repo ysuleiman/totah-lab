@@ -1,7 +1,9 @@
 package totah.lab.hermes.uniprot;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
+@Tag("integration")
 public class UniProtClientTest {
 
     @Test

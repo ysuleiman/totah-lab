@@ -2,6 +2,7 @@ package totah.lab.hermes.rcsb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 import totah.lab.hermes.rcsb.internal.RcsbJsonParser;
 
 import java.util.List;
@@ -18,6 +19,7 @@ class RcsbGeneralSearcherTest {
     private final RcsbQueryFactory queryFactory = new RcsbQueryFactory(mapper);
 
     @Test
+    @Tag("integration")
     void canExecuteWholeStructureSimilaritySearch() throws Exception {
         // Build a global 3D structural shape query for Hemoglobin (PDB ID: 4HHB)
         var wholeStructureQuery = queryFactory.createWholeStructureQuery("4HHB", "1");
@@ -28,6 +30,7 @@ class RcsbGeneralSearcherTest {
     }
 
     @Test
+    @Tag("integration")
     void canExecuteSequenceSimilaritySearch() throws Exception {
         // Short partial sequence snippet
         String humanInsulinSnippet = "GIVEQCCTSICSLYQLENYCN";
@@ -54,4 +57,3 @@ class RcsbGeneralSearcherTest {
         assertEquals(List.of("4HHB"), ids);
     }
 }
-

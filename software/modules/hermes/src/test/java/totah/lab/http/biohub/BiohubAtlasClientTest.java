@@ -2,6 +2,7 @@ package totah.lab.hermes.biohub;
 
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,7 @@ import java.util.zip.ZipOutputStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("integration")
 class BiohubAtlasClientTest {
 
     private static final String HASH = "973eb56c8acaa2458cd7beae3af41781";

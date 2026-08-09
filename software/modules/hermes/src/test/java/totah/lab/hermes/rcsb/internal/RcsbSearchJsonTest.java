@@ -2,6 +2,8 @@ package totah.lab.hermes.rcsb.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import totah.lab.hermes.rcsb.RcsbAttributeCondition;
+import totah.lab.hermes.rcsb.RcsbAttributeSearch;
 import totah.lab.hermes.rcsb.RcsbResidue;
 import totah.lab.hermes.rcsb.RcsbSequenceSearch;
 import totah.lab.hermes.rcsb.RcsbStructureMotifSearch;
@@ -9,6 +11,7 @@ import totah.lab.hermes.rcsb.RcsbStructureMotifSearch;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RcsbSearchJsonTest {
@@ -59,5 +62,55 @@ class RcsbSearchJsonTest {
                 hits.stream().map(hit -> hit.identifier()).toList());
         assertEquals(0.9, hits.getFirst().score());
         assertEquals("1ABC", hits.getFirst().pdbId().orElseThrow());
+    }
+
+    @Test
+    void encodesAttributeSearchAsAndedEntryQuery() throws Exception {
+        var json = objectMapper.readTree(codec.request(new RcsbAttributeSearch(
+                RcsbAttributeCondition.organismTaxonomy("9606"),
+                RcsbAttributeCondition.enzymeClass("2.1.1"),
+                RcsbAttributeCondition.resolutionAtMost(2.0))));
+
+        assertEquals("group", json.at("/query/type").textValue());
+        assertEquals("and", json.at("/query/logical_operator").textValue());
+        assertEquals("entry", json.path("return_type").textValue());
+        assertTrue(json.at("/request_options/return_all_hits").booleanValue());
+
+        assertEquals("rcsb_entity_source_organism.taxonomy_lineage.id",
+                json.at("/query/nodes/0/parameters/attribute").textValue());
+        assertEquals("9606",
+                json.at("/query/nodes/0/parameters/value").textValue());
+        assertEquals("rcsb_polymer_entity.rcsb_ec_lineage.id",
+                json.at("/query/nodes/1/parameters/attribute").textValue());
+        assertEquals("2.1.1",
+                json.at("/query/nodes/1/parameters/value").textValue());
+        // numeric conditions are emitted as JSON numbers, not text
+        assertEquals(2.0,
+                json.at("/query/nodes/2/parameters/value").doubleValue());
+        assertEquals("less_or_equal",
+                json.at("/query/nodes/2/parameters/operator").textValue());
+    }
+
+    @Test
+    void omitsValueForExistsConditions() throws Exception {
+        var json = objectMapper.readTree(codec.request(new RcsbAttributeSearch(
+                new RcsbAttributeCondition(
+                        "rcsb_entry_info.deposited_model_count", "exists", null))));
+
+        assertEquals("exists",
+                json.at("/query/nodes/0/parameters/operator").textValue());
+        assertTrue(json.at("/query/nodes/0/parameters/value").isMissingNode());
+    }
+
+    @Test
+    void rejectsInvalidAttributeConditions() {
+        assertThrows(IllegalArgumentException.class,
+                () -> RcsbAttributeCondition.organismTaxonomy("human"));
+        assertThrows(IllegalArgumentException.class,
+                () -> RcsbAttributeCondition.enzymeClass("not-an-ec"));
+        assertThrows(IllegalArgumentException.class,
+                () -> RcsbAttributeCondition.resolutionAtMost(0.0));
+        assertThrows(IllegalArgumentException.class,
+                () -> new RcsbAttributeSearch(List.of()));
     }
 }
