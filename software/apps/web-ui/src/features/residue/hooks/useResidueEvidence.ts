@@ -2,10 +2,12 @@ import { useMemo } from 'react'
 import type { ResidueEvidence } from '../../../api/types'
 import { useApiQuery } from '../../../api/hooks'
 
-export function useResidueEvidence(structureId: number) {
+export function useResidueEvidence(structureId: number | null) {
   const query = useApiQuery<ResidueEvidence[]>(
-    `/api/structures/${structureId}/residue-evidence`
-      + '?analysisType=ESMC_CONSTRAINT',
+    structureId != null
+      ? `/api/structures/${structureId}/residue-evidence`
+        + '?analysisType=ESMC_CONSTRAINT'
+      : null,
   )
   const byResidueId = useMemo(
     () => new Map(

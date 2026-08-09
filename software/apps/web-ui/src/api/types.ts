@@ -1,9 +1,27 @@
+export type ResidueCategoryKey =
+  | 'HYDROPHOBIC'
+  | 'AROMATIC'
+  | 'POLAR'
+  | 'POSITIVELY_CHARGED'
+  | 'NEGATIVELY_CHARGED'
+  | 'CYSTEINE'
+  | 'GLYCINE'
+  | 'PROLINE'
+
+export interface ResidueChemistryView {
+  categories: string[]
+  primaryCategory: ResidueCategoryKey | null
+  primaryLabel: string | null
+  colorKey: ResidueCategoryKey | null
+}
+
 export interface Residue {
   id: number
   chain: string
   residueNumber: number
   insertionCode: string
   residueName: string
+  chemistry?: ResidueChemistryView
 }
 
 export interface ResidueEvidence {

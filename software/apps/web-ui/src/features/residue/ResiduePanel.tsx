@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import type {
   AtomDistance,
   DockingRunSummary,
   PocketDetails,
   Residue,
+  ResidueChemistryView,
   ResidueAnalysis,
   ResidueEvidence,
   ResidueNeighborhood,
@@ -24,6 +25,7 @@ interface Props {
   highlightedResidueIds: Set<number>
   chosenPocketResidueIds?: Set<number>
   directContactResidueIds?: Set<number>
+  ligandContactResidueIds?: Set<number>
   activePocket: PocketDetails | null
   pocketLoading: boolean
   dockingRuns: DockingRunSummary[]
@@ -33,6 +35,12 @@ interface Props {
   analysisLoading: boolean
   residueEvidence?: Map<number, ResidueEvidence>
   evidenceLoading?: boolean
+  /** Replaces the "Highlighting N residues for …" caption. */
+  contextNote?: ReactNode
+  /** Strips the panel to the strip: no heading, search, run selector. */
+  bare?: boolean
+  /** Tints chosen-pocket, non-contact residues by category. */
+  colorPocketByCategory?: boolean
 }
 
 export function ResiduePanel({
@@ -41,6 +49,7 @@ export function ResiduePanel({
   highlightedResidueIds,
   chosenPocketResidueIds = new Set(),
   directContactResidueIds = new Set(),
+  ligandContactResidueIds = new Set(),
   activePocket,
   pocketLoading,
   dockingRuns,
@@ -50,6 +59,9 @@ export function ResiduePanel({
   analysisLoading,
   residueEvidence = new Map(),
   evidenceLoading = false,
+  contextNote,
+  bare = false,
+  colorPocketByCategory = false,
 }: Props) {
   const [query, setQuery] = useState('')
   const [selectedResidue, setSelectedResidue] = useState<Residue | null>(null)
@@ -112,50 +124,75 @@ export function ResiduePanel({
   }, [query, residues])
   const contactScoreThreshold =
     residueAnalysis.values().next().value?.contactScoreThreshold ?? null
+  // Categories actually tinted on the strip: chosen-pocket residues that
+  // are not ligand contacts (those stay green/red).
+  const pocketCategories = useMemo<ResidueChemistryView[]>(() => {
+    if (!colorPocketByCategory) return []
+    const present = new Map<string, ResidueChemistryView>()
+    for (const residue of residues) {
+      if (
+        chosenPocketResidueIds.has(residue.id)
+        && !ligandContactResidueIds.has(residue.id)
+      ) {
+        const chemistry = residue.chemistry
+        if (chemistry?.colorKey) present.set(chemistry.colorKey, chemistry)
+      }
+    }
+    return [...present.values()]
+  }, [
+    colorPocketByCategory,
+    residues,
+    chosenPocketResidueIds,
+    ligandContactResidueIds,
+  ])
 
   return (
-    <section className="panel residue-panel" aria-labelledby="residues-heading">
-      <div className="panel-heading residue-heading">
-        <div>
-          <p className="eyebrow">Primary sequence</p>
-          <h2 id="residues-heading">Residues</h2>
+    <section className="panel residue-panel" aria-label="Structure residues">
+      {!bare && (
+        <div className="panel-heading residue-heading">
+          <div>
+            <p className="eyebrow">Primary sequence</p>
+            <h2 id="residues-heading">Residues</h2>
+          </div>
+          <label className="residue-search">
+            <span className="sr-only">Filter residues</span>
+            <input
+              type="search"
+              placeholder="Find MET1…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </label>
         </div>
-        <label className="residue-search">
-          <span className="sr-only">Filter residues</span>
-          <input
-            type="search"
-            placeholder="Find MET1…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-      </div>
+      )}
       <div className="residue-context">
         <span>
-          {pocketLoading ? (
-            'Loading residue evidence…'
-          ) : activePocket ? (
-            activePocket.evidence ? (
-              <>
-                Chosen fpocket with{' '}
-                <strong>
-                  {activePocket.evidence.directContactResidueCount}{' '}
-                  {activePocket.evidence.ligandCcd} direct contacts
-                </strong>
-              </>
+          {contextNote ?? (
+            pocketLoading ? (
+              'Loading residue evidence…'
+            ) : activePocket ? (
+              activePocket.evidence ? (
+                <>
+                  Chosen fpocket with{' '}
+                  <strong>
+                    {activePocket.evidence.directContactResidueCount}{' '}
+                    {activePocket.evidence.ligandCcd} direct contacts
+                  </strong>
+                </>
+              ) : (
+                <>
+                  Highlighting {activePocket.residues.length} residues for{' '}
+                  <strong>
+                    {activePocket.source} {activePocket.pocketNumber}
+                  </strong>
+                </>
+              )
             ) : (
-              <>
-                Highlighting {activePocket.residues.length} residues for{' '}
-                <strong>
-                  {activePocket.source} {activePocket.pocketNumber}
-                </strong>
-              </>
+              'Select a pocket to highlight its residues'
             )
-          ) : (
-            'Select a pocket to highlight its residues'
           )}
         </span>
-        {dockingRuns.length > 0 && (
+        {!bare && dockingRuns.length > 0 && (
           <label className="run-selector">
             <span>Docking run</span>
             <select
@@ -183,6 +220,7 @@ export function ResiduePanel({
         showDocking={residueAnalysis.size > 0}
         showConstraint={residueEvidence.size > 0}
         showNeighbors={neighborResidueIds.size > 0}
+        categories={pocketCategories}
       />
       <ResidueSequence
         residues={filtered}
@@ -190,11 +228,13 @@ export function ResiduePanel({
         chosenPocketResidueIds={chosenPocketResidueIds}
         biohubSelected={activePocket?.source === 'BIOHUB'}
         directContactResidueIds={directContactResidueIds}
+        ligandContactResidueIds={ligandContactResidueIds}
         neighborResidueIds={neighborResidueIds}
         residueAnalysis={residueAnalysis}
         residueEvidence={residueEvidence}
         selectedResidueId={selectedResidue?.id ?? null}
         onResidueSelect={setSelectedResidue}
+        colorPocketByCategory={colorPocketByCategory}
       />
       {selectedResidue && (
         <div className="residue-detail">

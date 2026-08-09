@@ -1,9 +1,17 @@
+import type { CSSProperties } from 'react'
+import type { ResidueChemistryView } from '../../../api/types'
+import {
+  CATEGORY_COLORS,
+} from '../../ligands/residueCategory'
+
 interface Props {
   showChosenPocket: boolean
   showBiohub: boolean
   showDocking: boolean
   showConstraint: boolean
   showNeighbors: boolean
+  /** Pocket categories currently tinted on the strip. */
+  categories?: ResidueChemistryView[]
 }
 
 export function ResidueGuide({
@@ -12,6 +20,7 @@ export function ResidueGuide({
   showDocking,
   showConstraint,
   showNeighbors,
+  categories = [],
 }: Props) {
   return (
     <aside className="residue-guide" aria-label="Residue color guide">
@@ -42,8 +51,24 @@ export function ResidueGuide({
       {showNeighbors && (
         <GuideItem signal="neighbor" label="Spatial neighbor" />
       )}
+      {categories.map((chemistry) => chemistry.colorKey && (
+        <span className="residue-guide-item" key={chemistry.colorKey}>
+          <i
+            className="residue-guide-swatch category"
+            style={{
+              '--category-color': CATEGORY_COLORS[chemistry.colorKey],
+            } as CategorySwatchStyle}
+            aria-hidden="true"
+          />
+          {chemistry.primaryLabel}
+        </span>
+      ))}
     </aside>
   )
+}
+
+type CategorySwatchStyle = CSSProperties & {
+  '--category-color': string
 }
 
 interface GuideItemProps {

@@ -9,6 +9,12 @@ const residue = {
   residueNumber: 200,
   insertionCode: ' ',
   residueName: 'ASP',
+  chemistry: {
+    categories: ['NEGATIVELY_CHARGED'],
+    primaryCategory: 'NEGATIVELY_CHARGED' as const,
+    primaryLabel: 'Negative',
+    colorKey: 'NEGATIVELY_CHARGED' as const,
+  },
 }
 
 const analysis: ResidueAnalysis = {
@@ -113,5 +119,38 @@ describe('ResidueSequence', () => {
     expect(screen.getByRole('listitem', {
       name: 'ASP 202, chain A',
     })).not.toHaveClass('highlighted', 'biohub-only', 'biohub-direct-contact')
+  })
+
+  it('tints non-contact pocket residues by category when enabled', () => {
+    const pocketResidue = { ...residue, id: 448, residueNumber: 203 }
+    const contactResidue = { ...residue, id: 449, residueNumber: 204 }
+    render(
+      <ResidueSequence
+        residues={[pocketResidue, contactResidue]}
+        pocketResidueIds={new Set([pocketResidue.id, contactResidue.id])}
+        chosenPocketResidueIds={new Set([
+          pocketResidue.id,
+          contactResidue.id,
+        ])}
+        ligandContactResidueIds={new Set([contactResidue.id])}
+        colorPocketByCategory
+        neighborResidueIds={new Set()}
+        residueAnalysis={new Map()}
+        selectedResidueId={null}
+        onResidueSelect={() => undefined}
+      />,
+    )
+
+    const tinted = screen.getByRole('listitem', {
+      name: 'ASP 203, chain A',
+    })
+    expect(tinted).toHaveClass('category')
+    expect(tinted).toHaveStyle({ '--category-color': '#8a4fbf' })
+    expect(tinted).toHaveAttribute('title', expect.stringContaining('Negative'))
+    const contact = screen.getByRole('listitem', {
+      name: 'ASP 204, chain A',
+    })
+    expect(contact).toHaveClass('ligand-contact-inside')
+    expect(contact).not.toHaveClass('category')
   })
 })

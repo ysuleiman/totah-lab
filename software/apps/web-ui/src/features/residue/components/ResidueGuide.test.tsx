@@ -23,4 +23,34 @@ describe('ResidueGuide', () => {
       .not.toBeInTheDocument()
     expect(screen.queryByText('Spatial neighbor')).not.toBeInTheDocument()
   })
+
+  it('lists the pocket categories currently tinted on the strip', () => {
+    render(
+      <ResidueGuide
+        showChosenPocket
+        showBiohub={false}
+        showDocking={false}
+        showConstraint={false}
+        showNeighbors={false}
+        categories={[
+          {
+            categories: ['HYDROPHOBIC'],
+            primaryCategory: 'HYDROPHOBIC',
+            primaryLabel: 'Hydrophobic',
+            colorKey: 'HYDROPHOBIC',
+          },
+          {
+            categories: ['NEGATIVELY_CHARGED'],
+            primaryCategory: 'NEGATIVELY_CHARGED',
+            primaryLabel: 'Negative',
+            colorKey: 'NEGATIVELY_CHARGED',
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('Hydrophobic')).toBeInTheDocument()
+    expect(screen.getByText('Negative')).toBeInTheDocument()
+    expect(screen.queryByText('Aromatic')).not.toBeInTheDocument()
+  })
 })

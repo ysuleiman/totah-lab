@@ -23,3 +23,17 @@ export async function getJson<T>(
   }
   return response.json() as Promise<T>
 }
+
+export async function getText(
+  path: string,
+  signal?: AbortSignal,
+): Promise<string> {
+  const response = await fetch(path, { signal })
+  if (!response.ok) {
+    throw new ApiError(
+      `Request failed with status ${response.status}`,
+      response.status,
+    )
+  }
+  return response.text()
+}
