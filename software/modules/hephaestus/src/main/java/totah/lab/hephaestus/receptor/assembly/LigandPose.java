@@ -4,6 +4,7 @@ import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
 import totah.lab.gaia.structure.Residue;
+import totah.lab.gaia.structure.Structure;
 import totah.lab.hephaestus.model.PreparedLigand;
 
 import java.util.List;
@@ -32,7 +33,63 @@ public record LigandPose(
 
     /** Returns prepared chemistry with the validated pose coordinates. */
     public PreparedLigand preparedPose() {
-        return preparedLigand.withLigand(posedLigand);
+        Ligand prepared = preparedLigand.ligand();
+        List<Chain> posedChains = posedLigand.structure().getChains();
+        List<Chain> positionedChains = new java.util.ArrayList<>(
+                prepared.structure().getChainCount());
+
+        for (int chainIndex = 0;
+                chainIndex < prepared.structure().getChainCount();
+                chainIndex++) {
+            Chain preparedChain = prepared.structure().getChains()
+                    .get(chainIndex);
+            Chain posedChain = posedChains.get(chainIndex);
+            List<Residue> positionedResidues = new java.util.ArrayList<>(
+                    preparedChain.residueCount());
+
+            for (int residueIndex = 0;
+                    residueIndex < preparedChain.residueCount();
+                    residueIndex++) {
+                Residue preparedResidue = preparedChain.residues()
+                        .get(residueIndex);
+                Residue posedResidue = posedChain.residues()
+                        .get(residueIndex);
+                List<Atom> positionedAtoms = new java.util.ArrayList<>(
+                        preparedResidue.getAtomCount());
+
+                for (int atomIndex = 0;
+                        atomIndex < preparedResidue.getAtomCount();
+                        atomIndex++) {
+                    Atom preparedAtom = preparedResidue.getAtoms()
+                            .get(atomIndex);
+                    Atom posedAtom = posedResidue.getAtoms().get(atomIndex);
+                    positionedAtoms.add(preparedAtom.toBuilder()
+                            .position(posedAtom.getPosition())
+                            .build());
+                }
+                positionedResidues.add(preparedResidue.toBuilder()
+                        .atoms(positionedAtoms)
+                        .build());
+            }
+            positionedChains.add(new Chain(
+                    preparedChain.id(),
+                    positionedResidues));
+        }
+
+        Structure preparedStructure = prepared.structure();
+        Structure positionedStructure = new Structure(
+                positionedChains,
+                preparedStructure.bonds(),
+                preparedStructure.getConnectivityMetadata());
+        Ligand positionedLigand = new Ligand(
+                prepared.id(),
+                prepared.name(),
+                prepared.componentCode().orElse(null),
+                prepared.smiles().orElse(null),
+                prepared.inchiKey().orElse(null),
+                prepared.formalCharge(),
+                positionedStructure);
+        return preparedLigand.withLigand(positionedLigand);
     }
 
     private static void requireSameAtomLayout(
