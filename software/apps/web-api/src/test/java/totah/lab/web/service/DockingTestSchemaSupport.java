@@ -74,6 +74,20 @@ public abstract class DockingTestSchemaSupport {
             throw new ExceptionInInitializerError(exception);
         }
 
+        try (InputStream in = DockingTestSchemaSupport.class
+                .getResourceAsStream("/component-pocket-annotation.sql")) {
+            if (in == null) {
+                throw new IllegalStateException(
+                        "component-pocket-annotation.sql not on classpath");
+            }
+            String annotationDdl = new String(in.readAllBytes(),
+                    StandardCharsets.UTF_8)
+                    .replace("docking.", TEST_SCHEMA + ".");
+            ddl = ddl + System.lineSeparator() + annotationDdl;
+        } catch (IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+
         try (Connection connection = testConnection();
              Statement statement = connection.createStatement()) {
             for (String command : ddl.split(";")) {

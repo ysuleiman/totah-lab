@@ -75,8 +75,6 @@ public class ExperimentalAssemblyImportService {
                 request.fpocketOutput(), null, "fpocket", request.fpocketVersion(),
                 request.fpocketCommand(), request.startedAt(), request.completedAt());
 
-        jdbc.update("DELETE FROM assembly_component_occurrence "
-                + "WHERE assembly_id = ?", assembly);
         jdbc.update("DELETE FROM assembly_polymer_entity "
                 + "WHERE assembly_id = ?", assembly);
         persistPolymers(assembly, chains, references);
@@ -210,27 +208,52 @@ public class ExperimentalAssemblyImportService {
 
     private void persistComponents(long assembly,
             List<BoundComponentOccurrence> components) {
+        Set<Long> retained = new LinkedHashSet<>();
         for (BoundComponentOccurrence component : components) {
             Set<String> alternates = new LinkedHashSet<>();
-            component.atoms().forEach(atom -> alternates.add(
-                    atom.alternateLocation() == null ? "" : atom.alternateLocation()));
+            component.atoms().stream()
+                    .map(atom -> normalizeAlternate(atom.alternateLocation()))
+                    .filter(alternate -> !alternate.isEmpty())
+                    .forEach(alternates::add);
             if (alternates.isEmpty()) {
                 alternates.add("");
             }
             for (String alternate : alternates) {
-                jdbc.update("""
+                retained.add(id("""
                         INSERT INTO assembly_component_occurrence
                             (assembly_id, component_id, label_asym_id,
                              auth_asym_id, auth_sequence_id, insertion_code,
                              alternate_location, model_number)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        ON CONFLICT DO NOTHING
+                        ON CONFLICT ON CONSTRAINT
+                            assembly_component_occurrence_unique
+                        DO UPDATE SET component_id=EXCLUDED.component_id
+                        RETURNING id
                         """, assembly, component.componentId(), component.asymId(),
                         component.authAsymId(), component.authSequenceId(),
                         component.insertionCode(), alternate,
-                        component.modelNumber());
+                        component.modelNumber()));
             }
         }
+        if (retained.isEmpty()) {
+            jdbc.update("DELETE FROM assembly_component_occurrence "
+                    + "WHERE assembly_id=?", assembly);
+        } else {
+            String placeholders = String.join(",", java.util.Collections
+                    .nCopies(retained.size(), "?"));
+            Object[] arguments = new Object[retained.size() + 1];
+            arguments[0] = assembly;
+            int index = 1;
+            for (Long id : retained) arguments[index++] = id;
+            jdbc.update("DELETE FROM assembly_component_occurrence "
+                    + "WHERE assembly_id=? AND id NOT IN (" + placeholders + ")",
+                    arguments);
+        }
+    }
+
+    private static String normalizeAlternate(String value) {
+        return value == null || value.isBlank() || value.equals(".")
+                || value.equals("?") ? "" : value;
     }
 
     private void persistPockets(long assembly, long artifact,
