@@ -6,6 +6,8 @@ import org.springframework.web.server.ResponseStatusException;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
+import totah.lab.web.chemistry.ResidueChemistryView;
+import totah.lab.web.chemistry.ResidueChemistryViewMapper;
 import totah.lab.web.persistence.PocketResidueProjection;
 import totah.lab.web.persistence.StructureDetailsProjection;
 import totah.lab.web.persistence.StructureRepository;
@@ -336,7 +338,8 @@ public class StructureService {
                 residue.getChain(),
                 residue.getResidueNumber(),
                 residue.getInsertionCode(),
-                residue.getResidueName()
+                residue.getResidueName(),
+                ResidueChemistryViewMapper.map(residue.getResidueName())
         );
     }
 
@@ -389,8 +392,19 @@ public class StructureService {
             String chain,
             int residueNumber,
             String insertionCode,
-            String residueName
+            String residueName,
+            ResidueChemistryView chemistry
     ) {
+        public ResidueDetails(
+                long id,
+                String chain,
+                int residueNumber,
+                String insertionCode,
+                String residueName
+        ) {
+            this(id, chain, residueNumber, insertionCode, residueName,
+                    ResidueChemistryViewMapper.map(residueName));
+        }
     }
 
     public record ResidueNeighborhood(

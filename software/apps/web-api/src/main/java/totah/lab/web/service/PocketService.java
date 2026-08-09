@@ -1,5 +1,8 @@
 package totah.lab.web.service;
 
+import totah.lab.web.chemistry.ResidueChemistryView;
+import totah.lab.web.chemistry.ResidueChemistryViewMapper;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -143,7 +146,8 @@ public class PocketService {
                 residue.getChain(),
                 residue.getResidueNumber(),
                 residue.getInsertionCode(),
-                residue.getResidueName()
+                residue.getResidueName(),
+                ResidueChemistryViewMapper.map(residue.getResidueName())
         );
     }
 
@@ -248,7 +252,18 @@ public class PocketService {
             String chain,
             int residueNumber,
             String insertionCode,
-            String residueName
+            String residueName,
+            ResidueChemistryView chemistry
     ) {
+        public ResidueDetails(
+                long id,
+                String chain,
+                int residueNumber,
+                String insertionCode,
+                String residueName
+        ) {
+            this(id, chain, residueNumber, insertionCode, residueName,
+                    ResidueChemistryViewMapper.map(residueName));
+        }
     }
 }
