@@ -1,5 +1,6 @@
 package totah.lab.hephaestus.receptor.assembly;
 
+import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.molecule.Ligand;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.Chain;
@@ -33,17 +34,52 @@ public record LigandPose(
 
     /** Returns prepared chemistry with the validated pose coordinates. */
     public PreparedLigand preparedPose() {
-        Ligand prepared = preparedLigand.ligand();
-        List<Chain> posedChains = posedLigand.structure().getChains();
+        List<Point3D> positions = posedLigand.structure().getChains().stream()
+                .flatMap(chain -> chain.residues().stream())
+                .flatMap(residue -> residue.getAtoms().stream())
+                .map(Atom::getPosition)
+                .toList();
+        return preparedLigand.withLigand(positionedLigand(
+                preparedLigand.ligand(), positions));
+    }
+
+    /** Creates a pose by applying ordered coordinates to prepared atoms. */
+    public static LigandPose fromCoordinates(
+            String id,
+            PreparedLigand preparedLigand,
+            List<Point3D> positions,
+            Map<String, String> provenance) {
+
+        Objects.requireNonNull(preparedLigand, "preparedLigand");
+        return new LigandPose(
+                id,
+                preparedLigand,
+                positionedLigand(preparedLigand.ligand(), positions),
+                provenance);
+    }
+
+    private static Ligand positionedLigand(
+            Ligand prepared,
+            List<Point3D> positions) {
+
+        Objects.requireNonNull(positions, "positions");
+        int expectedAtomCount = prepared.structure().getAtomCount();
+        if (positions.size() != expectedAtomCount) {
+            throw new IllegalArgumentException(
+                    "Pose coordinate count " + positions.size()
+                            + " does not match prepared atom count "
+                            + expectedAtomCount);
+        }
+
         List<Chain> positionedChains = new java.util.ArrayList<>(
                 prepared.structure().getChainCount());
+        int positionIndex = 0;
 
         for (int chainIndex = 0;
                 chainIndex < prepared.structure().getChainCount();
                 chainIndex++) {
             Chain preparedChain = prepared.structure().getChains()
                     .get(chainIndex);
-            Chain posedChain = posedChains.get(chainIndex);
             List<Residue> positionedResidues = new java.util.ArrayList<>(
                     preparedChain.residueCount());
 
@@ -51,8 +87,6 @@ public record LigandPose(
                     residueIndex < preparedChain.residueCount();
                     residueIndex++) {
                 Residue preparedResidue = preparedChain.residues()
-                        .get(residueIndex);
-                Residue posedResidue = posedChain.residues()
                         .get(residueIndex);
                 List<Atom> positionedAtoms = new java.util.ArrayList<>(
                         preparedResidue.getAtomCount());
@@ -62,9 +96,10 @@ public record LigandPose(
                         atomIndex++) {
                     Atom preparedAtom = preparedResidue.getAtoms()
                             .get(atomIndex);
-                    Atom posedAtom = posedResidue.getAtoms().get(atomIndex);
                     positionedAtoms.add(preparedAtom.toBuilder()
-                            .position(posedAtom.getPosition())
+                            .position(Objects.requireNonNull(
+                                    positions.get(positionIndex++),
+                                    "positions must not contain null"))
                             .build());
                 }
                 positionedResidues.add(preparedResidue.toBuilder()
@@ -89,7 +124,7 @@ public record LigandPose(
                 prepared.inchiKey().orElse(null),
                 prepared.formalCharge(),
                 positionedStructure);
-        return preparedLigand.withLigand(positionedLigand);
+        return positionedLigand;
     }
 
     private static void requireSameAtomLayout(
