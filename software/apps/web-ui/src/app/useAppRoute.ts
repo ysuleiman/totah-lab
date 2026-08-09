@@ -13,7 +13,11 @@ function normalizePath(pathname: string): string {
     return DEFAULT_PATH
   }
 
-  if (pathname === '/selectivity') {
+  if (
+    pathname === '/selectivity'
+    || pathname === '/ligands'
+    || pathname === '/reports/dcmb'
+  ) {
     return pathname
   }
 

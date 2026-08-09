@@ -23,6 +23,18 @@ const NAVIGATION: NavigationItem[] = [
     active: (pathname) => pathname === '/selectivity',
   },
   {
+    label: 'Ligands',
+    description: 'Receptor-ligand poses',
+    path: '/ligands',
+    active: (pathname) => pathname === '/ligands',
+  },
+  {
+    label: 'DCMB report',
+    description: 'Mechanism validation',
+    path: '/reports/dcmb',
+    active: (pathname) => pathname === '/reports/dcmb',
+  },
+  {
     label: 'Structures',
     description: 'Browse structures',
     path: `/structures/${DEFAULT_STRUCTURE_ID}`,

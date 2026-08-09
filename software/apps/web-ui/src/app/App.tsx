@@ -2,9 +2,11 @@ import { useState, type ReactNode } from 'react'
 import { AppShell } from './AppShell'
 import { DEFAULT_POCKET_ID, useAppRoute } from './useAppRoute'
 import { PocketComparisonPage } from '../features/compare/PocketComparisonPage'
+import { LigandAnalysisPage } from '../features/ligands/LigandAnalysisPage'
 import { SelectivityWorkspace } from '../features/selectivity/SelectivityWorkspace'
 import { SimilarPocketsPage } from '../features/similar/SimilarPocketsPage'
 import { StructureWorkspace } from '../features/structure/StructureWorkspace'
+import { DcmbReportPage } from '../features/report/DcmbReportPage'
 
 const STRUCTURE_PATH = /^\/structures\/([1-9]\d*)$/
 const SIMILAR_PATH = /^\/pockets\/([1-9]\d*)\/similar$/
@@ -47,6 +49,10 @@ export function App() {
     )
   } else if (pathname === '/selectivity') {
     content = <SelectivityWorkspace />
+  } else if (pathname === '/ligands') {
+    content = <LigandAnalysisPage />
+  } else if (pathname === '/reports/dcmb') {
+    content = <DcmbReportPage />
   } else {
     const structureId = structureMatch
       ? Number(structureMatch[1])
