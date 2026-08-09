@@ -1,142 +1,185 @@
-# Focused BA/DCMB/2,4-isomer geometric validation
+# Focused BA/DCMB/2,4-isomer/CONH geometric validation
 
 ## Decision
 
-The multi-seed experiment confirms that the docking scores and leading pose
-families are reproducible, but DCMB does not uniquely reproduce a METTL7A
-inhibitory geometry. DCMB shows a real BA-relative increase in leading-pose TSL
-volume occlusion and greater 7B escape behavior. The 2,4 positional isomer,
-however, reproduces or exceeds both properties, and BA blocks the 7A catalytic
-corridor more frequently. Mechanistic geometry is somewhat informative but is not
-selective enough to authorize the top-100 SAM-bound screen.
+Adding the chemically distinct historical inhibitor CONH reveals **convergence of
+the leading poses**, but not inhibitor-specific discrimination. Recurrent rank-1
+DCMB and CONH poses in 7A contact SAM and conflict with every productive TSL
+state; CONH produces even larger mean TSL-envelope overlap. However, benzylamine
+and the 2,4 positional control also conflict with every TSL state in their leading
+families. Across all alternate poses, productive-TSL interference is not enriched
+among the two inhibitor-labeled compounds. CONH also has more 7B escape poses than
+DCMB, showing that redirection is shared rather than DCMB-specific.
 
-## Fixed scope and provenance
+Mechanistic geometry remains more descriptive than docking score, but it cannot
+yet identify the experimentally anchored DCMB phenotype reliably enough to
+authorize a top-100 screen.
 
-Observed: only BA, DCMB R/S, and 2,4-dichloro-α-methylbenzylamine R/S were docked.
-WT METTL7A+SAM and WT METTL7B+SAM were reused byte-for-byte from the validated SAR
-checkpoint. SAM was neither moved nor minimized. All ligands retained the same +1
-amine preparation. Vina 1.2.5 used seeds 1, 7, and 42, exhaustiveness 16, up to 12
-poses, and the established receptor-specific boxes. This produced 30 jobs and 358
-poses; two jobs returned 11 rather than 12 poses.
+## Evidence labels
 
-The five existing productive METTL7A TSL states and six existing productive
-METTL7B TSL states were reused without regeneration or transformation. The 7B
-states match the docking frame exactly. The locally relaxed 7A states remain in
-the same frame with raw 244-Cα RMSDs of 0.000–0.058 Å, reflecting their previously
-accepted local response rather than a coordinate-frame change.
+- **DCMB / LY-78335:** experimentally established recombinant human METTL7A
+  inhibitor (IC50 1.17 μM) with reported lack of METTL7B inhibition in the modern
+  study. [Russell et al. 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC10353073/)
+- **CONH / UK-1187A:** historical TMT/PNMT inhibitor comparator. No direct
+  METTL7A-versus-METTL7B experiment was located; no METTL7 selectivity is assigned.
+  Historical PNMT use is supported by [Liang et al. 1982](https://doi.org/10.1016/S0022-3565(25)33343-4),
+  and historical TMT inhibition is reported in the small-molecule
+  methyltransferase literature.
+- **Benzylamine and 2,4 positional analog:** historical benzylamine/PNMT SAR
+  comparators; no direct METTL7 activity is assigned.
 
-The accepted homologous superpocket is the METTL7B **FPOCKET pocket 2,
-1,690.538 Å³, 197-alpha-sphere** cloud. It was rigidly transferred to 7A by the
-244-Cα homologous fit solely for matched containment measurement. No biological
-pocket identity was inferred from the retained `pocket1_vert.pqr` filename.
+No missing activity value was imputed and no PNMT measurement was relabeled as a
+METTL7 result.
 
-## 1. Are score differences reproducible?
+## CONH chemical identity and preparation
 
-Yes, numerically—but score does not reproduce the desired ordering.
+Observed source identity: 2-cyclooctyl-2-hydroxyethylamine, PubChem CID 1551,
+canonical connectivity `C1CCCC(CCC1)C(CN)O`, InChIKey
+`NUOYMOJXFODLFN-UHFFFAOYSA-N`. [PubChem record](https://pubchem.ncbi.nlm.nih.gov/compound/1551)
 
-| Receptor | BA | DCMB, best enantiomer | 2,4 isomer, best enantiomer |
-|---|---:|---:|---:|
-| 7A + SAM | −6.017 ± 0.010 | −6.168 ± 0.002 | **−6.628 ± 0.010** |
-| 7B + SAM | −4.411 ± 0.001 | −5.262 ± 0.008 | **−5.298 ± 0.037** |
+The source record does not specify the alcohol-center stereochemistry. Both R and
+S variants were therefore prepared explicitly. The primary amine is protonated
+(+1), the hydroxyl is neutral, and both variants use the same ETKDGv3/MMFF94s and
+Hephaestus PDBQT pipeline as the controls. `conh_compounds.csv` and
+`conh_preparation_manifest.json` retain hashes and assumptions.
 
-Values are mean ± population SD of the best score from each seed, in kcal/mol.
-Each 7A variant's rank-1 pose belongs to the same structural family in all three
-seeds. This is reproducible failure, not random seed noise: the 2,4 isomer remains
-favored over DCMB.
+## Fixed experimental scope
 
-Inference: docking score is unsuitable as the ranking channel for a future broad
-screen.
+Only BA, DCMB R/S, 2,4-isomer R/S, and CONH R/S were docked. WT METTL7A+SAM and
+WT METTL7B+SAM were reused byte-for-byte; SAM was not moved or minimized. Vina
+1.2.5 used seeds 1, 7, and 42, exhaustiveness 16, up to 12 poses, established
+receptor-specific boxes, and identical preparation rules. The expanded campaign
+contains 42 jobs and 502 poses.
 
-## 2. SAM compatibility and on-site occupancy
+The five accepted productive 7A TSL states and six accepted productive 7B TSL
+states were reused without regeneration. They produced 2,760 pose/TSL comparisons.
+The 7B structures match the receptor frame exactly. The accepted locally relaxed
+7A structures remain in the direct receptor frame with 244-Cα RMSDs of
+0.000–0.058 Å. No coordinate transformation was applied to TSL or ligand poses.
 
-Observed: no 7A pose among the three compounds has a hard ligand–SAM pair below
-2.0 Å. Rank-1 poses are SAM-contacting across every 7A seed. Across all poses,
-fully compatible fractions are similarly low: BA 5.6%, DCMB 4.2%, and 2,4 isomer
-5.6%.
+Containment uses the corrected METTL7B **FPOCKET pocket 2, 1,690.538 Å³,
+197-alpha-sphere** homologous superpocket, rigidly transferred to 7A by the 244-Cα
+homology fit. The retained `pocket1_vert.pqr` filename remains an indexing artifact,
+not the biological pocket number.
 
-In 7B the fully SAM-compatible fractions are BA 19.4%, DCMB 9.9%, and 2,4 isomer
-12.7%. Thus DCMB does not uniquely coexist with SAM in 7B. BA has the most SAM-
-compatible poses, although that fact alone does not imply productive coexistence.
+## 1. Score reproducibility
 
-On-site fractions in 7A are BA 63.9%, DCMB 48.6%, and 2,4 isomer 47.2%. In 7B
-they are 97.2%, 73.2%, and 70.4%, respectively. All determinations use the matched
-197-sphere homologous superpocket and remain separate from docking score.
+| Receptor | BA | DCMB | 2,4 isomer | CONH |
+|---|---:|---:|---:|---:|
+| 7A + SAM | −6.017 ± 0.010 | −6.168 ± 0.002 | **−6.628 ± 0.010** | −6.523 ± 0.035 |
+| 7B + SAM | −4.411 ± 0.001 | −5.262 ± 0.008 | −5.298 ± 0.037 | **−5.453 ± 0.004** |
 
-## 3. Does DCMB occupy a more consistent 7A inhibitory geometry?
+Values are mean ± population SD of the best enantiomer/score per seed in kcal/mol.
+Scores are highly reproducible, but their ordering has no validated activity
+meaning: the unmeasured 2,4 control remains favored over DCMB in 7A and CONH is
+favored in 7B despite lacking a direct METTL7 selectivity measurement.
 
-Partly, relative to BA, but not relative to the 2,4 isomer.
+Inference: score remains unsuitable as a top-100 ranking channel.
 
-All three DCMB rank-1 poses reproduce one family for each enantiomer across seeds.
-All rank-1 BA and 2,4-isomer poses are also recurrent across seeds. Against all
-five productive 7A TSL states, every rank-1 pose of every compound has a direct
-pair below 2.0 Å.
+## 2. Leading-pose convergence in METTL7A
 
-| 7A rank-1 comparison | BA | DCMB R | DCMB S | 2,4 R | 2,4 S |
-|---|---:|---:|---:|---:|---:|
-| Direct-conflict fraction | 100% | 100% | 100% | 100% | 100% |
-| Mean core overlap (Å³) | 11.42 | 13.48 | 15.79 | 14.96 | 14.01 |
-| Mean shared envelope (Å³) | 72.30 | 85.66 | 94.65 | 92.22 | 86.61 |
-| Corridor-blocked fraction | **80.0%** | 20.0% | 20.0% | 6.7% | 33.3% |
+Every rank-1 pose of BA, DCMB, the 2,4 isomer, and CONH has at least one <2.0 Å
+pair with every productive 7A TSL state. DCMB and CONH therefore converge on a
+TSL-conflicting leading geometry, but the controls do too.
 
-Observed: DCMB's leading families occlude more TSL volume than BA, but the 2,4
-isomer has comparable occlusion. BA, not DCMB, most consistently occupies the
-finite TSL-S→SAM-methyl catalytic corridor.
+| 7A rank-1 evidence | BA | DCMB R | DCMB S | 2,4 R | 2,4 S | CONH R | CONH S |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Direct-conflict fraction | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
+| Mean core overlap (Å³) | 11.42 | 13.48 | 15.79 | 14.96 | 14.01 | **18.04** | **17.71** |
+| Shared envelope (Å³) | 72.30 | 85.66 | 94.65 | 92.22 | 86.61 | **104.10** | **104.10** |
+| Corridor-blocked fraction | **80.0%** | 20.0% | 20.0% | 6.7% | 33.3% | 26.7% | 0.0% |
 
-Across all alternate poses rather than rank 1 alone, direct TSL-conflict fractions
-are BA 58.3%, DCMB 44.4%, and 2,4 isomer 37.5%. Therefore DCMB is not the most
-consistent substrate-conflicting ligand under alternate-pose sampling.
+Observed: CONH produces the largest leading-family TSL-volume occlusion despite
+its different scaffold. This supports a physically possible general
+TMT-inhibitor-compatible geometry. It does not establish an inhibitor-associated
+signature because both non-METTL-validated controls reproduce direct conflict,
+and BA blocks the finite catalytic corridor most often.
 
-## 4. Does DCMB interfere with productive TSL more consistently?
+Pose recurrence is also not unique. CONH S rank 1 belongs to one family across all
+seeds; CONH R uses the same leading family for seeds 1 and 42 but a different
+substrate-facing family in seed 7. All 7A DCMB, BA, and 2,4 leading poses are
+likewise recurrent across seeds.
 
-No. It interferes more volumetrically than BA in the recurrent leading family,
-but less frequently across the full pose ensemble. The 2,4 isomer reproduces the
-leading-pose volume phenotype, and BA more frequently blocks the catalytic
-corridor. These independent channels do not identify DCMB as uniquely inhibitory.
+## 3. Full-ensemble productive-TSL interference
 
-## 5. Does DCMB show stronger 7B redirection or escape?
+| 7A all-pose evidence | BA | DCMB | 2,4 isomer | CONH |
+|---|---:|---:|---:|---:|
+| Direct TSL-conflict pairings | **58.3%** | 44.4% | 37.5% | **27.8%** |
+| Mean core overlap (Å³) | 6.27 | 6.41 | 5.61 | 4.66 |
+| Mean shared envelope (Å³) | 40.13 | 40.41 | 34.20 | 28.29 |
+| Corridor-blocked pairings | 11.1% | 8.9% | 6.7% | 8.9% |
 
-DCMB shows a BA-relative increase, but the 2,4 isomer is stronger:
+Observed: inhibitor-labeled DCMB and CONH are not enriched for interference when
+all retained poses are considered. CONH has the strongest leading-pose overlap but
+the lowest all-pose conflict frequency, indicating a bimodal or orientation-
+dependent geometry rather than a uniformly substrate-occluding mechanism.
 
-| All-pose 7B behavior | BA | DCMB | 2,4 isomer |
-|---|---:|---:|---:|
-| Wider/escape-subpocket poses | 11.1% | 18.3% | **22.5%** |
-| Substrate-facing poses | 86.1% | 54.9% | **47.9%** |
-| Direct TSL-conflict pairings | 86.1% | 54.9% | **47.9%** |
-| Corridor-blocked pairings | 15.7% | **5.9%** | 8.5% |
+Inference: DCMB and CONH may access a common 7A TSL-conflicting family, but the
+static ensemble does not show that this family is inhibitor-specific or dominant.
 
-Inference: dichloro-α-methyl substitution promotes 7B redirection relative to BA,
-but positional chlorine placement is not discriminated in DCMB's favor. This may
-describe a chemotype-level escape property, not the DCMB-specific METTL7A
-phenotype.
+## 4. SAM compatibility
 
-## 6. Docking score versus mechanistic geometry
+No 7A rank-1 pose has a hard ligand–SAM pair below 2.0 Å; all are SAM-contacting.
+Across all 7A poses, fully compatible fractions are BA 5.6%, DCMB 4.2%, 2,4
+isomer 5.6%, and CONH 13.9%. CONH therefore has more cofactor-compatible
+alternatives than DCMB rather than reproducing a uniquely constrained DCMB state.
 
-Mechanistic geometry is more informative than score because it exposes recurrent
-TSL occlusion and 7B redirection that score cannot describe. It is not yet a useful
-DCMB-specific discriminator: BA and especially the 2,4 isomer reproduce major
-channels, sometimes more strongly. The evidence dimensions are therefore retained
-separately; no master score was constructed.
+In 7B, fully compatible fractions are BA 19.4%, DCMB 9.9%, 2,4 isomer 12.7%, and
+CONH 9.7%. CONH R's rank-1 family is fully SAM-compatible in all three seeds;
+CONH S is compatible in two of three. DCMB rank-1 compatibility is less consistent.
 
-## 7. Is the model ready for top-100 screening?
+## 5. 7A-versus-7B redirection and escape
 
-No. A broad screen would rank compounds using a model that reproducibly favors the
-wrong positional isomer and does not uniquely recover DCMB's known METTL7A
-phenotype. A defensible next gate would require METTL7A activity data for BA and
-the 2,4 isomer, or an orthogonal dynamic/energetic discriminator validated against
-those measurements. No top-100 jobs were launched.
+| All-pose behavior | BA | DCMB | 2,4 isomer | CONH |
+|---|---:|---:|---:|---:|
+| 7A wider/escape poses | 5.6% | 4.2% | 9.7% | **26.4%** |
+| 7B wider/escape poses | 11.1% | 18.3% | 22.5% | **37.5%** |
+| 7B substrate-facing poses | 86.1% | 54.9% | 47.9% | **47.2%** |
+| 7B direct TSL-conflict pairings | 86.1% | 54.9% | 47.9% | **47.2%** |
 
-## Machine-readable deliverables
+CONH has the strongest 7B escape/redirection signal, but also substantial 7A
+escape. Thus 7B escape is shared with CONH and is not DCMB-scaffold specific.
+DCMB's 7B redirection remains greater than BA's but weaker than both the 2,4
+control and CONH.
 
-- `per_seed_pose_metrics.csv`: score, seed, rank, SAM geometry, containment,
-  centroid/orientation, and directional subpocket for all 358 poses.
-- `tsl_interference_metrics.csv`: 1,968 pose/TSL comparisons with direct, volume,
-  envelope, and catalytic-corridor channels.
-- `pose_families.csv` and `pose_family_behavior.csv`: unconstrained RMSD family
-  assignments, seed recurrence, and substrate-conflict/escape behavior.
-- `cross_seed_reproducibility.csv`: rank-1 family and geometry per seed.
-- `matched_compound_summary.csv` and `matched_parent_summary.csv`: matched 7A/7B
-  variant-level and racemate-aware parent summaries.
-- `tsl_frame_validation.csv`, `docking_manifest.json`, and
-  `analysis_manifest.json`: provenance and operational definitions.
+## 6. Protein contact fingerprints
+
+The recurrent 7A CONH leading poses contact the same central wall used by DCMB,
+including Phe43, Leu145, His175, Trp195, Phe199, Cys202, Trp231, and Val234;
+CONH additionally commonly contacts Asp200/Gly201. In 7B, CONH shifts to the
+Leu39/Met40/Leu43, Ile198/Gly199, Cys202, Leu232, and Val234 wall. This is genuine
+contact-level convergence and paralog redirection, but the complete fingerprints
+show substantial overlap with the 2,4 comparator as well. Every pose's residue
+set is retained in `per_seed_pose_metrics.csv` rather than collapsed into a score.
+
+## Requested answers
+
+1. **Does DCMB retain a distinctive structural phenotype?** Only partly. Its
+   recurrent 7A leading family is TSL-conflicting and it redirects in 7B, but those
+   properties are not unique and are sometimes stronger for controls.
+2. **Does CONH reproduce that phenotype?** It reproduces and exceeds leading-pose
+   TSL-volume occlusion, while showing a more bimodal full ensemble and more escape.
+   This is partial functional convergence, not proof of one inhibitory mechanism.
+3. **Is productive-TSL interference enriched among inhibitors?** No. BA has the
+   highest all-pose direct-conflict frequency, while CONH has the lowest. Rank-1
+   direct conflict is universal across all four parents.
+4. **Is 7B escape DCMB-specific?** No. It is shared and strongest for CONH; the
+   2,4 positional comparator also exceeds DCMB.
+5. **Do the results strengthen mechanistic ranking readiness?** They strengthen
+   the physical plausibility of a cross-scaffold TSL-occluding family, but weaken
+   its specificity as a ranking rule. The model remains unready for top-100 use.
+
+## Deliverables and readiness gate
+
+The expanded machine-readable outputs contain 502 poses, 2,760 TSL comparisons,
+233 unconstrained RMSD families, 42 seed reproducibility records, parent- and
+variant-level summaries, SAM and superpocket geometry, directional occupancy,
+catalytic-corridor metrics, and protein-contact fingerprints. Provenance and
+thresholds are in `docking_manifest.json`, `conh_preparation_manifest.json`, and
+`analysis_manifest.json`.
+
+No top-100 docking was started. A future readiness gate still requires direct
+METTL7 measurements for CONH, BA, and the 2,4 isomer or a validated orthogonal
+dynamic/energetic discriminator.
 
 **PARTIAL**
