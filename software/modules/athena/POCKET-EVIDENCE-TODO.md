@@ -11,8 +11,12 @@
       Initial SAM/SAH/SFG pass: 4,488/4,505 site residues mapped across 210
       assembly-target evaluations; 17 construct/outside-alignment residues
       remain explicitly unmapped; rerun checksum is stable.
-- [ ] Build sequence-supported residue correspondence among represented human
-      methyltransferases without forcing low-confidence alignments.
+- [x] Build sequence-supported residue correspondence among represented human
+      methyltransferases without forcing low-confidence alignments. Version 2
+      evaluated all 1,770 target pairs: 156 passed the versioned 30% identity
+      and 70% reciprocal-coverage gate; 1,614 remain explicitly low confidence
+      without persisted residue pairs. The accepted layer contains 52,499
+      position correspondences and has a stable rerun checksum.
 - [ ] Derive separate site-grammar dimensions for residue identity,
       substitution, chemistry class, direct-contact frequency, near-shell
       frequency, ligand-region contact, and structural variability. Do not
