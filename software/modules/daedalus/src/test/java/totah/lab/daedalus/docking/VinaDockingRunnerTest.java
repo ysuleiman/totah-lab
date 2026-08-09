@@ -77,6 +77,33 @@ class VinaDockingRunnerTest {
     }
 
     @Test
+    void passesExplicitPoseOutputForSequentialDocking() throws Exception {
+        Path receptor = touch("receptor.pdbqt");
+        Path ligand = touch("ligand.pdbqt");
+        Path argumentsFile = temporaryDirectory.resolve("output-args.txt");
+        Path poseOutput = temporaryDirectory.resolve("poses/sam-out.pdbqt");
+        Path fakeVina = fakeVina("""
+                #!/bin/bash
+                printf '%%s\n' "$@" > "%s"
+                exit 0
+                """.formatted(argumentsFile));
+
+        new VinaDockingRunner(fakeVina).run(
+                new DockingInput(receptor, ligand, Optional.empty()),
+                VinaDockingOptions.ofBox(
+                        0.0, 0.0, 0.0, 20.0, 20.0, 20.0),
+                poseOutput);
+
+        List<String> arguments = Files.readAllLines(argumentsFile);
+        int outputFlag = arguments.indexOf("--out");
+        assertTrue(outputFlag >= 0);
+        assertEquals(
+                poseOutput.toAbsolutePath().normalize().toString(),
+                arguments.get(outputFlag + 1));
+        assertTrue(Files.isDirectory(poseOutput.getParent()));
+    }
+
+    @Test
     void reportsNonZeroExitCode() throws Exception {
         Path receptor = touch("receptor.pdbqt");
         Path ligand = touch("ligand.pdbqt");

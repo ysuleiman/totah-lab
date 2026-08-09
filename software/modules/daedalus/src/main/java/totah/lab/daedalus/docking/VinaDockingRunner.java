@@ -32,12 +32,23 @@ public final class VinaDockingRunner {
     public VinaDockingResult run(
             DockingInput input,
             VinaDockingOptions options) throws IOException, InterruptedException {
+        return run(input, options, null);
+    }
+
+    /**
+     * Runs Vina with an explicit pose-output artifact for downstream workflows.
+     */
+    public VinaDockingResult run(
+            DockingInput input,
+            VinaDockingOptions options,
+            Path poseOutput) throws IOException, InterruptedException {
         Objects.requireNonNull(input, "input");
         Objects.requireNonNull(options, "options");
         requireFile(vinaExecutable, "Vina executable");
         requireFile(input.receptorPdbqt(), "Receptor PDBQT");
         requireFile(input.ligandPdbqt(), "Ligand PDBQT");
         input.flexPdbqt().ifPresent(flex -> requireFile(flex, "Flex PDBQT"));
+        Path normalizedPoseOutput = normalizeOutput(poseOutput);
 
         List<String> command = new ArrayList<>(List.of(
                 vinaExecutable.toAbsolutePath().normalize().toString(),
@@ -54,6 +65,10 @@ public final class VinaDockingRunner {
             command.add("--flex");
             command.add(flex.toAbsolutePath().normalize().toString());
         });
+        if (normalizedPoseOutput != null) {
+            command.add("--out");
+            command.add(normalizedPoseOutput.toString());
+        }
         if (options.seed() != null) {
             command.add("--seed");
             command.add(Integer.toString(options.seed()));
@@ -75,6 +90,18 @@ public final class VinaDockingRunner {
         }
         return new VinaDockingResult(
                 exitCode, VinaOutputParser.parse(output), output);
+    }
+
+    private static Path normalizeOutput(Path output) throws IOException {
+        if (output == null) {
+            return null;
+        }
+        Path normalized = output.toAbsolutePath().normalize();
+        Path parent = normalized.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+        return normalized;
     }
 
     private static void requireFile(Path path, String description) {
