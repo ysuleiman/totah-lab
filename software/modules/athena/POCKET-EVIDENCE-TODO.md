@@ -17,10 +17,15 @@
       and 70% reciprocal-coverage gate; 1,614 remain explicitly low confidence
       without persisted residue pairs. The accepted layer contains 52,499
       position correspondences and has a stable rerun checksum.
-- [ ] Derive separate site-grammar dimensions for residue identity,
+- [x] Derive separate site-grammar dimensions for residue identity,
       substitution, chemistry class, direct-contact frequency, near-shell
       frequency, ligand-region contact, and structural variability. Do not
-      combine these into a master score.
+      combine these into a master score. Version 1 persists 52,499 accepted
+      alignment rows and 156 independent site summaries; 4,751 aligned rows
+      carry experimental site-local evidence. Experimental CA superposition
+      makes at least one side structurally evaluable for 2,586 site rows and
+      both sides evaluable for 124. METTL7A/METTL7B are not represented by an
+      accepted experimental target correspondence and remain an explicit gap.
 - [ ] Build CCD-topology-based atom correspondence for the chemically shared
       SAM/SAH/SFG scaffold and retain analog-specific substituent regions.
 - [ ] Structurally compare sites using sequence-supported site residues, with

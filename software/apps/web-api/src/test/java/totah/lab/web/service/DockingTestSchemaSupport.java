@@ -88,6 +88,19 @@ public abstract class DockingTestSchemaSupport {
         }
 
         try (InputStream in = DockingTestSchemaSupport.class
+                .getResourceAsStream("/experimental-site-grammar.sql")) {
+            if (in == null) throw new IllegalStateException(
+                    "experimental-site-grammar.sql not on classpath");
+            String grammarDdl = new String(in.readAllBytes(),
+                    StandardCharsets.UTF_8)
+                    .replace("docking.", TEST_SCHEMA + ".")
+                    .replace("public.targets", TEST_SCHEMA + ".targets");
+            ddl = ddl + System.lineSeparator() + grammarDdl;
+        } catch (IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+
+        try (InputStream in = DockingTestSchemaSupport.class
                 .getResourceAsStream("/component-pocket-annotation.sql")) {
             if (in == null) {
                 throw new IllegalStateException(

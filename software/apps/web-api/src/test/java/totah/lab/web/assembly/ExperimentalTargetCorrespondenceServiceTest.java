@@ -30,6 +30,7 @@ class ExperimentalTargetCorrespondenceServiceTest
         dataSource.setPassword(System.getenv().getOrDefault("DB_PASSWORD",
                 "admin"));
         jdbc = new JdbcTemplate(dataSource);
+        jdbc.execute("TRUNCATE experimental_target_alignment CASCADE");
         jdbc.execute("TRUNCATE experimental_assembly CASCADE");
         jdbc.execute("TRUNCATE experimental_target_sequence CASCADE");
         addSource("QTESTA", "a.cif");
