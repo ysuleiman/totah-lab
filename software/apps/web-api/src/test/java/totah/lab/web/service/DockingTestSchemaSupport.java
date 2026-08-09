@@ -101,6 +101,21 @@ public abstract class DockingTestSchemaSupport {
             throw new ExceptionInInitializerError(exception);
         }
 
+        try (InputStream in = DockingTestSchemaSupport.class
+                .getResourceAsStream("/experimental-residue-mapping.sql")) {
+            if (in == null) {
+                throw new IllegalStateException(
+                        "experimental-residue-mapping.sql not on classpath");
+            }
+            String mappingDdl = new String(in.readAllBytes(),
+                    StandardCharsets.UTF_8)
+                    .replace("docking.", TEST_SCHEMA + ".")
+                    .replace("public.targets", TEST_SCHEMA + ".targets");
+            ddl = ddl + System.lineSeparator() + mappingDdl;
+        } catch (IOException exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
+
         try (Connection connection = testConnection();
              Statement statement = connection.createStatement()) {
             for (String command : ddl.split(";")) {

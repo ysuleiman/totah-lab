@@ -5,9 +5,12 @@
 - [ ] Restrict the initial cohort to single-human-target canonical SAM, SAH,
       and SFG experimental binding sites from canonical-site method version
       `f77da7fc9`.
-- [ ] Persist provenance-preserving PDB polymer residue to UniProt position
+- [x] Persist provenance-preserving PDB polymer residue to UniProt position
       mappings. Keep assembly, entity, chain, author/label residue identifiers,
       insertion codes, mutations, missing residues, and mapping failures.
+      Initial SAM/SAH/SFG pass: 4,488/4,505 site residues mapped across 210
+      assembly-target evaluations; 17 construct/outside-alignment residues
+      remain explicitly unmapped; rerun checksum is stable.
 - [ ] Build sequence-supported residue correspondence among represented human
       methyltransferases without forcing low-confidence alignments.
 - [ ] Derive separate site-grammar dimensions for residue identity,
