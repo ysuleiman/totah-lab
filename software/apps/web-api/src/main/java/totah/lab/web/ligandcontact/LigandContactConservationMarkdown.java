@@ -7,6 +7,8 @@ import totah.lab.web.ligandcontact.LigandContactConservationAnalyzer
         .LigandContactConservationReport;
 import totah.lab.web.ligandcontact.LigandContactConservationAnalyzer
         .Row;
+import totah.lab.web.ligandcontact.LigandMoietyConservationAnalyzer
+        .LigandMoietyConservationReport;
 
 import java.util.Locale;
 
@@ -118,6 +120,116 @@ public final class LigandContactConservationMarkdown {
                 .append('\n');
 
         return markdown.toString();
+    }
+
+    /**
+     * Renders the Phase 2 moiety-level section: which part of the
+     * ligand each aligned residue faces.
+     */
+    public static String renderMoietySection(
+            LigandMoietyConservationReport report
+    ) {
+        StringBuilder markdown = new StringBuilder();
+
+        markdown.append("## ").append(report.ligandCcd())
+                .append(" moiety conservation (atom level)\n\n");
+        markdown.append("| ").append(report.queryLabel())
+                .append(" residue | ")
+                .append(report.candidateLabel())
+                .append(" residue | ")
+                .append(report.queryLabel()).append(" faces | ")
+                .append(report.candidateLabel())
+                .append(" faces | Distances Å | Identity")
+                .append(" | Same moiety |\n");
+        markdown.append("|---|---|---|---|---|---|---|\n");
+
+        for (LigandMoietyConservationAnalyzer.Row row : report.rows()) {
+            markdown.append("| ")
+                    .append(residue(
+                            row.queryResidueName(),
+                            row.queryResidueNumber()))
+                    .append(" | ")
+                    .append(residue(
+                            row.candidateResidueName(),
+                            row.candidateResidueNumber()))
+                    .append(" | ")
+                    .append(moiety(row.queryFacingMoiety(),
+                            row.queryDirectContact()))
+                    .append(" | ")
+                    .append(moiety(row.candidateFacingMoiety(),
+                            row.candidateDirectContact()))
+                    .append(" | ")
+                    .append(distance(row.queryFacingDistance()))
+                    .append(" / ")
+                    .append(distance(row.candidateFacingDistance()))
+                    .append(" | ")
+                    .append(matchType(row.matchType()))
+                    .append(" | ")
+                    .append(!row.sequenceConsistent()
+                            ? "gap"
+                            : row.sameFacingMoiety() ? "yes" : "no")
+                    .append(" |\n");
+        }
+
+        LigandMoietyConservationAnalyzer.Aggregate aggregate =
+                report.aggregate();
+        markdown.append("\n### Moiety aggregate\n\n");
+        markdown.append("- Query contacts by moiety: ")
+                .append(moietyCounts(aggregate.queryContactsByMoiety()))
+                .append('\n');
+        markdown.append("- Candidate contacts by moiety: ")
+                .append(moietyCounts(
+                        aggregate.candidateContactsByMoiety()))
+                .append('\n');
+        line(markdown, "Shared-contact count",
+                aggregate.sharedContactCount());
+        line(markdown, "Same-moiety count",
+                aggregate.sameMoietyCount());
+        line(markdown, "Moiety-switch count",
+                aggregate.moietySwitchCount());
+        markdown.append("- Mean facing-distance difference: ")
+                .append(String.format(
+                        Locale.ROOT, "%.2f",
+                        aggregate.meanFacingDistanceDifference()))
+                .append(" Å\n");
+        markdown.append("- Median facing-distance difference: ")
+                .append(String.format(
+                        Locale.ROOT, "%.2f",
+                        aggregate.medianFacingDistanceDifference()))
+                .append(" Å\n");
+
+        return markdown.toString();
+    }
+
+    private static String moiety(
+            SamMoiety moiety,
+            boolean directContact
+    ) {
+        if (!directContact || moiety == null) {
+            return "—";
+        }
+        return moiety.name().toLowerCase(Locale.ROOT);
+    }
+
+    private static String moietyCounts(
+            java.util.Map<SamMoiety, Integer> counts
+    ) {
+        if (counts.isEmpty()) {
+            return "none";
+        }
+        StringBuilder text = new StringBuilder();
+        for (SamMoiety moiety : SamMoiety.values()) {
+            Integer count = counts.get(moiety);
+            if (count != null) {
+                if (text.length() > 0) {
+                    text.append(", ");
+                }
+                text.append(moiety.name().toLowerCase(Locale.ROOT))
+                        .append(' ')
+                        .append(count);
+            }
+        }
+        return text.toString();
     }
 
     private static void line(
