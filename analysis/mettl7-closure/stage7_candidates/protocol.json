@@ -1,0 +1,43 @@
+{
+  "schema": "mettl7b_prospective_candidate_protocol_v1",
+  "candidate_universe_manifest": "provenance-manifest.json",
+  "candidate_count": 216,
+  "candidate_direction": "METTL7B_FAVORED_COMPUTATIONAL_CANDIDATES",
+  "receptors": {
+    "7B": "../stage4/prepared/7B_WT_SAM_BOUND.pdbqt",
+    "7A": "../stage4/prepared/7A_WT_SAM_BOUND.pdbqt"
+  },
+  "docking": {
+    "engine": "AutoDock Vina 1.2.5-17-gda92a68",
+    "seeds": [1, 7, 42],
+    "exhaustiveness": 32,
+    "modes_per_seed": 9,
+    "minimum_returned_modes_per_seed": 8,
+    "cpu_per_process": 1,
+    "boxes": {
+      "7B": {"center_A": [2.8444, -2.1005, -4.2105], "size_A": [25.334, 22.0, 23.923]},
+      "7A": {"center_A": [1.802, -3.9254, -6.7763], "size_A": [28.452, 22.0, 26.506]}
+    }
+  },
+  "pose_rules": {
+    "canonical_site": "at least 70 percent of ligand heavy atoms within 4.0 A of frozen homologous superpocket spheres",
+    "severe_protein_clash": "one or more ligand-protein heavy-atom pairs below 2.0 A",
+    "sam_compatibility": "incompatible below 2.0 A; close_nonoverlapping from 2.0 A to below 2.5 A; compatible at or above 2.5 A",
+    "clustering": "complete-linkage direct coordinate RMSD at 2.0 A; identical atom order required",
+    "representative": "geometric medoid minimizing mean within-family RMSD; seed then mode tie-break; engine score unused"
+  },
+  "interference_rules": {
+    "source": "frozen Stage 4 definitions",
+    "direct_overlap": "candidate-TSL heavy-atom minimum distance below 2.0 A",
+    "transfer_corridor_blockade": "candidate atom projects within SAM-CE-to-TSL-S segment and lies at or below 2.0 A",
+    "excluded_volume_radius_A": 1.7,
+    "movement_gate_shared_volume_threshold_A3": 0.5,
+    "classification": ["BROAD_INTERFERENCE", "STATE_DEPENDENT_INTERFERENCE", "ESCAPE", "NOT_CLASSIFIED_SHARED_VOLUME_ONLY"]
+  },
+  "evidence_policy": {
+    "engine_scores": "ENGINE_OUTPUT_ONLY",
+    "missing": "NOT_EVALUATED, never negative",
+    "aggregate_selectivity_score": false,
+    "dcmb_role": "METTL7A experimental inhibition anchor and mechanistic comparator, not expected inverse template"
+  }
+}
