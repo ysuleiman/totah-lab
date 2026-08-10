@@ -1,0 +1,286 @@
+{
+  "schema_version": "0.1.0",
+  "baseline_id": "mettl7a-mettl7b-release-a-stage0-2026-08-10",
+  "status": "FINAL_WITH_DECLARED_LIMITATIONS",
+  "generated_on": "2026-08-10",
+  "repository_root": "/Users/yazan/totah-lab",
+  "evidence_classes": [
+    "EXPERIMENTAL",
+    "STRUCTURAL_OBSERVATION",
+    "COMPUTATIONAL_HYPOTHESIS",
+    "PREDICTION"
+  ],
+  "rules": {
+    "no_master_score": true,
+    "docking_scores_are_engine_outputs_only": true,
+    "missing_observations_are_not_zero": true,
+    "canonical_analysis_requires_sam_present": true,
+    "new_docking_allowed_before_freeze": false
+  },
+  "targets": {
+    "METTL7A": {
+      "gene": "METTL7A",
+      "aliases": ["TMT1A"],
+      "uniprot": "Q9H8H3",
+      "canonical_chain": "A",
+      "canonical_residue_count": 244,
+      "canonical_receptor": {
+        "path": "resources/shared-resources/src/main/resources/Q9H8H3/Q9H8H3_TMT1A_HUMAN.pdb",
+        "sha256": "c6ff231dc80284865f5d60fbe037cbf109d10df49edf54fbfe58ef0e77636735",
+        "model_identifier": "AF-Q9H8H3-F1-model_v6",
+        "model_version": "AlphaFold DB v6",
+        "evidence_class": "PREDICTION"
+      },
+      "canonical_sam_complex": {
+        "path": "analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb",
+        "sha256": "a2f2e0a27681ae339cfc31683738d1d97b5e650df774d0bd3d9e0bfe8c65f687",
+        "source_complex": "analysis/dcmb/sam_state/recovered/Q9H8H3_sam_esmfold2_complex.pdb",
+        "source_sha256": "bb36034aa585521aa98b31bef713e0fdc233fb711b79354af0b4a2306fb0a33b",
+        "source_model": "esmfold2-fast-2026-05",
+        "fit_ca_pairs": 244,
+        "fit_ca_rmsd_angstrom": 0.5499706512247919,
+        "sam_heavy_atom_count": 27,
+        "severe_receptor_sam_pairs_lt_1_5_angstrom": 0,
+        "evidence_class": "PREDICTION"
+      },
+      "pockets": {
+        "canonical_site": {
+          "name": "homologous 197-sphere SAM superpocket",
+          "definition": "METTL7B canonical-v6 197-sphere cloud transferred to the METTL7A canonical frame by a deterministic 244-C-alpha Kabsch fit",
+          "path": "analysis/mettl7-closure/stage0/METTL7A_homologous_197_sphere_SAM_superpocket.pqr",
+          "sha256": "0c64e2274bd1976a4ad56bfbf93639be8889c4c8632b5a1e49c8f8ae4397ca7f",
+          "transfer_provenance": "analysis/mettl7-closure/stage0/superpocket_transfer.json",
+          "sphere_count": 197,
+          "evidence_class": "STRUCTURAL_OBSERVATION"
+        },
+        "dcmb_reference_subsite": {
+          "path": "resources/shared-resources/src/main/resources/Q9H8H3/fpocket/pockets/pocket1_vert.pqr",
+          "sha256": "4ea7829f6dabd89b8055cc6ad7a3e89d1f9eee502e89a9a8e0bbd2990ec5e3bc",
+          "fpocket_number": 1,
+          "sphere_count": 59,
+          "note": "Smaller DCMB subsite; not the complete SAM superpocket.",
+          "evidence_class": "STRUCTURAL_OBSERVATION"
+        }
+      }
+    },
+    "METTL7B": {
+      "gene": "METTL7B",
+      "aliases": ["TMT1B"],
+      "uniprot": "Q6UX53",
+      "canonical_chain": "A",
+      "canonical_residue_count": 244,
+      "canonical_receptor": {
+        "path": "experiments/METTL7B-v6_diffdock/target_protein.pdb",
+        "sha256": "bcd2eff94ecba2612b3a506e2a24b676eb3e033e3fb2deeb1b0768cbdc281e27",
+        "model_identifier": "AF-Q6UX53-F1-model_v6",
+        "model_version": "AlphaFold DB v6; header date 2025-08-01",
+        "evidence_class": "PREDICTION"
+      },
+      "canonical_sam_complex": {
+        "path": "analysis/dcmb/sam_state/validated/WT_METTL7B_SAM_BOUND.pdb",
+        "sha256": "937452b35fab5c3567d5eb1c4a24b9f0f08ceea5b0aa79f28d73dac3a1a95fb7",
+        "source_complex": "analysis/dcmb/sam_state/recovered/Q6UX53_sam_esmfold2_complex.pdb",
+        "source_sha256": "79a975193547893d70b38dd2fe4b59c2ecf7ad262c87e3dadfb4e4e1f4476389",
+        "source_model": "esmfold2-fast-2026-05",
+        "fit_ca_pairs": 244,
+        "fit_ca_rmsd_angstrom": 0.6108350643198043,
+        "sam_heavy_atom_count": 27,
+        "severe_receptor_sam_pairs_lt_1_5_angstrom": 0,
+        "evidence_class": "PREDICTION"
+      },
+      "pockets": {
+        "canonical_site": {
+          "name": "homologous 197-sphere SAM superpocket",
+          "path": "resources/shared-resources/src/main/resources/Q6UX53/fpocket/pockets/pocket2_vert.pqr",
+          "sha256": "11b97a44ae5cb0c6e116e36e28f90047bf9218d167a6ff8d9d9f65c8637a5e5c",
+          "sphere_count": 197,
+          "checked_in_rerun_fpocket_number": 2,
+          "imported_database_run_fpocket_number": 1,
+          "imported_database_pocket_id": 3,
+          "evidence_class": "STRUCTURAL_OBSERVATION"
+        }
+      }
+    }
+  },
+  "experimental_facts": [
+    {
+      "id": "EXP-DCMB-7A-IC50",
+      "statement": "DCMB/LY-78335 inhibits recombinant human METTL7A with a reported IC50 of 1.17 micromolar.",
+      "evidence_class": "EXPERIMENTAL",
+      "primary_source": {
+        "citation": "Russell DA et al. Drug Metab Dispos. 2023;51(8):1024-1034.",
+        "doi": "10.1124/dmd.123.001268",
+        "pmid": "37137720",
+        "pmcid": "PMC10353073",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10353073/",
+        "assay_context": "Purified recombinant N-GST-METTL7A; TSL substrate; single-time-point activity assay; n=3"
+      },
+      "local_source": "analysis/dcmb/sar_experiment/DCMB_SAR_MECHANISTIC_REPORT.md",
+      "status": "ACCEPTED"
+    },
+    {
+      "id": "EXP-DCMB-7B-NO-INHIBITION",
+      "statement": "The same study reports no METTL7B inhibition at high tested concentrations, without a numeric IC50 in the local evidence summary.",
+      "evidence_class": "EXPERIMENTAL",
+      "primary_source": {
+        "citation": "Russell DA et al. Drug Metab Dispos. 2023;51(8):1024-1034.",
+        "doi": "10.1124/dmd.123.001268",
+        "pmid": "37137720",
+        "pmcid": "PMC10353073",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10353073/",
+        "assay_context": "Purified recombinant N-GST-METTL7B; TSL substrate; DCMB comparison reported in Figure 3; no numeric IC50 reported"
+      },
+      "local_source": "analysis/dcmb/sar_experiment/DCMB_SAR_MECHANISTIC_REPORT.md",
+      "status": "ACCEPTED"
+    },
+    {
+      "id": "EXP-TSL-7A-SUBSTRATE",
+      "statement": "Thio-S-linalool is an experimentally established METTL7A substrate.",
+      "evidence_class": "EXPERIMENTAL",
+      "primary_source": {
+        "citation": "Russell DA et al. Drug Metab Dispos. 2023;51(8):1024-1034.",
+        "doi": "10.1124/dmd.123.001268",
+        "pmid": "37137720",
+        "pmcid": "PMC10353073",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10353073/",
+        "assay_context": "Purified recombinant N-GST-METTL7A methylation of TSL measured as TMSL formation by LC-MS/MS"
+      },
+      "local_source": "analysis/dcmb/TSL_CATALYTIC_GEOMETRY_RECONSTRUCTION.md",
+      "status": "ACCEPTED"
+    }
+  ],
+  "residue_correspondence": {
+    "path": "analysis/mettl7-correspondence/mettl7a_p32_mettl7b_p3_sequence_mapping.csv",
+    "sha256": "150d5ac69635202ddccc0bfc53fc314cf8f24b2892f012b3454283f507c4d78f",
+    "numbering_relation": "identity for the canonical 244-residue structures in the mapped region",
+    "key_pairs": [
+      {"mettl7a": "A:PHE43", "mettl7b": "A:LEU43"},
+      {"mettl7a": "A:PHE199", "mettl7b": "A:GLY199"},
+      {"mettl7a": "A:TRP195", "mettl7b": "A:TRP195"},
+      {"mettl7a": "A:GLU232", "mettl7b": "A:LEU232"}
+    ],
+    "evidence_class": "STRUCTURAL_OBSERVATION"
+  },
+  "accepted_computational_states": {
+    "productive_tsl": {
+      "METTL7A": {
+        "paths": "analysis/dcmb/tsl_conformational_response/WT_METTL7A_SAM_TSL_relaxed_{1..5}.pdb",
+        "count": 5,
+        "state": "pre-transfer restrained-response states",
+        "evidence_class": "COMPUTATIONAL_HYPOTHESIS"
+      },
+      "METTL7B": {
+        "paths": "analysis/dcmb/mettl7b_selectivity/WT_METTL7B_SAM_TSL_fixed_{1..6}.pdb",
+        "count": 6,
+        "state": "pre-transfer fixed-receptor states",
+        "evidence_class": "COMPUTATIONAL_HYPOTHESIS"
+      }
+    },
+    "post_transfer": {
+      "METTL7A": {
+        "paths": "analysis/dcmb/tsl_conformational_response/WT_METTL7A_SAH_TMSL_product_{1..5}.pdb",
+        "count": 5,
+        "status": "RETAINED_AS_DIAGNOSTIC_ONLY",
+        "evidence_class": "COMPUTATIONAL_HYPOTHESIS"
+      }
+    },
+    "dcmb_pose_families": {
+      "canonical_source": "analysis/dcmb/controlled_campaign/family_results.csv",
+      "normalized_family_inventory": "analysis/mettl7-closure/stage0/dcmb_family_inventory.csv",
+      "normalized_pose_inventory": "analysis/mettl7-closure/stage0/dcmb_pose_inventory.csv",
+      "sam_bound_families": 66,
+      "sam_bound_poses": 214,
+      "accepted_on_site_poses": 161,
+      "rejected_outside_site_poses": 53,
+      "required_state": "SAM_BOUND",
+      "note": "Only on-site SAM-bound families may enter the final mechanistic matrix. Vina scores remain engine outputs.",
+      "evidence_class": "PREDICTION"
+    }
+  },
+  "mutant_inputs": [
+    {"system": "METTL7A F43L", "path": "analysis/dcmb/reciprocal_mutation/METTL7A_F43L_fixed_backbone.pdb", "sha256": "876277c0b084b7917b7e9e187e0331b0fef2d1a4e8c4c14e628973ced5229596", "status": "PRELIMINARY_INPUT_REQUIRES_STAGE2_VALIDATION"},
+    {"system": "METTL7A F199G", "path": "analysis/dcmb/reciprocal_mutation/METTL7A_F199G_fixed_backbone.pdb", "sha256": "4fedb4955e216baf69b3d40abaa27dabffb0fd764c504bf71822c7611444ecb8", "status": "PRELIMINARY_INPUT_REQUIRES_STAGE2_VALIDATION"},
+    {"system": "METTL7A F43L/F199G", "path": "analysis/dcmb/reciprocal_mutation/METTL7A_F43L_F199G_fixed_backbone.pdb", "sha256": "d4bdf1997209366ab65b9fdd2b7ef702c6b49553f01919b1d957cf6b32151c46", "status": "PRELIMINARY_INPUT_REQUIRES_STAGE2_VALIDATION"},
+    {"system": "METTL7B L43F", "path": "analysis/dcmb/reciprocal_mutation/METTL7B_L43F_fixed_backbone.pdb", "sha256": "2e7bda479a334a70cc9447f83bb4f69b942273df8647c639facc344706b69cb9", "status": "SUPERSEDED_BY_REPACKED_CANDIDATE_PENDING_STAGE2_SELECTION"},
+    {"system": "METTL7B G199F", "path": "analysis/dcmb/reciprocal_mutation/METTL7B_G199F_fixed_backbone.pdb", "sha256": "5a225ec3b167cda480c933a0c79af40cb8185b1a207d0eff949e7e5b54c74dc7", "status": "PRELIMINARY_INPUT_REQUIRES_STAGE2_VALIDATION"},
+    {"system": "METTL7B L43F/G199F", "path": "analysis/dcmb/reciprocal_mutation/METTL7B_L43F_G199F_fixed_backbone.pdb", "sha256": "b3a4126c871cbc73b965b381aa9d556a46791db7853c6acd25ddd2e4fb6800ec", "status": "PRELIMINARY_INPUT_REQUIRES_STAGE2_VALIDATION"}
+  ],
+  "deprecated": [
+    {
+      "id": "DEP-7B-AF-V2-MIXED-FRAME",
+      "scope": "Any METTL7B result combining the old AlphaFold v2 receptor/poses with v6 fpocket spheres",
+      "reason": "Wrong coordinate frame: approximately 27 angstrom absolute offset and 6.31 angstrom fitted C-alpha RMSD.",
+      "replacement": "AF-Q6UX53-F1-model_v6 receptor SHA bcd2eff9... with frame-matched v6 pocket artifacts",
+      "source": "experiments/METTL7B-v6/PROVENANCE.txt"
+    },
+    {
+      "id": "DEP-FPOCKET-NUMBER-AS-BIOLOGICAL-ID",
+      "scope": "Conclusions identifying the biological site solely by fpocket ordinal",
+      "reason": "fpocket ordinals are run-local; the same 197-sphere METTL7B SAM superpocket is pocket 1/DB id 3 in the imported run and pocket 2 in the checked-in rerun.",
+      "replacement": "Use the homologous 197-sphere SAM superpocket name plus run-specific mapping",
+      "source": "analysis/dcmb/METTL7B_SAM_SUPERPOCKET_IDENTITY.md"
+    },
+    {
+      "id": "DEP-PROTEIN-ONLY-DCMB-MECHANISM",
+      "scope": "Protein-only DCMB poses used as canonical evidence for ternary SAM-bound mechanism",
+      "reason": "SAM atoms were absent from those receptor coordinates.",
+      "replacement": "SAM-bound families in analysis/dcmb/controlled_campaign/family_results.csv",
+      "source": "analysis/dcmb/DCMB_SAM_STATE_AUDIT.md"
+    },
+    {
+      "id": "DEP-STATIC-CLASHING-TSL",
+      "scope": "Failed static WT METTL7A TSL candidates",
+      "reason": "They fail preregistered protein/SAM steric gates and cannot support interference conclusions.",
+      "replacement": "Five restrained-response pre-transfer states",
+      "source": "analysis/dcmb/TSL_CATALYTIC_GEOMETRY_RECONSTRUCTION.md"
+    },
+    {
+      "id": "DEP-7B-L43F-FORCED-ROTAMER",
+      "scope": "The unrepacked fixed-backbone METTL7B L43F conformer as a final mutant receptor",
+      "reason": "Prior analysis found that local L229 accommodation is required; forcing one rotamer is not a valid final preparation.",
+      "replacement": "Stage 2 conformer selected from documented L43F/L229 local repacking",
+      "source": "analysis/dcmb/F43_L43_RECIPROCAL_MUTATION_TEST.md"
+    }
+  ],
+  "current_mechanistic_hypotheses": [
+    {
+      "statement": "SAM-bound METTL7A DCMB families conflict with all five retained productive TSL states, while METTL7B retains family-specific directional escape modes.",
+      "evidence_class": "COMPUTATIONAL_HYPOTHESIS",
+      "sources": [
+        "analysis/dcmb/DCMB_TSL_CATALYTIC_STATE_SPATIAL_INTERFERENCE.md",
+        "analysis/dcmb/WT_METTL7B_CATALYTIC_STATE_AND_DCMB_TSL_SELECTIVITY.md"
+      ]
+    },
+    {
+      "statement": "Residues 43 and 199 contribute to a distributed, background-dependent pocket wall rather than a symmetric two-residue switch.",
+      "evidence_class": "COMPUTATIONAL_HYPOTHESIS",
+      "sources": [
+        "analysis/dcmb/F43_G199_COOPERATIVE_WALL_TEST.md",
+        "analysis/dcmb/DCMB_DISPLACEMENT_FIELD_ANALYSIS.md"
+      ]
+    },
+    {
+      "statement": "W195/L232 primarily describe destination-side accommodation and backbone-conditioned geometry rather than an independently sufficient selectivity switch.",
+      "evidence_class": "COMPUTATIONAL_HYPOTHESIS",
+      "sources": [
+        "analysis/dcmb/E232_L232_RECIPROCAL_FEASIBILITY.md",
+        "analysis/dcmb/DCMB_DISPLACEMENT_FIELD_ANALYSIS.md"
+      ]
+    }
+  ],
+  "software_provenance": {
+    "docking_engine": "AutoDock Vina 1.2.5-17-gda92a68",
+    "docking_protocol_manifest": "analysis/dcmb/controlled_campaign/campaign_manifest.json",
+    "sam_validation_metrics": "analysis/dcmb/sam_state/validated/validation_metrics.json",
+    "mutation_preparation": "analysis/dcmb/reciprocal_mutation/receptor_preparation.csv",
+    "stage0_runtime": "analysis/mettl7-closure/stage0/runtime_provenance.json",
+    "stage0_materialization_script": "analysis/mettl7-closure/stage0/finalize_stage0.py",
+    "notes": "Retained scripts, seeds, thresholds, inputs, and engine version support reconstruction. Original host/container lockfiles were not retained for every historical analysis and remain a declared provenance limitation."
+  },
+  "unresolved": [
+    "Optionally archive and checksum a local copy of the open-access primary publication; DOI, PMID, PMCID, assay context, and stable URL are now recorded.",
+    "Select and checksum the final locally repacked METTL7B L43F conformer and propagate the frozen selection rule to L43F/G199F during Stage 2.",
+    "Original host/container lockfiles were not retained for every historical calculation; Stage 1 must define a fully locked environment for the final matrix.",
+    "Post-transfer METTL7A states remain diagnostic-only and are intentionally excluded from the productive-state inventory."
+  ]
+}
