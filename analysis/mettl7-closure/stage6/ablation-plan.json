@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0",
+  "shared_example_set": 697,
+  "shared_training_targets": ["masked_contact_role", "masked_residue_or_chemistry", "physical_site_group_contrastive"],
+  "variants": [
+    {"id": "geometry_only", "channels": ["raw_residue_coordinates", "raw_pair_distances"], "excluded": ["residue_identity", "residue_chemistry", "ligand", "cofactor", "cavity"]},
+    {"id": "residue_graph", "channels": ["gaia_residue_nodes", "gaia_sequence_edges", "gaia_spatial_edges", "gaia_distances"], "excluded": ["ligand", "cofactor", "cavity"]},
+    {"id": "residue_ligand_cofactor", "channels": ["gaia_residue_graph", "hephaestus_ligand_topology", "explicit_cofactor_topology", "athena_contact_annotations"], "excluded": ["cavity"]},
+    {"id": "residue_ligand_cofactor_cavity", "channels": ["gaia_residue_graph", "hephaestus_ligand_topology", "explicit_cofactor_topology", "athena_contact_annotations", "gaia_alpha_spheres", "derived_sphere_surface_gap_edges"], "excluded": []}
+  ],
+  "baseline_comparisons": [
+    {"id": "pocketmatch_symmetric", "role": "BASELINE_VALIDATION"},
+    {"id": "pocketmatch_query_coverage", "role": "BASELINE_VALIDATION"},
+    {"id": "production_global_geometric_retrieval", "role": "BASELINE_VALIDATION"},
+    {"id": "aligned_raw_pocket_geometry", "role": "BASELINE_VALIDATION"}
+  ],
+  "evaluation_unit": "physical_site_group",
+  "metrics": ["group_recall_at_k", "mean_reciprocal_rank", "median_first_relevant_rank"],
+  "restriction": "Diagnostic grouped retrieval only; no leakage-safe supervised generalization claim."
+}

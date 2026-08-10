@@ -1,7 +1,14 @@
 {
   "schema_version": "1.0.0-pretraining-review",
   "status": "FINALIZED_FOR_REVIEW_NO_TRAINING",
-  "unit_of_export": "one experimental ligand occurrence at one canonical experimental binding site",
+  "unit_of_export": "one adapter envelope over a Gaia ResidueGraph induced site view, one experimental ligand occurrence, and contributing Gaia pockets",
+  "canonical_domain_models": {
+    "protein": "totah.lab.gaia.graph.ResidueGraph and ResidueGraphView",
+    "experimental_annotations": "totah.lab.athena.pocket.evidence and evidence.grammar",
+    "ligand_and_cofactor": "totah.lab.hephaestus.ligand.topology.LigandTopology plus Gaia atoms and ChemicalBond",
+    "cavity": "totah.lab.gaia.pocket.Pocket, AlphaSphereSet and AlphaSphere",
+    "parallel_ml_graph_semantics": false
+  },
   "source_scope": {
     "structures": 416,
     "canonical_site_observations": 697,
@@ -34,8 +41,14 @@
       "contact_type", "evidence_band", "evaluated", "missing_reason", "provenance"
     ]
   },
-  "node_types": ["RESIDUE", "LIGAND_ATOM", "COFACTOR_ATOM"],
-  "edge_types": ["SEQUENCE_ADJACENCY", "RESIDUE_SPATIAL_CONTACT", "LIGAND_COVALENT_BOND", "RESIDUE_LIGAND_DIRECT", "RESIDUE_LIGAND_NEAR_SHELL", "RESIDUE_COFACTOR_DIRECT", "RESIDUE_COFACTOR_NEAR_SHELL"],
+  "cavity_layer": {
+    "raw_nodes": "Every contributing fpocket alpha sphere with stable pocket/sphere ID, center and radius",
+    "derived_edges": "Undirected sphere pairs whose surface gap is <= 1.0 A; store center distance and signed surface gap independently",
+    "authority": "Raw AlphaSphereSet; derived adjacency is rebuildable adapter output",
+    "aggregate_fpocket_scores": "EXCLUDED"
+  },
+  "node_types": ["GAIA_RESIDUE_REFERENCE", "LIGAND_ATOM_REFERENCE", "COFACTOR_ATOM_REFERENCE", "GAIA_ALPHA_SPHERE_REFERENCE"],
+  "edge_types": ["GAIA_SEQUENCE_EDGE", "GAIA_SPATIAL_DISTANCE", "GAIA_ATOM_PROXIMITY", "LIGAND_COVALENT_BOND", "RESIDUE_LIGAND_DIRECT", "RESIDUE_LIGAND_NEAR_SHELL", "RESIDUE_COFACTOR_DIRECT", "RESIDUE_COFACTOR_NEAR_SHELL", "ALPHA_SPHERE_SURFACE_GAP"],
   "missingness_policy": "Every optional feature has an availability state; unavailable observations are null plus a reason, never numeric zero.",
   "cofactor_policy": "SAM, SAH, SFG, and other cofactors remain distinct explicit atom subgraphs and are never folded into pocket summary features.",
   "score_policy": "No Vina score, docking-derived affinity, master score, or METTL7 computational class is present in training features or labels.",

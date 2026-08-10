@@ -1,0 +1,24 @@
+feature_or_artifact,classification,reason
+Gaia residue identity and coordinates,RAW MODEL FEATURE,Canonical source structure
+Gaia residue chemistry categories and availability,RAW MODEL FEATURE,Intrinsic residue annotation
+Gaia sequence edges and provenance,RAW MODEL FEATURE,Canonical polymer adjacency
+Gaia spatial edges and raw distances,RAW MODEL FEATURE,Canonical cutoff query result
+Hephaestus CCD ligand topology,RAW MODEL FEATURE,Canonical chemical connectivity
+Ligand formal charge and aromaticity,RAW MODEL FEATURE,Canonical topology metadata when evaluated
+SAM SAH SFG identity,RAW MODEL FEATURE,Explicit cofactor chemistry
+fpocket alpha-sphere center and radius,RAW MODEL FEATURE,Canonical observed void geometry
+alpha-sphere surface-gap adjacency,RAW MODEL FEATURE,Deterministic derived cavity topology with declared rule
+Athena experimental direct or near-shell contact role,TRAINING TARGET,Masked reconstruction only where evaluated
+Athena residue identity or chemistry,TRAINING TARGET,Optional masked reconstruction target
+Physical-site group identity,TRAINING TARGET,Contrastive positive grouping only; never an input feature
+PocketMatch symmetric and query-coverage ranks,BASELINE/VALIDATION,Deterministic retrieval comparator
+Global geometric descriptor retrieval,BASELINE/VALIDATION,Production geometric comparator
+Pocket alignment and raw geometry comparisons,BASELINE/VALIDATION,Post-retrieval validation channels
+PDB assembly artifact paths and SHA-256,PROVENANCE ONLY,Traceability and reconstruction
+UniProt mapping method and version,PROVENANCE ONLY,Traceability; mapped position may be a raw feature
+fpocket aggregate score and druggability score,EXCLUDED,Tool score is not raw geometry
+Vina score and pose rank,EXCLUDED,Computational docking output; prohibited supervision
+METTL7 Stage 3 or Stage 4 class,EXCLUDED,External computational benchmark only
+METTL7 mutation identity,EXCLUDED,External sensitivity benchmark metadata only
+AlphaFold confidence as experimental label,EXCLUDED,Predicted evidence cannot label experimental graphs
+Unavailable feature encoded as numeric zero,EXCLUDED,Missingness must remain explicit
