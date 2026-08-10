@@ -59,9 +59,11 @@ paired AS (
 ),
 selected AS (
     SELECT p.*, p.score_7a - p.score_7b AS delta_7a_minus_7b
-    FROM paired p
-    WHERE p.score_7b <= -7.5
-      AND p.score_7a - p.score_7b >= 1.0
+    FROM paired p JOIN compounds c ON c.id=p.compound_id
+    WHERE p.score_7b < -5.5
+      AND coalesce(c.external_id,c.name,p.compound_id::text) NOT ILIKE 'WH%'
+    ORDER BY p.score_7a-p.score_7b DESC,p.score_7b,p.compound_id
+    LIMIT 200
 )
 SELECT
     row_number() OVER (ORDER BY s.delta_7a_minus_7b DESC, s.score_7b, s.compound_id) AS historical_rank,
@@ -74,7 +76,7 @@ SELECT
     s.score_7b AS historical_engine_output_7b,
     s.score_7a AS historical_engine_output_7a,
     s.delta_7a_minus_7b AS historical_delta_7a_minus_7b,
-    true AS historical_216_member,
+    true AS corrected_top200_nonwarhead_member,
     (s.score_7b <= -7.0 AND s.delta_7a_minus_7b >= 1.5) AS alternative_116_member,
     s.analysis_campaign_id,
     s.analysis_campaign_name,

@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent
-FILES = ("candidate-provenance.csv", "alternative-filter-116.csv")
+FILES = ("candidate-provenance.csv",)
 
 
 def sha256(path: Path) -> str:
@@ -28,27 +28,16 @@ def rows(name: str) -> list[dict[str, str]]:
 
 def main() -> None:
     historical = rows(FILES[0])
-    alternative = rows(FILES[1])
     historical_ids = {row["immutable_ligand_identity_sha256"] for row in historical}
-    alternative_ids = {row["immutable_ligand_identity_sha256"] for row in alternative}
-    if len(historical) != 216 or len(historical_ids) != 216:
-        raise RuntimeError("historical universe must contain 216 unique identities")
-    if len(alternative) != 116 or len(alternative_ids) != 116:
-        raise RuntimeError("alternative filter must contain 116 unique identities")
+    if len(historical) != 200 or len(historical_ids) != 200:
+        raise RuntimeError("corrected universe must contain 200 unique identities")
     manifest = {
-        "schema": "mettl7_prospective_candidate_provenance_lock_v1",
+        "schema": "mettl7_prospective_candidate_provenance_lock_v2",
         "candidate_direction": "METTL7B_FAVORED_COMPUTATIONAL_CANDIDATES",
         "paired_historical_corpus_count": 7716,
         "historical_universe": {
-            "count": 216,
-            "rule": {"historical_engine_output_7b_lte": -7.5, "historical_delta_7a_minus_7b_gte": 1.0},
-        },
-        "alternative_filter_provenance_only": {
-            "count": 116,
-            "rule": {"historical_engine_output_7b_lte": -7.0, "historical_delta_7a_minus_7b_gte": 1.5},
-            "overlap_with_historical_216": len(historical_ids & alternative_ids),
-            "outside_historical_216": len(alternative_ids - historical_ids),
-            "does_not_redefine_candidate_universe": True,
+            "count": 200,
+            "rule": {"historical_engine_output_7b_lt": -5.5, "exclude_label_prefix": "WH", "order": "historical_delta_7a_minus_7b DESC", "limit": 200},
         },
         "evidence_level": "COMPUTATIONAL_CANDIDATE",
         "files": [

@@ -1,26 +1,11 @@
 {
-  "alternative_filter_provenance_only": {
-    "count": 116,
-    "does_not_redefine_candidate_universe": true,
-    "outside_historical_216": 4,
-    "overlap_with_historical_216": 112,
-    "rule": {
-      "historical_delta_7a_minus_7b_gte": 1.5,
-      "historical_engine_output_7b_lte": -7.0
-    }
-  },
   "candidate_direction": "METTL7B_FAVORED_COMPUTATIONAL_CANDIDATES",
   "evidence_level": "COMPUTATIONAL_CANDIDATE",
   "files": [
     {
-      "bytes": 837774,
+      "bytes": 745854,
       "path": "candidate-provenance.csv",
-      "sha256": "1ccdc54b7c16ef75c30f5697f484b3680c345bbf797ca958ff6252e276c7c055"
-    },
-    {
-      "bytes": 29963,
-      "path": "alternative-filter-116.csv",
-      "sha256": "816ed23d5340fe341feb198d8989c172576a5d341092c0d38473fd8e8a4eb516"
+      "sha256": "530d351c99ed02eb9c78365e128d14ea720af54ee9f8858c0eb25e07f50b3d10"
     }
   ],
   "frozen_boundaries": {
@@ -29,12 +14,14 @@
     "stages_0_4_modified": false
   },
   "historical_universe": {
-    "count": 216,
+    "count": 200,
     "rule": {
-      "historical_delta_7a_minus_7b_gte": 1.0,
-      "historical_engine_output_7b_lte": -7.5
+      "exclude_label_prefix": "WH",
+      "historical_engine_output_7b_lt": -5.5,
+      "limit": 200,
+      "order": "historical_delta_7a_minus_7b DESC"
     }
   },
   "paired_historical_corpus_count": 7716,
-  "schema": "mettl7_prospective_candidate_provenance_lock_v1"
+  "schema": "mettl7_prospective_candidate_provenance_lock_v2"
 }

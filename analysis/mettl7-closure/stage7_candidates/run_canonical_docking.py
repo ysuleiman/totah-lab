@@ -8,7 +8,7 @@ import csv
 import hashlib
 import json
 import subprocess
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -97,8 +97,8 @@ def main() -> None:
         raise RuntimeError("candidate provenance hash mismatch")
     with (HERE / "candidate-provenance.csv").open(newline="") as handle:
         rows = list(csv.DictReader(handle))
-    if len(rows) != 216:
-        raise RuntimeError("candidate universe is not 216")
+    if len(rows) != 200:
+        raise RuntimeError("candidate universe is not the corrected non-WH top 200")
     prepared = prepare_ligands(rows)
     RAW.mkdir(parents=True, exist_ok=True)
     jobs = []
@@ -112,7 +112,7 @@ def main() -> None:
                     "output": str(RAW / f"{stem}.pdbqt"), "log": str(RAW / f"{stem}.log"),
                 })
     results = []
-    with ProcessPoolExecutor(max_workers=args.workers) as executor:
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
         futures = {executor.submit(run_job, job): job for job in jobs}
         for index, future in enumerate(as_completed(futures), 1):
             result = future.result()
