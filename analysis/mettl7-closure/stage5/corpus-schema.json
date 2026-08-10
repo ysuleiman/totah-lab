@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0-pretraining-review",
+  "status": "FINALIZED_FOR_REVIEW_NO_TRAINING",
+  "unit_of_export": "one experimental ligand occurrence at one canonical experimental binding site",
+  "source_scope": {
+    "structures": 416,
+    "canonical_site_observations": 697,
+    "experimental_only": true,
+    "predicted_structures_excluded_from_training": true
+  },
+  "records": {
+    "site": [
+      "site_id", "pdb_id", "assembly_id", "model_number", "experimental_method",
+      "resolution_angstrom", "source_artifact_sha256", "uniprot_accession", "target_id",
+      "entity_id", "label_asym_id", "auth_asym_id", "site_number", "localization_status",
+      "canonical_site_group_id", "physical_site_group_id", "ligand_occurrence_id",
+      "component_id", "component_class", "cofactor_identity", "ligand_centroid_xyz",
+      "contributing_pocket_ids", "fpocket_descriptors", "missing_data", "provenance"
+    ],
+    "residue_node": [
+      "node_id", "auth_residue_id", "uniprot_position", "mapping_outcome", "amino_acid",
+      "chemistry_class", "ca_xyz", "side_chain_centroid_xyz", "direct_contact_role",
+      "near_shell_role", "minimum_ligand_distance_angstrom", "contact_observation_count",
+      "shell_observation_count", "structural_variability_ca_rmsf", "structural_variability_side_chain_rmsf",
+      "solvent_accessibility", "sequence_conservation", "feature_availability", "provenance"
+    ],
+    "ligand_atom_node": [
+      "node_id", "source_atom_id", "component_id", "element", "atom_type", "formal_charge",
+      "aromatic", "hydrogen_bond_donor", "hydrogen_bond_acceptor", "xyz", "is_cofactor_atom",
+      "feature_availability", "provenance"
+    ],
+    "edge": [
+      "source_node_id", "target_node_id", "edge_type", "distance_angstrom", "sequence_separation",
+      "contact_type", "evidence_band", "evaluated", "missing_reason", "provenance"
+    ]
+  },
+  "node_types": ["RESIDUE", "LIGAND_ATOM", "COFACTOR_ATOM"],
+  "edge_types": ["SEQUENCE_ADJACENCY", "RESIDUE_SPATIAL_CONTACT", "LIGAND_COVALENT_BOND", "RESIDUE_LIGAND_DIRECT", "RESIDUE_LIGAND_NEAR_SHELL", "RESIDUE_COFACTOR_DIRECT", "RESIDUE_COFACTOR_NEAR_SHELL"],
+  "missingness_policy": "Every optional feature has an availability state; unavailable observations are null plus a reason, never numeric zero.",
+  "cofactor_policy": "SAM, SAH, SFG, and other cofactors remain distinct explicit atom subgraphs and are never folded into pocket summary features.",
+  "score_policy": "No Vina score, docking-derived affinity, master score, or METTL7 computational class is present in training features or labels.",
+  "coordinate_policy": "Store source Cartesian coordinates; graph models may construct translation/rotation-invariant distances and equivariant relative vectors at load time.",
+  "determinism": "Stable IDs derive from source keys; rows and adjacency lists sort lexicographically; schema, source artifacts, grouping rules, and split assignments are content-addressed."
+}
