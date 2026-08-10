@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0.0",
+  "protocol_id": "mettl7-release-a-eight-system-v1",
+  "status": "LOCKED_BEFORE_STAGE2",
+  "baseline_commit": "74ac4580e",
+  "physical_state": "protein_plus_fixed_SAM",
+  "systems": [
+    {"id": "7A_WT", "target": "METTL7A", "mutations": []},
+    {"id": "7B_WT", "target": "METTL7B", "mutations": []},
+    {"id": "7A_F43L", "target": "METTL7A", "mutations": ["F43L"]},
+    {"id": "7A_F199G", "target": "METTL7A", "mutations": ["F199G"]},
+    {"id": "7A_F43L_F199G", "target": "METTL7A", "mutations": ["F43L", "F199G"]},
+    {"id": "7B_L43F", "target": "METTL7B", "mutations": ["L43F"]},
+    {"id": "7B_G199F", "target": "METTL7B", "mutations": ["G199F"]},
+    {"id": "7B_L43F_G199F", "target": "METTL7B", "mutations": ["L43F", "G199F"]}
+  ],
+  "coordinate_policy": {
+    "native_frames": ["METTL7A canonical AlphaFold DB v6 frame", "METTL7B canonical AlphaFold DB v6 frame"],
+    "cross_target_frame": "244-residue sequence-mapped C-alpha Kabsch fit",
+    "maximum_frame_fit_rmsd_A": 2.0,
+    "sam_policy": "Use the Stage 0 validated SAM coordinates unchanged in every construct of the corresponding target.",
+    "sam_heavy_atoms_expected": 27,
+    "sam_prepared_atom_records_expected": 49,
+    "sam_coordinate_rmsd_tolerance_A": 0.001,
+    "atom_ordering": "Preserve parent receptor atom order; replace mutated side-chain records in canonical residue position; append fixed SAM identically within each target."
+  },
+  "preparation": {
+    "backbone_motion_during_mutation": "FORBIDDEN",
+    "unrelated_sidechain_motion": "FORBIDDEN",
+    "allowed_local_repacking": {"systems": ["7B_L43F", "7B_L43F_G199F"], "residues": [43, 229]},
+    "l43f_rule": "analysis/mettl7-closure/stage0/l43f_selection_rule.json",
+    "severe_clash_distance_A": 2.0,
+    "required_checks": ["atom completeness", "chain A", "residues 1-244", "mutation identity", "atom ordering", "SAM identity and coordinates", "receptor-SAM clashes", "canonical-pocket membership", "coordinate-frame consistency"],
+    "failure_result": "NOT_EVALUABLE_PREPARATION_FAILURE"
+  },
+  "productive_tsl": {
+    "identity": "7alpha-thiospironolactone",
+    "pubchem_cid": 119472,
+    "conformer_generation": "RDKit ETKDGv3 followed by ligand-only MMFF optimization",
+    "random_seed": 20260808,
+    "conformers_requested": 12,
+    "attack_distances_A": [2.8, 3.0, 3.2],
+    "rotations_per_distance_per_conformer": 600,
+    "attack_angle_min_deg": 150.0,
+    "attack_angle_max_deg": 180.0,
+    "protein_heavy_atom_pairs_lt_2A": 0,
+    "sam_nonreactive_heavy_atom_pairs_lt_2A": 0,
+    "superpocket_atom_fraction_min": 0.70,
+    "family_clustering": "complete linkage, direct same-atom-order heavy-atom RMSD <= 2.0 A",
+    "static_phase": "No receptor or SAM movement.",
+    "limited_response_phase": {
+      "allowed_only_after_static_failure": true,
+      "movable_residues": "Side chains with any heavy atom within 4.5 A of the candidate TSL; local backbone atoms only for residues that remain a direct <2.0 A obstruction after side-chain response.",
+      "sam_movement": "FORBIDDEN",
+      "ligand_movement": "FORBIDDEN",
+      "maximum_backbone_rmsd_A": 0.25,
+      "maximum_any_atom_displacement_A": 1.50,
+      "maximum_bond_deviation_A": 0.02,
+      "same_productive_gates_after_response": true,
+      "failure_result": "NOT_PRODUCTIVE_UNDER_LIMITED_RESPONSE"
+    },
+    "retention": "Retain every passing geometry family medoid; do not choose a score-best state."
+  },
+  "dcmb_docking": {
+    "engine": "AutoDock Vina 1.2.5-17-gda92a68",
+    "ligands": ["DCMB_R", "DCMB_S"],
+    "ligand_inputs": ["analysis/dcmb/artifacts/DCMB_R.pdbqt", "analysis/dcmb/artifacts/DCMB_S.pdbqt"],
+    "seeds": [1, 7, 42],
+    "exhaustiveness": 32,
+    "modes_requested_per_seed": 9,
+    "minimum_returned_modes_per_seed": 8,
+    "boxes": {
+      "METTL7A": {"center_A": [1.8020, -3.9254, -6.7763], "size_A": [28.452, 22.0, 26.506]},
+      "METTL7B": {"center_A": [2.8444, -2.1005, -4.2105], "size_A": [25.334, 22.0, 23.923]}
+    },
+    "protein_flexibility": "fixed",
+    "sam": "fixed and included in receptor",
+    "canonical_site_assignment": "At least 70% of DCMB heavy atoms within 4.0 A of a sphere in the target's 197-sphere homologous SAM superpocket.",
+    "off_site_handling": "Retain raw pose; classify REJECTED_OUTSIDE_CANONICAL_SITE; exclude from pose families.",
+    "family_clustering": "Per system and enantiomer, complete linkage direct same-atom-order heavy-atom RMSD <= 2.0 A.",
+    "representative": "Family medoid by minimum mean direct RMSD; ties by seed then mode. Engine score is not used.",
+    "score_policy": "Store as docking-engine output only; never interpret as potency, affinity, probability, or evidence priority.",
+    "sam_compatibility": {"sterically_incompatible": "any pair <2.0 A", "close_nonoverlapping": "none <2.0 A and any pair <2.5 A", "compatible": "minimum distance >=2.5 A"},
+    "batch_failure": "If any seed returns fewer than 8 modes or any receptor loses fixed SAM, mark that system/enantiomer NOT_EVALUABLE_DOCKING_FAILURE; do not synthesize poses or selectively rerun with changed settings."
+  },
+  "independent_outputs": [
+    "SAM compatibility",
+    "productive TSL feasibility",
+    "receptor movement required for productive TSL",
+    "accepted DCMB pose families",
+    "DCMB-TSL steric overlap",
+    "DCMB interference with transfer corridors",
+    "local accessible volume",
+    "bottleneck and corridor dimensions",
+    "residue-contact fingerprints",
+    "ligand centroid and orientation in canonical site frame",
+    "mutation-induced structural changes",
+    "explicit failure modes"
+  ],
+  "metric_definitions": {
+    "contact_fingerprint": "Residue has any protein-ligand heavy-atom distance <=4.5 A; report residue and minimum distance.",
+    "local_accessible_volume": "0.5 A grid within 3.0 A of the ligand or predefined site probe and at least 2.0 A from protein heavy atoms.",
+    "direct_overlap": "Report minimum DCMB-TSL distance, pair counts <2.0 and <2.5 A, shared 1.0 A core-envelope volume, shared 1.7 A occupied volume, and atoms within the reciprocal 1.7 A envelopes.",
+    "transfer_corridor": "Finite segment from TSL sulfur to SAM methyl carbon; report ligand distances and occupied fractions at radii 1.5, 2.0, and 2.5 A. Blockade requires a DCMB atom projected within the segment and <=2.0 A from it.",
+    "movement_interference": "Report minimum DCMB-to-moving-atom path distance, paths <3.4 A and <2.0 A, and shared 1.7 A swept-envelope volume. Mechanistic gating requires swept overlap >=0.5 A3.",
+    "centroid_orientation": "Ligand heavy-atom centroid and principal long axis in the native receptor frame and the common METTL7A frame; orientation sign canonicalized toward the pocket mouth.",
+    "bottleneck": "Minimum opposing-wall heavy-atom surface separation along the preregistered 43/199-to-195/232 corridor; preserve every named residue-pair distance separately.",
+    "mutation_change": "Mutant minus same-target WT for each raw metric; never combine dimensions."
+  },
+  "interference_classification": {
+    "broadly_interfering": "Direct <2.0 A overlap or transfer-corridor blockade in every retained productive TSL family.",
+    "state_dependent_interfering": "The same condition occurs in at least one but not all retained productive TSL families.",
+    "non_interfering_escape": "No direct <2.0 A overlap, no 2.0 A corridor blockade, and zero shared 1.7 A occupied volume for at least one retained productive state.",
+    "not_evaluable": "No retained productive TSL state or no accepted DCMB family exists for the system."
+  },
+  "mutation_matrix": {
+    "contrasts": ["7A_F43L - 7A_WT", "7A_F199G - 7A_WT", "7A_F43L_F199G - 7A_WT", "7B_L43F - 7B_WT", "7B_G199F - 7B_WT", "7B_L43F_G199F - 7B_WT"],
+    "interaction_per_metric": "I = (double - WT) - (position43_single - WT) - (position199_single - WT)",
+    "additivity_rule": "For seed-sampled metrics, additive if the stratified-by-enantiomer seed bootstrap 95% interval for I includes zero; cooperative if it excludes zero in the same direction as the double-WT effect; antagonistic if it excludes zero in the opposite direction. For deterministic single-structure metrics without replicates, report I but categorical additivity is NOT_EVALUABLE.",
+    "asymmetry_rule": "Reciprocal effects are asymmetric when their direction or evaluability differs, or when normalized seed-bootstrap intervals do not overlap after expressing each change relative to its own WT. Do not require reciprocal symmetry."
+  },
+  "global_stop_rules": [
+    "Any coordinate-frame mismatch above the fixed gate",
+    "Any protocol divergence between systems",
+    "Missing or moved SAM coordinates",
+    "Severe unresolved receptor-SAM clash",
+    "Mutation identity or atom-order failure",
+    "WT control produces no accepted DCMB family",
+    "Arbitrary response exceeds the limited-response gates",
+    "A requested observation is unavailable: emit NOT_EVALUABLE rather than zero",
+    "No new metric, residue scan, docking campaign, MD, or composite score may be introduced in response to an unexpected result"
+  ],
+  "verdict_policy": "No master verdict or composite score. Each evidence dimension and failure reason is reported independently. Scientific conclusions must retain EXPERIMENTAL, STRUCTURAL_OBSERVATION, COMPUTATIONAL_HYPOTHESIS, or PREDICTION labels."
+}
