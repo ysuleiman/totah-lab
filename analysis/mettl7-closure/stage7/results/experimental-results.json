@@ -1,0 +1,122 @@
+{
+  "status": "SEALED_EXPERIMENTAL_ONLY",
+  "seed": 20260810,
+  "input_sha256": "4031b46c02ea073b9b440602492695adfb87c1c759cfe222cfccca9ad5e6843c",
+  "variants": {
+    "geometry_only": {
+      "non_neural_pca": {
+        "queries": 297,
+        "recall_at_1": 0.4983164983164983,
+        "recall_at_5": 0.7407407407407407,
+        "recall_at_10": 0.8215488215488216,
+        "mrr": 0.6107394716235461,
+        "median_first_relevant_rank": 2.0
+      },
+      "small_autoencoder": {
+        "queries": 297,
+        "recall_at_1": 0.3367003367003367,
+        "recall_at_5": 0.6363636363636364,
+        "recall_at_10": 0.7306397306397306,
+        "mrr": 0.47322362988214384,
+        "median_first_relevant_rank": 3.0
+      },
+      "dimensions": 17,
+      "pca_explained_variance": 0.9998560262922395
+    },
+    "residue_graph": {
+      "non_neural_pca": {
+        "queries": 297,
+        "recall_at_1": 0.8215488215488216,
+        "recall_at_5": 0.9528619528619529,
+        "recall_at_10": 0.9764309764309764,
+        "mrr": 0.8852868072267954,
+        "median_first_relevant_rank": 1.0
+      },
+      "small_autoencoder": {
+        "queries": 297,
+        "recall_at_1": 0.7946127946127947,
+        "recall_at_5": 0.9427609427609428,
+        "recall_at_10": 0.9528619528619529,
+        "mrr": 0.861545197521578,
+        "median_first_relevant_rank": 1.0
+      },
+      "dimensions": 45,
+      "pca_explained_variance": 0.8391630689669987
+    },
+    "residue_ligand_cofactor": {
+      "non_neural_pca": {
+        "queries": 297,
+        "recall_at_1": 0.7946127946127947,
+        "recall_at_5": 0.9393939393939394,
+        "recall_at_10": 0.9730639730639731,
+        "mrr": 0.8600687878132962,
+        "median_first_relevant_rank": 1.0
+      },
+      "small_autoencoder": {
+        "queries": 297,
+        "recall_at_1": 0.7474747474747475,
+        "recall_at_5": 0.9191919191919192,
+        "recall_at_10": 0.9595959595959596,
+        "mrr": 0.8234540164717915,
+        "median_first_relevant_rank": 1.0
+      },
+      "dimensions": 58,
+      "pca_explained_variance": 0.7515244845698867
+    },
+    "residue_ligand_cofactor_cavity": {
+      "non_neural_pca": {
+        "queries": 297,
+        "recall_at_1": 0.7407407407407407,
+        "recall_at_5": 0.8956228956228957,
+        "recall_at_10": 0.9393939393939394,
+        "mrr": 0.8167512330154958,
+        "median_first_relevant_rank": 1.0
+      },
+      "small_autoencoder": {
+        "queries": 297,
+        "recall_at_1": 0.7104377104377104,
+        "recall_at_5": 0.8653198653198653,
+        "recall_at_10": 0.9023569023569024,
+        "mrr": 0.779386132025409,
+        "median_first_relevant_rank": 1.0
+      },
+      "dimensions": 74,
+      "pca_explained_variance": 0.7247415535000945
+    }
+  },
+  "masked_tasks": {
+    "contact_role": {
+      "observation_accuracy": 0.701195219123506,
+      "balanced_accuracy": 0.5330552311741988
+    },
+    "residue_identity": {
+      "observation_accuracy": 0.5252324037184595,
+      "balanced_accuracy": 0.49863636363636366,
+      "trivial_majority_accuracy": 0.10977242302543508
+    }
+  },
+  "controls": {
+    "same_pdb_excluded_from_retrieval": true,
+    "group_balanced_training": true,
+    "target_ccd_cofactor_group_ids_not_features": true,
+    "family_held_out_claim": false
+  },
+  "sealed": {
+    "geometry_only": {
+      "artifact": "geometry_only-sealed.npz",
+      "sha256": "32fe8453495ad255c47afd1cf7a1afacf8aa96685445bb2589f4e4e45a838687"
+    },
+    "residue_graph": {
+      "artifact": "residue_graph-sealed.npz",
+      "sha256": "2e0871c3abe6292b1897ce7655014d2a63c6a441a61f95500783776a801086b9"
+    },
+    "residue_ligand_cofactor": {
+      "artifact": "residue_ligand_cofactor-sealed.npz",
+      "sha256": "b38d2bf13406cbef8108c405296abd08e31acea069485346e36d1af10553a8ef"
+    },
+    "residue_ligand_cofactor_cavity": {
+      "artifact": "residue_ligand_cofactor_cavity-sealed.npz",
+      "sha256": "659dbdecfe647a112750bca81d50611ee1d2b845592c7fe9e61697a32214bc61"
+    }
+  }
+}
