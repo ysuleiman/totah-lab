@@ -25,6 +25,7 @@ import totah.lab.prometheus.neural.DenseLayer;
 import totah.lab.prometheus.neural.FeedForwardNetwork;
 import totah.lab.prometheus.neural.GeometryConditionedHydrogenMoleculeState;
 import totah.lab.prometheus.neural.HeliumCorrelatedNeuralState;
+import totah.lab.prometheus.neural.GeneralSlaterJastrowState;
 import totah.lab.prometheus.neural.IdentityActivation;
 import totah.lab.prometheus.neural.ParameterTensor;
 import totah.lab.prometheus.neural.TanhActivation;
@@ -40,6 +41,7 @@ import totah.lab.prometheus.variational.ParameterVector;
 import totah.lab.prometheus.variational.ThreeDimensionalRayleighFunctional;
 import totah.lab.prometheus.variational.TransformedRadialPointSet;
 import totah.lab.prometheus.variational.force.AnalyticDifferentialSwctForceEstimator;
+import totah.lab.prometheus.variational.force.GeneralAnalyticDifferentialSwctForceEstimator;
 
 /** Concrete, stateless Java-only backend for the frozen H/He/H2 Step-0 regressions. */
 public final class JavaNeuralQuantumBackend implements QuantumBackend {
@@ -65,6 +67,7 @@ public final class JavaNeuralQuantumBackend implements QuantumBackend {
             case "prometheus-regression-hydrogen" -> validAtom(r,"H",0,2)&&energyOnly(r)&&r.specification().calculationType()==CalculationType.SINGLE_POINT;
             case "prometheus-regression-helium" -> validAtom(r,"He",0,1)&&energyOnly(r)&&r.specification().calculationType()==CalculationType.SINGLE_POINT;
             case "prometheus-regression-h2" -> validH2(r)&&validH2Request(r);
+            case "prometheus-general-force-h2-fixture" -> validH2(r)&&r.specification().calculationType()==CalculationType.FORCE_EVALUATION&&r.requiredObservables().equals(QuantumExecutionRequest.energyAndForces());
             default -> false;
         };
     }
@@ -92,6 +95,7 @@ public final class JavaNeuralQuantumBackend implements QuantumBackend {
             double e=new HeliumRayleighFunctional().evaluate(new HeliumCorrelatedNeuralState(new ParameterVector(HE_PARAMS)),new HeliumHamiltonian(),HeliumImportancePointSet.create(30000,1.8,1009)).objective();
             return scalar(e,"FROZEN_HELIUM_REGRESSION");
         }
+        if(id.equals("prometheus-general-force-h2-fixture"))return computeGeneralForce(r);
         double radius=Math.abs(r.geometry().atoms().get(1).z()-r.geometry().atoms().get(0).z());
         var state=new GeometryConditionedHydrogenMoleculeState(radius,new ParameterVector(H2_PARAMS));
         var h=new HydrogenMoleculeHamiltonian(radius);var batches=new HydrogenMoleculeImportanceBatches(2500,radius,1.15,43,512);
@@ -109,6 +113,8 @@ public final class JavaNeuralQuantumBackend implements QuantumBackend {
         provenance.put("force_estimator",JavaNeuralRuntimePolicy.FORCE_ESTIMATOR);provenance.put("numerical_swct",JavaNeuralRuntimePolicy.NUMERICAL_SWCT);
         return new Computed(forceResult.energyHartree(),Optional.of(new QuantumResult.CartesianField(gradients,QuantumResult.CartesianUnit.HARTREE_PER_BOHR)),Optional.of(new QuantumResult.CartesianField(forces,QuantumResult.CartesianUnit.HARTREE_PER_BOHR)),Map.copyOf(provenance));
     }
+
+    private static Computed computeGeneralForce(QuantumExecutionRequest r){List<totah.lab.prometheus.molecular.NuclearCenter> nuclei=new ArrayList<>();for(int i=0;i<r.geometry().atoms().size();i++){var a=r.geometry().atoms().get(i);nuclei.add(new totah.lab.prometheus.molecular.NuclearCenter(i,a.element(),new totah.lab.prometheus.molecular.NuclearCharge(1),new totah.lab.prometheus.molecular.CartesianPosition(a.x(),a.y(),a.z(),totah.lab.prometheus.molecular.LengthUnit.BOHR)));}var molecule=new totah.lab.prometheus.molecular.Molecule(r.specification().molecule().moleculeId(),nuclei,new totah.lab.prometheus.molecular.MolecularCharge(0),new totah.lab.prometheus.molecular.ElectronCount(2),new totah.lab.prometheus.molecular.SpinSector(1,1,1));var state=GeneralSlaterJastrowState.cuspInitialized(molecule);double radius=Math.abs(r.geometry().atoms().get(1).z()-r.geometry().atoms().get(0).z());var batches=new HydrogenMoleculeImportanceBatches(2500,radius,1.15,43,512);totah.lab.prometheus.variational.GeneralMolecularSampleSource source=consumer->batches.forEachBatch(batch->batch.forEach(point->{var old=point.coordinates().particles();var coordinates=new totah.lab.prometheus.variational.QuantumCoordinates(List.of(new totah.lab.prometheus.variational.QuantumCoordinates.ParticleCoordinate(0,old.get(0).xBohr(),old.get(0).yBohr(),old.get(0).zBohr(),totah.lab.prometheus.variational.SpinProjection.ALPHA),new totah.lab.prometheus.variational.QuantumCoordinates.ParticleCoordinate(1,old.get(1).xBohr(),old.get(1).yBohr(),old.get(1).zBohr(),totah.lab.prometheus.variational.SpinProjection.BETA)));consumer.accept(point.weight(),coordinates);}));var result=new GeneralAnalyticDifferentialSwctForceEstimator().evaluate(state,source);List<QuantumResult.Vector3> force=result.forces().stream().map(f->new QuantumResult.Vector3(f.fx(),f.fy(),f.fz())).toList();List<QuantumResult.Vector3> gradient=force.stream().map(f->new QuantumResult.Vector3(-f.x(),-f.y(),-f.z())).toList();Map<String,String> provenance=Map.of("force_estimator","GENERAL_ANALYTIC_DIFFERENTIAL_SWCT","state_traversals",Long.toString(result.stateTraversals()),"local_energy_evaluations",Long.toString(result.localEnergyEvaluations()),"directional_ad_passes",Long.toString(result.directionalAdPasses()),"force_unit",result.forceUnit());return new Computed(result.energyHartree(),Optional.of(new QuantumResult.CartesianField(gradient,QuantumResult.CartesianUnit.HARTREE_PER_BOHR)),Optional.of(new QuantumResult.CartesianField(force,QuantumResult.CartesianUnit.HARTREE_PER_BOHR)),provenance);}
 
     private static Computed scalar(double e,String kernel){return new Computed(e,Optional.empty(),Optional.empty(),Map.of("kernel",kernel,"sampling","BOUNDED_DETERMINISTIC"));}
     private static boolean energyOnly(QuantumExecutionRequest r){return r.requiredObservables().equals(SetHolder.ENERGY);}
