@@ -46,6 +46,16 @@ Evaluate in this order, stopping an implementation that fails its fixtures:
    implicit/Lagrangian response equation; it may not be obtained by retraining
    neighboring geometries. If the response equation is underdetermined, report
    that fact rather than regularizing after inspection.
+
+   Locked numerical realization: evaluate the 20-component energy gradient on
+   the same deterministic configurations; central-difference that gradient with
+   parameter step `1e-4` to form the local energy Hessian and with geometry step
+   `1e-3 bohr` to form the mixed derivative. Solve
+   `H_theta_theta * dtheta/dR = -d(g_theta)/dR` by unregularized pivoted
+   elimination. Report rank and pivot ratio. No diagonal shift, pseudoinverse,
+   truncation, or parameter movement is allowed. A rank-deficient or pivot-ratio
+   `<1e-10` system is `PARAMETER_RESPONSE_UNDERDETERMINED` and produces no
+   corrected-force claim.
 3. `BARE_HELLMANN_FEYNMAN`: Qian Eq. 5, retained as a diagnostic rather than a
    preferred estimator because of its documented variance and first-order
    wavefunction error.
