@@ -52,7 +52,11 @@ public final class TrueResidualPreconditionedConjugateGradientSolver {
             double[] nextPreconditioned = preconditioner.apply(trueResidual);
             double nextResidualPreconditioned = dot(trueResidual, nextPreconditioned);
             if (!(nextResidualPreconditioned >= 0.0) || !Double.isFinite(nextResidualPreconditioned)) {
-                throw new IllegalArgumentException("PCG invalid preconditioned residual");
+                throw new IllegalArgumentException("PCG invalid preconditioned residual at iteration="+iteration
+                        +" rMz="+nextResidualPreconditioned+" previousRMz="+residualPreconditioned
+                        +" trueNorm="+trueNorm+" threshold="+threshold
+                        +" residual="+java.util.Arrays.toString(trueResidual)
+                        +" preconditioned="+java.util.Arrays.toString(nextPreconditioned));
             }
             double beta = nextResidualPreconditioned / residualPreconditioned;
             for (int i = 0; i < dimension; i++) {
