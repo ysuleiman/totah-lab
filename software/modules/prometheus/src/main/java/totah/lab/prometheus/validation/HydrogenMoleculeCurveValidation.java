@@ -14,6 +14,7 @@ import totah.lab.prometheus.identity.CanonicalHashing;
 import totah.lab.prometheus.neural.HydrogenMoleculeCorrelatedState;
 import totah.lab.prometheus.neural.HydrogenMoleculeUncorrelatedState;
 import totah.lab.prometheus.variational.ConvergedFiniteDifferenceAdam;
+import totah.lab.prometheus.variational.DifferentiableQuantumState;
 import totah.lab.prometheus.variational.HydrogenMoleculeHamiltonian;
 import totah.lab.prometheus.variational.HydrogenMoleculeImportancePointSet;
 import totah.lab.prometheus.variational.HydrogenMoleculeRayleighFunctional;
@@ -85,7 +86,7 @@ public final class HydrogenMoleculeCurveValidation {
                 continuationSaving,seedSpread,smooth,forceSigns,passed);
     }
 
-    static Audit audit(HydrogenMoleculeCorrelatedState state,double radius) {
+    static Audit audit(DifferentiableQuantumState state,double radius) {
         double nuclearMaximum=0;
         for(double nucleus:new double[]{-radius/2,radius/2}) nuclearMaximum=Math.max(nuclearMaximum,
                 Math.abs(sphericalNuclearCusp(state,nucleus,radius)+1));
@@ -94,33 +95,33 @@ public final class HydrogenMoleculeCurveValidation {
         return new Audit(nuclearMaximum,Math.abs(electronCusp-0.5),exchange,nuclear,
                 derivative.maxGradientError,derivative.laplacianError);
     }
-    private static double sphericalNuclearCusp(HydrogenMoleculeCorrelatedState state,double nucleus,double radius) {
+    private static double sphericalNuclearCusp(DifferentiableQuantumState state,double nucleus,double radius) {
         double h=2e-5; return (Math.log(sphericalAverage(state,nucleus,2*h,radius))
                 -Math.log(sphericalAverage(state,nucleus,h,radius)))/h;
     }
-    private static double sphericalAverage(HydrogenMoleculeCorrelatedState state,double nucleus,double shell,double radius) {
+    private static double sphericalAverage(DifferentiableQuantumState state,double nucleus,double shell,double radius) {
         double[][] d={{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};double sum=0;
         for(double[] v:d) sum+=state.value(configuration(shell*v[0],shell*v[1],nucleus+shell*v[2],
                 0.4,-0.3,radius/2+0.7)).real(); return sum/d.length;
     }
-    private static double electronCusp(HydrogenMoleculeCorrelatedState state,double radius) {
+    private static double electronCusp(DifferentiableQuantumState state,double radius) {
         double h=2e-5; return (Math.log(coalescence(state,2*h,radius))-Math.log(coalescence(state,h,radius)))/h;
     }
-    private static double coalescence(HydrogenMoleculeCorrelatedState state,double separation,double radius) {
+    private static double coalescence(DifferentiableQuantumState state,double separation,double radius) {
         double sum=0;double[][] d={{1,0,0},{-1,0,0},{0,1,0},{0,-1,0},{0,0,1},{0,0,-1}};
         for(double[] v:d) sum+=state.value(configuration(separation*v[0]/2,separation*v[1]/2,
                 0.2+separation*v[2]/2,-separation*v[0]/2,-separation*v[1]/2,
                 0.2-separation*v[2]/2)).real(); return sum/d.length;
     }
-    private static double exchangeError(HydrogenMoleculeCorrelatedState state,double radius) {
+    private static double exchangeError(DifferentiableQuantumState state,double radius) {
         return Math.abs(state.value(configuration(.3,-.2,radius/2+.4,-.4,.5,-radius/2-.2)).real()
                 -state.value(configuration(-.4,.5,-radius/2-.2,.3,-.2,radius/2+.4)).real());
     }
-    private static double nuclearSwapError(HydrogenMoleculeCorrelatedState state,double radius) {
+    private static double nuclearSwapError(DifferentiableQuantumState state,double radius) {
         return Math.abs(state.value(configuration(.3,-.2,radius/2+.4,-.4,.5,-radius/2-.2)).real()
                 -state.value(configuration(.3,-.2,-radius/2-.4,-.4,.5,radius/2+.2)).real());
     }
-    private static DerivativeAudit derivativeAudit(HydrogenMoleculeCorrelatedState state,double radius,double step) {
+    private static DerivativeAudit derivativeAudit(DifferentiableQuantumState state,double radius,double step) {
         double[] xyz={.35,-.22,radius/2+.45,-.41,.37,-radius/2-.31};
         var analytic=state.evaluateWithDerivatives(configuration(xyz));double center=analytic.value().real();
         double finiteLaplacian=0,maxGradient=0;

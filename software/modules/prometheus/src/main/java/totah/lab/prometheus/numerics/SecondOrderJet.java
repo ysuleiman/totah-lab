@@ -21,6 +21,10 @@ public final class SecondOrderJet {
     public double value() { return value; }
     public double gradient(int axis) { return gradient[axis]; }
     public double laplacian() { return Arrays.stream(diagonal).sum(); }
+    public double laplacian(int axes) {
+        if(axes<0||axes>diagonal.length)throw new IllegalArgumentException("invalid Laplacian axis count");
+        double sum=0;for(int i=0;i<axes;i++)sum+=diagonal[i];return sum;
+    }
     public SecondOrderJet add(SecondOrderJet other) {
         return combine(other,1.0);
     }
