@@ -46,6 +46,10 @@ the promotion contract below.
    reduction is a separate phase; bounded memory and replayability are gates.
 7. **ForceBalance and downstream consumers never invoke QM.** They consume a
    frozen, checksummed evidence set read-only.
+8. **Capability class is explicit.** `AB_INITIO` consumes only Hamiltonian and
+   geometry; `REFERENCE_ASSISTED_DIAGNOSTIC` may use external labels to test
+   capacity but cannot produce production QM evidence; `SURROGATE` learns
+   external QM labels and is never represented as ab initio.
 
 ## Literature-supported mathematical directions
 
@@ -110,6 +114,35 @@ holdout geometries must be frozen before training. This is not authorization to
 retune H2: one controlled objective comparison should establish capacity and
 transfer, then close. Smoothness penalties without independent physical labels
 are lower priority because they can make a wrong PES smoothly wrong.
+
+The selected Controlled Experiment 1 is narrower still: a one-shot
+`REFERENCE_ASSISTED_DIAGNOSTIC` using dimensionless existing error scales and
+force-derived symmetric local-energy constraints. Success establishes
+representational capacity only. It does not authorize force-supervised
+production Prometheus.
+
+### Self-supervised production PES refinement hypotheses
+
+The production direction must remain variational and ab initio. Four
+Prometheus-specific hypotheses are recorded for later preregistration:
+
+1. allocate geometry work adaptively from local-energy variance, SR residual,
+   Monte Carlo/derivative uncertainty, neighboring-energy disagreement, and
+   curvature;
+2. decompose `theta(R)=theta_shared+Delta theta(R)`, regularizing a smooth local
+   residual toward zero to retain shared efficiency with local flexibility;
+3. require internal agreement between differential-SWCT and central PES
+   derivatives without supplying an external force target;
+4. refine the geometry mesh where
+   `|E(R+d)-2E(R)+E(R-d)|/d^2`, variance, or stationarity indicates insufficient
+   resolution.
+
+The first and fourth are consistent with published transferable-wavefunction
+work that samples geometries nonuniformly, including by prior energy variance.
+The residual decomposition and combined acquisition policy are Prometheus
+hypotheses, not literature-established algorithms. Internal derivative
+consistency can expose inconsistency but cannot repair a globally wrong PES by
+itself.
 
 ### Explicit SR
 

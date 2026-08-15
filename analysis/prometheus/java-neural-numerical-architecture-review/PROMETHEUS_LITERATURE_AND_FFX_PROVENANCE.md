@@ -11,6 +11,9 @@
 | Neural-VMC force comparison | Joint force accuracy/contribution/variance/cost benchmark | Frozen study follows its estimator separation | Qian et al., DOI `10.1063/5.0112344` |
 | SWCT scaling/regularization | Control force overhead and infinite variance | Variance benefit reproduced diagnostically | Nakano et al., DOI `10.1063/5.0076302` |
 | Acceptance-ratio Pulay and compact HF estimators | Soften divergence, regularize tails, lower force variance | Proposed estimator experiment after PES-derivative attribution; not implemented | Linteau et al., arXiv `2603.14521` |
+| Sobolev training | Derivative observations can improve function/derivative approximation | Supports a reference-assisted capacity diagnostic, not production VMC | Czarnecki et al., arXiv `1706.04859` |
+| Taylor force-to-energy augmentation | Avoid direct force-loss higher derivatives by constructing nearby energy labels | Selected diagnostic pattern; surrogate precedent only | Cooper et al., DOI `10.1038/s41524-020-0323-8` |
+| Transferable neural wavefunctions | Shared optimization/pretraining across compounds and geometries; geometry selection may use prior variance | Supports adaptive variational geometry-allocation research | Scherbela et al., DOI `10.1038/s41467-023-44216-9` |
 
 The first five force-method PDFs are archived under
 `reference/prometheus-nuclear-force-literature/` with SHA-256 values in its
