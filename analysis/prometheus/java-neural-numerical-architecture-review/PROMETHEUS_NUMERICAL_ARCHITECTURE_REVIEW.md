@@ -211,6 +211,18 @@ regions, cancellation in local-energy derivatives, incorrect Jacobian terms,
 and silent sign/unit errors. Per-sample comparison against multiple symmetric
 finite-difference steps is required before aggregate comparison.
 
+Controlled Experiment E3 subsequently validated this direction as
+`ANALYTIC_DIFFERENTIAL_SWCT_EQUIVALENT_AND_FASTER`. A two-direction
+forward-over-spatial-second-order jet carried total-SWCT and bare-nuclear
+tangents through one shared state graph. Against the frozen numerical estimator,
+force differences were `7.94e-7`, `1.77e-7`, and `5.30e-9 Ha/bohr` at R=1.0,
+1.4, and 3.0 bohr; variance and standard-error gates passed. Traversals fell
+from `5N` to `N`, while measured median wall speedups were 1.87x, 2.12x, and
+1.70x. The relative-memory and reflection/antisymmetry audits passed. This is
+the preferred force-evaluation primitive for the frozen centered-H2
+representation. General molecular vector-force transfer remains unestablished
+and requires its own capability gate.
+
 The frozen audit also records: correlated finite difference uses two paired
 evaluations; AC-ZV uses one state evaluation; AC-ZVZB uses one state/local-energy
 evaluation; and the parameter-response audit used exactly 3,096,000 evaluations
