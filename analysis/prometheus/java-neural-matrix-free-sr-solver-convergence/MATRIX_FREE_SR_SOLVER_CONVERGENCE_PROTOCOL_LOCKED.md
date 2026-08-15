@@ -61,8 +61,9 @@ The panel is evaluated in this order for each frozen preconditioner:
    `r=b-Ax` from the operator after every update and use that true residual for
    stopping and the next preconditioned direction.
 3. `PCG_TRUE_RESIDUAL_COMPENSATED`: variant 2 with deterministic Neumaier
-   compensated dot products and norms for all scalar Krylov reductions and
-   streamed covariance accumulation.
+   compensated dot products and norms for solver-side scalar Krylov
+   reductions only. The streamed covariance operator and its accumulation
+   arithmetic remain byte-for-byte the E4 implementation.
 
 No flexible/adaptive preconditioner is introduced because every tested
 preconditioner is fixed. MINRES is reserved as a diagnostic only if the
