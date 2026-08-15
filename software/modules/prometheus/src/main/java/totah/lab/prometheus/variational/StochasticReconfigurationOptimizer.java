@@ -3,6 +3,7 @@ package totah.lab.prometheus.variational;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /** Deterministic stochastic-reconfiguration optimizer for fixed-geometry H2 states. */
 public final class StochasticReconfigurationOptimizer {
@@ -18,13 +19,35 @@ public final class StochasticReconfigurationOptimizer {
         Objects.requireNonNull(initial, "initial");
         Objects.requireNonNull(hamiltonian, "hamiltonian");
         Objects.requireNonNull(points, "points");
+        return optimize(initial,hamiltonian,new PointTraversal() {
+            @Override public int count() { return points.points().size(); }
+            @Override public void forEach(Consumer<CollocationPointSet.WeightedPoint> consumer) {
+                points.points().forEach(consumer);
+            }
+        });
+    }
+
+    public Result optimize(DifferentiableQuantumState initial,
+            HydrogenMoleculeHamiltonian hamiltonian, HydrogenMoleculeImportanceBatches batches) {
+        Objects.requireNonNull(initial, "initial"); Objects.requireNonNull(hamiltonian, "hamiltonian");
+        Objects.requireNonNull(batches, "batches");
+        return optimize(initial,hamiltonian,new PointTraversal() {
+            @Override public int count() { return batches.count(); }
+            @Override public void forEach(Consumer<CollocationPointSet.WeightedPoint> consumer) {
+                batches.forEachBatch(batch -> batch.forEach(consumer));
+            }
+        });
+    }
+
+    private Result optimize(DifferentiableQuantumState initial,
+            HydrogenMoleculeHamiltonian hamiltonian, PointTraversal points) {
         DifferentiableQuantumState state = initial;
         List<Double> energies = new ArrayList<>(configuration.iterations());
         long evaluations = 0;
         int completedIterations=0, stale=0; double bestEnergy=Double.POSITIVE_INFINITY;
         for (int iteration = 0; iteration < configuration.iterations(); iteration++) {
             Statistics statistics = statistics(state, hamiltonian, points);
-            evaluations += points.points().size();
+            evaluations += points.count();
             energies.add(statistics.energy());
             double[] direction = solve(statistics.covariance(), statistics.energyGradient(),
                     configuration.diagonalRegularization());
@@ -42,27 +65,28 @@ public final class StochasticReconfigurationOptimizer {
             if(completedIterations>=configuration.minimumIterations()&&stale>=configuration.patience()) break;
         }
         Statistics finalStatistics = statistics(state, hamiltonian, points);
-        evaluations += points.points().size();
+        evaluations += points.count();
         energies.add(finalStatistics.energy());
         return new Result(state.parameters(), finalStatistics.energy(), finalStatistics.variance(),
                 completedIterations, evaluations, energies,completedIterations<configuration.iterations());
     }
 
     private static Statistics statistics(DifferentiableQuantumState state,
-            HydrogenMoleculeHamiltonian hamiltonian, CollocationPointSet points) {
+            HydrogenMoleculeHamiltonian hamiltonian, PointTraversal points) {
         int parameterCount = state.parameters().values().size();
         double norm = 0.0, energyMoment = 0.0, energySquareMoment = 0.0;
         double[] observableMoment = new double[parameterCount];
         double[] observableEnergyMoment = new double[parameterCount];
         double[][] observableProductMoment = new double[parameterCount][parameterCount];
-        for (var point : points.points()) {
+        MutableStatistics moments = new MutableStatistics(norm,energyMoment,energySquareMoment);
+        points.forEach(point -> {
             DifferentiableStateEvaluation evaluation =
                     state.evaluateWithDerivatives(point.coordinates());
             if (evaluation.parameterGradient().derivatives().size() != parameterCount) {
                 throw new IllegalArgumentException("parameter-gradient dimension does not match parameters");
             }
             double psi = evaluation.value().real();
-            if (!Double.isFinite(psi) || Math.abs(psi) < MINIMUM_NORM) continue;
+            if (!Double.isFinite(psi) || Math.abs(psi) < MINIMUM_NORM) return;
             double probabilityWeight = point.weight() * psi * psi;
             double localEnergy = -0.5 * evaluation.coordinateLaplacian().value().real() / psi
                     + hamiltonian.potential(point.coordinates());
@@ -74,9 +98,9 @@ public final class StochasticReconfigurationOptimizer {
                 logarithmicDerivative[parameter] = evaluation.parameterGradient().derivatives()
                         .get(parameter).real() / psi;
             }
-            norm += probabilityWeight;
-            energyMoment += probabilityWeight * localEnergy;
-            energySquareMoment += probabilityWeight * localEnergy * localEnergy;
+            moments.norm += probabilityWeight;
+            moments.energy += probabilityWeight * localEnergy;
+            moments.energySquare += probabilityWeight * localEnergy * localEnergy;
             for (int row = 0; row < parameterCount; row++) {
                 observableMoment[row] += probabilityWeight * logarithmicDerivative[row];
                 observableEnergyMoment[row] += probabilityWeight * logarithmicDerivative[row] * localEnergy;
@@ -85,7 +109,8 @@ public final class StochasticReconfigurationOptimizer {
                             * logarithmicDerivative[row] * logarithmicDerivative[column];
                 }
             }
-        }
+        });
+        norm=moments.norm; energyMoment=moments.energy; energySquareMoment=moments.energySquare;
         if (!Double.isFinite(norm) || norm < MINIMUM_NORM) {
             throw new IllegalArgumentException("H2 state has zero or non-finite sampled norm");
         }
@@ -170,4 +195,14 @@ public final class StochasticReconfigurationOptimizer {
 
     private record Statistics(double energy, double variance, double[] energyGradient,
             double[][] covariance) { }
+    private static final class MutableStatistics {
+        private double norm,energy,energySquare;
+        private MutableStatistics(double norm,double energy,double energySquare) {
+            this.norm=norm;this.energy=energy;this.energySquare=energySquare;
+        }
+    }
+    private interface PointTraversal {
+        int count();
+        void forEach(Consumer<CollocationPointSet.WeightedPoint> consumer);
+    }
 }
