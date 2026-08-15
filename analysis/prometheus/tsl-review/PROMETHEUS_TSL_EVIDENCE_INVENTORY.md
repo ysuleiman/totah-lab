@@ -1,0 +1,248 @@
+# Prometheus TSL Evidence Inventory
+
+Quantum evidence: 100
+
+Classical evidence: 22
+
+Provenance gaps: 197
+
+## Quantum evidence by acceptance
+
+- ACCEPTED: 81
+- GEOMETRY_INVALID: 6
+- PROTOCOL_INCOMPLETE: 1
+- EXCLUDED_BY_PROTOCOL: 12
+
+## Quantum evidence by calculation type
+
+- OPTIMIZATION: 4
+- SINGLE_POINT: 38
+- HESSIAN: 3
+- RESP: 2
+- COUNTERPOISE_INTERACTION: 46
+- CONSTRAINED_SCAN: 7
+
+## Quantum evidence by protocol
+
+- `GFN2-xTB|ALPB(water)|none|none|false|unknown|unknown`: 2
+- `HF|6-31G(d)|none|gas|false|AmberTools|26.0`: 2
+- `PBE0|def2-TZVP|D3(BJ)|none|true|PySCF|unknown`: 4
+- `PBE0|def2-TZVP|D3(BJ)|none|true|unknown|unknown`: 42
+- `PBE|3-21G|none|none|false|unknown|unknown`: 7
+- `PBE|def2-SVP|D3(BJ)|gas|false|PySCF|2.14.0`: 10
+- `PBE|def2-SVP|D3(BJ)|none|false|unknown|unknown`: 30
+- `unknown|none|none|none|false|unknown|unknown`: 3
+
+## Classical evidence by acceptance
+
+- ACCEPTED: 19
+- GEOMETRY_INVALID: 3
+
+## Classical evidence by calculation type
+
+- CLASSICAL_FIXED_GEOMETRY_ENERGY: 6
+- ENERGY_DECOMPOSITION: 16
+
+## Classical evidence by protocol
+
+- `GAFF2|none|none|none|false|AmberTools|unknown`: 22
+
+## Provenance gaps
+
+- QUANTUM 001db5c802265a474735a952dd067ad94b32f8766089786acbda372d3b079242: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 001db5c802265a474735a952dd067ad94b32f8766089786acbda372d3b079242: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 028173eca4d906a81be2978833fb5d4d3a5e417e21dbdd36a0004c1d6b162af2: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 080e915242aa3b0841dfdc2f35abafdc3c41c7923a3bf5625751459efe0afd42: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 080e915242aa3b0841dfdc2f35abafdc3c41c7923a3bf5625751459efe0afd42: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 087ecccbbb0849a11068508cf83d079c68c0218565fae4ac38a43749022e1eb8: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 087ecccbbb0849a11068508cf83d079c68c0218565fae4ac38a43749022e1eb8: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 0c40031a8d34a9b7d5e0f5074e77b79ab6c92b37b24967e2a9f8e25e325f25bc: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 0db72c6b2a00a8568a5f3ee7cd928d7c474967c7306124fb053c21818fd1c3d5: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 0db72c6b2a00a8568a5f3ee7cd928d7c474967c7306124fb053c21818fd1c3d5: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 0efd71c47f7b1a31c63275d296abf9eab6d2930eb4afc178d995a6d7c2d4f870: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 107bde46ba95f32e270520855287e59cb755f141879208890c4346d23994400c: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 107bde46ba95f32e270520855287e59cb755f141879208890c4346d23994400c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 13d535a5335748eb9f138783fe67cf85cb60a865a6b5a82198626ddd86f76af2: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 13d535a5335748eb9f138783fe67cf85cb60a865a6b5a82198626ddd86f76af2: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 1434c7d26d2139e569af62a1714aa158e27a18de9bec0194b33eb29026b0f3ff: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 15b87ed4a4fef7dded9a82da3278a10e0e7cb94561ee53035c7607a86ad89da7: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 15b87ed4a4fef7dded9a82da3278a10e0e7cb94561ee53035c7607a86ad89da7: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 1950a3a989c1ef2a1286310942937591455819f4a4de88ff6b737f88b1b1ce76: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 1950a3a989c1ef2a1286310942937591455819f4a4de88ff6b737f88b1b1ce76: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 1b3128a3bd6fb32773747168387231e254f3f41603c6b92e3e1c54916cc121eb: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 1b3128a3bd6fb32773747168387231e254f3f41603c6b92e3e1c54916cc121eb: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 1d7038cd117b7a4a0de57a2ac703480568af61aeb4bf4e56dec6ac6488ec742d: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 1d7038cd117b7a4a0de57a2ac703480568af61aeb4bf4e56dec6ac6488ec742d: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 21cd9fb89b6f695f0123ae3dfc9e2e3649d4cd22e4cd8aa88afc4925bdf68fe6: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 21cd9fb89b6f695f0123ae3dfc9e2e3649d4cd22e4cd8aa88afc4925bdf68fe6: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 245093211ab5b43645c70fc78923051bbfeae836fca0add2825c61d8b874135e: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 245093211ab5b43645c70fc78923051bbfeae836fca0add2825c61d8b874135e: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 2a75cfc51d0fe155ccfddbeb43c19c26c237ce819f1dc23c4c837a966caa7e9b: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 2a75cfc51d0fe155ccfddbeb43c19c26c237ce819f1dc23c4c837a966caa7e9b: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 2b4c2048bf31f4d06149b54320aeca1695bcd68b67ac48ef6cd5c4b04fb28a2a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 3615ca89fa5725d115df9caa2b26b59ac90c4a33f7fbc17a2acfe80c86428348: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 371dc78d7b0112c9a7b807eba4e61b72058c987cf47352feb9b3b73847e3321a: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 371dc78d7b0112c9a7b807eba4e61b72058c987cf47352feb9b3b73847e3321a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 37c198a850a0f2555771a4ef5600b78ed523d48452c624f291406cc9109b8cb0: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 3afbafeb9c0a7a9fcf42a6e63dac9645561d7b9cd764c2392d1e8ff3f29a62f6: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 3afbafeb9c0a7a9fcf42a6e63dac9645561d7b9cd764c2392d1e8ff3f29a62f6: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 3b5e8858b3d0ff399ea80197010d69c897b42e5680a185b313edf083048d7e68: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 3b5e8858b3d0ff399ea80197010d69c897b42e5680a185b313edf083048d7e68: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 3c61ce3603e56d4e107f0cac0285ec64e0c75594a2f2c66c826204df370ba045: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 3dd9ebb65f743bfb32f32e9c56d402d587d94764f6a5554eb69dbaa1dbfb3d5b: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 3eaf235e8b1912090382b130abfd4c20674c55a24c8d84e3d9228a7c28c5d455: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 3eaf235e8b1912090382b130abfd4c20674c55a24c8d84e3d9228a7c28c5d455: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 43ab87866d15b0d2adeaef86241785e31c34050350b9d0a8a7bfd380145fe524: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 43ab87866d15b0d2adeaef86241785e31c34050350b9d0a8a7bfd380145fe524: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4420ddb8ba0dc5a575702498b888736f89a5ec83ecf2c4b476527987db36fdea: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4420ddb8ba0dc5a575702498b888736f89a5ec83ecf2c4b476527987db36fdea: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4602c4f8500d24d587aadb189233de720bd0eddae0f8b8efac049fe38ccef04a: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4602c4f8500d24d587aadb189233de720bd0eddae0f8b8efac049fe38ccef04a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 47b3bd31e207aa37c67490dc58f98c441b134edd7f9a9482936a78fa32235733: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 47b3bd31e207aa37c67490dc58f98c441b134edd7f9a9482936a78fa32235733: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4b1552ec12e207e596175b1a804087cc554b21c4dfcc77f2e7115505a207f748: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4b1552ec12e207e596175b1a804087cc554b21c4dfcc77f2e7115505a207f748: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4b9fc80d43465b468fa057a84b9197300b3b020f0e3262e92ab141784040153b: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4b9fc80d43465b468fa057a84b9197300b3b020f0e3262e92ab141784040153b: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4e24875bfce6309754d14ea57ab1ff1513cde180c093a71f16db8e7ae8f0c2dd: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4e24875bfce6309754d14ea57ab1ff1513cde180c093a71f16db8e7ae8f0c2dd: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 4e53de2e039541e075443c8f6b02d1ed386972a2f8fa3d7525e1cfae7ebf4ed7: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 4e53de2e039541e075443c8f6b02d1ed386972a2f8fa3d7525e1cfae7ebf4ed7: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 5092fce6b796d8c2f9f88ac4acf4e9ddde076da5179e1a59cfd534e614270038: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 5092fce6b796d8c2f9f88ac4acf4e9ddde076da5179e1a59cfd534e614270038: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 57fc0a5e891eb1a4e4c257ddc614fbfb8869ec2cd7a1e2797c80cfba23d85849: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 59c4ab5b3fec1ff62f9dcec0518293a5e587882469425e9af680ddbb1975e7be: PROTOCOL_METHOD_MISSING — protocol method is unresolved
+- QUANTUM 59c4ab5b3fec1ff62f9dcec0518293a5e587882469425e9af680ddbb1975e7be: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 59c4ab5b3fec1ff62f9dcec0518293a5e587882469425e9af680ddbb1975e7be: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 59dd4710ce8575c580910032be643acc6e548c7d35c3a645784e26d5c9af14e5: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 5e3cf244ecc6fd1a111586bccbb089e4a468e92a68742e8fd39eaf2bd900c03b: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 5e3cf244ecc6fd1a111586bccbb089e4a468e92a68742e8fd39eaf2bd900c03b: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 5ed6dc47002df60a8fa9c3e98e419006ef67ddfca0bcf46151114673372ce202: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 5ed6dc47002df60a8fa9c3e98e419006ef67ddfca0bcf46151114673372ce202: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 62a8b9b275306489ed45377f59dbc6e0e382d4937a9e8616c736f9b85b24c80f: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 63d392528b257af34207f4aed6838535daafe5d72436e76074cb2103efda1a38: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 63d392528b257af34207f4aed6838535daafe5d72436e76074cb2103efda1a38: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 65dc6d6bffb22b9b3197bcce20288416e7a504968138238f856b3f728246d4b5: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 65dc6d6bffb22b9b3197bcce20288416e7a504968138238f856b3f728246d4b5: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 685f77c4065ec91f2e4a7439014556bfbbaadbb0a4d2db102f35fb5858de9a19: PROTOCOL_METHOD_MISSING — protocol method is unresolved
+- QUANTUM 685f77c4065ec91f2e4a7439014556bfbbaadbb0a4d2db102f35fb5858de9a19: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 685f77c4065ec91f2e4a7439014556bfbbaadbb0a4d2db102f35fb5858de9a19: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 68d5602bd8733e04c587d7a86790087bd510554481cf7b7d52c7f35d03869f59: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 698d0e86456c790be83d4675aec83f3dd0575d039bd049067e56299b8be92946: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 698d0e86456c790be83d4675aec83f3dd0575d039bd049067e56299b8be92946: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 6a8eb1fead1c9a5f05b39781d51c850d48b2042efbea4a06cc535a3345382c30: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 6a8eb1fead1c9a5f05b39781d51c850d48b2042efbea4a06cc535a3345382c30: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 6b8e14f3bc2ccc8fd4c0a2da2d5693c3c463b561c49e2f454dd3859dc76e395a: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 6b8e14f3bc2ccc8fd4c0a2da2d5693c3c463b561c49e2f454dd3859dc76e395a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 73c9fd344043850bc6be2616e76bff9f35f1fcadec8b95302e0d58c316302329: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 73c9fd344043850bc6be2616e76bff9f35f1fcadec8b95302e0d58c316302329: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 751edbf081eb74461e05faba375b7ea1c9404c01037c7364a90b1898f9ff26ed: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 751edbf081eb74461e05faba375b7ea1c9404c01037c7364a90b1898f9ff26ed: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 76fa4c695f13b39baf74c795320b8fb1762a2350ec9febc4d1906fdef71f637f: PROTOCOL_METHOD_MISSING — protocol method is unresolved
+- QUANTUM 76fa4c695f13b39baf74c795320b8fb1762a2350ec9febc4d1906fdef71f637f: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 76fa4c695f13b39baf74c795320b8fb1762a2350ec9febc4d1906fdef71f637f: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 7723b7a0d9fcab73b25ffe9f9587ada58b7573a4b443091b585c751edded8e62: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 7723b7a0d9fcab73b25ffe9f9587ada58b7573a4b443091b585c751edded8e62: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 7ab17db73ba354ec0e7239032fe309112eb441e3f8aecb4468c92dda6f27be81: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 7ab17db73ba354ec0e7239032fe309112eb441e3f8aecb4468c92dda6f27be81: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 7cf4f3b1d1686edd4cdf8217152ffb2f9b800afbe2d202fa94073b6c7bc9970c: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 7cf4f3b1d1686edd4cdf8217152ffb2f9b800afbe2d202fa94073b6c7bc9970c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 7d0828f90eb1d25012ad927a48b4531a8ee83ded8998395bb7b19818e06d9c73: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 7d3aa650d803ce31933a8a6fc932cb1d2e751a5ebd3ceaa8af50273807aef757: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 7d3aa650d803ce31933a8a6fc932cb1d2e751a5ebd3ceaa8af50273807aef757: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 7da5b97ed16671e025fbe869a8a61b618473690103efebef22917a0686e2650d: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 817820f1a1a139308246e03e22ae295335983194e7416e6c48929d09f81d4f9d: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 817820f1a1a139308246e03e22ae295335983194e7416e6c48929d09f81d4f9d: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 81b9778ce914a1aa0d9c4f949c173c42e219bb0b056766ae822681ba61166a38: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 81b9778ce914a1aa0d9c4f949c173c42e219bb0b056766ae822681ba61166a38: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 825365d93bc101b45dcb2a476432d3532e3ccf0b408cdbac79cf384cc435c492: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 83661bfae5c6b1180437ff9fec83537e1b42fcaa301ab7d45aca10763c2dfb09: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 83661bfae5c6b1180437ff9fec83537e1b42fcaa301ab7d45aca10763c2dfb09: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 84e8f70d90ee52850cf6c593528357afbbcfbef6b626aabb79d167b418c3178c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 887bc2141b0f0a3d5a48b84b457b75efaee32b5c063e1e7467e3f8527bb5669c: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 887bc2141b0f0a3d5a48b84b457b75efaee32b5c063e1e7467e3f8527bb5669c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 8ae30445beef4feca25ea1af4196281e393e414dd68b02e94b183fb720138842: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 8ae30445beef4feca25ea1af4196281e393e414dd68b02e94b183fb720138842: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 8b15c44dd557855547f33249f23fe9c92c83d417fbf42d3df006da7a8b0d70fa: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 8c36cc1f4669fc5271635fc2c9b98462405ffd0cc7b3caf066675eedeb12c9f4: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 8c36cc1f4669fc5271635fc2c9b98462405ffd0cc7b3caf066675eedeb12c9f4: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 8d3cfb53db4c3fcb441c7ac0572a6d9d6124cebec8fab7d56071c2cbc0f008aa: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 8d3cfb53db4c3fcb441c7ac0572a6d9d6124cebec8fab7d56071c2cbc0f008aa: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 90c485f61cb649ac79b3bd5d44f0192c7de9d610f923a2dae1e0789c6e04cdad: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 90c485f61cb649ac79b3bd5d44f0192c7de9d610f923a2dae1e0789c6e04cdad: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM 9de69fcc44d58ab5301ba21daa6828f6401551984131f7b2da1ba3661e1b3b60: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM 9de69fcc44d58ab5301ba21daa6828f6401551984131f7b2da1ba3661e1b3b60: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL 9e6cc8182a548fa67cec129d6cab9db6869980b87430c67bca1e3e1f246f59f0: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL a01a3740d09e26521bada065d8df80eb4171058b86aaf514a8a69642799a96cd: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM a40b7cf5f166ee60bd4d116b9efeebad7bab156ce740e133639e56126ef895f0: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM a40b7cf5f166ee60bd4d116b9efeebad7bab156ce740e133639e56126ef895f0: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM a4cf52cb118c314bfdb1135a890bbe1a1a8645ca6d59aee94d395a78b06add98: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM a4cf52cb118c314bfdb1135a890bbe1a1a8645ca6d59aee94d395a78b06add98: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM a99bc5636a9da21eab5e998e012900e9fc5c840e4282eccd1929f2636c8f77ea: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM a99bc5636a9da21eab5e998e012900e9fc5c840e4282eccd1929f2636c8f77ea: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM afad9b710ff99f3cedefceb736c6e2383c7e1dc2049f6494a2b83a01adcce481: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM afad9b710ff99f3cedefceb736c6e2383c7e1dc2049f6494a2b83a01adcce481: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL b2874028bfed224041b29d2ced7d95109222a13e2eec5125bb32e286a9007853: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM b8b834ecebf2e74f2c085371259e01aec818874c41aeaddaf4f8d4160aceff28: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM b8b834ecebf2e74f2c085371259e01aec818874c41aeaddaf4f8d4160aceff28: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM b9cde28e2740eea2b41216f7a1a3edeb776bb2b4bee120f4a41ada93f219ddf3: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM b9cde28e2740eea2b41216f7a1a3edeb776bb2b4bee120f4a41ada93f219ddf3: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM baa37d55813e6d264664102e5727b596471b1c6b6a5751dd758d23eabddf5b99: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM baa37d55813e6d264664102e5727b596471b1c6b6a5751dd758d23eabddf5b99: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM bc6592fa7d67889e3e0b34fe88209afd7079818097cdbc8ea1504f5587923a1f: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM bc6592fa7d67889e3e0b34fe88209afd7079818097cdbc8ea1504f5587923a1f: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM bed5b3743a2e9ed5492afa22370f9f99c252f3323c2b6eb1ac19bee620d125e6: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM bed5b3743a2e9ed5492afa22370f9f99c252f3323c2b6eb1ac19bee620d125e6: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM bf7087eed28e21c8e68dcf5f98fd1f4400e8464e2503ad1a5da9baca21d76b2d: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM bf7087eed28e21c8e68dcf5f98fd1f4400e8464e2503ad1a5da9baca21d76b2d: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL c122fcccc26bc2e134daf680e2a2205968da7819f821b644d0decf4f5ca9cb21: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM c16ab2ffcc64a768f670d98436befaafc9fd08f79f84ccb6fafa18ae94831d51: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM c16ab2ffcc64a768f670d98436befaafc9fd08f79f84ccb6fafa18ae94831d51: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM c2ed1558f2aecef5cf06151ecc4a7ecb4ef3b05a07a74eab481096757836e624: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM c2ed1558f2aecef5cf06151ecc4a7ecb4ef3b05a07a74eab481096757836e624: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM c420d1f2cd93bbd51c650a187b00280a22a26a6960c2f7e0e2b960e0c6de47cc: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM c702493bec2b8b28322ed363fb677fab7ba10d2b6b5886897b3ccc4f24035e8e: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM c702493bec2b8b28322ed363fb677fab7ba10d2b6b5886897b3ccc4f24035e8e: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM ca18570a6cf6d33110c60d98678d10405a32f56ff70dd2d2c40fa80e69b60904: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM ca18570a6cf6d33110c60d98678d10405a32f56ff70dd2d2c40fa80e69b60904: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM cb5c81c2d42f944409d678a4765db526b3b42b1baaf0d19a6812e112d190951a: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM cb5c81c2d42f944409d678a4765db526b3b42b1baaf0d19a6812e112d190951a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL ce6f2596e094a2ad6c20b8484e9a952ed1b442d0923259c9fbf7f5b087a57451: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM ce8bedcbbc60f841977979a3988f91f9226e1c3ddfc55f8d3d1acc76fcbb9063: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM ce8bedcbbc60f841977979a3988f91f9226e1c3ddfc55f8d3d1acc76fcbb9063: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM ce9c4cd1eff826ae053d631128351ebdb6284290a0c2e4b81abcac2e7ccc8069: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM ce9c4cd1eff826ae053d631128351ebdb6284290a0c2e4b81abcac2e7ccc8069: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM cf142eabf8140bb64db83283c219094f63b2aff2529ee579205f8b6efd5ab24b: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM cf142eabf8140bb64db83283c219094f63b2aff2529ee579205f8b6efd5ab24b: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM d2aa2a44e976582b424fa27190aa74089426869f7790702c2911e16e2b0c4303: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM d2aa2a44e976582b424fa27190aa74089426869f7790702c2911e16e2b0c4303: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM d5ce38829e8e7bb8716f7bbe8aea95ec43ba5427d50a443bf30cc3c640f2e096: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM d5ce38829e8e7bb8716f7bbe8aea95ec43ba5427d50a443bf30cc3c640f2e096: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM d8ba352e022aaacf0cbdd9a8eb69fbd194fe6459436030515c7dfa2ad2c7dc7d: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM d8ba352e022aaacf0cbdd9a8eb69fbd194fe6459436030515c7dfa2ad2c7dc7d: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM da34810b72bc191766eac079ac26d543b4d0eebc94ebec6f9beb1116568a2e03: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM da34810b72bc191766eac079ac26d543b4d0eebc94ebec6f9beb1116568a2e03: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM de0e8c2894da5363072d05829bf0c205e7117211612801559677f160991eeb9f: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM de0e8c2894da5363072d05829bf0c205e7117211612801559677f160991eeb9f: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM ded1fe919b6564ce3d9e3e93bb176c78bba702540e2ab40d7b8f2898ce24df71: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM ded1fe919b6564ce3d9e3e93bb176c78bba702540e2ab40d7b8f2898ce24df71: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM df64140e5a4911f8c75a5bf3e42631409952e7272a50339beb67b02b4e790533: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM df64140e5a4911f8c75a5bf3e42631409952e7272a50339beb67b02b4e790533: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL e1442f4d675df074ee771c348934c7608df241aa601b4a1d4d67c7f224e6c80c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM e2dea81418ec6c0f097259f27c0c09c0aed291280573b8a4d86c1e02dcdc857a: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM e2dea81418ec6c0f097259f27c0c09c0aed291280573b8a4d86c1e02dcdc857a: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM e576398d470252b3bd4635cd7d861dc31a69d21e4bf81d12540e66b78ec44814: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM e576398d470252b3bd4635cd7d861dc31a69d21e4bf81d12540e66b78ec44814: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM e711aa997d525d82f44c215eca929659fc4080e0dcde192ccb85de38135cea42: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM e711aa997d525d82f44c215eca929659fc4080e0dcde192ccb85de38135cea42: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM eb47dd05d435893b66ae4e7874776f521c5cb6c273b4155df15968d4acb52bd3: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM eb47dd05d435893b66ae4e7874776f521c5cb6c273b4155df15968d4acb52bd3: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM f168354c35e17dd2a366274f9513e79b16bfeb07cc44516300c69df0745a131c: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM f168354c35e17dd2a366274f9513e79b16bfeb07cc44516300c69df0745a131c: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM f4f59db92b889df8c25c236b321e6f600038fad673b6aff184efb18e1fbf4a2f: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM f4f59db92b889df8c25c236b321e6f600038fad673b6aff184efb18e1fbf4a2f: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- CLASSICAL f654592c0fb3a59f5f400038c48f859808665a87ebf0bd4f1042fb8a09ac03ca: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM faa0aec767882131b0cc1dad0513fc87c5a9b98aabb3894d53774b622cd883a7: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM faa0aec767882131b0cc1dad0513fc87c5a9b98aabb3894d53774b622cd883a7: SOFTWARE_VERSION_MISSING — protocol software version is unresolved
+- QUANTUM fe62070b496fcef20a77377516424ad27f24b592d7c6b05ac218636cad8c76cc: PROTOCOL_SOFTWARE_MISSING — protocol software is unresolved
+- QUANTUM fe62070b496fcef20a77377516424ad27f24b592d7c6b05ac218636cad8c76cc: SOFTWARE_VERSION_MISSING — protocol software version is unresolved

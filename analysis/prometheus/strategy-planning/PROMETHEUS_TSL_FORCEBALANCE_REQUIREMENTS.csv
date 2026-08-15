@@ -1,0 +1,7 @@
+strategy,requirement,protocol_constraint,exact_protocol,role,decision,matched_records,derivation,reason,output_capability
+"forcebalance-style","Cartesian forces","one common prospective QM protocol","true","DEVELOPMENT","GENERATE_NEW","0","none","canonical records contain minima Hessians and energies but not a prospective force-training cloud","force targets"
+"forcebalance-style","Hessian curvature","PBE-D3(BJ)/def2-SVP","true","DEVELOPMENT","REUSE_EXISTING","3","project or target existing Cartesian Hessians","three authoritative Hessians provide curvature targets","curvature targets"
+"forcebalance-style","conformational energies","within protocol groups only","false","DEVELOPMENT","DERIVE_FROM_EXISTING","32","relative energies from authoritative absolute energies","05H/05L cannot be pooled across materially different methods","energy targets"
+"forcebalance-style","executable initial force field","declared coupled-capable form","true","DEVELOPMENT","GENERATE_NEW","0","none","the failed V2/local-GAFF2 repair lineage cannot be the clean-slate model centre","model definition"
+"forcebalance-style","interaction energies","PBE0-D3(BJ)/def2-TZVP counterpoise","true","HOLDOUT","RESERVE_AS_HOLDOUT","34","none","geometry-valid accepted probes stay independent of training","nonbonded validation"
+"forcebalance-style","sealed validation family","entire MIN04 and independent probes","false","HOLDOUT","RESERVE_AS_HOLDOUT","66","none","holdout is frozen before parameter exposure","validation"

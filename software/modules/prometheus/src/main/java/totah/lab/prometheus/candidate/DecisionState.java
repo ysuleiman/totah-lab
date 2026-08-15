@@ -1,0 +1,13 @@
+package totah.lab.prometheus.candidate;
+
+/** Outcome state of a model decision. */
+public enum DecisionState {
+    VALIDATED_FOR_PRODUCTION,
+    VALIDATED_WITH_LIMITATIONS,
+    SUBSTANTIALLY_IMPROVED,
+    FAILED_HOLDOUT,
+    FUNCTIONAL_FORM_INSUFFICIENT,
+    NONBONDED_MODEL_INSUFFICIENT,
+    INSUFFICIENT_EVIDENCE,
+    INCOMPATIBLE_WITH_PRODUCTION_STACK
+}
