@@ -17,6 +17,15 @@ import totah.lab.prometheus.execution.EvidenceExecutionException;
 import totah.lab.prometheus.identity.GeometryIdentity;
 import totah.lab.prometheus.identity.MoleculeIdentity;
 import totah.lab.prometheus.ingest.authoritative.CartesianGeometry;
+import totah.lab.prometheus.molecular.CartesianPosition;
+import totah.lab.prometheus.molecular.ElectronCount;
+import totah.lab.prometheus.molecular.LengthUnit;
+import totah.lab.prometheus.molecular.MolecularCharge;
+import totah.lab.prometheus.molecular.Molecule;
+import totah.lab.prometheus.molecular.NuclearCenter;
+import totah.lab.prometheus.molecular.NuclearCharge;
+import totah.lab.prometheus.molecular.SpinSector;
+import totah.lab.prometheus.neural.GeneralSlaterJastrowState;
 import totah.lab.prometheus.planning.CalculationSpecification;
 import totah.lab.prometheus.planning.CostEstimate;
 import totah.lab.prometheus.planning.DatasetRole;
@@ -44,6 +53,12 @@ final class JavaNeuralQuantumRuntimeTest {
     @Test void optimizationSelectsBlockMatrixFreePolicyAndNeverDense()throws Exception{
         var result=new JavaNeuralQuantumBackend().execute(request(CalculationType.OPTIMIZATION,Set.of(QuantumObservable.ABSOLUTE_ENERGY)));
         assertEquals(JavaNeuralRuntimePolicy.OPTIMIZER,result.executionProvenance().get("optimizer"));assertEquals(JavaNeuralRuntimePolicy.DENSE_SOLVER,result.executionProvenance().get("dense_solver"));
+    }
+
+    @Test void generalMolecularIdentityStillReusesWithZeroSecondExecution()throws Exception{
+        AtomicInteger calls=new AtomicInteger();QuantumBackend delegate=new JavaNeuralQuantumBackend();QuantumBackend counted=new QuantumBackend(){public String backendId(){return delegate.backendId();}public QuantumBackendCapabilities capabilities(){return delegate.capabilities();}public boolean supports(QuantumExecutionRequest r){return delegate.supports(r);}public QuantumResult execute(QuantumExecutionRequest r)throws EvidenceExecutionException{calls.incrementAndGet();return delegate.execute(r);}};
+        double r=1.4;Molecule molecule=new Molecule("prometheus-regression-h2",List.of(new NuclearCenter(0,"H",new NuclearCharge(1),new CartesianPosition(0,0,-r/2,LengthUnit.BOHR)),new NuclearCenter(1,"H",new NuclearCharge(1),new CartesianPosition(0,0,r/2,LengthUnit.BOHR))),new MolecularCharge(0),new ElectronCount(2),new SpinSector(1,1,1));
+        QuantumExecutionRequest complete=new GeneralMolecularExecutionRequest(molecule,request(CalculationType.SINGLE_POINT,Set.of(QuantumObservable.ABSOLUTE_ENERGY)),"born-oppenheimer-coulomb-v1",GeneralSlaterJastrowState.REPRESENTATION_ID,JavaNeuralRuntimePolicy.OPTIMIZER).identityCompleteRequest();var runtime=new JavaNeuralQuantumRuntime(new QuantumExecutionService(new QuantumBackendSelector(List.of(counted))),new GeneratedEvidenceRegistry(temp.resolve("general-registry")));assertEquals(JavaNeuralQuantumRuntime.Disposition.GENERATED_NEW,runtime.executeOrReuse(complete).disposition());assertEquals(JavaNeuralQuantumRuntime.Disposition.REUSE_EXISTING,runtime.executeOrReuse(complete).disposition());assertEquals(1,calls.get());
     }
 
     private QuantumExecutionRequest request(CalculationType type,Set<QuantumObservable> observables){
