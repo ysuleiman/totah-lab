@@ -1,0 +1,13 @@
+package totah.lab.prometheus.numerics;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+class MatrixFreeSrNumericsTest {
+    @Test void streamedOperatorAndPcgMatchDenseControl(){double[][] observations={{-1,-2},{0,1},{1,1}};double[] weights={.2,.3,.5};double[] mean=new double[2];for(int s=0;s<3;s++)for(int i=0;i<2;i++)mean[i]+=weights[s]*observations[s][i];var operator=new StreamingCovarianceOperator(2,consumer->{for(int s=0;s<3;s++){double[] centered={observations[s][0]-mean[0],observations[s][1]-mean[1]};consumer.accept(weights[s],centered);}},.1);double[] vector={.7,-.2};double[] actual=operator.apply(vector);double[][] dense=dense(observations,weights,mean,.1);assertThat(actual[0]).isCloseTo(dense[0][0]*vector[0]+dense[0][1]*vector[1],org.assertj.core.data.Offset.offset(1e-15));assertThat(actual[1]).isCloseTo(dense[1][0]*vector[0]+dense[1][1]*vector[1],org.assertj.core.data.Offset.offset(1e-15));double[] rhs={-.3,.8};var result=new PreconditionedConjugateGradientSolver().solve(operator,FixedPreconditioners.diagonal(new double[]{dense[0][0],dense[1][1]}),rhs,new PreconditionedConjugateGradientSolver.Configuration(20,1e-12,1e-14));double determinant=dense[0][0]*dense[1][1]-dense[0][1]*dense[1][0];assertThat(result.solution()[0]).isCloseTo((rhs[0]*dense[1][1]-dense[0][1]*rhs[1])/determinant,org.assertj.core.data.Offset.offset(1e-12));assertThat(result.solution()[1]).isCloseTo((dense[0][0]*rhs[1]-rhs[0]*dense[1][0])/determinant,org.assertj.core.data.Offset.offset(1e-12));assertThat(result.converged()).isTrue();}
+    @Test void fixedBlocksApplyIndependentDenseInverses(){var preconditioner=FixedPreconditioners.blocks(4,List.of(new FixedPreconditioners.Block(0,2,new double[][]{{2,0},{0,4}}),new FixedPreconditioners.Block(2,4,new double[][]{{5,0},{0,10}})));assertThat(preconditioner.apply(new double[]{2,8,10,30})).containsExactly(1,2,2,3);}
+    private static double[][] dense(double[][] observations,double[] weights,double[] mean,double lambda){double[][] result=new double[2][2];for(int s=0;s<observations.length;s++)for(int i=0;i<2;i++)for(int j=0;j<2;j++)result[i][j]+=weights[s]*(observations[s][i]-mean[i])*(observations[s][j]-mean[j]);result[0][0]+=lambda;result[1][1]+=lambda;return result;}
+}

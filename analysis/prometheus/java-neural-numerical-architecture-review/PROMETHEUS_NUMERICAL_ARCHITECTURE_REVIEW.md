@@ -320,14 +320,31 @@ improvement must be demonstrated independently.
 
 ## Current decision
 
-No production rewrite is authorized. The first controlled scientific experiment
-should test PES derivative fidelity using a frozen derivative-aware objective and
-an untouched geometry holdout; it must be a single closed capability study, not
-another open-ended H2 tuning cycle. In parallel only at the design level, specify
-the analytic directional-SWCT derivative oracle. After those correctness issues,
-the order is matrix-free/structured SR, fused evaluation, exact evidence
-serialization, deterministic worker-local statistics, adaptive stopping, then
-profile-driven low-level tuning.
+The E4 matrix-free SR experiment remains frozen as
+`MATRIX_FREE_SR_NOT_EQUIVALENT`: its streamed covariance action agreed with the
+explicit matrix, but NONE and DIAGONAL recursive-PCG residuals missed the locked
+`1e-12` gate. E5 isolated solver arithmetic without changing the covariance,
+H2 control, damping, target, or threshold. The damped 20-parameter system was
+SPD with spectral condition number 38159.66. Independently recomputed true
+residuals confirmed that fixed wavefunction-component BLOCK PCG passes;
+compensated scalar reductions rescued NONE but not DIAGONAL. All accepted paths
+replayed bitwise and retained approximately `8e-13` maximum agreement with the
+explicit update.
+
+The accepted narrow architecture is therefore
+`BLOCK_PRECONDITIONED_MATRIX_FREE_SR_QUALIFIED`. Production matrix-free SR must
+use the preregistered wavefunction-component block partition, must grade
+convergence with an independently recomputed true residual, and must retain the
+explicit/dense small-system oracle. DIAGONAL is not called intrinsically
+defective; it is insufficient for this system under the locked accuracy.
+Compensated reductions remain a supported diagnostic rather than the default,
+because their benefit was solver/preconditioner dependent. The E4 negative
+result and every E5 trace remain permanent evidence.
+
+No H2 tuning or larger-system promotion follows from this numerical result.
+Subsequent architecture work may consume the qualified BLOCK matrix-free path,
+but must independently validate scientific accuracy and scaling in its own
+locked unit.
 
 ## Primary sources
 
