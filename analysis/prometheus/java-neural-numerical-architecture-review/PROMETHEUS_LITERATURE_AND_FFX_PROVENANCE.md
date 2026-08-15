@@ -10,7 +10,7 @@
 | Adjoint differential SWCT | Obtain force components near energy-evaluation cost | Proposed analytic-directional experiment | Sorella-Capriotti, DOI `10.1063/1.3516208` |
 | Neural-VMC force comparison | Joint force accuracy/contribution/variance/cost benchmark | Frozen study follows its estimator separation | Qian et al., DOI `10.1063/5.0112344` |
 | SWCT scaling/regularization | Control force overhead and infinite variance | Variance benefit reproduced diagnostically | Nakano et al., DOI `10.1063/5.0076302` |
-| Acceptance-ratio Pulay and compact HF estimators | Soften divergence, regularize tails, lower force variance | Highest-priority proposed experiment; not implemented | Linteau et al., arXiv `2603.14521` |
+| Acceptance-ratio Pulay and compact HF estimators | Soften divergence, regularize tails, lower force variance | Proposed estimator experiment after PES-derivative attribution; not implemented | Linteau et al., arXiv `2603.14521` |
 
 The first five force-method PDFs are archived under
 `reference/prometheus-nuclear-force-literature/` with SHA-256 values in its

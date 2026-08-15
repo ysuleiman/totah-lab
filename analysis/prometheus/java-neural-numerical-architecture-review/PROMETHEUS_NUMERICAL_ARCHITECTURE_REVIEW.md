@@ -83,6 +83,34 @@ to qualify regularization, conditioning, stopping, or stochastic error.
 
 ## Prometheus implementation evidence
 
+### PES derivative fidelity
+
+The dominant compressed-region force miss is already present in the derivative
+of the frozen geometry-conditioned PES. At R=1.0 bohr, correlated finite
+difference differs from the trusted force by about `0.0393 Ha/bohr`, while SWCT
+differs from that same frozen-PES slope by only about `0.00259 Ha/bohr`.
+Therefore an estimator-only improvement cannot be presumed to repair the trusted
+force error.
+
+The current shared-geometry SR objective is an equal-weight mean of sampled
+energies over the training radii. It contains no force label, derivative-match
+term, curvature term, or explicit geometry-local smoothness term. Smoothness and
+force behavior are checked after optimization. This is a scientifically clean
+energy-first baseline, but it does not constrain a low-energy-error model to
+have the correct local slope between training geometries.
+
+A future, separately preregistered model-generation study may compare the
+energy-only objective with a derivative-aware/Sobolev objective such as
+
+`L = L_energy + w_F sum_k ||dE_theta/dR(R_k) - F_k^reference||^2`,
+
+or a geometry-local consistency term that matches independently accepted energy
+differences/slopes. The derivative targets, weights, development geometries, and
+holdout geometries must be frozen before training. This is not authorization to
+retune H2: one controlled objective comparison should establish capacity and
+transfer, then close. Smoothness penalties without independent physical labels
+are lower priority because they can make a wrong PES smoothly wrong.
+
 ### Explicit SR
 
 `GeometryConditionedStochasticReconfigurationOptimizer` stores `double[P][P]`
@@ -100,6 +128,32 @@ reason is explicit: the current Java graph supplies second electronic
 derivatives but not the mixed derivative of the Laplacian with nuclear geometry.
 An analytic directional/mixed derivative may reduce evaluations, but only after
 finite-difference equivalence and force-statistics gates pass.
+
+For `N` accepted configurations, the current path performs `5N` state and `5N`
+local-energy evaluations: center, warped `R+delta`, warped `R-delta`, fixed
+coordinate `R+delta`, and fixed coordinate `R-delta`. It stores bounded scalar
+moments, so memory is `O(B * stateSize + K)` for batch size `B<=512` and `K`
+statistics; it does not retain `N` configurations.
+
+Differential SWCT requires the total nuclear-coordinate derivative of local
+energy, including the derivative of the electronic Laplacian, plus the warped
+log-amplitude/Jacobian derivative. In derivative notation this contains a mixed
+quantity of the form `d/dR [sum_i d2 Psi / dx_i2]`. A naive general third-order
+tensor would have prohibitive `O(D^3)` storage. The appropriate candidate is a
+nuclear-directional mixed derivative/Jacobian-vector product propagated through
+the existing graph, retaining only the electronic Hessian diagonal and its
+directional nuclear derivative: approximately `O(D)` derivative payload per
+node for one nuclear direction.
+
+The best-case analytic path is one primal state traversal plus directional
+derivative propagation per configuration, rather than five independent state
+traversals. It is not correctly described as exactly 5x faster: derivative
+arithmetic and graph retention make the analytic traversal more expensive than
+one primal traversal. The experiment must report node evaluations, retained
+bytes, state-equivalent work, and wall time. Stability risks include cusp/singular
+regions, cancellation in local-energy derivatives, incorrect Jacobian terms,
+and silent sign/unit errors. Per-sample comparison against multiple symmetric
+finite-difference steps is required before aggregate comparison.
 
 The frozen audit also records: correlated finite difference uses two paired
 evaluations; AC-ZV uses one state evaluation; AC-ZVZB uses one state/local-energy
@@ -122,6 +176,35 @@ Sampling is already bounded at 512 configurations and does not retain electron
 clouds. Accumulation is currently sequential and mutable. The next concurrency
 experiment should use worker-local mergeable packets and a fixed reduction tree,
 not hot atomics.
+
+### Evidence serialization
+
+The replay stop was archival, not physical. Future accepted scalar evidence must
+store three synchronized representations:
+
+- the 64-bit IEEE-754 payload, encoded as an unsigned hexadecimal bit string;
+- `Double.toHexString(value)`, which round-trips exactly;
+- a human-readable decimal, which is presentation only.
+
+Scientific identity and integrity checks use the exact bits plus typed units and
+field identity, never the presentation decimal. Arrays store exact bits per
+element with shape, atom/order mapping, units, and endianness in the checksummed
+envelope. Readers must verify agreement among bit, hexadecimal, and decimal
+representations and reject corruption. This design applies prospectively;
+historical `%.16g` evidence remains immutable and retains its documented replay
+limitation.
+
+### Parameter response and low-level tuning
+
+The brute-force parameter-response audit consumed exactly 3,096,000 state
+evaluations per geometry, was underdetermined at R=1.4 and 3.0 bohr, and produced
+a pathological correction at R=1.0. It remains diagnostic only. No optimization
+of this path is justified unless future evidence establishes that a response
+term is scientifically required.
+
+Bounded streaming already works. Off-heap storage, memory mapping, vectorization,
+and low-level loop tuning remain deferred until a qualified scientific kernel is
+profiled and one of those mechanisms is shown to dominate.
 
 ## Force Field X lessons, not copied algorithms
 
@@ -169,10 +252,14 @@ improvement must be demonstrated independently.
 
 ## Current decision
 
-No production rewrite is authorized. Run the smallest force-estimator
-mathematics experiment first. Only after a force formulation qualifies should
-Prometheus benchmark matrix-free SR, fused evaluation, deterministic parallel
-statistics, adaptive stopping, and low-level vectorization in that order.
+No production rewrite is authorized. The first controlled scientific experiment
+should test PES derivative fidelity using a frozen derivative-aware objective and
+an untouched geometry holdout; it must be a single closed capability study, not
+another open-ended H2 tuning cycle. In parallel only at the design level, specify
+the analytic directional-SWCT derivative oracle. After those correctness issues,
+the order is matrix-free/structured SR, fused evaluation, exact evidence
+serialization, deterministic worker-local statistics, adaptive stopping, then
+profile-driven low-level tuning.
 
 ## Primary sources
 

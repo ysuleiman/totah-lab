@@ -5,6 +5,26 @@ Status: `PREREGISTRATION_REQUIRED_BEFORE_EXECUTION`
 No experiment below is authorized by this review. Each must receive a locked
 protocol and its own scientific identity before implementation or execution.
 
+## E0 — compressed-region PES derivative fidelity
+
+Hypothesis: the energy-only geometry-conditioned training objective permits a
+small energy error but an incorrect local derivative at compressed H2 geometry;
+a preregistered derivative-aware objective can improve slope fidelity without
+damaging the PES holdout.
+
+- Development: a minimal subset of already accepted energy/force references,
+  selected before training. Hold out at least one compressed/intermediate region
+  and the dissociation behavior.
+- Compare exactly two objectives: current energy-only baseline and one locked
+  energy-plus-derivative objective. Freeze all weights, sample streams, seeds,
+  iterations, and gates first.
+- Measure energies, local slopes, curvature diagnostics, trusted-force errors,
+  variance, seed spread, and evaluation cost. Estimator and objective errors are
+  reported separately.
+- Falsifier: derivative improvement fails holdout, energy/PES gates regress,
+  result is seed-fragile, or improvement requires post-hoc weight adjustment.
+- Hard stop: one comparison only; no continuing H2 objective tuning.
+
 ## E1 — force-estimator mathematics
 
 Hypothesis: the Linteau acceptance-ratio Pulay treatment and/or compact
@@ -51,6 +71,10 @@ state evaluations without changing the SWCT estimator.
 - Falsifier: unexplained per-sample residual, sign/unit mismatch, tail change, or
   reliance on a dense third-order tensor.
 
+Cost hypothesis to test: current `5N` state/local-energy evaluations versus `N`
+fused primal-plus-directional traversals. Report state-equivalent node work and
+retained bytes; do not advertise a 5x speedup from evaluation count alone.
+
 ## E4 — deterministic worker-local statistics
 
 Hypothesis: worker-local Welford/pairwise packets increase throughput without
@@ -86,6 +110,20 @@ covariance without weight collapse.
   bias, and cost.
 - Falsifier: small/negative covariance benefit, unstable weights, or bias outside
   the force gate.
+
+## E7 — exact scalar evidence serialization
+
+Hypothesis: storing IEEE-754 bits, Java hexadecimal form, and presentation
+decimal eliminates formatting-dependent replay failures.
+
+- Use a synthetic corpus covering finite normal/subnormal values, signed zero,
+  infinities and NaN policy, plus copies of frozen force scalars.
+- Round-trip JSONL and restart/reload; compare raw bits, units, typed field
+  identity, and envelope checksum.
+- Confirm duplicate scientific identity is unaffected by presentation formatting.
+- Historical files are read-only fixtures and are never rewritten.
+- Falsifier: any finite value changes bits, representations disagree without
+  rejection, or checksum/identity depends on locale or decimal formatting.
 
 ## Mandatory evidence envelope
 
