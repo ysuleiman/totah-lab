@@ -35,6 +35,7 @@ final class WavefunctionMcmcSampleSetTest {
         assertEquals(meanRadius(rw),meanRadius(mala),.15);
         List<Double> weights=new ArrayList<>();mala.forEach((w,c)->weights.add(w));
         assertEquals(mala.size(),weights.size());assertTrue(weights.stream().allMatch(w->w==1.0));
+        List<QuantumCoordinates> walker=new ArrayList<>();mala.walkerSource(0).forEach((w,c)->walker.add(c));assertEquals(400,walker.size());assertThrows(IllegalArgumentException.class,()->mala.walkerSource(8));
         var diagnostic=new GeneralMolecularSamplingDiagnostics().evaluate(state,new totah.lab.prometheus.molecular.GeneralMolecularCoulombHamiltonian(hydrogen()),mala);
         assertEquals("DIRECT_WAVEFUNCTION_MCMC",diagnostic.samplingMode());
         assertEquals(1.0,diagnostic.effectiveSampleFraction(),0);assertEquals(mala.diagnostics().measurementAcceptance(),diagnostic.acceptanceRate().orElseThrow(),0);

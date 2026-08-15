@@ -99,6 +99,11 @@ public final class WavefunctionMcmcSampleSet implements DirectWavefunctionSample
     }
 
     public Diagnostics diagnostics(){return diagnostics;}
+    /** Bounded replay view for one independent walker, used for between-walker uncertainty estimates. */
+    public DirectWavefunctionSampleSource walkerSource(int walkerId){
+        if(walkerId<0||walkerId>=diagnostics.walkers())throw new IllegalArgumentException("walkerId out of range");
+        return consumer->{for(int i=0;i<samples.size();i++)if(walkerIds.get(i)==walkerId)consumer.accept(1.0,samples.get(i));};
+    }
     public StatisticalDiagnostics statisticalDiagnostics(GeneralSlaterJastrowState state,GeneralMolecularCoulombHamiltonian hamiltonian){
         if(!state.molecule().scientificIdentity().equals(hamiltonian.molecule().scientificIdentity()))throw new IllegalArgumentException("state/Hamiltonian mismatch");
         List<List<Double>> chains=new ArrayList<>();for(int w=0;w<diagnostics.walkers();w++)chains.add(new ArrayList<>());
