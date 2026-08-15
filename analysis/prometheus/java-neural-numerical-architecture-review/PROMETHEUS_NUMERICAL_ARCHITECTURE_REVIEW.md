@@ -130,6 +130,20 @@ evidence that the wavefunction cannot represent the derivative. A future design
 must distinguish exact differentiation of a finite objective from statistical
 qualification of an expectation-level VMC gradient estimator.
 
+The separately locked exact-finite-objective follow-up implemented mixed
+parameter/spatial forward AD, including `d(nabla^2 psi)/dtheta`. It passed the
+independent pre-iteration finite-difference gate (maximum error
+`6.120904494366641e-8`, RMS `3.063106549414219e-8`) and was computationally
+feasible. Its one controlled training/holdout execution nevertheless closed as
+`EXACT_FINITE_OBJECTIVE_DIFFERENTIATION_NOT_SUPPORTED`: R=1.0 validation-slope
+error worsened to `0.0591988761 Ha/bohr`, energy RMSE rose to
+`0.0184894380 Ha`, and fixed-perturbation spread was `0.155275954 Ha`.
+R=1.4/R=3.0 holdouts passed. Thus exact finite differentiation is now a verified
+numerical capability, but this reference-assisted finite-objective training
+intervention is not an accepted PES-construction method. The statistical
+expectation-objective route remains a separate future experiment, not a
+fallback used in this unit.
+
 ### Self-supervised production PES refinement hypotheses
 
 The production direction must remain variational and ab initio. Four
