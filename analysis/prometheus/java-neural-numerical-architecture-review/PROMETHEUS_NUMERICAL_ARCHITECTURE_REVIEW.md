@@ -121,6 +121,15 @@ force-derived symmetric local-energy constraints. Success establishes
 representational capacity only. It does not authorize force-supervised
 production Prometheus.
 
+Controlled Experiment 1 terminated before training as
+`DERIVATIVE_AWARE_OBJECTIVE_CORRECTNESS_DEFECT`. The proposed covariance RHS
+failed the locked exact finite-objective gradient audit (maximum component
+mismatch `17.040986779063722` versus `3e-5`). No parameters changed and no
+holdouts opened. This is a failure of the locked diagnostic realization, not
+evidence that the wavefunction cannot represent the derivative. A future design
+must distinguish exact differentiation of a finite objective from statistical
+qualification of an expectation-level VMC gradient estimator.
+
 ### Self-supervised production PES refinement hypotheses
 
 The production direction must remain variational and ab initio. Four
