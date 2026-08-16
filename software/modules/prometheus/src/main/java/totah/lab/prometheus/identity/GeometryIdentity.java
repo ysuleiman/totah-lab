@@ -7,7 +7,7 @@ import totah.lab.gaia.geometry.Point3D;
 
 /**
  * Hash identity of a geometry: SHA-256 over one line per atom in canonical order
- * ({@code "label x y z"} with coordinates at %.8f) plus the atom count.
+ * ({@code "label x y z"} with round-trip exact finite coordinates) plus the atom count.
  */
 public record GeometryIdentity(
         String sha256,

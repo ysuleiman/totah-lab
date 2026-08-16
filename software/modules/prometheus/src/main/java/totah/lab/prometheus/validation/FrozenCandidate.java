@@ -1,8 +1,9 @@
 package totah.lab.prometheus.validation;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 import totah.lab.prometheus.candidate.DerivedParameter;
 import totah.lab.prometheus.candidate.ParameterCandidate;
@@ -61,41 +62,27 @@ public final class FrozenCandidate {
     }
 
     private static String checksumOf(ParameterCandidate candidate, ValidationPlan plan) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("candidateId=").append(candidate.candidateId())
-                .append('\n').append("molecule=").append(candidate.molecule().moleculeId())
-                .append('\n').append("plan=").append(plan.planChecksum());
+        List<String> fields = new ArrayList<>(List.of(
+                candidate.candidateId(), candidate.molecule().moleculeId(), plan.planChecksum()));
 
         ForceFieldAtomMap typing = candidate.atomTyping();
-        sb.append('\n').append("forceField=").append(typing.forceFieldFamily());
+        fields.add(typing.forceFieldFamily());
         for (CanonicalAtomId atom : typing.canonical().atoms()) {
-            sb.append('\n').append("atom=").append(atom.canonicalIndex())
-                    .append('|').append(atom.label())
-                    .append('|').append(atom.elementSymbol())
-                    .append('|').append(typing.typeOf(atom.canonicalIndex()));
+            fields.add(CanonicalHashing.sequence(List.of(Integer.toString(atom.canonicalIndex()), atom.label(),
+                    atom.elementSymbol(), typing.typeOf(atom.canonicalIndex()))));
         }
 
         for (DerivedParameter parameter : candidate.parameters()) {
             ParameterProvenance provenance = parameter.provenance();
-            StringJoiner indices = new StringJoiner(",");
-            for (Integer index : parameter.canonicalAtomIndices()) {
-                indices.add(index.toString());
-            }
-            sb.append('\n').append("param=").append(parameter.parameterId())
-                    .append('|').append(parameter.kind().name())
-                    .append('|').append(parameter.functionalForm())
-                    .append('|').append(indices)
-                    .append('|').append(CanonicalHashing.format(parameter.value()))
-                    .append('|').append(parameter.unit())
-                    .append('|').append(provenance.derivationMethod())
-                    .append('|').append(String.join(",", provenance.sourceEvidenceHashes()))
-                    .append('|').append(provenance.developmentDatasetId())
-                    .append('|').append(provenance.algorithmVersion())
-                    .append('|').append(provenance.literatureReference())
-                    .append('|').append(provenance.candidateLineageId())
-                    .append('|').append(provenance.validationStatus().name());
+            List<String> indices = parameter.canonicalAtomIndices().stream().map(Object::toString).toList();
+            fields.add(CanonicalHashing.sequence(List.of(parameter.parameterId(), parameter.kind().name(),
+                    parameter.functionalForm(), CanonicalHashing.sequence(indices),
+                    CanonicalHashing.format(parameter.value()), parameter.unit(), provenance.derivationMethod(),
+                    CanonicalHashing.sequence(provenance.sourceEvidenceHashes()), provenance.developmentDatasetId(),
+                    provenance.algorithmVersion(), provenance.literatureReference(), provenance.candidateLineageId(),
+                    provenance.validationStatus().name())));
         }
-        return CanonicalHashing.sha256Hex(sb.toString());
+        return CanonicalHashing.sha256Hex(CanonicalHashing.sequence(fields));
     }
 
     public ParameterCandidate candidate() {

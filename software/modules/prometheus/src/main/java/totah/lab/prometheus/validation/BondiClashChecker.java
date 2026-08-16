@@ -34,8 +34,8 @@ public final class BondiClashChecker implements GeometryClashChecker {
     private final Set<Set<String>> bondedPairs;
 
     public BondiClashChecker(double scaleFactor, Set<Set<String>> bondedPairs) {
-        if (scaleFactor <= 0.0) {
-            throw new IllegalArgumentException("scaleFactor must be > 0, got " + scaleFactor);
+        if (!Double.isFinite(scaleFactor) || scaleFactor <= 0.0) {
+            throw new IllegalArgumentException("scaleFactor must be finite and > 0, got " + scaleFactor);
         }
         this.scaleFactor = scaleFactor;
         Objects.requireNonNull(bondedPairs, "bondedPairs");

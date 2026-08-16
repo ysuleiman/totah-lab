@@ -71,6 +71,10 @@ public final class HoldoutDataset {
                     "holdout content is only revealed to a frozen candidate; "
                             + "a mutable candidate must never see holdout values");
         }
+        if (!datasetId.equals(frozen.plan().holdoutDatasetId())) {
+            throw new IllegalArgumentException("frozen validation plan names holdout '"
+                    + frozen.plan().holdoutDatasetId() + "', not '" + datasetId + "'");
+        }
         Objects.requireNonNull(bundle, "bundle");
         Map<String, QuantumEvidence> byHash = new LinkedHashMap<>();
         for (QuantumEvidence evidence : bundle.quantum()) {

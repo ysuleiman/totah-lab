@@ -20,16 +20,16 @@ public record CostEstimate(
         if (jobCount < 0) {
             throw new IllegalArgumentException("jobCount must be >= 0");
         }
-        if (cpuHoursPerJob < 0) {
+        if (!Double.isFinite(cpuHoursPerJob) || cpuHoursPerJob < 0) {
             throw new IllegalArgumentException("cpuHoursPerJob must be >= 0");
         }
-        if (expectedWallHours < 0) {
+        if (!Double.isFinite(expectedWallHours) || expectedWallHours < 0) {
             throw new IllegalArgumentException("expectedWallHours must be >= 0");
         }
-        if (expectedLocalRuntimeHours < 0) {
+        if (!Double.isFinite(expectedLocalRuntimeHours) || expectedLocalRuntimeHours < 0) {
             throw new IllegalArgumentException("expectedLocalRuntimeHours must be >= 0");
         }
-        if (estimatedRemoteCostUsd < 0) {
+        if (!Double.isFinite(estimatedRemoteCostUsd) || estimatedRemoteCostUsd < 0) {
             throw new IllegalArgumentException("estimatedRemoteCostUsd must be >= 0");
         }
     }

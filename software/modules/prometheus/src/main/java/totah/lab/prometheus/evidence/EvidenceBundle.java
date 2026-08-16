@@ -30,7 +30,7 @@ public final class EvidenceBundle {
         String hash = evidence.identity().evidenceHash();
         QuantumEvidence existing = quantumByHash.get(hash);
         if (existing != null) {
-            if (!existing.equals(evidence)) {
+            if (!sameReplay(existing, evidence)) {
                 throw new IllegalArgumentException(
                         "evidence hash collision: different quantum evidence under hash " + hash);
             }
@@ -51,7 +51,7 @@ public final class EvidenceBundle {
         String hash = evidence.identity().evidenceHash();
         ClassicalEvidence existing = classicalByHash.get(hash);
         if (existing != null) {
-            if (!existing.equals(evidence)) {
+            if (!sameReplay(existing, evidence)) {
                 throw new IllegalArgumentException(
                         "evidence hash collision: different classical evidence under hash " + hash);
             }
@@ -118,5 +118,34 @@ public final class EvidenceBundle {
     /** Total number of stored evidence records (quantum + classical). */
     public int size() {
         return quantumByHash.size() + classicalByHash.size();
+    }
+
+    private static boolean sameReplay(QuantumEvidence left, QuantumEvidence right) {
+        return left.identity().equals(right.identity())
+                && sameProvenance(left.provenance(), right.provenance())
+                && left.convergence() == right.convergence()
+                && left.acceptance() == right.acceptance()
+                && left.energyHartree().equals(right.energyHartree())
+                && left.gradientHartreePerBohr().equals(right.gradientHartreePerBohr())
+                && left.hessianHartreePerBohr2().equals(right.hessianHartreePerBohr2())
+                && left.dipoleDebye().equals(right.dipoleDebye())
+                && left.interactionEnergyKcalMol().equals(right.interactionEnergyKcalMol())
+                && left.convergenceNote().equals(right.convergenceNote());
+    }
+
+    private static boolean sameReplay(ClassicalEvidence left, ClassicalEvidence right) {
+        return left.identity().equals(right.identity())
+                && left.forceFieldId().equals(right.forceFieldId())
+                && left.topologyReference().equals(right.topologyReference())
+                && left.decomposition().equals(right.decomposition())
+                && sameProvenance(left.provenance(), right.provenance())
+                && left.acceptance() == right.acceptance();
+    }
+
+    private static boolean sameProvenance(EvidenceProvenance left, EvidenceProvenance right) {
+        return left.sourcePath().equals(right.sourcePath())
+                && left.sha256().equals(right.sha256())
+                && left.derivedFromEvidenceHashes().equals(right.derivedFromEvidenceHashes())
+                && left.note().equals(right.note());
     }
 }

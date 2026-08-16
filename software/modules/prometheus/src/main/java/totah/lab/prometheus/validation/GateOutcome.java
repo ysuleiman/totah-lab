@@ -15,5 +15,10 @@ public record GateOutcome(
         if (detail.isBlank()) {
             throw new IllegalArgumentException("detail must be non-blank");
         }
+        boolean evaluated = gate.passes(observedValue);
+        if (passed != evaluated) {
+            throw new IllegalArgumentException(
+                    "passed must equal gate.passes(observedValue)");
+        }
     }
 }

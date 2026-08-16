@@ -21,11 +21,10 @@ import totah.lab.prometheus.planning.CalculationSpecification;
 import totah.lab.prometheus.recovery.ArtifactChecksums;
 
 /**
- * Narrow execution boundary for the authorized fixed-geometry PySCF pilot.
- * It accepts only pre-authorized specification checksums and never optimizes a
- * geometry. Scientific content is serialized before invoking the configured,
- * checksummed Python runner.
+ * Historical PySCF pilot adapter retained only for artifact compatibility.
+ * New execution is permanently disabled by the Java-only production policy.
  */
+@Deprecated(forRemoval = true)
 public final class LockedPyscfEnergyGradientExecutor implements EvidenceExecutor {
 
     private final Path python;
@@ -57,18 +56,14 @@ public final class LockedPyscfEnergyGradientExecutor implements EvidenceExecutor
     @Override
     public boolean supports(CalculationSpecification spec) {
         Objects.requireNonNull(spec, "spec");
-        String software = spec.protocol().software().toLowerCase(Locale.ROOT);
-        return software.startsWith("pyscf")
-                && (spec.calculationType() == CalculationType.FORCE_EVALUATION
-                    || spec.calculationType() == CalculationType.SINGLE_POINT)
-                && spec.constraints().isEmpty()
-                && requests(spec, "energy")
-                && (requests(spec, "gradient") || requests(spec, "forces"));
+        return false;
     }
 
     @Override
     public RawCalculationResult execute(CalculationSpecification spec) throws EvidenceExecutionException {
         Objects.requireNonNull(spec, "spec");
+        throw ExternalPythonExecutionPolicy.disabled(executorId());
+        /*
         if (!supports(spec)) {
             throw new EvidenceExecutionException("unsupported PySCF pilot specification: " + spec.specificationId());
         }
@@ -127,6 +122,7 @@ public final class LockedPyscfEnergyGradientExecutor implements EvidenceExecutor
             Thread.currentThread().interrupt();
             throw new EvidenceExecutionException("PySCF pilot interrupted", e);
         }
+        */
     }
 
     private void writeSpecification(CalculationSpecification spec, Path geometry, Path destination)

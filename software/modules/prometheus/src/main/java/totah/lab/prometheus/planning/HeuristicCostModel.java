@@ -36,12 +36,12 @@ public final class HeuristicCostModel implements CostModel {
         baseCpuHoursByType.forEach((type, hours) -> {
             Objects.requireNonNull(type, "calculation type key");
             Objects.requireNonNull(hours, "base CPU hours for " + type);
-            if (hours < 0) {
+            if (!Double.isFinite(hours) || hours < 0) {
                 throw new IllegalArgumentException("base CPU hours must be >= 0 for " + type);
             }
         });
         this.baseCpuHoursByType = Map.copyOf(baseCpuHoursByType);
-        if (pricePerCpuHourUsd < 0) {
+        if (!Double.isFinite(pricePerCpuHourUsd) || pricePerCpuHourUsd < 0) {
             throw new IllegalArgumentException("pricePerCpuHourUsd must be >= 0");
         }
         this.pricePerCpuHourUsd = pricePerCpuHourUsd;

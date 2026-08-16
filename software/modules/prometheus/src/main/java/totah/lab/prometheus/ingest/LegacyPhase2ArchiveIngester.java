@@ -460,10 +460,26 @@ public final class LegacyPhase2ArchiveIngester {
     private void ingestNativeAmberResp(Context ctx, Path unit05O) throws IOException {
         Path respDir = unit05O.resolve("native-amber-resp3min-hf631gd");
         Path chargesCsv = unit05O.resolve("TSL_RSH_NATIVE_AMBER_RESP_CHARGES.csv");
-        if (!Files.isDirectory(respDir) || !Files.isRegularFile(chargesCsv)) {
+        if (!Files.isDirectory(respDir)) {
+            ctx.issues.add(IngestionIssue.error(ctx.relativize(respDir),
+                    "accepted RESP evidence directory is missing"));
+            return;
+        }
+        if (!Files.isRegularFile(chargesCsv)) {
+            ctx.issues.add(IngestionIssue.error(ctx.relativize(chargesCsv),
+                    "accepted RESP charge CSV is missing"));
             return;
         }
         try {
+            Path resultFile = respDir.resolve("result.json");
+            if (!Files.isRegularFile(resultFile)) {
+                throw new IOException("accepted RESP result.json is missing");
+            }
+            JsonNode result = JsonArtifacts.readTree(resultFile);
+            ConvergenceStatus convergence = convergenceFrom(result);
+            if (convergence != ConvergenceStatus.CONVERGED) {
+                throw new IOException("accepted RESP result is not converged: " + convergence);
+            }
             CsvTable charges = CsvTable.read(chargesCsv);
             Map<Integer, Double> chargeByAtomId = new LinkedHashMap<>();
             for (List<String> row : charges.rows()) {
@@ -473,6 +489,11 @@ public final class LegacyPhase2ArchiveIngester {
                     chargeByAtomId.put(Integer.parseInt(id.get().trim()), charge.get());
                 }
             }
+            if (chargeByAtomId.size() != ctx.canonicalAtoms.size()) {
+                throw new IOException("RESP charge count " + chargeByAtomId.size()
+                        + " does not match canonical atom count " + ctx.canonicalAtoms.size());
+            }
+            validateRespRegenerations(result, chargeByAtomId);
 
             String classification = "";
             Path decisionReport = unit05O.resolve("NATIVE_AMBER_RESP_DECISION_REPORT.md");
@@ -505,12 +526,16 @@ public final class LegacyPhase2ArchiveIngester {
                     + (classification.isEmpty() ? "" : "; classification=" + classification);
 
             List<String> derivedFrom = new ArrayList<>(ctx.minimaEvidenceHashes.values());
+            EvidenceAcceptanceState acceptance = checksumMismatch(ctx, unit05O,
+                    "TSL_RSH_NATIVE_AMBER_RESP_CHARGES.csv")
+                            ? EvidenceAcceptanceState.CHECKSUM_INVALID
+                            : EvidenceAcceptanceState.ACCEPTED;
             QuantumEvidence evidence = new QuantumEvidence(
                     identity(ctx, geometry, 0, 1, CalculationType.RESP, protocol,
                             List.of(), List.of("resp_charges")),
                     provenance(ctx, chargesCsv, derivedFrom, note),
-                    ConvergenceStatus.CONVERGED,
-                    EvidenceAcceptanceState.ACCEPTED,
+                    convergence,
+                    acceptance,
                     Optional.empty(),
                     Optional.empty(),
                     Optional.empty(),
@@ -523,6 +548,30 @@ public final class LegacyPhase2ArchiveIngester {
         } catch (IOException | RuntimeException e) {
             ctx.issues.add(IngestionIssue.error(
                     ctx.relativize(respDir), "failed to ingest native Amber RESP: " + e.getMessage()));
+        }
+    }
+
+    private static void validateRespRegenerations(JsonNode result, Map<Integer, Double> chargeByAtomId)
+            throws IOException {
+        JsonNode regenerations = result.path("regenerations");
+        if (!regenerations.isObject() || regenerations.isEmpty()) {
+            throw new IOException("RESP result has no regeneration charge vectors");
+        }
+        List<Double> csvCharges = new ArrayList<>(chargeByAtomId.values());
+        for (var names = regenerations.fieldNames(); names.hasNext();) {
+            String name = names.next();
+            JsonNode charges = regenerations.path(name).path("charges");
+            if (!charges.isArray() || charges.size() != csvCharges.size()) {
+                throw new IOException("RESP " + name + " charge vector has the wrong size");
+            }
+            for (int index = 0; index < charges.size(); index++) {
+                JsonNode value = charges.get(index);
+                if (!value.isNumber() || !Double.isFinite(value.doubleValue())
+                        || Double.compare(value.doubleValue(), csvCharges.get(index)) != 0) {
+                    throw new IOException("RESP charge CSV disagrees with " + name
+                            + " at zero-based atom index " + index);
+                }
+            }
         }
     }
 
@@ -1186,14 +1235,14 @@ public final class LegacyPhase2ArchiveIngester {
     }
 
     private static ConvergenceStatus convergenceFromText(String status) {
-        String s = status.toUpperCase(Locale.ROOT);
-        if (s.contains("NOT_CONVERGED")) {
+        String s = status.strip().toUpperCase(Locale.ROOT);
+        if (s.matches(".*(?:NOT[_ -]?CONVERGED|UNCONVERGED|INCOMPLETE).*")) {
             return ConvergenceStatus.NOT_CONVERGED;
         }
         if (s.contains("FAILED")) {
             return ConvergenceStatus.FAILED;
         }
-        if (s.contains("CONVERGED") || s.contains("COMPLETE")) {
+        if (s.matches(".*(?:^|[^A-Z])(?:CONVERGED|COMPLETE)(?:[^A-Z]|$).*$")) {
             return ConvergenceStatus.CONVERGED;
         }
         return ConvergenceStatus.UNKNOWN;

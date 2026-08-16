@@ -1,6 +1,7 @@
 package totah.lab.prometheus.validation;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,16 +64,13 @@ public final class ValidationPlan {
 
     /** SHA-256 over the canonical serialization of the gates and the holdout dataset id. */
     public String planChecksum() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("holdoutDatasetId=").append(holdoutDatasetId);
+        List<String> fields = new ArrayList<>();
+        fields.add(holdoutDatasetId);
         for (ValidationGate gate : gates) {
-            sb.append('\n').append("gate=").append(gate.gateId())
-                    .append('|').append(gate.description())
-                    .append('|').append(gate.metric())
-                    .append('|').append(CanonicalHashing.format(gate.threshold()))
-                    .append('|').append(gate.comparison().name());
+            fields.add(CanonicalHashing.sequence(List.of(gate.gateId(), gate.description(), gate.metric(),
+                    CanonicalHashing.format(gate.threshold()), gate.comparison().name())));
         }
-        return CanonicalHashing.sha256Hex(sb.toString());
+        return CanonicalHashing.sha256Hex(CanonicalHashing.sequence(fields));
     }
 
     /** Always true: plans can only be created via {@link #preregister}. */

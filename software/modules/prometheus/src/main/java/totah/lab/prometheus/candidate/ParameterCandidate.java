@@ -69,10 +69,16 @@ public final class ParameterCandidate {
         this.molecule = Objects.requireNonNull(molecule, "molecule");
         this.atomTyping = Objects.requireNonNull(atomTyping, "atomTyping");
         this.parameters = List.copyOf(Objects.requireNonNull(parameters, "parameters"));
-        this.parentCandidateId = parentCandidateId; // nullable: null marks a root candidate
         if (generation < 0) {
             throw new IllegalArgumentException("generation must be >= 0");
         }
+        if (parentCandidateId == null && generation != 0) {
+            throw new IllegalArgumentException("a root candidate must have generation 0");
+        }
+        if (parentCandidateId != null && (parentCandidateId.isBlank() || generation == 0)) {
+            throw new IllegalArgumentException("a child candidate needs a non-blank parent and generation > 0");
+        }
+        this.parentCandidateId = parentCandidateId; // nullable: null marks a root candidate
         this.generation = generation;
         Objects.requireNonNull(evidenceClass, "evidenceClass");
         if (evidenceClass == EvidenceClass.PRODUCTION_MODEL && !productionApproved) {

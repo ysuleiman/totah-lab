@@ -24,7 +24,7 @@ public record ParameterProvenance(
         requireNonBlank(algorithmVersion, "algorithmVersion");
         Objects.requireNonNull(developmentDatasetId, "developmentDatasetId");
         Objects.requireNonNull(literatureReference, "literatureReference");
-        Objects.requireNonNull(candidateLineageId, "candidateLineageId");
+        requireNonBlank(candidateLineageId, "candidateLineageId");
         Objects.requireNonNull(validationStatus, "validationStatus");
     }
 

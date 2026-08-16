@@ -45,6 +45,10 @@ public record ValidationResult(
         requireNonBlank(planChecksum, "planChecksum");
         requireNonBlank(freezeChecksum, "freezeChecksum");
         outcomes = List.copyOf(Objects.requireNonNull(outcomes, "outcomes"));
+        if (outcomes.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "validation requires an outcome for every preregistered gate");
+        }
         Objects.requireNonNull(decision, "decision");
         Objects.requireNonNull(executedAt, "executedAt");
 
@@ -68,6 +72,19 @@ public record ValidationResult(
             ModelDecision decision) {
 
         Objects.requireNonNull(frozen, "frozen");
+        Objects.requireNonNull(outcomes, "outcomes");
+        List<ValidationGate> gates = frozen.plan().gates();
+        if (outcomes.size() != gates.size()) {
+            throw new IllegalArgumentException(
+                    "outcomes must match every preregistered gate exactly");
+        }
+        for (int index = 0; index < gates.size(); index++) {
+            if (!gates.get(index).equals(outcomes.get(index).gate())) {
+                throw new IllegalArgumentException(
+                        "outcome gate does not match preregistered plan at index "
+                                + index);
+            }
+        }
         return new ValidationResult(
                 frozen.plan().planChecksum(),
                 frozen.freezeChecksum(),

@@ -45,17 +45,26 @@ public record EvidenceIdentity(
      */
     public String evidenceHash() {
         StringBuilder sb = new StringBuilder();
-        sb.append("molecule=").append(molecule.moleculeId())
-                .append('\n').append("atomMapHash=").append(atomMapHash)
-                .append('\n').append("geometry=").append(geometry.sha256())
+        sb.append("molecule=").append(escapeLine(molecule.moleculeId()))
+                .append('\n').append("atomMapHash=").append(escapeLine(atomMapHash))
+                .append('\n').append("geometry=").append(escapeLine(geometry.sha256()))
                 .append('\n').append("atomCount=").append(geometry.atomCount())
                 .append('\n').append("formalCharge=").append(formalCharge)
                 .append('\n').append("multiplicity=").append(multiplicity)
                 .append('\n').append("calculationType=").append(calculationType.name())
-                .append('\n').append("protocol=").append(protocol.protocolKey())
-                .append('\n').append("constraints=").append(String.join(",", constraints))
-                .append('\n').append("requestedOutputs=").append(String.join(",", requestedOutputs));
+                .append('\n').append("protocol=").append(escapeLine(protocol.protocolKey()))
+                .append('\n').append("constraints=").append(escapedList(constraints))
+                .append('\n').append("requestedOutputs=").append(escapedList(requestedOutputs));
         return CanonicalHashing.sha256Hex(sb.toString());
+    }
+
+    private static String escapedList(List<String> values) {
+        return values.stream().map(value -> escapeLine(value).replace(",", "\\,"))
+                .collect(java.util.stream.Collectors.joining(","));
+    }
+
+    private static String escapeLine(String value) {
+        return value.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r");
     }
 
     /** True when the two identities hash identically, i.e. every field matches. */

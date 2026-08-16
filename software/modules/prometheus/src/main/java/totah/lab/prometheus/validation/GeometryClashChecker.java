@@ -21,6 +21,9 @@ public interface GeometryClashChecker {
             if (elementSymbol.isBlank()) {
                 throw new IllegalArgumentException("elementSymbol must be non-blank");
             }
+            if (!Double.isFinite(x) || !Double.isFinite(y) || !Double.isFinite(z)) {
+                throw new IllegalArgumentException("clash atom coordinates must be finite");
+            }
         }
     }
 

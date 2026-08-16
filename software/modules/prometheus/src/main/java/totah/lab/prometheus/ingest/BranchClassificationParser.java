@@ -56,8 +56,10 @@ final class BranchClassificationParser {
                 }
             });
         }
-        jsonFiles.sort(Comparator.comparing(p -> p.getFileName().toString()));
-        markdownFiles.sort(Comparator.comparing(p -> p.getFileName().toString()));
+        jsonFiles.sort(Comparator.comparingInt(BranchClassificationParser::decisionPriority)
+                .thenComparing(p -> p.getFileName().toString()));
+        markdownFiles.sort(Comparator.comparingInt(BranchClassificationParser::decisionPriority)
+                .thenComparing(p -> p.getFileName().toString()));
 
         for (Path json : jsonFiles) {
             JsonNode tree;
@@ -93,6 +95,17 @@ final class BranchClassificationParser {
             }
         }
         return Optional.empty();
+    }
+
+    private static int decisionPriority(Path path) {
+        String name = path.getFileName().toString().toUpperCase();
+        if (name.contains("FINAL_DECISION") || name.contains("FINAL_REPORT")) {
+            return 0;
+        }
+        if (name.contains("DECISION")) {
+            return name.contains("DEVELOPMENT") ? 2 : 1;
+        }
+        return 3;
     }
 
     private static Optional<String> firstText(JsonNode tree, String... keys) {

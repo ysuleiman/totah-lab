@@ -12,14 +12,17 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import totah.lab.prometheus.evidence.CalculationType;
 import totah.lab.prometheus.evidence.ConvergenceStatus;
+import totah.lab.prometheus.evidence.EvidenceIdentity;
 import totah.lab.prometheus.planning.CalculationSpecification;
 import totah.lab.prometheus.recovery.ArtifactChecksums;
 
-/** One fixed-geometry campaign target; orchestration and persistence live outside the executor. */
+/** Historical PySCF campaign adapter; Java-only policy permanently disables new execution. */
+@Deprecated(forRemoval = true)
 public final class LockedPyscfForceTargetExecutor implements EvidenceExecutor {
     private final Path python;
     private final Path script;
@@ -44,15 +47,15 @@ public final class LockedPyscfForceTargetExecutor implements EvidenceExecutor {
 
     @Override public String executorId() { return "pyscf-locked-force-campaign"; }
     @Override public boolean supports(CalculationSpecification spec) {
-        return spec.calculationType() == CalculationType.FORCE_EVALUATION
-                && spec.constraints().isEmpty() && spec.protocol().method().equals("PBE")
-                && spec.protocol().basis().equalsIgnoreCase("def2-SVP")
-                && spec.protocol().dispersion().equals("D3(BJ)");
+        Objects.requireNonNull(spec, "spec");
+        return false;
     }
 
     @Override public RawCalculationResult execute(CalculationSpecification spec)
             throws EvidenceExecutionException {
         Objects.requireNonNull(spec, "spec");
+        throw ExternalPythonExecutionPolicy.disabled(executorId());
+        /*
         if (!supports(spec) || !authorizedChecksums.contains(spec.checksum())) {
             throw new EvidenceExecutionException("force target specification is not authorized: " + spec.checksum());
         }
@@ -85,6 +88,7 @@ public final class LockedPyscfForceTargetExecutor implements EvidenceExecutor {
             Thread.currentThread().interrupt();
             throw new EvidenceExecutionException("force target interrupted", e);
         }
+        */
     }
 
     private void writeSpecification(CalculationSpecification spec, Path geometry, Path target) throws IOException {
@@ -106,6 +110,18 @@ public final class LockedPyscfForceTargetExecutor implements EvidenceExecutor {
     }
 
     private RawCalculationResult raw(CalculationSpecification spec, Path directory) throws IOException {
+        JsonNode result = mapper.readTree(directory.resolve("result.json").toFile());
+        String checksum = result.path("specification_checksum").asText("");
+        if (!checksum.equals(spec.checksum())) {
+            throw new IOException("result specification checksum mismatch");
+        }
+        String expectedIdentity = new EvidenceIdentity(spec.molecule(), atomMapHash, spec.geometry(),
+                spec.formalCharge(), spec.multiplicity(), spec.calculationType(), spec.protocol(),
+                spec.constraints(), spec.requiredOutputs()).evidenceHash();
+        if (!result.path("scientific_identity").asText("").equals(expectedIdentity)) {
+            throw new IOException("result scientific identity mismatch");
+        }
+        ConvergenceStatus convergence = convergence(result);
         List<RawArtifact> artifacts = new ArrayList<>();
         try (var files = Files.list(directory)) {
             for (Path path : files.filter(Files::isRegularFile).sorted(Comparator.comparing(Path::toString)).toList()) {
@@ -113,7 +129,21 @@ public final class LockedPyscfForceTargetExecutor implements EvidenceExecutor {
                         "generated_force_target_artifact"));
             }
         }
-        return new RawCalculationResult(spec, artifacts, ConvergenceStatus.CONVERGED,
+        return new RawCalculationResult(spec, artifacts, convergence,
                 "locked campaign energy+Cartesian-gradient target");
+    }
+
+    private static ConvergenceStatus convergence(JsonNode result) {
+        JsonNode scf = result.get("scf_converged");
+        if (scf != null && scf.isBoolean()) {
+            return scf.booleanValue() ? ConvergenceStatus.CONVERGED : ConvergenceStatus.NOT_CONVERGED;
+        }
+        String status = result.path("status").asText("").strip().toUpperCase();
+        return switch (status) {
+            case "CONVERGED", "COMPLETE", "COMPLETED" -> ConvergenceStatus.CONVERGED;
+            case "NOT_CONVERGED", "UNCONVERGED", "INCOMPLETE" -> ConvergenceStatus.NOT_CONVERGED;
+            case "FAILED", "ERROR" -> ConvergenceStatus.FAILED;
+            default -> ConvergenceStatus.UNKNOWN;
+        };
     }
 }

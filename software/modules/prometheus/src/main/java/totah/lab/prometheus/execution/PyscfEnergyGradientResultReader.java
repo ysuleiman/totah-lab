@@ -79,7 +79,7 @@ public final class PyscfEnergyGradientResultReader {
     }
 
     private double auxiliaryEnergy(Path auxiliary, JsonNode audit, String field, Path result) throws IOException {
-        if (audit.path(field).isNumber()) return audit.path(field).asDouble();
+        if (audit.path(field).isNumber()) return finiteDouble(audit.path(field), field, result);
         JsonNode recovered = mapper.readTree(auxiliary.toFile());
         return requiredDouble(recovered, "energy_hartree", result);
     }
@@ -94,7 +94,12 @@ public final class PyscfEnergyGradientResultReader {
                 throw new IOException("expected matrix row");
             }
             java.util.ArrayList<Double> values = new java.util.ArrayList<>();
-            row.forEach(value -> values.add(value.asDouble()));
+            for (JsonNode value : row) {
+                if (!value.isNumber() || !Double.isFinite(value.doubleValue())) {
+                    throw new IOException("matrix contains a non-finite or non-numeric value");
+                }
+                values.add(value.doubleValue());
+            }
             rows.add(List.copyOf(values));
         }
         return List.copyOf(rows);
@@ -113,6 +118,14 @@ public final class PyscfEnergyGradientResultReader {
         if (!value.isNumber()) {
             throw new IOException("missing numeric " + field + " in " + source);
         }
-        return value.asDouble();
+        return finiteDouble(value, field, source);
+    }
+
+    private static double finiteDouble(JsonNode value, String field, Path source) throws IOException {
+        double result = value.doubleValue();
+        if (!Double.isFinite(result)) {
+            throw new IOException("non-finite numeric " + field + " in " + source);
+        }
+        return result;
     }
 }

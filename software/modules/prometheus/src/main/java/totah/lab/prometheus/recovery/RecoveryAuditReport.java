@@ -2,6 +2,7 @@ package totah.lab.prometheus.recovery;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 
@@ -16,11 +17,12 @@ public record RecoveryAuditReport(
             throw new IllegalArgumentException("sourceGenerationId must be non-blank");
         }
         entries = List.copyOf(Objects.requireNonNull(entries, "entries"));
-        long distinct = entries.stream()
-                .map(entry -> entry.evidenceHash() + "\u0000" + entry.fieldName())
-                .distinct().count();
-        if (distinct != entries.size()) {
-            throw new IllegalArgumentException("duplicate evidence-field recovery entries");
+        var keys = new LinkedHashSet<String>();
+        var duplicates = new LinkedHashSet<String>();
+        entries.stream().map(entry -> entry.evidenceHash() + "\u0000" + entry.fieldName())
+                .forEach(key -> { if (!keys.add(key)) duplicates.add(key.replace('\u0000', ':')); });
+        if (!duplicates.isEmpty()) {
+            throw new IllegalArgumentException("duplicate evidence-field recovery entries: " + duplicates);
         }
     }
 

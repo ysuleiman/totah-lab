@@ -29,9 +29,7 @@ public record QuantumEvidence(
         Objects.requireNonNull(provenance, "provenance");
         Objects.requireNonNull(convergence, "convergence");
         Objects.requireNonNull(acceptance, "acceptance");
-        if ((convergence == ConvergenceStatus.FAILED
-                || convergence == ConvergenceStatus.NOT_CONVERGED
-                || convergence == ConvergenceStatus.EMPTY_OUTPUT)
+        if (convergence != ConvergenceStatus.CONVERGED
                 && acceptance == EvidenceAcceptanceState.ACCEPTED) {
             throw new IllegalArgumentException(
                     "evidence with convergence " + convergence + " cannot be ACCEPTED");

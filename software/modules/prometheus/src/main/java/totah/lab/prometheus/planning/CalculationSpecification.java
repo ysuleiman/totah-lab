@@ -74,28 +74,14 @@ public record CalculationSpecification(
      * scientifically identical and share a checksum.
      */
     public String checksum() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("scientificPurpose=").append(scientificPurpose)
-                .append('\n').append("molecule=").append(molecule.moleculeId())
-                .append('\n').append("geometry=").append(geometry.sha256())
-                .append('\n').append("atomCount=").append(geometry.atomCount())
-                .append('\n').append("formalCharge=").append(formalCharge)
-                .append('\n').append("multiplicity=").append(multiplicity)
-                .append('\n').append("protocol=").append(protocol.protocolKey())
-                .append('\n').append("constraints=").append(String.join(",", constraints))
-                .append('\n').append("calculationType=").append(calculationType.name())
-                .append('\n').append("requiredOutputs=").append(String.join(",", requiredOutputs))
-                .append('\n').append("acceptanceGates=").append(String.join(",", acceptanceGates))
-                .append('\n').append("role=").append(role.name())
-                .append('\n').append("jobCount=").append(estimatedCost.jobCount())
-                .append('\n').append("cpuHoursPerJob=")
-                .append(CanonicalHashing.format(estimatedCost.cpuHoursPerJob()))
-                .append('\n').append("expectedWallHours=")
-                .append(CanonicalHashing.format(estimatedCost.expectedWallHours()))
-                .append('\n').append("expectedLocalRuntimeHours=")
-                .append(CanonicalHashing.format(estimatedCost.expectedLocalRuntimeHours()))
-                .append('\n').append("estimatedRemoteCostUsd=")
-                .append(CanonicalHashing.format(estimatedCost.estimatedRemoteCostUsd()));
-        return CanonicalHashing.sha256Hex(sb.toString());
+        return CanonicalHashing.sha256Hex(CanonicalHashing.sequence(List.of(
+                scientificPurpose, molecule.moleculeId(), geometry.sha256(), Integer.toString(geometry.atomCount()),
+                Integer.toString(formalCharge), Integer.toString(multiplicity), protocol.protocolKey(),
+                CanonicalHashing.sequence(constraints), calculationType.name(),
+                CanonicalHashing.sequence(requiredOutputs), CanonicalHashing.sequence(acceptanceGates), role.name(),
+                Integer.toString(estimatedCost.jobCount()), CanonicalHashing.format(estimatedCost.cpuHoursPerJob()),
+                CanonicalHashing.format(estimatedCost.expectedWallHours()),
+                CanonicalHashing.format(estimatedCost.expectedLocalRuntimeHours()),
+                CanonicalHashing.format(estimatedCost.estimatedRemoteCostUsd()))));
     }
 }

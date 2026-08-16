@@ -17,6 +17,9 @@ public record ValidationGate(
         requireNonBlank(gateId, "gateId");
         requireNonBlank(description, "description");
         requireNonBlank(metric, "metric");
+        if (!Double.isFinite(threshold)) {
+            throw new IllegalArgumentException("threshold must be finite");
+        }
         Objects.requireNonNull(comparison, "comparison");
     }
 

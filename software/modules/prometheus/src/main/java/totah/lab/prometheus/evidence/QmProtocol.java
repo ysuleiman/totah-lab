@@ -30,18 +30,23 @@ public record QmProtocol(
     }
 
     /**
-     * Canonical string form of this protocol, joining every field with '|'.
+     * Canonical string form of every protocol field. Delimiters inside fields
+     * are escaped, preserving the established readable key for ordinary values.
      * Two protocols with the same key are considered the same protocol.
      */
     public String protocolKey() {
         return String.join("|",
-                method,
-                basis,
-                dispersion,
-                environment,
+                escape(method),
+                escape(basis),
+                escape(dispersion),
+                escape(environment),
                 Boolean.toString(counterpoise),
-                software,
-                softwareVersion);
+                escape(software),
+                escape(softwareVersion));
+    }
+
+    private static String escape(String value) {
+        return value.replace("\\", "\\\\").replace("|", "\\|");
     }
 
     private static String requireNonBlank(String value, String fieldName) {

@@ -161,6 +161,13 @@ public final class EvidenceValidator {
                             + expected + " for N=" + atomCount + " atoms",
                     false);
         }
+        for (int index = 0; index < hessianRowMajor.size(); index++) {
+            Double value = hessianRowMajor.get(index);
+            if (value == null || !Double.isFinite(value)) {
+                return new HessianOutcome(EvidenceAcceptanceState.FAILED_NUMERICALLY,
+                        "hessian contains a non-finite value at row-major index " + index, false);
+            }
+        }
         for (int row = 0; row < dimension; row++) {
             for (int col = row + 1; col < dimension; col++) {
                 double upper = hessianRowMajor.get(row * dimension + col);
@@ -188,6 +195,9 @@ public final class EvidenceValidator {
      */
     public EvidenceAcceptanceState finalAcceptance(List<EvidenceAcceptanceState> checks) {
         Objects.requireNonNull(checks, "checks");
+        if (checks.isEmpty()) {
+            throw new IllegalArgumentException("at least one acceptance check is required");
+        }
         EvidenceAcceptanceState worst = EvidenceAcceptanceState.ACCEPTED;
         int worstRank = -1;
         for (EvidenceAcceptanceState check : checks) {

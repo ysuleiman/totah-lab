@@ -55,7 +55,8 @@ public final class PyscfForceTargetEvidenceMapper implements GeneratedEvidenceMa
             for (int component = 0; component < 3; component++) {
                 double gradient = gradients.get(atom).get(component).asDouble();
                 double force = forces.get(atom).get(component).asDouble();
-                if (!Double.isFinite(gradient) || Math.abs(gradient + force) > 1e-12) {
+                if (!Double.isFinite(gradient) || !Double.isFinite(force)
+                        || Math.abs(gradient + force) > 1e-12) {
                     throw new IOException("force sign or finiteness validation failed");
                 }
                 flattened.add(gradient); norm2 += gradient * gradient;
@@ -64,7 +65,9 @@ public final class PyscfForceTargetEvidenceMapper implements GeneratedEvidenceMa
         double energy = root.path("energy_hartree").asDouble(Double.NaN);
         if (!Double.isFinite(energy)) throw new IOException("non-finite energy");
         double declaredNorm = root.path("gradient_norm_hartree_per_bohr").asDouble(Double.NaN);
-        if (Math.abs(Math.sqrt(norm2) - declaredNorm) > 1e-10) throw new IOException("gradient norm mismatch");
+        if (!Double.isFinite(declaredNorm) || Math.abs(Math.sqrt(norm2) - declaredNorm) > 1e-10) {
+            throw new IOException("gradient norm mismatch");
+        }
         QuantumEvidence evidence = new QuantumEvidence(identity,
                 new EvidenceProvenance(resultPath.toString(), ArtifactChecksums.sha256(resultPath), Instant.now(),
                         List.of(), "synchronously persisted common-protocol force target"),
