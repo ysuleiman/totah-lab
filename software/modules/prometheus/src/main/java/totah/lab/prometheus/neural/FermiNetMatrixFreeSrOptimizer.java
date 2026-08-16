@@ -1,29 +1,28 @@
 package totah.lab.prometheus.neural;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
-import totah.lab.prometheus.numerics.FixedPreconditioners;
-import totah.lab.prometheus.numerics.LinearOperator;
-import totah.lab.prometheus.numerics.StreamingCovarianceOperator;
-import totah.lab.prometheus.numerics.TrueResidualPreconditionedConjugateGradientSolver;
+import totah.lab.prometheus.numerics.FermiNetSampleSpaceSrSolver;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
 /**
- * Streaming stochastic reconfiguration for derivative-complete FermiNet states.
+ * Sample-space stochastic reconfiguration for derivative-complete FermiNet states.
  *
- * <p>The current bounded-memory implementation uses identity preconditioning.
- * This preserves O(p) solver-vector storage and avoids materializing either a
- * dense covariance matrix or a covariance-diagonal preconditioner pass.
- *
- * <p>The SR operator itself remains the regularized covariance:
+ * <p>Each non-zero-weight sample is evaluated exactly once and its complete
+ * parameter log-derivative vector is written to a temporary observation file.
+ * The SR solve is then performed in sample space:
  *
  * <pre>
- *     (S + damping I) delta = -gradient
+ * delta = -B^T (B B^T + damping I)^-1 q
  * </pre>
  *
- * and convergence is accepted only through the independently recomputed
- * true-residual gate in {@link TrueResidualPreconditionedConjugateGradientSolver}.
+ * where B = sqrt(W) C and C is the centered sample-by-parameter derivative matrix.
+ *
+ * <p>This removes high-dimensional PCG from the production path while preserving
+ * the same damped SR equations.
  */
 public final class FermiNetMatrixFreeSrOptimizer {
 
@@ -37,199 +36,118 @@ public final class FermiNetMatrixFreeSrOptimizer {
         Objects.requireNonNull(configuration, "configuration");
 
         if (samples.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "empty FermiNet SR sample set");
+            throw new IllegalArgumentException("empty FermiNet SR sample set");
         }
 
-        int parameters = state.parameterCount();
-        Counters counters = new Counters();
+        try (FermiNetSrObservationFile observations =
+                     FermiNetSrObservationFile.build(
+                             state,
+                             samples)) {
 
-        Statistics statistics =
-                statistics(
-                        state,
-                        samples,
-                        parameters,
-                        counters);
-
-        double gradientNorm =
-                norm(statistics.gradient);
-
-        requireFinite(
-                gradientNorm,
-                "gradient norm");
-
-        StreamingCovarianceOperator covariance =
-                new StreamingCovarianceOperator(
-                        parameters,
-                        consumer -> forEachEvaluation(
-                                state,
-                                samples,
-                                parameters,
-                                counters,
-                                evaluation -> {
-                                    double[] centered =
-                                            evaluation.derivatives.clone();
-
-                                    for (int i = 0; i < parameters; i++) {
-                                        centered[i] -=
-                                                statistics.meanDerivative[i];
-                                    }
-
-                                    consumer.accept(
-                                            evaluation.weight
-                                                    / statistics.weightSum,
-                                            centered);
-                                }),
-                        configuration.damping());
-
-        LinearOperator checkedOperator =
-                new LinearOperator() {
-                    @Override
-                    public int dimension() {
-                        return parameters;
-                    }
-
-                    @Override
-                    public double[] apply(double[] vector) {
-                        double[] result =
-                                covariance.apply(vector);
-
-                        requireFinite(
-                                result,
-                                "covariance-operator result");
-
-                        return result;
-                    }
-                };
-
-        double[] rightHandSide =
-                statistics.gradient.clone();
-
-        for (int i = 0; i < parameters; i++) {
-            rightHandSide[i] =
-                    -rightHandSide[i];
-        }
-
-        TrueResidualPreconditionedConjugateGradientSolver.Result solve;
-
-        if (gradientNorm == 0.0) {
-            solve =
-                    new TrueResidualPreconditionedConjugateGradientSolver.Result(
-                            new double[parameters],
-                            0,
-                            0,
-                            0.0,
-                            0.0,
-                            List.of(0.0),
-                            true);
-        } else {
-            solve =
-                    new TrueResidualPreconditionedConjugateGradientSolver()
+            FermiNetSampleSpaceSrSolver.Result solve =
+                    new FermiNetSampleSpaceSrSolver()
                             .solve(
-                                    checkedOperator,
-                                    FixedPreconditioners.identity(parameters),
-                                    rightHandSide,
-                                    new TrueResidualPreconditionedConjugateGradientSolver.Configuration(
-                                            configuration.maxSolverIterations(),
-                                            configuration.relativeTolerance(),
-                                            configuration.absoluteTolerance()));
-        }
+                                    observations,
+                                    configuration.damping(),
+                                    configuration.blockSize());
 
-        if (!solve.converged()
-                || !Double.isFinite(solve.relativeTrueResidual())
-                || !Double.isFinite(solve.absoluteTrueResidual())) {
-
-            throw new IllegalStateException(
-                    "FermiNet SR failed true-residual convergence gate"
-                            + System.lineSeparator()
-                            + "iterations="
-                            + solve.iterations()
-                            + System.lineSeparator()
-                            + "absoluteTrueResidual="
-                            + solve.absoluteTrueResidual()
-                            + System.lineSeparator()
-                            + "relativeTrueResidual="
-                            + solve.relativeTrueResidual()
-                            + System.lineSeparator()
-                            + "trueResidualHistory="
-                            + solve.trueResidualHistory());
-        }
-
-        double[] delta =
-                solve.solution();
-
-        requireFinite(
-                delta,
-                "SR solution");
-
-        double[] update =
-                new double[parameters];
-
-        for (int i = 0; i < parameters; i++) {
-            update[i] =
-                    configuration.learningRate()
-                            * delta[i];
-        }
-
-        double rawUpdateNorm =
-                norm(update);
-
-        requireFinite(
-                rawUpdateNorm,
-                "raw update norm");
-
-        boolean rescaled =
-                rawUpdateNorm
-                        > configuration.maxUpdateNorm();
-
-        if (rescaled) {
-            double scale =
-                    configuration.maxUpdateNorm()
-                            / rawUpdateNorm;
-
-            for (int i = 0; i < parameters; i++) {
-                update[i] *= scale;
-            }
-        }
-
-        double appliedUpdateNorm =
-                norm(update);
-
-        requireFinite(
-                appliedUpdateNorm,
-                "applied update norm");
-
-        double[] next =
-                state.parameterArray();
-
-        for (int i = 0; i < parameters; i++) {
-            next[i] +=
-                    update[i];
+            double[] delta =
+                    solve.delta();
 
             requireFinite(
-                    next[i],
-                    "updated parameter");
-        }
+                    delta,
+                    "SR solution");
 
-        return new Result(
-                state.withParameters(next),
-                statistics.energy,
-                gradientNorm,
-                rawUpdateNorm,
-                appliedUpdateNorm,
-                solve.absoluteTrueResidual(),
-                solve.relativeTrueResidual(),
-                solve.iterations(),
-                covariance.counters().streamedPasses(),
-                counters.evaluations,
-                rescaled,
-                statistics.gradient,
-                solve.trueResidualHistory());
+            double[] energyGradient =
+                    gradientFromObservations(
+                            observations);
+
+            double gradientNorm =
+                    norm(
+                            energyGradient);
+
+            requireFinite(
+                    gradientNorm,
+                    "gradient norm");
+
+            double[] update =
+                    new double[delta.length];
+
+            for (int i = 0; i < delta.length; i++) {
+                update[i] =
+                        configuration.learningRate()
+                                * delta[i];
+            }
+
+            double rawUpdateNorm =
+                    norm(
+                            update);
+
+            requireFinite(
+                    rawUpdateNorm,
+                    "raw update norm");
+
+            boolean rescaled =
+                    rawUpdateNorm
+                            > configuration.maxUpdateNorm();
+
+            if (rescaled) {
+                double scale =
+                        configuration.maxUpdateNorm()
+                                / rawUpdateNorm;
+
+                for (int i = 0; i < update.length; i++) {
+                    update[i] *=
+                            scale;
+                }
+            }
+
+            double appliedUpdateNorm =
+                    norm(
+                            update);
+
+            requireFinite(
+                    appliedUpdateNorm,
+                    "applied update norm");
+
+            double[] next =
+                    state.parameterArray();
+
+            for (int i = 0; i < next.length; i++) {
+                next[i] +=
+                        update[i];
+
+                requireFinite(
+                        next[i],
+                        "updated parameter");
+            }
+
+            return new Result(
+                    state.withParameters(next),
+                    solve.meanEnergyHartree(),
+                    gradientNorm,
+                    rawUpdateNorm,
+                    appliedUpdateNorm,
+                    solve.absoluteSampleSpaceResidual(),
+                    solve.relativeSampleSpaceResidual(),
+                    1,
+                    2,
+                    observations.neuralEvaluations(),
+                    rescaled,
+                    energyGradient,
+                    List.of(
+                            solve.relativeSampleSpaceResidual()));
+        } catch (IOException exception) {
+            throw new UncheckedIOException(
+                    "FermiNet SR observation I/O failed",
+                    exception);
+        }
     }
 
     /**
-     * Package-private verification seam using the exact same streamed covariance
-     * operator as production SR.
+     * Package-private reference seam retained for tests. This computes the same
+     * covariance action directly from fresh FermiNet evaluations and is not used
+     * by production sample-space SR.
      */
     double[] covarianceAction(
             FermiNetV1State state,
@@ -254,42 +172,82 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     "vector dimension mismatch");
         }
 
-        Counters counters =
-                new Counters();
+        double weightSum =
+                0.0;
 
-        Statistics statistics =
-                statistics(
-                        state,
-                        samples,
-                        parameters,
-                        counters);
+        double[] mean =
+                new double[parameters];
 
-        StreamingCovarianceOperator operator =
-                new StreamingCovarianceOperator(
-                        parameters,
-                        consumer -> forEachEvaluation(
-                                state,
-                                samples,
-                                parameters,
-                                counters,
-                                evaluation -> {
-                                    double[] centered =
-                                            evaluation.derivatives.clone();
+        for (WeightedSample sample : samples) {
+            if (sample.weight() == 0.0) {
+                continue;
+            }
 
-                                    for (int i = 0; i < parameters; i++) {
-                                        centered[i] -=
-                                                statistics.meanDerivative[i];
-                                    }
+            double[] derivatives =
+                    state.evaluate(
+                                    sample.coordinates())
+                            .parameterLogDerivatives();
 
-                                    consumer.accept(
-                                            evaluation.weight
-                                                    / statistics.weightSum,
-                                            centered);
-                                }),
-                        damping);
+            weightSum +=
+                    sample.weight();
+
+            for (int i = 0; i < parameters; i++) {
+                mean[i] +=
+                        sample.weight()
+                                * derivatives[i];
+            }
+        }
+
+        if (!(weightSum > 0.0)
+                || !Double.isFinite(weightSum)) {
+            throw new IllegalArgumentException(
+                    "non-positive FermiNet SR total weight");
+        }
+
+        for (int i = 0; i < parameters; i++) {
+            mean[i] /=
+                    weightSum;
+        }
 
         double[] result =
-                operator.apply(vector);
+                new double[parameters];
+
+        for (WeightedSample sample : samples) {
+            if (sample.weight() == 0.0) {
+                continue;
+            }
+
+            double[] derivatives =
+                    state.evaluate(
+                                    sample.coordinates())
+                            .parameterLogDerivatives();
+
+            double projection =
+                    0.0;
+
+            for (int i = 0; i < parameters; i++) {
+                projection +=
+                        (derivatives[i] - mean[i])
+                                * vector[i];
+            }
+
+            double scale =
+                    sample.weight()
+                            / weightSum
+                            * projection;
+
+            for (int i = 0; i < parameters; i++) {
+                result[i] +=
+                        scale
+                                * (derivatives[i] - mean[i]);
+            }
+        }
+
+        for (int i = 0; i < parameters; i++) {
+            result[i] +=
+                    damping
+                            * vector[i];
+        }
 
         requireFinite(
                 result,
@@ -298,154 +256,106 @@ public final class FermiNetMatrixFreeSrOptimizer {
         return result;
     }
 
-    private static Statistics statistics(
-            FermiNetV1State state,
-            List<WeightedSample> samples,
-            int parameters,
-            Counters counters) {
+    private static double[] gradientFromObservations(
+            FermiNetSrObservationFile observations)
+            throws IOException {
 
-        double[] sumDerivative =
-                new double[parameters];
+        int samples =
+                observations.sampleCount();
 
-        double[] sumDerivativeEnergy =
-                new double[parameters];
+        int parameters =
+                observations.parameterCount();
 
-        double[] totals =
-                new double[2];
+        double weightSum =
+                0.0;
 
-        forEachEvaluation(
-                state,
-                samples,
-                parameters,
-                counters,
-                evaluation -> {
-                    totals[0] +=
-                            evaluation.weight;
+        double meanEnergy =
+                0.0;
 
-                    totals[1] +=
-                            evaluation.weight
-                                    * evaluation.energy;
+        for (int sample = 0; sample < samples; sample++) {
+            weightSum +=
+                    observations.weight(sample);
 
-                    for (int i = 0; i < parameters; i++) {
-                        sumDerivative[i] +=
-                                evaluation.weight
-                                        * evaluation.derivatives[i];
+            meanEnergy +=
+                    observations.weight(sample)
+                            * observations.localEnergyHartree(sample);
+        }
 
-                        sumDerivativeEnergy[i] +=
-                                evaluation.weight
-                                        * evaluation.derivatives[i]
-                                        * evaluation.energy;
-                    }
-                });
-
-        if (!(totals[0] > 0.0)
-                || !Double.isFinite(totals[0])) {
-
+        if (!(weightSum > 0.0)
+                || !Double.isFinite(weightSum)) {
             throw new IllegalArgumentException(
                     "non-positive FermiNet SR total weight");
         }
 
-        double energy =
-                totals[1]
-                        / totals[0];
-
-        requireFinite(
-                energy,
-                "mean local energy");
-
-        double[] mean =
-                new double[parameters];
+        meanEnergy /=
+                weightSum;
 
         double[] gradient =
                 new double[parameters];
 
-        for (int i = 0; i < parameters; i++) {
-            mean[i] =
-                    sumDerivative[i]
-                            / totals[0];
+        int blockSize =
+                Math.min(
+                        8192,
+                        parameters);
 
-            gradient[i] =
-                    2.0
-                            * (sumDerivativeEnergy[i] / totals[0]
-                            - mean[i] * energy);
+        double[] block =
+                new double[
+                        Math.multiplyExact(
+                                samples,
+                                blockSize)];
+
+        for (int start = 0;
+             start < parameters;
+             start += blockSize) {
+
+            int length =
+                    Math.min(
+                            blockSize,
+                            parameters - start);
+
+            observations.readParameterBlock(
+                    start,
+                    length,
+                    block);
+
+            for (int local = 0;
+                 local < length;
+                 local++) {
+
+                double value =
+                        0.0;
+
+                for (int sample = 0;
+                     sample < samples;
+                     sample++) {
+
+                    double normalizedWeight =
+                            observations.weight(sample)
+                                    / weightSum;
+
+                    value +=
+                            2.0
+                                    * normalizedWeight
+                                    * (observations.localEnergyHartree(sample)
+                                    - meanEnergy)
+                                    * block[sample * length + local];
+                }
+
+                gradient[start + local] =
+                        value;
+            }
         }
-
-        requireFinite(
-                mean,
-                "mean parameter derivative");
 
         requireFinite(
                 gradient,
                 "energy gradient");
 
-        return new Statistics(
-                totals[0],
-                energy,
-                mean,
-                gradient);
+        return gradient;
     }
 
-    private static void forEachEvaluation(
-            FermiNetV1State state,
-            List<WeightedSample> samples,
-            int parameters,
-            Counters counters,
-            EvaluationConsumer consumer) {
+    private static double norm(
+            double[] values) {
 
-        for (WeightedSample sample : samples) {
-            if (!Double.isFinite(sample.weight())
-                    || sample.weight() < 0.0) {
-
-                throw new IllegalArgumentException(
-                        "invalid FermiNet SR sample weight");
-            }
-
-            if (sample.weight() == 0.0) {
-                continue;
-            }
-
-            FermiNetV1State.Evaluation evaluated =
-                    state.evaluate(
-                            sample.coordinates());
-
-            double[] derivatives =
-                    evaluated.parameterLogDerivatives();
-
-            if (derivatives.length != parameters) {
-                throw new IllegalArgumentException(
-                        "parameter derivative dimension mismatch");
-            }
-
-            requireFinite(
-                    derivatives,
-                    "parameter log derivative");
-
-            /*
-             * The validated APIs do not expose a canonical local-energy method
-             * accepting this Evaluation. FermiNetVmc.localEnergy is therefore
-             * retained as the Hamiltonian boundary.
-             */
-            double energy =
-                    FermiNetVmc.localEnergy(
-                                    state,
-                                    sample.coordinates())
-                            .totalHartree();
-
-            requireFinite(
-                    energy,
-                    "local energy");
-
-            counters.evaluations++;
-
-            consumer.accept(
-                    new SampleEvaluation(
-                            sample.weight(),
-                            energy,
-                            derivatives));
-        }
-    }
-
-    private static double norm(double[] values) {
         double scale =
                 0.0;
 
@@ -520,7 +430,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
 
             if (!Double.isFinite(weight)
                     || weight < 0.0) {
-
                 throw new IllegalArgumentException(
                         "invalid FermiNet SR sample weight");
             }
@@ -549,7 +458,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     || !Double.isFinite(relativeTolerance)
                     || !(absoluteTolerance > 0.0)
                     || !Double.isFinite(absoluteTolerance)) {
-
                 throw new IllegalArgumentException(
                         "invalid FermiNet SR configuration");
             }
@@ -577,10 +485,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     "state");
 
             Objects.requireNonNull(
-                    energyGradient,
-                    "energyGradient");
-
-            Objects.requireNonNull(
                     trueResidualHistory,
                     "trueResidualHistory");
 
@@ -602,28 +506,5 @@ public final class FermiNetMatrixFreeSrOptimizer {
             return List.copyOf(
                     trueResidualHistory);
         }
-    }
-
-    private record Statistics(
-            double weightSum,
-            double energy,
-            double[] meanDerivative,
-            double[] gradient) {
-    }
-
-    private record SampleEvaluation(
-            double weight,
-            double energy,
-            double[] derivatives) {
-    }
-
-    @FunctionalInterface
-    private interface EvaluationConsumer {
-        void accept(
-                SampleEvaluation value);
-    }
-
-    private static final class Counters {
-        private long evaluations;
     }
 }

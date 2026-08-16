@@ -121,7 +121,7 @@ final class FermiNetVmc {
 
         if (!initialWalkers.isEmpty()
                 && initialWalkers.size()
-                        != configuration.walkers()) {
+                != configuration.walkers()) {
 
             throw new IllegalArgumentException(
                     "initial walker count mismatch");
@@ -168,8 +168,8 @@ final class FermiNetVmc {
          * ------------------------------------------------------------
          */
         for (int sweep = 1;
-                sweep <= totalSweeps;
-                sweep++) {
+             sweep <= totalSweeps;
+             sweep++) {
 
             for (Walker walker :
                     walkers) {
@@ -208,8 +208,8 @@ final class FermiNetVmc {
 
             if (measuredSweep > 0
                     && measuredSweep
-                            % configuration.sweepsBetweenRetained()
-                            == 0) {
+                    % configuration.sweepsBetweenRetained()
+                    == 0) {
 
                 for (Walker walker :
                         walkers) {
@@ -276,9 +276,55 @@ final class FermiNetVmc {
                 state.spatialEvaluation(
                         electrons);
 
+        return localEnergyFromLaplacian(
+                state,
+                electrons,
+                spatial.laplacianOverWavefunction());
+    }
+
+    /**
+     * Local-energy evaluation reusing a derivative-complete FermiNet evaluation.
+     *
+     * <p>The supplied evaluation must have been produced by {@code state.evaluate(electrons)}
+     * for the same state and electron coordinates. This overload exists so SR can reuse the
+     * spatial Laplacian already computed while obtaining parameter derivatives, instead of
+     * performing a second FermiNet spatial traversal.
+     */
+    static LocalEnergyComponents localEnergy(
+            FermiNetV1State state,
+            QuantumCoordinates electrons,
+            FermiNetV1State.Evaluation evaluation) {
+
+        Objects.requireNonNull(
+                state,
+                "state");
+
+        Objects.requireNonNull(
+                electrons,
+                "electrons");
+
+        Objects.requireNonNull(
+                evaluation,
+                "evaluation");
+
+        validateElectronConfiguration(
+                state.molecule(),
+                electrons);
+
+        return localEnergyFromLaplacian(
+                state,
+                electrons,
+                evaluation.laplacianOverWavefunction());
+    }
+
+    private static LocalEnergyComponents localEnergyFromLaplacian(
+            FermiNetV1State state,
+            QuantumCoordinates electrons,
+            double laplacianOverWavefunction) {
+
         double kinetic =
                 -0.5
-                        * spatial.laplacianOverWavefunction();
+                        * laplacianOverWavefunction;
 
         Molecule molecule =
                 state.molecule();
@@ -325,16 +371,16 @@ final class FermiNetVmc {
          * Electron-electron Coulomb repulsion.
          */
         for (int i = 0;
-                i < electrons.particles().size();
-                i++) {
+             i < electrons.particles().size();
+             i++) {
 
             var left =
                     electrons.particles()
                             .get(i);
 
             for (int j = i + 1;
-                    j < electrons.particles().size();
-                    j++) {
+                 j < electrons.particles().size();
+                 j++) {
 
                 var right =
                         electrons.particles()
@@ -359,8 +405,8 @@ final class FermiNetVmc {
          * Nuclear-nuclear Coulomb repulsion.
          */
         for (int i = 0;
-                i < molecule.nuclei().size();
-                i++) {
+             i < molecule.nuclei().size();
+             i++) {
 
             var left =
                     molecule.nuclei()
@@ -371,8 +417,8 @@ final class FermiNetVmc {
                             .inBohr();
 
             for (int j = i + 1;
-                    j < molecule.nuclei().size();
-                    j++) {
+                 j < molecule.nuclei().size();
+                 j++) {
 
                 var right =
                         molecule.nuclei()
@@ -395,7 +441,7 @@ final class FermiNetVmc {
                         left.charge()
                                 .atomicNumber()
                                 * right.charge()
-                                        .atomicNumber()
+                                .atomicNumber()
                                 / r;
             }
         }
@@ -427,14 +473,14 @@ final class FermiNetVmc {
                         configuration.walkers());
 
         for (int index = 0;
-                index < configuration.walkers();
-                index++) {
+             index < configuration.walkers();
+             index++) {
 
             QuantumCoordinates coordinates =
                     initialWalkers.isEmpty()
                             ? referenceStyleInitialCoordinates(
-                                    state.molecule(),
-                                    random)
+                            state.molecule(),
+                            random)
                             : initialWalkers.get(index);
 
             validateElectronConfiguration(
@@ -493,15 +539,15 @@ final class FermiNetVmc {
                 1.0;
 
         for (int electron = 0;
-                electron < electrons;
-                electron++) {
+             electron < electrons;
+             electron++) {
 
             CartesianPosition center =
                     molecule.nuclei()
                             .get(
                                     electron
                                             % molecule.nuclei()
-                                                    .size())
+                                            .size())
                             .position()
                             .inBohr();
 
@@ -550,7 +596,7 @@ final class FermiNetVmc {
                     : Double.NEGATIVE_INFINITY;
 
         } catch (IllegalStateException
-                | IllegalArgumentException exception) {
+                 | IllegalArgumentException exception) {
 
             return Double.NEGATIVE_INFINITY;
         }
@@ -589,10 +635,10 @@ final class FermiNetVmc {
                         0.0,
                         2.0
                                 * (nextLog
-                                        - currentLog));
+                                - currentLog));
 
         return Math.log(
-                        random.nextDouble())
+                random.nextDouble())
                 < logAcceptance;
     }
 
@@ -646,8 +692,8 @@ final class FermiNetVmc {
         }
 
         for (int i = 0;
-                i < coordinates.particles().size();
-                i++) {
+             i < coordinates.particles().size();
+             i++) {
 
             var particle =
                     coordinates.particles()
@@ -662,8 +708,8 @@ final class FermiNetVmc {
 
             SpinProjection expected =
                     i
-                                    < molecule.spin()
-                                            .alphaElectrons()
+                            < molecule.spin()
+                            .alphaElectrons()
                             ? SpinProjection.ALPHA
                             : SpinProjection.BETA;
 
@@ -675,11 +721,11 @@ final class FermiNetVmc {
             }
 
             if (!Double.isFinite(
-                            particle.xBohr())
+                    particle.xBohr())
                     || !Double.isFinite(
-                            particle.yBohr())
+                    particle.yBohr())
                     || !Double.isFinite(
-                            particle.zBohr())) {
+                    particle.zBohr())) {
 
                 throw new IllegalArgumentException(
                         "non-finite electron coordinate");
