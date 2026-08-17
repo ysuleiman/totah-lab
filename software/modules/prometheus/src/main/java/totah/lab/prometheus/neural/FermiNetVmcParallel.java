@@ -162,7 +162,8 @@ final class FermiNetVmcParallel implements AutoCloseable {
         return new FermiNetVmc.Result(
                 retained,
                 acceptance,
-                List.of(energies));
+                List.of(energies),
+                FermiNetStateIdentity.of(state));
     }
 
     private double[] parallelSamplingLogs(

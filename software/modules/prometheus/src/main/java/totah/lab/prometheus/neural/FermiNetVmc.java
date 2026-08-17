@@ -57,7 +57,8 @@ final class FermiNetVmc {
     record Result(
             List<QuantumCoordinates> samples,
             double acceptance,
-            List<LocalEnergyComponents> localEnergies) {
+            List<LocalEnergyComponents> localEnergies,
+            String stateIdentity) {
 
         Result {
 
@@ -68,6 +69,10 @@ final class FermiNetVmc {
             Objects.requireNonNull(
                     localEnergies,
                     "localEnergies");
+
+            Objects.requireNonNull(
+                    stateIdentity,
+                    "stateIdentity");
 
             samples =
                     List.copyOf(samples);
@@ -88,6 +93,10 @@ final class FermiNetVmc {
 
                 throw new IllegalArgumentException(
                         "sample/local-energy count mismatch");
+            }
+
+            if (!stateIdentity.matches("[0-9a-f]{64}")) {
+                throw new IllegalArgumentException("invalid FermiNet state identity");
             }
         }
     }
@@ -242,7 +251,8 @@ final class FermiNetVmc {
         return new Result(
                 retained,
                 acceptance,
-                energies);
+                energies,
+                FermiNetStateIdentity.of(state));
     }
 
     /**

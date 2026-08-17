@@ -191,6 +191,7 @@ public final class FermiNetH2oSrDriver {
                 new FermiNetMatrixFreeSrOptimizer().oneIteration(
                         initialState,
                         srSamples,
+                        FermiNetKnownLocalEnergies.from(initialState, baseline),
                         srConfiguration);
         long srIterationNanos = System.nanoTime() - srStartedNanos;
 

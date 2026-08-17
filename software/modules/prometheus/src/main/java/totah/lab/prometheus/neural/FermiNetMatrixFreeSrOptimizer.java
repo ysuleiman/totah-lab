@@ -31,9 +31,22 @@ public final class FermiNetMatrixFreeSrOptimizer {
             List<WeightedSample> samples,
             Configuration configuration) {
 
+        return oneIteration(state, samples, null, configuration);
+    }
+
+    Result oneIteration(
+            FermiNetV1State state,
+            List<WeightedSample> samples,
+            FermiNetKnownLocalEnergies knownLocalEnergies,
+            Configuration configuration) {
+
         Objects.requireNonNull(state, "state");
         Objects.requireNonNull(samples, "samples");
         Objects.requireNonNull(configuration, "configuration");
+
+        if (knownLocalEnergies != null) {
+            knownLocalEnergies.validate(state, samples);
+        }
 
         if (samples.isEmpty()) {
             throw new IllegalArgumentException("empty FermiNet SR sample set");
@@ -55,10 +68,16 @@ public final class FermiNetMatrixFreeSrOptimizer {
                 """);
 
         try (FermiNetStructuredSrObservationFile observations =
-                     FermiNetStructuredSrObservationFile.buildParallel(
-                             state,
-                             samples,
-                             configuration.observationParallelism())) {
+                     knownLocalEnergies == null
+                             ? FermiNetStructuredSrObservationFile.buildParallel(
+                                     state,
+                                     samples,
+                                     configuration.observationParallelism())
+                             : FermiNetStructuredSrObservationFile.buildParallel(
+                                     state,
+                                     samples,
+                                     knownLocalEnergies,
+                                     configuration.observationParallelism())) {
 
             long observationConstructionNanos =
                     System.nanoTime() - observationStarted;

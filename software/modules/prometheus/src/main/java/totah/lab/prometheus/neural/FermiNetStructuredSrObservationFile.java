@@ -33,6 +33,7 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
     private final double[] energies;
     private final long generationNanos;
     private final long writeNanos;
+    private final int reusedLocalEnergyCount;
     private final ThreadLocal<ByteBuffer> readBuffers =
             ThreadLocal.withInitial(() ->
                     ByteBuffer.allocateDirect(Double.BYTES)
@@ -46,7 +47,8 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
             double[] weights,
             double[] energies,
             long generationNanos,
-            long writeNanos) {
+            long writeNanos,
+            int reusedLocalEnergyCount) {
         this.path = path;
         this.channel = channel;
         this.schema = schema;
@@ -54,6 +56,7 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
         this.energies = energies;
         this.generationNanos = generationNanos;
         this.writeNanos = writeNanos;
+        this.reusedLocalEnergyCount = reusedLocalEnergyCount;
     }
 
     static FermiNetStructuredSrObservationFile buildParallel(
@@ -66,7 +69,23 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                 state,
                 samples,
                 parallelism,
-                BuildHook.NONE);
+                BuildHook.NONE,
+                null);
+    }
+
+    static FermiNetStructuredSrObservationFile buildParallel(
+            FermiNetV1State state,
+            List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples,
+            FermiNetKnownLocalEnergies knownLocalEnergies,
+            int parallelism)
+            throws IOException {
+        Objects.requireNonNull(knownLocalEnergies, "knownLocalEnergies");
+        return buildParallel(
+                state,
+                samples,
+                parallelism,
+                BuildHook.NONE,
+                knownLocalEnergies);
     }
 
     static FermiNetStructuredSrObservationFile buildParallel(
@@ -76,6 +95,17 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
             BuildHook hook)
             throws IOException {
 
+        return buildParallel(state, samples, parallelism, hook, null);
+    }
+
+    private static FermiNetStructuredSrObservationFile buildParallel(
+            FermiNetV1State state,
+            List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples,
+            int parallelism,
+            BuildHook hook,
+            FermiNetKnownLocalEnergies knownLocalEnergies)
+            throws IOException {
+
         Objects.requireNonNull(state, "state");
         Objects.requireNonNull(samples, "samples");
         Objects.requireNonNull(hook, "hook");
@@ -83,10 +113,18 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
             throw new IllegalArgumentException("parallelism must be >= 1");
         }
 
-        List<FermiNetMatrixFreeSrOptimizer.WeightedSample> retained =
-                samples.stream()
-                        .filter(sample -> sample.weight() != 0.0)
-                        .toList();
+        if (knownLocalEnergies != null) {
+            knownLocalEnergies.validate(state, samples);
+        }
+
+        List<FermiNetMatrixFreeSrOptimizer.WeightedSample> retained = new ArrayList<>();
+        List<Integer> retainedSourceIndices = new ArrayList<>();
+        for (int i = 0; i < samples.size(); i++) {
+            if (samples.get(i).weight() != 0.0) {
+                retained.add(samples.get(i));
+                retainedSourceIndices.add(i);
+            }
+        }
         if (retained.isEmpty()) {
             throw new IllegalArgumentException("no non-zero SR samples");
         }
@@ -131,6 +169,7 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
 
             for (int row = 0; row < retained.size(); row++) {
                 int physicalRow = row;
+                int sourceIndex = retainedSourceIndices.get(row);
                 var sample = retained.get(row);
                 futures.add(executor.submit(() -> {
                     hook.beforeEvaluation(physicalRow);
@@ -139,18 +178,23 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                             state.structuredSrEvaluation(sample.coordinates());
                     generation.add(System.nanoTime() - started);
 
-                    FermiNetV1State.Evaluation spatial =
-                            new FermiNetV1State.Evaluation(
-                                    evaluation.sign(),
-                                    evaluation.logAbsoluteWavefunction(),
-                                    evaluation.logCoordinateGradient(),
-                                    evaluation.laplacianOverWavefunction(),
-                                    new double[0]);
-                    double energy = FermiNetVmc.localEnergy(
-                                    state,
-                                    sample.coordinates(),
-                                    spatial)
-                            .totalHartree();
+                    double energy;
+                    if (knownLocalEnergies == null) {
+                        FermiNetV1State.Evaluation spatial =
+                                new FermiNetV1State.Evaluation(
+                                        evaluation.sign(),
+                                        evaluation.logAbsoluteWavefunction(),
+                                        evaluation.logCoordinateGradient(),
+                                        evaluation.laplacianOverWavefunction(),
+                                        new double[0]);
+                        energy = FermiNetVmc.localEnergy(
+                                        state,
+                                        sample.coordinates(),
+                                        spatial)
+                                .totalHartree();
+                    } else {
+                        energy = knownLocalEnergies.energy(sourceIndex).totalHartree();
+                    }
                     if (!Double.isFinite(energy)) {
                         throw new IllegalArgumentException(
                                 "non-finite structured SR local energy");
@@ -201,7 +245,8 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                     weights,
                     energies,
                     generation.sum(),
-                    writes.sum());
+                    writes.sum(),
+                    knownLocalEnergies == null ? 0 : retained.size());
         } catch (Throwable failure) {
             if (executor != null) {
                 executor.shutdownNow();
@@ -321,6 +366,10 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
         return sampleCount();
     }
 
+    int reusedLocalEnergyCount() {
+        return reusedLocalEnergyCount;
+    }
+
     void printTiming(
             long constructionNanos,
             int parallelism)
@@ -334,6 +383,7 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                   statistics_construction_wall_ms=%.3f
                   statistics_generation_sum_ms=%.3f
                   statistics_spool_write_sum_ms=%.3f
+                  reused_local_energy_count=%d
                   full_n_by_p_jacobian=false
                   derivative_file=false
 
@@ -343,7 +393,8 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                 spoolBytes(),
                 constructionNanos / 1.0e6,
                 generationNanos / 1.0e6,
-                writeNanos / 1.0e6);
+                writeNanos / 1.0e6,
+                reusedLocalEnergyCount);
     }
 
     Path path() {
