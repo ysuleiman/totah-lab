@@ -15,26 +15,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Temporary off-heap/on-disk store for one SR iteration's derivative-complete
  * FermiNet observations.
  *
- * <p>Rows are written sample-major because {@link FermiNetV1State#evaluate}
- * naturally produces one complete parameter-derivative vector per sample.
- * This makes construction sequential instead of scattering every sample across
- * the entire file.
- *
- * <p>The sample-space solver later reads rectangular parameter blocks across
- * all samples. That preserves O(N*P) derivative I/O per sweep without keeping
- * the N*P derivative matrix on the Java heap.
+ * <p>Rows are sample-major. Parallel construction assigns every non-zero-weight
+ * sample its final compacted physical row before work begins. Workers may
+ * therefore finish in arbitrary order while preserving deterministic file
+ * contents.
  */
 public final class FermiNetSrObservationFile implements AutoCloseable {
 
     private static final int WRITE_BUFFER_BYTES = 1 << 20;
-    private static final ParallelBuildHook NO_PARALLEL_BUILD_HOOK =
-            new ParallelBuildHook() {};
 
     private final Path path;
     private final FileChannel channel;
@@ -44,6 +39,7 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
     private final double[] localEnergiesHartree;
     private final long derivativeBytes;
     private final long neuralEvaluations;
+    private final Timing timing;
 
     private boolean closed;
 
@@ -55,7 +51,8 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
             double[] weights,
             double[] localEnergiesHartree,
             long derivativeBytes,
-            long neuralEvaluations) {
+            long neuralEvaluations,
+            Timing timing) {
 
         this.path = path;
         this.channel = channel;
@@ -65,11 +62,26 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         this.localEnergiesHartree = localEnergiesHartree;
         this.derivativeBytes = derivativeBytes;
         this.neuralEvaluations = neuralEvaluations;
+        this.timing = timing;
     }
 
     /**
-     * Evaluates each non-zero-weight sample exactly once and writes its complete
-     * parameter log-derivative row sequentially to a temporary file.
+     * Test/diagnostic hook used by the existing parallel-observation tests.
+     */
+    public interface ParallelBuildHook {
+
+        ParallelBuildHook NONE = new ParallelBuildHook() {
+        };
+
+        default void beforeEvaluation(int row) {
+        }
+
+        default void afterWrite(int row) {
+        }
+    }
+
+    /**
+     * Serial observation construction.
      */
     public static FermiNetSrObservationFile build(
             FermiNetV1State state,
@@ -79,39 +91,12 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         Objects.requireNonNull(state, "state");
         Objects.requireNonNull(samples, "samples");
 
-        if (samples.isEmpty()) {
-            throw new IllegalArgumentException("empty FermiNet SR sample set");
-        }
+        long totalStarted = System.nanoTime();
 
-        int nonZero = 0;
+        ValidatedInput input =
+                validateInput(state, samples);
 
-        for (var sample : samples) {
-            Objects.requireNonNull(sample, "sample");
-
-            if (!Double.isFinite(sample.weight()) || sample.weight() < 0.0) {
-                throw new IllegalArgumentException("invalid FermiNet SR sample weight");
-            }
-
-            if (sample.weight() > 0.0) {
-                nonZero++;
-            }
-        }
-
-        if (nonZero == 0) {
-            throw new IllegalArgumentException("zero total FermiNet SR sample weight");
-        }
-
-        int parameters = state.parameterCount();
-
-        long elements =
-                Math.multiplyExact(
-                        (long) nonZero,
-                        parameters);
-
-        long bytes =
-                Math.multiplyExact(
-                        elements,
-                        Double.BYTES);
+        long setupStarted = System.nanoTime();
 
         Path path =
                 Files.createTempFile(
@@ -128,12 +113,25 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                             StandardOpenOption.WRITE,
                             StandardOpenOption.TRUNCATE_EXISTING);
 
-            double[] weights = new double[nonZero];
-            double[] energies = new double[nonZero];
+            double[] weights =
+                    new double[input.nonZeroSamples()];
 
-            ByteBuffer writeBytes =
+            double[] energies =
+                    new double[input.nonZeroSamples()];
+
+            ByteBuffer writeBuffer =
                     ByteBuffer.allocateDirect(WRITE_BUFFER_BYTES)
                             .order(ByteOrder.nativeOrder());
+
+            long setupNanos =
+                    System.nanoTime() - setupStarted;
+
+            long evaluationNanos = 0L;
+            long derivativeExtractionNanos = 0L;
+            long localEnergyNanos = 0L;
+            long validationNanos = 0L;
+            long writeNanos = 0L;
+            long maxEvaluationNanos = 0L;
 
             int stored = 0;
 
@@ -142,13 +140,35 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                     continue;
                 }
 
+                long started =
+                        System.nanoTime();
+
                 FermiNetV1State.Evaluation evaluation =
                         state.evaluate(sample.coordinates());
+
+                long elapsed =
+                        System.nanoTime() - started;
+
+                evaluationNanos += elapsed;
+
+                maxEvaluationNanos =
+                        Math.max(
+                                maxEvaluationNanos,
+                                elapsed);
+
+                started =
+                        System.nanoTime();
 
                 double[] derivatives =
                         evaluation.parameterLogDerivatives();
 
-                if (derivatives.length != parameters) {
+                derivativeExtractionNanos +=
+                        System.nanoTime() - started;
+
+                started =
+                        System.nanoTime();
+
+                if (derivatives.length != input.parameterCount()) {
                     throw new IllegalArgumentException(
                             "parameter derivative dimension mismatch");
                 }
@@ -157,6 +177,12 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                         derivatives,
                         "parameter log derivative");
 
+                validationNanos +=
+                        System.nanoTime() - started;
+
+                started =
+                        System.nanoTime();
+
                 double energy =
                         FermiNetVmc.localEnergy(
                                         state,
@@ -164,89 +190,90 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                                         evaluation)
                                 .totalHartree();
 
+                localEnergyNanos +=
+                        System.nanoTime() - started;
+
+                started =
+                        System.nanoTime();
+
                 if (!Double.isFinite(energy)) {
                     throw new IllegalArgumentException(
                             "non-finite local energy");
                 }
 
-                weights[stored] = sample.weight();
-                energies[stored] = energy;
+                validationNanos +=
+                        System.nanoTime() - started;
+
+                weights[stored] =
+                        sample.weight();
+
+                energies[stored] =
+                        energy;
+
+                started =
+                        System.nanoTime();
 
                 writeRowSequentially(
                         channel,
-                        writeBytes,
+                        writeBuffer,
                         derivatives);
+
+                writeNanos +=
+                        System.nanoTime() - started;
 
                 stored++;
             }
 
-            if (stored != nonZero) {
-                throw new IllegalStateException(
-                        "stored sample count mismatch");
-            }
+            long verificationStarted =
+                    System.nanoTime();
 
-            if (channel.size() != bytes) {
-                throw new IllegalStateException(
-                        "observation file size mismatch: "
-                                + channel.size()
-                                + " expected="
-                                + bytes);
-            }
+            verifyStoredFile(
+                    channel,
+                    stored,
+                    input.nonZeroSamples(),
+                    input.derivativeBytes());
+
+            long verificationNanos =
+                    System.nanoTime() - verificationStarted;
+
+            long totalNanos =
+                    System.nanoTime() - totalStarted;
+
+            Timing timing =
+                    new Timing(
+                            1,
+                            input.nonZeroSamples(),
+                            totalNanos,
+                            setupNanos,
+                            evaluationNanos,
+                            derivativeExtractionNanos,
+                            localEnergyNanos,
+                            validationNanos,
+                            writeNanos,
+                            0L,
+                            verificationNanos,
+                            maxEvaluationNanos);
 
             return new FermiNetSrObservationFile(
                     path,
                     channel,
-                    nonZero,
-                    parameters,
+                    input.nonZeroSamples(),
+                    input.parameterCount(),
                     weights,
                     energies,
-                    bytes,
-                    stored);
+                    input.derivativeBytes(),
+                    stored,
+                    timing);
 
         } catch (Throwable failure) {
-            if (channel != null) {
-                try {
-                    channel.close();
-                } catch (IOException ignored) {
-                }
-            }
-
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException ignored) {
-            }
+            cleanupFailure(
+                    channel,
+                    path);
 
             throw failure;
         }
     }
 
-    /**
-     * Experimental parallel construction of derivative-complete SR observations.
-     *
-     * <p>This does not replace {@link #build}. Samples are still compacted in the
-     * exact same non-zero-weight order as the serial implementation. Each worker
-     * evaluates one stored sample independently and writes its derivative row to
-     * that sample's predetermined byte range using positional FileChannel writes.
-     */
-    public static FermiNetSrObservationFile buildParallel(
-            FermiNetV1State state,
-            List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples)
-            throws IOException {
-
-        return buildParallel(
-                state,
-                samples,
-                Runtime.getRuntime().availableProcessors());
-    }
-
-    /**
-     * Experimental parallel construction with explicit worker count.
-     *
-     * <p>The FermiNet state is shared because evaluation scratch state is local to
-     * each call. No N x P derivative matrix is retained in heap. Each active task
-     * owns only its evaluation result/derivative vector and each executor thread
-     * reuses one direct row-write buffer.
-     */
     public static FermiNetSrObservationFile buildParallel(
             FermiNetV1State state,
             List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples,
@@ -257,10 +284,13 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                 state,
                 samples,
                 parallelism,
-                NO_PARALLEL_BUILD_HOOK);
+                ParallelBuildHook.NONE);
     }
 
-    static FermiNetSrObservationFile buildParallel(
+    /**
+     * Parallel construction preserving deterministic physical rows.
+     */
+    public static FermiNetSrObservationFile buildParallel(
             FermiNetV1State state,
             List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples,
             int parallelism,
@@ -272,34 +302,343 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         Objects.requireNonNull(hook, "hook");
 
         if (parallelism < 1) {
-            throw new IllegalArgumentException("parallelism must be positive");
+            throw new IllegalArgumentException(
+                    "parallelism must be >= 1");
         }
+
+        long totalStarted =
+                System.nanoTime();
+
+        ValidatedInput input =
+                validateInput(
+                        state,
+                        samples);
+
+        long setupStarted =
+                System.nanoTime();
+
+        Path path =
+                Files.createTempFile(
+                        "prometheus-ferminet-sr-observations-parallel-",
+                        ".bin");
+
+        FileChannel channel = null;
+        ExecutorService executor = null;
+
+        try {
+            channel =
+                    FileChannel.open(
+                            path,
+                            StandardOpenOption.READ,
+                            StandardOpenOption.WRITE,
+                            StandardOpenOption.TRUNCATE_EXISTING);
+
+            /*
+             * Establish final file size before concurrent positional writes.
+             */
+            if (input.derivativeBytes() > 0L) {
+                channel.position(
+                        input.derivativeBytes() - 1L);
+
+                channel.write(
+                        ByteBuffer.wrap(
+                                new byte[]{0}));
+            }
+
+            double[] weights =
+                    new double[input.nonZeroSamples()];
+
+            double[] energies =
+                    new double[input.nonZeroSamples()];
+
+            LongAdder evaluationNanos =
+                    new LongAdder();
+
+            LongAdder derivativeExtractionNanos =
+                    new LongAdder();
+
+            LongAdder localEnergyNanos =
+                    new LongAdder();
+
+            LongAdder validationNanos =
+                    new LongAdder();
+
+            LongAdder writeNanos =
+                    new LongAdder();
+
+            LongAccumulator maxEvaluationNanos =
+                    new LongAccumulator(
+                            Long::max,
+                            0L);
+
+            executor =
+                    Executors.newFixedThreadPool(
+                            parallelism);
+
+            List<Future<Void>> futures =
+                    new ArrayList<>(
+                            input.nonZeroSamples());
+
+            int compactedRow = 0;
+
+            for (var sample : samples) {
+                if (sample.weight() == 0.0) {
+                    continue;
+                }
+
+                final int physicalRow =
+                        compactedRow++;
+
+                final FileChannel workerChannel =
+                        channel;
+
+                futures.add(
+                        executor.submit(() -> {
+                            try {
+                                hook.beforeEvaluation(
+                                        physicalRow);
+
+                                long started =
+                                        System.nanoTime();
+
+                                FermiNetV1State.Evaluation evaluation =
+                                        state.evaluate(
+                                                sample.coordinates());
+
+                                long elapsed =
+                                        System.nanoTime() - started;
+
+                                evaluationNanos.add(
+                                        elapsed);
+
+                                maxEvaluationNanos.accumulate(
+                                        elapsed);
+
+                                started =
+                                        System.nanoTime();
+
+                                double[] derivatives =
+                                        evaluation.parameterLogDerivatives();
+
+                                derivativeExtractionNanos.add(
+                                        System.nanoTime() - started);
+
+                                started =
+                                        System.nanoTime();
+
+                                if (derivatives.length
+                                        != input.parameterCount()) {
+
+                                    throw new IllegalArgumentException(
+                                            "parameter derivative dimension mismatch");
+                                }
+
+                                requireFinite(
+                                        derivatives,
+                                        "parameter log derivative");
+
+                                validationNanos.add(
+                                        System.nanoTime() - started);
+
+                                started =
+                                        System.nanoTime();
+
+                                double energy =
+                                        FermiNetVmc.localEnergy(
+                                                        state,
+                                                        sample.coordinates(),
+                                                        evaluation)
+                                                .totalHartree();
+
+                                localEnergyNanos.add(
+                                        System.nanoTime() - started);
+
+                                started =
+                                        System.nanoTime();
+
+                                if (!Double.isFinite(energy)) {
+                                    throw new IllegalArgumentException(
+                                            "non-finite local energy");
+                                }
+
+                                validationNanos.add(
+                                        System.nanoTime() - started);
+
+                                weights[physicalRow] =
+                                        sample.weight();
+
+                                energies[physicalRow] =
+                                        energy;
+
+                                started =
+                                        System.nanoTime();
+
+                                writeRowAt(
+                                        workerChannel,
+                                        physicalRow,
+                                        input.parameterCount(),
+                                        derivatives);
+
+                                writeNanos.add(
+                                        System.nanoTime() - started);
+
+                                hook.afterWrite(
+                                        physicalRow);
+
+                                return null;
+
+                            } catch (Throwable failure) {
+                                throw new IOException(
+                                        "failed to build stored sample "
+                                                + physicalRow,
+                                        failure);
+                            }
+                        }));
+            }
+
+            long setupNanos =
+                    System.nanoTime() - setupStarted;
+
+            long waitStarted =
+                    System.nanoTime();
+
+            IOException workerFailure = null;
+
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+
+                    workerFailure =
+                            new IOException(
+                                    "interrupted while waiting for SR observation workers",
+                                    exception);
+
+                    break;
+
+                } catch (ExecutionException exception) {
+                    Throwable cause =
+                            exception.getCause();
+
+                    if (cause instanceof IOException ioException) {
+                        workerFailure =
+                                ioException;
+                    } else {
+                        workerFailure =
+                                new IOException(
+                                        "parallel SR observation worker failed",
+                                        cause);
+                    }
+
+                    break;
+                }
+            }
+
+            long waitNanos =
+                    System.nanoTime() - waitStarted;
+
+            if (workerFailure != null) {
+                for (Future<Void> future : futures) {
+                    future.cancel(true);
+                }
+
+                throw workerFailure;
+            }
+
+            executor.shutdown();
+            executor = null;
+
+            long verificationStarted =
+                    System.nanoTime();
+
+            verifyStoredFile(
+                    channel,
+                    input.nonZeroSamples(),
+                    input.nonZeroSamples(),
+                    input.derivativeBytes());
+
+            long verificationNanos =
+                    System.nanoTime() - verificationStarted;
+
+            long totalNanos =
+                    System.nanoTime() - totalStarted;
+
+            Timing timing =
+                    new Timing(
+                            parallelism,
+                            input.nonZeroSamples(),
+                            totalNanos,
+                            setupNanos,
+                            evaluationNanos.sum(),
+                            derivativeExtractionNanos.sum(),
+                            localEnergyNanos.sum(),
+                            validationNanos.sum(),
+                            writeNanos.sum(),
+                            waitNanos,
+                            verificationNanos,
+                            maxEvaluationNanos.get());
+
+            return new FermiNetSrObservationFile(
+                    path,
+                    channel,
+                    input.nonZeroSamples(),
+                    input.parameterCount(),
+                    weights,
+                    energies,
+                    input.derivativeBytes(),
+                    input.nonZeroSamples(),
+                    timing);
+
+        } catch (Throwable failure) {
+            if (executor != null) {
+                executor.shutdownNow();
+            }
+
+            cleanupFailure(
+                    channel,
+                    path);
+
+            throw failure;
+        }
+    }
+
+    private static ValidatedInput validateInput(
+            FermiNetV1State state,
+            List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples) {
 
         if (samples.isEmpty()) {
-            throw new IllegalArgumentException("empty FermiNet SR sample set");
+            throw new IllegalArgumentException(
+                    "empty FermiNet SR sample set");
         }
 
-        List<FermiNetMatrixFreeSrOptimizer.WeightedSample> storedSamples =
-                new ArrayList<>();
+        int nonZero = 0;
 
         for (var sample : samples) {
-            Objects.requireNonNull(sample, "sample");
+            Objects.requireNonNull(
+                    sample,
+                    "sample");
 
-            if (!Double.isFinite(sample.weight()) || sample.weight() < 0.0) {
-                throw new IllegalArgumentException("invalid FermiNet SR sample weight");
+            if (!Double.isFinite(sample.weight())
+                    || sample.weight() < 0.0) {
+
+                throw new IllegalArgumentException(
+                        "invalid FermiNet SR sample weight");
             }
 
             if (sample.weight() > 0.0) {
-                storedSamples.add(sample);
+                nonZero++;
             }
         }
 
-        if (storedSamples.isEmpty()) {
-            throw new IllegalArgumentException("zero total FermiNet SR sample weight");
+        if (nonZero == 0) {
+            throw new IllegalArgumentException(
+                    "zero total FermiNet SR sample weight");
         }
 
-        int nonZero = storedSamples.size();
-        int parameters = state.parameterCount();
+        int parameters =
+                state.parameterCount();
 
         long elements =
                 Math.multiplyExact(
@@ -311,207 +650,36 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                         elements,
                         Double.BYTES);
 
-        Path path =
-                Files.createTempFile(
-                        "prometheus-ferminet-sr-observations-parallel-",
-                        ".bin");
+        return new ValidatedInput(
+                nonZero,
+                parameters,
+                bytes);
+    }
 
-        FileChannel channel = null;
-        ExecutorService executor = null;
-        List<Future<?>> futures = null;
+    private static void verifyStoredFile(
+            FileChannel channel,
+            int stored,
+            int expectedSamples,
+            long expectedBytes)
+            throws IOException {
 
-        try {
-            channel =
-                    FileChannel.open(
-                            path,
-                            StandardOpenOption.READ,
-                            StandardOpenOption.WRITE,
-                            StandardOpenOption.TRUNCATE_EXISTING);
+        if (stored != expectedSamples) {
+            throw new IllegalStateException(
+                    "stored sample count mismatch: "
+                            + stored
+                            + " expected="
+                            + expectedSamples);
+        }
 
-            // Establish the complete file extent before concurrent positional writes.
-            preallocate(channel, bytes);
+        long actualBytes =
+                channel.size();
 
-            double[] weights = new double[nonZero];
-            double[] energies = new double[nonZero];
-
-            int workers =
-                    Math.min(
-                            parallelism,
-                            nonZero);
-
-            executor =
-                    Executors.newFixedThreadPool(workers);
-
-            FileChannel target = channel;
-
-            ThreadLocal<ByteBuffer> writeBuffers =
-                    ThreadLocal.withInitial(
-                            () -> ByteBuffer
-                                    .allocateDirect(WRITE_BUFFER_BYTES)
-                                    .order(ByteOrder.nativeOrder()));
-
-            futures =
-                    new ArrayList<>(nonZero);
-
-            for (int storedIndex = 0;
-                 storedIndex < nonZero;
-                 storedIndex++) {
-
-                final int row = storedIndex;
-                final var sample = storedSamples.get(storedIndex);
-
-                futures.add(
-                        executor.submit(
-                                () -> {
-                                    hook.beforeEvaluation(row);
-
-                                    FermiNetV1State.Evaluation evaluation =
-                                            state.evaluate(sample.coordinates());
-
-                                    double[] derivatives =
-                                            evaluation.parameterLogDerivatives();
-
-                                    if (derivatives.length != parameters) {
-                                        throw new IllegalArgumentException(
-                                                "parameter derivative dimension mismatch");
-                                    }
-
-                                    requireFinite(
-                                            derivatives,
-                                            "parameter log derivative");
-
-                                    double energy =
-                                            FermiNetVmc.localEnergy(
-                                                            state,
-                                                            sample.coordinates(),
-                                                            evaluation)
-                                                    .totalHartree();
-
-                                    if (!Double.isFinite(energy)) {
-                                        throw new IllegalArgumentException(
-                                                "non-finite local energy");
-                                    }
-
-                                    weights[row] = sample.weight();
-                                    energies[row] = energy;
-
-                                    long rowOffsetBytes =
-                                            Math.multiplyExact(
-                                                    Math.multiplyExact(
-                                                            (long) row,
-                                                            parameters),
-                                                    Double.BYTES);
-
-                                    writeRowAt(
-                                            target,
-                                            writeBuffers.get(),
-                                            derivatives,
-                                            rowOffsetBytes);
-
-                                    hook.afterWrite(row);
-
-                                    return null;
-                                }));
-            }
-
-            Throwable firstFailure = null;
-            int firstFailureRow = -1;
-
-            for (int row = 0; row < futures.size(); row++) {
-                try {
-                    futures.get(row).get();
-                } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
-
-                    if (firstFailure == null) {
-                        firstFailure = exception;
-                        firstFailureRow = row;
-                    }
-
-                    break;
-                } catch (ExecutionException exception) {
-                    if (firstFailure == null) {
-                        firstFailure = exception.getCause();
-                        firstFailureRow = row;
-                    }
-
-                    break;
-                }
-            }
-
-            if (firstFailure != null) {
-                throw workerFailure(
-                        firstFailureRow,
-                        firstFailure);
-            }
-
-            executor.shutdown();
-            executor = null;
-
-            if (channel.size() != bytes) {
-                throw new IllegalStateException(
-                        "observation file size mismatch: "
-                                + channel.size()
-                                + " expected="
-                                + bytes);
-            }
-
-            return new FermiNetSrObservationFile(
-                    path,
-                    channel,
-                    nonZero,
-                    parameters,
-                    weights,
-                    energies,
-                    bytes,
-                    nonZero);
-
-        } catch (Throwable failure) {
-            if (futures != null) {
-                for (Future<?> future : futures) {
-                    future.cancel(true);
-                }
-            }
-
-            if (executor != null) {
-                executor.shutdownNow();
-                try {
-                    executor.awaitTermination(30, TimeUnit.SECONDS);
-                } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
-                    failure.addSuppressed(exception);
-                }
-            }
-
-            if (channel != null) {
-                try {
-                    channel.close();
-                } catch (IOException exception) {
-                    failure.addSuppressed(exception);
-                }
-            }
-
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException exception) {
-                failure.addSuppressed(exception);
-            }
-
-            if (failure instanceof IOException io) {
-                throw io;
-            }
-
-            if (failure instanceof RuntimeException runtime) {
-                throw runtime;
-            }
-
-            if (failure instanceof Error error) {
-                throw error;
-            }
-
-            throw new IOException(
-                    "parallel FermiNet SR observation construction failed",
-                    failure);
+        if (actualBytes != expectedBytes) {
+            throw new IllegalStateException(
+                    "observation file size mismatch: "
+                            + actualBytes
+                            + " expected="
+                            + expectedBytes);
         }
     }
 
@@ -545,18 +713,62 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         return path;
     }
 
+    public Timing timing() {
+        return timing;
+    }
+
     /**
-     * Reads {@code length} consecutive parameters beginning at
-     * {@code parameterStart} for every stored sample.
+     * Prints aggregate timing for this build.
      *
-     * <p>The destination layout is sample-major within the requested block:
-     *
-     * <pre>
-     * destination[sample * length + localParameter]
-     * </pre>
-     *
-     * The destination must have at least {@code sampleCount * length} entries.
+     * <p>Worker timings are SUMMED across workers. They are therefore not wall
+     * times when parallelism is greater than one.
      */
+    public void printTiming() {
+
+        System.out.printf("""
+                SR_OBSERVATION_TIMING
+                  parallelism=%d
+                  samples=%d
+                  derivative_bytes=%d
+                  total_wall_ms=%.3f
+                  setup_wall_ms=%.3f
+                  worker_evaluation_sum_ms=%.3f
+                  derivative_extraction_sum_ms=%.3f
+                  local_energy_sum_ms=%.3f
+                  validation_sum_ms=%.3f
+                  file_write_sum_ms=%.3f
+                  completion_wait_wall_ms=%.3f
+                  verification_wall_ms=%.3f
+                  mean_evaluation_ms=%.3f
+                  max_evaluation_ms=%.3f
+                  worker_compute_sum_ms=%.3f
+                  worker_compute_to_wall_ratio=%.3f
+
+                """,
+                timing.parallelism(),
+                timing.samples(),
+                derivativeBytes,
+                millis(timing.totalNanos()),
+                millis(timing.setupNanos()),
+                millis(timing.evaluationNanos()),
+                millis(timing.derivativeExtractionNanos()),
+                millis(timing.localEnergyNanos()),
+                millis(timing.validationNanos()),
+                millis(timing.writeNanos()),
+                millis(timing.waitNanos()),
+                millis(timing.verificationNanos()),
+                timing.samples() == 0
+                        ? 0.0
+                        : millis(timing.evaluationNanos())
+                        / timing.samples(),
+                millis(timing.maxEvaluationNanos()),
+                millis(timing.workerComputeNanos()),
+                timing.totalNanos() == 0L
+                        ? 0.0
+                        : (double) timing.workerComputeNanos()
+                        / timing.totalNanos());
+    }
+
     public void readParameterBlock(
             int parameterStart,
             int length,
@@ -568,6 +780,7 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         if (parameterStart < 0
                 || length < 1
                 || parameterStart + length > parameterCount) {
+
             throw new IllegalArgumentException(
                     "invalid parameter block");
         }
@@ -591,7 +804,10 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                 ByteBuffer.allocateDirect(blockBytes)
                         .order(ByteOrder.nativeOrder());
 
-        for (int sample = 0; sample < sampleCount; sample++) {
+        for (int sample = 0;
+             sample < sampleCount;
+             sample++) {
+
             bytes.clear();
 
             long elementOffset =
@@ -620,95 +836,6 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                     destination,
                     sample * length,
                     length);
-        }
-    }
-
-    private static void preallocate(
-            FileChannel channel,
-            long bytes)
-            throws IOException {
-
-        if (bytes < 1L) {
-            return;
-        }
-
-        ByteBuffer oneByte = ByteBuffer.allocate(1);
-        oneByte.put((byte) 0);
-        oneByte.flip();
-
-        while (oneByte.hasRemaining()) {
-            channel.write(oneByte, bytes - 1L);
-        }
-    }
-
-    private static void writeRowAt(
-            FileChannel channel,
-            ByteBuffer bytes,
-            double[] row,
-            long rowOffsetBytes)
-            throws IOException {
-
-        int at = 0;
-        long position = rowOffsetBytes;
-
-        while (at < row.length) {
-            bytes.clear();
-
-            DoubleBuffer doubles =
-                    bytes.asDoubleBuffer();
-
-            int count =
-                    Math.min(
-                            doubles.capacity(),
-                            row.length - at);
-
-            doubles.put(
-                    row,
-                    at,
-                    count);
-
-            bytes.limit(count * Double.BYTES);
-            bytes.position(0);
-
-            while (bytes.hasRemaining()) {
-                int written =
-                        channel.write(
-                                bytes,
-                                position);
-
-                if (written < 0) {
-                    throw new IOException(
-                            "unexpected EOF writing SR observation file");
-                }
-
-                if (written == 0) {
-                    Thread.onSpinWait();
-                    continue;
-                }
-
-                position += written;
-            }
-
-            at += count;
-        }
-    }
-
-    private static IOException workerFailure(
-            int storedSampleIndex,
-            Throwable cause) {
-
-        return new IOException(
-                "parallel FermiNet SR observation worker failed at stored sample "
-                        + storedSampleIndex,
-                cause);
-    }
-
-    interface ParallelBuildHook {
-
-        default void beforeEvaluation(int storedSampleIndex) {
-        }
-
-        default void afterWrite(int storedSampleIndex) {
         }
     }
 
@@ -749,6 +876,77 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
         }
     }
 
+    /**
+     * Positional row write used by parallel workers.
+     */
+    private static void writeRowAt(
+            FileChannel channel,
+            int rowIndex,
+            int parameterCount,
+            double[] row)
+            throws IOException {
+
+        ByteBuffer bytes =
+                ByteBuffer.allocateDirect(WRITE_BUFFER_BYTES)
+                        .order(ByteOrder.nativeOrder());
+
+        long rowElementOffset =
+                Math.multiplyExact(
+                        (long) rowIndex,
+                        parameterCount);
+
+        long position =
+                Math.multiplyExact(
+                        rowElementOffset,
+                        Double.BYTES);
+
+        int at = 0;
+
+        while (at < row.length) {
+            bytes.clear();
+
+            DoubleBuffer doubles =
+                    bytes.asDoubleBuffer();
+
+            int count =
+                    Math.min(
+                            doubles.capacity(),
+                            row.length - at);
+
+            doubles.put(
+                    row,
+                    at,
+                    count);
+
+            bytes.limit(
+                    count * Double.BYTES);
+
+            bytes.position(0);
+
+            while (bytes.hasRemaining()) {
+                int written =
+                        channel.write(
+                                bytes,
+                                position);
+
+                if (written < 0) {
+                    throw new IOException(
+                            "failed positional write for SR observation row "
+                                    + rowIndex);
+                }
+
+                if (written == 0) {
+                    Thread.onSpinWait();
+                    continue;
+                }
+
+                position += written;
+            }
+
+            at += count;
+        }
+    }
+
     private static void readFully(
             FileChannel channel,
             ByteBuffer buffer,
@@ -773,7 +971,9 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
     }
 
     private void checkSample(int sampleIndex) {
-        if (sampleIndex < 0 || sampleIndex >= sampleCount) {
+        if (sampleIndex < 0
+                || sampleIndex >= sampleCount) {
+
             throw new IndexOutOfBoundsException(
                     "sample index: "
                             + sampleIndex);
@@ -798,6 +998,27 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                                 + label);
             }
         }
+    }
+
+    private static void cleanupFailure(
+            FileChannel channel,
+            Path path) {
+
+        if (channel != null) {
+            try {
+                channel.close();
+            } catch (IOException ignored) {
+            }
+        }
+
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+        }
+    }
+
+    private static double millis(long nanos) {
+        return nanos / 1.0e6;
     }
 
     @Override
@@ -830,6 +1051,34 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
 
         if (failure != null) {
             throw failure;
+        }
+    }
+
+    private record ValidatedInput(
+            int nonZeroSamples,
+            int parameterCount,
+            long derivativeBytes) {
+    }
+
+    public record Timing(
+            int parallelism,
+            int samples,
+            long totalNanos,
+            long setupNanos,
+            long evaluationNanos,
+            long derivativeExtractionNanos,
+            long localEnergyNanos,
+            long validationNanos,
+            long writeNanos,
+            long waitNanos,
+            long verificationNanos,
+            long maxEvaluationNanos) {
+
+        public long workerComputeNanos() {
+            return evaluationNanos
+                    + derivativeExtractionNanos
+                    + localEnergyNanos
+                    + validationNanos;
         }
     }
 }
