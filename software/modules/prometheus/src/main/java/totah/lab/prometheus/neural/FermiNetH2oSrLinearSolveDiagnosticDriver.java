@@ -116,6 +116,7 @@ public final class FermiNetH2oSrLinearSolveDiagnosticDriver {
                         SR_LEARNING_RATE,
                         SR_DAMPING,
                         SR_MAX_UPDATE_NORM,
+                        12,
                         SR_BLOCK_SIZE,
                         SR_MAX_SOLVER_ITERATIONS,
                         SR_RELATIVE_TOLERANCE,

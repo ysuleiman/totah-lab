@@ -39,10 +39,25 @@ public final class FermiNetMatrixFreeSrOptimizer {
             throw new IllegalArgumentException("empty FermiNet SR sample set");
         }
 
+        long totalIterationStarted =
+                System.nanoTime();
+
+        long observationStarted =
+                System.nanoTime();
+
         try (FermiNetSrObservationFile observations =
-                     FermiNetSrObservationFile.build(
+                     FermiNetSrObservationFile.buildParallel(
                              state,
-                             samples)) {
+                             samples,
+                             configuration.observationParallelism())) {
+
+            long observationConstructionNanos =
+                    System.nanoTime() - observationStarted;
+
+            observations.printTiming();
+
+            long sampleSpaceSolveStarted =
+                    System.nanoTime();
 
             FermiNetSampleSpaceSrSolver.Result solve =
                     new FermiNetSampleSpaceSrSolver()
@@ -51,12 +66,11 @@ public final class FermiNetMatrixFreeSrOptimizer {
                                     configuration.damping(),
                                     configuration.blockSize());
 
-            double[] delta =
-                    solve.delta();
+            long sampleSpaceSolveNanos =
+                    System.nanoTime() - sampleSpaceSolveStarted;
 
-            requireFinite(
-                    delta,
-                    "SR solution");
+            long energyGradientStarted =
+                    System.nanoTime();
 
             double[] energyGradient =
                     gradientFromObservations(
@@ -69,6 +83,19 @@ public final class FermiNetMatrixFreeSrOptimizer {
             requireFinite(
                     gradientNorm,
                     "gradient norm");
+
+            long energyGradientReconstructionNanos =
+                    System.nanoTime() - energyGradientStarted;
+
+            long updateRescalingStarted =
+                    System.nanoTime();
+
+            double[] delta =
+                    solve.delta();
+
+            requireFinite(
+                    delta,
+                    "SR solution");
 
             double[] update =
                     new double[delta.length];
@@ -110,6 +137,12 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     appliedUpdateNorm,
                     "applied update norm");
 
+            long updateRescalingNanos =
+                    System.nanoTime() - updateRescalingStarted;
+
+            long newStateConstructionStarted =
+                    System.nanoTime();
+
             double[] next =
                     state.parameterArray();
 
@@ -122,8 +155,29 @@ public final class FermiNetMatrixFreeSrOptimizer {
                         "updated parameter");
             }
 
+            FermiNetV1State nextState =
+                    state.withParameters(next);
+
+            long newStateConstructionNanos =
+                    System.nanoTime() - newStateConstructionStarted;
+
+            long totalIterationNanos =
+                    System.nanoTime() - totalIterationStarted;
+
+            Timing timing =
+                    new Timing(
+                            configuration.observationParallelism(),
+                            observationConstructionNanos,
+                            sampleSpaceSolveNanos,
+                            energyGradientReconstructionNanos,
+                            updateRescalingNanos,
+                            newStateConstructionNanos,
+                            totalIterationNanos);
+
+            timing.print();
+
             return new Result(
-                    state.withParameters(next),
+                    nextState,
                     solve.meanEnergyHartree(),
                     gradientNorm,
                     rawUpdateNorm,
@@ -136,7 +190,8 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     rescaled,
                     energyGradient,
                     List.of(
-                            solve.relativeSampleSpaceResidual()));
+                            solve.relativeSampleSpaceResidual()),
+                    timing);
         } catch (IOException exception) {
             throw new UncheckedIOException(
                     "FermiNet SR observation I/O failed",
@@ -440,12 +495,18 @@ public final class FermiNetMatrixFreeSrOptimizer {
             double learningRate,
             double damping,
             double maxUpdateNorm,
+            int observationParallelism,
             int blockSize,
             int maxSolverIterations,
             double relativeTolerance,
             double absoluteTolerance) {
 
         public Configuration {
+            if (observationParallelism < 1) {
+                throw new IllegalArgumentException(
+                        "invalid SR observation parallelism");
+            }
+
             if (!(learningRate > 0.0)
                     || !Double.isFinite(learningRate)
                     || !(damping > 0.0)
@@ -477,7 +538,8 @@ public final class FermiNetMatrixFreeSrOptimizer {
             long sampleEvaluations,
             boolean updateRescaled,
             double[] energyGradient,
-            List<Double> trueResidualHistory) {
+            List<Double> trueResidualHistory,
+            Timing timing) {
 
         public Result {
             Objects.requireNonNull(
@@ -487,6 +549,10 @@ public final class FermiNetMatrixFreeSrOptimizer {
             Objects.requireNonNull(
                     trueResidualHistory,
                     "trueResidualHistory");
+
+            Objects.requireNonNull(
+                    timing,
+                    "timing");
 
             energyGradient =
                     energyGradient.clone();
@@ -506,5 +572,40 @@ public final class FermiNetMatrixFreeSrOptimizer {
             return List.copyOf(
                     trueResidualHistory);
         }
+    }
+
+    public record Timing(
+            int observationParallelism,
+            long observationConstructionNanos,
+            long sampleSpaceSolveNanos,
+            long energyGradientReconstructionNanos,
+            long updateRescalingNanos,
+            long newStateConstructionNanos,
+            long totalIterationNanos) {
+
+        public void print() {
+            System.out.printf("""
+                    FERMINET_SR_ITERATION_TIMING
+                      observation_parallelism=%d
+                      observation_construction_ms=%.3f
+                      sample_space_solve_ms=%.3f
+                      energy_gradient_reconstruction_ms=%.3f
+                      update_rescaling_ms=%.3f
+                      new_state_construction_ms=%.3f
+                      total_iteration_ms=%.3f
+
+                    """,
+                    observationParallelism,
+                    millis(observationConstructionNanos),
+                    millis(sampleSpaceSolveNanos),
+                    millis(energyGradientReconstructionNanos),
+                    millis(updateRescalingNanos),
+                    millis(newStateConstructionNanos),
+                    millis(totalIterationNanos));
+        }
+    }
+
+    private static double millis(long nanos) {
+        return nanos / 1.0e6;
     }
 }

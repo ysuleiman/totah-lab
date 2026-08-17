@@ -308,6 +308,7 @@ public final class FermiNetH2oSr512Driver {
                         SR_LEARNING_RATE,
                         SR_DAMPING,
                         SR_MAX_UPDATE_NORM,
+                        12,
                         SR_PARAMETER_BLOCK_SIZE,
                         LEGACY_MAX_SOLVER_ITERATIONS,
                         LEGACY_RELATIVE_TOLERANCE,

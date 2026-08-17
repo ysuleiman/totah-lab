@@ -37,6 +37,7 @@ final class FermiNetMatrixFreeSrSampleSpaceParityTest {
                         0.03,
                         0.2,
                         0.1,
+                        1,
                         128,
                         100,
                         1e-11,
