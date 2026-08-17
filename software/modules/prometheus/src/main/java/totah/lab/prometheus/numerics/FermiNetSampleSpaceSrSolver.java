@@ -326,7 +326,7 @@ public final class FermiNetSampleSpaceSrSolver {
 
         /*
          * ------------------------------------------------------------
-         * PHASE 4: second derivative sweep / delta reconstruction
+         * PHASE 4: second derivative sweep / delta and gradient reconstruction
          * ------------------------------------------------------------
          */
 
@@ -334,6 +334,9 @@ public final class FermiNetSampleSpaceSrSolver {
                 System.nanoTime();
 
         double[] delta =
+                new double[parameters];
+
+        double[] energyGradient =
                 new double[parameters];
 
         long reconstructionDerivativeValuesRead = 0L;
@@ -389,6 +392,9 @@ public final class FermiNetSampleSpaceSrSolver {
                 double value =
                         0.0;
 
+                double gradientValue =
+                        0.0;
+
                 for (int sample = 0;
                      sample < samples;
                      sample++) {
@@ -401,10 +407,20 @@ public final class FermiNetSampleSpaceSrSolver {
                             sqrtWeight[sample]
                                     * centered
                                     * y[sample];
+
+                    gradientValue +=
+                            2.0
+                                    * normalizedWeight[sample]
+                                    * (observations.localEnergyHartree(sample)
+                                    - meanEnergy)
+                                    * block[sample * length + local];
                 }
 
                 delta[parameterStart + local] =
                         -value;
+
+                energyGradient[parameterStart + local] =
+                        gradientValue;
             }
 
             reconstructionArithmeticNanos +=
@@ -426,6 +442,10 @@ public final class FermiNetSampleSpaceSrSolver {
         requireFinite(
                 delta,
                 "sample-space SR update");
+
+        requireFinite(
+                energyGradient,
+                "energy gradient");
 
         double[] residual =
                 multiply(
@@ -510,6 +530,7 @@ public final class FermiNetSampleSpaceSrSolver {
 
         return new Result(
                 delta,
+                energyGradient,
                 meanEnergy,
                 absoluteResidual,
                 qNorm == 0.0
@@ -708,6 +729,7 @@ public final class FermiNetSampleSpaceSrSolver {
 
     public record Result(
             double[] delta,
+            double[] energyGradient,
             double meanEnergyHartree,
             double absoluteSampleSpaceResidual,
             double relativeSampleSpaceResidual,
@@ -720,13 +742,25 @@ public final class FermiNetSampleSpaceSrSolver {
                     delta,
                     "delta");
 
+            Objects.requireNonNull(
+                    energyGradient,
+                    "energyGradient");
+
             delta =
                     delta.clone();
+
+            energyGradient =
+                    energyGradient.clone();
         }
 
         @Override
         public double[] delta() {
             return delta.clone();
+        }
+
+        @Override
+        public double[] energyGradient() {
+            return energyGradient.clone();
         }
     }
 }

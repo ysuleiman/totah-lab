@@ -69,12 +69,8 @@ public final class FermiNetMatrixFreeSrOptimizer {
             long sampleSpaceSolveNanos =
                     System.nanoTime() - sampleSpaceSolveStarted;
 
-            long energyGradientStarted =
-                    System.nanoTime();
-
             double[] energyGradient =
-                    gradientFromObservations(
-                            observations);
+                    solve.energyGradient();
 
             double gradientNorm =
                     norm(
@@ -83,9 +79,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
             requireFinite(
                     gradientNorm,
                     "gradient norm");
-
-            long energyGradientReconstructionNanos =
-                    System.nanoTime() - energyGradientStarted;
 
             long updateRescalingStarted =
                     System.nanoTime();
@@ -169,7 +162,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                             configuration.observationParallelism(),
                             observationConstructionNanos,
                             sampleSpaceSolveNanos,
-                            energyGradientReconstructionNanos,
                             updateRescalingNanos,
                             newStateConstructionNanos,
                             totalIterationNanos);
@@ -309,103 +301,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                 "covariance-operator result");
 
         return result;
-    }
-
-    private static double[] gradientFromObservations(
-            FermiNetSrObservationFile observations)
-            throws IOException {
-
-        int samples =
-                observations.sampleCount();
-
-        int parameters =
-                observations.parameterCount();
-
-        double weightSum =
-                0.0;
-
-        double meanEnergy =
-                0.0;
-
-        for (int sample = 0; sample < samples; sample++) {
-            weightSum +=
-                    observations.weight(sample);
-
-            meanEnergy +=
-                    observations.weight(sample)
-                            * observations.localEnergyHartree(sample);
-        }
-
-        if (!(weightSum > 0.0)
-                || !Double.isFinite(weightSum)) {
-            throw new IllegalArgumentException(
-                    "non-positive FermiNet SR total weight");
-        }
-
-        meanEnergy /=
-                weightSum;
-
-        double[] gradient =
-                new double[parameters];
-
-        int blockSize =
-                Math.min(
-                        8192,
-                        parameters);
-
-        double[] block =
-                new double[
-                        Math.multiplyExact(
-                                samples,
-                                blockSize)];
-
-        for (int start = 0;
-             start < parameters;
-             start += blockSize) {
-
-            int length =
-                    Math.min(
-                            blockSize,
-                            parameters - start);
-
-            observations.readParameterBlock(
-                    start,
-                    length,
-                    block);
-
-            for (int local = 0;
-                 local < length;
-                 local++) {
-
-                double value =
-                        0.0;
-
-                for (int sample = 0;
-                     sample < samples;
-                     sample++) {
-
-                    double normalizedWeight =
-                            observations.weight(sample)
-                                    / weightSum;
-
-                    value +=
-                            2.0
-                                    * normalizedWeight
-                                    * (observations.localEnergyHartree(sample)
-                                    - meanEnergy)
-                                    * block[sample * length + local];
-                }
-
-                gradient[start + local] =
-                        value;
-            }
-        }
-
-        requireFinite(
-                gradient,
-                "energy gradient");
-
-        return gradient;
     }
 
     private static double norm(
@@ -578,7 +473,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
             int observationParallelism,
             long observationConstructionNanos,
             long sampleSpaceSolveNanos,
-            long energyGradientReconstructionNanos,
             long updateRescalingNanos,
             long newStateConstructionNanos,
             long totalIterationNanos) {
@@ -589,7 +483,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                       observation_parallelism=%d
                       observation_construction_ms=%.3f
                       sample_space_solve_ms=%.3f
-                      energy_gradient_reconstruction_ms=%.3f
                       update_rescaling_ms=%.3f
                       new_state_construction_ms=%.3f
                       total_iteration_ms=%.3f
@@ -598,7 +491,6 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     observationParallelism,
                     millis(observationConstructionNanos),
                     millis(sampleSpaceSolveNanos),
-                    millis(energyGradientReconstructionNanos),
                     millis(updateRescalingNanos),
                     millis(newStateConstructionNanos),
                     millis(totalIterationNanos));

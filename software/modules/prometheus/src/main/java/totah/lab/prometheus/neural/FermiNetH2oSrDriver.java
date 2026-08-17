@@ -28,26 +28,14 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 import totah.lab.prometheus.variational.SpinProjection;
 
 /**
- * One-step H2O FermiNet SR pilot.
+ * Canonical one-step H2O FermiNet sample-space SR driver.
  *
  * <p>Loads the frozen HF-pretrained state, measures an independent baseline,
  * performs exactly one matrix-free SR update, measures the updated state, writes
  * diagnostics, and stops. It never overwrites the pretraining artifacts.
  */
-public final class FermiNetH2oSrPilotDriver {
+public final class FermiNetH2oSrDriver {
 
-    private static final int VMC_WARMUP_SWEEPS = 100;
-    private static final int VMC_RETAINED_PER_WALKER = 1;
-    private static final int VMC_SWEEPS_BETWEEN_RETAINED = 10;
-    private static final double VMC_STEP_SIZE_BOHR = 0.02;
-    private static final long BASELINE_VMC_SEED = 20260818L;
-    private static final long POST_SR_VMC_SEED = 20260819L;
-
-    /* Conservative one-step pilot values, not production defaults. */
-    private static final double SR_LEARNING_RATE = 0.01;
-    private static final double SR_DAMPING = 1.0;
-    private static final double SR_MAX_UPDATE_NORM = 0.05;
-    private static final int SR_BLOCK_SIZE = 128; // retained by current optimizer API; diagonal pilot ignores it
     private static final int SR_MAX_SOLVER_ITERATIONS = 50;
     private static final double SR_RELATIVE_TOLERANCE = 1.0e-6;
     private static final double SR_ABSOLUTE_TOLERANCE = 1.0e-8;
@@ -58,7 +46,7 @@ public final class FermiNetH2oSrPilotDriver {
     private static final ObjectMapper JSON =
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
-    private FermiNetH2oSrPilotDriver() {}
+    private FermiNetH2oSrDriver() {}
 
     public static void main(String[] args) throws Exception {
         Arguments arguments = Arguments.parse(args);
@@ -68,28 +56,34 @@ public final class FermiNetH2oSrPilotDriver {
         FermiNetV1Configuration configuration = FermiNetV1Configuration.locked();
         FermiNetParameterLayout layout = new FermiNetParameterLayout(configuration, molecule);
 
-        double[] parameterValues = readParameters(
-                arguments.pretrainingDirectory().resolve("pretrained-parameters.hex"),
-                layout.parameterCount());
+        double[] parameterValues = readParameters(arguments.parameterFile(), layout.parameterCount());
 
         FermiNetV1State initialState = new FermiNetV1State(
                 molecule,
                 configuration,
                 FermiNetParameters.fromArray(layout, parameterValues));
 
-        List<QuantumCoordinates> pretrainedWalkers = readWalkers(
-                arguments.pretrainingDirectory().resolve("pretrained-walkers.csv"),
-                molecule);
+        List<QuantumCoordinates> availableWalkers = readWalkers(arguments.walkerFile(), molecule);
+        int requiredWalkers = arguments.sampleCount() / arguments.retainedPerWalker();
+        if (availableWalkers.size() < requiredWalkers) {
+            throw new IllegalArgumentException("walker artifact has " + availableWalkers.size()
+                    + " walkers; configuration requires " + requiredWalkers);
+        }
+        List<QuantumCoordinates> pretrainedWalkers = List.copyOf(
+                availableWalkers.subList(0, requiredWalkers));
 
         verifySamplingParity(initialState, pretrainedWalkers);
 
         System.out.printf(Locale.ROOT, """
-                Prometheus FermiNet H2O one-step SR pilot
+                Prometheus canonical FermiNet H2O one-step SR
                 -----------------------------------------
-                pretraining input      : %s
+                preset                 : %s
+                parameter input        : %s
+                walker input           : %s
                 output                 : %s
                 parameters             : %d
                 walkers                : %d
+                SR samples             : %d
 
                 baseline VMC:
                   warmup sweeps        : %d
@@ -102,26 +96,31 @@ public final class FermiNetH2oSrPilotDriver {
                   learning rate        : %.8g
                   damping              : %.8g
                   max update norm      : %.8g
-                  preconditioner       : diagonal
-                  block size API field : %d
-                  max PCG iterations   : %d
+                  solver               : sample-space Cholesky SR
+                  parameter block size : %d
+                  observation parallel.: %d
+                  max solver iterations: %d
                   relative tolerance   : %.3e
                   absolute tolerance   : %.3e
 
                 """,
-                arguments.pretrainingDirectory(),
+                arguments.preset(),
+                arguments.parameterFile(),
+                arguments.walkerFile(),
                 arguments.outputDirectory(),
                 initialState.parameterCount(),
                 pretrainedWalkers.size(),
-                VMC_WARMUP_SWEEPS,
-                VMC_RETAINED_PER_WALKER,
-                VMC_SWEEPS_BETWEEN_RETAINED,
-                VMC_STEP_SIZE_BOHR,
-                BASELINE_VMC_SEED,
-                SR_LEARNING_RATE,
-                SR_DAMPING,
-                SR_MAX_UPDATE_NORM,
-                SR_BLOCK_SIZE,
+                arguments.sampleCount(),
+                arguments.warmupSweeps(),
+                arguments.retainedPerWalker(),
+                arguments.sweepsBetweenRetained(),
+                arguments.stepSizeBohr(),
+                arguments.baselineSeed(),
+                arguments.learningRate(),
+                arguments.damping(),
+                arguments.maxUpdateNorm(),
+                arguments.parameterBlockSize(),
+                arguments.observationParallelism(),
                 SR_MAX_SOLVER_ITERATIONS,
                 SR_RELATIVE_TOLERANCE,
                 SR_ABSOLUTE_TOLERANCE);
@@ -131,16 +130,20 @@ public final class FermiNetH2oSrPilotDriver {
         /* 1. Independent baseline VMC. */
         FermiNetVmc.Configuration baselineConfiguration = new FermiNetVmc.Configuration(
                 pretrainedWalkers.size(),
-                VMC_WARMUP_SWEEPS,
-                VMC_RETAINED_PER_WALKER,
-                VMC_SWEEPS_BETWEEN_RETAINED,
-                VMC_STEP_SIZE_BOHR,
-                BASELINE_VMC_SEED);
+                arguments.warmupSweeps(),
+                arguments.retainedPerWalker(),
+                arguments.sweepsBetweenRetained(),
+                arguments.stepSizeBohr(),
+                arguments.baselineSeed());
 
         FermiNetVmc.Result baseline = new FermiNetVmc().sample(
                 initialState,
                 baselineConfiguration,
                 pretrainedWalkers);
+        if (baseline.samples().size() != arguments.sampleCount()) {
+            throw new IllegalStateException("expected " + arguments.sampleCount()
+                    + " SR samples but obtained " + baseline.samples().size());
+        }
 
         EnergyStatistics baselineEnergy = energyStatistics(baseline.localEnergies());
         requireOperationalAcceptance(baseline.acceptance(), "baseline");
@@ -171,11 +174,11 @@ public final class FermiNetH2oSrPilotDriver {
         /* 3. Exactly one matrix-free SR update. */
         FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration =
                 new FermiNetMatrixFreeSrOptimizer.Configuration(
-                        SR_LEARNING_RATE,
-                        SR_DAMPING,
-                        SR_MAX_UPDATE_NORM,
-                        12,
-                        SR_BLOCK_SIZE,
+                        arguments.learningRate(),
+                        arguments.damping(),
+                        arguments.maxUpdateNorm(),
+                        arguments.observationParallelism(),
+                        arguments.parameterBlockSize(),
                         SR_MAX_SOLVER_ITERATIONS,
                         SR_RELATIVE_TOLERANCE,
                         SR_ABSOLUTE_TOLERANCE);
@@ -197,7 +200,7 @@ public final class FermiNetH2oSrPilotDriver {
                 -----------------
                 SR initial energy      : %+.10f Ha
                 gradient norm          : %.10e
-                PCG iterations         : %d
+                Cholesky solves        : %d
                 relative true residual : %.10e
                 streamed passes        : %d
                 sample evaluations     : %d
@@ -219,11 +222,11 @@ public final class FermiNetH2oSrPilotDriver {
         /* 4. Independent post-SR VMC, from the latest retained walkers. */
         FermiNetVmc.Configuration postConfiguration = new FermiNetVmc.Configuration(
                 baseline.samples().size(),
-                VMC_WARMUP_SWEEPS,
-                VMC_RETAINED_PER_WALKER,
-                VMC_SWEEPS_BETWEEN_RETAINED,
-                VMC_STEP_SIZE_BOHR,
-                POST_SR_VMC_SEED);
+                arguments.warmupSweeps(),
+                1,
+                arguments.sweepsBetweenRetained(),
+                arguments.stepSizeBohr(),
+                arguments.postSrSeed());
 
         FermiNetVmc.Result post = new FermiNetVmc().sample(
                 updatedState,
@@ -252,7 +255,7 @@ public final class FermiNetH2oSrPilotDriver {
                 deltaEnergy, direction, started, finished);
 
         System.out.printf(Locale.ROOT, """
-                H2O one-step SR pilot complete.
+                H2O canonical one-step SR run complete.
                 --------------------------------
                 baseline acceptance     : %.6f
                 baseline energy         : %+.10f +/- %.10f Ha
@@ -497,10 +500,12 @@ public final class FermiNetH2oSrPilotDriver {
             Instant finished) throws IOException {
 
         Map<String, Object> summary = new LinkedHashMap<>();
-        summary.put("schema", "prometheus-ferminet-h2o-sr-pilot-v1");
+        summary.put("schema", "prometheus-ferminet-h2o-sr-v2");
         summary.put("started_utc", started.toString());
         summary.put("finished_utc", finished.toString());
-        summary.put("pretraining_directory", arguments.pretrainingDirectory().toString());
+        summary.put("preset", arguments.preset());
+        summary.put("parameter_input", arguments.parameterFile().toString());
+        summary.put("walker_input", arguments.walkerFile().toString());
         summary.put("parameter_count", sr.state().parameterCount());
         summary.put("sr_steps_executed", 1);
         summary.put("additional_sr_steps_executed", 0);
@@ -514,10 +519,12 @@ public final class FermiNetH2oSrPilotDriver {
         summary.put("baseline", baselineMap);
 
         Map<String, Object> srMap = new LinkedHashMap<>();
-        srMap.put("learning_rate", SR_LEARNING_RATE);
-        srMap.put("damping", SR_DAMPING);
-        srMap.put("max_update_norm", SR_MAX_UPDATE_NORM);
-        srMap.put("preconditioner", "STREAMED_COVARIANCE_DIAGONAL");
+        srMap.put("learning_rate", arguments.learningRate());
+        srMap.put("damping", arguments.damping());
+        srMap.put("max_update_norm", arguments.maxUpdateNorm());
+        srMap.put("solver", "SAMPLE_SPACE_CHOLESKY_SR");
+        srMap.put("parameter_block_size", arguments.parameterBlockSize());
+        srMap.put("observation_parallelism", arguments.observationParallelism());
         srMap.put("gradient_norm", sr.gradientNorm());
         srMap.put("raw_update_norm", sr.rawUpdateNorm());
         srMap.put("applied_update_norm", sr.appliedUpdateNorm());
@@ -543,7 +550,7 @@ public final class FermiNetH2oSrPilotDriver {
         summary.put("forces_evaluated", false);
         summary.put("continue_sr_automatically", false);
 
-        JSON.writeValue(arguments.outputDirectory().resolve("sr-pilot-summary.json").toFile(), summary);
+        JSON.writeValue(arguments.outputDirectory().resolve("sr-summary.json").toFile(), summary);
     }
 
     private static Molecule water() {
@@ -569,34 +576,124 @@ public final class FermiNetH2oSrPilotDriver {
             double standardDeviation,
             double standardError) {}
 
-    private record Arguments(Path pretrainingDirectory, Path outputDirectory) {
+    private record Arguments(
+            String preset,
+            Path parameterFile,
+            Path walkerFile,
+            Path outputDirectory,
+            int sampleCount,
+            int retainedPerWalker,
+            int warmupSweeps,
+            int sweepsBetweenRetained,
+            double stepSizeBohr,
+            long baselineSeed,
+            long postSrSeed,
+            double learningRate,
+            double damping,
+            double maxUpdateNorm,
+            int parameterBlockSize,
+            int observationParallelism) {
+
         private static Arguments parse(String[] args) {
-            Path pretraining = Path.of("analysis", "prometheus-ferminet-h2o-pretraining");
-            Path output = Path.of("analysis", "prometheus-ferminet-h2o-sr-pilot");
+            String preset = "historical-n64";
+            Path parameters = null;
+            Path walkers = null;
+            Path output = null;
+            int sampleCount = 64;
+            int retainedPerWalker = 1;
+            int warmupSweeps = 100;
+            int sweepsBetweenRetained = 10;
+            double stepSizeBohr = 0.02;
+            long baselineSeed = 20260818L;
+            long postSrSeed = 20260819L;
+            double learningRate = 0.01;
+            double damping = 1.0;
+            double maxUpdateNorm = 0.05;
+            int parameterBlockSize = 128;
+            int observationParallelism = 12;
 
             for (int i = 0; i < args.length; i++) {
                 switch (args[i]) {
-                    case "--pretraining" -> {
-                        if (++i >= args.length) throw usage("--pretraining requires a path");
-                        pretraining = Path.of(args[i]);
-                    }
-                    case "--output" -> {
-                        if (++i >= args.length) throw usage("--output requires a path");
-                        output = Path.of(args[i]);
-                    }
+                    case "--preset" -> preset = value(args, ++i, "--preset");
+                    case "--parameters" -> parameters = Path.of(value(args, ++i, "--parameters"));
+                    case "--walkers" -> walkers = Path.of(value(args, ++i, "--walkers"));
+                    case "--output" -> output = Path.of(value(args, ++i, "--output"));
+                    case "--sample-count" -> sampleCount = integer(args, ++i, "--sample-count");
+                    case "--retained-per-walker" -> retainedPerWalker = integer(args, ++i, "--retained-per-walker");
+                    case "--warmup-sweeps" -> warmupSweeps = integer(args, ++i, "--warmup-sweeps");
+                    case "--sweeps-between-retained" -> sweepsBetweenRetained = integer(args, ++i, "--sweeps-between-retained");
+                    case "--step-size-bohr" -> stepSizeBohr = decimal(args, ++i, "--step-size-bohr");
+                    case "--baseline-seed" -> baselineSeed = number(args, ++i, "--baseline-seed");
+                    case "--post-sr-seed" -> postSrSeed = number(args, ++i, "--post-sr-seed");
+                    case "--learning-rate" -> learningRate = decimal(args, ++i, "--learning-rate");
+                    case "--damping" -> damping = decimal(args, ++i, "--damping");
+                    case "--max-update-norm" -> maxUpdateNorm = decimal(args, ++i, "--max-update-norm");
+                    case "--block-size" -> parameterBlockSize = integer(args, ++i, "--block-size");
+                    case "--observation-parallelism" -> observationParallelism = integer(args, ++i, "--observation-parallelism");
                     default -> throw usage("unknown argument: " + args[i]);
                 }
             }
+            if (!"historical-n64".equals(preset)) throw usage("unknown preset: " + preset);
+            if (parameters == null || walkers == null || output == null) {
+                throw usage("--parameters, --walkers, and --output are required");
+            }
+            if (sampleCount < 2 || retainedPerWalker < 1
+                    || sampleCount % retainedPerWalker != 0
+                    || warmupSweeps < 0 || sweepsBetweenRetained < 1
+                    || !(stepSizeBohr > 0.0) || !Double.isFinite(stepSizeBohr)
+                    || !(learningRate > 0.0) || !Double.isFinite(learningRate)
+                    || !(damping > 0.0) || !Double.isFinite(damping)
+                    || !(maxUpdateNorm > 0.0) || !Double.isFinite(maxUpdateNorm)
+                    || parameterBlockSize < 1 || observationParallelism < 1) {
+                throw usage("invalid numeric configuration");
+            }
+            return new Arguments(preset,
+                    parameters.toAbsolutePath().normalize(),
+                    walkers.toAbsolutePath().normalize(),
+                    output.toAbsolutePath().normalize(),
+                    sampleCount, retainedPerWalker, warmupSweeps, sweepsBetweenRetained,
+                    stepSizeBohr, baselineSeed, postSrSeed, learningRate, damping,
+                    maxUpdateNorm, parameterBlockSize, observationParallelism);
+        }
 
-            return new Arguments(
-                    pretraining.toAbsolutePath().normalize(),
-                    output.toAbsolutePath().normalize());
+        private static String value(String[] args, int index, String option) {
+            if (index >= args.length) throw usage(option + " requires a value");
+            return args[index];
+        }
+
+        private static int integer(String[] args, int index, String option) {
+            try {
+                return Integer.parseInt(value(args, index, option));
+            } catch (NumberFormatException exception) {
+                throw usage(option + " requires an integer");
+            }
+        }
+
+        private static long number(String[] args, int index, String option) {
+            try {
+                return Long.parseLong(value(args, index, option));
+            } catch (NumberFormatException exception) {
+                throw usage(option + " requires an integer");
+            }
+        }
+
+        private static double decimal(String[] args, int index, String option) {
+            try {
+                return Double.parseDouble(value(args, index, option));
+            } catch (NumberFormatException exception) {
+                throw usage(option + " requires a number");
+            }
         }
 
         private static IllegalArgumentException usage(String problem) {
             return new IllegalArgumentException(problem + System.lineSeparator() + """
-                    --pretraining PATH
-                    --output PATH
+                    --preset historical-n64
+                    --parameters PATH --walkers PATH --output PATH
+                    [--sample-count N] [--retained-per-walker N]
+                    [--warmup-sweeps N] [--sweeps-between-retained N]
+                    [--step-size-bohr X] [--baseline-seed N] [--post-sr-seed N]
+                    [--learning-rate X] [--damping X] [--max-update-norm X]
+                    [--block-size N] [--observation-parallelism N]
                     """);
         }
     }

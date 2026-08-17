@@ -1,5 +1,6 @@
 package totah.lab.prometheus.neural;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -48,6 +49,14 @@ final class FermiNetSampleSpaceSrSolverTest {
                                     damping,
                                     128);
 
+            double[] legacyGradient =
+                    legacyEnergyGradient(observations);
+
+            long gradientBitMismatches =
+                    bitMismatches(
+                            legacyGradient,
+                            result.energyGradient());
+
             DenseReference dense =
                     denseReference(
                             fixture.state,
@@ -75,6 +84,7 @@ final class FermiNetSampleSpaceSrSolverTest {
                       neural_evaluations=%d
                       sample_space_relative_residual=%.17g
                       delta_max_error=%.17g
+                      gradient_bit_mismatches=%d
                       gram_derivative_values_read=%d
                       reconstruction_derivative_values_read=%d
 
@@ -85,6 +95,7 @@ final class FermiNetSampleSpaceSrSolverTest {
                     observations.neuralEvaluations(),
                     result.relativeSampleSpaceResidual(),
                     maxError,
+                    gradientBitMismatches,
                     result.gramDerivativeValuesRead(),
                     result.reconstructionDerivativeValuesRead());
 
@@ -99,7 +110,68 @@ final class FermiNetSampleSpaceSrSolverTest {
                             < 2e-9,
                     "sample-space/parameter-space SR delta error="
                             + maxError);
+
+            assertEquals(
+                    0L,
+                    gradientBitMismatches,
+                    "fused gradient must be bit-identical to the removed traversal");
+
+            long derivativeValues =
+                    (long) observations.sampleCount()
+                            * observations.parameterCount();
+
+            assertEquals(derivativeValues, result.gramDerivativeValuesRead());
+            assertEquals(derivativeValues, result.reconstructionDerivativeValuesRead());
         }
+    }
+
+    private static double[] legacyEnergyGradient(
+            FermiNetSrObservationFile observations)
+            throws IOException {
+
+        int samples = observations.sampleCount();
+        int parameters = observations.parameterCount();
+        double weightSum = 0.0;
+        double meanEnergy = 0.0;
+
+        for (int sample = 0; sample < samples; sample++) {
+            weightSum += observations.weight(sample);
+            meanEnergy += observations.weight(sample)
+                    * observations.localEnergyHartree(sample);
+        }
+        meanEnergy /= weightSum;
+
+        double[] gradient = new double[parameters];
+        int blockSize = Math.min(8192, parameters);
+        double[] block = new double[Math.multiplyExact(samples, blockSize)];
+
+        for (int start = 0; start < parameters; start += blockSize) {
+            int length = Math.min(blockSize, parameters - start);
+            observations.readParameterBlock(start, length, block);
+
+            for (int local = 0; local < length; local++) {
+                double value = 0.0;
+                for (int sample = 0; sample < samples; sample++) {
+                    double normalizedWeight = observations.weight(sample) / weightSum;
+                    value += 2.0
+                            * normalizedWeight
+                            * (observations.localEnergyHartree(sample) - meanEnergy)
+                            * block[sample * length + local];
+                }
+                gradient[start + local] = value;
+            }
+        }
+        return gradient;
+    }
+
+    private static long bitMismatches(double[] left, double[] right) {
+        long mismatches = 0L;
+        for (int i = 0; i < left.length; i++) {
+            if (Double.doubleToLongBits(left[i]) != Double.doubleToLongBits(right[i])) {
+                mismatches++;
+            }
+        }
+        return mismatches;
     }
 
     private static DenseReference denseReference(
