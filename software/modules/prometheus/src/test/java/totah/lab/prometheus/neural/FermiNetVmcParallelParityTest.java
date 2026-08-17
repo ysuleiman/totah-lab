@@ -19,8 +19,8 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 import totah.lab.prometheus.variational.SpinProjection;
 
 /**
- * Proves deterministic finite-path parity between canonical sequential VMC and
- * the experimental parallel walker implementation.
+ * Proves deterministic finite-path parity between sequential VMC and the
+ * deterministic parallel implementation used by the canonical H2O SR driver.
  */
 final class FermiNetVmcParallelParityTest {
 
@@ -44,25 +44,12 @@ final class FermiNetVmcParallelParityTest {
                                 configuration,
                                 fixture.walkers);
 
-        int parallelism =
-                Math.max(
-                        2,
-                        Math.min(
-                                8,
-                                Runtime.getRuntime()
-                                        .availableProcessors()));
-
-        FermiNetVmc.Result parallel;
-
-        try (FermiNetVmcParallel sampler =
-                     new FermiNetVmcParallel(parallelism)) {
-
-            parallel =
-                    sampler.sample(
-                            fixture.state,
-                            configuration,
-                            fixture.walkers);
-        }
+        int parallelism = FermiNetH2oSrDriver.canonicalVmcParallelism();
+        FermiNetVmc.Result parallel = FermiNetH2oSrDriver.sampleCanonicalVmc(
+                fixture.state,
+                configuration,
+                fixture.walkers,
+                parallelism);
 
         assertEquals(
                 sequential.acceptance(),

@@ -36,6 +36,8 @@ import totah.lab.prometheus.variational.SpinProjection;
  */
 public final class FermiNetH2oSrDriver {
 
+    private static final int VMC_PARALLELISM = Math.max(1,
+            Math.min(12, Runtime.getRuntime().availableProcessors()));
     private static final int SR_MAX_SOLVER_ITERATIONS = 50;
     private static final double SR_RELATIVE_TOLERANCE = 1.0e-6;
     private static final double SR_ABSOLUTE_TOLERANCE = 1.0e-8;
@@ -49,6 +51,7 @@ public final class FermiNetH2oSrDriver {
     private FermiNetH2oSrDriver() {}
 
     public static void main(String[] args) throws Exception {
+        long driverStartedNanos = System.nanoTime();
         Arguments arguments = Arguments.parse(args);
         Files.createDirectories(arguments.outputDirectory());
 
@@ -84,6 +87,8 @@ public final class FermiNetH2oSrDriver {
                 parameters             : %d
                 walkers                : %d
                 SR samples             : %d
+                VMC implementation     : deterministic parallel
+                VMC parallelism        : %d
 
                 baseline VMC:
                   warmup sweeps        : %d
@@ -107,6 +112,7 @@ public final class FermiNetH2oSrDriver {
                 initialState.parameterCount(),
                 pretrainedWalkers.size(),
                 arguments.sampleCount(),
+                VMC_PARALLELISM,
                 arguments.warmupSweeps(),
                 arguments.retainedPerWalker(),
                 arguments.sweepsBetweenRetained(),
@@ -128,10 +134,13 @@ public final class FermiNetH2oSrDriver {
                 arguments.stepSizeBohr(),
                 arguments.baselineSeed());
 
-        FermiNetVmc.Result baseline = new FermiNetVmc().sample(
+        long baselineStartedNanos = System.nanoTime();
+        FermiNetVmc.Result baseline = sampleCanonicalVmc(
                 initialState,
                 baselineConfiguration,
-                pretrainedWalkers);
+                pretrainedWalkers,
+                VMC_PARALLELISM);
+        long baselineVmcNanos = System.nanoTime() - baselineStartedNanos;
         if (baseline.samples().size() != arguments.sampleCount()) {
             throw new IllegalStateException("expected " + arguments.sampleCount()
                     + " SR samples but obtained " + baseline.samples().size());
@@ -177,11 +186,13 @@ public final class FermiNetH2oSrDriver {
 
         System.out.println("Starting exactly ONE SR update...");
 
+        long srStartedNanos = System.nanoTime();
         FermiNetMatrixFreeSrOptimizer.Result sr =
                 new FermiNetMatrixFreeSrOptimizer().oneIteration(
                         initialState,
                         srSamples,
                         srConfiguration);
+        long srIterationNanos = System.nanoTime() - srStartedNanos;
 
         FermiNetV1State updatedState = sr.state();
         verifyFiniteParameters(updatedState);
@@ -218,10 +229,13 @@ public final class FermiNetH2oSrDriver {
                 arguments.stepSizeBohr(),
                 arguments.postSrSeed());
 
-        FermiNetVmc.Result post = new FermiNetVmc().sample(
+        long postStartedNanos = System.nanoTime();
+        FermiNetVmc.Result post = sampleCanonicalVmc(
                 updatedState,
                 postConfiguration,
-                baseline.samples());
+                baseline.samples(),
+                VMC_PARALLELISM);
+        long postSrVmcNanos = System.nanoTime() - postStartedNanos;
 
         EnergyStatistics postEnergy = energyStatistics(post.localEnergies());
         requireOperationalAcceptance(post.acceptance(), "post-SR");
@@ -231,6 +245,7 @@ public final class FermiNetH2oSrDriver {
         Instant finished = Instant.now();
 
         /* 5. Persist pilot evidence; never touch the frozen pretraining artifacts. */
+        long persistenceStartedNanos = System.nanoTime();
         writeParameters(arguments.outputDirectory().resolve("post-sr-parameters.hex"),
                 updatedState.parameterArray());
         writeWalkers(arguments.outputDirectory().resolve("baseline-retained-walkers.csv"),
@@ -243,6 +258,23 @@ public final class FermiNetH2oSrDriver {
                 post.localEnergies());
         writeSummary(arguments, baseline, baselineEnergy, sr, post, postEnergy,
                 deltaEnergy, direction, started, finished);
+        long persistenceNanos = System.nanoTime() - persistenceStartedNanos;
+        long totalDriverNanos = System.nanoTime() - driverStartedNanos;
+
+        System.out.printf(Locale.ROOT, """
+                FERMINET_H2O_SR_DRIVER_TIMING
+                  baseline_vmc_ms=%.3f
+                  sr_iteration_ms=%.3f
+                  post_sr_vmc_ms=%.3f
+                  persistence_ms=%.3f
+                  total_driver_ms=%.3f
+
+                """,
+                milliseconds(baselineVmcNanos),
+                milliseconds(srIterationNanos),
+                milliseconds(postSrVmcNanos),
+                milliseconds(persistenceNanos),
+                milliseconds(totalDriverNanos));
 
         System.out.printf(Locale.ROOT, """
                 H2O canonical one-step SR run complete.
@@ -271,6 +303,24 @@ public final class FermiNetH2oSrDriver {
                 postEnergy.standardError(),
                 deltaEnergy,
                 direction);
+    }
+
+    static FermiNetVmc.Result sampleCanonicalVmc(
+            FermiNetV1State state,
+            FermiNetVmc.Configuration configuration,
+            List<QuantumCoordinates> initialWalkers,
+            int parallelism) {
+        try (FermiNetVmcParallel sampler = new FermiNetVmcParallel(parallelism)) {
+            return sampler.sample(state, configuration, initialWalkers);
+        }
+    }
+
+    static int canonicalVmcParallelism() {
+        return VMC_PARALLELISM;
+    }
+
+    private static double milliseconds(long nanoseconds) {
+        return nanoseconds / 1_000_000.0;
     }
 
     private static void requireOperationalAcceptance(double acceptance, String stage) {
