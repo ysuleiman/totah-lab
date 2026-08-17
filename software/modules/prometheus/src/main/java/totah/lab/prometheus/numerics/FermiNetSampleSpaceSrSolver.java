@@ -57,6 +57,8 @@ public final class FermiNetSampleSpaceSrSolver {
             int parameterBlockSize)
             throws IOException {
 
+        long totalStarted = System.nanoTime();
+
         Objects.requireNonNull(
                 observations,
                 "observations");
@@ -77,6 +79,14 @@ public final class FermiNetSampleSpaceSrSolver {
 
         int parameters =
                 observations.parameterCount();
+
+        /*
+         * ------------------------------------------------------------
+         * PHASE 1: weights, mean energy, q construction
+         * ------------------------------------------------------------
+         */
+
+        long setupStarted = System.nanoTime();
 
         double weightSum = 0.0;
         double weightedEnergy = 0.0;
@@ -160,7 +170,24 @@ public final class FermiNetSampleSpaceSrSolver {
         double[] centeredWeighted =
                 new double[samples];
 
+        long setupNanos =
+                System.nanoTime() - setupStarted;
+
+        /*
+         * ------------------------------------------------------------
+         * PHASE 2: first derivative sweep / Gram construction
+         * ------------------------------------------------------------
+         *
+         * Separate file-read time from arithmetic time.
+         */
+
+        long gramTotalStarted =
+                System.nanoTime();
+
+        long gramReadNanos = 0L;
+        long gramArithmeticNanos = 0L;
         long gramDerivativeValuesRead = 0L;
+        int gramBlocksRead = 0;
 
         for (int parameterStart = 0;
              parameterStart < parameters;
@@ -171,14 +198,25 @@ public final class FermiNetSampleSpaceSrSolver {
                             maximumBlock,
                             parameters - parameterStart);
 
+            long readStarted =
+                    System.nanoTime();
+
             observations.readParameterBlock(
                     parameterStart,
                     length,
                     block);
 
+            gramReadNanos +=
+                    System.nanoTime() - readStarted;
+
+            gramBlocksRead++;
+
             gramDerivativeValuesRead +=
                     (long) samples
                             * length;
+
+            long arithmeticStarted =
+                    System.nanoTime();
 
             for (int local = 0;
                  local < length;
@@ -231,7 +269,16 @@ public final class FermiNetSampleSpaceSrSolver {
                     }
                 }
             }
+
+            gramArithmeticNanos +=
+                    System.nanoTime() - arithmeticStarted;
         }
+
+        /*
+         * Damping + symmetric upper triangle.
+         */
+        long gramFinalizeStarted =
+                System.nanoTime();
 
         for (int row = 0;
              row < samples;
@@ -253,16 +300,46 @@ public final class FermiNetSampleSpaceSrSolver {
             }
         }
 
+        long gramFinalizeNanos =
+                System.nanoTime() - gramFinalizeStarted;
+
+        long gramTotalNanos =
+                System.nanoTime() - gramTotalStarted;
+
+        /*
+         * ------------------------------------------------------------
+         * PHASE 3: N x N Cholesky solve
+         * ------------------------------------------------------------
+         */
+
+        long linearSolveStarted =
+                System.nanoTime();
+
         double[] y =
                 choleskySolve(
                         gram,
                         q,
                         samples);
 
+        long linearSolveNanos =
+                System.nanoTime() - linearSolveStarted;
+
+        /*
+         * ------------------------------------------------------------
+         * PHASE 4: second derivative sweep / delta reconstruction
+         * ------------------------------------------------------------
+         */
+
+        long reconstructionTotalStarted =
+                System.nanoTime();
+
         double[] delta =
                 new double[parameters];
 
         long reconstructionDerivativeValuesRead = 0L;
+        long reconstructionReadNanos = 0L;
+        long reconstructionArithmeticNanos = 0L;
+        int reconstructionBlocksRead = 0;
 
         for (int parameterStart = 0;
              parameterStart < parameters;
@@ -273,14 +350,25 @@ public final class FermiNetSampleSpaceSrSolver {
                             maximumBlock,
                             parameters - parameterStart);
 
+            long readStarted =
+                    System.nanoTime();
+
             observations.readParameterBlock(
                     parameterStart,
                     length,
                     block);
 
+            reconstructionReadNanos +=
+                    System.nanoTime() - readStarted;
+
+            reconstructionBlocksRead++;
+
             reconstructionDerivativeValuesRead +=
                     (long) samples
                             * length;
+
+            long arithmeticStarted =
+                    System.nanoTime();
 
             for (int local = 0;
                  local < length;
@@ -318,7 +406,22 @@ public final class FermiNetSampleSpaceSrSolver {
                 delta[parameterStart + local] =
                         -value;
             }
+
+            reconstructionArithmeticNanos +=
+                    System.nanoTime() - arithmeticStarted;
         }
+
+        long reconstructionTotalNanos =
+                System.nanoTime() - reconstructionTotalStarted;
+
+        /*
+         * ------------------------------------------------------------
+         * PHASE 5: validation / residual diagnostics
+         * ------------------------------------------------------------
+         */
+
+        long diagnosticsStarted =
+                System.nanoTime();
 
         requireFinite(
                 delta,
@@ -330,7 +433,10 @@ public final class FermiNetSampleSpaceSrSolver {
                         y,
                         samples);
 
-        for (int i = 0; i < samples; i++) {
+        for (int i = 0;
+             i < samples;
+             i++) {
+
             residual[i] -=
                     q[i];
         }
@@ -340,6 +446,67 @@ public final class FermiNetSampleSpaceSrSolver {
 
         double qNorm =
                 norm(q);
+
+        long diagnosticsNanos =
+                System.nanoTime() - diagnosticsStarted;
+
+        long totalNanos =
+                System.nanoTime() - totalStarted;
+
+        /*
+         * Print once per solve. No logging occurs inside parameter loops.
+         */
+        System.out.printf("""
+                FERMINET_SAMPLE_SPACE_SR_TIMING
+                  samples=%d
+                  parameters=%d
+                  parameter_block_size=%d
+
+                  setup_ms=%.3f
+
+                  gram_total_ms=%.3f
+                  gram_read_ms=%.3f
+                  gram_arithmetic_ms=%.3f
+                  gram_finalize_ms=%.3f
+                  gram_blocks_read=%d
+                  gram_derivative_values_read=%d
+
+                  linear_solve_ms=%.3f
+
+                  reconstruction_total_ms=%.3f
+                  reconstruction_read_ms=%.3f
+                  reconstruction_arithmetic_ms=%.3f
+                  reconstruction_blocks_read=%d
+                  reconstruction_derivative_values_read=%d
+
+                  diagnostics_ms=%.3f
+
+                  total_solver_ms=%.3f
+                %n""",
+                samples,
+                parameters,
+                parameterBlockSize,
+
+                millis(setupNanos),
+
+                millis(gramTotalNanos),
+                millis(gramReadNanos),
+                millis(gramArithmeticNanos),
+                millis(gramFinalizeNanos),
+                gramBlocksRead,
+                gramDerivativeValuesRead,
+
+                millis(linearSolveNanos),
+
+                millis(reconstructionTotalNanos),
+                millis(reconstructionReadNanos),
+                millis(reconstructionArithmeticNanos),
+                reconstructionBlocksRead,
+                reconstructionDerivativeValuesRead,
+
+                millis(diagnosticsNanos),
+
+                millis(totalNanos));
 
         return new Result(
                 delta,
@@ -387,6 +554,7 @@ public final class FermiNetSampleSpaceSrSolver {
                 if (row == column) {
                     if (!(value > 0.0)
                             || !Double.isFinite(value)) {
+
                         throw new IllegalArgumentException(
                                 "sample-space SR matrix is not SPD at diagonal "
                                         + row
@@ -396,7 +564,9 @@ public final class FermiNetSampleSpaceSrSolver {
 
                     lower[row * n + column] =
                             Math.sqrt(value);
+
                 } else {
+
                     lower[row * n + column] =
                             value
                                     / lower[column * n + column];
@@ -528,6 +698,12 @@ public final class FermiNetSampleSpaceSrSolver {
                                 + label);
             }
         }
+    }
+
+    private static double millis(
+            long nanos) {
+
+        return nanos / 1.0e6;
     }
 
     public record Result(
