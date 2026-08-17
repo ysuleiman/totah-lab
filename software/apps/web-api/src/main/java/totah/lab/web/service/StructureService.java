@@ -317,6 +317,52 @@ public class StructureService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public String getStructureFileContent(long structureId) throws IOException {
+        StructureDetailsProjection structure = structureRepository
+                .findStructureDetails(structureId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Structure not found: " + structureId
+                ));
+        return structureArtifactService.readText(
+                structure.getArtifactStorageLocation()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public String getValidatedSamFileContent(long structureId)
+            throws IOException {
+        StructureDetailsProjection structure = structureRepository
+                .findStructureDetails(structureId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        NOT_FOUND,
+                        "Structure not found: " + structureId
+                ));
+        String accession = structure.getUniProtId();
+        if (accession == null || accession.isBlank()) {
+            throw new IOException("Structure has no UniProt accession");
+        }
+        String validatedPose = switch (accession) {
+            case "Q6UX53" -> "WT_METTL7B_SAM_BOUND.pdb";
+            case "Q9H8H3" -> "WT_METTL7A_SAM_BOUND.pdb";
+            default -> throw new IOException(
+                    "No validated SAM pose is available for " + accession);
+        };
+        String complex = structureArtifactService.readClasspathText(
+                "/validated-sam/" + validatedPose);
+        String sam = complex.lines()
+                .filter(line -> (line.startsWith("HETATM")
+                        || line.startsWith("ATOM  "))
+                        && line.length() >= 20
+                        && "SAM".equals(line.substring(17, 20).trim()))
+                .collect(Collectors.joining("\n"));
+        if (sam.isBlank()) {
+            throw new IOException("Validated complex contains no SAM atoms");
+        }
+        return sam + "\nEND\n";
+    }
+
     private ChosenPocketSummary chosenPocket(
             StructureDetailsProjection structure
     ) {

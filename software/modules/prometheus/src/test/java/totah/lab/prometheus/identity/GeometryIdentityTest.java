@@ -42,23 +42,25 @@ class GeometryIdentityTest {
     }
 
     @Test
-    void serializationIsStableAtEightDecimals() {
+    void serializationPreservesEveryFiniteCoordinateBitExceptSignedZero() {
         CanonicalAtomMap map = TslFixtures.canonicalMap();
         List<Point3D> base = TslFixtures.geometryA();
 
-        // perturbation below the %.8f resolution must not change the hash
+        // Even a sub-1e-8 perturbation is a different frozen geometry.
         List<Point3D> perturbed = base.stream()
                 .map(p -> new Point3D(p.x() + 1e-12, p.y(), p.z()))
                 .toList();
         assertThat(GeometryIdentity.of(map, perturbed).sha256())
-                .isEqualTo(GeometryIdentity.of(map, base).sha256());
-
-        // perturbation above the %.8f resolution must change the hash
-        List<Point3D> moved = base.stream()
-                .map(p -> new Point3D(p.x() + 1e-6, p.y(), p.z()))
-                .toList();
-        assertThat(GeometryIdentity.of(map, moved).sha256())
                 .isNotEqualTo(GeometryIdentity.of(map, base).sha256());
+
+        List<Point3D> positiveZero = base.stream()
+                .map(p -> new Point3D(p.x() == 0.0 ? 0.0 : p.x(), p.y(), p.z()))
+                .toList();
+        List<Point3D> negativeZero = positiveZero.stream()
+                .map(p -> new Point3D(p.x() == 0.0 ? -0.0 : p.x(), p.y(), p.z()))
+                .toList();
+        assertThat(GeometryIdentity.of(map, negativeZero).sha256())
+                .isEqualTo(GeometryIdentity.of(map, positiveZero).sha256());
     }
 
     @Test

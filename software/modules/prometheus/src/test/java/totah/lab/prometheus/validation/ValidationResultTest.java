@@ -83,4 +83,36 @@ class ValidationResultTest {
         assertThat(result.allPassed()).isFalse();
         assertThat(result.decision().state()).isEqualTo(DecisionState.FAILED_HOLDOUT);
     }
+
+    @Test
+    void emptyOutcomesCannotVacuouslyPromote() {
+        assertThatThrownBy(() -> ValidationResult.of(frozen(), List.of(),
+                decision(DecisionState.VALIDATED_FOR_PRODUCTION,
+                        "no gates were run")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("every preregistered gate");
+    }
+
+    @Test
+    void outcomesMustBeTheExactPreregisteredGates() {
+        ValidationGate loose = new ValidationGate("loose", "unregistered",
+                "rmse", 100, Comparison.AT_MOST);
+        GateOutcome substituted = new GateOutcome(loose, 2.3, true,
+                "passes only the substituted gate");
+        assertThatThrownBy(() -> ValidationResult.of(frozen(),
+                List.of(substituted),decision(
+                        DecisionState.VALIDATED_FOR_PRODUCTION,
+                        "substituted a loose gate")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("does not match preregistered plan");
+    }
+
+    @Test
+    void callerCannotLieAboutGateOutcome() {
+        assertThatThrownBy(() -> new GateOutcome(
+                ValidationTestData.rmseGate(),2.3,true,
+                "caller claims a passing result"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("gate.passes");
+    }
 }

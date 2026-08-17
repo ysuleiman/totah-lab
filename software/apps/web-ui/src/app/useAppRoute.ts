@@ -5,6 +5,7 @@ export const DEFAULT_POCKET_ID = 1
 
 const DEFAULT_PATH = `/structures/${DEFAULT_STRUCTURE_ID}`
 const STRUCTURE_PATH = /^\/structures\/([1-9]\d*)$/
+const STRUCTURE_COMPARE_PATH = /^\/structures\/([1-9]\d*)\/compare\/([1-9]\d*)$/
 const SIMILAR_PATH = /^\/pockets\/([1-9]\d*)\/similar$/
 const COMPARE_PATH = /^\/pockets\/([1-9]\d*)\/compare\/([1-9]\d*)$/
 
@@ -23,6 +24,7 @@ function normalizePath(pathname: string): string {
 
   if (
     STRUCTURE_PATH.test(pathname)
+    || STRUCTURE_COMPARE_PATH.test(pathname)
     || SIMILAR_PATH.test(pathname)
     || COMPARE_PATH.test(pathname)
   ) {

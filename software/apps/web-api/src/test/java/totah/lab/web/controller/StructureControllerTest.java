@@ -41,6 +41,41 @@ class StructureControllerTest {
     }
 
     @Test
+    void returnsStructureArtifactForVisualization() throws Exception {
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new StructureController(
+                        new RecordingStructureService(),
+                        new RecordingResidueEvidenceService()
+                ))
+                .build();
+
+        mockMvc.perform(get("/api/structures/2/file"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result
+                        .MockMvcResultMatchers.content()
+                        .contentTypeCompatibleWith("text/plain"))
+                .andExpect(org.springframework.test.web.servlet.result
+                        .MockMvcResultMatchers.content()
+                        .string("ATOM structure 2"));
+    }
+
+    @Test
+    void returnsValidatedSamForVisualization() throws Exception {
+        MockMvc mockMvc = MockMvcBuilders
+                .standaloneSetup(new StructureController(
+                        new RecordingStructureService(),
+                        new RecordingResidueEvidenceService()
+                ))
+                .build();
+
+        mockMvc.perform(get("/api/structures/2/sam-file"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result
+                        .MockMvcResultMatchers.content()
+                        .string("HETATM SAM structure 2"));
+    }
+
+    @Test
     void bindsResidueNeighborCutoff() throws Exception {
         RecordingStructureService service = new RecordingStructureService();
         MockMvc mockMvc = MockMvcBuilders
@@ -160,6 +195,16 @@ class StructureControllerTest {
                     )),
                     "/api/structures/" + structureId + "/pockets"
             );
+        }
+
+        @Override
+        public String getStructureFileContent(long structureId) {
+            return "ATOM structure " + structureId;
+        }
+
+        @Override
+        public String getValidatedSamFileContent(long structureId) {
+            return "HETATM SAM structure " + structureId;
         }
 
         @Override

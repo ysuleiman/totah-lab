@@ -96,4 +96,12 @@ class BondiClashCheckerTest {
 
         assertThat(checker.clashes(List.of(S26, xe))).hasSize(1);
     }
+
+    @Test
+    void nonFiniteConfigurationCannotSilentlyDisableClashDetection() {
+        assertThatThrownBy(() -> new BondiClashChecker(Double.NaN, Set.of()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ClashAtom("OW", "O", Double.NaN, 0.0, 0.0))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

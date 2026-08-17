@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import totah.lab.web.service.ResidueEvidenceService;
 import totah.lab.web.service.StructureService;
 
@@ -43,6 +45,26 @@ public final class StructureController {
             @PathVariable("structureId") long structureId
     ) {
         return structureService.getStructure(structureId);
+    }
+
+    @GetMapping(value = "/{structureId}/file",
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> structureFile(
+            @PathVariable("structureId") long structureId
+    ) throws IOException {
+        return ResponseEntity.ok(
+                structureService.getStructureFileContent(structureId)
+        );
+    }
+
+    @GetMapping(value = "/{structureId}/sam-file",
+            produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> validatedSamFile(
+            @PathVariable("structureId") long structureId
+    ) throws IOException {
+        return ResponseEntity.ok(
+                structureService.getValidatedSamFileContent(structureId)
+        );
     }
 
     @GetMapping("/{structureId}/residues/{residueId}/neighbors")

@@ -49,6 +49,37 @@ class ChainTest {
     }
 
     @Test
+    void shouldRejectNullResidueElement() {
+        List<Residue> residues = new ArrayList<>();
+        residues.add(null);
+
+        assertThrows(
+                NullPointerException.class,
+                () -> new Chain("A", residues));
+    }
+
+    @Test
+    void shouldRejectDuplicateResidueIdentity() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new Chain(
+                        "A",
+                        List.of(
+                                new Residue("ALA", 10, 'A', List.of()),
+                                new Residue("GLY", 10, 'A', List.of()))));
+    }
+
+    @Test
+    void shouldPreserveResidueOrder() {
+        Residue first = new Residue("GLY", 20, List.of());
+        Residue second = new Residue("ALA", 10, List.of());
+
+        Chain chain = new Chain("A", List.of(first, second));
+
+        assertEquals(List.of(first, second), chain.residues());
+    }
+
+    @Test
     void shouldReturnResidueCount() {
         Chain chain = new Chain(
                 "A",

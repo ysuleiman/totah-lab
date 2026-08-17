@@ -1,18 +1,25 @@
 import { type FormEvent, useState } from 'react'
-import type { Structure } from '../../../api/types'
+import type { PocketDetails, Structure } from '../../../api/types'
+import { MolstarViewer } from './MolstarViewer'
 
 interface Props {
   structure: Structure
+  activePocket?: PocketDetails | null
   onStructureSubmit: (structureId: number) => void
+  onCompare?: (structureId: number) => void
   onReportRequest?: () => void
 }
 
 export function StructureHero({
   structure,
+  activePocket,
   onStructureSubmit,
+  onCompare,
   onReportRequest,
 }: Props) {
   const [input, setInput] = useState(String(structure.id))
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [mechanisticViewerOpen, setMechanisticViewerOpen] = useState(false)
   const receptor = structure.receptor
   const geneName = receptor.geneName ?? receptor.targetName
   const proteinName = receptor.proteinName ?? receptor.targetName
@@ -25,7 +32,7 @@ export function StructureHero({
     }
   }
 
-  return (
+  return (<>
     <section className="structure-hero">
       <div>
         <p className="eyebrow">
@@ -65,6 +72,36 @@ export function StructureHero({
         <button
           className="report-button"
           type="button"
+          onClick={() => setViewerOpen(true)}
+        >
+          3D view
+          <small>Mol*</small>
+        </button>
+        <button
+          className="report-button"
+          type="button"
+          disabled={!activePocket}
+          title={activePocket
+            ? 'Open the mechanistic pocket viewer'
+            : 'Waiting for the selected pocket geometry'}
+          onClick={() => setMechanisticViewerOpen(true)}
+        >
+          Mechanistic pocket
+          <small>New panel</small>
+        </button>
+        {onCompare && (
+          <button
+            className="report-button"
+            type="button"
+            onClick={() => onCompare(structure.id === 2 ? 3 : 2)}
+          >
+            Compare
+            <small>With structure {structure.id === 2 ? 3 : 2}</small>
+          </button>
+        )}
+        <button
+          className="report-button"
+          type="button"
           disabled={!onReportRequest}
           title={
             onReportRequest
@@ -92,5 +129,22 @@ export function StructureHero({
         </div>
       </dl>
     </section>
-  )
+    {viewerOpen && (
+      <MolstarViewer
+        structureId={structure.id}
+        structureName={proteinName}
+        pocket={activePocket ?? null}
+        onClose={() => setViewerOpen(false)}
+      />
+    )}
+    {mechanisticViewerOpen && (
+      <MolstarViewer
+        structureId={structure.id}
+        structureName={proteinName}
+        pocket={activePocket ?? null}
+        variant="mechanistic"
+        onClose={() => setMechanisticViewerOpen(false)}
+      />
+    )}
+  </>)
 }

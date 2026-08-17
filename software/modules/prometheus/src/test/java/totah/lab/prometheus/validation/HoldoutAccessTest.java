@@ -84,6 +84,18 @@ class HoldoutAccessTest {
         assertThat(revealed).containsExactly(hold);
     }
 
+    @Test
+    void frozenCandidateCannotRevealADifferentHoldout() {
+        HoldoutDataset holdout = new HoldoutDataset("holdout-2", new LinkedHashSet<>(), "");
+        FrozenCandidate frozen = FrozenCandidate.freeze(
+                ValidationTestData.candidate("cand-1", 91.0), ValidationTestData.plan("holdout-1"));
+
+        assertThatThrownBy(() -> holdout.revealTo(frozen, new EvidenceBundle()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("holdout-1")
+                .hasMessageContaining("holdout-2");
+    }
+
     private static Set<String> methodNames(Method[] methods) {
         return Arrays.stream(methods)
                 .filter(m -> Modifier.isPublic(m.getModifiers()))

@@ -48,4 +48,12 @@ class CostEstimateTest {
         assertThatThrownBy(() -> new CostEstimate(0, 0.0, 0.0, 0.0, -0.01))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void nonFiniteComponentsAreRejected() {
+        assertThatThrownBy(() -> new CostEstimate(1, Double.NaN, 0.0, 0.0, 0.0))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new CostEstimate(1, 0.0, Double.POSITIVE_INFINITY, 0.0, 0.0))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

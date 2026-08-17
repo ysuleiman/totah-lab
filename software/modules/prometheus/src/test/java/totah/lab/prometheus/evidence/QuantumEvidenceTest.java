@@ -36,7 +36,8 @@ class QuantumEvidenceTest {
         for (ConvergenceStatus status : List.of(
                 ConvergenceStatus.FAILED,
                 ConvergenceStatus.NOT_CONVERGED,
-                ConvergenceStatus.EMPTY_OUTPUT)) {
+                ConvergenceStatus.EMPTY_OUTPUT,
+                ConvergenceStatus.UNKNOWN)) {
             assertThatThrownBy(() -> build(status, EvidenceAcceptanceState.ACCEPTED))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("cannot be ACCEPTED");

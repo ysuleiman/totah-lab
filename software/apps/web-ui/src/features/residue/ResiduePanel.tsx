@@ -41,6 +41,16 @@ interface Props {
   bare?: boolean
   /** Tints chosen-pocket, non-contact residues by category. */
   colorPocketByCategory?: boolean
+  /** Keeps neighborhood selection and cutoff inline; hides detail panels. */
+  neighborhoodOnly?: boolean
+  /** Omits the legend when a parent view provides one shared guide. */
+  hideGuide?: boolean
+  /** Controlled neighbor cutoff, used when multiple residue maps share one slider. */
+  neighborCutoff?: number
+  /** Notifies a parent-owned neighbor cutoff control. */
+  onNeighborCutoffChange?: (cutoff: number) => void
+  /** Omits the inline cutoff slider while preserving selection status and clearing. */
+  hideNeighborCutoff?: boolean
 }
 
 export function ResiduePanel({
@@ -62,10 +72,17 @@ export function ResiduePanel({
   contextNote,
   bare = false,
   colorPocketByCategory = false,
+  neighborhoodOnly = false,
+  hideGuide = false,
+  neighborCutoff,
+  onNeighborCutoffChange,
+  hideNeighborCutoff = false,
 }: Props) {
   const [query, setQuery] = useState('')
   const [selectedResidue, setSelectedResidue] = useState<Residue | null>(null)
-  const [cutoff, setCutoff] = useState(6)
+  const [localCutoff, setLocalCutoff] = useState(6)
+  const cutoff = neighborCutoff ?? localCutoff
+  const setCutoff = onNeighborCutoffChange ?? setLocalCutoff
   const [measurementNeighborId, setMeasurementNeighborId] =
     useState<number | null>(null)
   const [firstAtomChoice, setFirstAtomChoice] = useState<string | null>(null)
@@ -165,7 +182,7 @@ export function ResiduePanel({
           </label>
         </div>
       )}
-      <div className="residue-context">
+      {!neighborhoodOnly && <div className="residue-context">
         <span>
           {contextNote ?? (
             pocketLoading ? (
@@ -207,21 +224,48 @@ export function ResiduePanel({
             </select>
           </label>
         )}
-      </div>
-      <ResidueContactLegend threshold={contactScoreThreshold} />
-      {activePocket?.evidence && (
+      </div>}
+      {!neighborhoodOnly && (
+        <ResidueContactLegend threshold={contactScoreThreshold} />
+      )}
+      {!neighborhoodOnly && activePocket?.evidence && (
         <BiohubPocketEvidence evidence={activePocket.evidence} />
       )}
-      <ResidueGuide
-        showChosenPocket={
-          highlightedResidueIds.size > 0 || chosenPocketResidueIds.size > 0
-        }
-        showBiohub={activePocket?.source === 'BIOHUB'}
-        showDocking={residueAnalysis.size > 0}
-        showConstraint={residueEvidence.size > 0}
-        showNeighbors={neighborResidueIds.size > 0}
-        categories={pocketCategories}
-      />
+      {!hideGuide && (
+        <ResidueGuide
+          showChosenPocket={
+            highlightedResidueIds.size > 0 || chosenPocketResidueIds.size > 0
+          }
+          showBiohub={activePocket?.source === 'BIOHUB'}
+          showDocking={residueAnalysis.size > 0}
+          showConstraint={residueEvidence.size > 0}
+          showNeighbors={neighborResidueIds.size > 0}
+          categories={pocketCategories}
+        />
+      )}
+      {neighborhoodOnly && selectedResidue && (
+        <div className={`compact-neighborhood-control${hideNeighborCutoff ? ' minimal' : ''}`}>
+          {!hideNeighborCutoff && <label>
+            <span>Neighbor cutoff</span>
+            <input
+              aria-label="Neighbor cutoff"
+              type="range"
+              min="2"
+              max="12"
+              step="0.5"
+              value={cutoff}
+              onChange={(event) => setCutoff(Number(event.target.value))}
+            />
+            <strong>{cutoff.toFixed(1)} Å</strong>
+          </label>}
+          <button type="button" onClick={() => setSelectedResidue(null)}>
+            Clear
+          </button>
+          {neighborhood.error && (
+            <small>Neighbor calculation unavailable</small>
+          )}
+        </div>
+      )}
       <ResidueSequence
         residues={filtered}
         pocketResidueIds={highlightedResidueIds}
@@ -233,10 +277,11 @@ export function ResiduePanel({
         residueAnalysis={residueAnalysis}
         residueEvidence={residueEvidence}
         selectedResidueId={selectedResidue?.id ?? null}
-        onResidueSelect={setSelectedResidue}
+        onResidueSelect={(residue) => setSelectedResidue((current) =>
+          current?.id === residue.id ? null : residue)}
         colorPocketByCategory={colorPocketByCategory}
       />
-      {selectedResidue && (
+      {selectedResidue && !neighborhoodOnly && (
         <div className="residue-detail">
           <div className="residue-detail-title">
             <div>

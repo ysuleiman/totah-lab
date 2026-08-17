@@ -1,0 +1,17 @@
+Reference repository: google-deepmind/ferminet
+Reference commit: c4312c315dda1c5728994ba89629744f71c6eb66
+JAX x64: enabled
+Fixture purpose: forward-architecture numerical parity only
+Parameter vector: arbitrary deterministic frozen vector in Java layout order (seed 44017)
+Parameter count: 1204
+
+Reference equations/tensor conventions transcribed directly from pinned official source:
+- ferminet/networks.py construct_input_features
+- make_ferminet_features
+- construct_symmetric_features
+- make_fermi_net_layers/apply_layer
+- make_orbitals
+- ferminet/network_blocks.py linear_layer, logdet_matmul
+- ferminet/envelopes.py make_isotropic_envelope
+
+This fixture does NOT claim parity of DeepMind parameter initialization PRNG.

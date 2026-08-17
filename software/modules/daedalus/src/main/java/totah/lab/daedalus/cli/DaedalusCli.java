@@ -10,9 +10,9 @@ import totah.lab.daedalus.docking.PocketGridBox;
 import totah.lab.daedalus.docking.PocketGridBoxLoader;
 import totah.lab.daedalus.docking.VinaDockingOptions;
 import totah.lab.daedalus.docking.VinaDockingResult;
-import totah.lab.daedalus.ligandprep.Ad4TypingDiagnosis;
-import totah.lab.daedalus.ligandprep.FileLigandPrepSampler;
-import totah.lab.daedalus.ligandprep.LigandPrepComparisonRunner;
+import totah.lab.daedalus.conformance.ligandprep.Ad4TypingDiagnosis;
+import totah.lab.daedalus.conformance.ligandprep.FileLigandPrepSampler;
+import totah.lab.daedalus.conformance.ligandprep.LigandPrepComparisonRunner;
 import totah.lab.hephaestus.client.HephaestusClients;
 
 import java.io.IOException;

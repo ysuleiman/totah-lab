@@ -170,6 +170,19 @@ class LegacyPhase2ArchiveIngesterTest {
     }
 
     @Test
+    void respColumnDriftCannotSilentlyProduceAcceptedEmptyCharges() throws Exception {
+        Path charges = unit05O.resolve("TSL_RSH_NATIVE_AMBER_RESP_CHARGES.csv");
+        Files.writeString(charges, "atom_id,renamed_charge_column\n9,-0.287472\n");
+
+        IngestionResult result = ingest();
+
+        assertThat(result.bundle().byType(CalculationType.RESP)).noneSatisfy(evidence ->
+                assertThat(evidence.acceptance()).isEqualTo(EvidenceAcceptanceState.ACCEPTED));
+        assertThat(result.issues()).anySatisfy(issue ->
+                assertThat(issue.message()).contains("RESP charge count"));
+    }
+
+    @Test
     void geometryAuditExcludesDesignFailureProbes() throws Exception {
         IngestionResult result = ingest();
 
@@ -365,7 +378,9 @@ class LegacyPhase2ArchiveIngesterTest {
     }
 
     private void writeRespModel() throws IOException {
-        Files.createDirectories(unit05O.resolve("native-amber-resp3min-hf631gd/regeneration-A/all-three"));
+        Path resp = Files.createDirectories(
+                unit05O.resolve("native-amber-resp3min-hf631gd/regeneration-A/all-three"))
+                .getParent().getParent();
         Files.writeString(unit05O.resolve("TSL_RSH_NATIVE_AMBER_RESP_CHARGES.csv"), """
                 atom_id,atom_name,native_resp_charge_e,native_output_precision,canonical_order
                 9,C8,-0.287472,6_DECIMAL_NATIVE_QOUT,9
@@ -373,6 +388,15 @@ class LegacyPhase2ArchiveIngesterTest {
                 11,C10,0.099171,6_DECIMAL_NATIVE_QOUT,11
                 26,S26,-0.290064,6_DECIMAL_NATIVE_QOUT,26
                 56,H56,0.172272,6_DECIMAL_NATIVE_QOUT,56
+                """);
+        Files.writeString(resp.resolve("result.json"), """
+                {
+                  "status": "COMPLETE",
+                  "regenerations": {
+                    "regeneration-A": {"charges": [-0.287472, -0.047795, 0.099171, -0.290064, 0.172272]},
+                    "regeneration-B": {"charges": [-0.287472, -0.047795, 0.099171, -0.290064, 0.172272]}
+                  }
+                }
                 """);
         Files.writeString(unit05O.resolve("NATIVE_AMBER_RESP_DECISION_REPORT.md"), """
                 # Native Amber RESP decision report

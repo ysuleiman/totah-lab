@@ -1,5 +1,7 @@
 package totah.lab.prometheus.evidence;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import totah.lab.prometheus.fixtures.EvidenceFixtures;
@@ -55,5 +57,27 @@ class EvidenceIdentityTest {
 
         assertThat(a.sameGeometryDifferentProtocol(b)).isFalse();
         assertThat(a.isExactDuplicateOf(b)).isFalse();
+    }
+
+    @Test
+    void listDelimitersCannotCollapseDifferentConstraintStructures() {
+        EvidenceIdentity base = EvidenceFixtures.identity(CalculationType.SINGLE_POINT,
+                EvidenceFixtures.PBE_DEF2_SVP, TslFixtures.geometryIdentityA());
+        EvidenceIdentity oneConstraint = new EvidenceIdentity(base.molecule(), base.atomMapHash(), base.geometry(),
+                base.formalCharge(), base.multiplicity(), base.calculationType(), base.protocol(),
+                List.of("freeze=a,b"), base.requestedOutputs());
+        EvidenceIdentity twoConstraints = new EvidenceIdentity(base.molecule(), base.atomMapHash(), base.geometry(),
+                base.formalCharge(), base.multiplicity(), base.calculationType(), base.protocol(),
+                List.of("freeze=a", "b"), base.requestedOutputs());
+
+        assertThat(oneConstraint.evidenceHash()).isNotEqualTo(twoConstraints.evidenceHash());
+    }
+
+    @Test
+    void protocolDelimitersCannotCollapseDifferentFields() {
+        QmProtocol first = new QmProtocol("a|b", "c", "none", "none", false, "PySCF", "2.8");
+        QmProtocol second = new QmProtocol("a", "b|c", "none", "none", false, "PySCF", "2.8");
+
+        assertThat(first.protocolKey()).isNotEqualTo(second.protocolKey());
     }
 }

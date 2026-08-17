@@ -6,9 +6,11 @@ import { LigandAnalysisPage } from '../features/ligands/LigandAnalysisPage'
 import { SelectivityWorkspace } from '../features/selectivity/SelectivityWorkspace'
 import { SimilarPocketsPage } from '../features/similar/SimilarPocketsPage'
 import { StructureWorkspace } from '../features/structure/StructureWorkspace'
+import { StructureComparisonPage } from '../features/structure/StructureComparisonPage'
 import { DcmbReportPage } from '../features/report/DcmbReportPage'
 
 const STRUCTURE_PATH = /^\/structures\/([1-9]\d*)$/
+const STRUCTURE_COMPARE_PATH = /^\/structures\/([1-9]\d*)\/compare\/([1-9]\d*)$/
 const SIMILAR_PATH = /^\/pockets\/([1-9]\d*)\/similar$/
 const COMPARE_PATH = /^\/pockets\/([1-9]\d*)\/compare\/([1-9]\d*)$/
 const POCKET_PATH = /^\/pockets\/([1-9]\d*)\//
@@ -27,12 +29,21 @@ export function App() {
     : cardPocketId ?? DEFAULT_POCKET_ID
 
   const structureMatch = STRUCTURE_PATH.exec(pathname)
+  const structureCompareMatch = STRUCTURE_COMPARE_PATH.exec(pathname)
   const similarMatch = SIMILAR_PATH.exec(pathname)
   const compareMatch = COMPARE_PATH.exec(pathname)
 
   let content: ReactNode
 
-  if (compareMatch) {
+  if (structureCompareMatch) {
+    content = (
+      <StructureComparisonPage
+        leftStructureId={Number(structureCompareMatch[1])}
+        rightStructureId={Number(structureCompareMatch[2])}
+        onNavigate={navigate}
+      />
+    )
+  } else if (compareMatch) {
     content = (
       <PocketComparisonPage
         queryPocketId={Number(compareMatch[1])}
@@ -63,6 +74,8 @@ export function App() {
         structureId={structureId}
         onNavigate={(nextStructureId) =>
           navigate(`/structures/${nextStructureId}`)}
+        onCompare={(otherStructureId) =>
+          navigate(`/structures/${structureId}/compare/${otherStructureId}`)}
         onPocketSelect={setCardPocketId}
       />
     )

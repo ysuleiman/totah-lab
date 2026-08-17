@@ -24,7 +24,7 @@ final class LockedPyscfEnergyGradientExecutorTest {
         assertThat(executor.supports(spec)).isFalse(); // fixture asks energy only, not gradient
         assertThatThrownBy(() -> executor.execute(spec))
                 .isInstanceOf(EvidenceExecutionException.class)
-                .hasMessageContaining("unsupported");
+                .hasMessageContaining("external Python execution is disabled");
     }
 
     @Test
@@ -32,5 +32,14 @@ final class LockedPyscfEnergyGradientExecutorTest {
         var executor = new LockedPyscfEnergyGradientExecutor(
                 Path.of("python"), Path.of("runner.py"), temporary, Map.of(), Set.of());
         assertThat(executor.executorId()).isEqualTo("pyscf-locked-energy-gradient-pilot");
+    }
+
+    @Test
+    void pythonExecutionIsPermanentlyDisabled() {
+        var executor = new LockedPyscfEnergyGradientExecutor(
+                Path.of("python"), Path.of("runner.py"), temporary, Map.of(), Set.of());
+        assertThatThrownBy(() -> executor.execute(ExecutionTestSpecs.withSoftware("PySCF")))
+                .isInstanceOf(EvidenceExecutionException.class)
+                .hasMessageContaining("external Python execution is disabled");
     }
 }

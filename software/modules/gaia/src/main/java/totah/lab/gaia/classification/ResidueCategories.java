@@ -14,6 +14,12 @@ import java.util.Set;
  */
 public final class ResidueCategories {
 
+    private static final Set<String> STANDARD_AMINO_ACIDS = Set.of(
+            "ALA", "ARG", "ASN", "ASP", "CYS",
+            "GLN", "GLU", "GLY", "HIS", "ILE",
+            "LEU", "LYS", "MET", "PHE", "PRO",
+            "SER", "THR", "TRP", "TYR", "VAL");
+
     private static final Set<String> HYDROPHOBIC =
             Set.of("ALA", "VAL", "ILE", "LEU", "MET", "PHE", "TYR", "TRP");
     private static final Set<String> POLAR =
@@ -25,6 +31,12 @@ public final class ResidueCategories {
             Set.of("PHE", "TYR", "TRP", "HIS");
 
     private ResidueCategories() {
+    }
+
+    public static boolean isStandardAminoAcid(String residueName) {
+        Objects.requireNonNull(residueName, "residueName");
+        return STANDARD_AMINO_ACIDS.contains(
+                residueName.trim().toUpperCase(Locale.ROOT));
     }
 
     public static Set<ResidueCategory> classify(String residueName) {

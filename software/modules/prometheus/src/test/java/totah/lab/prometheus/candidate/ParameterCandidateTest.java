@@ -113,4 +113,18 @@ class ParameterCandidateTest {
         assertThat(production.parameters().getFirst().provenance().sourceEvidenceHashes())
                 .containsExactly("abc123");
     }
+
+    @Test
+    void lineageShapeMustMatchGeneration() {
+        assertThatThrownBy(() -> new ParameterCandidate("bad-root", TslFixtures.TSL,
+                TslFixtures.forceFieldMapGaff2(), List.of(angleParam()), null, 5,
+                EvidenceClass.EVIDENCE, T0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("generation 0");
+        assertThatThrownBy(() -> new ParameterCandidate("bad-child", TslFixtures.TSL,
+                TslFixtures.forceFieldMapGaff2(), List.of(angleParam()), " ", 1,
+                EvidenceClass.EVIDENCE, T0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("non-blank parent");
+    }
 }

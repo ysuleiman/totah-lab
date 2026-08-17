@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.zip.GZIPInputStream;
@@ -40,17 +40,45 @@ public class StructureArtifactService {
             @Value("${totah.artifacts.root}") String artifactRoot,
             @Value("${totah.artifacts.external-root:}")
                     String externalRoot) {
-        Objects.requireNonNull(artifactRoot, "artifactRoot");
-        if (artifactRoot.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Artifact storage root must not be blank");
-        }
-        this.artifactRoot = Path.of(artifactRoot)
-                .toAbsolutePath()
-                .normalize();
+        this.artifactRoot = resolveArtifactRoot(artifactRoot);
         this.externalRoot = externalRoot == null || externalRoot.isBlank()
                 ? null
                 : Path.of(externalRoot).toAbsolutePath().normalize();
+    }
+
+    private static Path resolveArtifactRoot(String configuredRoot) {
+        if (configuredRoot != null && !configuredRoot.isBlank()) {
+            Path configured = Path.of(configuredRoot)
+                    .toAbsolutePath()
+                    .normalize();
+            Path repositoryResources = configured.resolve(
+                    "resources/shared-resources/src/main/resources");
+            return Files.isDirectory(repositoryResources)
+                    ? repositoryResources
+                    : configured;
+        }
+
+        Path discovered = discoverArtifactRoot(Path.of(
+                System.getProperty("user.dir")));
+        if (discovered == null) {
+            throw new IllegalArgumentException(
+                    "Artifact storage root is not configured and could not "
+                            + "be discovered from the working directory");
+        }
+        return discovered;
+    }
+
+    static Path discoverArtifactRoot(Path start) {
+        Path current = start.toAbsolutePath().normalize();
+        while (current != null) {
+            Path candidate = current.resolve(
+                    "resources/shared-resources/src/main/resources");
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+            current = current.getParent();
+        }
+        return null;
     }
 
     public Structure load(
@@ -66,6 +94,41 @@ public class StructureArtifactService {
         Structure loaded = readStructure(path);
         cache.put(artifactId, new CachedStructure(path, loaded));
         return loaded;
+    }
+
+    public String readText(String storageLocation) throws IOException {
+        Path path = resolveStorageLocation(storageLocation);
+        try (InputStream fileInput = Files.newInputStream(path);
+             InputStream input = path.getFileName().toString().endsWith(".gz")
+                     ? new GZIPInputStream(fileInput)
+                     : fileInput) {
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    public String readExternalText(Path relativePath) throws IOException {
+        if (externalRoot == null) {
+            throw new IOException("External artifact root is not configured");
+        }
+        if (relativePath.isAbsolute()) {
+            throw new IOException("External artifact path must be relative");
+        }
+        Path resolved = externalRoot.resolve(relativePath).normalize();
+        if (!resolved.startsWith(externalRoot)) {
+            throw new IOException("External artifact path escapes configured root");
+        }
+        return readText(resolved.toString());
+    }
+
+    public String readClasspathText(String resourcePath) throws IOException {
+        try (InputStream input = StructureArtifactService.class
+                .getResourceAsStream(resourcePath)) {
+            if (input == null) {
+                throw new IOException(
+                        "Classpath artifact was not found: " + resourcePath);
+            }
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     private Structure readStructure(Path path) throws IOException {

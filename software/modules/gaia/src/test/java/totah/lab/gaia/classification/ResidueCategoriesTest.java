@@ -3,9 +3,18 @@ package totah.lab.gaia.classification;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResidueCategoriesTest {
+
+    @Test
+    void recognizesOnlyCanonicalStandardAminoAcidNames() {
+        assertTrue(ResidueCategories.isStandardAminoAcid(" ala "));
+        assertFalse(ResidueCategories.isStandardAminoAcid("MSE"));
+        assertFalse(ResidueCategories.isStandardAminoAcid("HOH"));
+    }
 
     @Test
     void phenylalanineIsHydrophobicAndAromatic() {

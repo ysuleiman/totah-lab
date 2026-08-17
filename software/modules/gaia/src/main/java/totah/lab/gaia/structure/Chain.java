@@ -1,9 +1,15 @@
 package totah.lab.gaia.structure;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
+/**
+ * An ordered collection of residues with unique canonical identities.
+ * Residue order is preserved exactly as supplied.
+ */
 public record Chain(
         String id,
         List<Residue> residues) {
@@ -20,6 +26,7 @@ public record Chain(
         }
 
         residues = List.copyOf(residues);
+        validateUniqueResidueIdentities(residues);
     }
 
     /**
@@ -110,5 +117,36 @@ public record Chain(
         }
 
         return insertionCode;
+    }
+
+    private static void validateUniqueResidueIdentities(
+            List<Residue> residues) {
+
+        Set<ResiduePosition> identities = new HashSet<>();
+        for (Residue residue : residues) {
+            ResiduePosition identity = new ResiduePosition(
+                    residue.getNumber(),
+                    normalizeInsertionCode(residue.getInsertionCode()));
+            if (!identities.add(identity)) {
+                throw new IllegalArgumentException(
+                        "Duplicate residue identity: "
+                                + identity.number()
+                                + formatInsertionCode(
+                                        identity.insertionCode()));
+            }
+        }
+    }
+
+    private static String formatInsertionCode(
+            Character insertionCode) {
+
+        return insertionCode == null
+                ? ""
+                : Character.toString(insertionCode);
+    }
+
+    private record ResiduePosition(
+            int number,
+            Character insertionCode) {
     }
 }

@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import type { AlphaSphereView, Point3D } from '../../api/types'
 
+export interface ViewerCamera {
+  yaw: number
+  pitch: number
+  zoom: number
+}
+
 interface Props {
   queryPoints: Point3D[]
   originalCandidatePoints: Point3D[]
@@ -19,6 +25,22 @@ interface Props {
   candidateSpheres?: AlphaSphereView[]
   alignedCandidateSpheres?: AlphaSphereView[]
   sphereScale?: number
+  labels?: { point: Point3D; label: string }[]
+  showLabels?: boolean
+  surfaceTriangles?: Point3D[]
+  originalCandidateBonds?: Point3D[]
+  alignedPointSize?: number
+  camera?: ViewerCamera
+  onCameraChange?: (camera: ViewerCamera) => void
+  sceneCenter?: Point3D
+  sceneRadius?: number
+}
+
+interface ProjectedLabel {
+  label: string
+  x: number
+  y: number
+  visible: boolean
 }
 
 interface GlState {
@@ -34,6 +56,7 @@ interface GlState {
   pixelsPerUnitLocation: WebGLUniformLocation | null
   useRadiusLocation: WebGLUniformLocation | null
   rimLocation: WebGLUniformLocation | null
+  meshLocation: WebGLUniformLocation | null
   queryBuffer: WebGLBuffer | null
   originalCandidateBuffer: WebGLBuffer | null
   alignedCandidateBuffer: WebGLBuffer | null
@@ -44,6 +67,8 @@ interface GlState {
   querySphereBuffer: WebGLBuffer | null
   candidateSphereBuffer: WebGLBuffer | null
   alignedSphereBuffer: WebGLBuffer | null
+  surfaceBuffer: WebGLBuffer | null
+  originalCandidateBondBuffer: WebGLBuffer | null
   queryCount: number
   originalCandidateCount: number
   alignedCandidateCount: number
@@ -53,6 +78,8 @@ interface GlState {
   querySphereCount: number
   candidateSphereCount: number
   alignedSphereCount: number
+  surfaceCount: number
+  originalCandidateBondCount: number
   radius: number
 }
 
@@ -88,11 +115,13 @@ precision mediump float;
 uniform vec3 uColor;
 uniform float uOpacity;
 uniform float uRim;
+uniform float uMesh;
 void main() {
-  vec2 offset = gl_PointCoord - vec2(0.5);
-  float dist = length(offset) * 2.0;
-  if (dist > 1.0) {
-    discard;
+  float dist = 0.0;
+  if (uMesh < 0.5) {
+    vec2 offset = gl_PointCoord - vec2(0.5);
+    dist = length(offset) * 2.0;
+    if (dist > 1.0) discard;
   }
   vec3 color = uColor;
   if (uRim > 0.5) {
@@ -106,11 +135,22 @@ void main() {
 export function PointCloudViewer(props: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const stateRef = useRef<GlState | null>(null)
-  const cameraRef = useRef({ yaw: 0.7, pitch: 0.45, zoom: 3.2 })
+  const cameraRef = useRef<ViewerCamera>(props.camera ?? {
+    yaw: 0.7, pitch: 0.45, zoom: 3.2,
+  })
   const propsRef = useRef(props)
   propsRef.current = props
 
   const [supported, setSupported] = useState(true)
+  const [projectedLabels, setProjectedLabels] = useState<ProjectedLabel[]>([])
+
+  function renderScene() {
+    setProjectedLabels(render(
+      stateRef.current,
+      cameraRef.current,
+      propsRef.current,
+    ))
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -151,7 +191,8 @@ export function PointCloudViewer(props: Props) {
       camera.pitch = Math.max(-1.5, Math.min(1.5, camera.pitch))
       lastX = event.clientX
       lastY = event.clientY
-      render(stateRef.current, cameraRef.current, propsRef.current)
+      renderScene()
+      propsRef.current.onCameraChange?.({ ...camera })
     }
     const onMouseUp = () => {
       dragging = false
@@ -163,7 +204,8 @@ export function PointCloudViewer(props: Props) {
         1.2,
         Math.min(12, camera.zoom * (event.deltaY > 0 ? 1.1 : 0.9)),
       )
-      render(stateRef.current, cameraRef.current, propsRef.current)
+      renderScene()
+      propsRef.current.onCameraChange?.({ ...camera })
     }
 
     canvas.addEventListener('mousedown', onMouseDown)
@@ -172,7 +214,7 @@ export function PointCloudViewer(props: Props) {
     canvas.addEventListener('wheel', onWheel, { passive: false })
 
     uploadGeometry(state, propsRef.current)
-    render(state, cameraRef.current, propsRef.current)
+    setProjectedLabels(render(state, cameraRef.current, propsRef.current))
 
     return () => {
       canvas.removeEventListener('mousedown', onMouseDown)
@@ -186,12 +228,18 @@ export function PointCloudViewer(props: Props) {
 
   useEffect(() => {
     cameraRef.current = { yaw: 0.7, pitch: 0.45, zoom: 3.2 }
-    render(stateRef.current, cameraRef.current, propsRef.current)
+    renderScene()
   }, [props.resetKey])
 
   useEffect(() => {
+    if (!props.camera) return
+    cameraRef.current = { ...props.camera }
+    renderScene()
+  }, [props.camera?.yaw, props.camera?.pitch, props.camera?.zoom])
+
+  useEffect(() => {
     uploadGeometry(stateRef.current, propsRef.current)
-    render(stateRef.current, cameraRef.current, propsRef.current)
+    renderScene()
   }, [
     props.queryPoints,
     props.originalCandidatePoints,
@@ -201,10 +249,12 @@ export function PointCloudViewer(props: Props) {
     props.querySpheres,
     props.candidateSpheres,
     props.alignedCandidateSpheres,
+    props.surfaceTriangles,
+    props.originalCandidateBonds,
   ])
 
   useEffect(() => {
-    render(stateRef.current, cameraRef.current, propsRef.current)
+    renderScene()
   }, [
     props.showQuery,
     props.showOriginalCandidate,
@@ -214,6 +264,8 @@ export function PointCloudViewer(props: Props) {
     props.showCentroids,
     props.showMatchedResidues,
     props.sphereScale,
+    props.labels,
+    props.showLabels,
   ])
 
   if (!supported) {
@@ -224,7 +276,26 @@ export function PointCloudViewer(props: Props) {
     )
   }
 
-  return <canvas ref={canvasRef} className="viewer-canvas" />
+  return (
+    <div className="viewer-canvas-wrap">
+      <canvas ref={canvasRef} className="viewer-canvas" />
+      {props.showLabels && (
+        <div className="viewer-label-layer" aria-label="Residue labels">
+          {projectedLabels.filter((label) => label.visible).map((label) => (
+            <span
+              key={label.label}
+              className={label.label.startsWith('MOUTH')
+                ? 'mouth-label'
+                : label.label.startsWith('SAM') ? 'sam-label' : ''}
+              style={{ left: label.x, top: label.y }}
+            >
+              {label.label}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function createGlState(gl: WebGLRenderingContext): GlState | null {
@@ -261,6 +332,7 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     pixelsPerUnitLocation: gl.getUniformLocation(program, 'uPixelsPerUnit'),
     useRadiusLocation: gl.getUniformLocation(program, 'uUseRadius'),
     rimLocation: gl.getUniformLocation(program, 'uRim'),
+    meshLocation: gl.getUniformLocation(program, 'uMesh'),
     queryBuffer: null,
     originalCandidateBuffer: null,
     alignedCandidateBuffer: null,
@@ -271,6 +343,8 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     querySphereBuffer: null,
     candidateSphereBuffer: null,
     alignedSphereBuffer: null,
+    surfaceBuffer: null,
+    originalCandidateBondBuffer: null,
     queryCount: 0,
     originalCandidateCount: 0,
     alignedCandidateCount: 0,
@@ -280,6 +354,8 @@ function createGlState(gl: WebGLRenderingContext): GlState | null {
     querySphereCount: 0,
     candidateSphereCount: 0,
     alignedSphereCount: 0,
+    surfaceCount: 0,
+    originalCandidateBondCount: 0,
     radius: 10,
   }
 }
@@ -297,6 +373,8 @@ function destroyGlState(state: GlState) {
     state.querySphereBuffer,
     state.candidateSphereBuffer,
     state.alignedSphereBuffer,
+    state.surfaceBuffer,
+    state.originalCandidateBondBuffer,
   ]) {
     if (buffer) gl.deleteBuffer(buffer)
   }
@@ -381,6 +459,16 @@ function uploadGeometry(state: GlState | null, props: Props) {
     state.alignedSphereBuffer,
     alignedSpheres,
   )
+  state.surfaceBuffer = uploadPoints(
+    gl,
+    state.surfaceBuffer,
+    props.surfaceTriangles ?? [],
+  )
+  state.originalCandidateBondBuffer = uploadPoints(
+    gl,
+    state.originalCandidateBondBuffer,
+    props.originalCandidateBonds ?? [],
+  )
 
   state.queryCount = props.queryPoints.length
   state.originalCandidateCount = props.originalCandidatePoints.length
@@ -391,6 +479,8 @@ function uploadGeometry(state: GlState | null, props: Props) {
   state.querySphereCount = querySpheres.length
   state.candidateSphereCount = candidateSpheres.length
   state.alignedSphereCount = alignedSpheres.length
+  state.surfaceCount = props.surfaceTriangles?.length ?? 0
+  state.originalCandidateBondCount = props.originalCandidateBonds?.length ?? 0
 
   let radius = 1
   const visiblePoints = [
@@ -402,6 +492,8 @@ function uploadGeometry(state: GlState | null, props: Props) {
     ...querySpheres.map((sphere) => sphere.center),
     ...candidateSpheres.map((sphere) => sphere.center),
     ...alignedSpheres.map((sphere) => sphere.center),
+    ...(props.surfaceTriangles ?? []),
+    ...(props.originalCandidateBonds ?? []),
   ]
   const sceneCenter = centroidOf(visiblePoints)
   for (const point of visiblePoints) {
@@ -471,8 +563,8 @@ function render(
   state: GlState | null,
   camera: { yaw: number; pitch: number; zoom: number },
   props: Props,
-) {
-  if (!state) return
+): ProjectedLabel[] {
+  if (!state) return []
   const { gl } = state
 
   const canvas = gl.canvas as HTMLCanvasElement
@@ -492,15 +584,19 @@ function render(
 
   gl.useProgram(state.program)
 
-  const allPoints = [
+  const allPoints = state.surfaceCount > 0 ? (props.surfaceTriangles ?? []) : [
     ...props.queryPoints,
     ...props.originalCandidatePoints,
     ...props.alignedCandidatePoints,
     ...(props.matchedQueryResiduePoints ?? []),
     ...(props.matchedCandidateResiduePoints ?? []),
+    ...(props.querySpheres ?? []).map((sphere) => sphere.center),
+    ...(props.candidateSpheres ?? []).map((sphere) => sphere.center),
+    ...(props.alignedCandidateSpheres ?? []).map((sphere) => sphere.center),
+    ...(props.surfaceTriangles ?? []),
   ]
-  const center = centroidOf(allPoints)
-  const distance = Math.max(1, state.radius) * camera.zoom
+  const center = props.sceneCenter ?? centroidOf(allPoints)
+  const distance = Math.max(1, props.sceneRadius ?? state.radius) * camera.zoom
   const aspect = width / height
   const projection = perspective(
     Math.PI / 4,
@@ -524,10 +620,25 @@ function render(
   gl.uniform1f(state.pixelsPerUnitLocation, height * projection[5])
   gl.uniform1f(state.useRadiusLocation, 0)
   gl.uniform1f(state.rimLocation, 0)
+  gl.uniform1f(state.meshLocation, 0)
   gl.enableVertexAttribArray(state.positionLocation)
 
   if (props.showQuery) {
-    if (state.querySphereCount > 0) {
+    if (state.surfaceCount > 0) {
+      gl.uniform1f(state.meshLocation, 1)
+      // A translucent pocket is contextual geometry, not an occluder. Avoid
+      // writing it into the depth buffer so ligands inside remain visible.
+      gl.depthMask(false)
+      drawPoints(
+        state,
+        state.surfaceBuffer,
+        state.surfaceCount,
+        QUERY_COLOR,
+        gl.TRIANGLES,
+      )
+      gl.depthMask(true)
+      gl.uniform1f(state.meshLocation, 0)
+    } else if (state.querySphereCount > 0) {
       drawSpheres(state, state.querySphereBuffer, state.querySphereCount,
         QUERY_COLOR)
     } else if (state.queryCount > 0) {
@@ -535,6 +646,16 @@ function render(
     }
   }
   if (props.showOriginalCandidate) {
+    gl.uniform1f(state.opacityLocation, 1)
+    gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 0.58)
+    drawPoints(
+      state,
+      state.originalCandidateBondBuffer,
+      state.originalCandidateBondCount,
+      ORIGINAL_COLOR,
+      gl.POINTS,
+    )
+    gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 1.35)
     if (state.candidateSphereCount > 0) {
       drawSpheres(state, state.candidateSphereBuffer,
         state.candidateSphereCount, ORIGINAL_COLOR)
@@ -546,8 +667,14 @@ function render(
         ORIGINAL_COLOR,
       )
     }
+    gl.uniform1f(state.opacityLocation, props.opacity)
+    gl.uniform1f(state.sizeLocation, props.pointSize * ratio)
   }
   if (props.showAlignedCandidate) {
+    gl.uniform1f(
+      state.sizeLocation,
+      (props.alignedPointSize ?? props.pointSize) * ratio,
+    )
     if (state.alignedSphereCount > 0) {
       drawSpheres(state, state.alignedSphereBuffer, state.alignedSphereCount,
         ALIGNED_COLOR)
@@ -559,6 +686,7 @@ function render(
         ALIGNED_COLOR,
       )
     }
+    gl.uniform1f(state.sizeLocation, props.pointSize * ratio)
   }
   if (props.showCentroids) {
     gl.uniform1f(state.sizeLocation, props.pointSize * ratio * 2.5)
@@ -587,6 +715,55 @@ function render(
       gl.LINES,
     )
   }
+  return declutterLabels((props.labels ?? []).map(({ point, label }) => {
+    const [clipX, clipY, , clipW] = transformPoint(mvp, point)
+    const visible = clipW > 0
+      && Math.abs(clipX / clipW) <= 1
+      && Math.abs(clipY / clipW) <= 1
+    return {
+      label,
+      x: (clipX / clipW * 0.5 + 0.5) * width / ratio,
+      y: (-clipY / clipW * 0.5 + 0.5) * height / ratio,
+      visible,
+    }
+  }))
+}
+
+function declutterLabels(labels: ProjectedLabel[]): ProjectedLabel[] {
+  const accepted: ProjectedLabel[] = []
+  return labels
+    .sort((first, second) => labelPriority(second.label)
+      - labelPriority(first.label) || first.y - second.y)
+    .map((label) => {
+      const overlaps = accepted.some((other) =>
+        Math.abs(other.x - label.x) < 82
+          && Math.abs(other.y - label.y) < 18,
+      )
+      const next = { ...label, visible: label.visible && !overlaps }
+      if (next.visible) accepted.push(next)
+      return next
+    })
+}
+
+function labelPriority(label: string) {
+  if (label.includes('reaction center')) return 4
+  if (label.startsWith('PRIMARY_CANDIDATE')) return 3
+  if (label.includes('CANDIDATE') || label.startsWith('LOCAL_OPENING')) return 2
+  if (label.startsWith('SAM')) return 1
+  return 0
+}
+
+function transformPoint(
+  matrix: number[],
+  point: Point3D,
+): [number, number, number, number] {
+  const vector = [point.x, point.y, point.z, 1]
+  return [0, 1, 2, 3].map((row) =>
+    matrix[row] * vector[0]
+      + matrix[4 + row] * vector[1]
+      + matrix[8 + row] * vector[2]
+      + matrix[12 + row] * vector[3],
+  ) as [number, number, number, number]
 }
 
 function drawPoints(

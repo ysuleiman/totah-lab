@@ -18,10 +18,16 @@ import { PocketReportPanel } from '../report/PocketReportPanel'
 interface Props {
   structureId: number
   onNavigate: (structureId: number) => void
+  onCompare?: (structureId: number) => void
   onPocketSelect?: (pocketId: number) => void
 }
 
-export function StructureWorkspace({ structureId, onNavigate, onPocketSelect }: Props) {
+export function StructureWorkspace({
+  structureId,
+  onNavigate,
+  onCompare,
+  onPocketSelect,
+}: Props) {
   const structureQuery = useApiQuery<Structure>(
     `/api/structures/${structureId}`,
   )
@@ -96,7 +102,9 @@ export function StructureWorkspace({ structureId, onNavigate, onPocketSelect }: 
     <div className="workspace">
       <StructureHero
         structure={structure}
+        activePocket={pocketQuery.data}
         onStructureSubmit={handleStructureSubmit}
+        onCompare={onCompare}
         onReportRequest={
           effectivePocketId && effectiveRunId
             ? () => setReportRequested(true)

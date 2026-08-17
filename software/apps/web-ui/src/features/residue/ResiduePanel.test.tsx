@@ -51,7 +51,7 @@ describe('ResiduePanel', () => {
       },
     )
 
-    render(
+    const { rerender } = render(
       <ResiduePanel
         structureId={2}
         residues={[residue, neighborResidue]}
@@ -63,6 +63,7 @@ describe('ResiduePanel', () => {
         onRunSelect={() => undefined}
         residueAnalysis={new Map()}
         analysisLoading={false}
+        neighborCutoff={6}
       />,
     )
 
@@ -80,6 +81,26 @@ describe('ResiduePanel', () => {
     expect(screen.getByLabelText('Neighbor residue atom')).toHaveValue('SG')
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
       '/api/structures/2/residues/202/neighbors?cutoff=6',
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    ))
+
+    rerender(
+      <ResiduePanel
+        structureId={2}
+        residues={[residue, neighborResidue]}
+        highlightedResidueIds={new Set([202])}
+        activePocket={null}
+        pocketLoading={false}
+        dockingRuns={[]}
+        selectedRunId={null}
+        onRunSelect={() => undefined}
+        residueAnalysis={new Map()}
+        analysisLoading={false}
+        neighborCutoff={12}
+      />,
+    )
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      '/api/structures/2/residues/202/neighbors?cutoff=12',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     ))
   })

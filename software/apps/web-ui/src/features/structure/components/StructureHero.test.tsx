@@ -49,6 +49,8 @@ describe('StructureHero', () => {
         'https://www.uniprot.org/uniprotkb/Q6UX53/entry',
       )
     expect(screen.getByText('AF-Q6UX53-F1-model_v6')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /3D view Mol\*/i }))
+      .toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Report Select data/i }))
       .toBeDisabled()
   })

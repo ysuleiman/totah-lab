@@ -15,6 +15,7 @@ import totah.lab.prometheus.identity.CanonicalHashing;
 import totah.lab.prometheus.identity.EvidenceAtomMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EvidenceValidatorTest {
 
@@ -125,6 +126,19 @@ class EvidenceValidatorTest {
     }
 
     @Test
+    void nonFiniteSymmetricHessianFailsNumerically() {
+        List<Double> hessian = List.of(
+                Double.NaN, 0.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 0.0, 1.0);
+
+        EvidenceValidator.HessianOutcome outcome = validator.verifyHessian(hessian, 1);
+
+        assertThat(outcome.state()).isEqualTo(EvidenceAcceptanceState.FAILED_NUMERICALLY);
+        assertThat(outcome.reason()).contains("non-finite");
+    }
+
+    @Test
     void finalAcceptanceFollowsPrecedenceOrder() {
         assertThat(validator.finalAcceptance(List.of(
                 EvidenceAcceptanceState.ACCEPTED, EvidenceAcceptanceState.ACCEPTED)))
@@ -145,7 +159,7 @@ class EvidenceValidatorTest {
                 EvidenceAcceptanceState.PENDING,
                 EvidenceAcceptanceState.EXCLUDED_BY_PROTOCOL)))
                 .isEqualTo(EvidenceAcceptanceState.EXCLUDED_BY_PROTOCOL);
-        assertThat(validator.finalAcceptance(List.of()))
-                .isEqualTo(EvidenceAcceptanceState.ACCEPTED);
+        assertThatThrownBy(() -> validator.finalAcceptance(List.of()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
