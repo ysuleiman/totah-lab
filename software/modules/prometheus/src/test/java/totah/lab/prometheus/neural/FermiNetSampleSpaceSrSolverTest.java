@@ -1,9 +1,12 @@
 package totah.lab.prometheus.neural;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +126,300 @@ final class FermiNetSampleSpaceSrSolverTest {
             assertEquals(derivativeValues, result.gramDerivativeValuesRead());
             assertEquals(derivativeValues, result.reconstructionDerivativeValuesRead());
         }
+    }
+
+    @Test
+    void structuredSolveMatchesExplicitDerivativeOracle()
+            throws IOException {
+
+        Fixture fixture = fixture();
+        double damping = 0.2;
+
+        try (FermiNetSrObservationFile explicit =
+                     FermiNetSrObservationFile.build(
+                             fixture.state,
+                             fixture.samples);
+             FermiNetStructuredSrObservationFile structured =
+                     FermiNetStructuredSrObservationFile.buildParallel(
+                             fixture.state,
+                             fixture.samples,
+                             2)) {
+
+            double[] explicitDerivatives =
+                    new double[Math.multiplyExact(
+                            explicit.sampleCount(),
+                            explicit.parameterCount())];
+            explicit.readParameterBlock(
+                    0,
+                    explicit.parameterCount(),
+                    explicitDerivatives);
+
+            for (FermiNetStructuredSrStatistics.Family family
+                    : structured.schema().families()) {
+                double[] familyStatistics =
+                        structured.readFamily(family);
+                FermiNetParameterLayout.Block block =
+                        structured.schema().layout().block(
+                                family.blockName());
+                double familyMaxError = 0.0;
+                double[][] reconstructedSamples =
+                        new double[structured.sampleCount()][];
+                for (int sample = 0;
+                     sample < structured.sampleCount();
+                     sample++) {
+                    double[] reconstructed =
+                            FermiNetStructuredSampleSpaceSrSolver
+                                    .materializeSampleFamily(
+                                            familyStatistics,
+                                            family,
+                                            block,
+                                            structured.sampleCount(),
+                                            sample);
+                    reconstructedSamples[sample] = reconstructed;
+                    for (int parameter = 0;
+                         parameter < block.size();
+                         parameter++) {
+                        familyMaxError = Math.max(
+                                familyMaxError,
+                                Math.abs(
+                                        reconstructed[parameter]
+                                                - explicitDerivatives[
+                                                sample * explicit.parameterCount()
+                                                        + block.startInclusive()
+                                                        + parameter]));
+                    }
+                }
+                assertTrue(
+                        familyMaxError < 2e-12,
+                        family.blockName()
+                                + " structured family derivative error="
+                                + familyMaxError);
+
+                double familyGramError = 0.0;
+                double familyGramScale = 0.0;
+                for (int left = 0;
+                     left < structured.sampleCount();
+                     left++) {
+                    for (int right = 0;
+                         right < structured.sampleCount();
+                         right++) {
+                        double explicitFamilyDot = 0.0;
+                        for (int parameter = 0;
+                             parameter < block.size();
+                             parameter++) {
+                            explicitFamilyDot +=
+                                    reconstructedSamples[left][parameter]
+                                            * reconstructedSamples[right][parameter];
+                        }
+                        double structuredFamilyDot =
+                                FermiNetStructuredSampleSpaceSrSolver.familyDot(
+                                        familyStatistics,
+                                        family,
+                                        left,
+                                        right);
+                        familyGramError = Math.max(
+                                familyGramError,
+                                Math.abs(explicitFamilyDot
+                                        - structuredFamilyDot));
+                        familyGramScale = Math.max(
+                                familyGramScale,
+                                Math.abs(explicitFamilyDot));
+                    }
+                }
+                assertTrue(
+                        familyGramError
+                                <= 1e-12 * Math.max(1.0, familyGramScale),
+                        family.blockName()
+                                + " structured family Gram error="
+                                + familyGramError);
+
+                System.out.printf(
+                        "FERMINET_STRUCTURED_FAMILY_PARITY family=%s derivative_max_abs=%.17g gram_max_abs=%.17g gram_max_rel=%.17g%n",
+                        family.blockName(),
+                        familyMaxError,
+                        familyGramError,
+                        familyGramError / Math.max(1.0, familyGramScale));
+            }
+
+            FermiNetSampleSpaceSrSolver.Result expected =
+                    new FermiNetSampleSpaceSrSolver()
+                            .solve(explicit, damping, 128);
+
+            FermiNetStructuredSampleSpaceSrSolver.Result actual =
+                    new FermiNetStructuredSampleSpaceSrSolver()
+                            .solve(structured, damping);
+
+            double gradientError = maxError(
+                    expected.energyGradient(),
+                    actual.energyGradient());
+            double deltaError = maxError(
+                    expected.delta(),
+                    actual.delta());
+
+            double[] explicitGram = centeredDampedGram(
+                    explicit,
+                    explicitDerivatives,
+                    damping);
+            double gramError = maxError(
+                    explicitGram,
+                    actual.centeredDampedGram());
+            double gramRelativeError = maxRelativeError(
+                    explicitGram,
+                    actual.centeredDampedGram());
+            double gradientRelativeError = maxRelativeError(
+                    expected.energyGradient(),
+                    actual.energyGradient());
+            double deltaRelativeError = maxRelativeError(
+                    expected.delta(),
+                    actual.delta());
+            double deltaNormDifference = Math.abs(
+                    norm(expected.delta()) - norm(actual.delta()));
+            double deltaCosine = cosine(
+                    expected.delta(),
+                    actual.delta());
+
+            System.out.printf("""
+                    FERMINET_STRUCTURED_SR_PARITY
+                      statistics_spool_bytes=%d
+                      explicit_derivative_bytes=%d
+                      mean_energy_error=%.17g
+                      centered_gram_max_error=%.17g
+                      centered_gram_max_relative_error=%.17g
+                      gradient_max_error=%.17g
+                      gradient_max_relative_error=%.17g
+                      delta_max_error=%.17g
+                      delta_max_relative_error=%.17g
+                      delta_norm_difference=%.17g
+                      delta_cosine=%.17g
+
+                    """,
+                    actual.statisticsSpoolBytes(),
+                    explicit.derivativeBytes(),
+                    Math.abs(expected.meanEnergyHartree()
+                            - actual.meanEnergyHartree()),
+                    gramError,
+                    gramRelativeError,
+                    gradientError,
+                    gradientRelativeError,
+                    deltaError,
+                    deltaRelativeError,
+                    deltaNormDifference,
+                    deltaCosine);
+
+            assertEquals(
+                    Double.doubleToLongBits(expected.meanEnergyHartree()),
+                    Double.doubleToLongBits(actual.meanEnergyHartree()));
+            assertTrue(gramError < 2e-9,
+                    "structured centered Gram error=" + gramError);
+            assertTrue(gradientError < 2e-10,
+                    "structured gradient error=" + gradientError);
+            assertTrue(deltaError < 2e-9,
+                    "structured delta error=" + deltaError);
+        }
+    }
+
+    @Test
+    void structuredStatisticsSpoolIsRemovedAfterWorkerFailure()
+            throws IOException {
+        Fixture fixture = fixture();
+        long before = structuredSpoolCount();
+
+        assertThrows(
+                IOException.class,
+                () -> FermiNetStructuredSrObservationFile.buildParallel(
+                        fixture.state,
+                        fixture.samples,
+                        2,
+                        row -> {
+                            if (row == 1) {
+                                throw new IllegalStateException(
+                                        "injected structured spool failure");
+                            }
+                        }));
+
+        assertEquals(before, structuredSpoolCount(),
+                "failed structured SR build leaked its ephemeral spool");
+    }
+
+    private static long structuredSpoolCount()
+            throws IOException {
+        Path temporary = Path.of(System.getProperty("java.io.tmpdir"));
+        try (var paths = Files.list(temporary)) {
+            return paths
+                    .filter(path -> path.getFileName().toString()
+                            .startsWith("prometheus-ferminet-structured-sr-"))
+                    .count();
+        }
+    }
+
+    private static double[] centeredDampedGram(
+            FermiNetSrObservationFile observations,
+            double[] derivatives,
+            double damping) {
+        int samples = observations.sampleCount();
+        int parameters = observations.parameterCount();
+        double weightSum = 0.0;
+        for (int sample = 0; sample < samples; sample++) {
+            weightSum += observations.weight(sample);
+        }
+        double[] weight = new double[samples];
+        double[] mean = new double[parameters];
+        for (int sample = 0; sample < samples; sample++) {
+            weight[sample] = observations.weight(sample) / weightSum;
+            for (int parameter = 0; parameter < parameters; parameter++) {
+                mean[parameter] += weight[sample]
+                        * derivatives[sample * parameters + parameter];
+            }
+        }
+        double[] gram = new double[samples * samples];
+        for (int row = 0; row < samples; row++) {
+            for (int column = 0; column < samples; column++) {
+                double value = 0.0;
+                for (int parameter = 0; parameter < parameters; parameter++) {
+                    value += (derivatives[row * parameters + parameter]
+                            - mean[parameter])
+                            * (derivatives[column * parameters + parameter]
+                            - mean[parameter]);
+                }
+                gram[row * samples + column] = Math.sqrt(
+                        weight[row] * weight[column]) * value;
+            }
+            gram[row * samples + row] += damping;
+        }
+        return gram;
+    }
+
+    private static double maxRelativeError(
+            double[] expected,
+            double[] actual) {
+        double maximum = 0.0;
+        for (int i = 0; i < expected.length; i++) {
+            maximum = Math.max(
+                    maximum,
+                    Math.abs(expected[i] - actual[i])
+                            / Math.max(1.0, Math.abs(expected[i])));
+        }
+        return maximum;
+    }
+
+    private static double cosine(double[] left, double[] right) {
+        double dot = 0.0;
+        double leftNorm = 0.0;
+        double rightNorm = 0.0;
+        for (int i = 0; i < left.length; i++) {
+            dot += left[i] * right[i];
+            leftNorm += left[i] * left[i];
+            rightNorm += right[i] * right[i];
+        }
+        return dot / Math.sqrt(leftNorm * rightNorm);
+    }
+
+    private static double norm(double[] values) {
+        double sum = 0.0;
+        for (double value : values) {
+            sum += value * value;
+        }
+        return Math.sqrt(sum);
     }
 
     private static double[] legacyEnergyGradient(

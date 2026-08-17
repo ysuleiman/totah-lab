@@ -2,6 +2,7 @@ package totah.lab.prometheus.neural;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -82,6 +83,120 @@ final class FermiNetV1StateTest {
                 coordinates,
                 actual,
                 layout);
+    }
+
+    @Test
+    void parameterDerivativeRangesReconstructFullVectorBitExactly() {
+
+        Molecule water =
+                water();
+
+        var configuration =
+                FermiNetV1Configuration.testFixture();
+
+        var layout =
+                new FermiNetParameterLayout(
+                        configuration,
+                        water);
+
+        var state =
+                new FermiNetV1State(
+                        water,
+                        configuration,
+                        FermiNetParameters.initialize(
+                                layout,
+                                44017L));
+
+        QuantumCoordinates coordinates =
+                coordinates();
+
+        double[] full =
+                state.evaluate(coordinates)
+                        .parameterLogDerivatives();
+
+        for (int chunkSize :
+                new int[]{1, 128, 8192, 127}) {
+
+            double[] reconstructed =
+                    new double[full.length];
+
+            for (int start = 0;
+                 start < full.length;
+                 start += chunkSize) {
+
+                int length =
+                        Math.min(
+                                chunkSize,
+                                full.length - start);
+
+                double[] chunk =
+                        new double[length];
+
+                state.parameterLogDerivatives(
+                        coordinates,
+                        start,
+                        length,
+                        chunk);
+
+                System.arraycopy(
+                        chunk,
+                        0,
+                        reconstructed,
+                        start,
+                        length);
+            }
+
+            int bitMismatches =
+                    0;
+
+            for (int i = 0;
+                 i < full.length;
+                 i++) {
+
+                if (Double.doubleToLongBits(full[i])
+                        != Double.doubleToLongBits(reconstructed[i])) {
+
+                    bitMismatches++;
+                }
+            }
+
+            assertEquals(
+                    0,
+                    bitMismatches,
+                    "chunk size " + chunkSize);
+        }
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> state.parameterLogDerivatives(
+                        coordinates,
+                        -1,
+                        1,
+                        new double[1]));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> state.parameterLogDerivatives(
+                        coordinates,
+                        0,
+                        0,
+                        new double[1]));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> state.parameterLogDerivatives(
+                        coordinates,
+                        full.length - 1,
+                        2,
+                        new double[2]));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> state.parameterLogDerivatives(
+                        coordinates,
+                        0,
+                        2,
+                        new double[1]));
     }
 
     @Test

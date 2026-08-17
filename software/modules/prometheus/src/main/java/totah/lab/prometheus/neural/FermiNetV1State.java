@@ -205,6 +205,116 @@ public final class FermiNetV1State {
                 parameterDerivative);
     }
 
+    StructuredSrEvaluation structuredSrEvaluation(
+            QuantumCoordinates coordinates) {
+
+        validate(coordinates);
+
+        int dimensions =
+                3 * molecule.electrons().value();
+
+        Interaction interaction =
+                interaction(
+                        coordinates,
+                        dimensions);
+
+        Output output =
+                output(
+                        interaction.one(),
+                        coordinates,
+                        dimensions);
+
+        FermiNetStructuredSrStatistics.Builder statistics =
+                new FermiNetStructuredSrStatistics.Builder(
+                        new FermiNetStructuredSrStatistics.Schema(
+                                layout));
+
+        backprop(
+                output,
+                interaction.caches(),
+                new ParameterGradientAccumulator(
+                        0,
+                        0,
+                        new double[0]),
+                statistics);
+
+        return new StructuredSrEvaluation(
+                output.sign(),
+                output.logAbsolute(),
+                output.logGradient(),
+                output.laplacianOverWavefunction(),
+                statistics.build());
+    }
+
+    /**
+     * Writes a canonical contiguous range of parameter log derivatives into
+     * caller-provided storage without materializing the full parameter vector.
+     */
+    public void parameterLogDerivatives(
+            QuantumCoordinates coordinates,
+            int parameterStart,
+            int parameterLength,
+            double[] destination) {
+
+        validateParameterDerivativeRange(
+                parameterStart,
+                parameterLength,
+                destination);
+
+        validate(coordinates);
+
+        int dimensions =
+                3 * molecule.electrons().value();
+
+        Interaction interaction =
+                interaction(
+                        coordinates,
+                        dimensions);
+
+        Output output =
+                output(
+                        interaction.one(),
+                        coordinates,
+                        dimensions);
+
+        Arrays.fill(
+                destination,
+                0,
+                parameterLength,
+                0.0);
+
+        backprop(
+                output,
+                interaction.caches(),
+                new ParameterGradientAccumulator(
+                        parameterStart,
+                        parameterLength,
+                destination));
+    }
+
+    private void validateParameterDerivativeRange(
+            int parameterStart,
+            int parameterLength,
+            double[] destination) {
+
+        Objects.requireNonNull(
+                destination,
+                "destination");
+
+        if (parameterStart < 0
+                || parameterLength < 1
+                || parameterStart > parameters.length - parameterLength) {
+
+            throw new IllegalArgumentException(
+                    "invalid parameter derivative range");
+        }
+
+        if (destination.length < parameterLength) {
+            throw new IllegalArgumentException(
+                    "parameter derivative destination too small");
+        }
+    }
+
     SpatialEvaluation spatialEvaluation(
             QuantumCoordinates coordinates) {
 
@@ -436,7 +546,10 @@ public final class FermiNetV1State {
 
         backpropLayers(
                 adjOne,
-                gradient,
+                new ParameterGradientAccumulator(
+                        0,
+                        gradient.length,
+                        gradient),
                 interaction.caches());
 
         return new PretrainingEvaluation(
@@ -1902,6 +2015,35 @@ public final class FermiNetV1State {
                 new double[
                         parameters.length];
 
+        backprop(
+                output,
+                caches,
+                new ParameterGradientAccumulator(
+                        0,
+                        gradient.length,
+                        gradient));
+
+        return gradient;
+    }
+
+    private void backprop(
+            Output output,
+            List<LayerCache> caches,
+            ParameterGradientAccumulator gradient) {
+
+        backprop(
+                output,
+                caches,
+                gradient,
+                null);
+    }
+
+    private void backprop(
+            Output output,
+            List<LayerCache> caches,
+            ParameterGradientAccumulator gradient,
+            FermiNetStructuredSrStatistics.Builder statistics) {
+
         double[][] adjOne =
                 new double[
                         molecule.electrons()
@@ -1918,15 +2060,15 @@ public final class FermiNetV1State {
                     output.mixture()[d],
                     d,
                     adjOne,
-                    gradient);
+                    gradient,
+                    statistics);
         }
 
         backpropLayers(
                 adjOne,
                 gradient,
-                caches);
-
-        return gradient;
+                caches,
+                statistics);
     }
 
     private void accumulateOrbitals(
@@ -1934,7 +2076,8 @@ public final class FermiNetV1State {
             double mix,
             int determinant,
             double[][] adjOne,
-            double[] gradient) {
+            ParameterGradientAccumulator gradient,
+            FermiNetStructuredSrStatistics.Builder statistics) {
 
         int n =
                 molecule.electrons()
@@ -1954,6 +2097,26 @@ public final class FermiNetV1State {
         double[][] inverse =
                 inverse(
                         matrix.values());
+
+        if (statistics != null
+                && determinant == 0) {
+            if (alpha > 0) {
+                statistics.denseInputs(
+                        "orbital.alpha.weight",
+                        Arrays.copyOfRange(
+                                matrix.features(),
+                                0,
+                                alpha));
+            }
+            if (alpha < n) {
+                statistics.denseInputs(
+                        "orbital.beta.weight",
+                        Arrays.copyOfRange(
+                                matrix.features(),
+                                alpha,
+                                n));
+            }
+        }
 
         for (int i = 0;
              i < n;
@@ -2020,15 +2183,23 @@ public final class FermiNetV1State {
                                 + head
                                 * width;
 
+                if (statistics != null) {
+                    statistics.denseAdjoint(
+                            weight.name(),
+                            i < alpha ? i : i - alpha,
+                            head,
+                            adjRaw);
+                }
+
                 for (int k = 0;
                      k < width;
                      k++) {
 
-                    gradient[
-                            weightBase + k] +=
+                    gradient.add(
+                            weightBase + k,
                             adjRaw
                                     * matrix.features()
-                                    [i][k];
+                                    [i][k]);
 
                     adjOne[i][k] +=
                             adjRaw
@@ -2065,19 +2236,33 @@ public final class FermiNetV1State {
                                     -sigmaValue
                                             * r);
 
-                    gradient[
+                    gradient.add(
                             pi.startInclusive()
-                                    + index] +=
+                                    + index,
                             adjEnvelope
-                                    * decay;
+                                    * decay);
 
-                    gradient[
+                    gradient.add(
                             sigma.startInclusive()
-                                    + index] +=
+                                    + index,
                             adjEnvelope
                                     * piValue
                                     * decay
-                                    * (-r);
+                                    * (-r));
+
+                    if (statistics != null) {
+                        statistics.addExplicit(
+                                pi.name(),
+                                index,
+                                adjEnvelope * decay);
+                        statistics.addExplicit(
+                                sigma.name(),
+                                index,
+                                adjEnvelope
+                                        * piValue
+                                        * decay
+                                        * (-r));
+                    }
                 }
             }
         }
@@ -2260,8 +2445,21 @@ public final class FermiNetV1State {
 
     private void backpropLayers(
             double[][] adjOne,
-            double[] gradient,
+            ParameterGradientAccumulator gradient,
             List<LayerCache> caches) {
+
+        backpropLayers(
+                adjOne,
+                gradient,
+                caches,
+                null);
+    }
+
+    private void backpropLayers(
+            double[][] adjOne,
+            ParameterGradientAccumulator gradient,
+            List<LayerCache> caches,
+            FermiNetStructuredSrStatistics.Builder statistics) {
 
         double[][][] adjTwoCarry =
                 null;
@@ -2319,6 +2517,12 @@ public final class FermiNetV1State {
                             == adjOne[0]
                             .length;
 
+            double[][] oneAdjoints =
+                    statistics == null
+                            ? null
+                            : new double[adjOne.length]
+                            [adjOne[0].length];
+
             for (int i = 0;
                  i < adjOne.length;
                  i++) {
@@ -2346,10 +2550,18 @@ public final class FermiNetV1State {
                                     - tanh
                                     * tanh);
 
-                    gradient[
+                    if (statistics != null) {
+                        oneAdjoints[i][o] = dz;
+                        statistics.addExplicit(
+                                oneBias.name(),
+                                o,
+                                dz);
+                    }
+
+                    gradient.add(
                             oneBias.startInclusive()
-                                    + o] +=
-                            dz;
+                                    + o,
+                            dz);
 
                     int base =
                             oneWeight.startInclusive()
@@ -2364,11 +2576,11 @@ public final class FermiNetV1State {
                                  .length;
                          k++) {
 
-                        gradient[
-                                base + k] +=
+                        gradient.add(
+                                base + k,
                                 dz
                                         * cache.aggregate()
-                                        [i][k];
+                                        [i][k]);
 
                         adjAggregate[i][k] +=
                                 dz
@@ -2384,6 +2596,13 @@ public final class FermiNetV1State {
                                         * INV_SQRT_2;
                     }
                 }
+            }
+
+            if (statistics != null) {
+                statistics.dense(
+                        oneWeight.name(),
+                        cache.aggregate(),
+                        oneAdjoints);
             }
 
             scatterAggregate(
@@ -2424,6 +2643,19 @@ public final class FermiNetV1State {
                                 .length
                                 == outWidth;
 
+                double[][] twoInputs =
+                        statistics == null
+                                ? null
+                                : new double[cache.two().length
+                                * cache.two().length][];
+
+                double[][] twoAdjoints =
+                        statistics == null
+                                ? null
+                                : new double[cache.two().length
+                                * cache.two().length]
+                                [outWidth];
+
                 for (int i = 0;
                      i < cache.two()
                              .length;
@@ -2461,10 +2693,22 @@ public final class FermiNetV1State {
                                             - tanh
                                             * tanh);
 
-                            gradient[
+                            if (statistics != null) {
+                                int occurrence =
+                                        i * cache.two().length + j;
+                                twoInputs[occurrence] =
+                                        cache.two()[i][j];
+                                twoAdjoints[occurrence][o] = dz;
+                                statistics.addExplicit(
+                                        twoBias.name(),
+                                        o,
+                                        dz);
+                            }
+
+                            gradient.add(
                                     twoBias.startInclusive()
-                                            + o] +=
-                                    dz;
+                                            + o,
+                                    dz);
 
                             int base =
                                     twoWeight.startInclusive()
@@ -2479,11 +2723,11 @@ public final class FermiNetV1State {
                                          .length;
                                  k++) {
 
-                                gradient[
-                                        base + k] +=
+                                gradient.add(
+                                        base + k,
                                         dz
                                                 * cache.two()
-                                                [i][j][k];
+                                                [i][j][k]);
 
                                 adjPreviousTwo
                                         [i][j][k] +=
@@ -2502,6 +2746,13 @@ public final class FermiNetV1State {
                             }
                         }
                     }
+                }
+
+                if (statistics != null) {
+                    statistics.dense(
+                            twoWeight.name(),
+                            twoInputs,
+                            twoAdjoints);
                 }
 
             } else if (adjTwoCarry != null) {
@@ -3312,6 +3563,24 @@ public final class FermiNetV1State {
         }
     }
 
+    record StructuredSrEvaluation(
+            int sign,
+            double logAbsoluteWavefunction,
+            double[] logCoordinateGradient,
+            double laplacianOverWavefunction,
+            FermiNetStructuredSrStatistics statistics) {
+
+        StructuredSrEvaluation {
+            logCoordinateGradient = logCoordinateGradient.clone();
+            Objects.requireNonNull(statistics, "statistics");
+        }
+
+        @Override
+        public double[] logCoordinateGradient() {
+            return logCoordinateGradient.clone();
+        }
+    }
+
     /**
      * Package-private immutable parity-test snapshot.
      */
@@ -3449,6 +3718,44 @@ public final class FermiNetV1State {
      * Internal records
      * =====================================================================
      */
+
+    private static final class ParameterGradientAccumulator {
+
+        private final int startInclusive;
+        private final int endExclusive;
+        private final double[] destination;
+
+        private ParameterGradientAccumulator(
+                int startInclusive,
+                int length,
+                double[] destination) {
+
+            this.startInclusive =
+                    startInclusive;
+
+            this.endExclusive =
+                    Math.addExact(
+                            startInclusive,
+                            length);
+
+            this.destination =
+                    destination;
+        }
+
+        private void add(
+                int parameterIndex,
+                double value) {
+
+            if (parameterIndex >= startInclusive
+                    && parameterIndex < endExclusive) {
+
+                destination[
+                        parameterIndex
+                                - startInclusive] +=
+                        value;
+            }
+        }
+    }
 
     private record Inputs(
             FermiNetSpatialJet[][] one,
@@ -3721,4 +4028,3 @@ public final class FermiNetV1State {
             double logMagnitude) {
     }
 }
-

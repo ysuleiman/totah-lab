@@ -5,14 +5,14 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
-import totah.lab.prometheus.numerics.FermiNetSampleSpaceSrSolver;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
 /**
  * Sample-space stochastic reconfiguration for derivative-complete FermiNet states.
  *
- * <p>Each non-zero-weight sample is evaluated exactly once and its complete
- * parameter log-derivative vector is written to a temporary observation file.
+ * <p>Each non-zero-weight sample is evaluated exactly once. Compact generic
+ * sufficient statistics are written to an ephemeral spool; the full
+ * sample-by-parameter Jacobian is never materialized or persisted.
  * The SR solve is then performed in sample space:
  *
  * <pre>
@@ -45,8 +45,17 @@ public final class FermiNetMatrixFreeSrOptimizer {
         long observationStarted =
                 System.nanoTime();
 
-        try (FermiNetSrObservationFile observations =
-                     FermiNetSrObservationFile.buildParallel(
+        System.out.println("""
+                FERMINET_SR_IMPLEMENTATION
+                  SR implementation       : structured Jacobian-free sample-space SR
+                  implementation class    : FermiNetStructuredSampleSpaceSrSolver
+                  temporary storage       : compact sufficient-statistics spool
+                  full N×P Jacobian       : no
+                  derivative file         : no
+                """);
+
+        try (FermiNetStructuredSrObservationFile observations =
+                     FermiNetStructuredSrObservationFile.buildParallel(
                              state,
                              samples,
                              configuration.observationParallelism())) {
@@ -54,17 +63,18 @@ public final class FermiNetMatrixFreeSrOptimizer {
             long observationConstructionNanos =
                     System.nanoTime() - observationStarted;
 
-            observations.printTiming();
+            observations.printTiming(
+                    observationConstructionNanos,
+                    configuration.observationParallelism());
 
             long sampleSpaceSolveStarted =
                     System.nanoTime();
 
-            FermiNetSampleSpaceSrSolver.Result solve =
-                    new FermiNetSampleSpaceSrSolver()
+            FermiNetStructuredSampleSpaceSrSolver.Result solve =
+                    new FermiNetStructuredSampleSpaceSrSolver()
                             .solve(
                                     observations,
-                                    configuration.damping(),
-                                    configuration.blockSize());
+                                    configuration.damping());
 
             long sampleSpaceSolveNanos =
                     System.nanoTime() - sampleSpaceSolveStarted;
