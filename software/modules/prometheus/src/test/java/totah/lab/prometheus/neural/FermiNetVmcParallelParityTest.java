@@ -1,6 +1,7 @@
 package totah.lab.prometheus.neural;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,15 @@ import totah.lab.prometheus.variational.SpinProjection;
  * deterministic parallel implementation used by the canonical H2O SR driver.
  */
 final class FermiNetVmcParallelParityTest {
+
+    private record Transition(
+            int walker,
+            QuantumCoordinates proposal,
+            long logUniformBits,
+            long currentLogBits,
+            long proposalLogBits,
+            boolean accepted) {
+    }
 
     @Test
     void parallelSamplerPreservesReferenceTrajectoryAndEnergies() {
@@ -116,6 +126,232 @@ final class FermiNetVmcParallelParityTest {
                 sequential.samples().size(),
                 parallelism,
                 sequential.acceptance());
+    }
+
+    @Test
+    void continuationIsBitExactToOneUninterruptedSamplingRun() {
+        Fixture fixture = fixture();
+        FermiNetVmc.Configuration configuration =
+                new FermiNetVmc.Configuration(
+                        fixture.walkers.size(),
+                        4,
+                        4,
+                        3,
+                        0.02,
+                        20260824L);
+
+        List<Transition> uninterruptedTrace = new ArrayList<>();
+        List<Transition> splitTrace = new ArrayList<>();
+
+        try (FermiNetVmcParallel sampler = new FermiNetVmcParallel(4)) {
+            var uninterrupted = sampler.beginSession(
+                    fixture.state,
+                    configuration,
+                    fixture.walkers);
+            var whole = uninterrupted.sample(
+                    fixture.state,
+                    4,
+                    4,
+                    3,
+                    observer(uninterruptedTrace));
+
+            var split = sampler.beginSession(
+                    fixture.state,
+                    configuration,
+                    fixture.walkers);
+            var first = split.sample(
+                    fixture.state,
+                    4,
+                    2,
+                    3,
+                    observer(splitTrace));
+            var second = split.sample(
+                    fixture.state,
+                    0,
+                    2,
+                    3,
+                    observer(splitTrace));
+
+            assertEquals(whole.proposed(), first.proposed() + second.proposed());
+            assertEquals(whole.accepted(), first.accepted() + second.accepted());
+            assertEquals(uninterruptedTrace.size(), splitTrace.size());
+
+            for (int transition = 0;
+                 transition < uninterruptedTrace.size();
+                 transition++) {
+                Transition expected = uninterruptedTrace.get(transition);
+                Transition actual = splitTrace.get(transition);
+                assertEquals(expected.walker(), actual.walker());
+                assertCoordinatesExactlyEqual(
+                        expected.proposal(),
+                        actual.proposal(),
+                        transition);
+                assertEquals(expected.logUniformBits(), actual.logUniformBits());
+                assertEquals(expected.currentLogBits(), actual.currentLogBits());
+                assertEquals(expected.proposalLogBits(), actual.proposalLogBits());
+                assertEquals(expected.accepted(), actual.accepted());
+            }
+
+            List<QuantumCoordinates> combinedSamples = new ArrayList<>();
+            combinedSamples.addAll(first.result().samples());
+            combinedSamples.addAll(second.result().samples());
+            assertCoordinateListsExactlyEqual(
+                    whole.result().samples(),
+                    combinedSamples);
+            assertCoordinateListsExactlyEqual(
+                    uninterrupted.currentWalkers(),
+                    split.currentWalkers());
+        }
+    }
+
+    @Test
+    void parameterChangeRefreshesWalkerLogsWithoutRestartingRandomStream() {
+        Fixture fixture = fixture();
+        FermiNetVmc.Configuration configuration =
+                new FermiNetVmc.Configuration(
+                        fixture.walkers.size(),
+                        0,
+                        1,
+                        1,
+                        0.02,
+                        20260824L);
+        double[] changedValues = fixture.state.parameterArray();
+        changedValues[0] += 0.01;
+        FermiNetV1State changedState = fixture.state.withParameters(changedValues);
+
+        List<Transition> unchangedTrace = new ArrayList<>();
+        List<Transition> changedTrace = new ArrayList<>();
+        List<Transition> replayTrace = new ArrayList<>();
+
+        try (FermiNetVmcParallel sampler = new FermiNetVmcParallel(4)) {
+            var unchanged = sampler.beginSession(
+                    fixture.state,
+                    configuration,
+                    fixture.walkers);
+            var changed = sampler.beginSession(
+                    fixture.state,
+                    configuration,
+                    fixture.walkers);
+            var replay = sampler.beginSession(
+                    fixture.state,
+                    configuration,
+                    fixture.walkers);
+
+            unchanged.sample(fixture.state, 0, 1, 1);
+            changed.sample(fixture.state, 0, 1, 1);
+            replay.sample(fixture.state, 0, 1, 1);
+
+            List<QuantumCoordinates> theta0FinalWalkers = changed.currentWalkers();
+            double[] theta0Logs = changed.currentWalkerLogs();
+            changed.refreshState(changedState);
+
+            assertCoordinateListsExactlyEqual(
+                    theta0FinalWalkers,
+                    changed.currentWalkers());
+            double[] theta1Logs = changed.currentWalkerLogs();
+            boolean anyLogChanged = false;
+            for (int walker = 0; walker < theta1Logs.length; walker++) {
+                double expected = changedState.samplingEvaluation(
+                                theta0FinalWalkers.get(walker))
+                        .logAbsoluteWavefunction();
+                assertEquals(
+                        Double.doubleToRawLongBits(expected),
+                        Double.doubleToRawLongBits(theta1Logs[walker]));
+                anyLogChanged |= Double.doubleToRawLongBits(theta0Logs[walker])
+                        != Double.doubleToRawLongBits(theta1Logs[walker]);
+            }
+            assertTrue(anyLogChanged, "theta1 refresh must replace stale theta0 logs");
+
+            unchanged.sample(
+                    fixture.state,
+                    0,
+                    1,
+                    1,
+                    observer(unchangedTrace));
+            var continued = changed.sample(
+                    changedState,
+                    0,
+                    1,
+                    1,
+                    observer(changedTrace));
+            replay.refreshState(changedState);
+            var replayed = replay.sample(
+                    changedState,
+                    0,
+                    1,
+                    1,
+                    observer(replayTrace));
+
+            assertEquals(unchangedTrace.size(), changedTrace.size());
+            for (int transition = 0;
+                 transition < unchangedTrace.size();
+                 transition++) {
+                Transition expected = unchangedTrace.get(transition);
+                Transition actual = changedTrace.get(transition);
+                assertEquals(expected.walker(), actual.walker());
+                assertCoordinatesExactlyEqual(
+                        expected.proposal(),
+                        actual.proposal(),
+                        transition);
+                assertEquals(expected.logUniformBits(), actual.logUniformBits());
+
+                double expectedCurrentLog = changedState.samplingEvaluation(
+                                theta0FinalWalkers.get(actual.walker()))
+                        .logAbsoluteWavefunction();
+                double expectedProposalLog = changedState.samplingEvaluation(
+                                actual.proposal())
+                        .logAbsoluteWavefunction();
+                assertEquals(
+                        Double.doubleToRawLongBits(expectedCurrentLog),
+                        actual.currentLogBits());
+                assertEquals(
+                        Double.doubleToRawLongBits(expectedProposalLog),
+                        actual.proposalLogBits());
+                boolean expectedAccepted =
+                        Double.longBitsToDouble(actual.logUniformBits())
+                                < Math.min(
+                                0.0,
+                                2.0 * (expectedProposalLog - expectedCurrentLog));
+                assertEquals(expectedAccepted, actual.accepted());
+            }
+            assertEquals(
+                    FermiNetStateIdentity.of(changedState),
+                    continued.result().stateIdentity());
+            assertEquals(changedTrace, replayTrace);
+            assertCoordinateListsExactlyEqual(
+                    continued.result().samples(),
+                    replayed.result().samples());
+            assertCoordinateListsExactlyEqual(
+                    changed.currentWalkers(),
+                    replay.currentWalkers());
+        }
+    }
+
+    private static FermiNetVmcParallel.TransitionObserver observer(
+            List<Transition> transitions) {
+
+        return (walker, proposal, logUniform, currentLog, proposalLog, accepted) ->
+                transitions.add(
+                        new Transition(
+                                walker,
+                                proposal,
+                                Double.doubleToRawLongBits(logUniform),
+                                Double.doubleToRawLongBits(currentLog),
+                                Double.doubleToRawLongBits(proposalLog),
+                                accepted));
+    }
+
+    private static void assertCoordinateListsExactlyEqual(
+            List<QuantumCoordinates> expected,
+            List<QuantumCoordinates> actual) {
+
+        assertEquals(expected.size(), actual.size());
+        for (int index = 0; index < expected.size(); index++) {
+            assertCoordinatesExactlyEqual(
+                    expected.get(index),
+                    actual.get(index),
+                    index);
+        }
     }
 
     private static void assertCoordinatesExactlyEqual(

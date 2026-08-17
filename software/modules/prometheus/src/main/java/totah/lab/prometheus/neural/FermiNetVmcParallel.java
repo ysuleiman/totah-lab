@@ -28,6 +28,23 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
  */
 final class FermiNetVmcParallel implements AutoCloseable {
 
+    @FunctionalInterface
+    interface TransitionObserver {
+        void observe(
+                int walker,
+                QuantumCoordinates proposal,
+                double logAcceptanceUniform,
+                double currentLogAbsolute,
+                double proposalLogAbsolute,
+                boolean accepted);
+    }
+
+    record ContinuationResult(
+            FermiNetVmc.Result result,
+            long proposed,
+            long accepted) {
+    }
+
     private final ForkJoinPool pool;
 
     FermiNetVmcParallel(int parallelism) {
@@ -38,6 +55,20 @@ final class FermiNetVmcParallel implements AutoCloseable {
     }
 
     FermiNetVmc.Result sample(
+            FermiNetV1State state,
+            FermiNetVmc.Configuration configuration,
+            List<QuantumCoordinates> initialWalkers) {
+
+        return beginSession(state, configuration, initialWalkers)
+                .sample(
+                        state,
+                        configuration.warmupSweeps(),
+                        configuration.retainedPerWalker(),
+                        configuration.sweepsBetweenRetained())
+                .result();
+    }
+
+    SamplingSession beginSession(
             FermiNetV1State state,
             FermiNetVmc.Configuration configuration,
             List<QuantumCoordinates> initialWalkers) {
@@ -55,8 +86,6 @@ final class FermiNetVmcParallel implements AutoCloseable {
             throw new IllegalArgumentException("initial walker count mismatch");
         }
 
-        Random random = new Random(configuration.seed());
-
         int walkerCount = configuration.walkers();
         Walker[] walkers = new Walker[walkerCount];
 
@@ -67,50 +96,118 @@ final class FermiNetVmcParallel implements AutoCloseable {
             walkers[i] = new Walker(initialWalkers.get(i), initialLogs[i]);
         }
 
-        long proposed = 0L;
-        long accepted = 0L;
+        return new SamplingSession(
+                walkers,
+                new Random(configuration.seed()),
+                configuration.stepSizeBohr(),
+                FermiNetStateIdentity.of(state));
+    }
 
-        List<QuantumCoordinates> retained =
-                new ArrayList<>(
-                        Math.multiplyExact(
-                                configuration.walkers(),
-                                configuration.retainedPerWalker()));
+    /**
+     * Stateful deterministic sampling continuation.
+     *
+     * <p>An exact future checkpoint must preserve both the internal 48-bit
+     * {@link Random} state and the cached value/state used by
+     * {@link Random#nextGaussian()}; recording only the original seed cannot
+     * restart an arbitrary point in this stream exactly.
+     */
+    final class SamplingSession {
 
-        int measurementSweeps =
-                Math.multiplyExact(
-                        configuration.retainedPerWalker(),
-                        configuration.sweepsBetweenRetained());
+        private final Walker[] walkers;
+        private final Random random;
+        private final double stepSizeBohr;
+        private String stateIdentity;
 
-        int totalSweeps =
-                Math.addExact(
-                        configuration.warmupSweeps(),
-                        measurementSweeps);
+        private SamplingSession(
+                Walker[] walkers,
+                Random random,
+                double stepSizeBohr,
+                String stateIdentity) {
 
-        QuantumCoordinates[] candidates =
-                new QuantumCoordinates[walkerCount];
+            this.walkers = walkers;
+            this.random = random;
+            this.stepSizeBohr = stepSizeBohr;
+            this.stateIdentity = stateIdentity;
+        }
 
-        double[] logAcceptanceUniform =
-                new double[walkerCount];
+        ContinuationResult sample(
+                FermiNetV1State state,
+                int warmupSweeps,
+                int retainedPerWalker,
+                int sweepsBetweenRetained) {
 
-        for (int sweep = 1; sweep <= totalSweeps; sweep++) {
+            return sample(
+                    state,
+                    warmupSweeps,
+                    retainedPerWalker,
+                    sweepsBetweenRetained,
+                    (walker, proposal, logUniform, currentLog, proposalLog, accepted) -> {
+                    });
+        }
 
-            for (int walker = 0; walker < walkerCount; walker++) {
-                candidates[walker] =
-                        moveAllElectrons(
-                                walkers[walker].coordinates,
-                                configuration.stepSizeBohr(),
-                                random);
+        ContinuationResult sample(
+                FermiNetV1State state,
+                int warmupSweeps,
+                int retainedPerWalker,
+                int sweepsBetweenRetained,
+                TransitionObserver observer) {
 
-                logAcceptanceUniform[walker] =
-                        Math.log(random.nextDouble());
+            Objects.requireNonNull(state, "state");
+            Objects.requireNonNull(observer, "observer");
+
+            if (warmupSweeps < 0
+                    || retainedPerWalker < 1
+                    || sweepsBetweenRetained < 1) {
+                throw new IllegalArgumentException(
+                        "invalid FermiNet continuation configuration");
             }
+
+            refreshState(state);
+
+            long proposed = 0L;
+            long accepted = 0L;
+
+            List<QuantumCoordinates> retained =
+                    new ArrayList<>(
+                            Math.multiplyExact(
+                                    walkers.length,
+                                    retainedPerWalker));
+
+            int measurementSweeps =
+                    Math.multiplyExact(
+                            retainedPerWalker,
+                            sweepsBetweenRetained);
+
+            int totalSweeps =
+                    Math.addExact(
+                            warmupSweeps,
+                            measurementSweeps);
+
+            QuantumCoordinates[] candidates =
+                    new QuantumCoordinates[walkers.length];
+
+            double[] logAcceptanceUniform =
+                    new double[walkers.length];
+
+            for (int sweep = 1; sweep <= totalSweeps; sweep++) {
+
+                for (int walker = 0; walker < walkers.length; walker++) {
+                    candidates[walker] =
+                            moveAllElectrons(
+                                    walkers[walker].coordinates,
+                                    stepSizeBohr,
+                                    random);
+
+                    logAcceptanceUniform[walker] =
+                            Math.log(random.nextDouble());
+                }
 
             double[] nextLogs =
                     parallelSamplingLogs(
                             state,
                             List.of(candidates));
 
-            for (int walker = 0; walker < walkerCount; walker++) {
+            for (int walker = 0; walker < walkers.length; walker++) {
                 double nextLog = nextLogs[walker];
 
                 validateFiniteLog(nextLog, "candidate", walker);
@@ -124,20 +221,37 @@ final class FermiNetVmcParallel implements AutoCloseable {
                                         * (nextLog
                                         - walkers[walker].logAbsolute));
 
+                double currentLog = walkers[walker].logAbsolute;
+
                 if (logAcceptanceUniform[walker] < logAcceptance) {
                     walkers[walker].coordinates = candidates[walker];
                     walkers[walker].logAbsolute = nextLog;
                     accepted++;
+                    observer.observe(
+                            walker,
+                            candidates[walker],
+                            logAcceptanceUniform[walker],
+                            currentLog,
+                            nextLog,
+                            true);
+                } else {
+                    observer.observe(
+                            walker,
+                            candidates[walker],
+                            logAcceptanceUniform[walker],
+                            currentLog,
+                            nextLog,
+                            false);
                 }
             }
 
             int measuredSweep =
                     sweep
-                            - configuration.warmupSweeps();
+                            - warmupSweeps;
 
             if (measuredSweep > 0
                     && measuredSweep
-                    % configuration.sweepsBetweenRetained()
+                    % sweepsBetweenRetained
                     == 0) {
 
                 for (Walker walker : walkers) {
@@ -159,11 +273,44 @@ final class FermiNetVmcParallel implements AutoCloseable {
                         state,
                         retained);
 
-        return new FermiNetVmc.Result(
-                retained,
-                acceptance,
-                List.of(energies),
-                FermiNetStateIdentity.of(state));
+            return new ContinuationResult(
+                    new FermiNetVmc.Result(
+                            retained,
+                            acceptance,
+                            List.of(energies),
+                            stateIdentity),
+                    proposed,
+                    accepted);
+        }
+
+        List<QuantumCoordinates> currentWalkers() {
+            return java.util.Arrays.stream(walkers)
+                    .map(walker -> walker.coordinates)
+                    .toList();
+        }
+
+        double[] currentWalkerLogs() {
+            return java.util.Arrays.stream(walkers)
+                    .mapToDouble(walker -> walker.logAbsolute)
+                    .toArray();
+        }
+
+        void refreshState(FermiNetV1State state) {
+            Objects.requireNonNull(state, "state");
+            String nextStateIdentity = FermiNetStateIdentity.of(state);
+            if (nextStateIdentity.equals(stateIdentity)) {
+                return;
+            }
+
+            double[] refreshedLogs = parallelSamplingLogs(
+                    state,
+                    currentWalkers());
+            for (int walker = 0; walker < walkers.length; walker++) {
+                validateFiniteLog(refreshedLogs[walker], "continued walker", walker);
+                walkers[walker].logAbsolute = refreshedLogs[walker];
+            }
+            stateIdentity = nextStateIdentity;
+        }
     }
 
     private double[] parallelSamplingLogs(
