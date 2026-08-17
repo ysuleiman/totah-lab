@@ -96,12 +96,8 @@ public final class FermiNetH2oSrDriver {
                   learning rate        : %.8g
                   damping              : %.8g
                   max update norm      : %.8g
-                  solver               : sample-space Cholesky SR
-                  parameter block size : %d
+                  solver               : structured Jacobian-free sample-space Cholesky SR
                   observation parallel.: %d
-                  max solver iterations: %d
-                  relative tolerance   : %.3e
-                  absolute tolerance   : %.3e
 
                 """,
                 arguments.preset(),
@@ -119,11 +115,7 @@ public final class FermiNetH2oSrDriver {
                 arguments.learningRate(),
                 arguments.damping(),
                 arguments.maxUpdateNorm(),
-                arguments.parameterBlockSize(),
-                arguments.observationParallelism(),
-                SR_MAX_SOLVER_ITERATIONS,
-                SR_RELATIVE_TOLERANCE,
-                SR_ABSOLUTE_TOLERANCE);
+                arguments.observationParallelism());
 
         Instant started = Instant.now();
 
@@ -202,7 +194,6 @@ public final class FermiNetH2oSrDriver {
                 gradient norm          : %.10e
                 Cholesky solves        : %d
                 relative true residual : %.10e
-                streamed passes        : %d
                 sample evaluations     : %d
                 raw update norm        : %.10e
                 applied update norm    : %.10e
@@ -213,7 +204,6 @@ public final class FermiNetH2oSrDriver {
                 sr.gradientNorm(),
                 sr.solverIterations(),
                 sr.relativeTrueResidual(),
-                sr.streamedOperatorPasses(),
                 sr.sampleEvaluations(),
                 sr.rawUpdateNorm(),
                 sr.appliedUpdateNorm(),
@@ -522,8 +512,7 @@ public final class FermiNetH2oSrDriver {
         srMap.put("learning_rate", arguments.learningRate());
         srMap.put("damping", arguments.damping());
         srMap.put("max_update_norm", arguments.maxUpdateNorm());
-        srMap.put("solver", "SAMPLE_SPACE_CHOLESKY_SR");
-        srMap.put("parameter_block_size", arguments.parameterBlockSize());
+        srMap.put("solver", "STRUCTURED_JACOBIAN_FREE_SAMPLE_SPACE_CHOLESKY_SR");
         srMap.put("observation_parallelism", arguments.observationParallelism());
         srMap.put("gradient_norm", sr.gradientNorm());
         srMap.put("raw_update_norm", sr.rawUpdateNorm());
@@ -531,7 +520,6 @@ public final class FermiNetH2oSrDriver {
         srMap.put("update_rescaled", sr.updateRescaled());
         srMap.put("solver_iterations", sr.solverIterations());
         srMap.put("relative_true_residual", sr.relativeTrueResidual());
-        srMap.put("streamed_operator_passes", sr.streamedOperatorPasses());
         srMap.put("sample_evaluations", sr.sampleEvaluations());
         srMap.put("sr_sample_mean_energy_hartree", sr.initialEnergyHartree());
         summary.put("sr", srMap);
@@ -596,9 +584,13 @@ public final class FermiNetH2oSrDriver {
 
         private static Arguments parse(String[] args) {
             String preset = "historical-n64";
-            Path parameters = null;
-            Path walkers = null;
-            Path output = null;
+            Path repositoryRoot = Path.of("/Users/yazan/totah-lab");
+            Path parameters = repositoryRoot.resolve(
+                    "artifacts/prometheus/h2o/ferminet/pretrained/parameters.hex");
+            Path walkers = repositoryRoot.resolve(
+                    "artifacts/prometheus/h2o/ferminet/pretrained/walkers.csv");
+            Path output = repositoryRoot.resolve(
+                    "artifacts/prometheus/h2o/ferminet/sr/latest");
             int sampleCount = 64;
             int retainedPerWalker = 1;
             int warmupSweeps = 100;
@@ -609,7 +601,7 @@ public final class FermiNetH2oSrDriver {
             double learningRate = 0.01;
             double damping = 1.0;
             double maxUpdateNorm = 0.05;
-            int parameterBlockSize = 128;
+            int parameterBlockSize = 8192;
             int observationParallelism = 12;
 
             for (int i = 0; i < args.length; i++) {
@@ -634,9 +626,6 @@ public final class FermiNetH2oSrDriver {
                 }
             }
             if (!"historical-n64".equals(preset)) throw usage("unknown preset: " + preset);
-            if (parameters == null || walkers == null || output == null) {
-                throw usage("--parameters, --walkers, and --output are required");
-            }
             if (sampleCount < 2 || retainedPerWalker < 1
                     || sampleCount % retainedPerWalker != 0
                     || warmupSweeps < 0 || sweepsBetweenRetained < 1

@@ -64,7 +64,7 @@ final class FermiNetStoredCovarianceOperatorTest {
         }
 
         double[] expected =
-                streaming.covarianceAction(
+                streaming.explicitJacobianCovarianceActionReference(
                         fixture.state,
                         fixture.samples,
                         0.2,

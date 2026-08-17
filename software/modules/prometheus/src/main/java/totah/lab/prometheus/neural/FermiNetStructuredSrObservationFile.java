@@ -100,6 +100,7 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                 (long) schema.statisticCount(),
                 Double.BYTES);
         long totalBytes = Math.multiplyExact(rowBytes, retained.size());
+        int rowByteCount = Math.toIntExact(rowBytes);
         Path path = Files.createTempFile(
                 "prometheus-ferminet-structured-sr-", ".bin");
         FileChannel channel = null;
@@ -121,6 +122,10 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
             LongAdder generation = new LongAdder();
             LongAdder writes = new LongAdder();
             executor = Executors.newFixedThreadPool(parallelism);
+            ThreadLocal<ByteBuffer> writeBuffers =
+                    ThreadLocal.withInitial(() ->
+                            ByteBuffer.allocateDirect(rowByteCount)
+                                    .order(ByteOrder.nativeOrder()));
             List<Future<Void>> futures = new ArrayList<>(retained.size());
             FileChannel workerChannel = channel;
 
@@ -151,7 +156,8 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                                 "non-finite structured SR local energy");
                     }
 
-                    double[] values = evaluation.statistics().values();
+                    double[] values = evaluation.statistics()
+                            .internalValuesForSpoolWrite();
                     if (values.length != schema.statisticCount()) {
                         throw new IllegalArgumentException(
                                 "structured SR schema mismatch");
@@ -160,7 +166,12 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
                     energies[physicalRow] = energy;
 
                     started = System.nanoTime();
-                    writeRow(workerChannel, physicalRow, rowBytes, values);
+                    writeRow(
+                            workerChannel,
+                            writeBuffers.get(),
+                            physicalRow,
+                            rowBytes,
+                            values);
                     writes.add(System.nanoTime() - started);
                     return null;
                 }));
@@ -213,13 +224,12 @@ final class FermiNetStructuredSrObservationFile implements AutoCloseable {
 
     private static void writeRow(
             FileChannel channel,
+            ByteBuffer bytes,
             int row,
             long rowBytes,
             double[] values)
             throws IOException {
-        ByteBuffer bytes = ByteBuffer.allocateDirect(
-                        Math.multiplyExact(values.length, Double.BYTES))
-                .order(ByteOrder.nativeOrder());
+        bytes.clear();
         bytes.asDoubleBuffer().put(values);
         bytes.limit(values.length * Double.BYTES);
         long position = Math.multiplyExact((long) row, rowBytes);

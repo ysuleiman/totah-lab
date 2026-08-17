@@ -31,7 +31,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         for (int i = 0; i < p; i++) probe[i] = Math.sin(.17 * (i + 1));
         double[] denseAction = multiply(dense.system, probe);
         var optimizer = new FermiNetMatrixFreeSrOptimizer();
-        double[] streamingAction = optimizer.covarianceAction(
+        double[] streamingAction = optimizer.explicitJacobianCovarianceActionReference(
                 fixture.state, fixture.samples, .2, probe);
         double actionError = maxError(denseAction, streamingAction);
 
@@ -60,8 +60,8 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         assertTrue(updateError < 3e-9, "dense/matrix-free SR update");
         assertTrue(Double.isFinite(result.relativeTrueResidual()));
         assertTrue(result.relativeTrueResidual() <= configuration.relativeTolerance());
-        assertTrue(result.solverIterations() > 0);
-        assertTrue(result.streamedOperatorPasses() > 0);
+        assertEquals(1, result.solverIterations());
+        assertEquals(0, result.streamedOperatorPasses());
         assertEquals(4L,
                 result.sampleEvaluations(),
                 "cached SR must evaluate each nonzero sample exactly once");

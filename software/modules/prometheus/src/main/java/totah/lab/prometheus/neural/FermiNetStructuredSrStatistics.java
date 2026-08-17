@@ -99,7 +99,7 @@ final class FermiNetStructuredSrStatistics {
                             inputs,
                             offset,
                             length);
-                } else {
+                } else if (isExplicitFamily(name)) {
                     family = new Family(
                             name,
                             Kind.EXPLICIT,
@@ -108,6 +108,9 @@ final class FermiNetStructuredSrStatistics {
                             0,
                             offset,
                             block.size());
+                } else {
+                    throw new IllegalArgumentException(
+                            "unsupported FermiNet SR parameter block: " + name);
                 }
 
                 assembled.add(family);
@@ -129,6 +132,15 @@ final class FermiNetStructuredSrStatistics {
             }
             this.byBlock = Map.copyOf(indexed);
             this.statisticCount = offset;
+        }
+
+        private static boolean isExplicitFamily(String name) {
+            return name.startsWith("interaction.")
+                    && (name.endsWith(".one.bias")
+                    || name.endsWith(".two.bias"))
+                    || name.startsWith("envelope.")
+                    && (name.endsWith(".pi")
+                    || name.endsWith(".sigma"));
         }
 
         FermiNetParameterLayout layout() {
@@ -157,6 +169,7 @@ final class FermiNetStructuredSrStatistics {
 
         private final Schema schema;
         private final double[] values;
+        private boolean built;
 
         Builder(Schema schema) {
             this.schema = Objects.requireNonNull(schema, "schema");
@@ -167,6 +180,7 @@ final class FermiNetStructuredSrStatistics {
                 String blockName,
                 double[][] inputs,
                 double[][] adjoints) {
+            ensureMutable();
             Family family = schema.family(blockName);
             if (family.kind() != Kind.DENSE_WEIGHT
                     || inputs.length != family.occurrences()
@@ -197,6 +211,7 @@ final class FermiNetStructuredSrStatistics {
         void denseInputs(
                 String blockName,
                 double[][] inputs) {
+            ensureMutable();
             Family family = schema.family(blockName);
             if (family.kind() != Kind.DENSE_WEIGHT
                     || inputs.length != family.occurrences()) {
@@ -219,6 +234,7 @@ final class FermiNetStructuredSrStatistics {
                 int occurrence,
                 int output,
                 double value) {
+            ensureMutable();
             Family family = schema.family(blockName);
             if (family.kind() != Kind.DENSE_WEIGHT
                     || occurrence < 0
@@ -239,6 +255,7 @@ final class FermiNetStructuredSrStatistics {
                 String blockName,
                 int localIndex,
                 double value) {
+            ensureMutable();
             Family family = schema.family(blockName);
             if (family.kind() != Kind.EXPLICIT
                     || localIndex < 0
@@ -250,13 +267,22 @@ final class FermiNetStructuredSrStatistics {
         }
 
         FermiNetStructuredSrStatistics build() {
+            ensureMutable();
             for (double value : values) {
                 if (!Double.isFinite(value)) {
                     throw new IllegalArgumentException(
                             "non-finite structured SR statistic");
                 }
             }
+            built = true;
             return new FermiNetStructuredSrStatistics(schema, values);
+        }
+
+        private void ensureMutable() {
+            if (built) {
+                throw new IllegalStateException(
+                        "structured SR statistics builder already consumed");
+            }
         }
     }
 
@@ -267,7 +293,7 @@ final class FermiNetStructuredSrStatistics {
             Schema schema,
             double[] values) {
         this.schema = schema;
-        this.values = values.clone();
+        this.values = values;
     }
 
     Schema schema() {
@@ -276,6 +302,14 @@ final class FermiNetStructuredSrStatistics {
 
     double[] values() {
         return values.clone();
+    }
+
+    /**
+     * Package-private ownership view for the immediate spool write only.
+     * Callers must neither modify nor retain the returned array.
+     */
+    double[] internalValuesForSpoolWrite() {
+        return values;
     }
 
     @Override

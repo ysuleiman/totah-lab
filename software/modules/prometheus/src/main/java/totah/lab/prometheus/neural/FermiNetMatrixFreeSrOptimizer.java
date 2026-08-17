@@ -186,8 +186,8 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     appliedUpdateNorm,
                     solve.absoluteSampleSpaceResidual(),
                     solve.relativeSampleSpaceResidual(),
-                    1,
-                    2,
+                    solve.linearSolveCount(),
+                    0,
                     observations.neuralEvaluations(),
                     rescaled,
                     energyGradient,
@@ -206,7 +206,7 @@ public final class FermiNetMatrixFreeSrOptimizer {
      * covariance action directly from fresh FermiNet evaluations and is not used
      * by production sample-space SR.
      */
-    double[] covarianceAction(
+    double[] explicitJacobianCovarianceActionReference(
             FermiNetV1State state,
             List<WeightedSample> samples,
             double damping,
@@ -406,6 +406,14 @@ public final class FermiNetMatrixFreeSrOptimizer {
             double relativeTolerance,
             double absoluteTolerance) {
 
+        /**
+         * {@code blockSize}, {@code maxSolverIterations},
+         * {@code relativeTolerance}, and {@code absoluteTolerance} are retained
+         * for source compatibility with the former explicit-Jacobian/PCG path.
+         * Structured production SR uses a direct sample-space Cholesky solve and
+         * does not consume those four values.
+         */
+
         public Configuration {
             if (observationParallelism < 1) {
                 throw new IllegalArgumentException(
@@ -445,6 +453,13 @@ public final class FermiNetMatrixFreeSrOptimizer {
             double[] energyGradient,
             List<Double> trueResidualHistory,
             Timing timing) {
+
+        /**
+         * {@code solverIterations} is the number of direct sample-space linear
+         * solves. {@code streamedOperatorPasses} is a legacy compatibility field
+         * and is always zero for structured SR because no streamed covariance
+         * operator or derivative-file pass executes in production.
+         */
 
         public Result {
             Objects.requireNonNull(

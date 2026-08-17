@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
@@ -277,6 +278,21 @@ final class FermiNetSampleSpaceSrSolverTest {
             double deltaCosine = cosine(
                     expected.delta(),
                     actual.delta());
+            double finalParameterError = 0.0;
+            double[] initialParameters = fixture.state.parameterArray();
+            double[] expectedDelta = expected.delta();
+            double[] actualDelta = actual.delta();
+            for (int parameter = 0;
+                 parameter < initialParameters.length;
+                 parameter++) {
+                double expectedParameter = initialParameters[parameter]
+                        + 0.01 * expectedDelta[parameter];
+                double actualParameter = initialParameters[parameter]
+                        + 0.01 * actualDelta[parameter];
+                finalParameterError = Math.max(
+                        finalParameterError,
+                        Math.abs(expectedParameter - actualParameter));
+            }
 
             System.out.printf("""
                     FERMINET_STRUCTURED_SR_PARITY
@@ -291,6 +307,7 @@ final class FermiNetSampleSpaceSrSolverTest {
                       delta_max_relative_error=%.17g
                       delta_norm_difference=%.17g
                       delta_cosine=%.17g
+                      final_parameter_max_error=%.17g
 
                     """,
                     actual.statisticsSpoolBytes(),
@@ -304,7 +321,8 @@ final class FermiNetSampleSpaceSrSolverTest {
                     deltaError,
                     deltaRelativeError,
                     deltaNormDifference,
-                    deltaCosine);
+                    deltaCosine,
+                    finalParameterError);
 
             assertEquals(
                     Double.doubleToLongBits(expected.meanEnergyHartree()),
@@ -315,6 +333,8 @@ final class FermiNetSampleSpaceSrSolverTest {
                     "structured gradient error=" + gradientError);
             assertTrue(deltaError < 2e-9,
                     "structured delta error=" + deltaError);
+            assertTrue(finalParameterError < 2e-11,
+                    "structured final parameter error=" + finalParameterError);
         }
     }
 
@@ -339,6 +359,50 @@ final class FermiNetSampleSpaceSrSolverTest {
 
         assertEquals(before, structuredSpoolCount(),
                 "failed structured SR build leaked its ephemeral spool");
+    }
+
+    @Test
+    void structuredStatisticsSpoolIsRemovedAfterSolverFailure()
+            throws IOException {
+        Fixture fixture = fixture();
+        long before = structuredSpoolCount();
+
+        try (FermiNetStructuredSrObservationFile observations =
+                     FermiNetStructuredSrObservationFile.buildParallel(
+                             fixture.state,
+                             fixture.samples,
+                             2)) {
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> new FermiNetStructuredSampleSpaceSrSolver()
+                            .solve(observations, Double.NaN));
+        }
+
+        assertEquals(before, structuredSpoolCount(),
+                "failed structured SR solve leaked its ephemeral spool");
+    }
+
+    @Test
+    void structuredObservationCompactsZeroWeightSamplesBeforeEvaluation()
+            throws IOException {
+        Fixture fixture = fixture();
+        List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples =
+                new ArrayList<>(fixture.samples);
+        samples.add(new FermiNetMatrixFreeSrOptimizer.WeightedSample(
+                0.0,
+                coordinates(0.25)));
+        AtomicInteger evaluations = new AtomicInteger();
+
+        try (FermiNetStructuredSrObservationFile observations =
+                     FermiNetStructuredSrObservationFile.buildParallel(
+                             fixture.state,
+                             samples,
+                             2,
+                             row -> evaluations.incrementAndGet())) {
+            assertEquals(fixture.samples.size(), observations.sampleCount());
+            assertEquals(fixture.samples.size(), observations.neuralEvaluations());
+            assertEquals(fixture.samples.size(), evaluations.get());
+        }
     }
 
     private static long structuredSpoolCount()

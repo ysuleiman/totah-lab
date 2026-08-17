@@ -21,7 +21,7 @@ import totah.lab.prometheus.variational.SpinProjection;
 
 /**
  * Diagnostic-only comparison of explicit dense SR matrix arithmetic against
- * FermiNetMatrixFreeSrOptimizer.covarianceAction().
+ * FermiNetMatrixFreeSrOptimizer.explicitJacobianCovarianceActionReference().
  *
  * <p>This test does NOT call oneIteration(), does NOT modify parameters, and
  * does NOT exercise the production PCG solver. It isolates the dense-vs-streamed
@@ -82,9 +82,9 @@ final class FermiNetSrDenseStreamingIterationDiagnosticTest {
             double[] apDense = multiply(dense.system(), pd);
 
             /*
-             * A p using the exact production covarianceAction() seam.
+             * A p using the explicit-Jacobian reference-oracle seam.
              */
-            double[] apStreamed = optimizer.covarianceAction(
+            double[] apStreamed = optimizer.explicitJacobianCovarianceActionReference(
                     state,
                     samples,
                     DAMPING,
@@ -113,7 +113,7 @@ final class FermiNetSrDenseStreamingIterationDiagnosticTest {
              * Independently recomputed true residuals b - A x.
              */
             double[] axDense = multiply(dense.system(), xd);
-            double[] axStreamed = optimizer.covarianceAction(
+            double[] axStreamed = optimizer.explicitJacobianCovarianceActionReference(
                     state,
                     samples,
                     DAMPING,

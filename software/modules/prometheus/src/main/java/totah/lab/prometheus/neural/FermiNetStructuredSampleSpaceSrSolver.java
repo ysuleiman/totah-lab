@@ -193,6 +193,7 @@ final class FermiNetStructuredSampleSpaceSrSolver {
                 meanEnergy,
                 absoluteResidual,
                 qNorm == 0.0 ? 0.0 : absoluteResidual / qNorm,
+                1,
                 observations.spoolBytes(),
                 totalNanos);
     }
@@ -466,6 +467,7 @@ final class FermiNetStructuredSampleSpaceSrSolver {
             double meanEnergyHartree,
             double absoluteSampleSpaceResidual,
             double relativeSampleSpaceResidual,
+            int linearSolveCount,
             long statisticsSpoolBytes,
             long totalSolverNanos) {
 
