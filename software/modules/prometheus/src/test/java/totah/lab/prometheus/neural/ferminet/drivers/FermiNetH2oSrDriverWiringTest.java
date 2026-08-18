@@ -7,6 +7,7 @@ import totah.lab.prometheus.neural.ferminet.reference.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -42,6 +43,55 @@ final class FermiNetH2oSrDriverWiringTest {
                 source.indexOf("static int canonicalVmcParallelism()", seamStart));
         assertTrue(seamBody.contains("FermiNetRuntimeSampling.sampleParallel("),
                 "canonical VMC seam must delegate to deterministic parallel VMC");
+    }
+
+    @Test
+    void oneIterationRemainsTheDefaultAndPreservesTheOneStepPath() throws IOException {
+        String source = Files.readString(driverSource());
+
+        assertTrue(source.contains("int iterations = 1;"));
+        assertTrue(source.contains("if (arguments.iterations() > 1)"));
+        assertTrue(source.contains("iteration = optimizer.oneIteration("));
+        assertTrue(source.contains("sampleCanonicalVmc("),
+                "one-step mode must retain independent post-SR validation");
+    }
+
+    @Test
+    void multiIterationModeUsesOnePersistentOptimizerCall() throws IOException {
+        String source = Files.readString(driverSource());
+        int methodStart = source.indexOf("private static void runPersistentTrajectory(");
+        int nextMethod = source.indexOf("private static void persistIteration(", methodStart);
+        String method = source.substring(methodStart, nextMethod);
+
+        assertEquals(1, occurrences(method, "optimizer.optimize("));
+        assertEquals(0, occurrences(method, "oneIteration("));
+        assertTrue(method.contains("arguments.iterations()"));
+    }
+
+    @Test
+    void provenanceMismatchFailsClosed() {
+        IllegalStateException mismatch = assertThrows(IllegalStateException.class,
+                () -> FermiNetH2oSrDriver.verifyIdentity(
+                        "wrong", "expected", "decoded parameter checksum"));
+        assertTrue(mismatch.getMessage().contains("decoded parameter checksum mismatch"));
+    }
+
+    @Test
+    void driverUsesDecodedParameterIdentityAndPersistsContinuity() throws IOException {
+        String source = Files.readString(driverSource());
+        int verification = source.indexOf("verifyProvenance(initialState");
+        int optimizer = source.indexOf("new FermiNetVariationalOptimizer(");
+
+        assertTrue(verification >= 0 && verification < optimizer,
+                "provenance must be checked before optimizer construction");
+        assertTrue(source.contains(
+                "FermiNetPretrainingQualification.parameterChecksum(state)"));
+        assertFalse(source.contains("sha256(arguments.parameterFile())"),
+                "raw parameter-file SHA must not be used as canonical state identity");
+        assertTrue(source.contains("expectedInputChecksum = outputChecksum"));
+        assertTrue(source.contains("input_parameter_checksum"));
+        assertTrue(source.contains("output_parameter_checksum"));
+        assertTrue(source.contains("next_walker_checksum"));
     }
 
     private static Path driverSource() {

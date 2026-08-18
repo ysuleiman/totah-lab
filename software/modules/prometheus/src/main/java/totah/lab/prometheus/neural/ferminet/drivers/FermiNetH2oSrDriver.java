@@ -4,9 +4,12 @@ import totah.lab.prometheus.neural.ferminet.runtime.*;
 import totah.lab.prometheus.neural.ferminet.pretraining.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +42,16 @@ import totah.lab.prometheus.variational.SpinProjection;
  */
 public final class FermiNetH2oSrDriver {
 
+    private static final String EXPECTED_PARAMETER_CHECKSUM =
+            "43a41da438fdcdccf1f6496db6af7848fda1f572bc657ea8037b399b6c12c16b";
+    private static final String EXPECTED_GEOMETRY_IDENTITY =
+            "2b5c454215a84de2cfacd6ce7cec2cf018b5b7ee6ab95267332f0fdc26421234";
+    private static final String EXPECTED_HF_ARTIFACT_SHA256 =
+            "2c2ae3854bf743124c8d3b9847095080f6c6f990f94cf73d030f64ee56912d89";
+    private static final String HF_ARTIFACT_RESOURCE =
+            "/totah/lab/prometheus/neural/h2o-uhf-ccpvdz.json";
+    private static final int CANONICAL_WALKERS = 64;
+
     private static final int VMC_PARALLELISM = Math.max(1,
             Math.min(12, Runtime.getRuntime().availableProcessors()));
     private static final double MIN_ACCEPTANCE = 0.20;
@@ -52,8 +65,6 @@ public final class FermiNetH2oSrDriver {
     public static void main(String[] args) throws Exception {
         long driverStartedNanos = System.nanoTime();
         Arguments arguments = Arguments.parse(args);
-        Files.createDirectories(arguments.outputDirectory());
-
         Molecule molecule = water();
         FermiNetV1Configuration configuration = FermiNetV1Configuration.locked();
         FermiNetParameterLayout layout = new FermiNetParameterLayout(configuration, molecule);
@@ -66,6 +77,8 @@ public final class FermiNetH2oSrDriver {
                 FermiNetParameters.fromArray(layout, parameterValues));
 
         List<QuantumCoordinates> availableWalkers = readWalkers(arguments.walkerFile(), molecule);
+        verifyProvenance(initialState, availableWalkers, hfArtifactSha256());
+        Files.createDirectories(arguments.outputDirectory());
         int requiredWalkers = arguments.sampleCount() / arguments.retainedPerWalker();
         if (availableWalkers.size() < requiredWalkers) {
             throw new IllegalArgumentException("walker artifact has " + availableWalkers.size()
@@ -83,6 +96,7 @@ public final class FermiNetH2oSrDriver {
                 parameter input        : %s
                 walker input           : %s
                 output                 : %s
+                iterations             : %d
                 parameters             : %d
                 walkers                : %d
                 SR samples             : %d
@@ -108,6 +122,7 @@ public final class FermiNetH2oSrDriver {
                 arguments.parameterFile(),
                 arguments.walkerFile(),
                 arguments.outputDirectory(),
+                arguments.iterations(),
                 initialState.parameterCount(),
                 pretrainedWalkers.size(),
                 arguments.sampleCount(),
@@ -138,6 +153,12 @@ public final class FermiNetH2oSrDriver {
                         arguments.damping(),
                         arguments.maxUpdateNorm(),
                         arguments.observationParallelism());
+
+        if (arguments.iterations() > 1) {
+            runPersistentTrajectory(arguments, initialState, pretrainedWalkers,
+                    samplingConfiguration, srConfiguration, driverStartedNanos);
+            return;
+        }
 
         System.out.println("Starting exactly ONE SR update...");
 
@@ -288,6 +309,217 @@ public final class FermiNetH2oSrDriver {
                 postEnergy.standardError(),
                 deltaEnergy,
                 direction);
+    }
+
+    private static void runPersistentTrajectory(
+            Arguments arguments,
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            FermiNetVariationalOptimizer.SamplingConfiguration sampling,
+            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
+            long driverStartedNanos) throws IOException {
+
+        System.out.printf(Locale.ROOT,
+                "Starting one persistent EXACT_SR trajectory of %d iterations...%n",
+                arguments.iterations());
+        List<FermiNetVariationalOptimizer.OptimizationIterationResult> results;
+        try (FermiNetVariationalOptimizer optimizer =
+                     new FermiNetVariationalOptimizer(VMC_PARALLELISM)) {
+            results = optimizer.optimize(
+                    initialState,
+                    initialWalkers,
+                    sampling,
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                            srConfiguration),
+                    arguments.iterations());
+        }
+
+        String expectedInputChecksum = EXPECTED_PARAMETER_CHECKSUM;
+        for (var iteration : results) {
+            if (iteration.optimizerType() != FermiNetOptimizerType.EXACT_SR) {
+                throw new IllegalStateException("canonical trajectory did not use EXACT_SR");
+            }
+            String inputChecksum = FermiNetPretrainingQualification.parameterChecksum(
+                    iteration.inputState());
+            String outputChecksum = FermiNetPretrainingQualification.parameterChecksum(
+                    iteration.updatedState());
+            if (!expectedInputChecksum.equals(inputChecksum)) {
+                throw new IllegalStateException("SR state-continuity checksum mismatch at iteration "
+                        + iteration.iteration());
+            }
+            verifyFiniteParameters(iteration.updatedState());
+            requireOperationalAcceptance(
+                    iteration.vmcResult().acceptance(),
+                    "iteration " + iteration.iteration());
+            if (iteration.nextWalkers().size() != CANONICAL_WALKERS) {
+                throw new IllegalStateException("persistent walker-count mismatch at iteration "
+                        + iteration.iteration());
+            }
+            persistIteration(arguments.outputDirectory(), iteration,
+                    inputChecksum, outputChecksum);
+            printIteration(iteration, inputChecksum, outputChecksum);
+            expectedInputChecksum = outputChecksum;
+        }
+
+        System.out.printf(Locale.ROOT, """
+                FERMINET_H2O_SR_TRAJECTORY_TIMING
+                  iterations=%d
+                  total_driver_ms=%.3f
+
+                Persistent EXACT_SR trajectory complete; no independent post-SR VMC was run.
+                """,
+                results.size(), milliseconds(System.nanoTime() - driverStartedNanos));
+    }
+
+    private static void persistIteration(
+            Path outputRoot,
+            FermiNetVariationalOptimizer.OptimizationIterationResult iteration,
+            String inputChecksum,
+            String outputChecksum) throws IOException {
+        Path directory = outputRoot.resolve(String.format(
+                Locale.ROOT, "iteration-%03d", iteration.iteration()));
+        Files.createDirectories(directory);
+        writeParameters(directory.resolve("input-parameters.hex"),
+                FermiNetStateAccess.parameterSnapshot(iteration.inputState()));
+        writeParameters(directory.resolve("output-parameters.hex"),
+                FermiNetStateAccess.parameterSnapshot(iteration.updatedState()));
+        writeWalkers(directory.resolve("next-walkers.csv"), iteration.nextWalkers());
+        writeEnergySamples(directory.resolve("local-energy-samples.csv"),
+                iteration.vmcResult().localEnergies());
+
+        var energy = iteration.energyStatistics();
+        var sr = iteration.exactSrResult();
+        var timing = sr.timing();
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("schema", "prometheus-ferminet-h2o-exact-sr-iteration-v1");
+        summary.put("iteration", iteration.iteration());
+        summary.put("seed", iteration.seed());
+        summary.put("optimizer", iteration.optimizerType().name());
+        summary.put("input_parameter_checksum", inputChecksum);
+        summary.put("output_parameter_checksum", outputChecksum);
+        summary.put("next_walker_checksum", walkerChecksum(iteration.nextWalkers()));
+        summary.put("walker_count", iteration.nextWalkers().size());
+        summary.put("sample_count", energy.count());
+        summary.put("mean_energy_hartree", energy.meanHartree());
+        summary.put("standard_error_hartree", energy.standardErrorHartree());
+        summary.put("standard_deviation_hartree", energy.standardDeviationHartree());
+        summary.put("acceptance", iteration.vmcResult().acceptance());
+        summary.put("gradient_norm", sr.gradientNorm());
+        summary.put("raw_update_norm", sr.rawUpdateNorm());
+        summary.put("applied_update_norm", sr.appliedUpdateNorm());
+        summary.put("update_rescaled", sr.updateRescaled());
+        summary.put("absolute_sr_residual", sr.absoluteTrueResidual());
+        summary.put("relative_sr_residual", sr.relativeTrueResidual());
+        summary.put("vmc_nanos", iteration.vmcNanos());
+        summary.put("sr_nanos", iteration.updateNanos());
+        summary.put("total_iteration_nanos", iteration.totalNanos());
+        summary.put("statistics_construction_nanos", timing.observationConstructionNanos());
+        summary.put("sample_space_solve_nanos", timing.sampleSpaceSolveNanos());
+        summary.put("update_rescaling_nanos", timing.updateRescalingNanos());
+        summary.put("new_state_construction_nanos", timing.newStateConstructionNanos());
+        JSON.writeValue(directory.resolve("iteration-summary.json").toFile(), summary);
+    }
+
+    private static void printIteration(
+            FermiNetVariationalOptimizer.OptimizationIterationResult iteration,
+            String inputChecksum,
+            String outputChecksum) {
+        var energy = iteration.energyStatistics();
+        var sr = iteration.exactSrResult();
+        System.out.printf(Locale.ROOT, """
+                EXACT_SR iteration %d
+                  input checksum       : %s
+                  output checksum      : %s
+                  energy               : %+.10f +/- %.10f Ha
+                  standard deviation   : %.10f Ha
+                  acceptance           : %.6f
+                  gradient norm        : %.10e
+                  raw update norm      : %.10e
+                  applied update norm  : %.10e
+                  clipped              : %s
+                  relative residual    : %.10e
+                  VMC ms               : %.3f
+                  SR ms                : %.3f
+                  total ms             : %.3f
+
+                """,
+                iteration.iteration(), inputChecksum, outputChecksum,
+                energy.meanHartree(), energy.standardErrorHartree(),
+                energy.standardDeviationHartree(), iteration.vmcResult().acceptance(),
+                sr.gradientNorm(), sr.rawUpdateNorm(), sr.appliedUpdateNorm(),
+                sr.updateRescaled(), sr.relativeTrueResidual(),
+                milliseconds(iteration.vmcNanos()),
+                milliseconds(iteration.updateNanos()),
+                milliseconds(iteration.totalNanos()));
+    }
+
+    static void verifyProvenance(
+            FermiNetV1State state,
+            List<QuantumCoordinates> walkers,
+            String hfArtifactSha256) {
+        String parameterChecksum =
+                FermiNetPretrainingQualification.parameterChecksum(state);
+        verifyIdentity(parameterChecksum, EXPECTED_PARAMETER_CHECKSUM,
+                "decoded parameter checksum");
+        String geometryIdentity =
+                FermiNetPretrainingQualification.geometryIdentity(state.molecule());
+        verifyIdentity(geometryIdentity, EXPECTED_GEOMETRY_IDENTITY,
+                "canonical geometry identity");
+        verifyIdentity(hfArtifactSha256, EXPECTED_HF_ARTIFACT_SHA256,
+                "HF artifact SHA-256");
+        if (walkers.size() != CANONICAL_WALKERS) {
+            throw new IllegalStateException("canonical walker count must be exactly "
+                    + CANONICAL_WALKERS + ", found " + walkers.size());
+        }
+    }
+
+    static void verifyIdentity(String actual, String expected, String label) {
+        if (!expected.equals(actual)) {
+            throw new IllegalStateException(label + " mismatch: " + actual);
+        }
+    }
+
+    private static String hfArtifactSha256() throws IOException {
+        try (InputStream input = FermiNetH2oSrDriver.class.getResourceAsStream(
+                HF_ARTIFACT_RESOURCE)) {
+            if (input == null) {
+                throw new IOException("missing HF artifact resource: " + HF_ARTIFACT_RESOURCE);
+            }
+            MessageDigest digest = sha256();
+            byte[] buffer = new byte[8192];
+            for (int count; (count = input.read(buffer)) >= 0;) {
+                digest.update(buffer, 0, count);
+            }
+            return java.util.HexFormat.of().formatHex(digest.digest());
+        }
+    }
+
+    private static String walkerChecksum(List<QuantumCoordinates> walkers) {
+        MessageDigest digest = sha256();
+        for (QuantumCoordinates walker : walkers) {
+            for (var particle : walker.particles()) {
+                updateLong(digest, particle.particleIndex());
+                updateLong(digest, particle.spin().ordinal());
+                updateLong(digest, Double.doubleToRawLongBits(particle.xBohr()));
+                updateLong(digest, Double.doubleToRawLongBits(particle.yBohr()));
+                updateLong(digest, Double.doubleToRawLongBits(particle.zBohr()));
+            }
+        }
+        return java.util.HexFormat.of().formatHex(digest.digest());
+    }
+
+    private static MessageDigest sha256() {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 unavailable", exception);
+        }
+    }
+
+    private static void updateLong(MessageDigest digest, long value) {
+        for (int shift = 56; shift >= 0; shift -= 8) {
+            digest.update((byte) (value >>> shift));
+        }
     }
 
     static FermiNetRuntimeSampling.Result sampleCanonicalVmc(
@@ -603,6 +835,7 @@ public final class FermiNetH2oSrDriver {
             Path parameterFile,
             Path walkerFile,
             Path outputDirectory,
+            int iterations,
             int sampleCount,
             int retainedPerWalker,
             int warmupSweeps,
@@ -616,16 +849,19 @@ public final class FermiNetH2oSrDriver {
             int observationParallelism) {
 
         private static Arguments parse(String[] args) {
-            String preset = "historical-n64";
+            String preset = "qualified-hf-n1024";
             Path repositoryRoot = Path.of("/Users/yazan/totah-lab");
             Path parameters = repositoryRoot.resolve(
-                    "artifacts/prometheus/h2o/ferminet/pretrained/parameters.hex");
+                    "artifacts/prometheus/h2o/ferminet/pretraining-qualification/"
+                            + "checkpoint-008000-20260818/pretrained-parameters.hex");
             Path walkers = repositoryRoot.resolve(
-                    "artifacts/prometheus/h2o/ferminet/pretrained/walkers.csv");
+                    "artifacts/prometheus/h2o/ferminet/pretraining-qualification/"
+                            + "checkpoint-008000-20260818/pretrained-walkers.csv");
             Path output = repositoryRoot.resolve(
                     "artifacts/prometheus/h2o/ferminet/sr/latest");
-            int sampleCount = 64;
-            int retainedPerWalker = 1;
+            int iterations = 1;
+            int sampleCount = 1024;
+            int retainedPerWalker = 16;
             int warmupSweeps = 100;
             int sweepsBetweenRetained = 10;
             double stepSizeBohr = 0.02;
@@ -642,6 +878,7 @@ public final class FermiNetH2oSrDriver {
                     case "--parameters" -> parameters = Path.of(value(args, ++i, "--parameters"));
                     case "--walkers" -> walkers = Path.of(value(args, ++i, "--walkers"));
                     case "--output" -> output = Path.of(value(args, ++i, "--output"));
+                    case "--iterations" -> iterations = integer(args, ++i, "--iterations");
                     case "--sample-count" -> sampleCount = integer(args, ++i, "--sample-count");
                     case "--retained-per-walker" -> retainedPerWalker = integer(args, ++i, "--retained-per-walker");
                     case "--warmup-sweeps" -> warmupSweeps = integer(args, ++i, "--warmup-sweeps");
@@ -656,9 +893,10 @@ public final class FermiNetH2oSrDriver {
                     default -> throw usage("unknown argument: " + args[i]);
                 }
             }
-            if (!"historical-n64".equals(preset)) throw usage("unknown preset: " + preset);
-            if (sampleCount < 2 || retainedPerWalker < 1
+            if (!"qualified-hf-n1024".equals(preset)) throw usage("unknown preset: " + preset);
+            if (iterations < 1 || sampleCount < 2 || retainedPerWalker < 1
                     || sampleCount % retainedPerWalker != 0
+                    || sampleCount / retainedPerWalker != CANONICAL_WALKERS
                     || warmupSweeps < 0 || sweepsBetweenRetained < 1
                     || !(stepSizeBohr > 0.0) || !Double.isFinite(stepSizeBohr)
                     || !(learningRate > 0.0) || !Double.isFinite(learningRate)
@@ -671,6 +909,7 @@ public final class FermiNetH2oSrDriver {
                     parameters.toAbsolutePath().normalize(),
                     walkers.toAbsolutePath().normalize(),
                     output.toAbsolutePath().normalize(),
+                    iterations,
                     sampleCount, retainedPerWalker, warmupSweeps, sweepsBetweenRetained,
                     stepSizeBohr, baselineSeed, postSrSeed, learningRate, damping,
                     maxUpdateNorm, observationParallelism);
@@ -707,8 +946,9 @@ public final class FermiNetH2oSrDriver {
 
         private static IllegalArgumentException usage(String problem) {
             return new IllegalArgumentException(problem + System.lineSeparator() + """
-                    --preset historical-n64
+                    --preset qualified-hf-n1024
                     --parameters PATH --walkers PATH --output PATH
+                    [--iterations N]
                     [--sample-count N] [--retained-per-walker N]
                     [--warmup-sweeps N] [--sweeps-between-retained N]
                     [--step-size-bohr X] [--baseline-seed N] [--post-sr-seed N]
