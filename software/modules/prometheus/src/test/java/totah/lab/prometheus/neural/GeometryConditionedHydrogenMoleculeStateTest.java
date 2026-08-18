@@ -1,5 +1,10 @@
 package totah.lab.prometheus.neural;
 
+import totah.lab.prometheus.neural.ferminet.runtime.*;
+import totah.lab.prometheus.neural.ferminet.pretraining.*;
+import totah.lab.prometheus.neural.ferminet.drivers.*;
+import totah.lab.prometheus.neural.ferminet.reference.*;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
