@@ -125,22 +125,42 @@ public final class FermiNetH2oSrDriver {
 
         Instant started = Instant.now();
 
-        /* 1. Independent baseline VMC. */
-        FermiNetVmc.Configuration baselineConfiguration = new FermiNetVmc.Configuration(
+        FermiNetVariationalOptimizer.SamplingConfiguration samplingConfiguration =
+                new FermiNetVariationalOptimizer.SamplingConfiguration(
                 pretrainedWalkers.size(),
                 arguments.warmupSweeps(),
                 arguments.retainedPerWalker(),
                 arguments.sweepsBetweenRetained(),
                 arguments.stepSizeBohr(),
                 arguments.baselineSeed());
+        FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration =
+                new FermiNetMatrixFreeSrOptimizer.Configuration(
+                        arguments.learningRate(),
+                        arguments.damping(),
+                        arguments.maxUpdateNorm(),
+                        arguments.observationParallelism(),
+                        arguments.parameterBlockSize(),
+                        SR_MAX_SOLVER_ITERATIONS,
+                        SR_RELATIVE_TOLERANCE,
+                        SR_ABSOLUTE_TOLERANCE);
 
-        long baselineStartedNanos = System.nanoTime();
-        FermiNetVmc.Result baseline = sampleCanonicalVmc(
-                initialState,
-                baselineConfiguration,
-                pretrainedWalkers,
-                VMC_PARALLELISM);
-        long baselineVmcNanos = System.nanoTime() - baselineStartedNanos;
+        System.out.println("Starting exactly ONE SR update...");
+
+        FermiNetVariationalOptimizer.OptimizationIterationResult iteration;
+        try (FermiNetVariationalOptimizer optimizer =
+                     new FermiNetVariationalOptimizer(VMC_PARALLELISM)) {
+            iteration = optimizer.oneIteration(
+                    0,
+                    initialState,
+                    pretrainedWalkers,
+                    samplingConfiguration,
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                            srConfiguration));
+        }
+        FermiNetVmc.Result baseline = iteration.vmcResult();
+        FermiNetMatrixFreeSrOptimizer.Result sr = iteration.exactSrResult();
+        long baselineVmcNanos = iteration.vmcNanos();
+        long srIterationNanos = iteration.updateNanos();
         if (baseline.samples().size() != arguments.sampleCount()) {
             throw new IllegalStateException("expected " + arguments.sampleCount()
                     + " SR samples but obtained " + baseline.samples().size());
@@ -163,37 +183,6 @@ public final class FermiNetH2oSrDriver {
                 baselineEnergy.standardError(),
                 baselineEnergy.standardDeviation(),
                 baselineEnergy.count());
-
-        /* 2. Direct |Psi|^2 VMC samples have equal SR weights. */
-        List<FermiNetMatrixFreeSrOptimizer.WeightedSample> srSamples =
-                new ArrayList<>(baseline.samples().size());
-
-        for (QuantumCoordinates coordinates : baseline.samples()) {
-            srSamples.add(new FermiNetMatrixFreeSrOptimizer.WeightedSample(1.0, coordinates));
-        }
-
-        /* 3. Exactly one matrix-free SR update. */
-        FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration =
-                new FermiNetMatrixFreeSrOptimizer.Configuration(
-                        arguments.learningRate(),
-                        arguments.damping(),
-                        arguments.maxUpdateNorm(),
-                        arguments.observationParallelism(),
-                        arguments.parameterBlockSize(),
-                        SR_MAX_SOLVER_ITERATIONS,
-                        SR_RELATIVE_TOLERANCE,
-                        SR_ABSOLUTE_TOLERANCE);
-
-        System.out.println("Starting exactly ONE SR update...");
-
-        long srStartedNanos = System.nanoTime();
-        FermiNetMatrixFreeSrOptimizer.Result sr =
-                new FermiNetMatrixFreeSrOptimizer().oneIteration(
-                        initialState,
-                        srSamples,
-                        FermiNetKnownLocalEnergies.from(initialState, baseline),
-                        srConfiguration);
-        long srIterationNanos = System.nanoTime() - srStartedNanos;
 
         FermiNetV1State updatedState = sr.state();
         verifyFiniteParameters(updatedState);

@@ -11,11 +11,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-/** Guards both canonical VMC phases against being silently rewired to serial VMC. */
+/** Guards canonical training and validation VMC against serial rewiring. */
 final class FermiNetH2oSrDriverWiringTest {
 
     @Test
-    void mainRoutesBaselineAndPostSrThroughDeterministicParallelVmc() throws IOException {
+    void mainRoutesTrainingThroughOptimizerAndValidationThroughParallelVmc()
+            throws IOException {
         String source = Files.readString(driverSource());
         int mainStart = source.indexOf("public static void main(String[] args)");
         int seamStart = source.indexOf("static FermiNetVmc.Result sampleCanonicalVmc(");
@@ -24,8 +25,10 @@ final class FermiNetH2oSrDriverWiringTest {
         assertTrue(seamStart > mainStart, "canonical VMC seam not found after main");
 
         String mainBody = source.substring(mainStart, seamStart);
-        assertEquals(2, occurrences(mainBody, "sampleCanonicalVmc("),
-                "baseline and post-SR must both use the canonical VMC seam");
+        assertEquals(1, occurrences(mainBody, "sampleCanonicalVmc("),
+                "post-SR validation must use the canonical VMC seam");
+        assertTrue(mainBody.contains("new FermiNetVariationalOptimizer(VMC_PARALLELISM)"),
+                "training VMC and update must use the canonical optimizer path");
         assertFalse(mainBody.contains("new FermiNetVmc()"),
                 "canonical main must not instantiate the serial sampler");
 
