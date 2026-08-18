@@ -240,6 +240,106 @@ final class FermiNetStructuredSampleSpaceSrSolver {
             int samples,
             int workers,
             ExecutorService executor) {
+        if (useMaterializedDenseKernel(family)) {
+            accumulateMaterializedDenseKernel(
+                    kernel, statistics, family, samples, workers, executor);
+            return;
+        }
+        accumulateFactorizedFamilyKernel(
+                kernel, statistics, family, samples, workers, executor);
+    }
+
+    private static boolean useMaterializedDenseKernel(
+            FermiNetStructuredSrStatistics.Family family) {
+        if (family.kind() != FermiNetStructuredSrStatistics.Kind.DENSE_WEIGHT) {
+            return false;
+        }
+        long materializedDot = Math.multiplyExact(
+                (long) family.inputs(), family.outputs());
+        long factorizedDot = Math.multiplyExact(
+                Math.multiplyExact(
+                        (long) family.occurrences(), family.occurrences()),
+                Math.addExact(family.inputs(), family.outputs()));
+        return materializedDot * 4L < factorizedDot;
+    }
+
+    private static void accumulateMaterializedDenseKernel(
+            double[] kernel,
+            double[] statistics,
+            FermiNetStructuredSrStatistics.Family family,
+            int samples,
+            int workers,
+            ExecutorService executor) {
+        int inputs = family.inputs();
+        int outputs = family.outputs();
+        int occurrences = family.occurrences();
+        int stride = family.statisticLength();
+        int gradientLength = Math.multiplyExact(inputs, outputs);
+        double[] gradients = new double[Math.multiplyExact(samples, gradientLength)];
+
+        List<Future<?>> futures = new ArrayList<>(workers);
+        for (int worker = 0; worker < workers; worker++) {
+            int start = samples * worker / workers;
+            int end = samples * (worker + 1) / workers;
+            futures.add(executor.submit(() -> {
+                for (int sample = start; sample < end; sample++) {
+                    int statisticBase = sample * stride;
+                    int adjointBase = statisticBase + family.inputLength();
+                    int gradientBase = sample * gradientLength;
+                    for (int output = 0; output < outputs; output++) {
+                        int outputBase = gradientBase + output * inputs;
+                        for (int input = 0; input < inputs; input++) {
+                            double value = 0.0;
+                            for (int occurrence = 0;
+                                 occurrence < occurrences;
+                                 occurrence++) {
+                                value += statistics[adjointBase
+                                                + occurrence * outputs
+                                                + output]
+                                        * statistics[statisticBase
+                                                + occurrence * inputs
+                                                + input];
+                            }
+                            gradients[outputBase + input] = value;
+                        }
+                    }
+                }
+            }));
+        }
+        await(futures);
+
+        futures.clear();
+        for (int worker = 0; worker < workers; worker++) {
+            int start = rowBoundary(worker, workers, samples);
+            int end = rowBoundary(worker + 1, workers, samples);
+            futures.add(executor.submit(() -> {
+                for (int row = start; row < end; row++) {
+                    int left = row * gradientLength;
+                    for (int column = 0; column <= row; column++) {
+                        int right = column * gradientLength;
+                        double value = 0.0;
+                        for (int parameter = 0;
+                             parameter < gradientLength;
+                             parameter++) {
+                            value += gradients[left + parameter]
+                                    * gradients[right + parameter];
+                        }
+                        kernel[row * samples + column] += value;
+                    }
+                }
+            }));
+        }
+        await(futures);
+        mirrorLowerTriangle(kernel, samples);
+    }
+
+    private static void accumulateFactorizedFamilyKernel(
+            double[] kernel,
+            double[] statistics,
+            FermiNetStructuredSrStatistics.Family family,
+            int samples,
+            int workers,
+            ExecutorService executor) {
         List<Future<?>> futures = new ArrayList<>(workers);
         for (int worker = 0; worker < workers; worker++) {
             int start = rowBoundary(worker, workers, samples);
@@ -257,6 +357,10 @@ final class FermiNetStructuredSampleSpaceSrSolver {
             }));
         }
         await(futures);
+        mirrorLowerTriangle(kernel, samples);
+    }
+
+    private static void mirrorLowerTriangle(double[] kernel, int samples) {
         for (int row = 0; row < samples; row++) {
             for (int column = 0; column < row; column++) {
                 kernel[column * samples + row] = kernel[row * samples + column];
