@@ -118,7 +118,9 @@ final class FermiNetKfacOptimizerTest {
         try (var optimizer = new FermiNetVariationalOptimizer(2)) {
             results = optimizer.optimize(
                     fixture.state(), walkers, sampling,
-                    FermiNetOptimizerType.KFAC, null, configuration(0.0), 2);
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.kfac(
+                            configuration(0.0)),
+                    2);
         }
         assertEquals(2, results.size());
         assertEquals(FermiNetOptimizerType.KFAC, results.get(0).optimizerType());
@@ -129,6 +131,27 @@ final class FermiNetKfacOptimizerTest {
         assertEquals(2, results.get(1).kfacResult().curvatureState().iteration());
         assertTrue(results.get(0).kfacResult().factorDecompositionUpdated());
         assertFalse(results.get(1).kfacResult().factorDecompositionUpdated());
+    }
+
+    @Test
+    void canonicalOneIterationSelectsKfacWithoutChangingVmcLifecycle() {
+        Fixture fixture = fixture();
+        List<QuantumCoordinates> walkers = fixture.samples().subList(0, 2).stream()
+                .map(FermiNetMatrixFreeSrOptimizer.WeightedSample::coordinates)
+                .toList();
+        var sampling = new FermiNetVariationalOptimizer.SamplingConfiguration(
+                2, 1, 2, 1, 0.02, 991L);
+        FermiNetVariationalOptimizer.OptimizationIterationResult result;
+        try (var optimizer = new FermiNetVariationalOptimizer(2)) {
+            result = optimizer.oneIteration(
+                    0, fixture.state(), walkers, sampling,
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.kfac(
+                            configuration(0.0)));
+        }
+        assertEquals(FermiNetOptimizerType.KFAC, result.optimizerType());
+        assertEquals(4, result.vmcResult().samples().size());
+        assertEquals(2, result.nextWalkers().size());
+        assertEquals(4, result.kfacResult().statisticsEvaluationCount());
     }
 
     private static void verifyFactors(int occurrences, int inputs, int outputs) {
