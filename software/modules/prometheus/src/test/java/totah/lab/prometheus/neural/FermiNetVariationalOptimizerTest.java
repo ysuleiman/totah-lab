@@ -66,6 +66,7 @@ final class FermiNetVariationalOptimizerTest {
                 new FermiNetMatrixFreeSrOptimizer().oneIteration(
                         fixture.state(),
                         manualSamples,
+                        FermiNetKnownLocalEnergies.from(fixture.state(), manualVmc),
                         srConfiguration);
 
         assertSameBits(manualVmc.acceptance(), actual.vmcResult().acceptance());
@@ -91,22 +92,91 @@ final class FermiNetVariationalOptimizerTest {
     }
 
     @Test
-    void optimizePropagatesUpdatedStateAndAdvancesSeedsForThreeSteps() {
+    void optimizeMatchesOnePersistentSessionWithWarmupOnlyOnce() {
         Fixture fixture = fixture();
+        var sampling = new FermiNetVariationalOptimizer.SamplingConfiguration(
+                2,
+                3,
+                2,
+                2,
+                0.02,
+                1200L);
+        var srConfiguration = srConfiguration();
         List<FermiNetVariationalOptimizer.IterationResult> results;
         try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
             results = optimizer.optimize(
                     fixture.state(),
                     fixture.walkers(),
-                    sampling(2, 2, 1200L),
-                    srConfiguration(),
+                    sampling,
+                    srConfiguration,
                     3);
         }
 
         assertEquals(3, results.size());
         assertEquals(1200L, results.get(0).seed());
-        assertEquals(1201L, results.get(1).seed());
-        assertEquals(1202L, results.get(2).seed());
+        assertEquals(1200L, results.get(1).seed());
+        assertEquals(1200L, results.get(2).seed());
+
+        FermiNetV1State manualState = fixture.state();
+        try (var vmc = new FermiNetVmcParallel(PARALLELISM)) {
+            FermiNetVmcParallel.SamplingSession session = vmc.beginSession(
+                    manualState,
+                    new FermiNetVmc.Configuration(
+                            sampling.walkers(),
+                            sampling.warmupSweeps(),
+                            sampling.retainedPerWalker(),
+                            sampling.sweepsBetweenRetained(),
+                            sampling.stepSizeBohr(),
+                            sampling.baseSeed()),
+                    fixture.walkers());
+            for (int iteration = 0; iteration < results.size(); iteration++) {
+                int warmup = iteration == 0 ? sampling.warmupSweeps() : 0;
+                FermiNetVmcParallel.ContinuationResult manualVmc = session.sample(
+                        manualState,
+                        warmup,
+                        sampling.retainedPerWalker(),
+                        sampling.sweepsBetweenRetained());
+                long expectedProposals = (long) sampling.walkers()
+                        * (warmup + sampling.retainedPerWalker()
+                        * sampling.sweepsBetweenRetained());
+                assertEquals(expectedProposals, manualVmc.proposed());
+
+                var optimizerResult = results.get(iteration);
+                assertSameBits(
+                        manualVmc.result().acceptance(),
+                        optimizerResult.vmcResult().acceptance());
+                assertCoordinatesExactly(
+                        manualVmc.result().samples(),
+                        optimizerResult.vmcResult().samples());
+                assertLocalEnergiesExactly(
+                        manualVmc.result().localEnergies(),
+                        optimizerResult.vmcResult().localEnergies());
+
+                List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples =
+                        manualVmc.result().samples().stream()
+                                .map(coordinates ->
+                                        new FermiNetMatrixFreeSrOptimizer.WeightedSample(
+                                                1.0,
+                                                coordinates))
+                                .toList();
+                FermiNetMatrixFreeSrOptimizer.Result manualSr =
+                        new FermiNetMatrixFreeSrOptimizer().oneIteration(
+                                manualState,
+                                samples,
+                                FermiNetKnownLocalEnergies.from(
+                                        manualState,
+                                        manualVmc.result()),
+                                srConfiguration);
+                assertArrayEquals(
+                        manualSr.state().parameterArray(),
+                        optimizerResult.updatedState().parameterArray());
+                assertEquals(
+                        optimizerResult.vmcResult().samples().size(),
+                        optimizerResult.reusedLocalEnergyCount());
+                manualState = manualSr.state();
+            }
+        }
+
         assertArrayEquals(
                 fixture.state().parameterArray(),
                 results.get(0).inputState().parameterArray());

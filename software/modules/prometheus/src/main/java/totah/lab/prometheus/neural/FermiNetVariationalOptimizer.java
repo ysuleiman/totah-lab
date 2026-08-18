@@ -53,6 +53,89 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                 vmc.sample(state, vmcConfiguration, walkers);
         long vmcNanos = System.nanoTime() - vmcStarted;
 
+        return finishIteration(
+                iteration,
+                seed,
+                state,
+                vmcResult,
+                sampling,
+                srConfiguration,
+                started,
+                vmcNanos,
+                System.nanoTime());
+    }
+
+    public List<IterationResult> optimize(
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            SamplingConfiguration sampling,
+            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
+            int iterations) {
+
+        Objects.requireNonNull(initialState, "initialState");
+        Objects.requireNonNull(initialWalkers, "initialWalkers");
+        Objects.requireNonNull(sampling, "sampling");
+        Objects.requireNonNull(srConfiguration, "srConfiguration");
+        if (iterations < 1) {
+            throw new IllegalArgumentException("iterations must be positive");
+        }
+
+        if (initialWalkers.size() != sampling.walkers()) {
+            throw new IllegalArgumentException("initial walker count mismatch");
+        }
+
+        FermiNetV1State state = initialState;
+        List<IterationResult> results = new ArrayList<>(iterations);
+
+        FermiNetVmc.Configuration initialConfiguration =
+                new FermiNetVmc.Configuration(
+                        sampling.walkers(),
+                        sampling.warmupSweeps(),
+                        sampling.retainedPerWalker(),
+                        sampling.sweepsBetweenRetained(),
+                        sampling.stepSizeBohr(),
+                        sampling.baseSeed());
+        FermiNetVmcParallel.SamplingSession session =
+                vmc.beginSession(state, initialConfiguration, initialWalkers);
+
+        for (int iteration = 0; iteration < iterations; iteration++) {
+            long started = System.nanoTime();
+            long vmcStarted = System.nanoTime();
+            FermiNetVmc.Result vmcResult = session.sample(
+                    state,
+                    iteration == 0 ? sampling.warmupSweeps() : 0,
+                    sampling.retainedPerWalker(),
+                    sampling.sweepsBetweenRetained()).result();
+            long vmcFinished = System.nanoTime();
+
+            IterationResult result = finishIteration(
+                    iteration,
+                    sampling.baseSeed(),
+                    state,
+                    vmcResult,
+                    sampling,
+                    srConfiguration,
+                    started,
+                    vmcFinished - vmcStarted,
+                    vmcFinished);
+            results.add(result);
+            state = result.updatedState();
+        }
+
+        return List.copyOf(results);
+    }
+
+    private static IterationResult finishIteration(
+            int iteration,
+            long seed,
+            FermiNetV1State state,
+            FermiNetVmc.Result vmcResult,
+            SamplingConfiguration sampling,
+            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
+            long started,
+            long vmcNanos,
+            long srStarted) {
+
         int expectedSamples = Math.multiplyExact(
                 sampling.walkers(), sampling.retainedPerWalker());
         if (vmcResult.samples().size() != expectedSamples) {
@@ -66,12 +149,13 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                                         1.0,
                                         coordinates))
                         .toList();
-
-        long srStarted = System.nanoTime();
+        FermiNetKnownLocalEnergies knownLocalEnergies =
+                FermiNetKnownLocalEnergies.from(state, vmcResult);
         FermiNetMatrixFreeSrOptimizer.Result srResult =
                 new FermiNetMatrixFreeSrOptimizer().oneIteration(
                         state,
                         srSamples,
+                        knownLocalEnergies,
                         srConfiguration);
         long srNanos = System.nanoTime() - srStarted;
 
@@ -93,40 +177,6 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                 vmcNanos,
                 srNanos,
                 System.nanoTime() - started);
-    }
-
-    public List<IterationResult> optimize(
-            FermiNetV1State initialState,
-            List<QuantumCoordinates> initialWalkers,
-            SamplingConfiguration sampling,
-            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
-            int iterations) {
-
-        Objects.requireNonNull(initialState, "initialState");
-        Objects.requireNonNull(initialWalkers, "initialWalkers");
-        Objects.requireNonNull(sampling, "sampling");
-        Objects.requireNonNull(srConfiguration, "srConfiguration");
-        if (iterations < 1) {
-            throw new IllegalArgumentException("iterations must be positive");
-        }
-
-        FermiNetV1State state = initialState;
-        List<QuantumCoordinates> walkers = List.copyOf(initialWalkers);
-        List<IterationResult> results = new ArrayList<>(iterations);
-
-        for (int iteration = 0; iteration < iterations; iteration++) {
-            IterationResult result = oneIteration(
-                    iteration,
-                    state,
-                    walkers,
-                    sampling,
-                    srConfiguration);
-            results.add(result);
-            state = result.updatedState();
-            walkers = result.nextWalkers();
-        }
-
-        return List.copyOf(results);
     }
 
     private static EnergyStatistics energyStatistics(
@@ -206,6 +256,10 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
             Objects.requireNonNull(vmcResult, "vmcResult");
             Objects.requireNonNull(srResult, "srResult");
             Objects.requireNonNull(energyStatistics, "energyStatistics");
+        }
+
+        int reusedLocalEnergyCount() {
+            return vmcResult.samples().size();
         }
     }
 
