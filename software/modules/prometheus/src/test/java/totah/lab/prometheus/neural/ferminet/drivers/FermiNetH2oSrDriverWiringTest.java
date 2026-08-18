@@ -50,8 +50,9 @@ final class FermiNetH2oSrDriverWiringTest {
         String source = Files.readString(driverSource());
 
         assertTrue(source.contains("int iterations = 1;"));
-        assertTrue(source.contains("if (arguments.iterations() > 1)"));
-        assertTrue(source.contains("iteration = optimizer.oneIteration("));
+        assertTrue(source.contains(
+                "if (arguments.iterations() > 1 || resumeCheckpoint != null)"));
+        assertTrue(source.contains("optimizer.optimizeCheckpointed("));
         assertTrue(source.contains("sampleCanonicalVmc("),
                 "one-step mode must retain independent post-SR validation");
     }
@@ -63,7 +64,8 @@ final class FermiNetH2oSrDriverWiringTest {
         int nextMethod = source.indexOf("private static void persistIteration(", methodStart);
         String method = source.substring(methodStart, nextMethod);
 
-        assertEquals(1, occurrences(method, "optimizer.optimize("));
+        assertEquals(1, occurrences(method, "optimizer.optimizeCheckpointed("));
+        assertEquals(1, occurrences(method, "optimizer.resume("));
         assertEquals(0, occurrences(method, "oneIteration("));
         assertTrue(method.contains("arguments.iterations()"));
     }
@@ -92,6 +94,8 @@ final class FermiNetH2oSrDriverWiringTest {
         assertTrue(source.contains("input_parameter_checksum"));
         assertTrue(source.contains("output_parameter_checksum"));
         assertTrue(source.contains("next_walker_checksum"));
+        assertTrue(source.contains("continuation-checkpoint.bin"));
+        assertTrue(source.contains("case \"--resume\""));
     }
 
     private static Path driverSource() {

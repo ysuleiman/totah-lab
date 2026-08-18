@@ -1,5 +1,10 @@
 package totah.lab.prometheus.neural.ferminet.runtime;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -103,6 +108,50 @@ final class FermiNetVmcParallel implements AutoCloseable {
                 FermiNetStateIdentity.of(state));
     }
 
+    SamplingSession restoreSession(
+            FermiNetV1State state,
+            FermiNetVmc.Configuration configuration,
+            List<QuantumCoordinates> walkers,
+            byte[] serializedRandom) {
+        Objects.requireNonNull(serializedRandom, "serializedRandom");
+        if (walkers.size() != configuration.walkers()) {
+            throw new IllegalArgumentException("checkpoint walker count mismatch");
+        }
+        double[] logs = parallelSamplingLogs(state, walkers);
+        Walker[] restored = new Walker[walkers.size()];
+        for (int i = 0; i < walkers.size(); i++) {
+            validateFiniteLog(logs[i], "checkpoint walker", i);
+            restored[i] = new Walker(walkers.get(i), logs[i]);
+        }
+        return new SamplingSession(restored, deserializeRandom(serializedRandom),
+                configuration.stepSizeBohr(), FermiNetStateIdentity.of(state));
+    }
+
+    private static Random deserializeRandom(byte[] serialized) {
+        try (ObjectInputStream input = new ObjectInputStream(
+                new ByteArrayInputStream(serialized))) {
+            Object value = input.readObject();
+            if (!(value instanceof Random random) || input.read() != -1) {
+                throw new IllegalArgumentException("invalid checkpoint RNG payload");
+            }
+            return random;
+        } catch (IOException | ClassNotFoundException exception) {
+            throw new IllegalArgumentException("invalid checkpoint RNG state", exception);
+        }
+    }
+
+    private static byte[] serializeRandom(Random random) {
+        try {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            try (ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+                output.writeObject(random);
+            }
+            return bytes.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException("cannot serialize checkpoint RNG state", exception);
+        }
+    }
+
     /**
      * Stateful deterministic sampling continuation.
      *
@@ -128,6 +177,10 @@ final class FermiNetVmcParallel implements AutoCloseable {
             this.random = random;
             this.stepSizeBohr = stepSizeBohr;
             this.stateIdentity = stateIdentity;
+        }
+
+        byte[] serializedRandomState() {
+            return serializeRandom(random);
         }
 
         ContinuationResult sample(

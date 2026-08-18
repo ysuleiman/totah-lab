@@ -8,12 +8,17 @@ import totah.lab.prometheus.neural.ferminet.reference.*;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import totah.lab.prometheus.molecular.CartesianPosition;
 import totah.lab.prometheus.molecular.ElectronCount;
@@ -30,6 +35,171 @@ import totah.lab.prometheus.variational.SpinProjection;
 final class FermiNetVariationalOptimizerTest {
 
     private static final int PARALLELISM = 2;
+
+    @TempDir
+    Path temporaryDirectory;
+
+    @Test
+    void checkpointedThreePlusFiveIsBitExactWithContinuousEight() throws IOException {
+        Fixture fixture = fixture();
+        var sampling = new FermiNetVariationalOptimizer.SamplingConfiguration(
+                2, 3, 2, 2, 0.02, 99117L);
+        var optimization = FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                srConfiguration());
+        String root = FermiNetOptimizationCheckpoint.parameterChecksum(
+                fixture.state().parameterArray());
+        String geometry = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+
+        List<FermiNetVariationalOptimizer.CheckpointedIteration> continuous;
+        List<FermiNetVariationalOptimizer.CheckpointedIteration> first;
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            continuous = optimizer.optimizeCheckpointed(
+                    fixture.state(), fixture.walkers(), sampling, optimization,
+                    root, geometry, 8);
+        }
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            first = optimizer.optimizeCheckpointed(
+                    fixture.state(), fixture.walkers(), sampling, optimization,
+                    root, geometry, 3);
+        }
+
+        Path persisted = temporaryDirectory.resolve("continuation.bin");
+        first.get(2).checkpoint().write(persisted);
+        FermiNetOptimizationCheckpoint restored =
+                FermiNetOptimizationCheckpoint.read(persisted);
+        FermiNetV1State resumedState = fixture.state().withParameters(
+                restored.parameters());
+        List<FermiNetVariationalOptimizer.CheckpointedIteration> resumed;
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            resumed = optimizer.resume(resumedState, restored, sampling,
+                    optimization, geometry, 5);
+        }
+
+        assertEquals(5, resumed.size());
+        for (int index = 0; index < resumed.size(); index++) {
+            var expected = continuous.get(index + 3);
+            var actual = resumed.get(index);
+            assertEquals(index + 3, actual.result().iteration());
+            assertEquals(expected.checkpoint().parameterChecksum(),
+                    actual.checkpoint().parameterChecksum());
+            assertEquals(expected.checkpoint().walkerChecksum(),
+                    actual.checkpoint().walkerChecksum());
+            assertArrayEquals(expected.result().updatedState().parameterArray(),
+                    actual.result().updatedState().parameterArray());
+            assertCoordinatesExactly(expected.result().nextWalkers(),
+                    actual.result().nextWalkers());
+            assertSameBits(expected.result().energyStatistics().meanHartree(),
+                    actual.result().energyStatistics().meanHartree());
+            assertSameBits(expected.result().energyStatistics().standardErrorHartree(),
+                    actual.result().energyStatistics().standardErrorHartree());
+            assertArrayEquals(expected.result().exactSrResult().energyGradient(),
+                    actual.result().exactSrResult().energyGradient());
+            assertSameBits(expected.result().exactSrResult().rawUpdateNorm(),
+                    actual.result().exactSrResult().rawUpdateNorm());
+        }
+    }
+
+    @Test
+    void checkpointedSingleIterationPreservesExistingOneStepResult() {
+        Fixture fixture = fixture();
+        var sampling = sampling(2, 2, 811L);
+        var optimization = FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                srConfiguration());
+        FermiNetVariationalOptimizer.OptimizationIterationResult existing;
+        FermiNetVariationalOptimizer.OptimizationIterationResult checkpointed;
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            existing = optimizer.oneIteration(
+                    0, fixture.state(), fixture.walkers(), sampling, optimization);
+        }
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            checkpointed = optimizer.optimizeCheckpointed(
+                    fixture.state(), fixture.walkers(), sampling, optimization,
+                    FermiNetOptimizationCheckpoint.parameterChecksum(
+                            fixture.state().parameterArray()),
+                    "1111111111111111111111111111111111111111111111111111111111111111",
+                    1).get(0).result();
+        }
+        assertCoordinatesExactly(existing.vmcResult().samples(),
+                checkpointed.vmcResult().samples());
+        assertLocalEnergiesExactly(existing.vmcResult().localEnergies(),
+                checkpointed.vmcResult().localEnergies());
+        assertArrayEquals(existing.updatedState().parameterArray(),
+                checkpointed.updatedState().parameterArray());
+        assertArrayEquals(existing.exactSrResult().energyGradient(),
+                checkpointed.exactSrResult().energyGradient());
+    }
+
+    @Test
+    void corruptedCheckpointAndConfigurationMismatchesFailClosed() throws IOException {
+        Fixture fixture = fixture();
+        var sampling = sampling(2, 2, 7712L);
+        var optimization = FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                srConfiguration());
+        String root = FermiNetOptimizationCheckpoint.parameterChecksum(
+                fixture.state().parameterArray());
+        String geometry = "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd";
+        FermiNetVariationalOptimizer.CheckpointedIteration completed;
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            completed = optimizer.optimizeCheckpointed(
+                    fixture.state(), fixture.walkers(), sampling, optimization,
+                    root, geometry, 1).get(0);
+        }
+        var checkpoint = completed.checkpoint();
+        FermiNetV1State state = completed.result().updatedState();
+
+        var badRandom = new FermiNetOptimizationCheckpoint(
+                checkpoint.completedIterations(), checkpoint.rootParameterChecksum(),
+                checkpoint.samplingConfigurationIdentity(),
+                checkpoint.optimizerConfigurationIdentity(), checkpoint.geometryIdentity(),
+                checkpoint.optimizerType(), checkpoint.parameters(), checkpoint.walkers(),
+                new byte[]{1, 2, 3});
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            assertThrows(IllegalArgumentException.class, () -> optimizer.resume(
+                    state, badRandom, sampling, optimization, geometry, 1));
+        }
+
+        var mismatchedSampling = new FermiNetVariationalOptimizer.SamplingConfiguration(
+                sampling.walkers(), sampling.warmupSweeps(),
+                sampling.retainedPerWalker(), sampling.sweepsBetweenRetained() + 1,
+                sampling.stepSizeBohr(), sampling.baseSeed());
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            assertThrows(IllegalArgumentException.class, () -> optimizer.resume(
+                    state, checkpoint, mismatchedSampling, optimization, geometry, 1));
+        }
+        var mismatchedOptimizer = FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                new FermiNetMatrixFreeSrOptimizer.Configuration(
+                        0.02, 1.0, 0.05, 2));
+        try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
+            assertThrows(IllegalArgumentException.class, () -> optimizer.resume(
+                    state, checkpoint, sampling, mismatchedOptimizer, geometry, 1));
+        }
+
+        Path parameterFile = temporaryDirectory.resolve("corrupt-parameter.bin");
+        checkpoint.write(parameterFile);
+        byte[] parameterBytes = Files.readAllBytes(parameterFile);
+        flipFirstLong(parameterBytes,
+                Double.doubleToRawLongBits(checkpoint.parameters()[0]));
+        Files.write(parameterFile, parameterBytes);
+        assertThrows(IOException.class,
+                () -> FermiNetOptimizationCheckpoint.read(parameterFile));
+
+        Path walkerFile = temporaryDirectory.resolve("corrupt-walker.bin");
+        checkpoint.write(walkerFile);
+        byte[] walkerBytes = Files.readAllBytes(walkerFile);
+        flipFirstLong(walkerBytes, Double.doubleToRawLongBits(
+                checkpoint.walkers().get(0).particles().get(0).xBohr()));
+        Files.write(walkerFile, walkerBytes);
+        assertThrows(IOException.class,
+                () -> FermiNetOptimizationCheckpoint.read(walkerFile));
+
+        Path randomFile = temporaryDirectory.resolve("corrupt-random.bin");
+        checkpoint.write(randomFile);
+        byte[] randomBytes = Files.readAllBytes(randomFile);
+        randomBytes[randomBytes.length - 1] ^= 1;
+        Files.write(randomFile, randomBytes);
+        assertThrows(IOException.class,
+                () -> FermiNetOptimizationCheckpoint.read(randomFile));
+    }
 
     @Test
     void oneIterationMatchesManualCompositionExactly() {
@@ -338,6 +508,18 @@ final class FermiNetVariationalOptimizerTest {
         assertEquals(
                 Double.doubleToRawLongBits(expected),
                 Double.doubleToRawLongBits(actual));
+    }
+
+    private static void flipFirstLong(byte[] bytes, long value) {
+        outer: for (int offset = 0; offset <= bytes.length - Long.BYTES; offset++) {
+            for (int index = 0; index < Long.BYTES; index++) {
+                int shift = 56 - index * 8;
+                if (bytes[offset + index] != (byte) (value >>> shift)) continue outer;
+            }
+            bytes[offset] ^= 1;
+            return;
+        }
+        throw new AssertionError("checkpoint value not found");
     }
 
     private record Fixture(

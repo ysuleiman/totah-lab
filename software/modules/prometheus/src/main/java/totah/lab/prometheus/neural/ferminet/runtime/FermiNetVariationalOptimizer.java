@@ -75,6 +75,115 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                         context, sampling.baseSeed(), sampling, configuration));
     }
 
+    /** Runs a fresh trajectory while returning an exact checkpoint per iteration. */
+    public List<CheckpointedIteration> optimizeCheckpointed(
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            SamplingConfiguration sampling,
+            OptimizationConfiguration configuration,
+            String rootParameterChecksum,
+            String geometryIdentity,
+            int iterations) {
+        return optimizeCheckpointedLoop(initialState, initialWalkers, sampling,
+                configuration, rootParameterChecksum, geometryIdentity,
+                0, null, iterations);
+    }
+
+    /** Restores the exact sampler stream and continues global iteration numbering. */
+    public List<CheckpointedIteration> resume(
+            FermiNetV1State state,
+            FermiNetOptimizationCheckpoint checkpoint,
+            SamplingConfiguration sampling,
+            OptimizationConfiguration configuration,
+            String geometryIdentity,
+            int iterations) {
+        Objects.requireNonNull(checkpoint, "checkpoint");
+        String stateChecksum = FermiNetOptimizationCheckpoint.parameterChecksum(
+                state.parameterArray());
+        if (!checkpoint.parameterChecksum().equals(stateChecksum)) {
+            throw new IllegalArgumentException("checkpoint parameter checksum mismatch");
+        }
+        if (!checkpoint.walkerChecksum().equals(
+                FermiNetOptimizationCheckpoint.walkerChecksum(checkpoint.walkers()))) {
+            throw new IllegalArgumentException("checkpoint walker checksum mismatch");
+        }
+        if (!checkpoint.samplingConfigurationIdentity().equals(
+                FermiNetOptimizationCheckpoint.samplingIdentity(sampling))) {
+            throw new IllegalArgumentException("checkpoint sampling configuration mismatch");
+        }
+        if (!checkpoint.optimizerConfigurationIdentity().equals(
+                FermiNetOptimizationCheckpoint.optimizerIdentity(configuration))
+                || checkpoint.optimizerType() != configuration.optimizerType()) {
+            throw new IllegalArgumentException("checkpoint optimizer configuration mismatch");
+        }
+        if (!checkpoint.geometryIdentity().equals(geometryIdentity)) {
+            throw new IllegalArgumentException("checkpoint geometry identity mismatch");
+        }
+        return optimizeCheckpointedLoop(state, checkpoint.walkers(), sampling,
+                configuration, checkpoint.rootParameterChecksum(), geometryIdentity,
+                checkpoint.completedIterations(), checkpoint.serializedRandomState(),
+                iterations);
+    }
+
+    private List<CheckpointedIteration> optimizeCheckpointedLoop(
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            SamplingConfiguration sampling,
+            OptimizationConfiguration configuration,
+            String rootParameterChecksum,
+            String geometryIdentity,
+            int completedIterations,
+            byte[] restoredRandomState,
+            int iterations) {
+        Objects.requireNonNull(initialState, "initialState");
+        Objects.requireNonNull(initialWalkers, "initialWalkers");
+        Objects.requireNonNull(sampling, "sampling");
+        Objects.requireNonNull(configuration, "configuration");
+        if (iterations < 1 || completedIterations < 0) {
+            throw new IllegalArgumentException("invalid checkpointed iteration count");
+        }
+        FermiNetVmc.Configuration vmcConfiguration = new FermiNetVmc.Configuration(
+                sampling.walkers(), sampling.warmupSweeps(),
+                sampling.retainedPerWalker(), sampling.sweepsBetweenRetained(),
+                sampling.stepSizeBohr(), sampling.baseSeed());
+        FermiNetVmcParallel.SamplingSession session = restoredRandomState == null
+                ? vmc.beginSession(initialState, vmcConfiguration, initialWalkers)
+                : vmc.restoreSession(initialState, vmcConfiguration, initialWalkers,
+                        restoredRandomState);
+        FermiNetV1State state = initialState;
+        List<CheckpointedIteration> results = new ArrayList<>(iterations);
+        for (int local = 0; local < iterations; local++) {
+            int global = Math.addExact(completedIterations, local);
+            long started = System.nanoTime();
+            long vmcStarted = System.nanoTime();
+            FermiNetVmc.Result vmcResult = session.sample(
+                    state,
+                    restoredRandomState == null && local == 0
+                            ? sampling.warmupSweeps() : 0,
+                    sampling.retainedPerWalker(),
+                    sampling.sweepsBetweenRetained()).result();
+            long vmcFinished = System.nanoTime();
+            Step<OptimizationIterationResult> step = finishSelected(
+                    new IterationContext(global, state, vmcResult, started,
+                            vmcFinished - vmcStarted, vmcFinished),
+                    sampling.baseSeed(), sampling, configuration);
+            var result = step.result();
+            var checkpoint = new FermiNetOptimizationCheckpoint(
+                    global + 1,
+                    rootParameterChecksum,
+                    FermiNetOptimizationCheckpoint.samplingIdentity(sampling),
+                    FermiNetOptimizationCheckpoint.optimizerIdentity(configuration),
+                    geometryIdentity,
+                    configuration.optimizerType(),
+                    step.state().parameterArray(),
+                    result.nextWalkers(),
+                    session.serializedRandomState());
+            results.add(new CheckpointedIteration(result, checkpoint));
+            state = step.state();
+        }
+        return List.copyOf(results);
+    }
+
     private Step<OptimizationIterationResult> finishSelected(
             IterationContext context,
             long seed,
@@ -358,6 +467,18 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
 
         int reusedLocalEnergyCount() {
             return vmcResult.samples().size();
+        }
+    }
+
+    public record CheckpointedIteration(
+            OptimizationIterationResult result,
+            FermiNetOptimizationCheckpoint checkpoint) {
+        public CheckpointedIteration {
+            Objects.requireNonNull(result, "result");
+            Objects.requireNonNull(checkpoint, "checkpoint");
+            if (checkpoint.completedIterations() != result.iteration() + 1) {
+                throw new IllegalArgumentException("checkpoint iteration mismatch");
+            }
         }
     }
 
