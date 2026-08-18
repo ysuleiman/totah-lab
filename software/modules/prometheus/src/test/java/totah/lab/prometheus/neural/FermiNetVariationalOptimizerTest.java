@@ -32,14 +32,15 @@ final class FermiNetVariationalOptimizerTest {
         var sampling = sampling(2, 2, 811L);
         var srConfiguration = srConfiguration();
 
-        FermiNetVariationalOptimizer.IterationResult actual;
+        FermiNetVariationalOptimizer.OptimizationIterationResult actual;
         try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
             actual = optimizer.oneIteration(
                     0,
                     fixture.state(),
                     fixture.walkers(),
                     sampling,
-                    srConfiguration);
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                            srConfiguration));
         }
 
         FermiNetVmc.Result manualVmc;
@@ -74,13 +75,15 @@ final class FermiNetVariationalOptimizerTest {
         assertLocalEnergiesExactly(
                 manualVmc.localEnergies(),
                 actual.vmcResult().localEnergies());
-        assertSameBits(manualSr.initialEnergyHartree(), actual.srResult().initialEnergyHartree());
-        assertSameBits(manualSr.gradientNorm(), actual.srResult().gradientNorm());
-        assertSameBits(manualSr.rawUpdateNorm(), actual.srResult().rawUpdateNorm());
-        assertSameBits(manualSr.appliedUpdateNorm(), actual.srResult().appliedUpdateNorm());
+        assertSameBits(manualSr.initialEnergyHartree(),
+                actual.exactSrResult().initialEnergyHartree());
+        assertSameBits(manualSr.gradientNorm(), actual.exactSrResult().gradientNorm());
+        assertSameBits(manualSr.rawUpdateNorm(), actual.exactSrResult().rawUpdateNorm());
+        assertSameBits(manualSr.appliedUpdateNorm(),
+                actual.exactSrResult().appliedUpdateNorm());
         assertSameBits(
                 manualSr.relativeTrueResidual(),
-                actual.srResult().relativeTrueResidual());
+                actual.exactSrResult().relativeTrueResidual());
         assertArrayEquals(
                 manualSr.state().parameterArray(),
                 actual.updatedState().parameterArray());
@@ -102,13 +105,14 @@ final class FermiNetVariationalOptimizerTest {
                 0.02,
                 1200L);
         var srConfiguration = srConfiguration();
-        List<FermiNetVariationalOptimizer.IterationResult> results;
+        List<FermiNetVariationalOptimizer.OptimizationIterationResult> results;
         try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
             results = optimizer.optimize(
                     fixture.state(),
                     fixture.walkers(),
                     sampling,
-                    srConfiguration,
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                            srConfiguration),
                     3);
         }
 
@@ -186,7 +190,7 @@ final class FermiNetVariationalOptimizerTest {
         assertArrayEquals(
                 results.get(1).updatedState().parameterArray(),
                 results.get(2).inputState().parameterArray());
-        for (FermiNetVariationalOptimizer.IterationResult result : results) {
+        for (FermiNetVariationalOptimizer.OptimizationIterationResult result : results) {
             assertFalse(Arrays.equals(
                     result.inputState().parameterArray(),
                     result.updatedState().parameterArray()));
@@ -197,19 +201,20 @@ final class FermiNetVariationalOptimizerTest {
     void allRetainedSamplesFeedSrButOnlyLastRetentionSeedsNextIteration() {
         Fixture fixture = fixture();
         var sampling = sampling(2, 3, 2026L);
-        FermiNetVariationalOptimizer.IterationResult result;
+        FermiNetVariationalOptimizer.OptimizationIterationResult result;
         try (var optimizer = new FermiNetVariationalOptimizer(PARALLELISM)) {
             result = optimizer.oneIteration(
                     0,
                     fixture.state(),
                     fixture.walkers(),
                     sampling,
-                    srConfiguration());
+                    FermiNetVariationalOptimizer.OptimizationConfiguration.exactSr(
+                            srConfiguration()));
         }
 
         int expectedSamples = sampling.walkers() * sampling.retainedPerWalker();
         assertEquals(expectedSamples, result.vmcResult().samples().size());
-        assertEquals(expectedSamples, result.srResult().sampleEvaluations());
+        assertEquals(expectedSamples, result.exactSrResult().sampleEvaluations());
         assertEquals(sampling.walkers(), result.nextWalkers().size());
         assertCoordinatesExactly(
                 result.vmcResult().samples().subList(
@@ -236,11 +241,7 @@ final class FermiNetVariationalOptimizerTest {
                 0.01,
                 1.0,
                 10.0,
-                2,
-                128,
-                50,
-                1.0e-6,
-                1.0e-8);
+                2);
     }
 
     private static Fixture fixture() {

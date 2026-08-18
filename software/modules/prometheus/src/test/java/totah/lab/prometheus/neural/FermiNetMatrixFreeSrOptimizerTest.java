@@ -36,7 +36,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         double actionError = maxError(denseAction, streamingAction);
 
         var configuration = new FermiNetMatrixFreeSrOptimizer.Configuration(
-                .03, .2, 100.0, 1, 64, 300, 1e-11, 1e-12);
+                .03, .2, 100.0, 1);
         var result = optimizer.oneIteration(fixture.state, fixture.samples, configuration);
         double gradientError = maxError(dense.gradient, result.energyGradient());
         double[] denseDelta = conjugateGradient(dense.system, negate(dense.gradient), 1e-12, 20);
@@ -59,7 +59,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         assertTrue(actionError < 2e-10, "dense/matrix-free covariance action");
         assertTrue(updateError < 3e-9, "dense/matrix-free SR update");
         assertTrue(Double.isFinite(result.relativeTrueResidual()));
-        assertTrue(result.relativeTrueResidual() <= configuration.relativeTolerance());
+        assertTrue(result.relativeTrueResidual() <= 1.0e-11);
         assertEquals(1, result.solverIterations());
         assertEquals(0, result.streamedOperatorPasses());
         assertEquals(4L,
@@ -75,10 +75,10 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         var optimizer = new FermiNetMatrixFreeSrOptimizer();
         var unbounded = optimizer.oneIteration(fixture.state, fixture.samples,
                 new FermiNetMatrixFreeSrOptimizer.Configuration(
-                        .03, .2, 100.0, 1, 64, 300, 1e-11, 1e-12));
+                        .03, .2, 100.0, 1));
         var bounded = optimizer.oneIteration(fixture.state, fixture.samples,
                 new FermiNetMatrixFreeSrOptimizer.Configuration(
-                        .03, .2, 1e-5, 1, 64, 300, 1e-11, 1e-12));
+                        .03, .2, 1e-5, 1));
         double[] raw = difference(unbounded.state().parameterArray(),
                 fixture.state.parameterArray());
         double[] applied = difference(bounded.state().parameterArray(),
@@ -98,7 +98,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         Fixture fixture = fixture();
         var optimizer = new FermiNetMatrixFreeSrOptimizer();
         var configuration = new FermiNetMatrixFreeSrOptimizer.Configuration(
-                .03, .2, .1, 1, 64, 30, 1e-9, 1e-12);
+                .03, .2, .1, 1);
 
         assertThrows(IllegalArgumentException.class,
                 () -> optimizer.oneIteration(
@@ -116,11 +116,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
                         Double.NaN,
                         .2,
                         .1,
-                        1,
-                        64,
-                        30,
-                        1e-9,
-                        1e-12));
+                        1));
 
         /*
          * Production-scale retained numeric storage estimate for the cached

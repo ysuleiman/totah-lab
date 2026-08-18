@@ -419,19 +419,21 @@ public final class FermiNetMatrixFreeSrOptimizer {
             double learningRate,
             double damping,
             double maxUpdateNorm,
-            int observationParallelism,
-            int blockSize,
-            int maxSolverIterations,
-            double relativeTolerance,
-            double absoluteTolerance) {
+            int observationParallelism) {
 
-        /**
-         * {@code blockSize}, {@code maxSolverIterations},
-         * {@code relativeTolerance}, and {@code absoluteTolerance} are retained
-         * for source compatibility with the former explicit-Jacobian/PCG path.
-         * Structured production SR uses a direct sample-space Cholesky solve and
-         * does not consume those four values.
-         */
+        /** Compatibility constructor for archived, non-production diagnostics. */
+        @Deprecated(forRemoval = true)
+        public Configuration(
+                double learningRate,
+                double damping,
+                double maxUpdateNorm,
+                int observationParallelism,
+                int ignoredBlockSize,
+                int ignoredMaxSolverIterations,
+                double ignoredRelativeTolerance,
+                double ignoredAbsoluteTolerance) {
+            this(learningRate, damping, maxUpdateNorm, observationParallelism);
+        }
 
         public Configuration {
             if (observationParallelism < 1) {
@@ -444,13 +446,7 @@ public final class FermiNetMatrixFreeSrOptimizer {
                     || !(damping > 0.0)
                     || !Double.isFinite(damping)
                     || !(maxUpdateNorm > 0.0)
-                    || !Double.isFinite(maxUpdateNorm)
-                    || blockSize < 1
-                    || maxSolverIterations < 1
-                    || !(relativeTolerance > 0.0)
-                    || !Double.isFinite(relativeTolerance)
-                    || !(absoluteTolerance > 0.0)
-                    || !Double.isFinite(absoluteTolerance)) {
+                    || !Double.isFinite(maxUpdateNorm)) {
                 throw new IllegalArgumentException(
                         "invalid FermiNet SR configuration");
             }

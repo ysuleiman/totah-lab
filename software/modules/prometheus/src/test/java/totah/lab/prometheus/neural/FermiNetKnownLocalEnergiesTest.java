@@ -62,7 +62,7 @@ final class FermiNetKnownLocalEnergiesTest {
         }
 
         var configuration = new FermiNetMatrixFreeSrOptimizer.Configuration(
-                0.01, 1.0, 0.05, 2, 128, 50, 1.0e-6, 1.0e-8);
+                0.01, 1.0, 0.05, 2);
         var computed = new FermiNetMatrixFreeSrOptimizer()
                 .oneIteration(fixture.state(), fixture.samples(), configuration);
         var reused = new FermiNetMatrixFreeSrOptimizer()

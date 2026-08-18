@@ -37,11 +37,7 @@ final class FermiNetMatrixFreeSrSampleSpaceParityTest {
                         0.03,
                         0.2,
                         0.1,
-                        1,
-                        128,
-                        100,
-                        1e-11,
-                        1e-14);
+                        1);
 
         FermiNetMatrixFreeSrOptimizer.Result result =
                 optimizer.oneIteration(

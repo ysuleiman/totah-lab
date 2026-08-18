@@ -21,18 +21,6 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
         this.kfac = new FermiNetKfacOptimizer(vmcParallelism);
     }
 
-    public IterationResult oneIteration(
-            int iteration,
-            FermiNetV1State state,
-            List<QuantumCoordinates> walkers,
-            SamplingConfiguration sampling,
-            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration) {
-
-        return exactResult(oneIteration(
-                iteration, state, walkers, sampling,
-                OptimizationConfiguration.exactSr(srConfiguration)));
-    }
-
     /** Runs one VMC/update iteration through the configured optimizer engine. */
     public OptimizationIterationResult oneIteration(
             int iteration,
@@ -73,18 +61,6 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                 System.nanoTime()), seed, sampling, configuration).result();
     }
 
-    public List<IterationResult> optimize(
-            FermiNetV1State initialState,
-            List<QuantumCoordinates> initialWalkers,
-            SamplingConfiguration sampling,
-            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
-            int iterations) {
-
-        return optimize(initialState, initialWalkers, sampling,
-                        OptimizationConfiguration.exactSr(srConfiguration), iterations)
-                .stream().map(FermiNetVariationalOptimizer::exactResult).toList();
-    }
-
     /** Runs the shared persistent-VMC loop with the configured update engine. */
     public List<OptimizationIterationResult> optimize(
             FermiNetV1State initialState,
@@ -99,33 +75,17 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                         context, sampling.baseSeed(), sampling, configuration));
     }
 
-    /** Compatibility overload; prefer {@link OptimizationConfiguration}. */
-    public List<OptimizationIterationResult> optimize(
-            FermiNetV1State initialState,
-            List<QuantumCoordinates> initialWalkers,
-            SamplingConfiguration sampling,
-            FermiNetOptimizerType optimizerType,
-            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
-            FermiNetKfacOptimizer.Configuration kfacConfiguration,
-            int iterations) {
-        return optimize(initialState, initialWalkers, sampling,
-                new OptimizationConfiguration(
-                        optimizerType, srConfiguration, kfacConfiguration),
-                iterations);
-    }
-
     private Step<OptimizationIterationResult> finishSelected(
             IterationContext context,
             long seed,
             SamplingConfiguration sampling,
-            OptimizationConfiguration configuration) {
+        OptimizationConfiguration configuration) {
         if (configuration.optimizerType() == FermiNetOptimizerType.EXACT_SR) {
-            IterationResult exact = finishIteration(
+            OptimizationIterationResult exact = finishExactIteration(
                     context.iteration(), seed, context.state(), context.vmcResult(),
                     sampling, configuration.exactSrConfiguration(),
                     context.started(), context.vmcNanos(), context.srStarted());
-            return new Step<>(exact.updatedState(),
-                    OptimizationIterationResult.exact(exact));
+            return new Step<>(exact.updatedState(), exact);
         }
 
         List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples =
@@ -149,17 +109,6 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                 null, update, context.vmcNanos(), updateNanos,
                 System.nanoTime() - context.started());
         return new Step<>(update.state(), result);
-    }
-
-    private static IterationResult exactResult(OptimizationIterationResult result) {
-        if (result.optimizerType() != FermiNetOptimizerType.EXACT_SR) {
-            throw new IllegalArgumentException("not an exact-SR result");
-        }
-        return new IterationResult(
-                result.iteration(), result.seed(), result.inputState(),
-                result.updatedState(), result.nextWalkers(), result.vmcResult(),
-                result.exactSrResult(), result.energyStatistics(), result.vmcNanos(),
-                result.updateNanos(), result.totalNanos());
     }
 
     private <T> List<T> optimizeLoop(
@@ -206,7 +155,7 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
         return List.copyOf(results);
     }
 
-    private static IterationResult finishIteration(
+    private static OptimizationIterationResult finishExactIteration(
             int iteration,
             long seed,
             FermiNetV1State state,
@@ -246,15 +195,17 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                         nextWalkerStart,
                         vmcResult.samples().size()));
 
-        return new IterationResult(
+        return new OptimizationIterationResult(
                 iteration,
                 seed,
+                FermiNetOptimizerType.EXACT_SR,
                 state,
                 srResult.state(),
                 nextWalkers,
                 vmcResult,
-                srResult,
                 energyStatistics(vmcResult.localEnergies()),
+                srResult,
+                null,
                 vmcNanos,
                 srNanos,
                 System.nanoTime() - started);
@@ -354,36 +305,6 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
         }
     }
 
-    public record IterationResult(
-            int iteration,
-            long seed,
-            FermiNetV1State inputState,
-            FermiNetV1State updatedState,
-            List<QuantumCoordinates> nextWalkers,
-            FermiNetVmc.Result vmcResult,
-            FermiNetMatrixFreeSrOptimizer.Result srResult,
-            EnergyStatistics energyStatistics,
-            long vmcNanos,
-            long srNanos,
-            long totalNanos) {
-
-        public IterationResult {
-            if (iteration < 0 || vmcNanos < 0 || srNanos < 0 || totalNanos < 0) {
-                throw new IllegalArgumentException("invalid iteration result");
-            }
-            Objects.requireNonNull(inputState, "inputState");
-            Objects.requireNonNull(updatedState, "updatedState");
-            nextWalkers = List.copyOf(nextWalkers);
-            Objects.requireNonNull(vmcResult, "vmcResult");
-            Objects.requireNonNull(srResult, "srResult");
-            Objects.requireNonNull(energyStatistics, "energyStatistics");
-        }
-
-        int reusedLocalEnergyCount() {
-            return vmcResult.samples().size();
-        }
-    }
-
     public record EnergyStatistics(
             int count,
             double meanHartree,
@@ -415,8 +336,11 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
             FermiNetKfacOptimizer.Result kfacResult,
             long vmcNanos,
             long updateNanos,
-            long totalNanos) {
+        long totalNanos) {
         public OptimizationIterationResult {
+            if (iteration < 0 || vmcNanos < 0 || updateNanos < 0 || totalNanos < 0) {
+                throw new IllegalArgumentException("invalid iteration result");
+            }
             Objects.requireNonNull(optimizerType, "optimizerType");
             Objects.requireNonNull(inputState, "inputState");
             Objects.requireNonNull(updatedState, "updatedState");
@@ -431,12 +355,8 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
             }
         }
 
-        private static OptimizationIterationResult exact(IterationResult exact) {
-            return new OptimizationIterationResult(
-                    exact.iteration(), exact.seed(), FermiNetOptimizerType.EXACT_SR,
-                    exact.inputState(), exact.updatedState(), exact.nextWalkers(),
-                    exact.vmcResult(), exact.energyStatistics(), exact.srResult(),
-                    null, exact.vmcNanos(), exact.srNanos(), exact.totalNanos());
+        int reusedLocalEnergyCount() {
+            return vmcResult.samples().size();
         }
     }
 

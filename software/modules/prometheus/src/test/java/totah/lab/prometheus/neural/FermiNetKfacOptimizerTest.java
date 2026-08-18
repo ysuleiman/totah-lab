@@ -55,7 +55,7 @@ final class FermiNetKfacOptimizerTest {
     void repositoryFixtureMatchesExactGradientAndReplaysDeterministically() {
         Fixture fixture = fixture();
         var exactConfiguration = new FermiNetMatrixFreeSrOptimizer.Configuration(
-                0.01, 0.2, 10.0, 2, 128, 50, 1.0e-6, 1.0e-8);
+                0.01, 0.2, 10.0, 2);
         var kfacConfiguration = configuration(0.0);
 
         FermiNetMatrixFreeSrOptimizer.Result exact =

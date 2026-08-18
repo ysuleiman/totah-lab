@@ -38,10 +38,6 @@ public final class FermiNetH2oSrDriver {
 
     private static final int VMC_PARALLELISM = Math.max(1,
             Math.min(12, Runtime.getRuntime().availableProcessors()));
-    private static final int SR_MAX_SOLVER_ITERATIONS = 50;
-    private static final double SR_RELATIVE_TOLERANCE = 1.0e-6;
-    private static final double SR_ABSOLUTE_TOLERANCE = 1.0e-8;
-
     private static final double MIN_ACCEPTANCE = 0.20;
     private static final double MAX_ACCEPTANCE = 0.90;
 
@@ -138,11 +134,7 @@ public final class FermiNetH2oSrDriver {
                         arguments.learningRate(),
                         arguments.damping(),
                         arguments.maxUpdateNorm(),
-                        arguments.observationParallelism(),
-                        arguments.parameterBlockSize(),
-                        SR_MAX_SOLVER_ITERATIONS,
-                        SR_RELATIVE_TOLERANCE,
-                        SR_ABSOLUTE_TOLERANCE);
+                        arguments.observationParallelism());
 
         System.out.println("Starting exactly ONE SR update...");
 
@@ -619,7 +611,6 @@ public final class FermiNetH2oSrDriver {
             double learningRate,
             double damping,
             double maxUpdateNorm,
-            int parameterBlockSize,
             int observationParallelism) {
 
         private static Arguments parse(String[] args) {
@@ -641,7 +632,6 @@ public final class FermiNetH2oSrDriver {
             double learningRate = 0.01;
             double damping = 1.0;
             double maxUpdateNorm = 0.05;
-            int parameterBlockSize = 8192;
             int observationParallelism = 12;
 
             for (int i = 0; i < args.length; i++) {
@@ -660,7 +650,6 @@ public final class FermiNetH2oSrDriver {
                     case "--learning-rate" -> learningRate = decimal(args, ++i, "--learning-rate");
                     case "--damping" -> damping = decimal(args, ++i, "--damping");
                     case "--max-update-norm" -> maxUpdateNorm = decimal(args, ++i, "--max-update-norm");
-                    case "--block-size" -> parameterBlockSize = integer(args, ++i, "--block-size");
                     case "--observation-parallelism" -> observationParallelism = integer(args, ++i, "--observation-parallelism");
                     default -> throw usage("unknown argument: " + args[i]);
                 }
@@ -673,7 +662,7 @@ public final class FermiNetH2oSrDriver {
                     || !(learningRate > 0.0) || !Double.isFinite(learningRate)
                     || !(damping > 0.0) || !Double.isFinite(damping)
                     || !(maxUpdateNorm > 0.0) || !Double.isFinite(maxUpdateNorm)
-                    || parameterBlockSize < 1 || observationParallelism < 1) {
+                    || observationParallelism < 1) {
                 throw usage("invalid numeric configuration");
             }
             return new Arguments(preset,
@@ -682,7 +671,7 @@ public final class FermiNetH2oSrDriver {
                     output.toAbsolutePath().normalize(),
                     sampleCount, retainedPerWalker, warmupSweeps, sweepsBetweenRetained,
                     stepSizeBohr, baselineSeed, postSrSeed, learningRate, damping,
-                    maxUpdateNorm, parameterBlockSize, observationParallelism);
+                    maxUpdateNorm, observationParallelism);
         }
 
         private static String value(String[] args, int index, String option) {
@@ -722,7 +711,7 @@ public final class FermiNetH2oSrDriver {
                     [--warmup-sweeps N] [--sweeps-between-retained N]
                     [--step-size-bohr X] [--baseline-seed N] [--post-sr-seed N]
                     [--learning-rate X] [--damping X] [--max-update-norm X]
-                    [--block-size N] [--observation-parallelism N]
+                    [--observation-parallelism N]
                     """);
         }
     }
