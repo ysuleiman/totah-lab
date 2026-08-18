@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
@@ -75,13 +80,64 @@ public final class ReferenceFermiNetPretrainer {
         }
     }
 
+    public record PretrainingState(
+            FermiNetV1State currentState,
+            List<QuantumCoordinates> walkers,
+            double[] firstMoment,
+            double[] secondMoment,
+            int completedIterations,
+            byte[] randomState,
+            FermiNetV1State bestState,
+            List<QuantumCoordinates> bestWalkers,
+            double bestLoss,
+            int bestIteration,
+            List<Double> lossHistory,
+            long proposed,
+            long accepted,
+            Configuration protocol) {
+
+        public PretrainingState {
+            Objects.requireNonNull(currentState, "currentState");
+            walkers = snapshotWalkers(walkers);
+            firstMoment = firstMoment.clone();
+            secondMoment = secondMoment.clone();
+            randomState = randomState.clone();
+            bestWalkers = snapshotWalkers(bestWalkers);
+            lossHistory = List.copyOf(lossHistory);
+            Objects.requireNonNull(protocol, "protocol");
+            if (firstMoment.length != currentState.parameterCount()
+                    || secondMoment.length != currentState.parameterCount()
+                    || completedIterations < 0
+                    || proposed < 0L
+                    || accepted < 0L
+                    || accepted > proposed
+                    || bestIteration < -1
+                    || bestIteration > completedIterations
+                    || (bestState == null) != (bestIteration == -1)
+                    || (bestState == null) != bestWalkers.isEmpty()) {
+                throw new IllegalArgumentException("invalid pretraining continuation state");
+            }
+        }
+
+        @Override public double[] firstMoment() { return firstMoment.clone(); }
+        @Override public double[] secondMoment() { return secondMoment.clone(); }
+        @Override public byte[] randomState() { return randomState.clone(); }
+    }
+
     public record Result(
             FermiNetV1State state,
             List<QuantumCoordinates> walkers,
             List<Double> lossHistory,
             double acceptance,
             String algorithm,
-            String referenceCommit) {
+            String referenceCommit,
+            FermiNetV1State finalState,
+            List<QuantumCoordinates> finalWalkers,
+            double finalLoss,
+            double bestLoss,
+            int bestIteration,
+            int completedIterations,
+            PretrainingState continuationState) {
 
         public Result {
 
@@ -90,9 +146,11 @@ public final class ReferenceFermiNetPretrainer {
             Objects.requireNonNull(lossHistory);
             Objects.requireNonNull(algorithm);
             Objects.requireNonNull(referenceCommit);
+            Objects.requireNonNull(finalState);
+            Objects.requireNonNull(continuationState);
 
-            walkers =
-                    List.copyOf(walkers);
+            walkers = snapshotWalkers(walkers);
+            finalWalkers = snapshotWalkers(finalWalkers);
 
             lossHistory =
                     List.copyOf(lossHistory);
@@ -130,44 +188,62 @@ public final class ReferenceFermiNetPretrainer {
                 configuration,
                 "configuration");
 
-        Objects.requireNonNull(
-                progress,
-                "progress");
+        return continueTraining(
+                begin(initial, configuration),
+                target,
+                configuration,
+                progress);
+    }
 
-        Random random =
-                new Random(
-                        configuration.seed());
+    public PretrainingState begin(
+            FermiNetV1State initial,
+            Configuration configuration) {
+        Objects.requireNonNull(initial, "initial");
+        Objects.requireNonNull(configuration, "configuration");
+        Random random = new Random(configuration.seed());
+        List<QuantumCoordinates> walkers = initialize(initial, configuration, random);
+        return new PretrainingState(
+                initial, walkers, new double[initial.parameterCount()],
+                new double[initial.parameterCount()], 0, serializeRandom(random),
+                null, List.of(), Double.POSITIVE_INFINITY, -1, List.of(),
+                0L, 0L, configuration);
+    }
 
-        List<QuantumCoordinates> walkers =
-                initialize(
-                        initial,
-                        configuration,
-                        random);
+    public Result continueTraining(
+            PretrainingState continuation,
+            HartreeFockOrbitalTarget target,
+            Configuration configuration) {
+        return continueTraining(continuation, target, configuration, (iteration, loss) -> {});
+    }
 
-        FermiNetV1State state =
-                initial;
+    public Result continueTraining(
+            PretrainingState continuation,
+            HartreeFockOrbitalTarget target,
+            Configuration configuration,
+            BiConsumer<Integer, Double> progress) {
+        Objects.requireNonNull(continuation, "continuation");
+        Objects.requireNonNull(target, "target");
+        Objects.requireNonNull(configuration, "configuration");
+        Objects.requireNonNull(progress, "progress");
+        validateContinuationProtocol(continuation.protocol(), configuration);
 
-        double[] firstMoment =
-                new double[
-                        state.parameterCount()];
+        Random random = deserializeRandom(continuation.randomState());
+        List<QuantumCoordinates> walkers = new ArrayList<>(continuation.walkers());
+        FermiNetV1State state = continuation.currentState();
+        double[] firstMoment = continuation.firstMoment();
+        double[] secondMoment = continuation.secondMoment();
+        List<Double> history = new ArrayList<>(continuation.lossHistory());
+        long proposed = continuation.proposed();
+        long accepted = continuation.accepted();
+        double bestLoss = continuation.bestLoss();
+        int bestIteration = continuation.bestIteration();
+        FermiNetV1State bestState = continuation.bestState();
+        List<QuantumCoordinates> bestWalkers = continuation.bestWalkers();
 
-        double[] secondMoment =
-                new double[
-                        state.parameterCount()];
-
-        List<Double> history =
-                new ArrayList<>(
-                        configuration.iterations());
-
-        long proposed =
-                0L;
-
-        long accepted =
-                0L;
-
-        for (int iteration = 1;
-             iteration <= configuration.iterations();
-             iteration++) {
+        int firstIteration = continuation.completedIterations() + 1;
+        int lastIteration = Math.addExact(
+                continuation.completedIterations(), configuration.iterations());
+        for (int iteration = firstIteration; iteration <= lastIteration; iteration++) {
 
             /*
              * ---------------------------------------------------------
@@ -246,6 +322,13 @@ public final class ReferenceFermiNetPretrainer {
 
             history.add(
                     loss);
+
+            if (loss < bestLoss) {
+                bestLoss = loss;
+                bestIteration = iteration;
+                bestState = iterationState;
+                bestWalkers = snapshotWalkers(walkers);
+            }
 
             progress.accept(
                     iteration,
@@ -370,16 +453,73 @@ public final class ReferenceFermiNetPretrainer {
             }
         }
 
+        PretrainingState next = new PretrainingState(
+                state, walkers, firstMoment, secondMoment, lastIteration,
+                serializeRandom(random), bestState, bestWalkers, bestLoss,
+                bestIteration, history, proposed, accepted, continuation.protocol());
+        FermiNetV1State returnedState = bestState == null ? state : bestState;
+        List<QuantumCoordinates> returnedWalkers =
+                bestState == null ? snapshotWalkers(walkers) : bestWalkers;
         return new Result(
-                state,
-                walkers,
+                returnedState,
+                returnedWalkers,
                 history,
                 proposed == 0
                         ? Double.NaN
                         : (double) accepted
                         / proposed,
                 "FERMINET_OCCUPIED_ORBITAL_MSE_ADAM_WITH_PER_STEP_RWM",
-                REFERENCE_COMMIT);
+                REFERENCE_COMMIT,
+                state,
+                walkers,
+                history.isEmpty() ? Double.NaN : history.getLast(),
+                bestLoss,
+                bestIteration,
+                lastIteration,
+                next);
+    }
+
+    private static void validateContinuationProtocol(
+            Configuration expected,
+            Configuration actual) {
+        if (expected.walkers() != actual.walkers()
+                || Double.doubleToLongBits(expected.learningRate()) != Double.doubleToLongBits(actual.learningRate())
+                || Double.doubleToLongBits(expected.moveWidthBohr()) != Double.doubleToLongBits(actual.moveWidthBohr())
+                || Double.doubleToLongBits(expected.initialWidthBohr()) != Double.doubleToLongBits(actual.initialWidthBohr())
+                || Double.doubleToLongBits(expected.scfFraction()) != Double.doubleToLongBits(actual.scfFraction())
+                || expected.seed() != actual.seed()) {
+            throw new IllegalArgumentException("pretraining continuation protocol mismatch");
+        }
+    }
+
+    private static List<QuantumCoordinates> snapshotWalkers(
+            List<QuantumCoordinates> walkers) {
+        Objects.requireNonNull(walkers, "walkers");
+        List<QuantumCoordinates> copy = new ArrayList<>(walkers.size());
+        for (QuantumCoordinates coordinates : walkers) {
+            copy.add(new QuantumCoordinates(new ArrayList<>(coordinates.particles())));
+        }
+        return List.copyOf(copy);
+    }
+
+    private static byte[] serializeRandom(Random random) {
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+             ObjectOutputStream output = new ObjectOutputStream(bytes)) {
+            output.writeObject(random);
+            output.flush();
+            return bytes.toByteArray();
+        } catch (IOException exception) {
+            throw new IllegalStateException("cannot snapshot pretraining RNG", exception);
+        }
+    }
+
+    private static Random deserializeRandom(byte[] bytes) {
+        try (ObjectInputStream input = new ObjectInputStream(
+                new ByteArrayInputStream(bytes))) {
+            return (Random) input.readObject();
+        } catch (IOException | ClassNotFoundException exception) {
+            throw new IllegalStateException("cannot restore pretraining RNG", exception);
+        }
     }
 
     /**

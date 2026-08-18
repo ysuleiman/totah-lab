@@ -454,8 +454,7 @@ public final class GaussianHartreeFockOrbitalTargetTest {
         return Path.of(
                 GaussianHartreeFockOrbitalTargetTest.class
                         .getResource(
-                                "/totah/lab/prometheus/neural/"
-                                        + "totah/lab/prometheus/neural/h2o-uhf-ccpvdz.json")
+                                "/totah/lab/prometheus/neural/h2o-uhf-ccpvdz.json")
                         .toURI());
     }
 

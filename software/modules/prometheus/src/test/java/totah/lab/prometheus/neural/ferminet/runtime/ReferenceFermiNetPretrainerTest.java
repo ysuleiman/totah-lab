@@ -9,10 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import java.nio.file.Path;
+import totah.lab.prometheus.neural.ferminet.pretraining.FermiNetPretrainingCheckpoint;
 
 import totah.lab.prometheus.molecular.CartesianPosition;
 import totah.lab.prometheus.molecular.ElectronCount;
@@ -26,6 +30,81 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 import totah.lab.prometheus.variational.SpinProjection;
 
 final class ReferenceFermiNetPretrainerTest {
+
+    @TempDir
+    Path temporaryDirectory;
+
+    @Test
+    void checkpointRoundTripPreservesExactContinuation() throws Exception {
+        FermiNetV1State initial = state(77L);
+        var configuration = new ReferenceFermiNetPretrainer.Configuration(
+                3, 4, 3.0e-4, 0.02, 1.0, 1.0, 991L);
+        var result = new ReferenceFermiNetPretrainer().train(
+                initial, target(), configuration);
+        Path checkpoint = temporaryDirectory.resolve("pretraining-state.bin");
+        FermiNetPretrainingCheckpoint.write(checkpoint, result.continuationState());
+        var restored = FermiNetPretrainingCheckpoint.read(checkpoint, initial);
+        assertArrayEquals(result.finalState().parameterArray(), restored.currentState().parameterArray());
+        assertArrayEquals(result.state().parameterArray(), restored.bestState().parameterArray());
+        assertArrayEquals(result.continuationState().firstMoment(), restored.firstMoment());
+        assertArrayEquals(result.continuationState().secondMoment(), restored.secondMoment());
+        assertArrayEquals(result.continuationState().randomState(), restored.randomState());
+        assertEquals(result.lossHistory(), restored.lossHistory());
+        assertEquals(result.bestIteration(), restored.bestIteration());
+    }
+
+    @Test
+    void bestCheckpointIsExactPreUpdateStateAndWalkerBatch() {
+        FermiNetV1State initial = state(77L);
+        HartreeFockOrbitalTarget target = target();
+        var configuration = new ReferenceFermiNetPretrainer.Configuration(
+                10, 4, 3.0e-4, 0.02, 1.0, 1.0, 991L);
+        var pretrainer = new ReferenceFermiNetPretrainer();
+        var campaign = pretrainer.begin(initial, configuration);
+        List<double[]> preUpdateParameters = new java.util.ArrayList<>();
+        List<List<QuantumCoordinates>> evaluationWalkers = new java.util.ArrayList<>();
+        ReferenceFermiNetPretrainer.Result segmented = null;
+        var one = new ReferenceFermiNetPretrainer.Configuration(
+                1, 4, 3.0e-4, 0.02, 1.0, 1.0, 991L);
+        for (int iteration = 0; iteration < 10; iteration++) {
+            preUpdateParameters.add(campaign.currentState().parameterArray());
+            evaluationWalkers.add(campaign.walkers());
+            segmented = pretrainer.continueTraining(campaign, target, one);
+            campaign = segmented.continuationState();
+        }
+        int best = segmented.bestIteration() - 1;
+        assertArrayEquals(preUpdateParameters.get(best), segmented.state().parameterArray());
+        for (int walker = 0; walker < configuration.walkers(); walker++) {
+            assertCoordinatesExactlyEqual(
+                    evaluationWalkers.get(best).get(walker), segmented.walkers().get(walker));
+        }
+        assertNotEquals(
+                java.util.Arrays.toString(segmented.state().parameterArray()),
+                java.util.Arrays.toString(segmented.finalState().parameterArray()));
+    }
+
+    @Test
+    void splitContinuationIsBitIdenticalToUninterruptedCampaign() {
+        FermiNetV1State initial = state(77L);
+        HartreeFockOrbitalTarget target = target();
+        var ten = new ReferenceFermiNetPretrainer.Configuration(
+                10, 4, 3.0e-4, 0.02, 1.0, 1.0, 991L);
+        var five = new ReferenceFermiNetPretrainer.Configuration(
+                5, 4, 3.0e-4, 0.02, 1.0, 1.0, 991L);
+        var pretrainer = new ReferenceFermiNetPretrainer();
+        var uninterrupted = pretrainer.train(initial, target, ten);
+        var first = pretrainer.train(initial, target, five);
+        var split = pretrainer.continueTraining(first.continuationState(), target, five);
+        assertEquals(uninterrupted.lossHistory(), split.lossHistory());
+        assertEquals(uninterrupted.bestIteration(), split.bestIteration());
+        assertEquals(uninterrupted.bestLoss(), split.bestLoss());
+        assertArrayEquals(uninterrupted.state().parameterArray(), split.state().parameterArray());
+        assertArrayEquals(uninterrupted.finalState().parameterArray(), split.finalState().parameterArray());
+        assertArrayEquals(uninterrupted.continuationState().firstMoment(), split.continuationState().firstMoment());
+        assertArrayEquals(uninterrupted.continuationState().secondMoment(), split.continuationState().secondMoment());
+        assertArrayEquals(uninterrupted.continuationState().randomState(), split.continuationState().randomState());
+        assertEquals(10, split.completedIterations());
+    }
 
     @Test
     void occupiedOrbitalLossGradientMatchesFiniteDifference() {

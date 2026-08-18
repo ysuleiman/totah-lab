@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.security.MessageDigest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -65,6 +66,12 @@ public final class FermiNetH2oPretrainingDriver {
     private static final int DEFAULT_WALKERS =
             64;
 
+    private static final int DEFAULT_QUALIFICATION_PARALLELISM = 12;
+    private static final int DEFAULT_QUALIFICATION_PANEL = 8;
+    private static final int DEFAULT_VMC_WARMUP = 100;
+    private static final int DEFAULT_VMC_SPACING = 10;
+    private static final long DEFAULT_VMC_SEED = 20260817L;
+
     private static final ObjectMapper OBJECT_MAPPER =
             new ObjectMapper()
                     .enable(SerializationFeature.INDENT_OUTPUT);
@@ -79,8 +86,7 @@ public final class FermiNetH2oPretrainingDriver {
         Arguments arguments =
                 Arguments.parse(args);
 
-        Files.createDirectories(
-                arguments.outputDirectory());
+        Files.createDirectories(arguments.outputDirectory());
 
         Molecule molecule =
                 water();
@@ -113,10 +119,14 @@ public final class FermiNetH2oPretrainingDriver {
                         networkConfiguration,
                         initialParameters);
 
-        ReferenceFermiNetPretrainer.Configuration pretrainingConfiguration =
+        ReferenceFermiNetPretrainer.Configuration defaults =
                 ReferenceFermiNetPretrainer.Configuration.referenceDefaults(
-                        arguments.walkers(),
-                        arguments.pretrainingSeed());
+                        arguments.walkers(), arguments.pretrainingSeed());
+        ReferenceFermiNetPretrainer.Configuration pretrainingConfiguration =
+                new ReferenceFermiNetPretrainer.Configuration(
+                        arguments.iterations(), defaults.walkers(), defaults.learningRate(),
+                        defaults.moveWidthBohr(), defaults.initialWidthBohr(),
+                        defaults.scfFraction(), defaults.seed());
 
         System.out.printf(
                 Locale.ROOT,
@@ -160,9 +170,15 @@ public final class FermiNetH2oPretrainingDriver {
         ReferenceFermiNetPretrainer pretrainer =
                 new ReferenceFermiNetPretrainer();
 
+        ReferenceFermiNetPretrainer.PretrainingState campaign =
+                arguments.resumeCheckpoint() == null
+                        ? pretrainer.begin(initialState, pretrainingConfiguration)
+                        : FermiNetPretrainingCheckpoint.read(
+                                arguments.resumeCheckpoint(), initialState);
+
         ReferenceFermiNetPretrainer.Result result =
-                pretrainer.train(
-                        initialState,
+                pretrainer.continueTraining(
+                        campaign,
                         hfTarget,
                         pretrainingConfiguration,
                         (iteration, loss) -> {
@@ -215,6 +231,43 @@ public final class FermiNetH2oPretrainingDriver {
                                 "pretrained-walkers.csv"),
                 result.walkers());
 
+        writeParametersHex(
+                arguments.outputDirectory().resolve("final-parameters.hex"),
+                FermiNetStateAccess.parameterSnapshot(result.finalState()));
+
+        writeWalkers(
+                arguments.outputDirectory().resolve("final-walkers.csv"),
+                result.finalWalkers());
+
+        FermiNetPretrainingCheckpoint.write(
+                arguments.outputDirectory().resolve("pretraining-state.bin"),
+                result.continuationState());
+
+        int panelSize = Math.min(DEFAULT_QUALIFICATION_PANEL, result.walkers().size());
+        List<QuantumCoordinates> panel =
+                List.copyOf(result.walkers().subList(0, panelSize));
+        FermiNetPretrainingQualification qualification =
+                new FermiNetPretrainingQualification();
+        var bestCorrespondence = qualification.evaluate(result.state(), hfTarget, panel);
+        var finalCorrespondence = qualification.evaluate(result.finalState(), hfTarget, panel);
+        String geometryIdentity = FermiNetPretrainingQualification.geometryIdentity(molecule);
+        FermiNetRuntimeSampling.Request vmcRequest = new FermiNetRuntimeSampling.Request(
+                result.walkers().size(), DEFAULT_VMC_WARMUP, 1,
+                DEFAULT_VMC_SPACING, defaults.moveWidthBohr(), DEFAULT_VMC_SEED);
+        var bestEnergy = qualification.evaluateEnergy(
+                result.state(), result.walkers(), vmcRequest,
+                DEFAULT_QUALIFICATION_PARALLELISM, geometryIdentity,
+                hfTarget.provenance().scfEnergyHartree());
+        var finalEnergy = qualification.evaluateEnergy(
+                result.finalState(), result.walkers(), vmcRequest,
+                DEFAULT_QUALIFICATION_PARALLELISM, geometryIdentity,
+                hfTarget.provenance().scfEnergyHartree());
+
+        writeQualification(
+                arguments.outputDirectory().resolve("qualification-summary.json"),
+                arguments, molecule, hfArtifact, initialState, result, panel,
+                bestCorrespondence, finalCorrespondence, bestEnergy, finalEnergy);
+
         writeSummary(
                 arguments.outputDirectory()
                         .resolve(
@@ -234,6 +287,8 @@ public final class FermiNetH2oPretrainingDriver {
                 Locale.ROOT,
                 """
                 H2O HF pretraining completed.
+                best iteration    : %d
+                best orbital MSE  : %.12e
                 final orbital MSE : %.12e
                 RWM acceptance    : %.6f
                 parameter count   : %d
@@ -244,11 +299,12 @@ public final class FermiNetH2oPretrainingDriver {
                   %s
                   %s
 
-                No post-pretraining burn-in, local-energy measurement, SR, or forces were run.
+                Read-only HF correspondence and VMC qualification were run.
+                SR and forces were NOT run.
                 """,
-                result.lossHistory()
-                        .get(
-                                result.lossHistory().size() - 1),
+                result.bestIteration(),
+                result.bestLoss(),
+                result.finalLoss(),
                 result.acceptance(),
                 result.state().parameterCount(),
                 arguments.outputDirectory()
@@ -267,7 +323,7 @@ public final class FermiNetH2oPretrainingDriver {
             int parameterCount) {
 
         if (result.lossHistory().size()
-                != configuration.iterations()) {
+                != result.completedIterations()) {
 
             throw new IllegalStateException(
                     "incomplete pretraining loss history");
@@ -629,12 +685,13 @@ public final class FermiNetH2oPretrainingDriver {
 
         summary.put(
                 "minimum_loss",
-                result.lossHistory()
-                        .stream()
-                        .mapToDouble(
-                                Double::doubleValue)
-                        .min()
-                        .orElseThrow());
+                result.bestLoss());
+
+        summary.put("best_iteration", result.bestIteration());
+        summary.put("best_loss", result.bestLoss());
+        summary.put("completed_iterations", result.completedIterations());
+        summary.put("returned_state", "BEST_PRE_UPDATE_STATE");
+        summary.put("final_state_persisted_separately", true);
 
         summary.put(
                 "rwm_acceptance",
@@ -646,7 +703,7 @@ public final class FermiNetH2oPretrainingDriver {
 
         summary.put(
                 "local_energy_evaluated",
-                false);
+                true);
 
         summary.put(
                 "sr_started",
@@ -659,6 +716,88 @@ public final class FermiNetH2oPretrainingDriver {
         OBJECT_MAPPER.writeValue(
                 output.toFile(),
                 summary);
+    }
+
+    private static void writeQualification(
+            Path output,
+            Arguments arguments,
+            Molecule molecule,
+            Path hfArtifact,
+            FermiNetV1State initialState,
+            ReferenceFermiNetPretrainer.Result result,
+            List<QuantumCoordinates> panel,
+            FermiNetPretrainingQualification.Result bestCorrespondence,
+            FermiNetPretrainingQualification.Result finalCorrespondence,
+            FermiNetPretrainingQualification.EnergyResult bestEnergy,
+            FermiNetPretrainingQualification.EnergyResult finalEnergy)
+            throws IOException {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("schema", "prometheus-ferminet-hf-pretraining-qualification-v1");
+        summary.put("canonical_geometry_identity",
+                FermiNetPretrainingQualification.geometryIdentity(molecule));
+        summary.put("hf_artifact", hfArtifact.toString());
+        summary.put("hf_artifact_sha256", sha256(hfArtifact));
+        summary.put("initial_parameter_checksum",
+                FermiNetPretrainingQualification.parameterChecksum(initialState));
+        summary.put("current_parameter_checksum",
+                FermiNetPretrainingQualification.parameterChecksum(result.finalState()));
+        summary.put("best_parameter_checksum",
+                FermiNetPretrainingQualification.parameterChecksum(result.state()));
+        summary.put("best_iteration", result.bestIteration());
+        summary.put("best_loss", result.bestLoss());
+        summary.put("final_loss", result.finalLoss());
+        summary.put("completed_iterations", result.completedIterations());
+        summary.put("configuration", result.continuationState().protocol());
+        summary.put("network_seed", arguments.networkSeed());
+        summary.put("pretraining_seed", arguments.pretrainingSeed());
+        summary.put("continuation_input", arguments.resumeCheckpoint() == null
+                ? "NEW_CAMPAIGN" : arguments.resumeCheckpoint().toString());
+        summary.put("qualification_configuration_checksum", coordinatesChecksum(panel));
+        summary.put("qualification_configurations", panel.size());
+        summary.put("vmc_parallelism", DEFAULT_QUALIFICATION_PARALLELISM);
+        summary.put("vmc_warmup_sweeps", DEFAULT_VMC_WARMUP);
+        summary.put("vmc_retained_per_walker", 1);
+        summary.put("vmc_sweeps_between_retained", DEFAULT_VMC_SPACING);
+        summary.put("vmc_seed", DEFAULT_VMC_SEED);
+        summary.put("best_correspondence", bestCorrespondence);
+        summary.put("final_correspondence", finalCorrespondence);
+        summary.put("best_energy", bestEnergy);
+        summary.put("final_energy", finalEnergy);
+        summary.put("sr_run", false);
+        OBJECT_MAPPER.writeValue(output.toFile(), summary);
+    }
+
+    private static String sha256(Path path) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            try (InputStream input = Files.newInputStream(path)) {
+                byte[] buffer = new byte[8192];
+                for (int count; (count = input.read(buffer)) >= 0; )
+                    digest.update(buffer, 0, count);
+            }
+            return java.util.HexFormat.of().formatHex(digest.digest());
+        } catch (java.security.NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    private static String coordinatesChecksum(List<QuantumCoordinates> panel) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            java.nio.ByteBuffer buffer = java.nio.ByteBuffer.allocate(Long.BYTES);
+            for (QuantumCoordinates coordinates : panel) {
+                for (var particle : coordinates.particles()) {
+                    digest.update(buffer.clear().putLong(particle.particleIndex()).array());
+                    digest.update(buffer.clear().putLong(Double.doubleToRawLongBits(particle.xBohr())).array());
+                    digest.update(buffer.clear().putLong(Double.doubleToRawLongBits(particle.yBohr())).array());
+                    digest.update(buffer.clear().putLong(Double.doubleToRawLongBits(particle.zBohr())).array());
+                    digest.update(particle.spin().name().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                }
+            }
+            return java.util.HexFormat.of().formatHex(digest.digest());
+        } catch (java.security.NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 
     private static Path resolveResource(
@@ -747,7 +886,9 @@ public final class FermiNetH2oPretrainingDriver {
             Path outputDirectory,
             int walkers,
             long networkSeed,
-            long pretrainingSeed) {
+            long pretrainingSeed,
+            int iterations,
+            Path resumeCheckpoint) {
 
         private static Arguments parse(
                 String[] args) {
@@ -765,6 +906,9 @@ public final class FermiNetH2oPretrainingDriver {
 
             long pretrainingSeed =
                     DEFAULT_PRETRAINING_SEED;
+
+            int iterations = 1000;
+            Path resumeCheckpoint = null;
 
             for (int i = 0;
                  i < args.length;
@@ -825,6 +969,17 @@ public final class FermiNetH2oPretrainingDriver {
                                         args[i]);
                     }
 
+                    case "--iterations" -> {
+                        if (++i >= args.length) throw usage("--iterations requires an integer");
+                        iterations = Integer.parseInt(args[i]);
+                        if (iterations < 1) throw usage("--iterations must be positive");
+                    }
+
+                    case "--resume" -> {
+                        if (++i >= args.length) throw usage("--resume requires a path");
+                        resumeCheckpoint = Path.of(args[i]).toAbsolutePath().normalize();
+                    }
+
                     case "--help", "-h" ->
                             throw usage(
                                     null);
@@ -842,7 +997,9 @@ public final class FermiNetH2oPretrainingDriver {
                             .normalize(),
                     walkers,
                     networkSeed,
-                    pretrainingSeed);
+                    pretrainingSeed,
+                    iterations,
+                    resumeCheckpoint);
         }
 
         private static IllegalArgumentException usage(
@@ -856,6 +1013,8 @@ public final class FermiNetH2oPretrainingDriver {
                         [--walkers N]
                         [--network-seed LONG]
                         [--pretraining-seed LONG]
+                        [--iterations N]
+                        [--resume CHECKPOINT]
 
                     Defaults:
                       walkers          = 64
