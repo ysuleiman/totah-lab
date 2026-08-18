@@ -11,11 +11,13 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 public final class FermiNetVariationalOptimizer implements AutoCloseable {
 
     private final FermiNetVmcParallel vmc;
+    private final int vmcParallelism;
 
     public FermiNetVariationalOptimizer(int vmcParallelism) {
         if (vmcParallelism < 1) {
             throw new IllegalArgumentException("invalid VMC parallelism");
         }
+        this.vmcParallelism = vmcParallelism;
         this.vmc = new FermiNetVmcParallel(vmcParallelism);
     }
 
@@ -72,32 +74,114 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
             FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
             int iterations) {
 
+        Objects.requireNonNull(srConfiguration, "srConfiguration");
+        return optimizeLoop(
+                initialState,
+                initialWalkers,
+                sampling,
+                iterations,
+                context -> {
+                    IterationResult result = finishIteration(
+                            context.iteration(), sampling.baseSeed(),
+                            context.state(), context.vmcResult(), sampling,
+                            srConfiguration, context.started(),
+                            context.vmcNanos(), context.srStarted());
+                    return new Step<>(result.updatedState(), result);
+                });
+    }
+
+    /** Runs the shared persistent-VMC loop with a selectable update engine. */
+    public List<OptimizationIterationResult> optimize(
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            SamplingConfiguration sampling,
+            FermiNetOptimizerType optimizerType,
+            FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
+            FermiNetKfacOptimizer.Configuration kfacConfiguration,
+            int iterations) {
+        Objects.requireNonNull(optimizerType, "optimizerType");
+        if (optimizerType == FermiNetOptimizerType.EXACT_SR) {
+            Objects.requireNonNull(srConfiguration, "srConfiguration");
+            return optimizeLoop(
+                    initialState, initialWalkers, sampling, iterations,
+                    context -> {
+                        IterationResult exact = finishIteration(
+                                context.iteration(), sampling.baseSeed(),
+                                context.state(), context.vmcResult(), sampling,
+                                srConfiguration, context.started(),
+                                context.vmcNanos(), context.srStarted());
+                        OptimizationIterationResult result =
+                                OptimizationIterationResult.exact(exact);
+                        return new Step<>(exact.updatedState(), result);
+                    });
+        }
+
+        Objects.requireNonNull(kfacConfiguration, "kfacConfiguration");
+        FermiNetKfacOptimizer kfac = new FermiNetKfacOptimizer(vmcParallelism);
+        return optimizeLoop(
+                initialState, initialWalkers, sampling, iterations,
+                context -> {
+                    List<FermiNetMatrixFreeSrOptimizer.WeightedSample> samples =
+                            context.vmcResult().samples().stream()
+                                    .map(coordinates ->
+                                            new FermiNetMatrixFreeSrOptimizer
+                                                    .WeightedSample(1.0, coordinates))
+                                    .toList();
+                    FermiNetKnownLocalEnergies energies =
+                            FermiNetKnownLocalEnergies.from(
+                                    context.state(), context.vmcResult());
+                    FermiNetKfacOptimizer.Result update = kfac.oneIteration(
+                            context.state(), samples, energies,
+                            kfacConfiguration);
+                    long updateNanos = System.nanoTime() - context.srStarted();
+                    int nextStart = context.vmcResult().samples().size()
+                            - sampling.walkers();
+                    OptimizationIterationResult result =
+                            new OptimizationIterationResult(
+                                    context.iteration(), sampling.baseSeed(),
+                                    FermiNetOptimizerType.KFAC,
+                                    context.state(), update.state(),
+                                    List.copyOf(context.vmcResult().samples().subList(
+                                            nextStart,
+                                            context.vmcResult().samples().size())),
+                                    context.vmcResult(),
+                                    energyStatistics(
+                                            context.vmcResult().localEnergies()),
+                                    null,
+                                    update,
+                                    context.vmcNanos(),
+                                    updateNanos,
+                                    System.nanoTime() - context.started());
+                    return new Step<>(update.state(), result);
+                });
+    }
+
+    private <T> List<T> optimizeLoop(
+            FermiNetV1State initialState,
+            List<QuantumCoordinates> initialWalkers,
+            SamplingConfiguration sampling,
+            int iterations,
+            IterationFinisher<T> finisher) {
         Objects.requireNonNull(initialState, "initialState");
         Objects.requireNonNull(initialWalkers, "initialWalkers");
         Objects.requireNonNull(sampling, "sampling");
-        Objects.requireNonNull(srConfiguration, "srConfiguration");
         if (iterations < 1) {
             throw new IllegalArgumentException("iterations must be positive");
         }
-
         if (initialWalkers.size() != sampling.walkers()) {
             throw new IllegalArgumentException("initial walker count mismatch");
         }
 
         FermiNetV1State state = initialState;
-        List<IterationResult> results = new ArrayList<>(iterations);
-
+        List<T> results = new ArrayList<>(iterations);
         FermiNetVmc.Configuration initialConfiguration =
                 new FermiNetVmc.Configuration(
-                        sampling.walkers(),
-                        sampling.warmupSweeps(),
+                        sampling.walkers(), sampling.warmupSweeps(),
                         sampling.retainedPerWalker(),
                         sampling.sweepsBetweenRetained(),
-                        sampling.stepSizeBohr(),
-                        sampling.baseSeed());
+                        sampling.stepSizeBohr(), sampling.baseSeed());
         FermiNetVmcParallel.SamplingSession session =
                 vmc.beginSession(state, initialConfiguration, initialWalkers);
-
         for (int iteration = 0; iteration < iterations; iteration++) {
             long started = System.nanoTime();
             long vmcStarted = System.nanoTime();
@@ -107,21 +191,12 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
                     sampling.retainedPerWalker(),
                     sampling.sweepsBetweenRetained()).result();
             long vmcFinished = System.nanoTime();
-
-            IterationResult result = finishIteration(
-                    iteration,
-                    sampling.baseSeed(),
-                    state,
-                    vmcResult,
-                    sampling,
-                    srConfiguration,
-                    started,
-                    vmcFinished - vmcStarted,
-                    vmcFinished);
-            results.add(result);
-            state = result.updatedState();
+            Step<T> step = finisher.finish(new IterationContext(
+                    iteration, state, vmcResult, started,
+                    vmcFinished - vmcStarted, vmcFinished));
+            results.add(step.result());
+            state = step.state();
         }
-
         return List.copyOf(results);
     }
 
@@ -280,4 +355,57 @@ public final class FermiNetVariationalOptimizer implements AutoCloseable {
             }
         }
     }
+
+    public record OptimizationIterationResult(
+            int iteration,
+            long seed,
+            FermiNetOptimizerType optimizerType,
+            FermiNetV1State inputState,
+            FermiNetV1State updatedState,
+            List<QuantumCoordinates> nextWalkers,
+            FermiNetVmc.Result vmcResult,
+            EnergyStatistics energyStatistics,
+            FermiNetMatrixFreeSrOptimizer.Result exactSrResult,
+            FermiNetKfacOptimizer.Result kfacResult,
+            long vmcNanos,
+            long updateNanos,
+            long totalNanos) {
+        public OptimizationIterationResult {
+            Objects.requireNonNull(optimizerType, "optimizerType");
+            Objects.requireNonNull(inputState, "inputState");
+            Objects.requireNonNull(updatedState, "updatedState");
+            nextWalkers = List.copyOf(nextWalkers);
+            Objects.requireNonNull(vmcResult, "vmcResult");
+            Objects.requireNonNull(energyStatistics, "energyStatistics");
+            if ((optimizerType == FermiNetOptimizerType.EXACT_SR)
+                    != (exactSrResult != null)
+                    || (optimizerType == FermiNetOptimizerType.KFAC)
+                    != (kfacResult != null)) {
+                throw new IllegalArgumentException("optimizer result/type mismatch");
+            }
+        }
+
+        private static OptimizationIterationResult exact(IterationResult exact) {
+            return new OptimizationIterationResult(
+                    exact.iteration(), exact.seed(), FermiNetOptimizerType.EXACT_SR,
+                    exact.inputState(), exact.updatedState(), exact.nextWalkers(),
+                    exact.vmcResult(), exact.energyStatistics(), exact.srResult(),
+                    null, exact.vmcNanos(), exact.srNanos(), exact.totalNanos());
+        }
+    }
+
+    @FunctionalInterface
+    private interface IterationFinisher<T> {
+        Step<T> finish(IterationContext context);
+    }
+
+    private record IterationContext(
+            int iteration,
+            FermiNetV1State state,
+            FermiNetVmc.Result vmcResult,
+            long started,
+            long vmcNanos,
+            long srStarted) {}
+
+    private record Step<T>(FermiNetV1State state, T result) {}
 }

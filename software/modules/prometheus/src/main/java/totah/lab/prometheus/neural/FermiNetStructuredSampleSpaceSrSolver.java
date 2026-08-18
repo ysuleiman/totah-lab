@@ -233,6 +233,59 @@ final class FermiNetStructuredSampleSpaceSrSolver {
                 : explicitDot(statistics, family, leftSample, rightSample);
     }
 
+    /** Reconstructs the exact weighted VMC energy gradient from structured data. */
+    static double[] energyGradient(
+            FermiNetStructuredSrObservationFile observations)
+            throws IOException {
+        int samples = observations.sampleCount();
+        double weightSum = 0.0;
+        double weightedEnergy = 0.0;
+        for (int sample = 0; sample < samples; sample++) {
+            double sampleWeight = observations.weight(sample);
+            weightSum += sampleWeight;
+            weightedEnergy += sampleWeight
+                    * observations.localEnergyHartree(sample);
+        }
+        if (!(weightSum > 0.0) || !Double.isFinite(weightSum)) {
+            throw new IllegalArgumentException("non-positive SR total weight");
+        }
+        double meanEnergy = weightedEnergy / weightSum;
+        double[] weight = new double[samples];
+        double[] sqrtWeight = new double[samples];
+        double[] q = new double[samples];
+        double sumQ = 0.0;
+        for (int sample = 0; sample < samples; sample++) {
+            weight[sample] = observations.weight(sample) / weightSum;
+            sqrtWeight[sample] = Math.sqrt(weight[sample]);
+            q[sample] = 2.0 * sqrtWeight[sample]
+                    * (observations.localEnergyHartree(sample) - meanEnergy);
+            sumQ += sqrtWeight[sample] * q[sample];
+        }
+        double[] coefficients = new double[samples];
+        for (int sample = 0; sample < samples; sample++) {
+            coefficients[sample] = sqrtWeight[sample] * q[sample]
+                    - weight[sample] * sumQ;
+        }
+
+        double[] gradient = new double[observations.parameterCount()];
+        double[] ignored = new double[gradient.length];
+        double[] zeros = new double[samples];
+        for (FermiNetStructuredSrStatistics.Family family
+                : observations.schema().families()) {
+            double[] statistics = observations.readFamily(family);
+            reconstructFamilyPair(
+                    statistics,
+                    family,
+                    observations.schema().layout().block(family.blockName()),
+                    samples,
+                    coefficients,
+                    zeros,
+                    gradient,
+                    ignored);
+        }
+        return gradient;
+    }
+
     private static void accumulateFamilyKernel(
             double[] kernel,
             double[] statistics,
