@@ -62,7 +62,7 @@ public record NuclearForceResult(
             double percentileNinetyNinePointNine, double maximum,
             long beyondFiveSigma, long beyondTenSigma) {}
 
-    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics {}
+    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics, AcZvDiagnostics {}
 
     public record CorrelatedFdDiagnostics(
             double deltaBohr,
@@ -83,6 +83,40 @@ public record NuclearForceResult(
             implements EstimatorDiagnostics {
         public SwctDiagnostics { components = List.copyOf(components); }
     }
+
+    /**
+     * AC-ZV decomposition and correlated-FD comparison evidence. The
+     * formulation and auxiliary provenance strings identify the exact
+     * equation convention; the contraction sign follows the Eq.-6-consistent
+     * form, not the historically printed Eq. 11. The comparison is
+     * diagnostic only: correlated FD is statistically noisy, so an
+     * indistinguishable difference of means is not evidence that AC-ZV is
+     * unbiased. No acceptance thresholds are applied anywhere.
+     */
+    public record AcZvDiagnostics(
+            String estimatorFormulation,
+            String auxiliaryEquation,
+            List<AcZvComponentDiagnostics> components)
+            implements EstimatorDiagnostics {
+        public AcZvDiagnostics {
+            Objects.requireNonNull(estimatorFormulation, "estimatorFormulation");
+            Objects.requireNonNull(auxiliaryEquation, "auxiliaryEquation");
+            components = List.copyOf(components);
+        }
+    }
+
+    public record AcZvComponentDiagnostics(
+            int nucleus,
+            int axis,
+            double nuclearRepulsionTermHartreePerBohr,
+            double meanContractionTermHartreePerBohr,
+            double correlatedFdMeanHartreePerBohr,
+            double correlatedFdChainStandardError,
+            double correlatedFdVariance,
+            double varianceReductionFactorVsCorrelatedFd,
+            double meanDifferenceVsCorrelatedFdHartreePerBohr,
+            double differenceCombinedUncertainty,
+            double differenceOverCombinedUncertainty) {}
 
     public record SwctComponentDiagnostics(
             int nucleus,

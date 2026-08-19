@@ -35,6 +35,12 @@ public record NuclearForceConfiguration(
                 NuclearForceEstimatorType.SWCT, null);
     }
 
+    /** AC-ZV has no numerical knobs: the derivation is fully analytic. */
+    public static NuclearForceConfiguration acZv() {
+        return new NuclearForceConfiguration(
+                NuclearForceEstimatorType.AC_ZV, null);
+    }
+
     public static NuclearForceConfiguration unsupported(
             NuclearForceEstimatorType type) {
         if (type == NuclearForceEstimatorType.CORRELATED_FD) {

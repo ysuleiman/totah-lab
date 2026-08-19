@@ -13,7 +13,9 @@ public final class FermiNetNuclearForcePipeline {
         this(Map.of(NuclearForceEstimatorType.CORRELATED_FD,
                 new CorrelatedFdFermiNetForceEstimator(),
                 NuclearForceEstimatorType.SWCT,
-                new SwctFermiNetForceEstimator()));
+                new SwctFermiNetForceEstimator(),
+                NuclearForceEstimatorType.AC_ZV,
+                new AcZvFermiNetForceEstimator()));
     }
 
     FermiNetNuclearForcePipeline(
