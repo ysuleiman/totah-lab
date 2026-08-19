@@ -48,10 +48,57 @@ public final class FermiNetRuntimeSampling {
         }
     }
 
+    /** Restores the exact persistent sampler stream captured by a checkpoint. */
+    public static Session resumeSession(
+            FermiNetV1State state,
+            Request request,
+            FermiNetOptimizationCheckpoint checkpoint,
+            int parallelism) {
+        Objects.requireNonNull(state, "state");
+        Objects.requireNonNull(request, "request");
+        Objects.requireNonNull(checkpoint, "checkpoint");
+        String parameters = FermiNetOptimizationCheckpoint.parameterChecksum(
+                FermiNetStateAccess.parameterSnapshot(state));
+        if (!checkpoint.parameterChecksum().equals(parameters)) {
+            throw new IllegalArgumentException("checkpoint parameter checksum mismatch");
+        }
+        if (!checkpoint.walkerChecksum().equals(
+                FermiNetOptimizationCheckpoint.walkerChecksum(checkpoint.walkers()))) {
+            throw new IllegalArgumentException("checkpoint walker checksum mismatch");
+        }
+        var sampling = new FermiNetVariationalOptimizer.SamplingConfiguration(
+                request.walkers(), request.warmupSweeps(), request.retainedPerWalker(),
+                request.sweepsBetweenRetained(), request.stepSizeBohr(), request.seed());
+        if (!checkpoint.samplingConfigurationIdentity().equals(
+                FermiNetOptimizationCheckpoint.samplingIdentity(sampling))) {
+            throw new IllegalArgumentException("checkpoint sampling configuration mismatch");
+        }
+        FermiNetVmcParallel sampler = new FermiNetVmcParallel(parallelism);
+        try {
+            return new Session(sampler, sampler.restoreSession(
+                    state, configuration(request), checkpoint.walkers(),
+                    checkpoint.serializedRandomState()));
+        } catch (RuntimeException exception) {
+            sampler.close();
+            throw exception;
+        }
+    }
+
     public static LocalEnergyComponents localEnergy(
             FermiNetV1State state,
             QuantumCoordinates coordinates) {
         return FermiNetVmc.localEnergy(state, coordinates);
+    }
+
+    /** Computes the sampling value and authoritative local energy from one spatial pass. */
+    public static LocalEnergySnapshot localEnergyWithLog(
+            FermiNetV1State state,
+            QuantumCoordinates coordinates) {
+        Objects.requireNonNull(state, "state");
+        FermiNetV1State.SpatialEvaluation evaluation = state.spatialEvaluation(coordinates);
+        return new LocalEnergySnapshot(
+                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
+                FermiNetVmc.localEnergy(state, coordinates, evaluation));
     }
 
     public static LocalEnergyComponents localEnergy(
@@ -103,6 +150,15 @@ public final class FermiNetRuntimeSampling {
     }
 
     public record Continuation(Result result, long proposed, long accepted) {}
+
+    public record LocalEnergySnapshot(
+            int sign,
+            double logAbsoluteWavefunction,
+            LocalEnergyComponents localEnergy) {
+        public LocalEnergySnapshot {
+            Objects.requireNonNull(localEnergy, "localEnergy");
+        }
+    }
 
     public static final class Session implements AutoCloseable {
         private final FermiNetVmcParallel sampler;

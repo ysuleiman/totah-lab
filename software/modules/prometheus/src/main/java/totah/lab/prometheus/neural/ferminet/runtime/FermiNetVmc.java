@@ -327,6 +327,19 @@ final class FermiNetVmc {
                 evaluation.laplacianOverWavefunction());
     }
 
+    /** Reuses an already-computed spatial evaluation without parameter backpropagation. */
+    static LocalEnergyComponents localEnergy(
+            FermiNetV1State state,
+            QuantumCoordinates electrons,
+            FermiNetV1State.SpatialEvaluation evaluation) {
+        Objects.requireNonNull(state, "state");
+        Objects.requireNonNull(electrons, "electrons");
+        Objects.requireNonNull(evaluation, "evaluation");
+        validateElectronConfiguration(state.molecule(), electrons);
+        return localEnergyFromLaplacian(
+                state, electrons, evaluation.laplacianOverWavefunction());
+    }
+
     private static LocalEnergyComponents localEnergyFromLaplacian(
             FermiNetV1State state,
             QuantumCoordinates electrons,
