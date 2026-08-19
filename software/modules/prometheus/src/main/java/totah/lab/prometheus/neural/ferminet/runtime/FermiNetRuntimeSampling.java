@@ -151,6 +151,14 @@ public final class FermiNetRuntimeSampling {
 
     public record Continuation(Result result, long proposed, long accepted) {}
 
+    public record CoordinateContinuation(
+            List<QuantumCoordinates> samples,
+            double acceptance,
+            long proposed,
+            long accepted) {
+        public CoordinateContinuation { samples = List.copyOf(samples); }
+    }
+
     public record LocalEnergySnapshot(
             int sign,
             double logAbsoluteWavefunction,
@@ -180,6 +188,19 @@ public final class FermiNetRuntimeSampling {
                     state, warmupSweeps, retainedPerWalker, sweepsBetweenRetained);
             return new Continuation(
                     snapshot(continuation.result()),
+                    continuation.proposed(), continuation.accepted());
+        }
+
+        /** Continues chains without constructing unneeded retained local energies. */
+        public CoordinateContinuation sampleCoordinates(
+                FermiNetV1State state,
+                int warmupSweeps,
+                int retainedPerWalker,
+                int sweepsBetweenRetained) {
+            var continuation = session.sampleCoordinates(
+                    state, warmupSweeps, retainedPerWalker, sweepsBetweenRetained);
+            return new CoordinateContinuation(
+                    continuation.samples(), continuation.acceptance(),
                     continuation.proposed(), continuation.accepted());
         }
 

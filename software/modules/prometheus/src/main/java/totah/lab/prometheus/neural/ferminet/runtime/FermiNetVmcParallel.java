@@ -50,6 +50,14 @@ final class FermiNetVmcParallel implements AutoCloseable {
             long accepted) {
     }
 
+    record CoordinateContinuationResult(
+            List<QuantumCoordinates> samples,
+            double acceptance,
+            long proposed,
+            long accepted) {
+        CoordinateContinuationResult { samples = List.copyOf(samples); }
+    }
+
     private final ForkJoinPool pool;
 
     FermiNetVmcParallel(int parallelism) {
@@ -205,6 +213,35 @@ final class FermiNetVmcParallel implements AutoCloseable {
                 int sweepsBetweenRetained,
                 TransitionObserver observer) {
 
+            CoordinateContinuationResult coordinates = advance(
+                    state, warmupSweeps, retainedPerWalker,
+                    sweepsBetweenRetained, observer);
+            LocalEnergyComponents[] energies = parallelLocalEnergies(
+                    state, coordinates.samples());
+            return new ContinuationResult(
+                    new FermiNetVmc.Result(
+                            coordinates.samples(), coordinates.acceptance(),
+                            List.of(energies), stateIdentity),
+                    coordinates.proposed(), coordinates.accepted());
+        }
+
+        CoordinateContinuationResult sampleCoordinates(
+                FermiNetV1State state,
+                int warmupSweeps,
+                int retainedPerWalker,
+                int sweepsBetweenRetained) {
+            return advance(state, warmupSweeps, retainedPerWalker,
+                    sweepsBetweenRetained,
+                    (walker, proposal, logUniform, currentLog, proposalLog, accepted) -> {});
+        }
+
+        private CoordinateContinuationResult advance(
+                FermiNetV1State state,
+                int warmupSweeps,
+                int retainedPerWalker,
+                int sweepsBetweenRetained,
+                TransitionObserver observer) {
+
             Objects.requireNonNull(state, "state");
             Objects.requireNonNull(observer, "observer");
 
@@ -321,19 +358,8 @@ final class FermiNetVmcParallel implements AutoCloseable {
                 (double) accepted
                         / proposed;
 
-        LocalEnergyComponents[] energies =
-                parallelLocalEnergies(
-                        state,
-                        retained);
-
-            return new ContinuationResult(
-                    new FermiNetVmc.Result(
-                            retained,
-                            acceptance,
-                            List.of(energies),
-                            stateIdentity),
-                    proposed,
-                    accepted);
+            return new CoordinateContinuationResult(
+                    List.copyOf(retained), acceptance, proposed, accepted);
         }
 
         List<QuantumCoordinates> currentWalkers() {

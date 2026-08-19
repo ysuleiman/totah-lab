@@ -42,7 +42,7 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
                     + "qualified-best-7988-n1024-checkpointed-8step/iteration-017/"
                     + "continuation-checkpoint.bin");
     private static final Path DEFAULT_OUTPUT = Path.of(
-            "artifacts/prometheus/h2o/ferminet/forces/correlated-fd-iteration-017");
+            "artifacts/prometheus/h2o/ferminet/forces/correlated-fd-iteration-017-n1024");
     private static final String EXPECTED_PARAMETERS =
             "dfa88d8f0714ea9f9cf45fd3f735a0b198f1f5eef42e6b0a96f2dc7e40341d20";
     private static final String EXPECTED_WALKERS =
@@ -55,7 +55,7 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
             "43a41da438fdcdccf1f6496db6af7848fda1f572bc657ea8037b399b6c12c16b";
     private static final int WALKERS = 64;
     private static final int RETAINED_PER_WALKER = 16;
-    private static final int VMC_PARALLELISM = 12;
+    private static final int VMC_PARALLELISM = 1;
     private static final ObjectMapper JSON =
             new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
@@ -82,14 +82,15 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
         } else {
             FermiNetRuntimeSampling.Request request = new FermiNetRuntimeSampling.Request(
                     WALKERS, 100, RETAINED_PER_WALKER, 10, 0.02, 20260818L);
-            FermiNetRuntimeSampling.Continuation continuation;
+            FermiNetRuntimeSampling.CoordinateContinuation continuation;
             try (FermiNetRuntimeSampling.Session session =
                          FermiNetRuntimeSampling.resumeSession(
                                  state, request, checkpoint, VMC_PARALLELISM)) {
-                continuation = session.sample(state, 0, RETAINED_PER_WALKER, 10);
+                continuation = session.sampleCoordinates(
+                        state, 0, RETAINED_PER_WALKER, 10);
             }
             dataset = FermiNetCorrelatedFdConfigurationFile.write(
-                    configurationFile, continuation.result().samples(), WALKERS);
+                    configurationFile, continuation.samples(), WALKERS);
             writeBatchManifest(arguments, checkpoint, dataset, continuation);
         }
         var reread = FermiNetCorrelatedFdConfigurationFile.inspect(
@@ -157,7 +158,7 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
     private static void writeBatchManifest(
             Arguments arguments, FermiNetOptimizationCheckpoint checkpoint,
             FermiNetCorrelatedFdConfigurationFile.Identity dataset,
-            FermiNetRuntimeSampling.Continuation continuation) throws IOException {
+            FermiNetRuntimeSampling.CoordinateContinuation continuation) throws IOException {
         Map<String, Object> values = new LinkedHashMap<>();
         values.put("schema", "prometheus-ferminet-correlated-fd-configurations-v1");
         values.put("source_wavefunction", "frozen iteration-17 checkpoint");
@@ -181,7 +182,7 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
         values.put("step_size_bohr", 0.02);
         values.put("proposals", continuation.proposed());
         values.put("accepted", continuation.accepted());
-        values.put("acceptance", continuation.result().acceptance());
+        values.put("acceptance", continuation.acceptance());
         JSON.writeValue(arguments.output().resolve(
                 "configuration-manifest.json").toFile(), values);
     }
