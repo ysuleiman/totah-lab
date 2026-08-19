@@ -36,9 +36,10 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
  * is the zero-variance term. The electron-nucleus bare force cancels
  * analytically against -1/2 laplacian(Q_A) and is never evaluated.
  *
- * <p>Two historical defects of the H2 reference implementation
- * ({@code AssarafCaffarelZvForceEstimator}, preserved unchanged as a
- * regression reference) are deliberately not reproduced here:
+ * <p>Two historical defects of the retired H2 reference implementation
+ * ({@code AssarafCaffarelZvForceEstimator}, removed from live source; see
+ * {@code AC_ZV_HISTORICAL_IMPLEMENTATION_RETIRED.md} and git history) are
+ * deliberately not reproduced here:
  *
  * <ul>
  *   <li>the printed Eq. 11 final expression carries a minus sign before the

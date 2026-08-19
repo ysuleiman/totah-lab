@@ -20,7 +20,6 @@ import totah.lab.prometheus.variational.HydrogenMoleculeImportanceBatches;
 import totah.lab.prometheus.variational.HydrogenMoleculeNuclearForceEstimator;
 import totah.lab.prometheus.variational.NonstationaryParameterResponseAudit;
 import totah.lab.prometheus.variational.ParameterVector;
-import totah.lab.prometheus.variational.force.AssarafCaffarelZvForceEstimator;
 import totah.lab.prometheus.variational.force.AssarafCaffarelZvzbForceEstimator;
 import totah.lab.prometheus.variational.force.CorrelatedSamplingFiniteDifferenceForceEstimator;
 import totah.lab.prometheus.variational.force.DirectHfPulayForceTrace;
@@ -65,11 +64,9 @@ public final class NuclearForceEstimatorCapabilityStudy {
                     swct.forceHartreePerBohr(),swctDiagnostic,swct.forceEstimatorVarianceHartree2PerBohr2(),swctWall,swct.stateEvaluations(),
                     swct.localEnergyEvaluations(),swct.stateEvaluations(),72000,1,swct.peakBatchSize(),"QIAN_EQ_14_NUMERICAL_DERIVATIVE"));
 
-            start=System.nanoTime();List<AssarafCaffarelZvForceEstimator.Contribution> zvTerms=new ArrayList<>();
-            var zv=new AssarafCaffarelZvForceEstimator().evaluate(state,h,batches,1,zvTerms::add);long zvWall=System.nanoTime()-start;
-            var zvDiagnostic=vectorDiagnostics(zvTerms);double zvForce=zv.rawStatistics().meanHartreePerBohr().z();
-            rows.add(row("ASSARAF_CAFFAREL_ZV",r,reference,zvForce,zvDiagnostic,zv.rawStatistics().varianceHartree2PerBohr2().z(),zvWall,
-                    zv.rawStatistics().stateEvaluations(),0,0,72000,1,zv.rawStatistics().peakBatchSize(),"QIAN_PRINTED_EQ_11"));
+            // The historical printed-Eq-11 AC-ZV row is retired as mathematically
+            // defective; see AC_ZV_HISTORICAL_IMPLEMENTATION_RETIRED.md. Frozen
+            // evidence remains in analysis/prometheus/java-neural-nuclear-force-estimator-study/.
 
             start=System.nanoTime();List<AssarafCaffarelZvzbForceEstimator.LinearContribution> zvzbTerms=new ArrayList<>();
             var zvzb=new AssarafCaffarelZvzbForceEstimator().evaluate(state,h,batches,1,zvzbTerms::add);long zvzbWall=System.nanoTime()-start;
@@ -103,7 +100,6 @@ public final class NuclearForceEstimatorCapabilityStudy {
     private static WeightedForceDiagnostics.Result bareDiagnostics(List<DirectHfPulayForceTrace.LinearContribution> terms){return linearDiagnostics(terms,0,true);}
     private static WeightedForceDiagnostics.Result equalDiagnostics(List<Double> terms){List<WeightedForceDiagnostics.Sample> samples=new ArrayList<>(terms.size());for(double value:terms)samples.add(new WeightedForceDiagnostics.Sample(1,value));return WeightedForceDiagnostics.summarize(samples);}
     private static WeightedForceDiagnostics.Result swctDiagnostics(List<HydrogenMoleculeSpaceWarpForceEstimator.LinearContribution> terms,double energy){List<WeightedForceDiagnostics.Sample> samples=new ArrayList<>(terms.size());for(var t:terms)samples.add(new WeightedForceDiagnostics.Sample(t.importanceWeight(),t.baseForceHartreePerBohr()+2*energy*t.sampledMeanEnergyCoefficientPerBohr()));return WeightedForceDiagnostics.summarize(samples);}
-    private static WeightedForceDiagnostics.Result vectorDiagnostics(List<AssarafCaffarelZvForceEstimator.Contribution> terms){List<WeightedForceDiagnostics.Sample> samples=new ArrayList<>(terms.size());for(var t:terms)samples.add(new WeightedForceDiagnostics.Sample(t.importanceWeight(),t.forceHartreePerBohr().z()));return WeightedForceDiagnostics.summarize(samples);}
     private static WeightedForceDiagnostics.Result zvzbDiagnostics(List<AssarafCaffarelZvzbForceEstimator.LinearContribution> terms,double energy){List<WeightedForceDiagnostics.Sample> samples=new ArrayList<>(terms.size());for(var t:terms)samples.add(new WeightedForceDiagnostics.Sample(t.importanceWeight(),t.constant().z()+energy*t.sampledMeanEnergyCoefficient().z()));return WeightedForceDiagnostics.summarize(samples);}
     private static boolean passes(List<Row> rows,String estimator){return rows.stream().filter(r->r.estimator().equals(estimator)).count()==3
             &&rows.stream().filter(r->r.estimator().equals(estimator)).allMatch(r->r.absoluteError()<=.03&&Math.signum(r.force())==Math.signum(r.referenceForce()));}

@@ -31,7 +31,6 @@ import totah.lab.prometheus.variational.HydrogenMoleculeImportanceBatches;
 import totah.lab.prometheus.variational.ParameterVector;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 import totah.lab.prometheus.variational.SpinProjection;
-import totah.lab.prometheus.variational.force.AssarafCaffarelZvForceEstimator;
 import totah.lab.prometheus.variational.force.AssarafCaffarelZvzbForceEstimator;
 
 final class AcZvFermiNetForceEstimatorTest {
@@ -190,13 +189,17 @@ final class AcZvFermiNetForceEstimatorTest {
     }
 
     /**
-     * Frozen H2 panel diagnostic: the historical printed-Eq.-11 result and the
-     * Eq.-6-consistent result are both reported; the new generalized code must
-     * reproduce the already observed improved Eq.-6-consistent values.
+     * Frozen H2 panel diagnostic: the Eq.-6-consistent generalized code must
+     * reproduce the already observed improved values. The historical
+     * printed-Eq.-11 implementation is retired (see
+     * AC_ZV_HISTORICAL_IMPLEMENTATION_RETIRED.md); its panel values survive
+     * here as locked constants sourced from the preserved study artifacts and
+     * git history, and are printed for comparison only.
      */
     @Test
     void frozenH2PanelReportsHistoricalAndConsistentFormulations() {
         double[] radii = {1.0, 1.4, 3.0};
+        // Retired printed-Eq-11 (nn-G) implementation, frozen study values.
         double[] historicalLocked = {
                 1.7227154464996024, 1.0616424506472109, 0.2833808194705944};
         double[] consistentLocked = {
@@ -206,16 +209,11 @@ final class AcZvFermiNetForceEstimatorTest {
         for (int k = 0; k < radii.length; k++) {
             var state = new GeometryConditionedHydrogenMoleculeState(
                     radii[k], H2_PARAMETERS);
-            var hamiltonian = new HydrogenMoleculeHamiltonian(radii[k]);
             var batches = new HydrogenMoleculeImportanceBatches(
                     72000, radii[k], 1.15, 1009, 512);
             Molecule molecule = h2(radii[k]);
 
-            double historical = new AssarafCaffarelZvForceEstimator()
-                    .evaluate(state, hamiltonian, batches, 1)
-                    .rawStatistics().meanHartreePerBohr().z();
-            assertEquals(historicalLocked[k], historical, 1e-12,
-                    "historical printed-Eq-11 regression R=" + radii[k]);
+            double historical = historicalLocked[k];
 
             double[] norm = {0.0}, sum = {0.0};
             batches.forEachBatch(batch -> batch.forEach(point -> {

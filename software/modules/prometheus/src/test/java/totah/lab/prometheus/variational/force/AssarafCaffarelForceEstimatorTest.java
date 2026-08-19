@@ -22,41 +22,6 @@ import totah.lab.prometheus.variational.StateLaplacian;
 
 class AssarafCaffarelForceEstimatorTest {
     @Test
-    void eq11ConstantWavefunctionFixtureHasNuclearForceSignUnitsAndAntisymmetry() {
-        var batches = new HydrogenMoleculeImportanceBatches(101, 2.0, 1.0, 23, 17);
-        var state = new CountingConstantState();
-        var estimator = new AssarafCaffarelZvForceEstimator();
-
-        var left = estimator.evaluate(state, new HydrogenMoleculeHamiltonian(2.0), batches, 0);
-        var right = estimator.evaluate(state, new HydrogenMoleculeHamiltonian(2.0), batches, 1);
-
-        assertThat(left.rawStatistics().meanHartreePerBohr().x()).isZero();
-        assertThat(left.rawStatistics().meanHartreePerBohr().y()).isZero();
-        assertThat(left.rawStatistics().meanHartreePerBohr().z()).isCloseTo(-0.25,
-                org.assertj.core.data.Offset.offset(1e-15));
-        assertThat(right.rawStatistics().meanHartreePerBohr().z()).isCloseTo(0.25,
-                org.assertj.core.data.Offset.offset(1e-15));
-        assertThat(left.rawStatistics().forceUnits()).isEqualTo("hartree/bohr");
-        assertThat(left.rawStatistics().stateEvaluations()).isEqualTo(101);
-        assertThat(left.rawStatistics().peakBatchSize()).isEqualTo(17);
-        assertThat(left.estimatorEquation()).isEqualTo("Qian-2022-Eq-11");
-    }
-
-    @Test
-    void eq11UsesOneStateBundleAndReplaysBitForBit() {
-        var batches = new HydrogenMoleculeImportanceBatches(137, 1.4, 1.0, 31, 29);
-        var firstState = new CountingConstantState();
-        var estimator = new AssarafCaffarelZvForceEstimator();
-        var first = estimator.evaluate(firstState, new HydrogenMoleculeHamiltonian(1.4), batches, 0);
-        var second = estimator.evaluate(new CountingConstantState(),
-                new HydrogenMoleculeHamiltonian(1.4), batches, 0);
-
-        assertThat(first).isEqualTo(second);
-        assertThat(firstState.evaluations()).isEqualTo(137);
-        assertThat(first.rawStatistics().effectiveSampleSize()).isBetween(1.0, 137.0);
-    }
-
-    @Test
     void eq6StreamingSufficientStatisticsEqualExactSecondPassContributions() {
         var batches = new HydrogenMoleculeImportanceBatches(113, 1.4, 1.0, 43, 19);
         var hamiltonian = new HydrogenMoleculeHamiltonian(1.4);
