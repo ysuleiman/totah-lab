@@ -7,6 +7,7 @@ import totah.lab.prometheus.neural.ferminet.reference.*;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +41,152 @@ final class FermiNetV1StateTest {
     private static final double LAPLACIAN_STEP = 1.0e-3;
 
     private static final double PARAMETER_STEP = 1.0e-5;
+
+    private static final double NUCLEAR_STEP = 1.0e-5;
+
+    @Test
+    void geometryCopyPreservesStateAndDisplacementPreservesParameters() {
+
+        Molecule water = water();
+        FermiNetV1State state = state(water);
+        QuantumCoordinates coordinates = coordinates();
+
+        Molecule copied = moveNucleus(water, 0, 0, 0.0);
+        FermiNetV1State copiedState = FermiNetStateAccess.withGeometry(state, copied);
+
+        var expected = state.evaluate(coordinates);
+        var actual = copiedState.evaluate(coordinates);
+
+        assertEquals(expected.sign(), actual.sign());
+        assertEquals(Double.doubleToRawLongBits(expected.logAbsoluteWavefunction()),
+                Double.doubleToRawLongBits(actual.logAbsoluteWavefunction()));
+        assertArrayEquals(expected.logCoordinateGradient(), actual.logCoordinateGradient(), 0.0);
+        assertEquals(Double.doubleToRawLongBits(expected.laplacianOverWavefunction()),
+                Double.doubleToRawLongBits(actual.laplacianOverWavefunction()));
+        assertEquals(FermiNetRuntimeSampling.localEnergy(state, coordinates),
+                FermiNetRuntimeSampling.localEnergy(copiedState, coordinates));
+
+        String checksum = parameterChecksum(state);
+        assertEquals(checksum, parameterChecksum(copiedState));
+
+        FermiNetV1State plus = FermiNetStateAccess.withGeometry(
+                state, moveNucleus(water, 1, 0, NUCLEAR_STEP));
+        FermiNetV1State minus = FermiNetStateAccess.withGeometry(
+                state, moveNucleus(water, 1, 0, -NUCLEAR_STEP));
+        assertEquals(checksum, parameterChecksum(plus));
+        assertEquals(checksum, parameterChecksum(minus));
+        assertNotEquals(water.scientificIdentity(), plus.molecule().scientificIdentity());
+        assertNotEquals(water.scientificIdentity(), minus.molecule().scientificIdentity());
+    }
+
+    @Test
+    void nuclearLogDerivativesMatchFrozenParameterCentralDifferences() {
+
+        Molecule water = water();
+        FermiNetV1State state = state(water);
+        String checksum = parameterChecksum(state);
+
+        List<QuantumCoordinates> configurations = List.of(
+                coordinates(),
+                move(coordinates(), 0, 0.073),
+                move(move(coordinates(), 8, -0.051), 21, 0.037));
+
+        double maximumAbsoluteError = 0.0;
+
+        for (int configuration = 0;
+             configuration < configurations.size();
+             configuration++) {
+
+            QuantumCoordinates electrons = configurations.get(configuration);
+            double[] analytic = FermiNetStateAccess.nuclear(state, electrons)
+                    .logNuclearGradient();
+            assertEquals(3 * water.nuclei().size(), analytic.length);
+
+            for (int component = 0;
+                 component < analytic.length;
+                 component++) {
+
+                int nucleus = component / 3;
+                int axis = component % 3;
+                FermiNetV1State plus = FermiNetStateAccess.withGeometry(
+                        state, moveNucleus(water, nucleus, axis, NUCLEAR_STEP));
+                FermiNetV1State minus = FermiNetStateAccess.withGeometry(
+                        state, moveNucleus(water, nucleus, axis, -NUCLEAR_STEP));
+
+                assertEquals(checksum, parameterChecksum(plus));
+                assertEquals(checksum, parameterChecksum(minus));
+
+                double finiteDifference = (
+                        FermiNetStateAccess.sampling(plus, electrons)
+                                .logAbsoluteWavefunction()
+                                - FermiNetStateAccess.sampling(minus, electrons)
+                                .logAbsoluteWavefunction())
+                        / (2.0 * NUCLEAR_STEP);
+
+                maximumAbsoluteError = Math.max(
+                        maximumAbsoluteError,
+                        Math.abs(finiteDifference - analytic[component]));
+
+                assertEquals(finiteDifference, analytic[component], 2.0e-7,
+                        "configuration " + configuration + ", component " + component);
+            }
+        }
+
+        System.out.printf(java.util.Locale.ROOT,
+                "FERMINET_NUCLEAR_DERIVATIVE_MAX_ABS_ERROR=%.16e%n",
+                maximumAbsoluteError);
+    }
+
+    @Test
+    void commonTranslationAndPlanarReflectionTransformNuclearDerivatives() {
+
+        Molecule water = water();
+        FermiNetV1State state = state(water);
+        QuantumCoordinates coordinates = coordinates();
+        double[] translation = {0.31, -0.27, 0.19};
+
+        FermiNetV1State translatedState = FermiNetStateAccess.withGeometry(
+                state, translate(water, translation));
+        QuantumCoordinates translatedCoordinates = translate(coordinates, translation);
+
+        var original = FermiNetStateAccess.nuclear(state, coordinates);
+        var translated = FermiNetStateAccess.nuclear(
+                translatedState, translatedCoordinates);
+        assertEquals(original.logAbsoluteWavefunction(),
+                translated.logAbsoluteWavefunction(), 1.0e-12);
+        assertArrayEquals(original.logNuclearGradient(),
+                translated.logNuclearGradient(), 1.0e-12);
+
+        FermiNetV1State planarState = planarReflectionSymmetricState(water);
+        var unreflected = FermiNetStateAccess.nuclear(planarState, coordinates);
+        var reflected = FermiNetStateAccess.nuclear(planarState, reflectZ(coordinates));
+        assertEquals(unreflected.logAbsoluteWavefunction(),
+                reflected.logAbsoluteWavefunction(), 2.0e-13);
+        for (int nucleus = 0; nucleus < water.nuclei().size(); nucleus++) {
+            assertEquals(unreflected.logNuclearGradient()[3 * nucleus],
+                    reflected.logNuclearGradient()[3 * nucleus], 2.0e-12);
+            assertEquals(unreflected.logNuclearGradient()[3 * nucleus + 1],
+                    reflected.logNuclearGradient()[3 * nucleus + 1], 2.0e-12);
+            assertEquals(-unreflected.logNuclearGradient()[3 * nucleus + 2],
+                    reflected.logNuclearGradient()[3 * nucleus + 2], 2.0e-12);
+        }
+    }
+
+    @Test
+    void displacedGeometryRejectsChangedMolecularTopology() {
+
+        Molecule water = water();
+        FermiNetV1State state = state(water);
+        List<NuclearCenter> nuclei = new ArrayList<>(water.nuclei());
+        NuclearCenter hydrogen = nuclei.get(1);
+        nuclei.set(1, new NuclearCenter(1, "He", new NuclearCharge(2),
+                hydrogen.position()));
+        Molecule incompatible = new Molecule(water.moleculeId(), nuclei,
+                new MolecularCharge(1), water.electrons(), water.spin());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> FermiNetStateAccess.withGeometry(state, incompatible));
+    }
 
     @Test
     void reducedNetworkCoordinateAndParameterDerivativesMatchFiniteDifferences() {
@@ -715,6 +862,199 @@ final class FermiNetV1StateTest {
 
         return new QuantumCoordinates(
                 particles);
+    }
+
+    private static FermiNetV1State state(
+            Molecule molecule) {
+
+        FermiNetV1Configuration configuration =
+                FermiNetV1Configuration.testFixture();
+
+        FermiNetParameterLayout layout =
+                new FermiNetParameterLayout(
+                        configuration,
+                        molecule);
+
+        return new FermiNetV1State(
+                molecule,
+                configuration,
+                FermiNetParameters.initialize(
+                        layout,
+                        44017L));
+    }
+
+    private static String parameterChecksum(
+            FermiNetV1State state) {
+
+        return FermiNetOptimizationCheckpoint.parameterChecksum(
+                FermiNetStateAccess.parameterSnapshot(state));
+    }
+
+    private static Molecule moveNucleus(
+            Molecule molecule,
+            int nucleus,
+            int axis,
+            double delta) {
+
+        List<NuclearCenter> nuclei =
+                new ArrayList<>(molecule.nuclei());
+
+        NuclearCenter old =
+                nuclei.get(nucleus);
+
+        CartesianPosition position =
+                old.position().inBohr();
+
+        double[] xyz = {
+                position.x(),
+                position.y(),
+                position.z()
+        };
+
+        xyz[axis] += delta;
+
+        nuclei.set(
+                nucleus,
+                new NuclearCenter(
+                        old.orderedIndex(),
+                        old.element(),
+                        old.charge(),
+                        new CartesianPosition(
+                                xyz[0],
+                                xyz[1],
+                                xyz[2],
+                                LengthUnit.BOHR)));
+
+        return new Molecule(
+                molecule.moleculeId(),
+                nuclei,
+                molecule.charge(),
+                molecule.electrons(),
+                molecule.spin());
+    }
+
+    private static Molecule translate(
+            Molecule molecule,
+            double[] translation) {
+
+        Molecule result =
+                molecule;
+
+        for (int nucleus = 0;
+             nucleus < molecule.nuclei().size();
+             nucleus++) {
+
+            for (int axis = 0;
+                 axis < 3;
+                 axis++) {
+
+                result =
+                        moveNucleus(
+                                result,
+                                nucleus,
+                                axis,
+                                translation[axis]);
+            }
+        }
+
+        return result;
+    }
+
+    private static QuantumCoordinates translate(
+            QuantumCoordinates coordinates,
+            double[] translation) {
+
+        List<QuantumCoordinates.ParticleCoordinate> particles =
+                new ArrayList<>();
+
+        for (var particle : coordinates.particles()) {
+            particles.add(new QuantumCoordinates.ParticleCoordinate(
+                    particle.particleIndex(),
+                    particle.xBohr() + translation[0],
+                    particle.yBohr() + translation[1],
+                    particle.zBohr() + translation[2],
+                    particle.spin()));
+        }
+
+        return new QuantumCoordinates(particles);
+    }
+
+    private static QuantumCoordinates reflectZ(
+            QuantumCoordinates coordinates) {
+
+        List<QuantumCoordinates.ParticleCoordinate> particles =
+                new ArrayList<>();
+
+        for (var particle : coordinates.particles()) {
+            particles.add(new QuantumCoordinates.ParticleCoordinate(
+                    particle.particleIndex(),
+                    particle.xBohr(),
+                    particle.yBohr(),
+                    -particle.zBohr(),
+                    particle.spin()));
+        }
+
+        return new QuantumCoordinates(particles);
+    }
+
+    private static FermiNetV1State planarReflectionSymmetricState(
+            Molecule molecule) {
+
+        FermiNetV1Configuration configuration =
+                FermiNetV1Configuration.testFixture();
+        FermiNetParameterLayout layout =
+                new FermiNetParameterLayout(configuration, molecule);
+        double[] parameters =
+                FermiNetParameters.initialize(layout, 44017L).toArray();
+
+        int oneInput = 4 * molecule.nuclei().size();
+        int twoInput = 4;
+        for (int layer = 0;
+             layer < configuration.interactionLayers();
+             layer++) {
+
+            FermiNetParameterLayout.Block one =
+                    layout.block("interaction." + layer + ".one.weight");
+            int aggregateInput = 3 * oneInput + 2 * twoInput;
+            for (int output = 0;
+                 output < configuration.oneElectronWidth();
+                 output++) {
+
+                int row = one.startInclusive() + output * aggregateInput;
+                if (layer == 0) {
+                    for (int stream = 0; stream < 3; stream++) {
+                        for (int nucleus = 0;
+                             nucleus < molecule.nuclei().size();
+                             nucleus++) {
+                            parameters[row + stream * oneInput
+                                    + 4 * nucleus + 3] = 0.0;
+                        }
+                    }
+                }
+                parameters[row + 3 * oneInput + 3] = 0.0;
+                parameters[row + 3 * oneInput + twoInput + 3] = 0.0;
+            }
+
+            boolean transformTwo =
+                    layer < configuration.interactionLayers() - 1
+                            || configuration.useLastLayer();
+            if (transformTwo) {
+                FermiNetParameterLayout.Block two =
+                        layout.block("interaction." + layer + ".two.weight");
+                for (int output = 0;
+                     output < configuration.twoElectronWidth();
+                     output++) {
+                    parameters[two.startInclusive() + output * twoInput + 3] = 0.0;
+                }
+                twoInput = configuration.twoElectronWidth();
+            }
+            oneInput = configuration.oneElectronWidth();
+        }
+
+        return new FermiNetV1State(
+                molecule,
+                configuration,
+                FermiNetParameters.fromArray(layout, parameters));
     }
 
     private static QuantumCoordinates coordinates() {

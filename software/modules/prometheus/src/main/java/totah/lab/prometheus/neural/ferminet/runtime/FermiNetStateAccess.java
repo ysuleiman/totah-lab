@@ -3,6 +3,7 @@ package totah.lab.prometheus.neural.ferminet.runtime;
 import java.util.List;
 import java.util.Objects;
 
+import totah.lab.prometheus.molecular.Molecule;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
 /** Narrow immutable bridge for persistence, pretraining, and diagnostics. */
@@ -20,6 +21,14 @@ public final class FermiNetStateAccess {
 
     public static double[] parameterSnapshot(FermiNetV1State state) {
         return Objects.requireNonNull(state, "state").parameterArray();
+    }
+
+    /** Returns an immutable geometry-displaced view with identical parameters. */
+    public static FermiNetV1State withGeometry(
+            FermiNetV1State state,
+            Molecule geometry) {
+        return Objects.requireNonNull(state, "state")
+                .withGeometry(Objects.requireNonNull(geometry, "geometry"));
     }
 
     public static SpatialSnapshot spatial(
@@ -40,6 +49,18 @@ public final class FermiNetStateAccess {
                 Objects.requireNonNull(state, "state").samplingEvaluation(coordinates);
         return new ValueSnapshot(
                 evaluation.sign(), evaluation.logAbsoluteWavefunction());
+    }
+
+    /** Nuclear-coordinate derivative at fixed electrons and fixed parameters. */
+    public static NuclearSnapshot nuclear(
+            FermiNetV1State state,
+            QuantumCoordinates coordinates) {
+        FermiNetV1State.NuclearEvaluation evaluation =
+                Objects.requireNonNull(state, "state")
+                        .nuclearEvaluation(coordinates);
+        return new NuclearSnapshot(
+                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
+                evaluation.logNuclearGradient());
     }
 
     /** Read-only orbital/determinant view used by HF pretraining qualification. */
@@ -97,6 +118,21 @@ public final class FermiNetStateAccess {
         @Override
         public double[] logCoordinateGradient() {
             return logCoordinateGradient.clone();
+        }
+    }
+
+    /** Canonical derivative order is nucleus-major, then x, y, z. */
+    public record NuclearSnapshot(
+            int sign,
+            double logAbsoluteWavefunction,
+            double[] logNuclearGradient) {
+        public NuclearSnapshot {
+            logNuclearGradient = logNuclearGradient.clone();
+        }
+
+        @Override
+        public double[] logNuclearGradient() {
+            return logNuclearGradient.clone();
         }
     }
 }
