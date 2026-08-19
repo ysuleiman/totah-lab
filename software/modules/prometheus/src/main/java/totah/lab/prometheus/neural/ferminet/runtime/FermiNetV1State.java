@@ -425,6 +425,38 @@ public final class FermiNetV1State {
                 output.logGradient());
     }
 
+    DirectionalEvaluation directionalEvaluation(
+            QuantumCoordinates coordinates,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
+        validate(coordinates);
+        Objects.requireNonNull(nuclearDirection, "nuclearDirection");
+        Objects.requireNonNull(electronDirection, "electronDirection");
+        int dimensions = 3 * molecule.electrons().value();
+        if (nuclearDirection.length != 3 * molecule.nuclei().size()
+                || electronDirection.length != dimensions
+                || Arrays.stream(nuclearDirection).anyMatch(x -> !Double.isFinite(x))
+                || Arrays.stream(electronDirection).anyMatch(x -> !Double.isFinite(x))) {
+            throw new IllegalArgumentException("invalid FermiNet coordinate direction");
+        }
+
+        Interaction interaction = interaction(
+                coordinates, dimensions, DerivativeDomain.DIRECTIONAL,
+                nuclearDirection, electronDirection);
+        Output output = output(
+                interaction.one(), coordinates, dimensions,
+                DerivativeDomain.DIRECTIONAL, nuclearDirection, electronDirection);
+        FermiNetSpatialJet wavefunction = output.wavefunction();
+        return new DirectionalEvaluation(
+                output.sign(), output.logAbsolute(),
+                wavefunction.directionalValue() / wavefunction.value(),
+                output.laplacianOverWavefunction(),
+                (wavefunction.directionalLaplacian() * wavefunction.value()
+                        - wavefunction.laplacian() * wavefunction.directionalValue())
+                        / (wavefunction.value() * wavefunction.value()));
+    }
+
     /**
      * Package-private diagnostic snapshot used exclusively by reference-parity
      * tests.
@@ -869,11 +901,23 @@ public final class FermiNetV1State {
             int dimensions,
             DerivativeDomain derivativeDomain) {
 
+        return interaction(coordinates, dimensions, derivativeDomain, null, null);
+    }
+
+    private Interaction interaction(
+            QuantumCoordinates coordinates,
+            int dimensions,
+            DerivativeDomain derivativeDomain,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
         Inputs input =
                 inputs(
                         coordinates,
                         dimensions,
-                        derivativeDomain);
+                        derivativeDomain,
+                        nuclearDirection,
+                        electronDirection);
 
         FermiNetSpatialJet[][] one =
                 input.one();
@@ -1194,6 +1238,16 @@ public final class FermiNetV1State {
             int dimensions,
             DerivativeDomain derivativeDomain) {
 
+        return inputs(coordinates, dimensions, derivativeDomain, null, null);
+    }
+
+    private Inputs inputs(
+            QuantumCoordinates coordinates,
+            int dimensions,
+            DerivativeDomain derivativeDomain,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
         int n =
                 coordinates.particles().size();
 
@@ -1218,7 +1272,11 @@ public final class FermiNetV1State {
                     coordinates.particles().get(i);
 
             xyz[i][0] =
-                    derivativeDomain == DerivativeDomain.ELECTRON
+                    derivativeDomain == DerivativeDomain.DIRECTIONAL
+                            ? FermiNetSpatialJet.directionalVariable(
+                                    particle.xBohr(), dimensions, 3 * i,
+                                    electronDirection[3 * i])
+                            : derivativeDomain == DerivativeDomain.ELECTRON
                             ? FermiNetSpatialJet.variable(
                                     particle.xBohr(),
                                     dimensions,
@@ -1228,7 +1286,11 @@ public final class FermiNetV1State {
                                     dimensions);
 
             xyz[i][1] =
-                    derivativeDomain == DerivativeDomain.ELECTRON
+                    derivativeDomain == DerivativeDomain.DIRECTIONAL
+                            ? FermiNetSpatialJet.directionalVariable(
+                                    particle.yBohr(), dimensions, 3 * i + 1,
+                                    electronDirection[3 * i + 1])
+                            : derivativeDomain == DerivativeDomain.ELECTRON
                             ? FermiNetSpatialJet.variable(
                                     particle.yBohr(),
                                     dimensions,
@@ -1238,7 +1300,11 @@ public final class FermiNetV1State {
                                     dimensions);
 
             xyz[i][2] =
-                    derivativeDomain == DerivativeDomain.ELECTRON
+                    derivativeDomain == DerivativeDomain.DIRECTIONAL
+                            ? FermiNetSpatialJet.directionalVariable(
+                                    particle.zBohr(), dimensions, 3 * i + 2,
+                                    electronDirection[3 * i + 2])
+                            : derivativeDomain == DerivativeDomain.ELECTRON
                             ? FermiNetSpatialJet.variable(
                                     particle.zBohr(),
                                     dimensions,
@@ -1258,7 +1324,10 @@ public final class FermiNetV1State {
                                 .inBohr();
 
                 FermiNetSpatialJet nucleusX =
-                        derivativeDomain == DerivativeDomain.NUCLEAR
+                        derivativeDomain == DerivativeDomain.DIRECTIONAL
+                                ? FermiNetSpatialJet.directionalConstant(
+                                        nucleus.x(), dimensions, nuclearDirection[3 * a])
+                                : derivativeDomain == DerivativeDomain.NUCLEAR
                                 ? FermiNetSpatialJet.variable(
                                         nucleus.x(),
                                         dimensions,
@@ -1268,7 +1337,10 @@ public final class FermiNetV1State {
                                         dimensions);
 
                 FermiNetSpatialJet nucleusY =
-                        derivativeDomain == DerivativeDomain.NUCLEAR
+                        derivativeDomain == DerivativeDomain.DIRECTIONAL
+                                ? FermiNetSpatialJet.directionalConstant(
+                                        nucleus.y(), dimensions, nuclearDirection[3 * a + 1])
+                                : derivativeDomain == DerivativeDomain.NUCLEAR
                                 ? FermiNetSpatialJet.variable(
                                         nucleus.y(),
                                         dimensions,
@@ -1278,7 +1350,10 @@ public final class FermiNetV1State {
                                         dimensions);
 
                 FermiNetSpatialJet nucleusZ =
-                        derivativeDomain == DerivativeDomain.NUCLEAR
+                        derivativeDomain == DerivativeDomain.DIRECTIONAL
+                                ? FermiNetSpatialJet.directionalConstant(
+                                        nucleus.z(), dimensions, nuclearDirection[3 * a + 2])
+                                : derivativeDomain == DerivativeDomain.NUCLEAR
                                 ? FermiNetSpatialJet.variable(
                                         nucleus.z(),
                                         dimensions,
@@ -1866,6 +1941,19 @@ public final class FermiNetV1State {
             int dimensions,
             DerivativeDomain derivativeDomain) {
 
+        return denseOrbitalMatrix(one, coordinates, determinant, dimensions,
+                derivativeDomain, null, null);
+    }
+
+    private DenseOrbitalMatrix denseOrbitalMatrix(
+            FermiNetSpatialJet[][] one,
+            QuantumCoordinates coordinates,
+            int determinant,
+            int dimensions,
+            DerivativeDomain derivativeDomain,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
         int n =
                 molecule.electrons()
                         .value();
@@ -1991,7 +2079,9 @@ public final class FermiNetV1State {
                                     i,
                                     a,
                                     dimensions,
-                                    derivativeDomain);
+                                    derivativeDomain,
+                                    nuclearDirection,
+                                    electronDirection);
 
                     int index =
                             head
@@ -2052,6 +2142,17 @@ public final class FermiNetV1State {
             int dimensions,
             DerivativeDomain derivativeDomain) {
 
+        return output(one, coordinates, dimensions, derivativeDomain, null, null);
+    }
+
+    private Output output(
+            FermiNetSpatialJet[][] one,
+            QuantumCoordinates coordinates,
+            int dimensions,
+            DerivativeDomain derivativeDomain,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
         int determinants =
                 configuration.determinants();
 
@@ -2072,7 +2173,9 @@ public final class FermiNetV1State {
                             coordinates,
                             d,
                             dimensions,
-                            derivativeDomain);
+                            derivativeDomain,
+                            nuclearDirection,
+                            electronDirection);
 
             FermiNetSpatialJet det =
                     determinant(
@@ -2177,7 +2280,8 @@ public final class FermiNetV1State {
                 scaled.laplacian()
                         / scaled.value(),
                 data,
-                mixture);
+                mixture,
+                scaled);
     }
 
     /*
@@ -3103,6 +3207,19 @@ public final class FermiNetV1State {
             int dimensions,
             DerivativeDomain derivativeDomain) {
 
+        return electronNuclearDistance(coordinates, electron, nucleus, dimensions,
+                derivativeDomain, null, null);
+    }
+
+    private FermiNetSpatialJet electronNuclearDistance(
+            QuantumCoordinates coordinates,
+            int electron,
+            int nucleus,
+            int dimensions,
+            DerivativeDomain derivativeDomain,
+            double[] nuclearDirection,
+            double[] electronDirection) {
+
         var e =
                 coordinates.particles()
                         .get(electron);
@@ -3114,42 +3231,63 @@ public final class FermiNetV1State {
                         .inBohr();
 
         FermiNetSpatialJet electronX =
-                derivativeDomain == DerivativeDomain.ELECTRON
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalVariable(
+                                e.xBohr(), dimensions, 3 * electron,
+                                electronDirection[3 * electron])
+                        : derivativeDomain == DerivativeDomain.ELECTRON
                         ? FermiNetSpatialJet.variable(
                                 e.xBohr(), dimensions, 3 * electron)
                         : FermiNetSpatialJet.constant(
                                 e.xBohr(), dimensions);
 
         FermiNetSpatialJet electronY =
-                derivativeDomain == DerivativeDomain.ELECTRON
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalVariable(
+                                e.yBohr(), dimensions, 3 * electron + 1,
+                                electronDirection[3 * electron + 1])
+                        : derivativeDomain == DerivativeDomain.ELECTRON
                         ? FermiNetSpatialJet.variable(
                                 e.yBohr(), dimensions, 3 * electron + 1)
                         : FermiNetSpatialJet.constant(
                                 e.yBohr(), dimensions);
 
         FermiNetSpatialJet electronZ =
-                derivativeDomain == DerivativeDomain.ELECTRON
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalVariable(
+                                e.zBohr(), dimensions, 3 * electron + 2,
+                                electronDirection[3 * electron + 2])
+                        : derivativeDomain == DerivativeDomain.ELECTRON
                         ? FermiNetSpatialJet.variable(
                                 e.zBohr(), dimensions, 3 * electron + 2)
                         : FermiNetSpatialJet.constant(
                                 e.zBohr(), dimensions);
 
         FermiNetSpatialJet nucleusX =
-                derivativeDomain == DerivativeDomain.NUCLEAR
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalConstant(
+                                n.x(), dimensions, nuclearDirection[3 * nucleus])
+                        : derivativeDomain == DerivativeDomain.NUCLEAR
                         ? FermiNetSpatialJet.variable(
                                 n.x(), dimensions, 3 * nucleus)
                         : FermiNetSpatialJet.constant(
                                 n.x(), dimensions);
 
         FermiNetSpatialJet nucleusY =
-                derivativeDomain == DerivativeDomain.NUCLEAR
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalConstant(
+                                n.y(), dimensions, nuclearDirection[3 * nucleus + 1])
+                        : derivativeDomain == DerivativeDomain.NUCLEAR
                         ? FermiNetSpatialJet.variable(
                                 n.y(), dimensions, 3 * nucleus + 1)
                         : FermiNetSpatialJet.constant(
                                 n.y(), dimensions);
 
         FermiNetSpatialJet nucleusZ =
-                derivativeDomain == DerivativeDomain.NUCLEAR
+                derivativeDomain == DerivativeDomain.DIRECTIONAL
+                        ? FermiNetSpatialJet.directionalConstant(
+                                n.z(), dimensions, nuclearDirection[3 * nucleus + 2])
+                        : derivativeDomain == DerivativeDomain.NUCLEAR
                         ? FermiNetSpatialJet.variable(
                                 n.z(), dimensions, 3 * nucleus + 2)
                         : FermiNetSpatialJet.constant(
@@ -3809,6 +3947,25 @@ public final class FermiNetV1State {
         }
     }
 
+    record DirectionalEvaluation(
+            int sign,
+            double logAbsoluteWavefunction,
+            double directionalLogAbsoluteWavefunction,
+            double laplacianOverWavefunction,
+            double directionalLaplacianOverWavefunction) {
+
+        DirectionalEvaluation {
+            if ((sign != 1 && sign != -1)
+                    || !Double.isFinite(logAbsoluteWavefunction)
+                    || !Double.isFinite(directionalLogAbsoluteWavefunction)
+                    || !Double.isFinite(laplacianOverWavefunction)
+                    || !Double.isFinite(directionalLaplacianOverWavefunction)) {
+                throw new IllegalArgumentException(
+                        "non-finite FermiNet directional evaluation");
+            }
+        }
+    }
+
     record StructuredSrEvaluation(
             int sign,
             double logAbsoluteWavefunction,
@@ -4047,11 +4204,13 @@ public final class FermiNetV1State {
             double[] logGradient,
             double laplacianOverWavefunction,
             DeterminantData[] data,
-            double[] mixture) {}
+            double[] mixture,
+            FermiNetSpatialJet wavefunction) {}
 
     private enum DerivativeDomain {
         ELECTRON,
-        NUCLEAR
+        NUCLEAR,
+        DIRECTIONAL
     }
 
     // Add inside FermiNetV1State.java, alongside spatialEvaluation(...).

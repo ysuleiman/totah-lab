@@ -63,6 +63,29 @@ public final class FermiNetStateAccess {
                 evaluation.logNuclearGradient());
     }
 
+    /**
+     * Exact directional derivative with fixed neural parameters. Electron
+     * coordinates remain the spatial differentiation variables used by the
+     * Laplacian; nuclear coordinates contribute only through the supplied
+     * direction.
+     */
+    public static DirectionalSnapshot directional(
+            FermiNetV1State state,
+            QuantumCoordinates coordinates,
+            NuclearDirection nuclearDirection,
+            ElectronDirection electronDirection) {
+        Objects.requireNonNull(nuclearDirection, "nuclearDirection");
+        Objects.requireNonNull(electronDirection, "electronDirection");
+        FermiNetV1State.DirectionalEvaluation evaluation =
+                Objects.requireNonNull(state, "state").directionalEvaluation(
+                        coordinates, nuclearDirection.values(), electronDirection.values());
+        return new DirectionalSnapshot(
+                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
+                evaluation.directionalLogAbsoluteWavefunction(),
+                evaluation.laplacianOverWavefunction(),
+                evaluation.directionalLaplacianOverWavefunction());
+    }
+
     /** Read-only orbital/determinant view used by HF pretraining qualification. */
     public static OrbitalSnapshot orbitals(
             FermiNetV1State state,
@@ -135,4 +158,23 @@ public final class FermiNetStateAccess {
             return logNuclearGradient.clone();
         }
     }
+
+    /** Canonical order is nucleus-major, then x, y, z. */
+    public record NuclearDirection(double[] values) {
+        public NuclearDirection { values = values.clone(); }
+        @Override public double[] values() { return values.clone(); }
+    }
+
+    /** Canonical order is electron-major, then x, y, z. */
+    public record ElectronDirection(double[] values) {
+        public ElectronDirection { values = values.clone(); }
+        @Override public double[] values() { return values.clone(); }
+    }
+
+    public record DirectionalSnapshot(
+            int sign,
+            double logAbsoluteWavefunction,
+            double directionalLogAbsoluteWavefunction,
+            double laplacianOverWavefunction,
+            double directionalLaplacianOverWavefunction) {}
 }

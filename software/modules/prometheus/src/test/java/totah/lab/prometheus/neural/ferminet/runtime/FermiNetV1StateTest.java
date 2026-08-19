@@ -138,6 +138,76 @@ final class FermiNetV1StateTest {
     }
 
     @Test
+    void directionalLogAndLaplacianMatchCentralDifferences() {
+        Molecule molecule = water();
+        FermiNetV1State state = state(molecule);
+        List<QuantumCoordinates> configurations = List.of(
+                coordinates(),
+                move(coordinates(), 2, 0.031),
+                move(move(coordinates(), 12, -0.027), 25, 0.019));
+        double[][] nuclearDirections = {
+                {0.13, -0.07, 0.03, -0.05, 0.11, -0.02, 0.04, -0.09, 0.06},
+                new double[9],
+                {0.08, 0.02, -0.04, -0.03, 0.07, 0.01, -0.05, -0.02, 0.03}
+        };
+        double[][] electronDirections = {
+                new double[30],
+                deterministicDirection(30, 0.017),
+                deterministicDirection(30, -0.011)
+        };
+        double h = 2.0e-5;
+        double maximumLogAbsoluteError = 0.0;
+        double maximumLogRelativeError = 0.0;
+        double maximumLaplacianAbsoluteError = 0.0;
+        double maximumLaplacianRelativeError = 0.0;
+
+        for (QuantumCoordinates coordinates : configurations) {
+            for (int direction = 0; direction < nuclearDirections.length; direction++) {
+                double[] nuclear = nuclearDirections[direction];
+                double[] electron = electronDirections[direction];
+                var actual = FermiNetStateAccess.directional(
+                        state, coordinates,
+                        new FermiNetStateAccess.NuclearDirection(nuclear),
+                        new FermiNetStateAccess.ElectronDirection(electron));
+                FermiNetV1State plusState = FermiNetStateAccess.withGeometry(
+                        state, moveNuclei(molecule, nuclear, h));
+                FermiNetV1State minusState = FermiNetStateAccess.withGeometry(
+                        state, moveNuclei(molecule, nuclear, -h));
+                QuantumCoordinates plusCoordinates = moveElectrons(coordinates, electron, h);
+                QuantumCoordinates minusCoordinates = moveElectrons(coordinates, electron, -h);
+                var plus = FermiNetStateAccess.spatial(plusState, plusCoordinates);
+                var minus = FermiNetStateAccess.spatial(minusState, minusCoordinates);
+                double expectedLog = (plus.logAbsoluteWavefunction()
+                        - minus.logAbsoluteWavefunction()) / (2.0 * h);
+                double expectedLaplacian = (plus.laplacianOverWavefunction()
+                        - minus.laplacianOverWavefunction()) / (2.0 * h);
+                double logError = Math.abs(actual.directionalLogAbsoluteWavefunction()
+                        - expectedLog);
+                double laplacianError = Math.abs(actual.directionalLaplacianOverWavefunction()
+                        - expectedLaplacian);
+                maximumLogAbsoluteError = Math.max(maximumLogAbsoluteError, logError);
+                maximumLogRelativeError = Math.max(maximumLogRelativeError,
+                        relativeError(logError, expectedLog));
+                maximumLaplacianAbsoluteError = Math.max(
+                        maximumLaplacianAbsoluteError, laplacianError);
+                maximumLaplacianRelativeError = Math.max(
+                        maximumLaplacianRelativeError,
+                        relativeError(laplacianError, expectedLaplacian));
+                assertEquals(expectedLog, actual.directionalLogAbsoluteWavefunction(), 2.0e-7);
+                assertEquals(expectedLaplacian,
+                        actual.directionalLaplacianOverWavefunction(), 2.0e-5);
+            }
+        }
+        System.out.printf(java.util.Locale.ROOT,
+                "FERMINET_DIRECTIONAL_LOG_MAX_ABS_ERROR=%.16e%n"
+                        + "FERMINET_DIRECTIONAL_LOG_MAX_REL_ERROR=%.16e%n"
+                        + "FERMINET_DIRECTIONAL_LAPLACIAN_MAX_ABS_ERROR=%.16e%n"
+                        + "FERMINET_DIRECTIONAL_LAPLACIAN_MAX_REL_ERROR=%.16e%n",
+                maximumLogAbsoluteError, maximumLogRelativeError,
+                maximumLaplacianAbsoluteError, maximumLaplacianRelativeError);
+    }
+
+    @Test
     void commonTranslationAndPlanarReflectionTransformNuclearDerivatives() {
 
         Molecule water = water();
@@ -931,6 +1001,37 @@ final class FermiNetV1StateTest {
                 molecule.charge(),
                 molecule.electrons(),
                 molecule.spin());
+    }
+
+    private static Molecule moveNuclei(
+            Molecule molecule, double[] direction, double scale) {
+        Molecule result = molecule;
+        for (int component = 0; component < direction.length; component++) {
+            result = moveNucleus(result, component / 3, component % 3,
+                    scale * direction[component]);
+        }
+        return result;
+    }
+
+    private static QuantumCoordinates moveElectrons(
+            QuantumCoordinates coordinates, double[] direction, double scale) {
+        QuantumCoordinates result = coordinates;
+        for (int component = 0; component < direction.length; component++) {
+            result = move(result, component, scale * direction[component]);
+        }
+        return result;
+    }
+
+    private static double[] deterministicDirection(int length, double scale) {
+        double[] result = new double[length];
+        for (int i = 0; i < length; i++) {
+            result[i] = scale * ((i % 7) - 3);
+        }
+        return result;
+    }
+
+    private static double relativeError(double absoluteError, double expected) {
+        return absoluteError / Math.max(1.0e-12, Math.abs(expected));
     }
 
     private static Molecule translate(
