@@ -15,7 +15,9 @@ public final class FermiNetNuclearForcePipeline {
                 NuclearForceEstimatorType.SWCT,
                 new SwctFermiNetForceEstimator(),
                 NuclearForceEstimatorType.AC_ZV,
-                new AcZvFermiNetForceEstimator()));
+                new AcZvFermiNetForceEstimator(),
+                NuclearForceEstimatorType.AC_ZVZB,
+                new AcZvzbFermiNetForceEstimator()));
     }
 
     FermiNetNuclearForcePipeline(

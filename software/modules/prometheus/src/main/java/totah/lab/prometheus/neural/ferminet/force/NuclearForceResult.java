@@ -62,7 +62,7 @@ public record NuclearForceResult(
             double percentileNinetyNinePointNine, double maximum,
             long beyondFiveSigma, long beyondTenSigma) {}
 
-    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics, AcZvDiagnostics {}
+    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics, AcZvDiagnostics, AcZvzbDiagnostics {}
 
     public record CorrelatedFdDiagnostics(
             double deltaBohr,
@@ -117,6 +117,45 @@ public record NuclearForceResult(
             double meanDifferenceVsCorrelatedFdHartreePerBohr,
             double differenceCombinedUncertainty,
             double differenceOverCombinedUncertainty) {}
+
+    /**
+     * AC-ZVZB decomposition and FD/SWCT/AC-ZV comparison evidence. The ZV
+     * part is nn + contraction; the ZB term is the density-response
+     * correction mean[2(E_v - E_L) Q]. All comparisons are diagnostic only;
+     * no acceptance thresholds are applied anywhere.
+     */
+    public record AcZvzbDiagnostics(
+            String estimatorFormulation,
+            String auxiliaryEquation,
+            double sampledMeanEnergyHartree,
+            List<AcZvzbComponentDiagnostics> components)
+            implements EstimatorDiagnostics {
+        public AcZvzbDiagnostics {
+            Objects.requireNonNull(estimatorFormulation, "estimatorFormulation");
+            Objects.requireNonNull(auxiliaryEquation, "auxiliaryEquation");
+            components = List.copyOf(components);
+        }
+    }
+
+    public record AcZvzbComponentDiagnostics(
+            int nucleus,
+            int axis,
+            double nuclearRepulsionTermHartreePerBohr,
+            double meanContractionTermHartreePerBohr,
+            double meanAuxiliaryQ,
+            double meanZeroBiasTermHartreePerBohr,
+            double correlatedFdMeanHartreePerBohr,
+            double correlatedFdChainStandardError,
+            double correlatedFdVariance,
+            double varianceReductionFactorVsCorrelatedFd,
+            double swctMeanHartreePerBohr,
+            double swctChainStandardError,
+            double swctVariance,
+            double varianceReductionFactorVsSwct,
+            double acZvMeanHartreePerBohr,
+            double acZvChainStandardError,
+            double acZvVariance,
+            double varianceReductionFactorVsAcZv) {}
 
     public record SwctComponentDiagnostics(
             int nucleus,
