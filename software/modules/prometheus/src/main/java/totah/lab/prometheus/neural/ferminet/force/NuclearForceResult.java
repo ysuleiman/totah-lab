@@ -62,7 +62,7 @@ public record NuclearForceResult(
             double percentileNinetyNinePointNine, double maximum,
             long beyondFiveSigma, long beyondTenSigma) {}
 
-    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics {}
+    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics {}
 
     public record CorrelatedFdDiagnostics(
             double deltaBohr,
@@ -70,6 +70,37 @@ public record NuclearForceResult(
             implements EstimatorDiagnostics {
         public CorrelatedFdDiagnostics { components = List.copyOf(components); }
     }
+
+    /**
+     * SWCT decomposition and correlated-FD comparison evidence. The
+     * comparison is diagnostic only: correlated FD is statistically noisy,
+     * so an indistinguishable difference of means is not evidence that SWCT
+     * is unbiased. No acceptance thresholds are applied anywhere.
+     */
+    public record SwctDiagnostics(
+            double meanLocalEnergyHartree,
+            List<SwctComponentDiagnostics> components)
+            implements EstimatorDiagnostics {
+        public SwctDiagnostics { components = List.copyOf(components); }
+    }
+
+    public record SwctComponentDiagnostics(
+            int nucleus,
+            int axis,
+            double meanDirectForceTermHartreePerBohr,
+            double meanKineticDirectionalDerivativePerBohr,
+            double meanCoulombDirectionalDerivativePerBohr,
+            double meanCovariancePulayTermHartreePerBohr,
+            double meanWavefunctionLogTermHartreePerBohr,
+            double meanJacobianDivergenceTermHartreePerBohr,
+            double meanDirectionalLogDerivativePerBohr,
+            double correlatedFdMeanHartreePerBohr,
+            double correlatedFdChainStandardError,
+            double correlatedFdVariance,
+            double varianceReductionFactor,
+            double meanDifferenceHartreePerBohr,
+            double differenceCombinedUncertainty,
+            double differenceOverCombinedUncertainty) {}
 
     public record ComponentDiagnostics(
             int nucleus,

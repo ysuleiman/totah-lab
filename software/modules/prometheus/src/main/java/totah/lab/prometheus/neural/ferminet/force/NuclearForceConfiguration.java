@@ -29,6 +29,12 @@ public record NuclearForceConfiguration(
                 new CorrelatedFdConfiguration(deltaBohr));
     }
 
+    /** SWCT has no numerical knobs: the derivation is fully analytic. */
+    public static NuclearForceConfiguration swct() {
+        return new NuclearForceConfiguration(
+                NuclearForceEstimatorType.SWCT, null);
+    }
+
     public static NuclearForceConfiguration unsupported(
             NuclearForceEstimatorType type) {
         if (type == NuclearForceEstimatorType.CORRELATED_FD) {

@@ -76,6 +76,7 @@ public final class FermiNetH2oForceQualificationDriver {
         NuclearForceConfiguration configuration = switch (arguments.estimator()) {
             case CORRELATED_FD -> NuclearForceConfiguration.correlatedFd(
                     FermiNetCorrelatedFiniteDifferenceForceReference.STEP_BOHR);
+            case SWCT -> NuclearForceConfiguration.swct();
             default -> NuclearForceConfiguration.unsupported(arguments.estimator());
         };
         var result = new FermiNetNuclearForcePipeline().estimate(context, configuration);
