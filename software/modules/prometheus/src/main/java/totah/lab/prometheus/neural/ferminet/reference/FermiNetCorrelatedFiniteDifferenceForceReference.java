@@ -32,7 +32,7 @@ public final class FermiNetCorrelatedFiniteDifferenceForceReference {
         String parameterChecksum =
                 FermiNetPretrainingQualification.parameterChecksum(center);
         int componentCount = 3 * center.molecule().nuclei().size();
-        ComponentWork[] work = new ComponentWork[componentCount];
+        List<ComponentResult> results = new ArrayList<>(componentCount);
         for (int component = 0; component < componentCount; component++) {
             int nucleus = component / 3;
             int axis = component % 3;
@@ -43,53 +43,48 @@ public final class FermiNetCorrelatedFiniteDifferenceForceReference {
             verifyParameters(parameterChecksum, plus, minus);
             verifyDisplacement(center.molecule(), plus.molecule(), nucleus, axis, STEP_BOHR);
             verifyDisplacement(center.molecule(), minus.molecule(), nucleus, axis, -STEP_BOHR);
-            work[component] = new ComponentWork(
+            ComponentWork work = new ComponentWork(
                     nucleus, axis, plus, minus, dataset.sampleCount(), walkerCount);
-        }
 
-        // Pass one: log-sum-exp weight normalization. No spatial jets are created.
-        FermiNetCorrelatedFdConfigurationFile.forEach(
-                configurationFile, walkerCount, (sample, chain, retained, coordinates) -> {
-                    double centerLog = FermiNetStateAccess.sampling(center, coordinates)
-                            .logAbsoluteWavefunction();
-                    for (ComponentWork component : work) {
+            // Pass one: log-sum-exp normalization for this component.
+            FermiNetCorrelatedFdConfigurationFile.forEach(
+                    configurationFile, walkerCount, (sample, chain, retained, coordinates) -> {
+                        double centerLog = FermiNetStateAccess.sampling(center, coordinates)
+                                .logAbsoluteWavefunction();
                         double plusLog = FermiNetStateAccess.sampling(
-                                component.plus, coordinates).logAbsoluteWavefunction();
+                                work.plus, coordinates).logAbsoluteWavefunction();
                         double minusLog = FermiNetStateAccess.sampling(
-                                component.minus, coordinates).logAbsoluteWavefunction();
-                        component.plusWeights.add(2.0 * (plusLog - centerLog));
-                        component.minusWeights.add(2.0 * (minusLog - centerLog));
-                    }
-                });
+                                work.minus, coordinates).logAbsoluteWavefunction();
+                        work.plusWeights.add(2.0 * (plusLog - centerLog));
+                        work.minusWeights.add(2.0 * (minusLog - centerLog));
+                    });
 
-        // Pass two: one +/- spatial pair at a time; only scalar accumulators survive.
-        FermiNetCorrelatedFdConfigurationFile.forEach(
-                configurationFile, walkerCount, (sample, chain, retained, coordinates) -> {
-                    double centerLog = FermiNetStateAccess.sampling(center, coordinates)
-                            .logAbsoluteWavefunction();
-                    for (ComponentWork component : work) {
-                        var plus = FermiNetRuntimeSampling.localEnergyWithLog(
-                                component.plus, coordinates);
-                        var minus = FermiNetRuntimeSampling.localEnergyWithLog(
-                                component.minus, coordinates);
-                        double plusWeight = component.plusWeights.normalizedToMean(
-                                2.0 * (plus.logAbsoluteWavefunction() - centerLog));
-                        double minusWeight = component.minusWeights.normalizedToMean(
-                                2.0 * (minus.logAbsoluteWavefunction() - centerLog));
+            // Pass two: one spatial +/- pair survives at a time.
+            FermiNetCorrelatedFdConfigurationFile.forEach(
+                    configurationFile, walkerCount, (sample, chain, retained, coordinates) -> {
+                        double centerLog = FermiNetStateAccess.sampling(center, coordinates)
+                                .logAbsoluteWavefunction();
+                        var plusValue = FermiNetRuntimeSampling.localEnergyWithLog(
+                                work.plus, coordinates);
+                        var minusValue = FermiNetRuntimeSampling.localEnergyWithLog(
+                                work.minus, coordinates);
+                        double plusWeight = work.plusWeights.normalizedToMean(
+                                2.0 * (plusValue.logAbsoluteWavefunction() - centerLog));
+                        double minusWeight = work.minusWeights.normalizedToMean(
+                                2.0 * (minusValue.logAbsoluteWavefunction() - centerLog));
                         double plusContribution = plusWeight
-                                * plus.localEnergy().totalHartree();
+                                * plusValue.localEnergy().totalHartree();
                         double minusContribution = minusWeight
-                                * minus.localEnergy().totalHartree();
+                                * minusValue.localEnergy().totalHartree();
                         double force = -(plusContribution - minusContribution)
                                 / (2.0 * STEP_BOHR);
-                        component.add(sample, chain, plusContribution,
-                                minusContribution, force);
-                    }
-                });
-
-        List<ComponentResult> results = new ArrayList<>(componentCount);
-        for (ComponentWork component : work) {
-            results.add(component.finish(parameterChecksum));
+                        work.add(sample, chain, plusContribution, minusContribution, force);
+                        System.gc();
+                    });
+            results.add(work.finish(parameterChecksum));
+            System.out.printf("FERMINET_CORRELATED_FD_COMPONENT=%d/%d%n",
+                    component + 1, componentCount);
+            System.gc();
         }
         return new Result(
                 STEP_BOHR, parameterChecksum,

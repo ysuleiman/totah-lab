@@ -11,6 +11,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -86,8 +87,18 @@ public final class FermiNetH2oCorrelatedFiniteDifferenceForceDriver {
             try (FermiNetRuntimeSampling.Session session =
                          FermiNetRuntimeSampling.resumeSession(
                                  state, request, checkpoint, VMC_PARALLELISM)) {
-                continuation = session.sampleCoordinates(
-                        state, 0, RETAINED_PER_WALKER, 10);
+                List<totah.lab.prometheus.variational.QuantumCoordinates> samples =
+                        new ArrayList<>(WALKERS * RETAINED_PER_WALKER);
+                long proposed = 0L, accepted = 0L;
+                for (int retained = 0; retained < RETAINED_PER_WALKER; retained++) {
+                    var segment = session.sampleCoordinates(state, 0, 1, 10);
+                    samples.addAll(segment.samples());
+                    proposed += segment.proposed();
+                    accepted += segment.accepted();
+                    System.gc();
+                }
+                continuation = new FermiNetRuntimeSampling.CoordinateContinuation(
+                        samples, (double) accepted / proposed, proposed, accepted);
             }
             dataset = FermiNetCorrelatedFdConfigurationFile.write(
                     configurationFile, continuation.samples(), WALKERS);

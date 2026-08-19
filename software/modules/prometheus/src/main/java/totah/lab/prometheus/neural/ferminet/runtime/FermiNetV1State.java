@@ -63,6 +63,15 @@ public final class FermiNetV1State {
             FermiNetV1Configuration configuration,
             double[] parameters) {
 
+        this(molecule, configuration, parameters, true);
+    }
+
+    private FermiNetV1State(
+            Molecule molecule,
+            FermiNetV1Configuration configuration,
+            double[] parameters,
+            boolean copyParameters) {
+
         this.molecule =
                 Objects.requireNonNull(
                         molecule,
@@ -103,11 +112,9 @@ public final class FermiNetV1State {
                         configuration,
                         molecule);
 
-        this.parameters =
-                Objects.requireNonNull(
-                                parameters,
-                                "parameters")
-                        .clone();
+        this.parameters = copyParameters
+                ? Objects.requireNonNull(parameters, "parameters").clone()
+                : Objects.requireNonNull(parameters, "parameters");
 
         if (parameters.length
                 != layout.parameterCount()
@@ -178,7 +185,8 @@ public final class FermiNetV1State {
         return new FermiNetV1State(
                 geometry,
                 configuration,
-                parameters);
+                parameters,
+                false);
     }
 
     private void requireCompatibleGeometry(
