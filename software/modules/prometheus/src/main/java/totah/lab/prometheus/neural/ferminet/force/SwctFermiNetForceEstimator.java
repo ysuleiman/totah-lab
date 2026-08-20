@@ -11,10 +11,15 @@ import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import totah.lab.prometheus.molecular.Molecule;
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFdConfigurationFile;
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDifferenceForceReference;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetRuntimeSampling;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetStateAccess;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
 import totah.lab.prometheus.variational.QuantumCoordinates;
@@ -74,7 +79,8 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
     @Override
     public NuclearForceResult estimate(
             FermiNetForceEvaluationContext context,
-            NuclearForceConfiguration configuration) throws IOException {
+            NuclearForceConfiguration configuration,
+            FermiNetDerivativeEngine derivativeEngine) throws IOException {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(configuration, "configuration");
         if (configuration.estimatorType() != NuclearForceEstimatorType.SWCT) {
@@ -99,47 +105,49 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         double[][] jacobianHalfDivergence = new double[components][samples];
         boolean[][] finite = new boolean[components][samples];
 
+        SampleInput[] inputs = new SampleInput[samples];
         FermiNetCorrelatedFdConfigurationFile.forEach(
                 context.configurationFile(), walkers,
-                (sample, chain, retained, coordinates) -> {
-            chains[sample] = chain;
-            double localEnergy;
-            try {
-                localEnergy = FermiNetRuntimeSampling.localEnergyWithLog(
-                        state, coordinates).localEnergy().totalHartree();
-            } catch (RuntimeException exception) {
-                localEnergy = Double.NaN;
+                (sample, chain, retained, coordinates) ->
+                        inputs[sample] = new SampleInput(
+                                sample, chain, retained, coordinates));
+        List<FermiNetStateAccess.NuclearDirection> nuclearDirections =
+                nuclearDirections(molecule.nuclei().size());
+        int parallelism = derivativeEngine.sampleParallelism();
+        if (parallelism == 1) {
+            for (SampleInput input : inputs) {
+                evaluateSample(state, molecule, derivativeEngine,
+                        nuclearDirections, input, chains, localEnergies,
+                        kineticDirectional, coulombDirectional,
+                        wavefunctionLog, jacobianHalfDivergence, finite);
             }
-            localEnergies[sample] = localEnergy;
-            GeneralMolecularSpaceWarp.Weight[][] weights = null;
+        } else {
+            ExecutorService executor = Executors.newFixedThreadPool(parallelism);
             try {
-                weights = warpWeights(molecule, coordinates);
-            } catch (RuntimeException exception) {
-                // Recorded as non-finite below; never recomputed numerically.
-            }
-            for (int nucleus = 0; nucleus < molecule.nuclei().size(); nucleus++) {
-                for (int axis = 0; axis < 3; axis++) {
-                    int component = 3 * nucleus + axis;
-                    if (!Double.isFinite(localEnergy) || weights == null) {
-                        markNonfinite(kineticDirectional, coulombDirectional,
-                                wavefunctionLog, jacobianHalfDivergence, finite,
-                                component, sample);
-                        continue;
-                    }
+                List<Future<?>> futures = new ArrayList<>(inputs.length);
+                for (SampleInput input : inputs) {
+                    futures.add(executor.submit(() -> evaluateSample(
+                            state, molecule, derivativeEngine,
+                            nuclearDirections, input, chains, localEnergies,
+                            kineticDirectional, coulombDirectional,
+                            wavefunctionLog, jacobianHalfDivergence, finite)));
+                }
+                for (Future<?> future : futures) {
                     try {
-                        evaluateComponent(state, molecule, coordinates, weights,
-                                nucleus, axis, kineticDirectional,
-                                coulombDirectional, wavefunctionLog,
-                                jacobianHalfDivergence, finite,
-                                component, sample);
-                    } catch (RuntimeException exception) {
-                        markNonfinite(kineticDirectional, coulombDirectional,
-                                wavefunctionLog, jacobianHalfDivergence, finite,
-                                component, sample);
+                        future.get();
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("SWCT sample evaluation interrupted",
+                                exception);
+                    } catch (ExecutionException exception) {
+                        throw new IOException("SWCT sample evaluation failed",
+                                exception.getCause());
                     }
                 }
+            } finally {
+                executor.shutdownNow();
             }
-        });
+        }
 
         double energySum = 0.0;
         int energyCount = 0;
@@ -257,20 +265,14 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
     }
 
     private static void evaluateComponent(
-            FermiNetV1State state, Molecule molecule,
+            Molecule molecule,
             QuantumCoordinates coordinates,
             GeneralMolecularSpaceWarp.Weight[][] weights,
+            FermiNetStateAccess.DirectionalSnapshot directional,
             int nucleus, int axis,
             double[][] kineticDirectional, double[][] coulombDirectional,
             double[][] wavefunctionLog, double[][] jacobianHalfDivergence,
             boolean[][] finite, int component, int sample) {
-        int nuclei = molecule.nuclei().size();
-        double[] nuclearDirection = new double[3 * nuclei];
-        nuclearDirection[3 * nucleus + axis] = 1.0;
-        var directional = FermiNetStateAccess.directional(state, coordinates,
-                new FermiNetStateAccess.NuclearDirection(nuclearDirection),
-                new FermiNetStateAccess.ElectronDirection(
-                        electronDirection(weights, nucleus, axis)));
         double kinetic = -0.5 * directional.directionalLaplacianOverWavefunction();
         double coulomb = coulombDirectionalDerivative(molecule, coordinates,
                 nucleus, axis, electronWeights(weights, nucleus));
@@ -290,6 +292,106 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         jacobianHalfDivergence[component][sample] = halfDivergence;
         finite[component][sample] = true;
     }
+
+    private static void evaluateSample(
+            FermiNetV1State state,
+            Molecule molecule,
+            FermiNetDerivativeEngine derivativeEngine,
+            List<FermiNetStateAccess.NuclearDirection> nuclearDirections,
+            SampleInput input,
+            int[] chains,
+            double[] localEnergies,
+            double[][] kineticDirectional,
+            double[][] coulombDirectional,
+            double[][] wavefunctionLog,
+            double[][] jacobianHalfDivergence,
+            boolean[][] finite) {
+        int sample = input.sample();
+        QuantumCoordinates coordinates = input.coordinates();
+        chains[sample] = input.chain();
+        int components = 3 * molecule.nuclei().size();
+        GeneralMolecularSpaceWarp.Weight[][] weights;
+        FermiNetStateAccess.DirectionalBatchSnapshot derivativeBatch;
+        try {
+            weights = warpWeights(molecule, coordinates);
+            derivativeBatch = derivativeEngine.directionalBatch(
+                    state, coordinates, nuclearDirections,
+                    electronDirections(weights));
+        } catch (RuntimeException exception) {
+            localEnergies[sample] = Double.NaN;
+            for (int component = 0; component < components; component++) {
+                markNonfinite(kineticDirectional, coulombDirectional,
+                        wavefunctionLog, jacobianHalfDivergence, finite,
+                        component, sample);
+            }
+            return;
+        }
+        double localEnergy;
+        try {
+            localEnergy = FermiNetRuntimeSampling.localEnergyWithLog(
+                    state, coordinates, derivativeBatch.spatial())
+                    .localEnergy().totalHartree();
+        } catch (RuntimeException exception) {
+            localEnergy = Double.NaN;
+        }
+        localEnergies[sample] = localEnergy;
+        for (int nucleus = 0; nucleus < molecule.nuclei().size(); nucleus++) {
+            for (int axis = 0; axis < 3; axis++) {
+                int component = 3 * nucleus + axis;
+                if (!Double.isFinite(localEnergy)) {
+                    markNonfinite(kineticDirectional, coulombDirectional,
+                            wavefunctionLog, jacobianHalfDivergence, finite,
+                            component, sample);
+                    continue;
+                }
+                try {
+                    evaluateComponent(molecule, coordinates, weights,
+                            derivativeBatch.directions().get(component),
+                            nucleus, axis, kineticDirectional,
+                            coulombDirectional, wavefunctionLog,
+                            jacobianHalfDivergence, finite,
+                            component, sample);
+                } catch (RuntimeException exception) {
+                    markNonfinite(kineticDirectional, coulombDirectional,
+                            wavefunctionLog, jacobianHalfDivergence, finite,
+                            component, sample);
+                }
+            }
+        }
+    }
+
+    private static List<FermiNetStateAccess.NuclearDirection> nuclearDirections(
+            int nuclei) {
+        int components = 3 * nuclei;
+        List<FermiNetStateAccess.NuclearDirection> result =
+                new ArrayList<>(components);
+        for (int component = 0; component < components; component++) {
+            double[] direction = new double[components];
+            direction[component] = 1.0;
+            result.add(new FermiNetStateAccess.NuclearDirection(direction));
+        }
+        return List.copyOf(result);
+    }
+
+    private static List<FermiNetStateAccess.ElectronDirection> electronDirections(
+            GeneralMolecularSpaceWarp.Weight[][] weights) {
+        int components = 3 * weights[0].length;
+        List<FermiNetStateAccess.ElectronDirection> result =
+                new ArrayList<>(components);
+        for (int component = 0; component < components; component++) {
+            int nucleus = component / 3;
+            int axis = component % 3;
+            result.add(new FermiNetStateAccess.ElectronDirection(
+                    electronDirection(weights, nucleus, axis)));
+        }
+        return List.copyOf(result);
+    }
+
+    private record SampleInput(
+            int sample,
+            int chain,
+            int retained,
+            QuantumCoordinates coordinates) {}
 
     private static void markNonfinite(
             double[][] kineticDirectional, double[][] coulombDirectional,

@@ -1,6 +1,7 @@
 package totah.lab.prometheus.neural.ferminet.force;
 
 import java.io.IOException;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -18,7 +19,8 @@ public final class CorrelatedFdFermiNetForceEstimator
     @Override
     public NuclearForceResult estimate(
             FermiNetForceEvaluationContext context,
-            NuclearForceConfiguration configuration) throws IOException {
+            NuclearForceConfiguration configuration,
+            FermiNetDerivativeEngine derivativeEngine) throws IOException {
         if (configuration.estimatorType() != NuclearForceEstimatorType.CORRELATED_FD) {
             throw new IllegalArgumentException("correlated-FD estimator configuration mismatch");
         }

@@ -17,6 +17,7 @@ import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFdConfig
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDifferenceForceReference;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetRuntimeSampling;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetStateAccess;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
@@ -76,7 +77,8 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
     @Override
     public NuclearForceResult estimate(
             FermiNetForceEvaluationContext context,
-            NuclearForceConfiguration configuration) throws IOException {
+            NuclearForceConfiguration configuration,
+            FermiNetDerivativeEngine derivativeEngine) throws IOException {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(configuration, "configuration");
         if (configuration.estimatorType() != NuclearForceEstimatorType.AC_ZVZB) {

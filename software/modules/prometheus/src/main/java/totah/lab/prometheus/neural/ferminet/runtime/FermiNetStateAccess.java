@@ -9,6 +9,10 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 /** Narrow immutable bridge for persistence, pretraining, and diagnostics. */
 public final class FermiNetStateAccess {
 
+    private static final FermiNetDerivativeEngine REFERENCE_DERIVATIVES =
+            FermiNetDerivativeEngines.create(
+                    FermiNetDerivativeConfiguration.referenceJet());
+
     private FermiNetStateAccess() {}
 
     public static FermiNetV1State replaceParameters(
@@ -34,12 +38,7 @@ public final class FermiNetStateAccess {
     public static SpatialSnapshot spatial(
             FermiNetV1State state,
             QuantumCoordinates coordinates) {
-        FermiNetV1State.SpatialEvaluation evaluation =
-                Objects.requireNonNull(state, "state").spatialEvaluation(coordinates);
-        return new SpatialSnapshot(
-                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
-                evaluation.logCoordinateGradient(),
-                evaluation.laplacianOverWavefunction());
+        return REFERENCE_DERIVATIVES.spatial(state, coordinates);
     }
 
     public static ValueSnapshot sampling(
@@ -55,12 +54,7 @@ public final class FermiNetStateAccess {
     public static NuclearSnapshot nuclear(
             FermiNetV1State state,
             QuantumCoordinates coordinates) {
-        FermiNetV1State.NuclearEvaluation evaluation =
-                Objects.requireNonNull(state, "state")
-                        .nuclearEvaluation(coordinates);
-        return new NuclearSnapshot(
-                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
-                evaluation.logNuclearGradient());
+        return REFERENCE_DERIVATIVES.nuclear(state, coordinates);
     }
 
     /**
@@ -74,16 +68,14 @@ public final class FermiNetStateAccess {
             QuantumCoordinates coordinates,
             NuclearDirection nuclearDirection,
             ElectronDirection electronDirection) {
-        Objects.requireNonNull(nuclearDirection, "nuclearDirection");
-        Objects.requireNonNull(electronDirection, "electronDirection");
-        FermiNetV1State.DirectionalEvaluation evaluation =
-                Objects.requireNonNull(state, "state").directionalEvaluation(
-                        coordinates, nuclearDirection.values(), electronDirection.values());
-        return new DirectionalSnapshot(
-                evaluation.sign(), evaluation.logAbsoluteWavefunction(),
-                evaluation.directionalLogAbsoluteWavefunction(),
-                evaluation.laplacianOverWavefunction(),
-                evaluation.directionalLaplacianOverWavefunction());
+        return REFERENCE_DERIVATIVES.directional(state, coordinates,
+                nuclearDirection, electronDirection);
+    }
+
+    /** Returns the configured immutable derivative execution engine. */
+    public static FermiNetDerivativeEngine derivatives(
+            FermiNetDerivativeConfiguration configuration) {
+        return FermiNetDerivativeEngines.create(configuration);
     }
 
     /** Read-only orbital/determinant view used by HF pretraining qualification. */
@@ -177,4 +169,16 @@ public final class FermiNetStateAccess {
             double directionalLogAbsoluteWavefunction,
             double laplacianOverWavefunction,
             double directionalLaplacianOverWavefunction) {}
+
+    public record DirectionalBatchSnapshot(
+            SpatialSnapshot spatial,
+            List<DirectionalSnapshot> directions) {
+        public DirectionalBatchSnapshot {
+            Objects.requireNonNull(spatial, "spatial");
+            directions = List.copyOf(directions);
+            if (directions.isEmpty()) {
+                throw new IllegalArgumentException("empty directional batch");
+            }
+        }
+    }
 }

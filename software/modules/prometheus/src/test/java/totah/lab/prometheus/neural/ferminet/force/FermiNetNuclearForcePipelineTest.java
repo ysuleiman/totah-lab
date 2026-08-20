@@ -80,7 +80,8 @@ final class FermiNetNuclearForcePipelineTest {
     @Test
     void dispatcherUsesSingleSelectionBoundaryAndFailsClosed() throws Exception {
         AtomicBoolean invoked = new AtomicBoolean();
-        var estimator = (FermiNetNuclearForceEstimator) (context, configuration) -> {
+        var estimator = (FermiNetNuclearForceEstimator)
+                (context, configuration, derivativeEngine) -> {
             invoked.set(true);
             return dummy();
         };

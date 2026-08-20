@@ -101,6 +101,26 @@ public final class FermiNetRuntimeSampling {
                 FermiNetVmc.localEnergy(state, coordinates, evaluation));
     }
 
+    /**
+     * Authoritative local energy assembled from an already-computed immutable
+     * derivative-engine spatial snapshot.
+     */
+    public static LocalEnergySnapshot localEnergyWithLog(
+            FermiNetV1State state,
+            QuantumCoordinates coordinates,
+            FermiNetStateAccess.SpatialSnapshot spatial) {
+        Objects.requireNonNull(state, "state");
+        Objects.requireNonNull(spatial, "spatial");
+        FermiNetV1State.SpatialEvaluation evaluation =
+                new FermiNetV1State.SpatialEvaluation(
+                        spatial.sign(), spatial.logAbsoluteWavefunction(),
+                        spatial.logCoordinateGradient(),
+                        spatial.laplacianOverWavefunction());
+        return new LocalEnergySnapshot(
+                spatial.sign(), spatial.logAbsoluteWavefunction(),
+                FermiNetVmc.localEnergy(state, coordinates, evaluation));
+    }
+
     public static LocalEnergyComponents localEnergy(
             FermiNetV1State state,
             QuantumCoordinates coordinates,

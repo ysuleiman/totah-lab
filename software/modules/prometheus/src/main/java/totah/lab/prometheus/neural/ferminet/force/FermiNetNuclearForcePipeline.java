@@ -3,6 +3,8 @@ package totah.lab.prometheus.neural.ferminet.force;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeConfiguration;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines;
 
 /** The single canonical estimator-selection boundary. */
 public final class FermiNetNuclearForcePipeline {
@@ -28,6 +30,15 @@ public final class FermiNetNuclearForcePipeline {
     public NuclearForceResult estimate(
             FermiNetForceEvaluationContext context,
             NuclearForceConfiguration configuration) throws IOException {
+        return estimate(context, configuration,
+                FermiNetDerivativeConfiguration.referenceJet());
+    }
+
+    public NuclearForceResult estimate(
+            FermiNetForceEvaluationContext context,
+            NuclearForceConfiguration configuration,
+            FermiNetDerivativeConfiguration derivativeConfiguration)
+            throws IOException {
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(configuration, "configuration");
         FermiNetNuclearForceEstimator estimator = estimators.get(
@@ -37,6 +48,9 @@ public final class FermiNetNuclearForcePipeline {
                     "FermiNet force estimator is not implemented: "
                             + configuration.estimatorType());
         }
-        return estimator.estimate(context, configuration);
+        return estimator.estimate(context, configuration,
+                FermiNetDerivativeEngines.create(
+                        Objects.requireNonNull(derivativeConfiguration,
+                                "derivativeConfiguration")));
     }
 }

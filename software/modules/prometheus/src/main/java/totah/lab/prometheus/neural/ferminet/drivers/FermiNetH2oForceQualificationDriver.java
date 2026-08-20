@@ -27,6 +27,8 @@ import totah.lab.prometheus.neural.ferminet.pretraining.FermiNetPretrainingQuali
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFdConfigurationFile;
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDifferenceForceReference;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetOptimizationCheckpoint;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeConfiguration;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngineType;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetOptimizerType;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameterLayout;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameters;
@@ -81,7 +83,10 @@ public final class FermiNetH2oForceQualificationDriver {
             case AC_ZVZB -> NuclearForceConfiguration.acZvzb();
             default -> NuclearForceConfiguration.unsupported(arguments.estimator());
         };
-        var result = new FermiNetNuclearForcePipeline().estimate(context, configuration);
+        var derivativeConfiguration = new FermiNetDerivativeConfiguration(
+                arguments.derivativeEngine(), arguments.forceParallelism());
+        var result = new FermiNetNuclearForcePipeline().estimate(
+                context, configuration, derivativeConfiguration);
         var validation = FermiNetNuclearForceValidation.validate(molecule, result);
         Path output = arguments.output() == null
                 ? Path.of("artifacts/prometheus/h2o/ferminet/forces")
@@ -100,11 +105,14 @@ public final class FermiNetH2oForceQualificationDriver {
                 geometry identity      : %s
                 dataset checksum       : %s
                 samples                : %d (%d chains x %d retained)
+                derivative engine      : %s
+                force parallelism      : %d
                 classification         : %s
                 output                 : %s
                 """, result.estimatorType(), result.parameterChecksum(),
                 result.geometryIdentity(), result.datasetChecksum(), result.sampleCount(),
-                result.chainCount(), result.retainedPerChain(), result.classification(), output);
+                result.chainCount(), result.retainedPerChain(), arguments.derivativeEngine(),
+                arguments.forceParallelism(), result.classification(), output);
     }
 
     private record Artifact(
@@ -155,10 +163,15 @@ public final class FermiNetH2oForceQualificationDriver {
             NuclearForceEstimatorType estimator,
             Path checkpoint,
             Path dataset,
-            Path output) {
+            Path output,
+            FermiNetDerivativeEngineType derivativeEngine,
+            int forceParallelism) {
         private static Arguments parse(String[] args) {
             NuclearForceEstimatorType estimator = NuclearForceEstimatorType.CORRELATED_FD;
             Path checkpoint = DEFAULT_CHECKPOINT, dataset = DEFAULT_DATASET, output = null;
+            FermiNetDerivativeEngineType derivativeEngine =
+                    FermiNetDerivativeEngineType.BATCHED_FORWARD;
+            int forceParallelism = 6;
             for (int i = 0; i < args.length; i++) {
                 switch (args[i]) {
                     case "--estimator" -> estimator = NuclearForceEstimatorType.valueOf(
@@ -166,10 +179,16 @@ public final class FermiNetH2oForceQualificationDriver {
                     case "--checkpoint" -> checkpoint = Path.of(args[++i]);
                     case "--dataset" -> dataset = Path.of(args[++i]);
                     case "--output" -> output = Path.of(args[++i]);
+                    case "--derivative-engine" -> derivativeEngine =
+                            FermiNetDerivativeEngineType.valueOf(
+                                    args[++i].toUpperCase(Locale.ROOT));
+                    case "--force-parallelism" -> forceParallelism =
+                            Integer.parseInt(args[++i]);
                     default -> throw new IllegalArgumentException("unknown option: " + args[i]);
                 }
             }
-            return new Arguments(estimator, checkpoint, dataset, output);
+            return new Arguments(estimator, checkpoint, dataset, output,
+                    derivativeEngine, forceParallelism);
         }
     }
 }

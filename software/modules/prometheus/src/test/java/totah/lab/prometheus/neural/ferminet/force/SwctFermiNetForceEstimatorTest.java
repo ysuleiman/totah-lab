@@ -1,6 +1,7 @@
 package totah.lab.prometheus.neural.ferminet.force;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +24,8 @@ import totah.lab.prometheus.neural.GeneralSlaterJastrowState;
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFdConfigurationFile;
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDifferenceForceReference;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetOptimizationCheckpoint;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeConfiguration;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameterLayout;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameters;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1Configuration;
@@ -163,12 +166,17 @@ final class SwctFermiNetForceEstimatorTest {
         FermiNetV1State state = new FermiNetV1State(molecule, network,
                 FermiNetParameters.fromArray(layout, checkpoint.parameters()));
 
+        int benchmarkSamples = Integer.getInteger(
+                "ferminet.swct.benchmarkSamples", 16);
+        if (benchmarkSamples != 16 && benchmarkSamples != 64) {
+            throw new IllegalArgumentException("benchmarkSamples must be 16 or 64");
+        }
         List<QuantumCoordinates> subset = new ArrayList<>();
         FermiNetCorrelatedFdConfigurationFile.forEach(
                 configurationsFile, 64, (sample, chain, retained, coordinates) -> {
-                    if (sample < 16) subset.add(coordinates);
+                    if (sample < benchmarkSamples) subset.add(coordinates);
                 });
-        assertEquals(16, subset.size());
+        assertEquals(benchmarkSamples, subset.size());
         Path directory = Files.createTempDirectory("swct-smoke");
         Path subsetFile = directory.resolve("configurations.csv");
         var identity = FermiNetCorrelatedFdConfigurationFile.write(
@@ -180,10 +188,69 @@ final class SwctFermiNetForceEstimatorTest {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 subsetFile, identity, "0".repeat(64),
                 checkpoint.rootParameterChecksum());
-        long start = System.nanoTime();
-        NuclearForceResult result = new SwctFermiNetForceEstimator()
-                .estimate(context, NuclearForceConfiguration.swct());
-        long elapsed = System.nanoTime() - start;
+        var estimator = new SwctFermiNetForceEstimator();
+        boolean batchedOnly = Boolean.getBoolean("ferminet.swct.batchedOnly");
+        boolean referenceOnly = Boolean.getBoolean("ferminet.swct.referenceOnly");
+        if (batchedOnly && referenceOnly) {
+            throw new IllegalArgumentException("conflicting SWCT benchmark modes");
+        }
+        NuclearForceResult reference = null;
+        long referenceElapsed = -1L;
+        if (!batchedOnly) {
+            long referenceStart = System.nanoTime();
+            reference = estimator.estimate(
+                    context, NuclearForceConfiguration.swct(),
+                    FermiNetDerivativeEngines.create(
+                            FermiNetDerivativeConfiguration.referenceJet()));
+            referenceElapsed = System.nanoTime() - referenceStart;
+        }
+        NuclearForceResult result;
+        long batchedElapsed;
+        if (referenceOnly) {
+            result = reference;
+            batchedElapsed = -1L;
+        } else {
+            long batchedStart = System.nanoTime();
+            result = estimator.estimate(
+                    context, NuclearForceConfiguration.swct(),
+                    FermiNetDerivativeEngines.create(
+                            FermiNetDerivativeConfiguration.batchedForward(
+                                    Integer.getInteger(
+                                            "ferminet.swct.parallelism", 1))));
+            batchedElapsed = System.nanoTime() - batchedStart;
+        }
+        System.out.printf(java.util.Locale.ROOT,
+                "SWCT_REFERENCE_%d_SAMPLES_NANOS=%d%n"
+                        + "SWCT_BATCHED_%d_SAMPLES_NANOS=%d%n",
+                benchmarkSamples, referenceElapsed,
+                benchmarkSamples, batchedElapsed);
+
+        if (reference != null && !referenceOnly) {
+        assertEquals(reference.components().size(), result.components().size());
+        for (int component = 0; component < reference.components().size(); component++) {
+            var expected = reference.components().get(component);
+            var actual = result.components().get(component);
+            assertArrayEquals(expected.rawSamples(), actual.rawSamples(), 1.0e-7,
+                    "raw SWCT component " + component);
+            assertEquals(expected.meanHartreePerBohr(), actual.meanHartreePerBohr(),
+                    1.0e-8, "mean " + component);
+            assertEquals(expected.variance(), actual.variance(), 1.0e-6,
+                    "variance " + component);
+            assertEquals(expected.chainStandardError(),
+                    actual.chainStandardError(), 1.0e-8,
+                    "chain SE " + component);
+            assertEquals(expected.tails().beyondFiveSigma(),
+                    actual.tails().beyondFiveSigma(), "5sigma " + component);
+            assertEquals(expected.tails().beyondTenSigma(),
+                    actual.tails().beyondTenSigma(), "10sigma " + component);
+            assertEquals(expected.tails().minimum(), actual.tails().minimum(),
+                    1.0e-7, "tail min " + component);
+            assertEquals(expected.tails().maximum(), actual.tails().maximum(),
+                    1.0e-7, "tail max " + component);
+            assertEquals(expected.tails().median(), actual.tails().median(),
+                    1.0e-7, "tail median " + component);
+        }
+        }
 
         assertEquals(NuclearForceEstimatorType.SWCT, result.estimatorType());
         assertEquals(9, result.components().size());
@@ -195,7 +262,7 @@ final class SwctFermiNetForceEstimatorTest {
         for (int component = 0; component < 9; component++) {
             var c = result.components().get(component);
             var d = diagnostics.components().get(component);
-            assertEquals(16, c.finiteCount(), "finite " + component);
+            assertEquals(benchmarkSamples, c.finiteCount(), "finite " + component);
             assertEquals(0, c.nonfiniteCount(), "nonfinite " + component);
             assertTrue(Double.isFinite(c.meanHartreePerBohr()));
             assertTrue(Double.isFinite(c.chainStandardError()));
@@ -214,8 +281,6 @@ final class SwctFermiNetForceEstimatorTest {
                             - d.correlatedFdMeanHartreePerBohr(),
                     d.meanDifferenceHartreePerBohr(), 1e-12);
         }
-        System.out.printf(java.util.Locale.ROOT,
-                "SWCT_SMOKE_16_SAMPLES_9_COMPONENTS_NANOS=%d%n", elapsed);
     }
 
     /** Diagnostic-only FD stand-in with huge variance; never a scientific reference. */
