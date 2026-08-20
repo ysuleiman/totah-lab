@@ -58,6 +58,10 @@ final class FermiNetBatchedJetWorkspace {
         return jets.size();
     }
 
+    int retainedChunkCount() {
+        return chunks.size();
+    }
+
     private Slice allocate(int length) {
         if (length > CHUNK_DOUBLES) {
             throw new IllegalArgumentException("batched jet payload exceeds workspace chunk");

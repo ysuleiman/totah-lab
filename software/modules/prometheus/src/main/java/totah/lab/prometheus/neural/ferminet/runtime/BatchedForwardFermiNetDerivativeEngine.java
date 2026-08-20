@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
@@ -14,7 +15,7 @@ final class BatchedForwardFermiNetDerivativeEngine
         implements FermiNetDerivativeEngine {
 
     private final Map<WorkspaceShape, Deque<FermiNetBatchedJetWorkspace>> workspaces =
-            new HashMap<>();
+            new LinkedHashMap<>(16, 0.75f, true);
     private final int sampleParallelism;
 
     BatchedForwardFermiNetDerivativeEngine(int sampleParallelism) {
@@ -145,8 +146,70 @@ final class BatchedForwardFermiNetDerivativeEngine
     private void releaseWorkspace(
             WorkspaceShape shape, FermiNetBatchedJetWorkspace workspace) {
         synchronized (workspaces) {
-            workspaces.get(shape).addFirst(workspace);
+            workspaces.computeIfAbsent(shape, ignored -> new ArrayDeque<>())
+                    .addFirst(workspace);
+            trimIdleWorkspaces();
         }
+    }
+
+    private void trimIdleWorkspaces() {
+        int retained = retainedWorkspaceCountLocked();
+        Iterator<Map.Entry<WorkspaceShape, Deque<FermiNetBatchedJetWorkspace>>>
+                shapes = workspaces.entrySet().iterator();
+        while (retained > sampleParallelism && shapes.hasNext()) {
+            Map.Entry<WorkspaceShape, Deque<FermiNetBatchedJetWorkspace>> entry =
+                    shapes.next();
+            Deque<FermiNetBatchedJetWorkspace> idle = entry.getValue();
+            while (retained > sampleParallelism && !idle.isEmpty()) {
+                idle.removeLast();
+                retained--;
+            }
+            if (idle.isEmpty()) shapes.remove();
+        }
+    }
+
+    long retainedPrimitiveBytes() {
+        synchronized (workspaces) {
+            long bytes = 0L;
+            for (Deque<FermiNetBatchedJetWorkspace> idle : workspaces.values()) {
+                for (FermiNetBatchedJetWorkspace workspace : idle) {
+                    bytes = Math.addExact(bytes, workspace.retainedPrimitiveBytes());
+                }
+            }
+            return bytes;
+        }
+    }
+
+    int retainedWorkspaceCount() {
+        synchronized (workspaces) {
+            return retainedWorkspaceCountLocked();
+        }
+    }
+
+    int retainedShapeCount() {
+        synchronized (workspaces) {
+            return workspaces.size();
+        }
+    }
+
+    int maximumRetainedChunkCount() {
+        synchronized (workspaces) {
+            int maximum = 0;
+            for (Deque<FermiNetBatchedJetWorkspace> idle : workspaces.values()) {
+                for (FermiNetBatchedJetWorkspace workspace : idle) {
+                    maximum = Math.max(maximum, workspace.retainedChunkCount());
+                }
+            }
+            return maximum;
+        }
+    }
+
+    private int retainedWorkspaceCountLocked() {
+        int retained = 0;
+        for (Deque<FermiNetBatchedJetWorkspace> idle : workspaces.values()) {
+            retained += idle.size();
+        }
+        return retained;
     }
 
     private record WorkspaceShape(int dimensions, int directions) {}
