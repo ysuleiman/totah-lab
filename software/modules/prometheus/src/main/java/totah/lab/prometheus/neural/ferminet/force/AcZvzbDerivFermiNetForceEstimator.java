@@ -134,17 +134,35 @@ public final class AcZvzbDerivFermiNetForceEstimator
             try {
                 double localEnergy = FermiNetRuntimeSampling.localEnergyWithLog(
                         state, coordinates).localEnergy().totalHartree();
+                if (!Double.isFinite(localEnergy)) {
+                    localEnergies[sample] = Double.NaN;
+                    electronLogGradients[sample] = null;
+                    nuclearLogGradients[sample] = null;
+                    return;
+                }
                 double[] electronLogGradient = FermiNetStateAccess.spatial(
                         state, coordinates).logCoordinateGradient();
                 double[] nuclearLogGradient = FermiNetStateAccess.nuclear(
                         state, coordinates).logNuclearGradient();
-                if (!Double.isFinite(localEnergy)) {
-                    throw new IllegalStateException("non-finite local energy");
-                }
                 localEnergies[sample] = localEnergy;
                 electronLogGradients[sample] = electronLogGradient;
                 nuclearLogGradients[sample] = nuclearLogGradient;
             } catch (FermiNetPhysicalSingularityException exception) {
+                localEnergies[sample] = Double.NaN;
+                electronLogGradients[sample] = null;
+                nuclearLogGradients[sample] = null;
+            } catch (IllegalArgumentException exception) {
+                if (!"Coulomb singularity".equals(exception.getMessage())) {
+                    throw exception;
+                }
+                localEnergies[sample] = Double.NaN;
+                electronLogGradients[sample] = null;
+                nuclearLogGradients[sample] = null;
+            } catch (IllegalStateException exception) {
+                if (!"non-finite local-energy component".equals(
+                        exception.getMessage())) {
+                    throw exception;
+                }
                 localEnergies[sample] = Double.NaN;
                 electronLogGradients[sample] = null;
                 nuclearLogGradients[sample] = null;

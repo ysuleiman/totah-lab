@@ -123,14 +123,29 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
             try {
                 double localEnergy = FermiNetRuntimeSampling.localEnergyWithLog(
                         state, coordinates).localEnergy().totalHartree();
+                if (!Double.isFinite(localEnergy)) {
+                    localEnergies[sample] = Double.NaN;
+                    logGradients[sample] = null;
+                    return;
+                }
                 double[] logGradient = FermiNetStateAccess.spatial(
                         state, coordinates).logCoordinateGradient();
-                if (!Double.isFinite(localEnergy)) {
-                    throw new IllegalStateException("non-finite local energy");
-                }
                 localEnergies[sample] = localEnergy;
                 logGradients[sample] = logGradient;
             } catch (FermiNetPhysicalSingularityException exception) {
+                localEnergies[sample] = Double.NaN;
+                logGradients[sample] = null;
+            } catch (IllegalArgumentException exception) {
+                if (!"Coulomb singularity".equals(exception.getMessage())) {
+                    throw exception;
+                }
+                localEnergies[sample] = Double.NaN;
+                logGradients[sample] = null;
+            } catch (IllegalStateException exception) {
+                if (!"non-finite local-energy component".equals(
+                        exception.getMessage())) {
+                    throw exception;
+                }
                 localEnergies[sample] = Double.NaN;
                 logGradients[sample] = null;
             }
