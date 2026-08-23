@@ -160,7 +160,7 @@ class AdversarialCompositeIngestAcceptanceTest {
                 0.017 0.031 -0.019 0.022 0.441 0.029
                 -0.028 0.014 0.035 -0.026 0.029 0.556
                 """);
-        Files.writeString(frequencies, "0.0\n2713.42\n");
+        Files.writeString(frequencies, "23.50\n2713.42\n");
         Files.writeString(log, "converged SCF energy = -76.02\n");
         Files.writeString(directory.resolve("result.json"), """
                 {"status":"HESSIAN_COMPLETE","energy_hartree":-76.02,

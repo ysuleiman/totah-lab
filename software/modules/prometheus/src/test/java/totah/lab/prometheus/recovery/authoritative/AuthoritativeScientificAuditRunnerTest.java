@@ -25,7 +25,7 @@ class AuthoritativeScientificAuditRunnerTest {
         assertThat(result.audit().entries()).allSatisfy(entry ->
                 assertThat(entry.recovery().classification()).isNotNull());
         assertThat(result.reconstruction().minima()).isEqualTo(3);
-        assertThat(result.reconstruction().hessians()).isEqualTo(3);
+        assertThat(result.reconstruction().hessians()).isZero();
         assertThat(result.reconstruction().probes()).isEqualTo(19);
         assertThat(result.reconstruction().historicalComparisons())
                 .allMatch(comparison -> comparison.matchesTolerance());

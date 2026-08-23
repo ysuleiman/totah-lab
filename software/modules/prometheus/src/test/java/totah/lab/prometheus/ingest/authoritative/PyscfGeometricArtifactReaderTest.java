@@ -23,7 +23,7 @@ class PyscfGeometricArtifactReaderTest {
     private final PyscfGeometricArtifactReader reader = new PyscfGeometricArtifactReader();
 
     @Test
-    void reconstructsTheThreeArchivedVerifiedMinimaAndHessiansWhenArchiveIsPresent() throws IOException {
+    void rejectsTheThreeArchivedZeroedFrequencySpectraWhenArchiveIsPresent() throws IOException {
         Path root = findRepositoryRoot();
         Path unit = root.resolve("analysis/mettl7-phase2/execution-unit-05O");
         Assumptions.assumeTrue(Files.isDirectory(unit), "project evidence archive is not present");
@@ -31,20 +31,17 @@ class PyscfGeometricArtifactReaderTest {
         double[] expectedEnergies = {-1477.9438395697157, -1477.9410218953778, -1477.9243060703888};
         String[] ids = {"MIN01", "MIN02", "MIN04"};
         for (int i = 0; i < ids.length; i++) {
+            Path hessianDirectory = unit.resolve("hessians").resolve(ids[i]);
             PyscfGeometricOptimization optimization = reader.readOptimization(
                     unit.resolve("qm-native-minima").resolve(ids[i]));
-            PyscfHessianResult hessian = reader.readHessian(unit.resolve("hessians").resolve(ids[i]));
             assertThat(optimization.calculationId().value()).contains(ids[i]);
             assertThat(optimization.finalGeometry().value().orElseThrow().atoms()).hasSize(56);
             assertThat(optimization.finalEnergyHartree().value().orElseThrow())
                     .isCloseTo(expectedEnergies[i], within(5.0e-10));
-            assertThat(hessian.cartesianDimension()).isEqualTo(168);
-            assertThat(hessian.cartesianHessian().value().orElseThrow()).hasSize(168 * 168);
-            assertThat(hessian.frequencies().value().orElseThrow()).hasSize(162);
-            assertThat(hessian.artifactChecksumsVerified()).isTrue();
-            assertThat(hessian.method().value()).hasValueSatisfying(value ->
-                    assertThat(value).contains("TRUSTED_PBE_ONLY_HESSIAN").doesNotContain("D3"));
-            assertThat(hessian.protocol().dispersion().value()).contains("none");
+            assertThatThrownBy(() -> reader.readHessian(hessianDirectory))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageContaining("suspicious exact zero")
+                    .hasMessageContaining("frequencies_cm-1.txt");
         }
     }
 
@@ -108,7 +105,7 @@ class PyscfGeometricArtifactReaderTest {
         Path frequencies = temporary.resolve("frequencies_cm-1.txt");
         Path log = temporary.resolve("raw_combined.log");
         Files.writeString(matrix, "1.0 0.1\n0.1 2.0\n");
-        Files.writeString(frequencies, "0.0\n47.06\n");
+        Files.writeString(frequencies, "23.50\n47.06\n");
         Files.writeString(log, "");
         Files.writeString(temporary.resolve("result.json"), """
                 {"status":"HESSIAN_COMPLETE","energy_hartree":-1477.9438395697284,
@@ -124,7 +121,7 @@ class PyscfGeometricArtifactReaderTest {
 
         assertThat(result.cartesianDimension()).isEqualTo(2);
         assertThat(result.cartesianHessian().value().orElseThrow()).containsExactly(1.0, 0.1, 0.1, 2.0);
-        assertThat(result.frequencies().value().orElseThrow()).containsExactly(0.0, 47.06);
+        assertThat(result.frequencies().value().orElseThrow()).containsExactly(23.50, 47.06);
         assertThat(result.hessianUnit()).contains("hartree/bohr^2").contains("unmass-weighted");
         assertThat(result.artifactChecksumsVerified()).isTrue();
         assertThat(result.method().value()).hasValueSatisfying(value ->

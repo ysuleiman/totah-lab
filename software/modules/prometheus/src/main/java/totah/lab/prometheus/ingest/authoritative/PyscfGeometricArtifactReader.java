@@ -105,6 +105,15 @@ public final class PyscfGeometricArtifactReader {
         if (frequencies.size() != declaredCount) {
             throw new IOException("frequency_count=" + declaredCount + " but artifact contains " + frequencies.size());
         }
+        String frequencyProjection = requiredText(input, "frequency_projection", inputPath);
+        VibrationalSpectrumIntegrity.Assessment spectrum = VibrationalSpectrumIntegrity.assessProjected(
+                frequencies, frequencyProjection, frequencyPath);
+        String declaredStatus = requiredText(result, "status", resultPath);
+        if (declaredStatus.contains("VERIFIED_LOCAL_MINIMUM")
+                && spectrum.classification() == VibrationalSpectrumIntegrity.Classification.SADDLE_POINT) {
+            throw new IOException("status claims VERIFIED_LOCAL_MINIMUM but signed projected spectrum contains "
+                    + spectrum.negativeVibrationalModes() + " negative vibrational mode(s): " + frequencyPath);
+        }
 
         return new PyscfHessianResult(
                 raw("calculation_id", requiredText(input, "minimum_id", inputPath), inputPath, "/minimum_id"),
@@ -122,10 +131,9 @@ public final class PyscfGeometricArtifactReader {
                 "hartree/bohr^2 (unmass-weighted Cartesian second derivatives)",
                 raw("frequencies", frequencies, frequencyPath, "numeric records 1..EOF"),
                 "cm^-1",
-                raw("frequency_projection", requiredText(input, "frequency_projection", inputPath), inputPath,
-                        "/frequency_projection"),
+                raw("frequency_projection", frequencyProjection, inputPath, "/frequency_projection"),
                 raw("scf_converged", requiredBoolean(result, "scf_converged", resultPath), resultPath, "/scf_converged"),
-                raw("status", requiredText(result, "status", resultPath), resultPath, "/status"),
+                raw("status", declaredStatus, resultPath, "/status"),
                 checksumsVerified,
                 "normal_modes_mass_weighted.npy is PySCF harmonic_analysis norm_mode; the Cartesian Hessian itself is not mass weighted"
                         + (compositeHessianClaim

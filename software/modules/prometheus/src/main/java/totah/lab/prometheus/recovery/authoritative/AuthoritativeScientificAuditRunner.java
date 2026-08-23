@@ -222,9 +222,19 @@ public final class AuthoritativeScientificAuditRunner {
         Path unit05O = archiveRoot.resolve("execution-unit-05O");
         PyscfGeometricArtifactReader pyscf = new PyscfGeometricArtifactReader();
         List<PyscfGeometricOptimization> minima = new ArrayList<>();
+        int hessians = 0;
         for (String id : List.of("MIN01", "MIN02", "MIN04")) {
             minima.add(pyscf.readOptimization(unit05O.resolve("qm-native-minima").resolve(id)));
-            pyscf.readHessian(unit05O.resolve("hessians").resolve(id));
+            try {
+                pyscf.readHessian(unit05O.resolve("hessians").resolve(id));
+                hessians++;
+            } catch (IOException exception) {
+                if (!exception.getMessage().contains("suspicious exact zero")) {
+                    throw exception;
+                }
+                // Preserve the raw directories, but do not count a sign-destroyed projected
+                // spectrum as a successfully reconstructed scientific Hessian result.
+            }
         }
         List<HistoricalValueComparison> comparisons = new ArrayList<>(pyscf.compareHistoricalEnergies(minima,
                 unit05O.resolve("QM_NATIVE_ENDPOINT_SUMMARY.csv"), "minimum_id", "energy_hartree", 5.0e-10));
@@ -253,7 +263,7 @@ public final class AuthoritativeScientificAuditRunner {
                 unit05O.resolve("final-19-point-force-field-diagnostic/MASTER_19_POINT_TABLE.csv"), 1.0e-8));
         new AmberRespReader().read(unit05O.resolve(
                 "native-amber-resp3min-hf631gd/regeneration-A/all-three"));
-        return new Reconstruction(3, 3, unit05hRecords.size(), unit05lRecords.size(), probeRecords.size(), 1,
+        return new Reconstruction(3, hessians, unit05hRecords.size(), unit05lRecords.size(), probeRecords.size(), 1,
                 comparisons);
     }
 
@@ -349,9 +359,11 @@ public final class AuthoritativeScientificAuditRunner {
         long unrecoverable = audit.entries().size() - recovered;
         boolean comparisonsPass = reconstruction.historicalComparisons().stream()
                 .allMatch(HistoricalValueComparison::matchesTolerance);
-        String classification = comparisonsPass
-                ? "VERIFIED_RAW_FOUNDATION_READY_FOR_CANONICAL_REGENERATION"
-                : "RAW_RECONSTRUCTION_DISCREPANCY_REQUIRES_REVIEW";
+        String classification = !comparisonsPass
+                ? "RAW_RECONSTRUCTION_DISCREPANCY_REQUIRES_REVIEW"
+                : reconstruction.hessians() < reconstruction.minima()
+                        ? "HESSIAN_FREQUENCY_INTEGRITY_BLOCKED"
+                        : "VERIFIED_RAW_FOUNDATION_READY_FOR_CANONICAL_REGENERATION";
         String json = """
                 {
                   "classification" : "%s",
@@ -362,7 +374,7 @@ public final class AuthoritativeScientificAuditRunner {
                   "raw_records_reconstructed" : %d,
                   "historical_comparisons" : %d,
                   "all_historical_comparisons_pass" : %s,
-                  "strategy_conclusion" : "Trusted QM/RESP evidence is reconstructable; production force-field readiness must be reassessed only after a separately authorized canonical regeneration."
+                  "strategy_conclusion" : "Trusted scalar QM/RESP evidence is reconstructable; Hessian-derived stationary-point claims remain blocked unless signed projected spectra pass integrity checks."
                 }
                 """.formatted(classification, audit.entries().size(), recovered, unrecoverable,
                 reconstruction.totalRecords(), reconstruction.historicalComparisons().size(), comparisonsPass);
@@ -379,10 +391,11 @@ public final class AuthoritativeScientificAuditRunner {
                 - Trusted raw calculation records reconstructed: %d
                 - Historical derived-value comparisons: %d (%s)
 
-                The raw QM minima, Hessians, Unit 05H/05L calculations, probe calculations, and accepted RESP
-                fit form a reproducible scientific foundation. This does not itself validate a production force
-                field. The earlier strategy decision must be rerun only after a separately authorized canonical
-                regeneration incorporates these recovered fields.
+                The raw QM geometries/energies, Unit 05H/05L calculations, probe calculations, and accepted RESP
+                fit are reconstructable. Historical Hessian results with sign-destroyed projected spectra are not
+                counted as reconstructed scientific Hessian results. This does not itself validate a production
+                force field. The earlier strategy decision must be rerun only after a separately authorized
+                canonical regeneration incorporates trustworthy fields.
                 """.formatted(classification, audit.entries().size(), recovered, unrecoverable,
                 reconstruction.totalRecords(), reconstruction.historicalComparisons().size(),
                 comparisonsPass ? "all pass" : "one or more fail");
