@@ -1,0 +1,69 @@
+{
+  "classification_rules": {
+    "CORE_EQUILIBRIUM": "OTHER_EXISTING_GEOMETRY or MINIMUM_OPTIMIZATION_TRAJECTORY within the verified homogeneous partition",
+    "EXTENDED_BOUND_DOMAIN": "torsional/constrained geometry or force-cloud geometry inside both observed bound-like energy and force envelopes",
+    "STABILITY_GUARD": "force-cloud geometry inside the bound-like energy envelope but above the bound-like force envelope",
+    "STRESS_TEST_ONLY": "force-cloud geometry whose relative energy exceeds the maximum observed non-force-cloud energy for its source minimum"
+  },
+  "domain_counts": {
+    "CORE_EQUILIBRIUM": 7,
+    "EXTENDED_BOUND_DOMAIN": 35,
+    "STABILITY_GUARD": 8,
+    "STRESS_TEST_ONLY": 10
+  },
+  "enzyme_geometry_diagnostics": [
+    "sulfur orientation",
+    "S-H distance and projected force",
+    "phi/psi and sulfur-exposing torsions",
+    "SAM-approach compatibility (coverage gap; no proxy label invented)"
+  ],
+  "future_metrics": {
+    "C_S_PROJECTED_FORCE_ERROR": "THRESHOLD_NOT_YET_JUSTIFIED",
+    "ENERGY_RMS": "existing locked <=2.0 kcal/mol gate is recorded but not changed or newly authorized here",
+    "GLOBAL_FORCE_COMPONENT_RMS": "THRESHOLD_NOT_YET_JUSTIFIED",
+    "RELATIVE_ENERGY_RMS": "THRESHOLD_NOT_YET_JUSTIFIED",
+    "SULFUR_LOCAL_FORCE_COMPONENT_RMS": "existing historical 7.5 kcal/mol/A gate is recorded but not changed or newly authorized here",
+    "SULFUR_ORIENTATION/TORSIONAL_ERROR": "THRESHOLD_NOT_YET_JUSTIFIED",
+    "S_H_PROJECTED_FORCE_ERROR": "THRESHOLD_NOT_YET_JUSTIFIED"
+  },
+  "physical_roles": [
+    "EQUILIBRIUM_MINIMUM",
+    "LOW_ENERGY_CONFORMER",
+    "TORSIONAL_TRANSITION",
+    "SULFUR_ORIENTATION",
+    "S_H_LOCAL_DISTORTION",
+    "THIOL_HBOND_GEOMETRY",
+    "SAM_APPROACH_GEOMETRY",
+    "PROTEIN_LIKE_DISTORTION",
+    "REPULSIVE_STABILITY",
+    "HIGH_STRAIN_STRESS_TEST"
+  ],
+  "reference_partition": {
+    "MIN01": {
+      "bound_like_envelope_kcal_mol": 51.15316519085986,
+      "bound_like_force_envelope_kcal_mol_angstrom": 12.14952715915523,
+      "definition": "lowest verified GPU60 total energy within source minimum",
+      "energy_hartree": -1477.9418040284438
+    },
+    "MIN02": {
+      "bound_like_envelope_kcal_mol": 144.79663736728816,
+      "bound_like_force_envelope_kcal_mol_angstrom": 18.426638337712202,
+      "definition": "lowest verified GPU60 total energy within source minimum",
+      "energy_hartree": -1477.9389228135983
+    },
+    "MIN04": {
+      "bound_like_envelope_kcal_mol": 96.42206934856544,
+      "bound_like_force_envelope_kcal_mol_angstrom": 14.291732360886538,
+      "definition": "lowest verified GPU60 total energy within source minimum",
+      "energy_hartree": -1477.9235486580187
+    }
+  },
+  "schema": "trusted-tsl-rsh-domain-v1",
+  "target": "TSL-RSH equilibrium/bound-state sampling relevant to METTL7A/B + SAM",
+  "thresholds_changed": false,
+  "uncovered_roles_in_gpu60": [
+    "THIOL_HBOND_GEOMETRY",
+    "SAM_APPROACH_GEOMETRY",
+    "PROTEIN_LIKE_DISTORTION"
+  ]
+}
