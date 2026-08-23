@@ -24,6 +24,13 @@ read back with verified checksums. Delta exposes this through
 `DeltaModelTrainer.persistSuccessfulFit`; future Amber/RESP/vdW/ML fit paths
 must use the same seam or an adapter with exactly the same mandatory state.
 
+`DeltaModelTrainer` currently defines a preflight gate and this persistence
+boundary only. No production fitter is wired through it, and it has no
+`train(...)` operation. The **first actual fitter implementation** must define
+success to include production of a checksum-verified
+`FitArtifactWriter.Receipt`. Returning an in-memory model, coefficient vector,
+metric, or ordinary success status before that receipt exists is prohibited.
+
 ## Identity ordering decision (B3)
 
 `constraints`, `requiredOutputs`, and `acceptanceGates` are unordered sets of
