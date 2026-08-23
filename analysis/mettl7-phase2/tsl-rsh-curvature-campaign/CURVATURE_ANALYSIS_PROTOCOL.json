@@ -1,0 +1,53 @@
+{
+  "schema": "tsl-rsh-curvature-analysis-protocol-v1",
+  "frozen_before_qm": true,
+  "coordinate_source": "CURVATURE_COORDINATE_DEFINITIONS.json",
+  "pair_source": "CURVATURE_PAIR_PANEL.json",
+  "energy_mixed_curvature": {
+    "equation": "H_ij^(E) = (E_++ - E_+- - E_-+ + E_--)/(4 h_i h_j)",
+    "energies": "total PBE+D3(BJ) energies in a common anchor/pair/scale panel",
+    "periodic_coordinates": "signed displacements are wrapped to (-pi,pi] before division"
+  },
+  "gradient_secant_curvature": {
+    "cartesian_gradient": "g_R = electronic_gradient + d3_gradient",
+    "jacobian": "J_i,a = partial q_i / partial R_a, evaluated at each labeled geometry with the exact coordinate definitions",
+    "internal_gradient_projection": "g_q = pinv(J^T) g_R; use SVD rcond=1e-10 and persist rank/singular values/projection residual",
+    "secant_equation": "Delta g_q = H Delta q",
+    "estimator": "symmetric least-squares H fitted independently per anchor from that anchor's corner gradient secants; report unconstrained antisymmetric part before symmetrization",
+    "no_held_out_label_use": true
+  },
+  "consistency_diagnostics": {
+    "energy_gradient": "compare H_ij^(E) with symmetric gradient/secant H_ij, including sign and propagated numerical uncertainty",
+    "opposite_corner_symmetry": "compare + and - directional secants and retain their difference as a nonlinearity diagnostic",
+    "scale_stability": "for MIN01 S_C/C_S_H compare full and half scale estimates before pooling",
+    "anchor_dependence": "retain MIN01, MIN02, and MIN04 estimates separately before any aggregate"
+  },
+  "numerical_uncertainty": {
+    "energy_reference_difference_hartree": 5.168203642824665e-10,
+    "gradient_rms_reference_hartree_per_bohr": 7.537830768521607e-7,
+    "gradient_max_reference_hartree_per_bohr": 3.6847275325449513e-6,
+    "propagation": "use independent-error root-sum-square propagation for energy corners and Jacobian-projected gradient components; report both RMS-based and conservative max-based intervals"
+  },
+  "predeclared_classification": {
+    "MIXED_CURVATURE_RESOLVED": "energy and gradient estimates have the same sign and their propagated 95% uncertainty intervals exclude zero and overlap",
+    "MIXED_CURVATURE_NOT_RESOLVED": "both estimators are compatible with zero or their uncertainty intervals do not establish a common nonzero value",
+    "SCALE_DEPENDENT_NONLINEAR": "the preregistered full/half-scale estimates are mutually incompatible under propagated 95% uncertainty or opposite-corner secants disagree beyond that uncertainty",
+    "ANCHOR_DEPENDENT": "at least two anchor-specific resolved estimates are mutually incompatible under propagated 95% uncertainty; anchor-specific values remain primary",
+    "precedence": [
+      "SCALE_DEPENDENT_NONLINEAR",
+      "ANCHOR_DEPENDENT",
+      "MIXED_CURVATURE_RESOLVED",
+      "MIXED_CURVATURE_NOT_RESOLVED"
+    ],
+    "no_arbitrary_magnitude_threshold": true
+  },
+  "later_model_form_classes": [
+    "SPARSE_LOW_ORDER_COUPLING",
+    "DENSE_STATE_DEPENDENT_COUPLING",
+    "PRIMARILY_DIAGONAL_LOCAL_CURVATURE",
+    "INSUFFICIENT_SUPPORT"
+  ],
+  "later_model_form_decision_deferred_until_qm_and_independent_review": true,
+  "validation_labels_used": false,
+  "model_fit_run": false
+}

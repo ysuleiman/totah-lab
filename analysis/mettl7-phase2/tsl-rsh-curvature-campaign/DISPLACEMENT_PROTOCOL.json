@@ -1,0 +1,54 @@
+{
+  "acceptance": {
+    "chirality": "sign of every nondegenerate tetrahedral carbon volume preserved",
+    "connectivity": "same covalent-radius graph as anchor",
+    "minimum_interatomic_distance_angstrom": 0.7,
+    "non_target_coordinate_drift_max": 2e-06,
+    "target_displacement_error_max": 2e-07
+  },
+  "anchor_points": 0,
+  "anchor_reason": "trusted anchor energies/gradients already exist; this preparation creates only new displaced geometries",
+  "construction": "iterative minimum-Cartesian-norm Newton solve over all six monitored internal coordinates; selected coordinates displaced, other five/six constrained to anchor values",
+  "justification": {
+    "angle_step": "1.5 degrees is locally small; conventional angle curvature predicts ~0.02-0.1 kcal/mol signals",
+    "bond_steps": "0.010-0.015 A are <1% of the 1.35-1.86 A equilibrium bonds; conventional 60-300 kcal/mol/A^2 curvature predicts 0.006-0.07 kcal/mol signals, over 10^4 times the 5.17e-10 Ha CPU/GPU energy discrepancy",
+    "second_scale": "0.5 scale for S_C/C_S_H at MIN01 is frozen now to diagnose finite-difference scale dependence",
+    "torsion_step": "3 degrees is locally small relative to the observed conformational spread while producing gradient secants well above ~1e-12 Ha/bohr GPU reproducibility"
+  },
+  "raw_factorial_count": 76,
+  "schema": "tsl-rsh-curvature-displacement-protocol-v1",
+  "single_coordinate_points": 0,
+  "single_coordinate_reason": "mixed energy curvature uses four corners; gradient/secant estimator uses corner gradients and no additional single-coordinate labels are mathematically required",
+  "steps": {
+    "CHI": {
+      "full_scale": 0.05235987755982989,
+      "half_scale": 0.026179938779914945,
+      "unit": "radian"
+    },
+    "C_S_H": {
+      "full_scale": 0.026179938779914945,
+      "half_scale": 0.013089969389957472,
+      "unit": "radian"
+    },
+    "PHI": {
+      "full_scale": 0.05235987755982989,
+      "half_scale": 0.026179938779914945,
+      "unit": "radian"
+    },
+    "PSI": {
+      "full_scale": 0.05235987755982989,
+      "half_scale": 0.026179938779914945,
+      "unit": "radian"
+    },
+    "S_C": {
+      "full_scale": 0.015,
+      "half_scale": 0.0075,
+      "unit": "angstrom"
+    },
+    "S_H": {
+      "full_scale": 0.01,
+      "half_scale": 0.005,
+      "unit": "angstrom"
+    }
+  }
+}

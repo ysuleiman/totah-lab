@@ -1,0 +1,65 @@
+{
+  "schema": "tsl-rsh-curvature-gpu-qm-protocol-v1",
+  "protocol_parent": "trusted homogeneous GPU-60",
+  "protocol_parent_runner": "analysis/mettl7-phase2/execution-unit-05O/gpu-qm-campaign/completed-batch-60/run_frozen_gpu_campaign.py",
+  "method": "PBE",
+  "basis": "def2-SVP",
+  "auxiliary_basis": "def2-SVP-JKFIT",
+  "density_fitting": true,
+  "grid": {
+    "level": 2,
+    "pruning": "NWChem",
+    "partition": "original Becke",
+    "radial_method": "Treutler-Ahlrichs",
+    "atomic_radii_adjustment": "Treutler"
+  },
+  "scf": {
+    "convergence_tolerance": 1e-8,
+    "maximum_cycles": 160,
+    "initial_guess": "MINAO"
+  },
+  "dispersion": {
+    "model": "D3(BJ)",
+    "functional": "PBE",
+    "s6": 1.0,
+    "s8": 0.7875,
+    "a1": 0.4289,
+    "a2": 4.4407,
+    "alp": 14.0,
+    "atm": false,
+    "s9": 0.0,
+    "library": "simple-dftd3 1.5.0",
+    "parameter_database_sha256": "b1d9d1b9882dcad5361a99c34745ad44f8a274d80c907d9d0187255e4323d645"
+  },
+  "software": {
+    "pyscf": "2.14.0",
+    "gpu4pyscf": "1.8.0"
+  },
+  "hardware": "NVIDIA A100",
+  "atom_count": 56,
+  "electron_count": 202,
+  "charge": 0,
+  "multiplicity": 1,
+  "spin_pyscf": 0,
+  "force_convention": "force = -total_gradient",
+  "mandatory_components": [
+    "geometry.xyz",
+    "electronic_energy_hartree",
+    "electronic_gradient_hartree_per_bohr",
+    "d3_energy_hartree",
+    "d3_gradient_hartree_per_bohr",
+    "total_energy_hartree",
+    "total_gradient_hartree_per_bohr",
+    "force_hartree_per_bohr",
+    "scf_converged",
+    "scf_cycles",
+    "timings",
+    "software_identity",
+    "gpu_identity",
+    "geometry_checksum",
+    "per_file_checksums"
+  ],
+  "qm_protocol_matches_gpu60": true,
+  "preparation_only": true,
+  "qm_executed": false
+}
