@@ -136,6 +136,27 @@ class ScientificResultCompletenessValidatorTest {
     }
 
     @Test
+    void derivedFrequenciesWithoutExactSourceHessianBindingFailClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Map<String, ScientificArtifactReference> artifacts = new LinkedHashMap<>(manifest.artifacts());
+        writeArtifact(artifacts, "frequencies_cm-1", "100.0\n200.0\n");
+        manifest = new ScientificResultManifest(manifest.resultId(), manifest.type(), artifacts);
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_PROVENANCE);
+    }
+
+    @Test
+    void derivedFrequenciesBoundToExactCompositeHessianPass() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Map<String, ScientificArtifactReference> artifacts = new LinkedHashMap<>(manifest.artifacts());
+        writeArtifact(artifacts, "frequencies_cm-1", "100.0\n200.0\n");
+        writeArtifact(artifacts, "frequencies_hessian_sha256",
+                artifacts.get("total_hessian").sha256() + "\n");
+        manifest = new ScientificResultManifest(manifest.resultId(), manifest.type(), artifacts);
+        assertThat(validator.validate(temp, manifest).status())
+                .isEqualTo(ScientificResultCompleteness.REPRODUCIBLE_COMPLETE);
+    }
+
+    @Test
     void deletedCoefficientFileFailsClosed() throws Exception {
         ScientificResultManifest manifest = fitManifest(ScientificResultType.PARAMETER_FIT, FIT);
         Files.delete(temp.resolve("fitted_coefficients"));
@@ -220,6 +241,17 @@ class ScientificResultCompletenessValidatorTest {
             artifacts.put(name, new ScientificArtifactReference(Path.of(name), sha256(file)));
         }
         if (type == ScientificResultType.QM_CALCULATION) {
+            writeArtifact(artifacts, "geometry.xyz", "1\nfixture\nH 0 0 0\n");
+            writeArtifact(artifacts, "atom_order", "H\n");
+            writeArtifact(artifacts, "method", "PBE\n");
+            writeArtifact(artifacts, "dispersion_configuration", "none\n");
+            writeArtifact(artifacts, "electronic_energy", "-1.0\n");
+            writeArtifact(artifacts, "dispersion_energy", "0.0\n");
+            writeArtifact(artifacts, "total_energy", "-1.0\n");
+            writeArtifact(artifacts, "electronic_gradient", "0 0 0\n");
+            writeArtifact(artifacts, "dispersion_gradient", "0 0 0\n");
+            writeArtifact(artifacts, "total_gradient", "0 0 0\n");
+            writeArtifact(artifacts, "force", "0 0 0\n");
             Files.writeString(temp.resolve("hessian_requested"), "false\n");
             artifacts.put("hessian_requested", new ScientificArtifactReference(
                     Path.of("hessian_requested"), sha256(temp.resolve("hessian_requested"))));

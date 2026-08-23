@@ -1,0 +1,93 @@
+{
+  "schema": "tsl-observable-completeness-revalidation-v1",
+  "validator_commit_parent": "747e3a84bcce5567c2c6b21c938d8760c90379a8",
+  "new_qm_run": false,
+  "model_fit_run": false,
+  "frozen_evidence_modified": false,
+  "gpu60": {
+    "status": "REVALIDATED_60_OF_60",
+    "source": "analysis/mettl7-phase2/execution-unit-05O/gpu-qm-campaign/completed-batch-60/gpu_qm_results",
+    "original_archive": "TSL_RSH_GPU_BATCH_60_COMPLETE.zip",
+    "original_archive_sha256": "5bde40b9ce95a1f725426400de4fb309902662c9e0c0b07c8655fb7890129848",
+    "checks": [
+      "nested SHA256SUMS",
+      "56 atoms, charge 0, spin 0, 202 electrons",
+      "geometry SHA-256",
+      "SCF convergence",
+      "finite electronic, D3, and total energies",
+      "total_energy = electronic_energy + d3_energy",
+      "finite 56x3 electronic, D3, total-gradient, and force arrays",
+      "total_gradient = electronic_gradient + d3_gradient",
+      "force = -total_gradient",
+      "nonzero D3 component",
+      "protocol and software execution identity"
+    ],
+    "failures": []
+  },
+  "curvature76": {
+    "status": "REVALIDATED_76_OF_76",
+    "archive": "analysis/mettl7-phase2/tsl-rsh-curvature-campaign/analysis-results/immutable-ingestion/TSL_RSH_CURVATURE_GPU_RESULTS.zip",
+    "archive_sha256": "732963b8682b966539cb2eadbe55f4fca9f181611364dc788698da220ac09cbf",
+    "geometry_manifest_sha256": "7ee2f2d8033407ae607b10952ac423ceb52b7a999f5d98740315ec6ca9e9444b",
+    "checks": [
+      "76 exact campaign IDs",
+      "76 nested SHA256SUMS manifests",
+      "geometry-manifest identities",
+      "56 atoms, charge 0, spin 0, 202 electrons",
+      "SCF convergence",
+      "finite and compositional electronic, D3, total-energy, gradient, and force observables",
+      "nonzero D3 component",
+      "protocol and software execution identity"
+    ],
+    "failures": []
+  },
+  "minimum_hessians": {
+    "MIN01": {
+      "status": "TRUSTED_PBE_ONLY_HESSIAN_NOT_REPRODUCIBLE_COMPLETE",
+      "raw_npy_sha256": "5e3e2f1b8537cb8ea6a89d5de101ce1c54e7294edd6eb7ff0001be84269e153c",
+      "canonical_cartesian_max_asymmetry_hartree_per_bohr2": 1.2078136392701389e-6
+    },
+    "MIN02": {
+      "status": "TRUSTED_PBE_ONLY_HESSIAN_NOT_REPRODUCIBLE_COMPLETE",
+      "raw_npy_sha256": "3ca70e7bda0f4493ca0ba912108598aafaa918ecc8b27506fb00412be2f914c8",
+      "canonical_cartesian_max_asymmetry_hartree_per_bohr2": 9.658514965593668e-8
+    },
+    "MIN04": {
+      "status": "TRUSTED_PBE_ONLY_HESSIAN_NOT_REPRODUCIBLE_COMPLETE",
+      "raw_npy_sha256": "bd19976b0c47363a8215ba45aadf0d156cf5d5628b2dcd301177b393b6d152bd",
+      "canonical_cartesian_max_asymmetry_hartree_per_bohr2": 1.58109189740685e-7
+    },
+    "common_defects": [
+      "historical method metadata claims PBE-D3(BJ), but the executed Hessian is electronic PBE only",
+      "no historical dispersion Hessian component or composite total exists",
+      "raw analytic matrices exceed the locked 1e-8 symmetry diagnostic",
+      "cartesian_hessian_flat_hartree_per_bohr2.txt used direct reshape of a [atom_i,atom_j,axis_i,axis_j] tensor instead of canonical [atom_i,axis_i,atom_j,axis_j] ordering"
+    ]
+  },
+  "derived_vibrational_observables": {
+    "MIN01": "PBE_ONLY_DERIVED_OBSERVABLE_INCOMPLETE_MISSING_EXACT_HESSIAN_BINDING",
+    "MIN02": "PBE_ONLY_DERIVED_OBSERVABLE_INCOMPLETE_MISSING_EXACT_HESSIAN_BINDING",
+    "MIN04": "PBE_ONLY_DERIVED_OBSERVABLE_INCOMPLETE_MISSING_EXACT_HESSIAN_BINDING",
+    "details": "Each frequency file has 162 finite values and each normal-mode array has shape 162x56x3 with verified historical checksums. They were derived from the electronic Hessian passed to PySCF harmonic_analysis, not a PBE-D3(BJ) total Hessian. No standalone artifact binds either derived observable to the exact source-Hessian SHA-256."
+  },
+  "invalidated_downstream_artifacts": [
+    {
+      "path": "analysis/mettl7-phase2/tsl-rsh-curvature-campaign/d3-hessian-completion",
+      "reason": "compute_missing_d3_hessians.py directly reshaped the PySCF [56,56,3,3] electronic tensor to [168,168] without the required axis permutation; persisted total Hessians therefore combine incompatible Cartesian index topologies"
+    },
+    {
+      "path": "analysis/mettl7-phase2/tsl-rsh-curvature-campaign/analyze_total_hessian_internal_coordinates.py",
+      "reason": "its total-Hessian inputs come from the invalid component-index composition above"
+    },
+    {
+      "path": "analysis/mettl7-phase2/tsl-rsh-curvature-campaign/HESSIAN_AND_CURVATURE_DECISION_REPORT.md",
+      "reason": "any conclusion using the invalid total-Hessian completion is not trusted"
+    },
+    {
+      "path": "analysis/mettl7-phase2/execution-unit-05O/hessian-bonded-v3",
+      "reason": "historical Hessian-derived parameterization consumed the legacy flattened Hessian representation and predates observable-component completeness"
+    }
+  ],
+  "current_tsl_work_unblocked": false,
+  "blocking_reason": "GPU60 and CURVATURE76 remain trusted, but no complete trusted PBE-D3(BJ) minimum Hessian or correctly bound PBE-D3 vibrational observable currently exists. The attempted D3 completion has a Cartesian component-index ordering defect and must not feed model-form decisions."
+}
