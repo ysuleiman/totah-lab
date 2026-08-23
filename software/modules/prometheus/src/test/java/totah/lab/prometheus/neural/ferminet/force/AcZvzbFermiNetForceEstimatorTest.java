@@ -2,6 +2,7 @@ package totah.lab.prometheus.neural.ferminet.force;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
@@ -37,6 +38,40 @@ import totah.lab.prometheus.variational.force.AssarafCaffarelZvzbForceEstimator;
 final class AcZvzbFermiNetForceEstimatorTest {
 
     private static final double MINIMUM_AMPLITUDE = 1e-14;
+
+    @Test
+    void invalidSamplesAtBeginningMiddleAndEndCannotBecomePhantomZeros() throws Exception {
+        for (int invalid : new int[] {0, 2, 4}) {
+            double[] samples = AcZvzbFermiNetForceEstimator.invalidSampleMatrix(1, 5)[0];
+            for (int i = 0; i < samples.length; i++) if (i != invalid) samples[i] = i + 1.0;
+            assertTrue(Double.isNaN(samples[invalid]));
+            var tails = AcZvzbFermiNetForceEstimator.class.getDeclaredMethod(
+                    "tails", double[].class, int.class, double.class, double.class);
+            tails.setAccessible(true);
+            Object diagnostics = tails.invoke(null, samples, 4, 3.0,
+                    Math.sqrt(10.0 / 3.0));
+            assertTrue(diagnostics instanceof NuclearForceResult.TailDiagnostics);
+        }
+        var tails = AcZvzbFermiNetForceEstimator.class.getDeclaredMethod(
+                "tails", double[].class, int.class, double.class, double.class);
+        tails.setAccessible(true);
+        var error = assertThrows(java.lang.reflect.InvocationTargetException.class,
+                () -> tails.invoke(null, new double[] {0.0, 2.0, 4.0}, 2, 3.0, 1.0));
+        assertTrue(error.getCause() instanceof IllegalArgumentException);
+
+        var summary = AcZvzbFermiNetForceEstimator.summarizeSamplesForTesting(
+                new double[] {Double.NaN, 2, 3, 4, 5, Double.NaN},
+                new int[] {0, 0, 0, 1, 1, 1}, 2);
+        assertEquals(4, summary.finiteCount());
+        assertEquals(3.5, summary.mean(), 0.0);
+        assertEquals(5.0 / 3.0, summary.variance(), 1e-15);
+        assertEquals(1.0, summary.chainStandardError(), 0.0);
+        assertEquals(2.0, summary.tails().minimum(), 0.0);
+        assertEquals(3.5, summary.tails().median(), 0.0);
+        assertEquals(5.0, summary.tails().maximum(), 0.0);
+        assertEquals(AcZvzbFermiNetForceEstimator.IMPLEMENTATION_FAILURE,
+                summary.classification());
+    }
 
     /** Frozen H2 study parameters from NuclearForceEstimatorCapabilityStudy. */
     private static final ParameterVector H2_PARAMETERS = new ParameterVector(List.of(
@@ -323,8 +358,11 @@ final class AcZvzbFermiNetForceEstimatorTest {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 subsetFile, identity, "0".repeat(64),
                 checkpoint.rootParameterChecksum());
-        NuclearForceResult result = new FermiNetNuclearForcePipeline()
-                .estimate(context, NuclearForceConfiguration.acZvzb());
+        NuclearForceResult result = new AcZvzbFermiNetForceEstimator()
+                .estimate(context, NuclearForceConfiguration.acZvzb(),
+                        totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines
+                                .create(totah.lab.prometheus.neural.ferminet.runtime
+                                        .FermiNetDerivativeConfiguration.referenceJet()));
 
         assertEquals(NuclearForceEstimatorType.AC_ZVZB, result.estimatorType());
         assertEquals(9, result.components().size());

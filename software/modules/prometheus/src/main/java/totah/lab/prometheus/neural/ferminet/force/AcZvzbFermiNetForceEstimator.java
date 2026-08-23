@@ -147,8 +147,7 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
                 ? energySum / energyCount : Double.NaN;
 
         // Pass two: F = nn + G + 2 (E_v - E_L) Q per component per sample.
-        double[][] forceSamples = new double[components][samples];
-        boolean[][] finite = new boolean[components][samples];
+        double[][] forceSamples = invalidSampleMatrix(components, samples);
         double[] contractionSums = new double[components];
         double[] auxiliarySums = new double[components];
         double[] zeroBiasSums = new double[components];
@@ -176,7 +175,6 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
                     continue;
                 }
                 forceSamples[component][sample] = force;
-                finite[component][sample] = true;
                 contractionSums[component] += contraction;
                 auxiliarySums[component] += q;
                 zeroBiasSums[component] += zeroBias;
@@ -193,7 +191,7 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
             int axis = component % 3;
             int finiteCount = 0;
             for (int sample = 0; sample < samples; sample++) {
-                if (finite[component][sample]) finiteCount++;
+                if (Double.isFinite(forceSamples[component][sample])) finiteCount++;
             }
             anyNonfinite |= finiteCount < samples;
             var fd = reference.components().get(component);
@@ -353,6 +351,11 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
 
     private static NuclearForceResult.TailDiagnostics tails(
             double[] values, int finiteCount, double mean, double sd) {
+        int actualFiniteCount = 0;
+        for (double value : values) if (Double.isFinite(value)) actualFiniteCount++;
+        if (actualFiniteCount != finiteCount) {
+            throw new IllegalArgumentException("finite sample count disagrees with sample values");
+        }
         if (finiteCount == 0) {
             return new NuclearForceResult.TailDiagnostics(Double.NaN, Double.NaN,
                     Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
@@ -393,6 +396,27 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
         };
     }
 
+    static double[][] invalidSampleMatrix(int components, int samples) {
+        double[][] values = new double[components][samples];
+        for (double[] componentSamples : values) Arrays.fill(componentSamples, Double.NaN);
+        return values;
+    }
+
+    static SampleSummary summarizeSamplesForTesting(double[] values, int[] chains,
+            int walkers) {
+        int count = 0;
+        for (double value : values) if (Double.isFinite(value)) count++;
+        ComponentStatistics statistics = ComponentStatistics.compute(values, chains, walkers, count);
+        return new SampleSummary(count, statistics.mean(), statistics.variance(),
+                statistics.chainStandardError(), tails(values, count, statistics.mean(),
+                Math.sqrt(statistics.variance())), count == values.length
+                ? NUMERICALLY_OPERATIONAL : IMPLEMENTATION_FAILURE);
+    }
+
+    record SampleSummary(int finiteCount, double mean, double variance,
+            double chainStandardError, NuclearForceResult.TailDiagnostics tails,
+            String classification) {}
+
     private static String checksum(double[] values) {
         MessageDigest digest;
         try { digest = MessageDigest.getInstance("SHA-256"); }
@@ -413,6 +437,11 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
             double mean, double chainStandardError, double variance) {
         private static ComponentStatistics compute(
                 double[] forceSamples, int[] chains, int walkers, int finiteCount) {
+            int actualFiniteCount = 0;
+            for (double value : forceSamples) if (Double.isFinite(value)) actualFiniteCount++;
+            if (actualFiniteCount != finiteCount) {
+                throw new IllegalArgumentException("finite sample count disagrees with sample values");
+            }
             if (finiteCount == 0) {
                 return new ComponentStatistics(
                         Double.NaN, Double.NaN, Double.NaN);

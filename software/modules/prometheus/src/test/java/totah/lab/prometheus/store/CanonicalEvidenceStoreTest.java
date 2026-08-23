@@ -99,6 +99,12 @@ class CanonicalEvidenceStoreTest {
                 .hasMessageContaining("checksum mismatch");
     }
 
+    @Test
+    void manifestPathsUsePortableForwardSlashes() {
+        assertThat(CanonicalEvidenceStore.portableRelativePath(Path.of("quantum\\record.json")))
+                .isEqualTo("quantum/record.json");
+    }
+
     private static EvidenceImportDescriptor descriptor(String sourceFingerprint) {
         return new EvidenceImportDescriptor(
                 "publication-archive", sourceFingerprint, "generic-test-importer", "1.0.0",

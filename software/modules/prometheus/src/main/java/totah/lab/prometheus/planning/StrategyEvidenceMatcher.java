@@ -93,6 +93,8 @@ public final class StrategyEvidenceMatcher {
                     .filter(StrategyEvidenceMatcher::accepted)
                     .filter(e -> e.identity().calculationType() == derivation.sourceType())
                     .filter(e -> sameMoleculeAndGeometry(e.identity(), scientific))
+                    .filter(e -> e.identity().formalCharge() == scientific.formalCharge()
+                            && e.identity().multiplicity() == scientific.multiplicity())
                     .filter(e -> protocolCompatible(e.identity(), scientific, requirement.exactProtocolRequired()))
                     .sorted(Comparator.comparing(e -> e.identity().evidenceHash()))
                     .toList();

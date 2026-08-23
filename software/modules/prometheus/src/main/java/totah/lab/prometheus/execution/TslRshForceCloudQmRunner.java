@@ -62,8 +62,8 @@ public final class TslRshForceCloudQmRunner {
         Result result = execute(python, worker, directory, "QUAL-MIN01", "QUALIFICATION",
                 geometry, ArtifactChecksums.sha256(geometry), elements, atomOrder, 2, 3000);
         JsonNode trusted = JSON.readTree(reference.resolve("result.json").toFile());
-        double energyError = Math.abs(result.json.path("energy_hartree").asDouble()
-                - trusted.path("energy_hartree").asDouble());
+        double energyError = Math.abs(requiredFiniteNumber(result.json, "energy_hartree")
+                - requiredFiniteNumber(trusted, "energy_hartree"));
         double[][] expected = readMatrix(reference.resolve("final_gradient_hartree_per_bohr.txt"), elements.size());
         double gradientError = maxError(expected, result.json.path("gradient_hartree_per_bohr"));
         boolean passed = energyError <= 1.0e-9 && gradientError <= 1.0e-8;
@@ -183,12 +183,14 @@ public final class TslRshForceCloudQmRunner {
                 || !result.path("d3_parameters").equals(spec.path("d3_parameters"))) {
             throw new IOException("result D3 identity mismatch");
         }
-        if (!result.path("scf_converged").asBoolean() || !Double.isFinite(result.path("energy_hartree").asDouble()))
+        if (!result.has("scf_converged") || !result.get("scf_converged").isBoolean()
+                || !result.get("scf_converged").booleanValue())
             throw new IOException("unconverged or nonfinite result");
+        requiredFiniteNumber(result, "energy_hartree");
         JsonNode g=result.path("gradient_hartree_per_bohr"), f=result.path("force_hartree_per_bohr");
         if (g.size()!=atoms || f.size()!=atoms) throw new IOException("incomplete gradient/force");
         for(int i=0;i<atoms;i++) { if(g.get(i).size()!=3||f.get(i).size()!=3) throw new IOException("invalid Cartesian row");
-            for(int j=0;j<3;j++){double gv=g.get(i).get(j).asDouble(),fv=f.get(i).get(j).asDouble();
+            for(int j=0;j<3;j++){double gv=requiredFiniteNumber(g.get(i),j),fv=requiredFiniteNumber(f.get(i),j);
                 if(!Double.isFinite(gv)||!Double.isFinite(fv)||Double.doubleToRawLongBits(fv)!=Double.doubleToRawLongBits(-gv))
                     throw new IOException("force/gradient invariant failed at "+i+","+j);}}
     }
@@ -218,16 +220,18 @@ public final class TslRshForceCloudQmRunner {
 
     private static void requireQualified(Path output) throws IOException { Path p=output.resolve("QUALIFICATION_REPORT.json");
         if(!Files.isRegularFile(p)||!JSON.readTree(p.toFile()).path("external_qm_backend_qualified").asBoolean()) throw new IOException("qualification gate not passed"); }
-    private static void verifyFrozenInputs(Path cloud) throws IOException {
+    static void verifyFrozenInputs(Path cloud) throws IOException {
         Map<String,String> expected=new LinkedHashMap<>();for(String line:Files.readAllLines(cloud.resolve("SHA256SUMS"))){String[] p=line.trim().split("\\s+",2);if(p.length==2)expected.put(p[1].replaceFirst("^\\*",""),p[0]);}
-        for(var e:expected.entrySet()){Path p=cloud.resolve(e.getKey());if(Files.isRegularFile(p)&&!ArtifactChecksums.sha256(p).equals(e.getValue()))throw new IOException("frozen input checksum mismatch: "+e.getKey());}
+        for(var e:expected.entrySet()){Path p=cloud.resolve(e.getKey());if(!Files.isRegularFile(p))throw new IOException("frozen input missing: "+e.getKey());if(!ArtifactChecksums.sha256(p).equals(e.getValue()))throw new IOException("frozen input checksum mismatch: "+e.getKey());}
         JsonNode status=JSON.readTree(cloud.resolve("FORCE_CLOUD_STATUS.json").toFile());if(status.path("retained_count").asInt()!=60||status.path("training_count").asInt()!=45||status.path("holdout_count").asInt()!=15||!status.path("protocol_sha256").asText().equals(PROTOCOL))throw new IOException("force-cloud invariant failed");
         JsonNode seal=JSON.readTree(cloud.resolve("HOLDOUT_SEAL.json").toFile());if(seal.path("holdout_count").asInt()!=15||!seal.path("split_manifest_sha256").asText().equals(ArtifactChecksums.sha256(cloud.resolve("TRAIN_HOLDOUT_SPLIT.csv"))))throw new IOException("holdout seal invalid");
     }
     private static List<Snapshot> readManifest(Path cloud)throws IOException{List<Snapshot> out=new ArrayList<>();for(String line:Files.readAllLines(cloud.resolve("SNAPSHOT_MANIFEST.csv")).subList(1,61)){String[]p=line.split(",",10);if(!p[8].equals(PROTOCOL))throw new IOException("snapshot protocol mismatch");out.add(new Snapshot(p[0],p[1],p[5],p[6]));}return out;}
     private static List<String> readElements(Path path)throws IOException{return Files.readAllLines(path).stream().skip(1).map(s->s.split(",")[1].toUpperCase(Locale.ROOT)).toList();}
     private static double[][] readMatrix(Path p,int rows)throws IOException{double[][]v=new double[rows][3];List<String>l=Files.readAllLines(p);for(int i=0;i<rows;i++){String[]x=l.get(i).trim().split("\\s+");for(int j=0;j<3;j++)v[i][j]=Double.parseDouble(x[j]);}return v;}
-    private static double maxError(double[][]e,JsonNode a){double m=0;for(int i=0;i<e.length;i++)for(int j=0;j<3;j++)m=Math.max(m,Math.abs(e[i][j]-a.get(i).get(j).asDouble()));return m;}
+    private static double maxError(double[][]e,JsonNode a)throws IOException{double m=0;for(int i=0;i<e.length;i++)for(int j=0;j<3;j++)m=Math.max(m,Math.abs(e[i][j]-requiredFiniteNumber(a.get(i),j)));return m;}
+    private static double requiredFiniteNumber(JsonNode object,String field)throws IOException{JsonNode value=object.get(field);if(value==null||!value.isNumber()||!Double.isFinite(value.doubleValue()))throw new IOException("missing, non-numeric, or non-finite "+field);return value.doubleValue();}
+    private static double requiredFiniteNumber(JsonNode array,int index)throws IOException{JsonNode value=array.get(index);if(value==null||!value.isNumber()||!Double.isFinite(value.doubleValue()))throw new IOException("missing, non-numeric, or non-finite Cartesian component "+index);return value.doubleValue();}
     private static void setThreads(Map<String,String>env,int n){String v=Integer.toString(n);for(String k:List.of("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS","VECLIB_MAXIMUM_THREADS","NUMEXPR_NUM_THREADS","BLIS_NUM_THREADS"))env.put(k,v);}
     private static void writeJson(Path p,JsonNode n)throws IOException{Files.createDirectories(p.getParent());Path t=Files.createTempFile(p.getParent(),p.getFileName().toString(),".tmp");JSON.writerWithDefaultPrettyPrinter().writeValue(t.toFile(),n);Files.move(t,p,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}
     private static void writeChecksums(Path d)throws IOException{StringBuilder b=new StringBuilder();try(var s=Files.list(d)){for(Path p:s.filter(Files::isRegularFile).sorted().toList())if(!p.getFileName().toString().equals("SHA256SUMS"))b.append(ArtifactChecksums.sha256(p)).append("  ").append(p.getFileName()).append('\n');}Files.writeString(d.resolve("SHA256SUMS"),b);}

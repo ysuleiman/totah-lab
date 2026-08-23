@@ -199,11 +199,15 @@ public final class CanonicalEvidenceStore {
             Path path,
             Path generation,
             EvidenceStoreManifest manifest) throws IOException {
-        String relative = generation.relativize(path).toString();
+        String relative = portableRelativePath(generation.relativize(path));
         String expected = manifest.recordSha256().get(relative);
         if (expected == null || !expected.equals(sha256(Files.readAllBytes(path)))) {
             throw new IOException("canonical evidence checksum mismatch: " + relative);
         }
+    }
+
+    static String portableRelativePath(Path relative) {
+        return relative.toString().replace('\\', '/');
     }
 
     private static Path generationPath(Path storeRoot, String generationId) {

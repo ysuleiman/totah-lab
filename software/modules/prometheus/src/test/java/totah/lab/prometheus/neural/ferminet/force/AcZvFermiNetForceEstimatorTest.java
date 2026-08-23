@@ -284,8 +284,11 @@ final class AcZvFermiNetForceEstimatorTest {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 subsetFile, identity, "0".repeat(64),
                 checkpoint.rootParameterChecksum());
-        NuclearForceResult result = new FermiNetNuclearForcePipeline()
-                .estimate(context, NuclearForceConfiguration.acZv());
+        NuclearForceResult result = new AcZvFermiNetForceEstimator().estimate(
+                context, NuclearForceConfiguration.acZv(),
+                totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines
+                        .create(totah.lab.prometheus.neural.ferminet.runtime
+                                .FermiNetDerivativeConfiguration.referenceJet()));
 
         assertEquals(NuclearForceEstimatorType.AC_ZV, result.estimatorType());
         assertEquals(9, result.components().size());

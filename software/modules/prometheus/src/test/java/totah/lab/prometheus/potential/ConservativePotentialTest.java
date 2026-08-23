@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import totah.lab.prometheus.potential.delta.basis.CompositeManyBodyBasis;
+import totah.lab.prometheus.potential.delta.basis.BasisEvaluation;
 import totah.lab.prometheus.potential.delta.basis.FourBodyBasis;
 import totah.lab.prometheus.potential.delta.basis.ManyBodyBasis;
 import totah.lab.prometheus.potential.delta.basis.ThreeBodyBasis;
@@ -35,6 +36,14 @@ class ConservativePotentialTest {
         ManyBodyBasis basis=new FourBodyBasis(List.of(new FourBodyBasis.Motif(FourBodyBasis.Kind.TORSION_FOURIER,0,1,2,3),new FourBodyBasis.Motif(FourBodyBasis.Kind.ANGLE_PAIR,0,1,2,3)));
         double[] coefficients=new double[basis.dimension()];for(int i=0;i<coefficients.length;i++)coefficients[i]=.013*(i+1);LinearDeltaModel model=new LinearDeltaModel(basis,new DeltaModelParameters(coefficients),new DeltaModelIdentity("4B","b","t","f","test"));double[][] xyz={{0,0,0},{1.2,.1,0},{1.8,1.1,.3},{2.4,1.4,1.2}};PotentialEvaluation evaluation=model.evaluate(new QuantumCoordinates(xyz));double h=1e-5,max=0,sum=0;int n=0;
         for(int atom=0;atom<4;atom++)for(int axis=0;axis<3;axis++){double[][]plus=copy(xyz),minus=copy(xyz);plus[atom][axis]+=h;minus[atom][axis]-=h;double fd=-(model.evaluate(new QuantumCoordinates(plus)).energy()-model.evaluate(new QuantumCoordinates(minus)).energy())/(2*h);double d=Math.abs(fd-evaluation.forces()[atom][axis]);max=Math.max(max,d);sum+=d*d;n++;}assertThat(max).isLessThanOrEqualTo(1e-4);assertThat(Math.sqrt(sum/n)).isLessThanOrEqualTo(1e-5);
+    }
+    @Test void sulfurBranchAnglePairUsesTheLockedSharedFourthTopology() {
+        FourBodyBasis basis=new FourBodyBasis(List.of(new FourBodyBasis.Motif(
+                FourBodyBasis.Kind.ANGLE_PAIR_SHARED_FOURTH,0,1,2,3)));
+        double[][] xyz={{1,0,0},{0,0,0},{0,1,0},{1,1,0}};
+        BasisEvaluation evaluation=basis.evaluate(new QuantumCoordinates(xyz));
+        assertThat(evaluation.values()[0]).isCloseTo(0.5,
+                org.assertj.core.data.Offset.offset(1e-15));
     }
     private static double[][] copy(double[][] value){return java.util.Arrays.stream(value).map(double[]::clone).toArray(double[][]::new);}
     private static double[][] transform(double[][] points,double[][]r){double[][]out=new double[points.length][3];for(int i=0;i<points.length;i++)for(int a=0;a<3;a++)for(int b=0;b<3;b++)out[i][a]+=r[a][b]*points[i][b];return out;}

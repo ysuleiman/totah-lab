@@ -162,14 +162,18 @@ public final class AcZvzbDerivFermiNetForceEstimator
                 ? energySum / energyCount : Double.NaN;
 
         // Pass two: F = nn + G + 2(E_v - E_L) d log|Psi|/dR per component.
-        double[][] forceSamples = new double[components][samples];
-        double[][] zbDerivSamples = new double[components][samples];
-        double[][] zbMinimalQSamples = new double[components][samples];
-        boolean[][] finite = new boolean[components][samples];
+        double[][] forceSamples = invalidSampleMatrix(components, samples);
+        double[][] zbDerivSamples = invalidSampleMatrix(components, samples);
+        double[][] zbMinimalQSamples = invalidSampleMatrix(components, samples);
         double[] contractionSums = new double[components];
         double[] responseSums = new double[components];
         double[][] finitePartSamples = configuration.pathakWagner() == null
                 ? null : new double[components][samples];
+        if (finitePartSamples != null) {
+            for (double[] componentSamples : finitePartSamples) {
+                Arrays.fill(componentSamples, Double.NaN);
+            }
+        }
         for (int sample = 0; sample < samples; sample++) {
             if (electronLogGradients[sample] == null) continue;
             for (int component = 0; component < components; component++) {
@@ -184,7 +188,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
                             electronLogGradients[sample], nucleus, axis);
                 } catch (FermiNetPhysicalSingularityException exception) {
                     markNonfinite(forceSamples, zbDerivSamples,
-                            zbMinimalQSamples, finite, component, sample);
+                            zbMinimalQSamples, component, sample);
                     continue;
                 }
                 double centered = meanEnergy - localEnergies[sample];
@@ -194,7 +198,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
                 double force = nuclearRepulsion[component] + contraction + zbDeriv;
                 if (!Double.isFinite(force) || !Double.isFinite(zbMinimalQ)) {
                     markNonfinite(forceSamples, zbDerivSamples,
-                            zbMinimalQSamples, finite, component, sample);
+                            zbMinimalQSamples, component, sample);
                     continue;
                 }
                 forceSamples[component][sample] = force;
@@ -204,7 +208,6 @@ public final class AcZvzbDerivFermiNetForceEstimator
                 }
                 zbDerivSamples[component][sample] = zbDeriv;
                 zbMinimalQSamples[component][sample] = zbMinimalQ;
-                finite[component][sample] = true;
                 contractionSums[component] += contraction;
                 responseSums[component] += nuclearLogGradients[sample][component];
             }
@@ -220,7 +223,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
             int axis = component % 3;
             int finiteCount = 0;
             for (int sample = 0; sample < samples; sample++) {
-                if (finite[component][sample]) finiteCount++;
+                if (Double.isFinite(forceSamples[component][sample])) finiteCount++;
             }
             anyNonfinite |= finiteCount < samples;
             var fd = reference.components().get(component);
@@ -291,7 +294,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
                 configuration.pathakWagner() == null ? null
                         : pathakWagnerDiagnostics(configuration.pathakWagner(),
                                 electronLogGradients, finitePartSamples,
-                                zbDerivSamples, finite, chains, walkers,
+                                zbDerivSamples, chains, walkers,
                                 components, samples);
         return new NuclearForceResult(
                 NuclearForceEstimatorType.AC_ZVZB_DERIV, classification,
@@ -310,7 +313,6 @@ public final class AcZvzbDerivFermiNetForceEstimator
                     double[][] electronLogGradients,
                     double[][] finitePartSamples,
                     double[][] zbSamples,
-                    boolean[][] finite,
                     int[] chains,
                     int walkers,
                     int components,
@@ -348,7 +350,9 @@ public final class AcZvzbDerivFermiNetForceEstimator
                 if (factor < 1.0) factorLessThanOne++;
                 if (factor > 1.0) factorGreaterThanOne++;
                 for (int component = 0; component < components; component++) {
-                    panelSamples[e][component][sample] = finite[component][sample]
+                    panelSamples[e][component][sample] = Double.isFinite(
+                            finitePartSamples[component][sample])
+                            && Double.isFinite(zbSamples[component][sample])
                             ? finitePartSamples[component][sample]
                                     + factor * zbSamples[component][sample]
                             : Double.NaN;
@@ -398,6 +402,9 @@ public final class AcZvzbDerivFermiNetForceEstimator
             }
             squaredNorm += value * value;
         }
+        if (!Double.isFinite(squaredNorm)) {
+            throw new IllegalArgumentException("electron log-gradient norm overflow");
+        }
         return squaredNorm == 0.0
                 ? Double.POSITIVE_INFINITY : 1.0 / Math.sqrt(squaredNorm);
     }
@@ -422,7 +429,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
         for (int i = 0; i < epsilon.length; i++) {
             x[i] = epsilon[i] * epsilon[i] * epsilon[i];
             y[i] = ComponentStatistics.compute(samples[i][component], chains,
-                    walkers, samples[i][component].length).mean();
+                    walkers, finiteCount(samples[i][component])).mean();
         }
         LinearFit fit = linearFit(x, y, 0, x.length);
         double[] coefficients = interceptCoefficients(x, 0, x.length);
@@ -434,7 +441,7 @@ public final class AcZvzbDerivFermiNetForceEstimator
             }
         }
         ComponentStatistics interceptStatistics = ComponentStatistics.compute(
-                interceptSamples, chains, walkers, interceptSamples.length);
+                interceptSamples, chains, walkers, finiteCount(interceptSamples));
         double[] residuals = new double[x.length];
         for (int i = 0; i < x.length; i++) {
             residuals[i] = y[i] - (fit.intercept() + fit.slope() * x[i]);
@@ -479,14 +486,19 @@ public final class AcZvzbDerivFermiNetForceEstimator
 
     private record LinearFit(double intercept, double slope) {}
 
+    private static int finiteCount(double[] values) {
+        int count = 0;
+        for (double value : values) if (Double.isFinite(value)) count++;
+        return count;
+    }
+
     private static void markNonfinite(
             double[][] forceSamples, double[][] zbDerivSamples,
-            double[][] zbMinimalQSamples, boolean[][] finite,
+            double[][] zbMinimalQSamples,
             int component, int sample) {
         forceSamples[component][sample] = Double.NaN;
         zbDerivSamples[component][sample] = Double.NaN;
         zbMinimalQSamples[component][sample] = Double.NaN;
-        finite[component][sample] = false;
     }
 
     private static double mean(double sum, int count) {
@@ -610,6 +622,10 @@ public final class AcZvzbDerivFermiNetForceEstimator
 
     private static NuclearForceResult.TailDiagnostics tails(
             double[] values, int finiteCount, double mean, double sd) {
+        int actualFiniteCount = finiteCount(values);
+        if (actualFiniteCount != finiteCount) {
+            throw new IllegalArgumentException("finite sample count disagrees with sample values");
+        }
         if (finiteCount == 0) {
             return new NuclearForceResult.TailDiagnostics(Double.NaN, Double.NaN,
                     Double.NaN, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
@@ -650,6 +666,12 @@ public final class AcZvzbDerivFermiNetForceEstimator
         };
     }
 
+    static double[][] invalidSampleMatrix(int components, int samples) {
+        double[][] values = new double[components][samples];
+        for (double[] componentSamples : values) Arrays.fill(componentSamples, Double.NaN);
+        return values;
+    }
+
     private static String checksum(double[] values) {
         MessageDigest digest;
         try { digest = MessageDigest.getInstance("SHA-256"); }
@@ -670,6 +692,10 @@ public final class AcZvzbDerivFermiNetForceEstimator
             double mean, double chainStandardError, double variance) {
         private static ComponentStatistics compute(
                 double[] forceSamples, int[] chains, int walkers, int finiteCount) {
+            int actualFiniteCount = finiteCount(forceSamples);
+            if (actualFiniteCount != finiteCount) {
+                throw new IllegalArgumentException("finite sample count disagrees with sample values");
+            }
             if (finiteCount == 0) {
                 return new ComponentStatistics(
                         Double.NaN, Double.NaN, Double.NaN);

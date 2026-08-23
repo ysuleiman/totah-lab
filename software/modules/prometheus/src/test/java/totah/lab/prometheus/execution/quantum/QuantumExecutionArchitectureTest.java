@@ -83,6 +83,33 @@ class QuantumExecutionArchitectureTest {
         assertThat(result.forceIsNegativeGradient(0.0)).isTrue();
     }
 
+    @Test
+    void nonfiniteForceOrGradientNeverPassesNegativeGradientInvariant() {
+        QuantumExecutionRequest request = request(List.of());
+        var nan = new QuantumResult.CartesianField(
+                List.of(new QuantumResult.Vector3(Double.NaN, 0.0, 0.0)),
+                QuantumResult.CartesianUnit.HARTREE_PER_BOHR);
+        QuantumResult result = new QuantumResult(request.scientificIdentity(), "java-native", "1",
+                ConvergenceStatus.CONVERGED, Optional.empty(), Optional.of(nan), Optional.of(nan),
+                Map.of(), Map.of(), Instant.EPOCH);
+        assertThat(result.forceIsNegativeGradient(0.0)).isFalse();
+        assertThatThrownBy(() -> result.forceIsNegativeGradient(Double.NaN))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void requiredOutputsParticipateInScientificIdentity() {
+        QuantumExecutionRequest base = request(List.of());
+        CalculationSpecification old = base.specification();
+        CalculationSpecification changed = new CalculationSpecification(old.specificationId(),
+                old.scientificPurpose(), old.molecule(), old.geometry(), old.formalCharge(),
+                old.multiplicity(), old.protocol(), old.constraints(), old.calculationType(),
+                List.of("absolute energy"), old.acceptanceGates(), old.role(), old.estimatedCost());
+        QuantumExecutionRequest other = new QuantumExecutionRequest(changed, base.geometry(),
+                base.canonicalAtomMapHash(), base.solverMode(), base.requiredObservables(), base.options());
+        assertThat(other.scientificIdentity()).isNotEqualTo(base.scientificIdentity());
+    }
+
     private static QuantumBackend backend(String id, Set<QuantumObservable> observables) {
         return new QuantumBackend() {
             @Override public String backendId() { return id; }

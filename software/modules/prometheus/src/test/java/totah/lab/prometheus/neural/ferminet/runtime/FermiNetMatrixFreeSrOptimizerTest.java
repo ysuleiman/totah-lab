@@ -66,6 +66,7 @@ final class FermiNetMatrixFreeSrOptimizerTest {
         assertTrue(Double.isFinite(result.relativeTrueResidual()));
         assertTrue(result.relativeTrueResidual() <= 1.0e-11);
         assertEquals(1, result.solverIterations());
+        assertEquals(result.solverIterations(), result.trueResidualHistory().size());
         assertEquals(0, result.streamedOperatorPasses());
         assertEquals(4L,
                 result.sampleEvaluations(),

@@ -22,10 +22,34 @@ final class FermiNetNuclearForceValidationTest {
 
     @Test void geometryOutsidePrecisionDerivedPlanarityToleranceIsNotPlanar() {
         assertFalse(FermiNetNuclearForceValidation.validate(
-                molecule(2.0 * FermiNetNuclearForceValidation
-                        .PLANAR_GEOMETRY_TOLERANCE_BOHR),
-                result(new double[][]{{1, 2, 3}, {-4, 5, -6}}))
+                nonplanarMolecule(),
+                result(new double[][]{{1, 2, 3}, {-4, 5, -6}, {2, 1, 0}, {1, 1, 1}}))
                 .planarGeometry());
+    }
+
+    @Test void componentLengthCannotHideDuplicateOrOutOfRangeIdentities() {
+        NuclearForceResult valid = result(new double[][]{{1, 2, 3}, {-4, 5, -6}});
+        List<NuclearForceResult.Component> duplicate = new ArrayList<>(valid.components());
+        duplicate.set(5, duplicate.get(0));
+        NuclearForceResult malformed = new NuclearForceResult(valid.estimatorType(),
+                valid.classification(), valid.parameterChecksum(), valid.geometryIdentity(),
+                valid.datasetChecksum(), valid.checkpointChecksum(),
+                valid.estimatorConfigurationIdentity(), valid.sampleCount(), valid.chainCount(),
+                valid.retainedPerChain(), duplicate, valid.estimatorDiagnostics());
+        assertThrows(IllegalArgumentException.class,
+                () -> FermiNetNuclearForceValidation.validate(molecule(0), malformed));
+    }
+
+    @Test void planarityAndOutOfPlaneForceAreOrientationIndependent() {
+        Molecule yzPlane = new Molecule("yz-plane", List.of(
+                new NuclearCenter(0,"O",new NuclearCharge(8),new CartesianPosition(0,0,0,LengthUnit.BOHR)),
+                new NuclearCenter(1,"H",new NuclearCharge(1),new CartesianPosition(0,1,0,LengthUnit.BOHR)),
+                new NuclearCenter(2,"H",new NuclearCharge(1),new CartesianPosition(0,0,1,LengthUnit.BOHR))),
+                new MolecularCharge(0),new ElectronCount(10),new SpinSector(5,5,1));
+        var validation = FermiNetNuclearForceValidation.validate(yzPlane,
+                result(new double[][]{{2,0,0},{-3,0,0},{1,0,0}}));
+        assertTrue(validation.planarGeometry());
+        assertEquals(3.0, validation.maximumAbsoluteOutOfPlaneForce(), 0.0);
     }
 
     private static Molecule molecule(double secondZ) {
@@ -34,6 +58,15 @@ final class FermiNetNuclearForceValidationTest {
                         new CartesianPosition(0.2,-0.3,0,LengthUnit.BOHR)),
                 new NuclearCenter(1,"H",new NuclearCharge(1),
                         new CartesianPosition(1.7,0.4,secondZ,LengthUnit.BOHR))),
+                new MolecularCharge(0),new ElectronCount(9),new SpinSector(5,4,2));
+    }
+
+    private static Molecule nonplanarMolecule() {
+        return new Molecule("nonplanar", List.of(
+                new NuclearCenter(0,"C",new NuclearCharge(6),new CartesianPosition(0,0,0,LengthUnit.BOHR)),
+                new NuclearCenter(1,"H",new NuclearCharge(1),new CartesianPosition(1,0,0,LengthUnit.BOHR)),
+                new NuclearCenter(2,"H",new NuclearCharge(1),new CartesianPosition(0,1,0,LengthUnit.BOHR)),
+                new NuclearCenter(3,"H",new NuclearCharge(1),new CartesianPosition(0,0,1e-3,LengthUnit.BOHR))),
                 new MolecularCharge(0),new ElectronCount(9),new SpinSector(5,4,2));
     }
 

@@ -36,6 +36,24 @@ import totah.lab.prometheus.variational.QuantumCoordinates;
 
 final class AcZvzbDerivFermiNetForceEstimatorTest {
 
+    @Test
+    void derivativeEstimatorInvalidSamplesAreExplicitNanAtEveryPosition() {
+        for (int invalid : new int[] {0, 2, 4}) {
+            double[] samples = AcZvzbDerivFermiNetForceEstimator
+                    .invalidSampleMatrix(1, 5)[0];
+            for (int i = 0; i < samples.length; i++) if (i != invalid) samples[i] = i + 1.0;
+            assertTrue(Double.isNaN(samples[invalid]));
+            double sum = 0.0;
+            int count = 0;
+            for (double value : samples) if (Double.isFinite(value)) {
+                sum += value;
+                count++;
+            }
+            assertEquals(4, count);
+            assertEquals((15.0 - (invalid + 1.0)) / 4.0, sum / count, 0.0);
+        }
+    }
+
     /** Frozen H2 study parameters from NuclearForceEstimatorCapabilityStudy. */
     private static final ParameterVector H2_PARAMETERS = new ParameterVector(List.of(
             .8576772116910546, .11919655001255025, -.06709570692540537,
@@ -285,14 +303,16 @@ final class AcZvzbDerivFermiNetForceEstimatorTest {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 subsetFile, identity, "0".repeat(64),
                 checkpoint.rootParameterChecksum());
-        var pipeline = new FermiNetNuclearForcePipeline();
-        NuclearForceResult acZvResult = pipeline.estimate(
-                context, NuclearForceConfiguration.acZv());
-        NuclearForceResult result = pipeline.estimate(
-                context, NuclearForceConfiguration.acZvzbDeriv());
-        NuclearForceResult regularized = pipeline.estimate(
+        var engine = totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines
+                .create(totah.lab.prometheus.neural.ferminet.runtime
+                        .FermiNetDerivativeConfiguration.referenceJet());
+        NuclearForceResult acZvResult = new AcZvFermiNetForceEstimator().estimate(
+                context, NuclearForceConfiguration.acZv(), engine);
+        NuclearForceResult result = new AcZvzbDerivFermiNetForceEstimator().estimate(
+                context, NuclearForceConfiguration.acZvzbDeriv(), engine);
+        NuclearForceResult regularized = new AcZvzbDerivFermiNetForceEstimator().estimate(
                 context, NuclearForceConfiguration.acZvzbDerivPathakWagner(
-                        0.100, 0.050, 0.020, 0.010, 0.005));
+                        0.100, 0.050, 0.020, 0.010, 0.005), engine);
 
         assertEquals(NuclearForceEstimatorType.AC_ZVZB_DERIV,
                 result.estimatorType());

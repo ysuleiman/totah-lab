@@ -188,7 +188,7 @@ public final class FermiNetH2oSrLinearSolveDiagnosticDriver {
                     "empty true-residual history");
         }
 
-        if (history.size() != result.solverIterations() + 1) {
+        if (history.size() != result.solverIterations()) {
             throw new IllegalStateException(
                     "unexpected residual-history length: "
                             + history.size()

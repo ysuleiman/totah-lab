@@ -22,12 +22,12 @@ public final class AmberPrmtopReader {
     public AmberTopologyResult read(Path topology) throws IOException {
         ArtifactLines file = ArtifactLines.read(topology);
         Map<String, Section> sections = sections(file.lines());
-        List<String> pointers = tokens(file.lines(), sections.get("POINTERS"));
+        List<String> pointers = numericTokens(file.lines(), sections.get("POINTERS"));
         if (pointers.isEmpty()) throw new IOException("Missing POINTERS in " + topology);
         int atoms = Integer.parseInt(pointers.getFirst());
         List<String> names = fixedStrings(file.lines(), sections.get("ATOM_NAME"), atoms);
         List<String> types = fixedStrings(file.lines(), sections.get("AMBER_ATOM_TYPE"), atoms);
-        List<String> scaledTokens = tokens(file.lines(), sections.get("CHARGE"));
+        List<String> scaledTokens = numericTokens(file.lines(), sections.get("CHARGE"));
         if (scaledTokens.size() < atoms) throw new IOException("CHARGE shorter than NATOM");
         List<Double> charges = new ArrayList<>(atoms);
         for (int i = 0; i < atoms; i++) charges.add(Double.parseDouble(scaledTokens.get(i)) / AMBER_CHARGE_SCALE);
@@ -56,18 +56,26 @@ public final class AmberPrmtopReader {
     }
 
     private static List<String> fixedStrings(List<String> lines, Section section, int count) throws IOException {
-        List<String> values = tokens(lines, section);
+        List<String> values = tokens(lines, section, false);
         if (values.size() < count) throw new IOException("Topology section shorter than NATOM");
         return List.copyOf(values.subList(0, count));
     }
 
-    private static List<String> tokens(List<String> lines, Section section) throws IOException {
+    private static List<String> numericTokens(List<String> lines, Section section) throws IOException {
+        return tokens(lines, section, true);
+    }
+
+    private static List<String> tokens(List<String> lines, Section section,
+            boolean normalizeFortranExponent) throws IOException {
         if (section == null) throw new IOException("Required prmtop section missing");
         List<String> values = new ArrayList<>();
         for (String line : lines.subList(section.start(), section.end())) {
             for (int i = 0; i < line.length(); i += section.width()) {
                 String value = line.substring(i, Math.min(i + section.width(), line.length())).trim();
-                if (!value.isEmpty()) values.add(value.replace('D', 'E'));
+                if (!value.isEmpty()) {
+                    values.add(normalizeFortranExponent
+                            ? value.replace('D', 'E').replace('d', 'e') : value);
+                }
             }
         }
         return values;

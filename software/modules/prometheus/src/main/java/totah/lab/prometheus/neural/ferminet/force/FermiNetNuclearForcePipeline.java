@@ -32,8 +32,7 @@ public final class FermiNetNuclearForcePipeline {
     public NuclearForceResult estimate(
             FermiNetForceEvaluationContext context,
             NuclearForceConfiguration configuration) throws IOException {
-        return estimate(context, configuration,
-                FermiNetDerivativeConfiguration.referenceJet());
+        throw new IOException("unverified FermiNet force context; call context.verified(checkpoint) before scientific execution");
     }
 
     public NuclearForceResult estimate(
@@ -41,6 +40,23 @@ public final class FermiNetNuclearForcePipeline {
             NuclearForceConfiguration configuration,
             FermiNetDerivativeConfiguration derivativeConfiguration)
             throws IOException {
+        throw new IOException("unverified FermiNet force context; call context.verified(checkpoint) before scientific execution");
+    }
+
+    public NuclearForceResult estimate(
+            FermiNetForceEvaluationContext.Verified verified,
+            NuclearForceConfiguration configuration) throws IOException {
+        return estimate(verified, configuration,
+                FermiNetDerivativeConfiguration.referenceJet());
+    }
+
+    public NuclearForceResult estimate(
+            FermiNetForceEvaluationContext.Verified verified,
+            NuclearForceConfiguration configuration,
+            FermiNetDerivativeConfiguration derivativeConfiguration)
+            throws IOException {
+        Objects.requireNonNull(verified, "verified");
+        FermiNetForceEvaluationContext context = verified.context();
         Objects.requireNonNull(context, "context");
         Objects.requireNonNull(configuration, "configuration");
         FermiNetNuclearForceEstimator estimator = estimators.get(

@@ -73,5 +73,10 @@ public final class PreconditionedConjugateGradientSolver {
             solution = solution.clone();
             residualHistory = List.copyOf(residualHistory);
         }
+
+        @Override
+        public double[] solution() {
+            return solution.clone();
+        }
     }
 }

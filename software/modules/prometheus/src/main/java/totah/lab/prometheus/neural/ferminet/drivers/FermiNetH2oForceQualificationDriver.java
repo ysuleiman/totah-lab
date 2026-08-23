@@ -75,8 +75,8 @@ public final class FermiNetH2oForceQualificationDriver {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 arguments.dataset(), dataset, sha256(arguments.checkpoint()),
                 checkpoint.rootParameterChecksum());
-        context.verifyDataset();
-        var provenanceVerification = context.verifyCheckpoint(arguments.checkpoint());
+        var verifiedContext = context.verified(arguments.checkpoint());
+        var provenanceVerification = verifiedContext.provenance();
         NuclearForceConfiguration configuration = switch (arguments.estimator()) {
             case CORRELATED_FD -> NuclearForceConfiguration.correlatedFd(
                     FermiNetCorrelatedFiniteDifferenceForceReference.STEP_BOHR);
@@ -92,7 +92,7 @@ public final class FermiNetH2oForceQualificationDriver {
         var derivativeConfiguration = new FermiNetDerivativeConfiguration(
                 arguments.derivativeEngine(), arguments.forceParallelism());
         var result = new FermiNetNuclearForcePipeline().estimate(
-                context, configuration, derivativeConfiguration);
+                verifiedContext, configuration, derivativeConfiguration);
         var validation = FermiNetNuclearForceValidation.validate(molecule, result);
         var physicalDiagnostics = FermiNetNuclearForceValidation
                 .physicalDiagnostics(molecule, result);

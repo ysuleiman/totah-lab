@@ -16,19 +16,25 @@ public final class FermiNetNuclearForceValidation {
         if (result.components().size() != expected) {
             throw new IllegalArgumentException("incomplete nuclear force vector");
         }
+        requireCompleteCartesianIdentity(molecule, result);
         double[] total = new double[3];
         int finite = 0, nonfinite = 0;
         double maximumPlanar = 0.0;
-        double referenceZ = molecule.nuclei().get(0).position().inBohr().z();
-        boolean planar = molecule.nuclei().stream().allMatch(value ->
-                Math.abs(value.position().inBohr().z() - referenceZ)
-                        <= PLANAR_GEOMETRY_TOLERANCE_BOHR);
+        double[] normal = molecularPlaneNormal(molecule);
+        boolean planar = normal != null;
         for (var component : result.components()) {
             double value = component.meanHartreePerBohr();
             if (Double.isFinite(value)) finite++; else nonfinite++;
             total[component.axis()] += value;
-            if (planar && component.axis() == 2) {
-                maximumPlanar = Math.max(maximumPlanar, Math.abs(value));
+        }
+        if (planar) {
+            for (int nucleus = 0; nucleus < molecule.nuclei().size(); nucleus++) {
+                double[] force = new double[3];
+                for (var component : result.components()) if (component.nucleus() == nucleus) {
+                    force[component.axis()] = component.meanHartreePerBohr();
+                }
+                maximumPlanar = Math.max(maximumPlanar, Math.abs(force[0] * normal[0]
+                        + force[1] * normal[1] + force[2] * normal[2]));
             }
         }
         return new Result(
@@ -61,6 +67,7 @@ public final class FermiNetNuclearForceValidation {
         if (result.components().size() != expected) {
             throw new IllegalArgumentException("incomplete nuclear force vector");
         }
+        requireCompleteCartesianIdentity(molecule, result);
         double chargeSum = molecule.nuclei().stream()
                 .mapToDouble(nucleus -> nucleus.charge().atomicNumber()).sum();
         double ox = 0, oy = 0, oz = 0;
@@ -102,6 +109,51 @@ public final class FermiNetNuclearForceValidation {
     private static double norm(double[] value) {
         return Math.sqrt(value[0] * value[0] + value[1] * value[1]
                 + value[2] * value[2]);
+    }
+
+    private static void requireCompleteCartesianIdentity(Molecule molecule,
+            NuclearForceResult result) {
+        boolean[][] seen = new boolean[molecule.nuclei().size()][3];
+        for (var component : result.components()) {
+            if (component.nucleus() < 0 || component.nucleus() >= seen.length
+                    || component.axis() < 0 || component.axis() >= 3) {
+                throw new IllegalArgumentException("nuclear force component index out of range");
+            }
+            if (seen[component.nucleus()][component.axis()]) {
+                throw new IllegalArgumentException("duplicate nuclear force component identity");
+            }
+            seen[component.nucleus()][component.axis()] = true;
+        }
+        for (boolean[] nucleus : seen) for (boolean axis : nucleus) if (!axis) {
+            throw new IllegalArgumentException("missing nuclear force component identity");
+        }
+    }
+
+    private static double[] molecularPlaneNormal(Molecule molecule) {
+        if (molecule.nuclei().size() < 3) return new double[] {0.0, 0.0, 1.0};
+        var origin = molecule.nuclei().get(0).position().inBohr();
+        for (int i = 1; i < molecule.nuclei().size() - 1; i++) {
+            var a = molecule.nuclei().get(i).position().inBohr();
+            for (int j = i + 1; j < molecule.nuclei().size(); j++) {
+                var b = molecule.nuclei().get(j).position().inBohr();
+                double[] u = {a.x() - origin.x(), a.y() - origin.y(), a.z() - origin.z()};
+                double[] v = {b.x() - origin.x(), b.y() - origin.y(), b.z() - origin.z()};
+                double[] n = {u[1] * v[2] - u[2] * v[1],
+                        u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]};
+                double length = norm(n);
+                if (length <= PLANAR_GEOMETRY_TOLERANCE_BOHR) continue;
+                for (int axis = 0; axis < 3; axis++) n[axis] /= length;
+                for (var nucleus : molecule.nuclei()) {
+                    var p = nucleus.position().inBohr();
+                    double distance = Math.abs((p.x() - origin.x()) * n[0]
+                            + (p.y() - origin.y()) * n[1]
+                            + (p.z() - origin.z()) * n[2]);
+                    if (distance > PLANAR_GEOMETRY_TOLERANCE_BOHR) return null;
+                }
+                return n;
+            }
+        }
+        return new double[] {0.0, 0.0, 1.0};
     }
 
     public record PhysicalDiagnostics(boolean finiteVector,

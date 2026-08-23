@@ -113,7 +113,7 @@ public final class HydrogenMoleculeGeneration2Postprocessor {
                 100*work,speed,100*continuation);}
 
     private static void gate(StringBuilder out,String name,double value,String threshold,boolean pass){out.append(String.format(Locale.ROOT,"%s,%.16g,%s,%s%n",name,value,threshold,pass));}
-    private static double number(String json,String name){var matcher=Pattern.compile("\\\""+name+"\\\":(-?[0-9.Ee+]+)").matcher(json);
+    static double number(String json,String name){var matcher=Pattern.compile("\\\""+name+"\\\":([-+]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[Ee][-+]?[0-9]+)?)").matcher(json);
         if(!matcher.find())throw new IllegalArgumentException("missing "+name);return Double.parseDouble(matcher.group(1));}
     private static boolean bool(String json,String name){var matcher=Pattern.compile("\\\""+name+"\\\":(true|false)").matcher(json);
         if(!matcher.find())throw new IllegalArgumentException("missing "+name);return Boolean.parseBoolean(matcher.group(1));}

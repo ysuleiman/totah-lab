@@ -38,4 +38,18 @@ class AmberPrmtopReaderTest {
         assertThat(result.totalCharge().value().orElseThrow()).isZero();
         assertThat(result.charges().provenance().getFirst().sha256()).hasSize(64);
     }
+
+    @Test
+    void parsesFortranDExponentWithoutTransformingFixedWidthIdentifiers() throws Exception {
+        Path topology = Path.of("src/test/resources/amber/identifier-and-d-exponent.prmtop");
+
+        AmberTopologyResult result = new AmberPrmtopReader().read(topology);
+
+        assertThat(result.atomNames().value().orElseThrow())
+                .containsExactly("CD1", "HD11", "SD");
+        assertThat(result.atomTypes().value().orElseThrow())
+                .containsExactly("CD1", "HD11", "SD");
+        assertThat(result.charges().value().orElseThrow())
+                .containsExactly(1.0, -1.0, 0.5);
+    }
 }

@@ -60,6 +60,24 @@ class StrategyEvidenceMatcherTest {
     }
 
     @Test
+    void derivationDoesNotReuseDifferentChargeOrMultiplicity() {
+        EvidenceRequirement base = new EvidenceRequirement(CalculationType.SINGLE_POINT,
+                EvidenceFixtures.PBE_DEF2_SVP, EnergyTarget.of(CalculationType.SINGLE_POINT),
+                "charged target", DatasetRole.DEVELOPMENT, true, TslFixtures.TSL,
+                TslFixtures.geometryIdentityA());
+        ScientificEvidenceRequirement charged = new ScientificEvidenceRequirement(base, 1, 2,
+                EvidencePlanner.DEFAULT_CONSTRAINTS, EvidencePlanner.DEFAULT_REQUESTED_OUTPUTS,
+                EvidencePlanner.DEFAULT_ACCEPTANCE_GATES);
+        StrategyEvidenceRequirement derived = new StrategyEvidenceRequirement("charged-derived",
+                charged, true, true, Optional.of(new DerivationRule(CalculationType.HESSIAN,
+                "derived", "test")), List.of(), List.of("parameters"), List.of(), List.of());
+        MissingEvidencePlan plan = match(derived,
+                withAccepted(CalculationType.HESSIAN, EvidenceFixtures.PBE_DEF2_SVP));
+        assertThat(plan.resolutions().get(0).decision())
+                .isEqualTo(EvidenceReuseDecision.GENERATE_NEW);
+    }
+
+    @Test
     void unavailableSoftwareIsInfrastructureBlockedNotScientificInvalid() {
         StrategyEvidenceRequirement needed = requirement("density", CalculationType.SINGLE_POINT,
                 EvidenceFixtures.PBE_DEF2_SVP, DatasetRole.DEVELOPMENT, Optional.empty(),

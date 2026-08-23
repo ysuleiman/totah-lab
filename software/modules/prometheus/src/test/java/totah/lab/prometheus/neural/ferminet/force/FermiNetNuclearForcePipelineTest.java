@@ -90,10 +90,16 @@ final class FermiNetNuclearForcePipelineTest {
         };
         var pipeline = new FermiNetNuclearForcePipeline(
                 Map.of(NuclearForceEstimatorType.CORRELATED_FD, estimator));
-        pipeline.estimate(nullContext(), NuclearForceConfiguration.correlatedFd(1.0e-3));
+        var context = nullContext();
+        assertThrows(java.io.IOException.class, () -> pipeline.estimate(
+                context, NuclearForceConfiguration.correlatedFd(1.0e-3)));
+        var provenance = new FermiNetForceEvaluationContext.ProvenanceVerification(
+                context.checkpointChecksum(), true, true, false, "test fixture");
+        pipeline.estimate(context.verifiedForTesting(provenance),
+                NuclearForceConfiguration.correlatedFd(1.0e-3));
         assertTrue(invoked.get());
         assertThrows(UnsupportedOperationException.class, () ->
-                pipeline.estimate(nullContext(),
+                pipeline.estimate(verified(nullContext()),
                         NuclearForceConfiguration.unsupported(
                                 NuclearForceEstimatorType.SWCT)));
     }
@@ -138,7 +144,7 @@ final class FermiNetNuclearForcePipelineTest {
                 (context, configuration, derivativeEngine) -> dummy();
         var pipeline = new FermiNetNuclearForcePipeline(
                 Map.of(NuclearForceEstimatorType.CORRELATED_FD, estimator));
-        var result = pipeline.estimate(nullContext(),
+        var result = pipeline.estimate(verified(nullContext()),
                 NuclearForceConfiguration.correlatedFd(1.0e-3),
                 FermiNetDerivativeConfiguration.batchedForward(2));
         assertNotEquals(NuclearForceConfiguration.correlatedFd(1.0e-3).identity(),
@@ -163,6 +169,14 @@ final class FermiNetNuclearForcePipelineTest {
                 .FermiNetPretrainingQualification.geometryIdentity(molecule);
         return new FermiNetForceEvaluationContext(
                 state, parameter, geometry, file, identity, "0".repeat(64), parameter);
+    }
+
+    private static FermiNetForceEvaluationContext.Verified verified(
+            FermiNetForceEvaluationContext context) {
+        return context.verifiedForTesting(
+                new FermiNetForceEvaluationContext.ProvenanceVerification(
+                        context.checkpointChecksum(), true, true, false,
+                        "test-only verified wrapper"));
     }
 
     private static NuclearForceResult dummy() {

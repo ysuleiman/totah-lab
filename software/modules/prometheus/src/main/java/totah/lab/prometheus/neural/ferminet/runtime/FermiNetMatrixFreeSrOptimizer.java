@@ -495,6 +495,11 @@ public final class FermiNetMatrixFreeSrOptimizer {
             trueResidualHistory =
                     List.copyOf(
                             trueResidualHistory);
+
+            if (trueResidualHistory.size() != solverIterations) {
+                throw new IllegalArgumentException(
+                        "true residual history must contain one entry per direct solve");
+            }
         }
 
         @Override

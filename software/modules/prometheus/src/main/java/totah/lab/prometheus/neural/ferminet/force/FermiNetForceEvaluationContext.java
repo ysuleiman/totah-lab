@@ -79,6 +79,15 @@ public record FermiNetForceEvaluationContext(
                 + "requires an independent root artifact for cryptographic verification");
     }
 
+    public Verified verified(Path checkpointFile) throws IOException {
+        verifyDataset();
+        return new Verified(this, verifyCheckpoint(checkpointFile));
+    }
+
+    Verified verifiedForTesting(ProvenanceVerification provenance) {
+        return new Verified(this, provenance);
+    }
+
     public DeclaredProvenance declaredProvenance() {
         return new DeclaredProvenance(parameterChecksum, geometryIdentity,
                 dataset.sha256(), checkpointChecksum, rootParameterChecksum);
@@ -102,4 +111,22 @@ public record FermiNetForceEvaluationContext(
             boolean checkpointPayloadVerified,
             boolean rootCryptographicallyVerified,
             String rootVerificationReason) {}
+
+    public static final class Verified {
+        private final FermiNetForceEvaluationContext context;
+        private final ProvenanceVerification provenance;
+
+        private Verified(FermiNetForceEvaluationContext context,
+                ProvenanceVerification provenance) {
+            this.context = Objects.requireNonNull(context, "context");
+            this.provenance = Objects.requireNonNull(provenance, "provenance");
+            if (!provenance.checkpointCryptographicallyVerified()
+                    || !provenance.checkpointPayloadVerified()) {
+                throw new IllegalArgumentException("checkpoint provenance is not verified");
+            }
+        }
+
+        public FermiNetForceEvaluationContext context() { return context; }
+        public ProvenanceVerification provenance() { return provenance; }
+    }
 }

@@ -153,6 +153,7 @@ public final class ForceCampaignPreflightRunner {
         Path resultPath = sourceBase.resolve("result.json");
         Path gradientPath = sourceBase.resolve("final_gradient_hartree_per_bohr.txt");
         JsonNode result = mapper.readTree(resultPath.toFile());
+        double energy = requiredFiniteDouble(result, "energy_hartree");
         List<Double> gradient = new ArrayList<>();
         for (String line : Files.readAllLines(gradientPath)) {
             if (line.isBlank()) continue;
@@ -167,9 +168,17 @@ public final class ForceCampaignPreflightRunner {
                         + "promoted without QM recomputation");
         return new QuantumEvidence(identity, provenance,
                 totah.lab.prometheus.evidence.ConvergenceStatus.CONVERGED,
-                EvidenceAcceptanceState.ACCEPTED, Optional.of(result.path("energy_hartree").asDouble()),
+                EvidenceAcceptanceState.ACCEPTED, Optional.of(energy),
                 Optional.of(List.copyOf(gradient)), Optional.empty(), Optional.empty(), Optional.empty(),
                 "authoritative MIN02 protocol-control result");
+    }
+
+    static double requiredFiniteDouble(JsonNode object, String field) throws IOException {
+        JsonNode value = object.get(field);
+        if (value == null || !value.isNumber() || !Double.isFinite(value.doubleValue())) {
+            throw new IOException("missing, non-numeric, or non-finite " + field);
+        }
+        return value.doubleValue();
     }
 
     private static Optional<QuantumEvidence> compatibleCanonical(

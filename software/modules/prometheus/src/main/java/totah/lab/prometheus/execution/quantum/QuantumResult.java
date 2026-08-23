@@ -58,17 +58,23 @@ public record QuantumResult(
     public record Vector3(double x, double y, double z) { }
 
     public boolean forceIsNegativeGradient(double tolerance) {
-        if (tolerance < 0.0) throw new IllegalArgumentException("tolerance must be non-negative");
+        if (tolerance < 0.0 || !Double.isFinite(tolerance)) throw new IllegalArgumentException("tolerance must be finite and non-negative");
         if (gradient.isEmpty() || force.isEmpty()) return false;
         CartesianField gradients = gradient.orElseThrow();
         CartesianField forces = force.orElseThrow();
         if (gradients.unit() != forces.unit()) return false;
         for (int i = 0; i < gradients.vectors().size(); i++) {
             Vector3 g = gradients.vectors().get(i); Vector3 f = forces.vectors().get(i);
+            if (!finite(g) || !finite(f)) return false;
             if (Math.abs(g.x() + f.x()) > tolerance || Math.abs(g.y() + f.y()) > tolerance
                     || Math.abs(g.z() + f.z()) > tolerance) return false;
         }
         return true;
+    }
+
+    private static boolean finite(Vector3 value) {
+        return Double.isFinite(value.x()) && Double.isFinite(value.y())
+                && Double.isFinite(value.z());
     }
 
     private static void requireNonBlank(String value, String name) {

@@ -28,5 +28,5 @@ final class SolverConvergencePcg {
     static double dot(double[] a,double[] b,boolean compensated){if(!compensated){double sum=0;for(int i=0;i<a.length;i++)sum+=a[i]*b[i];return sum;}double sum=0,correction=0;for(int i=0;i<a.length;i++){double value=a[i]*b[i],next=sum+value;if(Math.abs(sum)>=Math.abs(value))correction+=(sum-next)+value;else correction+=(value-next)+sum;sum=next;}return sum+correction;}
     static double norm(double[] values,boolean compensated){return Math.sqrt(Math.max(0,dot(values,values,compensated)));}
     record Trace(int iteration,double recursiveResidual,double trueResidual,double residualGap){}
-    record Result(double[] solution,int iterations,int operatorApplications,boolean converged,boolean breakdown,double recursiveResidual,double trueResidual,double residualGap,double maximumConjugacyLoss,List<Trace> trace){Result{solution=solution.clone();trace=List.copyOf(trace);}}
+    record Result(double[] solution,int iterations,int operatorApplications,boolean converged,boolean breakdown,double recursiveResidual,double trueResidual,double residualGap,double maximumConjugacyLoss,List<Trace> trace){Result{solution=solution.clone();trace=List.copyOf(trace);}@Override public double[] solution(){return solution.clone();}}
 }
