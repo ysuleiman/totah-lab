@@ -1,0 +1,91 @@
+{
+  "schema": "tsl-rsh-min01-stationary-point-recovery-pilot-v1",
+  "status": "PREPARED_NOT_EXECUTED",
+  "software_baseline": "83c267182af0144c7802f2503d545ad30e9a58d8",
+  "scope": ["MIN01"],
+  "historical_structure_classification": "SADDLE_EVIDENCE_NOT_A_VERIFIED_MINIMUM",
+  "geometry_sha256": "36331712f69fa6a0f1ded7eb5df44f7dae7bdd0927507dd21eb7218be2320bdd",
+  "atom_count": 56,
+  "composition": {"C": 22, "H": 30, "O": 3, "S": 1},
+  "charge": 0,
+  "spin": 0,
+  "multiplicity": 1,
+  "electron_count": 202,
+  "input_sha256": {
+    "input/ATOM_ORDER.csv": "15200ef8e35cbdd9ea10e3750cbc20e3e29fa7c8bcd5180935d0caf06324ece6",
+    "input/MIN01_d3_hessian_canonical.npy": "1db1ac8180f5f9dc994c4e3c31a39f4fed2033d7dc947be1b09721c8281d868c",
+    "input/MIN01_historical_saddle.xyz": "36331712f69fa6a0f1ded7eb5df44f7dae7bdd0927507dd21eb7218be2320bdd",
+    "input/MIN01_pbe_hessian_pyscf_axes.npy": "5e3e2f1b8537cb8ea6a89d5de101ce1c54e7294edd6eb7ff0001be84269e153c",
+    "input/prepared_displacements/minus_a.xyz": "5999fbc8046e9d5f49de19ef664df46e3b7a05c900cbe0a22e54369c4551ea87",
+    "input/prepared_displacements/minus_half_a.xyz": "2ee24b946d3a47c466187f0a109a427bc39e5f687c055290947e9e98ab82ee23",
+    "input/prepared_displacements/plus_a.xyz": "80e3e796a9d7f2fd489997677daa99d22c9ccb660e14c33e9a832cfd8b86d1e8",
+    "input/prepared_displacements/plus_half_a.xyz": "4e29da7ebb0a3fc97421fc35ddecddef92e5c2c491c14fe7c0a0345e7af5b419"
+  },
+  "hessian_reconstruction": {
+    "pbe_input_axis_layout": "[atom_i,atom_j,axis_i,axis_j]",
+    "canonical_axis_layout": "[atom_i,axis_i,atom_j,axis_j]",
+    "equation": "H_total = canonicalize(H_PBE) + H_D3",
+    "units": "hartree/bohr^2",
+    "expected_escape_frequency_cm-1": -180.4366091924035,
+    "expected_negative_vibrational_mode_count": 3,
+    "mode_selection": "most negative signed total PBE+D3 projected vibrational mode"
+  },
+  "escape_displacement": {
+    "a_sqrt_amu_angstrom": 0.05,
+    "maximum_cartesian_atom_displacement_at_a_angstrom": 0.009678430180582343,
+    "equation": "delta_r_i_angstrom = q_sqrt_amu_angstrom * mass_weighted_eigenvector_i / sqrt(mass_i_amu)",
+    "branches": {"plus_a": 1.0, "minus_a": -1.0, "plus_half_a": 0.5, "minus_half_a": -0.5},
+    "energy_gate": "E(+q)+E(-q)-2E(0) < 0 independently for q=a and q=a/2"
+  },
+  "maximum_optimization_branches": 4,
+  "optimization": {
+    "algorithm": "geomeTRIC translation/rotation internal coordinates",
+    "maximum_iterations": 300,
+    "convergence_energy_hartree": 1e-5,
+    "convergence_gmax_hartree_per_bohr": 0.004,
+    "convergence_grms_hartree_per_bohr": 0.001,
+    "convergence_dmax_angstrom": 0.005,
+    "convergence_drms_angstrom": 0.002
+  },
+  "qm_protocol": {
+    "functional": "PBE",
+    "basis": "def2-SVP",
+    "auxiliary_basis": "def2-SVP-JKFIT",
+    "density_fitting": true,
+    "grid_level": 2,
+    "grid_semantics": "NWChem pruning; original Becke partition; Treutler-Ahlrichs radial grid; Treutler atomic-radii adjustment",
+    "scf_tolerance": 1e-8,
+    "scf_max_cycles": 160,
+    "initial_guess": "MINAO",
+    "dispersion": {
+      "model": "D3(BJ)", "implementation": "simple-dftd3 1.5.0",
+      "parameters": {"s6": 1.0, "s8": 0.7875, "s9": 0.0, "a1": 0.4289, "a2": 4.4407, "alp": 14.0},
+      "atm": false,
+      "parameter_database_sha256": "b1d9d1b9882dcad5361a99c34745ad44f8a274d80c907d9d0187255e4323d645"
+    }
+  },
+  "hessian_qualification": {
+    "electronic": "GPU4PySCF 1.8.0 analytic Hessian; fail closed if per-observable capability is unavailable",
+    "dispersion": "symmetric central differences of explicit D3 gradients",
+    "d3_h_bohr": 0.001,
+    "d3_convergence_h_bohr": 0.0005,
+    "d3_convergence_columns_zero_based": [27, 28, 29, 75, 76, 77, 165, 166, 167],
+    "required_components": ["electronic_hessian", "dispersion_hessian", "total_hessian"],
+    "frequency_policy": "persist signed mass-weighted eigenvalues, signed frequencies, modes and rigid-body projection diagnostics; exact projected zeros fail closed"
+  },
+  "publication_dataset_contract": {
+    "atomic_persistence": true,
+    "stdout_only_results_forbidden": true,
+    "checksums_required": true,
+    "per_step_geometry_energy_gradient_components_required": true,
+    "endpoint_component_complete_hessian_required": true,
+    "software_hardware_execution_receipts_required": true
+  },
+  "prohibitions": {
+    "MIN02": true,
+    "MIN04": true,
+    "model_fit": true,
+    "threshold_change": true,
+    "automatic_expansion": true
+  }
+}
