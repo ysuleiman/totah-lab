@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
@@ -30,6 +31,8 @@ import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameterLayout;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameters;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1Configuration;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeConfiguration;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngineType;
 
 final class FermiNetNuclearForcePipelineTest {
 
@@ -93,6 +96,54 @@ final class FermiNetNuclearForcePipelineTest {
                 pipeline.estimate(nullContext(),
                         NuclearForceConfiguration.unsupported(
                                 NuclearForceEstimatorType.SWCT)));
+    }
+
+    @Test
+    void scientificIdentitySeparatesEstimatorDerivativeAndParallelOrder()
+            throws Exception {
+        var context = nullContext();
+        String reference = FermiNetForceScientificIdentity.create(context,
+                NuclearForceConfiguration.swct(),
+                new FermiNetDerivativeConfiguration(
+                        FermiNetDerivativeEngineType.REFERENCE_JET, 1));
+        String engine = FermiNetForceScientificIdentity.create(context,
+                NuclearForceConfiguration.swct(),
+                new FermiNetDerivativeConfiguration(
+                        FermiNetDerivativeEngineType.BATCHED_FORWARD, 1));
+        String parallel = FermiNetForceScientificIdentity.create(context,
+                NuclearForceConfiguration.swct(),
+                new FermiNetDerivativeConfiguration(
+                        FermiNetDerivativeEngineType.BATCHED_FORWARD, 2));
+        String estimator = FermiNetForceScientificIdentity.create(context,
+                NuclearForceConfiguration.acZv(),
+                new FermiNetDerivativeConfiguration(
+                        FermiNetDerivativeEngineType.REFERENCE_JET, 1));
+        assertEquals(4, java.util.Set.of(reference, engine, parallel, estimator).size());
+    }
+
+    @Test void declaredCheckpointChecksumIsNotTreatedAsVerification()
+            throws Exception {
+        var context = nullContext();
+        Path corrupt = Files.createTempFile("declared-checkpoint", ".bin");
+        Files.writeString(corrupt, "not the declared checkpoint");
+        assertThrows(java.io.IOException.class,
+                () -> context.verifyCheckpoint(corrupt));
+        assertEquals("0".repeat(64),
+                context.declaredProvenance().checkpointChecksum());
+    }
+
+    @Test void pipelinePersistsCompleteIdentityRatherThanEstimatorOnly()
+            throws Exception {
+        var estimator = (FermiNetNuclearForceEstimator)
+                (context, configuration, derivativeEngine) -> dummy();
+        var pipeline = new FermiNetNuclearForcePipeline(
+                Map.of(NuclearForceEstimatorType.CORRELATED_FD, estimator));
+        var result = pipeline.estimate(nullContext(),
+                NuclearForceConfiguration.correlatedFd(1.0e-3),
+                FermiNetDerivativeConfiguration.batchedForward(2));
+        assertNotEquals(NuclearForceConfiguration.correlatedFd(1.0e-3).identity(),
+                result.estimatorConfigurationIdentity());
+        assertEquals(64, result.estimatorConfigurationIdentity().length());
     }
 
     private static FermiNetForceEvaluationContext nullContext() throws Exception {

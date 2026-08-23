@@ -275,3 +275,11 @@ validity and memory budget.
 11. Only after conventional QM qualification, implement neural/autodiff/VMC kernels behind the same owned math API.
 
 The 36-target campaign remains stopped until an owned backend is scientifically qualified.
+# 2026-08-20 conventional-DFT campaign decision
+
+The conclusion that Prometheus contains no suitable conventional Java DFT engine
+remains true. It no longer blocks the already-frozen TSL-RSH dataset: an explicit,
+narrow architecture decision permits PySCF 2.14.0 plus simple-dftd3 1.5.0 as a
+numerical worker under a complete Java-owned contract. This is not a claim that
+PySCF is Prometheus-owned scientific control, and it does not broaden the backend
+policy beyond this campaign.

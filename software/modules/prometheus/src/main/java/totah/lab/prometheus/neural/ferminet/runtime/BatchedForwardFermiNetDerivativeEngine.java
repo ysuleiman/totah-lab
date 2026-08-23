@@ -143,6 +143,11 @@ final class BatchedForwardFermiNetDerivativeEngine
         }
     }
 
+    FermiNetBatchedJetWorkspace acquireWorkspace(
+            int dimensions, int directions) {
+        return acquireWorkspace(new WorkspaceShape(dimensions, directions));
+    }
+
     private void releaseWorkspace(
             WorkspaceShape shape, FermiNetBatchedJetWorkspace workspace) {
         synchronized (workspaces) {
@@ -150,6 +155,13 @@ final class BatchedForwardFermiNetDerivativeEngine
                     .addFirst(workspace);
             trimIdleWorkspaces();
         }
+    }
+
+    void releaseWorkspace(
+            int dimensions, int directions,
+            FermiNetBatchedJetWorkspace workspace) {
+        workspace.reset();
+        releaseWorkspace(new WorkspaceShape(dimensions, directions), workspace);
     }
 
     private void trimIdleWorkspaces() {

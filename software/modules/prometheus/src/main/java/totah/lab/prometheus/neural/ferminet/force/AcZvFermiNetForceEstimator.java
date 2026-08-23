@@ -17,6 +17,7 @@ import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDi
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetStateAccess;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetPhysicalSingularityException;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
 /**
@@ -123,7 +124,7 @@ public final class AcZvFermiNetForceEstimator implements FermiNetNuclearForceEst
             try {
                 logGradient = FermiNetStateAccess.spatial(state, coordinates)
                         .logCoordinateGradient();
-            } catch (RuntimeException exception) {
+            } catch (FermiNetPhysicalSingularityException exception) {
                 logGradient = null;
             }
             for (int component = 0; component < components; component++) {
@@ -137,7 +138,7 @@ public final class AcZvFermiNetForceEstimator implements FermiNetNuclearForceEst
                 try {
                     contraction = auxiliaryContraction(
                             molecule, coordinates, logGradient, nucleus, axis);
-                } catch (RuntimeException exception) {
+                } catch (FermiNetPhysicalSingularityException exception) {
                     forceSamples[component][sample] = Double.NaN;
                     continue;
                 }
@@ -326,7 +327,7 @@ public final class AcZvFermiNetForceEstimator implements FermiNetNuclearForceEst
                 + displacement[1] * displacement[1]
                 + displacement[2] * displacement[2];
         if (!(r2 > 0.0) || !Double.isFinite(r2)) {
-            throw new IllegalArgumentException(
+            throw new FermiNetPhysicalSingularityException(
                     "electron-nucleus coalescence is undefined for raw AC samples");
         }
         return Math.sqrt(r2);
@@ -440,8 +441,10 @@ public final class AcZvFermiNetForceEstimator implements FermiNetNuclearForceEst
                             / (finiteCount - 1))
                     : Double.NaN;
             double chainSquares = 0.0;
+            int expectedChainCount = chainCounts[0];
             for (int chain = 0; chain < walkers; chain++) {
-                if (chainCounts[chain] == 0) {
+                if (chainCounts[chain] == 0
+                        || chainCounts[chain] != expectedChainCount) {
                     return new ComponentStatistics(mean, Double.NaN, variance);
                 }
                 double difference = chainSums[chain] / chainCounts[chain] - mean;

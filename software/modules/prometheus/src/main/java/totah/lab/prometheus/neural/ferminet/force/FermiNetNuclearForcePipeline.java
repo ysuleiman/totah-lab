@@ -19,7 +19,9 @@ public final class FermiNetNuclearForcePipeline {
                 NuclearForceEstimatorType.AC_ZV,
                 new AcZvFermiNetForceEstimator(),
                 NuclearForceEstimatorType.AC_ZVZB,
-                new AcZvzbFermiNetForceEstimator()));
+                new AcZvzbFermiNetForceEstimator(),
+                NuclearForceEstimatorType.AC_ZVZB_DERIV,
+                new AcZvzbDerivFermiNetForceEstimator()));
     }
 
     FermiNetNuclearForcePipeline(
@@ -48,9 +50,16 @@ public final class FermiNetNuclearForcePipeline {
                     "FermiNet force estimator is not implemented: "
                             + configuration.estimatorType());
         }
-        return estimator.estimate(context, configuration,
+        NuclearForceResult raw = estimator.estimate(context, configuration,
                 FermiNetDerivativeEngines.create(
                         Objects.requireNonNull(derivativeConfiguration,
                                 "derivativeConfiguration")));
+        String identity = FermiNetForceScientificIdentity.create(
+                context, configuration, derivativeConfiguration);
+        return new NuclearForceResult(raw.estimatorType(), raw.classification(),
+                raw.parameterChecksum(), raw.geometryIdentity(),
+                raw.datasetChecksum(), raw.checkpointChecksum(), identity,
+                raw.sampleCount(), raw.chainCount(), raw.retainedPerChain(),
+                raw.components(), raw.estimatorDiagnostics());
     }
 }

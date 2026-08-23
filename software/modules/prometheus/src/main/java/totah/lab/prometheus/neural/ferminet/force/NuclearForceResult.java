@@ -62,7 +62,7 @@ public record NuclearForceResult(
             double percentileNinetyNinePointNine, double maximum,
             long beyondFiveSigma, long beyondTenSigma) {}
 
-    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics, AcZvDiagnostics, AcZvzbDiagnostics {}
+    public sealed interface EstimatorDiagnostics permits CorrelatedFdDiagnostics, SwctDiagnostics, AcZvDiagnostics, AcZvzbDiagnostics, AcZvzbDerivDiagnostics {}
 
     public record CorrelatedFdDiagnostics(
             double deltaBohr,
@@ -157,6 +157,140 @@ public record NuclearForceResult(
             double acZvVariance,
             double varianceReductionFactorVsAcZv) {}
 
+    /**
+     * AC-2003 v=0 split-auxiliary ZVZB diagnostics: ZV decomposition, the ZB
+     * term with the frozen-parameter nuclear log-derivative response, and the
+     * same ZB term with the minimal-Q response for direct tail comparison,
+     * plus FD/SWCT/AC-ZV/AC-ZVZB comparison evidence. All comparisons are
+     * diagnostic only; no acceptance thresholds are applied anywhere.
+     */
+    public record AcZvzbDerivDiagnostics(
+            String estimatorFormulation,
+            String auxiliaryEquation,
+            double sampledMeanEnergyHartree,
+            List<AcZvzbDerivComponentDiagnostics> components,
+            PathakWagnerDiagnostics pathakWagner)
+            implements EstimatorDiagnostics {
+        public AcZvzbDerivDiagnostics {
+            Objects.requireNonNull(estimatorFormulation, "estimatorFormulation");
+            Objects.requireNonNull(auxiliaryEquation, "auxiliaryEquation");
+            components = List.copyOf(components);
+        }
+    }
+
+    public record PathakWagnerDiagnostics(
+            String equationProvenance,
+            NodalDistanceDiagnostics nodalDistance,
+            List<PathakWagnerEpsilonDiagnostics> epsilonPanel,
+            List<PathakWagnerExtrapolation> extrapolations) {
+        public PathakWagnerDiagnostics {
+            Objects.requireNonNull(equationProvenance, "equationProvenance");
+            Objects.requireNonNull(nodalDistance, "nodalDistance");
+            epsilonPanel = List.copyOf(epsilonPanel);
+            extrapolations = List.copyOf(extrapolations);
+        }
+    }
+
+    public record NodalDistanceDiagnostics(
+            double minimum,
+            double percentilePointOne,
+            double percentileOne,
+            double percentileFive,
+            double median,
+            String rawSampleChecksum,
+            double[] rawSamples) {
+        public NodalDistanceDiagnostics { rawSamples = rawSamples.clone(); }
+        @Override public double[] rawSamples() { return rawSamples.clone(); }
+    }
+
+    public record PathakWagnerEpsilonDiagnostics(
+            double epsilonBohr,
+            long affectedSampleCount,
+            long factorLessThanOneCount,
+            long factorGreaterThanOneCount,
+            double meanFactor,
+            List<PathakWagnerComponentDiagnostics> components) {
+        public PathakWagnerEpsilonDiagnostics {
+            components = List.copyOf(components);
+        }
+    }
+
+    public record PathakWagnerComponentDiagnostics(
+            int nucleus,
+            int axis,
+            double meanHartreePerBohr,
+            double chainStandardError,
+            double variance,
+            int finiteCount,
+            int nonfiniteCount,
+            TailDiagnostics tails,
+            String rawSampleChecksum,
+            double[] rawSamples) {
+        public PathakWagnerComponentDiagnostics {
+            Objects.requireNonNull(tails, "tails");
+            Objects.requireNonNull(rawSampleChecksum, "rawSampleChecksum");
+            rawSamples = rawSamples.clone();
+        }
+        @Override public double[] rawSamples() { return rawSamples.clone(); }
+    }
+
+    public record PathakWagnerExtrapolation(
+            int nucleus,
+            int axis,
+            double interceptHartreePerBohr,
+            double interceptChainStandardError,
+            double slope,
+            double[] fitResiduals,
+            double interceptDroppingLargestEpsilon,
+            double interceptDroppingSmallestEpsilon,
+            boolean cubicRegimeIdentified) {
+        public PathakWagnerExtrapolation {
+            fitResiduals = fitResiduals.clone();
+        }
+        @Override public double[] fitResiduals() { return fitResiduals.clone(); }
+    }
+
+    /** Raw extremes and outlier counts for one ZB term variant. */
+    public record ZbTermExtremes(
+            double minimum, double maximum,
+            long beyondFiveSigma, long beyondTenSigma) {}
+
+    public record AcZvzbDerivComponentDiagnostics(
+            int nucleus,
+            int axis,
+            double nuclearRepulsionTermHartreePerBohr,
+            double meanContractionTermHartreePerBohr,
+            double meanNuclearLogDerivativePerBohr,
+            double zbDerivativeMeanHartreePerBohr,
+            double zbDerivativeChainStandardError,
+            double zbDerivativeVariance,
+            ZbTermExtremes zbDerivativeExtremes,
+            double zbMinimalQMeanHartreePerBohr,
+            double zbMinimalQChainStandardError,
+            double zbMinimalQVariance,
+            ZbTermExtremes zbMinimalQExtremes,
+            double correlatedFdMeanHartreePerBohr,
+            double correlatedFdChainStandardError,
+            double correlatedFdVariance,
+            double varianceReductionFactorVsCorrelatedFd,
+            double swctMeanHartreePerBohr,
+            double swctChainStandardError,
+            double swctVariance,
+            double varianceReductionFactorVsSwct,
+            double acZvMeanHartreePerBohr,
+            double acZvChainStandardError,
+            double acZvVariance,
+            double varianceReductionFactorVsAcZv,
+            double acZvzbMeanHartreePerBohr,
+            double acZvzbChainStandardError,
+            double acZvzbVariance,
+            double varianceReductionFactorVsAcZvzb) {
+        public AcZvzbDerivComponentDiagnostics {
+            Objects.requireNonNull(zbDerivativeExtremes, "zbDerivativeExtremes");
+            Objects.requireNonNull(zbMinimalQExtremes, "zbMinimalQExtremes");
+        }
+    }
+
     public record SwctComponentDiagnostics(
             int nucleus,
             int axis,
@@ -185,5 +319,15 @@ public record NuclearForceResult(
             double minusEffectiveSampleSize,
             double pairedEffectiveSampleSize,
             String plusGeometryChecksum,
-            String minusGeometryChecksum) {}
+            String minusGeometryChecksum) {
+        /** min(ESS+, ESS-); not an ESS of the paired-force estimator. */
+        public double conservativeMarginalEffectiveSampleSize() {
+            return pairedEffectiveSampleSize;
+        }
+        /** @deprecated Misnamed historical accessor retained for API compatibility. */
+        @Deprecated(forRemoval = true)
+        @Override public double pairedEffectiveSampleSize() {
+            return pairedEffectiveSampleSize;
+        }
+    }
 }

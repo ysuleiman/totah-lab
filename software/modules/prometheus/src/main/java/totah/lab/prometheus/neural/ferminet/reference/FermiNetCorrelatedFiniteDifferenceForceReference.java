@@ -199,6 +199,15 @@ public final class FermiNetCorrelatedFiniteDifferenceForceReference {
             double[] rawForceSamples) {
         public ComponentResult { rawForceSamples = rawForceSamples.clone(); }
         @Override public double[] rawForceSamples() { return rawForceSamples.clone(); }
+        /** This is min(ESS+, ESS-), not an ESS of the paired-force estimator. */
+        public double conservativeMarginalEffectiveSampleSize() {
+            return pairedEffectiveSampleSize;
+        }
+        /** @deprecated Misnamed historical accessor retained for API compatibility. */
+        @Deprecated(forRemoval = true)
+        @Override public double pairedEffectiveSampleSize() {
+            return pairedEffectiveSampleSize;
+        }
     }
 
     public record TailDiagnostics(
@@ -235,6 +244,10 @@ public final class FermiNetCorrelatedFiniteDifferenceForceReference {
             double energyPlus = sumPlus / count, energyMinus = sumMinus / count;
             double force = -(energyPlus - energyMinus) / (2.0 * STEP_BOHR);
             double variance = sampleVariance(sumForce, sumForceSquared, count);
+            if (count % walkers != 0) {
+                throw new IllegalStateException(
+                        "correlated-FD chains do not have equal lengths");
+            }
             int retained = count / walkers;
             double chainSquares = 0.0;
             for (double chainSum : chainSums) {

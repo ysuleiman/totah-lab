@@ -11,8 +11,17 @@ import totah.lab.prometheus.variational.GeneralMolecularImportanceBatches;
 import totah.lab.prometheus.variational.GeneralMolecularMatrixFreeSrOptimizer;
 import totah.lab.prometheus.variational.force.GeneralAnalyticDifferentialSwctForceEstimator;
 
-/** Frozen Step-3 H2O calculation: existing general state, BLOCK SR, and vector-force estimator. */
+/**
+ * Frozen Step-3 H2O deterministic-quadrature validation calculation.
+ *
+ * <p>This is not iterative VMC sampling. All four SR iterations deliberately
+ * optimize the same checksum-identical bounded quadrature objective so this
+ * validation gate isolates optimizer behavior from sampling noise.
+ */
 public final class WaterMoleculeStep3Calculation {
+    public static final int TRAINING_SKIP = 101;
+    public static final int TRAINING_SAMPLE_COUNT = 512;
+    public static final int TRAINING_WALKERS = 64;
     private static final int[] EVALUATION_SKIPS={1009,2017,3019,4027};
 
     public Result run(Molecule molecule) {
@@ -23,7 +32,8 @@ public final class WaterMoleculeStep3Calculation {
         var configuration=new GeneralMolecularMatrixFreeSrOptimizer.Configuration(.02,.01,.10,2,200,1e-10,1e-12);
         List<Double> residuals=new ArrayList<>();long stateEvaluations=0,operatorPasses=0;
         for(int iteration=0;iteration<4;iteration++) {
-            var training=new GeneralMolecularImportanceBatches(molecule,512,4.0,101,64);
+            var training=new GeneralMolecularImportanceBatches(molecule,
+                    TRAINING_SAMPLE_COUNT,4.0,TRAINING_SKIP,TRAINING_WALKERS);
             var optimized=optimizer.oneIteration(state,hamiltonian,training,configuration);
             state=optimized.state();residuals.add(optimized.relativeTrueResidual());
             stateEvaluations+=optimized.initialStateEvaluations();operatorPasses+=optimized.streamedOperatorPasses();
@@ -53,6 +63,11 @@ public final class WaterMoleculeStep3Calculation {
     }
 
     private static long usedHeap(){Runtime runtime=Runtime.getRuntime();return runtime.totalMemory()-runtime.freeMemory();}
+    public static String trainingSampleIdentity(Molecule molecule) {
+        return new GeneralMolecularImportanceBatches(molecule,
+                TRAINING_SAMPLE_COUNT,4.0,TRAINING_SKIP,TRAINING_WALKERS)
+                .provenanceHash();
+    }
     private static double mean(List<Double> values){return values.stream().mapToDouble(Double::doubleValue).average().orElseThrow();}
     private static double mean(double[] values){double sum=0;for(double value:values)sum+=value;return sum/values.length;}
     private static double sampleVariance(List<Double> values){double mean=mean(values),sum=0;for(double value:values)sum+=(value-mean)*(value-mean);return sum/(values.size()-1);}

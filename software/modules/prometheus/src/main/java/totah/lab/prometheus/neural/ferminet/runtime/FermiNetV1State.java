@@ -2364,18 +2364,13 @@ public final class FermiNetV1State {
             double detValue =
                     det.value();
 
-            if (!Double.isFinite(detValue)
-                    || Math.abs(detValue)
-                    < SINGULAR_THRESHOLD) {
+            if (!Double.isFinite(detValue)) {
 
                 throw new IllegalStateException(
-                        "singular FermiNet determinant");
+                        "non-finite FermiNet determinant");
             }
 
-            int sign =
-                    detValue > 0.0
-                            ? 1
-                            : -1;
+            int sign = detValue > 0.0 ? 1 : detValue < 0.0 ? -1 : 0;
 
             double logMagnitude =
                     Math.log(
@@ -2395,6 +2390,11 @@ public final class FermiNetV1State {
                             logMagnitude);
         }
 
+        if (maxLog == Double.NEGATIVE_INFINITY) {
+            throw new FermiNetPhysicalSingularityException(
+                    "FermiNet determinant sum is exactly zero");
+        }
+
         FermiNetSpatialJet scaled =
                 FermiNetSpatialJet.constant(
                         0.0,
@@ -2411,13 +2411,10 @@ public final class FermiNetV1State {
                                                     -maxLog)));
         }
 
-        if (!Double.isFinite(
-                scaled.value())
-                || Math.abs(
-                scaled.value())
-                < SINGULAR_THRESHOLD) {
+        if (!Double.isFinite(scaled.value())
+                || scaled.value() == 0.0) {
 
-            throw new IllegalStateException(
+            throw new FermiNetPhysicalSingularityException(
                     "FermiNet determinant sum is numerically singular");
         }
 
@@ -2521,6 +2518,7 @@ public final class FermiNetV1State {
                     output.data()[d]
                             .matrix(),
                     output.mixture()[d],
+                    output.sign() * Math.exp(-output.logAbsolute()),
                     d,
                     adjOne,
                     gradient,
@@ -2537,6 +2535,7 @@ public final class FermiNetV1State {
     private void accumulateOrbitals(
             DenseOrbitalMatrix matrix,
             double mix,
+            double inverseWavefunction,
             int determinant,
             double[][] adjOne,
             ParameterGradientAccumulator gradient,
@@ -2557,9 +2556,7 @@ public final class FermiNetV1State {
                 molecule.nuclei()
                         .size();
 
-        double[][] inverse =
-                inverse(
-                        matrix.values());
+        double[][] inverse = inverseOrNull(matrix.values());
 
         if (statistics != null
                 && determinant == 0) {
@@ -2612,11 +2609,10 @@ public final class FermiNetV1State {
                  orbital < n;
                  orbital++) {
 
-                double adjPhi =
-                        mix
-                                * inverse[
-                                orbital]
-                                [i];
+                double adjPhi = inverse != null
+                        ? mix * inverse[orbital][i]
+                        : cofactor(matrix.values(), i, orbital)
+                                * inverseWavefunction;
 
                 double raw =
                         matrix.raw()
@@ -3676,7 +3672,7 @@ public final class FermiNetV1State {
                 + source.length;
     }
 
-    private static FermiNetSpatialJet determinant(
+    static FermiNetSpatialJet determinant(
             FermiNetSpatialJet[][] input) {
 
         int n =
@@ -3739,9 +3735,7 @@ public final class FermiNetV1State {
                     a[pivot][k]
                             .value())
                     < SINGULAR_THRESHOLD) {
-
-                throw new IllegalStateException(
-                        "singular FermiNet determinant");
+                return divisionFreeDeterminant(input);
             }
 
             if (pivot != k) {
@@ -3790,7 +3784,46 @@ public final class FermiNetV1State {
                 sign);
     }
 
-    private static double[][] inverse(
+    /** Division-free determinant over a commutative jet ring. */
+    private static FermiNetSpatialJet divisionFreeDeterminant(
+            FermiNetSpatialJet[][] input) {
+        int n = input.length;
+        if (n >= Integer.SIZE - 1) {
+            throw new IllegalArgumentException("determinant matrix is too large");
+        }
+        int states = 1 << n;
+        FermiNetSpatialJet[] current = new FermiNetSpatialJet[states];
+        current[0] = FermiNetSpatialJet.constant(
+                1.0, input[0][0].dimensions());
+        int fullMask = states - 1;
+        for (int row = 0; row < n; row++) {
+            FermiNetSpatialJet[] next = new FermiNetSpatialJet[states];
+            for (int mask = 0; mask < states; mask++) {
+                FermiNetSpatialJet partial = current[mask];
+                if (partial == null || Integer.bitCount(mask) != row) continue;
+                int available = fullMask ^ mask;
+                while (available != 0) {
+                    int bit = available & -available;
+                    int column = Integer.numberOfTrailingZeros(bit);
+                    int greaterColumns = Integer.bitCount(
+                            mask & ~((bit << 1) - 1));
+                    FermiNetSpatialJet term = partial.multiply(input[row][column]);
+                    if ((greaterColumns & 1) != 0) term = term.multiply(-1.0);
+                    int nextMask = mask | bit;
+                    next[nextMask] = next[nextMask] == null
+                            ? term : next[nextMask].add(term);
+                    available ^= bit;
+                }
+            }
+            current = next;
+        }
+        FermiNetSpatialJet result = current[fullMask];
+        return result == null
+                ? FermiNetSpatialJet.constant(0.0, input[0][0].dimensions())
+                : result;
+    }
+
+    private static double[][] inverseOrNull(
             double[][] input) {
 
         int n =
@@ -3846,9 +3879,7 @@ public final class FermiNetV1State {
             if (Math.abs(
                     a[pivot][k])
                     < SINGULAR_THRESHOLD) {
-
-                throw new IllegalStateException(
-                        "singular FermiNet determinant");
+                return null;
             }
 
             double[] row =
@@ -3909,6 +3940,58 @@ public final class FermiNetV1State {
         }
 
         return result;
+    }
+
+    static double cofactor(
+            double[][] matrix, int row, int column) {
+        int n = matrix.length;
+        if (n == 1) return 1.0;
+        double[][] minor = new double[n - 1][n - 1];
+        for (int sourceRow = 0, targetRow = 0;
+             sourceRow < n; sourceRow++) {
+            if (sourceRow == row) continue;
+            for (int sourceColumn = 0, targetColumn = 0;
+                 sourceColumn < n; sourceColumn++) {
+                if (sourceColumn == column) continue;
+                minor[targetRow][targetColumn++] =
+                        matrix[sourceRow][sourceColumn];
+            }
+            targetRow++;
+        }
+        double value = divisionFreeDeterminant(minor);
+        return ((row + column) & 1) == 0 ? value : -value;
+    }
+
+    static double divisionFreeDeterminant(double[][] input) {
+        int n = input.length;
+        if (n == 0) return 1.0;
+        if (n >= Integer.SIZE - 1) {
+            throw new IllegalArgumentException("determinant matrix is too large");
+        }
+        int states = 1 << n;
+        double[] current = new double[states];
+        current[0] = 1.0;
+        int fullMask = states - 1;
+        for (int row = 0; row < n; row++) {
+            double[] next = new double[states];
+            for (int mask = 0; mask < states; mask++) {
+                if (Integer.bitCount(mask) != row) continue;
+                double partial = current[mask];
+                int available = fullMask ^ mask;
+                while (available != 0) {
+                    int bit = available & -available;
+                    int column = Integer.numberOfTrailingZeros(bit);
+                    int greaterColumns = Integer.bitCount(
+                            mask & ~((bit << 1) - 1));
+                    double term = partial * input[row][column];
+                    next[mask | bit] += (greaterColumns & 1) == 0
+                            ? term : -term;
+                    available ^= bit;
+                }
+            }
+            current = next;
+        }
+        return current[fullMask];
     }
 
     private void validate(
@@ -4575,6 +4658,11 @@ public final class FermiNetV1State {
                             signed.logMagnitude());
         }
 
+        if (maxLog == Double.NEGATIVE_INFINITY) {
+            throw new FermiNetPhysicalSingularityException(
+                    "FermiNet determinant sum is exactly zero");
+        }
+
         double scaled =
                 0.0;
 
@@ -4590,10 +4678,9 @@ public final class FermiNetV1State {
         }
 
         if (!Double.isFinite(scaled)
-                || Math.abs(scaled)
-                < SINGULAR_THRESHOLD) {
+                || scaled == 0.0) {
 
-            throw new IllegalStateException(
+            throw new FermiNetPhysicalSingularityException(
                     "FermiNet determinant sum is numerically singular");
         }
 
@@ -4662,11 +4749,14 @@ public final class FermiNetV1State {
                     matrix[pivot][column];
 
             if (!Double.isFinite(pivotValue)
-                    || Math.abs(pivotValue)
-                    < SINGULAR_THRESHOLD) {
+                    ) {
 
                 throw new IllegalStateException(
-                        "singular FermiNet determinant");
+                        "non-finite FermiNet determinant");
+            }
+
+            if (pivotValue == 0.0) {
+                return new SignedLogDet(0, Double.NEGATIVE_INFINITY);
             }
 
             if (pivot != column) {

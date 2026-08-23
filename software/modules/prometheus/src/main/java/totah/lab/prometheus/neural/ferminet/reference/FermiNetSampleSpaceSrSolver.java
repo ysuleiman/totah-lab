@@ -3,7 +3,13 @@ package totah.lab.prometheus.neural.ferminet.reference;
 import totah.lab.prometheus.neural.ferminet.runtime.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetSrObservationFile;
 
@@ -41,6 +47,7 @@ import totah.lab.prometheus.neural.ferminet.reference.FermiNetSrObservationFile;
 public final class FermiNetSampleSpaceSrSolver {
 
     private static final int DEFAULT_PARAMETER_BLOCK = 8192;
+    private static final int DEFAULT_GRAM_WORKERS = 12;
 
     public Result solve(
             FermiNetSrObservationFile observations,
@@ -169,8 +176,13 @@ public final class FermiNetSampleSpaceSrSolver {
                                 samples,
                                 maximumBlock)];
 
-        double[] centeredWeighted =
-                new double[samples];
+        double[] parameterMeans =
+                new double[maximumBlock];
+
+        int gramWorkers =
+                Math.min(
+                        DEFAULT_GRAM_WORKERS,
+                        samples);
 
         long setupNanos =
                 System.nanoTime() - setupStarted;
@@ -191,9 +203,13 @@ public final class FermiNetSampleSpaceSrSolver {
         long gramDerivativeValuesRead = 0L;
         int gramBlocksRead = 0;
 
-        for (int parameterStart = 0;
-             parameterStart < parameters;
-             parameterStart += maximumBlock) {
+        ExecutorService gramExecutor =
+                Executors.newFixedThreadPool(gramWorkers);
+
+        try {
+            for (int parameterStart = 0;
+                 parameterStart < parameters;
+                 parameterStart += maximumBlock) {
 
             int length =
                     Math.min(
@@ -220,60 +236,56 @@ public final class FermiNetSampleSpaceSrSolver {
             long arithmeticStarted =
                     System.nanoTime();
 
-            for (int local = 0;
-                 local < length;
-                 local++) {
+                for (int local = 0;
+                     local < length;
+                     local++) {
 
-                double mean =
-                        0.0;
+                    double mean =
+                            0.0;
 
-                for (int sample = 0;
-                     sample < samples;
-                     sample++) {
+                    for (int sample = 0;
+                         sample < samples;
+                         sample++) {
 
-                    mean +=
-                            normalizedWeight[sample]
-                                    * block[sample * length + local];
+                        mean +=
+                                normalizedWeight[sample]
+                                        * block[sample * length + local];
+                    }
+
+                    parameterMeans[local] = mean;
                 }
 
-                for (int sample = 0;
-                     sample < samples;
-                     sample++) {
+                for (int local = 0;
+                     local < length;
+                     local++) {
 
-                    centeredWeighted[sample] =
-                            sqrtWeight[sample]
-                                    * (block[sample * length + local]
-                                    - mean);
-                }
+                    double mean = parameterMeans[local];
 
-                /*
-                 * Rank-one update gram += b_i b_i^T.
-                 * Accumulate only the lower triangle, then mirror.
-                 */
-                for (int row = 0;
-                     row < samples;
-                     row++) {
+                    for (int sample = 0;
+                         sample < samples;
+                         sample++) {
 
-                    double left =
-                            centeredWeighted[row];
+                        int index = sample * length + local;
 
-                    int rowOffset =
-                            row
-                                    * samples;
-
-                    for (int column = 0;
-                         column <= row;
-                         column++) {
-
-                        gram[rowOffset + column] +=
-                                left
-                                        * centeredWeighted[column];
+                        block[index] =
+                                sqrtWeight[sample]
+                                        * (block[index] - mean);
                     }
                 }
-            }
 
-            gramArithmeticNanos +=
-                    System.nanoTime() - arithmeticStarted;
+                accumulateGramRows(
+                        gramExecutor,
+                        gramWorkers,
+                        gram,
+                        block,
+                        samples,
+                        length);
+
+                gramArithmeticNanos +=
+                        System.nanoTime() - arithmeticStarted;
+            }
+        } finally {
+            gramExecutor.shutdownNow();
         }
 
         /*
@@ -490,6 +502,7 @@ public final class FermiNetSampleSpaceSrSolver {
                   gram_read_ms=%.3f
                   gram_arithmetic_ms=%.3f
                   gram_finalize_ms=%.3f
+                  gram_workers=%d
                   gram_blocks_read=%d
                   gram_derivative_values_read=%d
 
@@ -515,6 +528,7 @@ public final class FermiNetSampleSpaceSrSolver {
                 millis(gramReadNanos),
                 millis(gramArithmeticNanos),
                 millis(gramFinalizeNanos),
+                gramWorkers,
                 gramBlocksRead,
                 gramDerivativeValuesRead,
 
@@ -541,6 +555,89 @@ public final class FermiNetSampleSpaceSrSolver {
                 gramDerivativeValuesRead,
                 reconstructionDerivativeValuesRead,
                 parameterBlockSize);
+    }
+
+    private static void accumulateGramRows(
+            ExecutorService executor,
+            int workers,
+            double[] gram,
+            double[] block,
+            int samples,
+            int length)
+            throws IOException {
+
+        List<Future<?>> futures = new ArrayList<>(workers);
+
+        long totalElements =
+                (long) samples * (samples + 1L) / 2L;
+
+        for (int worker = 0; worker < workers; worker++) {
+            int rowStart =
+                    rowBoundary(
+                            totalElements * worker / workers,
+                            samples);
+            int rowEnd =
+                    rowBoundary(
+                            totalElements * (worker + 1L) / workers,
+                            samples);
+
+            futures.add(executor.submit(() -> {
+                for (int row = rowStart; row < rowEnd; row++) {
+                    int gramRow = row * samples;
+                    int blockRow = row * length;
+
+                    for (int column = 0; column <= row; column++) {
+                        double value = gram[gramRow + column];
+                        int blockColumn = column * length;
+
+                        for (int local = 0; local < length; local++) {
+                            value +=
+                                    block[blockRow + local]
+                                            * block[blockColumn + local];
+                        }
+
+                        gram[gramRow + column] = value;
+                    }
+                }
+            }));
+        }
+
+        try {
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IOException(
+                    "interrupted during parallel Gram construction",
+                    exception);
+        } catch (ExecutionException exception) {
+            throw new IOException(
+                    "parallel Gram construction failed",
+                    exception.getCause());
+        }
+    }
+
+    private static int rowBoundary(
+            long targetElements,
+            int samples) {
+
+        int low = 0;
+        int high = samples;
+
+        while (low < high) {
+            int middle = (low + high) >>> 1;
+            long elements =
+                    (long) middle * (middle + 1L) / 2L;
+
+            if (elements < targetElements) {
+                low = middle + 1;
+            } else {
+                high = middle;
+            }
+        }
+
+        return low;
     }
 
     private static double[] choleskySolve(

@@ -48,6 +48,8 @@ public final class FermiNetH2oSrDriver {
             "2b5c454215a84de2cfacd6ce7cec2cf018b5b7ee6ab95267332f0fdc26421234";
     private static final String EXPECTED_HF_ARTIFACT_SHA256 =
             "2c2ae3854bf743124c8d3b9847095080f6c6f990f94cf73d030f64ee56912d89";
+    private static final String EXPECTED_BRANCH_PARENT_PARAMETER_CHECKSUM =
+            "dfa88d8f0714ea9f9cf45fd3f735a0b198f1f5eef42e6b0a96f2dc7e40341d20";
     private static final String HF_ARTIFACT_RESOURCE =
             "/totah/lab/prometheus/neural/h2o-uhf-ccpvdz.json";
     private static final int CANONICAL_WALKERS = 64;
@@ -65,15 +67,24 @@ public final class FermiNetH2oSrDriver {
     public static void main(String[] args) throws Exception {
         long driverStartedNanos = System.nanoTime();
         Arguments arguments = Arguments.parse(args);
-        Molecule molecule = water();
+        FermiNetH2oGeometryManifest.Entry geometry = arguments.geometryKey() == null
+                ? FermiNetH2oGeometryManifest.require(
+                        FermiNetH2oGeometryManifest.CANONICAL_KEY)
+                : FermiNetH2oGeometryManifest.require(arguments.geometryKey());
+        Molecule molecule = geometry.molecule();
         FermiNetV1Configuration configuration = FermiNetV1Configuration.locked();
         FermiNetParameterLayout layout = new FermiNetParameterLayout(configuration, molecule);
 
         FermiNetOptimizationCheckpoint resumeCheckpoint = arguments.resumeCheckpoint() == null
                 ? null : FermiNetOptimizationCheckpoint.read(arguments.resumeCheckpoint());
-        double[] parameterValues = resumeCheckpoint == null
-                ? readParameters(arguments.parameterFile(), layout.parameterCount())
-                : resumeCheckpoint.parameters();
+        FermiNetOptimizationCheckpoint branchParent = arguments.branchFromCheckpoint() == null
+                ? null : FermiNetOptimizationCheckpoint.read(
+                        arguments.branchFromCheckpoint());
+        double[] parameterValues = resumeCheckpoint != null
+                ? resumeCheckpoint.parameters()
+                : branchParent != null
+                        ? branchParent.parameters()
+                        : readParameters(arguments.parameterFile(), layout.parameterCount());
         if (parameterValues.length != layout.parameterCount()) {
             throw new IllegalArgumentException("checkpoint parameter count mismatch");
         }
@@ -83,10 +94,19 @@ public final class FermiNetH2oSrDriver {
                 configuration,
                 FermiNetParameters.fromArray(layout, parameterValues));
 
-        List<QuantumCoordinates> availableWalkers = resumeCheckpoint == null
-                ? readWalkers(arguments.walkerFile(), molecule)
-                : resumeCheckpoint.walkers();
-        if (resumeCheckpoint == null) {
+        BranchProvenance branch = branchParent == null ? null
+                : verifyAndCreateBranchProvenance(
+                        arguments.branchFromCheckpoint(), arguments.baselineSeed(),
+                        geometry, initialState, branchParent);
+        List<QuantumCoordinates> availableWalkers = resumeCheckpoint != null
+                ? resumeCheckpoint.walkers()
+                : branchParent != null
+                        ? freshBranchWalkers(initialState, branch.walkerInitializationSeed())
+                        : readWalkers(arguments.walkerFile(), molecule);
+        if (branchParent != null) {
+            verifyIdentity(FermiNetPretrainingQualification.parameterChecksum(initialState),
+                    branch.parentParameterSha256(), "branch parent parameter checksum");
+        } else if (resumeCheckpoint == null) {
             verifyProvenance(initialState, availableWalkers, hfArtifactSha256());
         } else {
             verifyResumeProvenance(initialState, resumeCheckpoint, hfArtifactSha256());
@@ -110,6 +130,9 @@ public final class FermiNetH2oSrDriver {
                 walker input           : %s
                 output                 : %s
                 resume checkpoint      : %s
+                branch parent          : %s
+                geometry key           : %s
+                geometry identity      : %s
                 iterations             : %d
                 parameters             : %d
                 walkers                : %d
@@ -137,6 +160,9 @@ public final class FermiNetH2oSrDriver {
                 arguments.walkerFile(),
                 arguments.outputDirectory(),
                 arguments.resumeCheckpoint(),
+                arguments.branchFromCheckpoint(),
+                geometry.key(),
+                geometry.geometryIdentity(),
                 arguments.iterations(),
                 initialState.parameterCount(),
                 pretrainedWalkers.size(),
@@ -146,7 +172,7 @@ public final class FermiNetH2oSrDriver {
                 arguments.retainedPerWalker(),
                 arguments.sweepsBetweenRetained(),
                 arguments.stepSizeBohr(),
-                arguments.baselineSeed(),
+                branch == null ? arguments.baselineSeed() : branch.samplingSeed(),
                 arguments.learningRate(),
                 arguments.damping(),
                 arguments.maxUpdateNorm(),
@@ -161,7 +187,7 @@ public final class FermiNetH2oSrDriver {
                 arguments.retainedPerWalker(),
                 arguments.sweepsBetweenRetained(),
                 arguments.stepSizeBohr(),
-                arguments.baselineSeed());
+                branch == null ? arguments.baselineSeed() : branch.samplingSeed());
         FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration =
                 new FermiNetMatrixFreeSrOptimizer.Configuration(
                         arguments.learningRate(),
@@ -169,10 +195,10 @@ public final class FermiNetH2oSrDriver {
                         arguments.maxUpdateNorm(),
                         arguments.observationParallelism());
 
-        if (arguments.iterations() > 1 || resumeCheckpoint != null) {
+        if (arguments.iterations() > 1 || resumeCheckpoint != null || branch != null) {
             runPersistentTrajectory(arguments, initialState, pretrainedWalkers,
-                    samplingConfiguration, srConfiguration, resumeCheckpoint,
-                    driverStartedNanos);
+                    samplingConfiguration, srConfiguration, resumeCheckpoint, branch,
+                    geometry.geometryIdentity(), driverStartedNanos);
             return;
         }
 
@@ -337,6 +363,8 @@ public final class FermiNetH2oSrDriver {
             FermiNetVariationalOptimizer.SamplingConfiguration sampling,
             FermiNetMatrixFreeSrOptimizer.Configuration srConfiguration,
             FermiNetOptimizationCheckpoint resumeCheckpoint,
+            BranchProvenance branch,
+            String geometryIdentity,
             long driverStartedNanos) throws IOException {
 
         System.out.printf(Locale.ROOT,
@@ -350,15 +378,18 @@ public final class FermiNetH2oSrDriver {
             results = resumeCheckpoint == null
                     ? optimizer.optimizeCheckpointed(
                             initialState, initialWalkers, sampling, optimization,
-                            EXPECTED_PARAMETER_CHECKSUM,
-                            EXPECTED_GEOMETRY_IDENTITY, arguments.iterations())
+                            branch == null ? EXPECTED_PARAMETER_CHECKSUM
+                                    : branch.rootParameterSha256(),
+                            geometryIdentity, arguments.iterations())
                     : optimizer.resume(initialState, resumeCheckpoint, sampling,
-                            optimization, EXPECTED_GEOMETRY_IDENTITY,
+                            optimization, geometryIdentity,
                             arguments.iterations());
         }
 
         String expectedInputChecksum = resumeCheckpoint == null
-                ? EXPECTED_PARAMETER_CHECKSUM : resumeCheckpoint.parameterChecksum();
+                ? branch == null ? EXPECTED_PARAMETER_CHECKSUM
+                        : branch.parentParameterSha256()
+                : resumeCheckpoint.parameterChecksum();
         for (var checkpointed : results) {
             var iteration = checkpointed.result();
             if (iteration.optimizerType() != FermiNetOptimizerType.EXACT_SR) {
@@ -381,9 +412,15 @@ public final class FermiNetH2oSrDriver {
                         + iteration.iteration());
             }
             persistIteration(arguments.outputDirectory(), iteration,
-                    inputChecksum, outputChecksum, checkpointed.checkpoint());
+                    inputChecksum, outputChecksum, checkpointed.checkpoint(), branch);
             printIteration(iteration, inputChecksum, outputChecksum);
             expectedInputChecksum = outputChecksum;
+        }
+
+        if (branch != null) {
+            persistBranchProvenance(arguments.outputDirectory(), branch);
+            evaluateFinalBranchEnergy(arguments.outputDirectory(), sampling,
+                    results.get(results.size() - 1));
         }
 
         System.out.printf(Locale.ROOT, """
@@ -401,14 +438,17 @@ public final class FermiNetH2oSrDriver {
             FermiNetVariationalOptimizer.OptimizationIterationResult iteration,
             String inputChecksum,
             String outputChecksum,
-            FermiNetOptimizationCheckpoint checkpoint) throws IOException {
+            FermiNetOptimizationCheckpoint checkpoint,
+            BranchProvenance branch) throws IOException {
         Path directory = outputRoot.resolve(String.format(
                 Locale.ROOT, "iteration-%03d", iteration.iteration()));
         Files.createDirectories(directory);
-        writeParameters(directory.resolve("input-parameters.hex"),
-                FermiNetStateAccess.parameterSnapshot(iteration.inputState()));
-        writeParameters(directory.resolve("output-parameters.hex"),
-                FermiNetStateAccess.parameterSnapshot(iteration.updatedState()));
+        if (branch == null) {
+            writeParameters(directory.resolve("input-parameters.hex"),
+                    FermiNetStateAccess.parameterSnapshot(iteration.inputState()));
+            writeParameters(directory.resolve("output-parameters.hex"),
+                    FermiNetStateAccess.parameterSnapshot(iteration.updatedState()));
+        }
         writeWalkers(directory.resolve("next-walkers.csv"), iteration.nextWalkers());
         writeEnergySamples(directory.resolve("local-energy-samples.csv"),
                 iteration.vmcResult().localEnergies());
@@ -444,6 +484,22 @@ public final class FermiNetH2oSrDriver {
         summary.put("sample_space_solve_nanos", timing.sampleSpaceSolveNanos());
         summary.put("update_rescaling_nanos", timing.updateRescalingNanos());
         summary.put("new_state_construction_nanos", timing.newStateConstructionNanos());
+        summary.put("local_energy_tails", localEnergyTails(
+                iteration.vmcResult().localEnergies()));
+        if (branch != null) {
+            summary.put("execution_mode", "BRANCH_FROM");
+            summary.put("parent_checkpoint_sha256", branch.parentCheckpointSha256());
+            summary.put("parent_parameter_sha256", branch.parentParameterSha256());
+            summary.put("parent_geometry_sha256", branch.parentGeometrySha256());
+            summary.put("child_geometry_sha256", branch.childGeometrySha256());
+            summary.put("geometry_key", branch.geometryKey());
+            summary.put("branch_sampling_seed", branch.samplingSeed());
+            summary.put("walker_initialization_seed", branch.walkerInitializationSeed());
+            summary.put("branch_session_identity", branch.sessionIdentity());
+        } else {
+            summary.put("execution_mode", checkpoint.completedIterations() > 1
+                    ? "RESUME_OR_CANONICAL_TRAJECTORY" : "CANONICAL");
+        }
         JSON.writeValue(directory.resolve("iteration-summary.json").toFile(), summary);
     }
 
@@ -478,6 +534,187 @@ public final class FermiNetH2oSrDriver {
                 milliseconds(iteration.vmcNanos()),
                 milliseconds(iteration.updateNanos()),
                 milliseconds(iteration.totalNanos()));
+    }
+
+    static BranchProvenance verifyAndCreateBranchProvenance(
+            Path parentCheckpoint,
+            long baselineSeed,
+            FermiNetH2oGeometryManifest.Entry child,
+            FermiNetV1State childState,
+            FermiNetOptimizationCheckpoint parent) throws IOException {
+        if (FermiNetH2oGeometryManifest.CANONICAL_KEY.equals(child.key())) {
+            throw new IllegalArgumentException(
+                    "BRANCH_FROM requires a displaced frozen geometry");
+        }
+        verifyIdentity(parent.parameterChecksum(),
+                EXPECTED_BRANCH_PARENT_PARAMETER_CHECKSUM,
+                "iteration-17 parent parameter checksum");
+        verifyIdentity(parent.geometryIdentity(), EXPECTED_GEOMETRY_IDENTITY,
+                "branch parent canonical geometry identity");
+        verifyIdentity(parent.rootParameterChecksum(), EXPECTED_PARAMETER_CHECKSUM,
+                "branch root pretrained parameter checksum");
+        verifyIdentity(FermiNetPretrainingQualification.parameterChecksum(childState),
+                parent.parameterChecksum(), "branch copied parameter checksum");
+        verifyIdentity(FermiNetPretrainingQualification.geometryIdentity(
+                childState.molecule()), child.geometryIdentity(),
+                "branch child geometry identity");
+        if (parent.completedIterations() != 18
+                || parent.optimizerType() != FermiNetOptimizerType.EXACT_SR
+                || parent.walkers().size() != CANONICAL_WALKERS) {
+            throw new IllegalStateException(
+                    "branch parent is not the qualified iteration-17 checkpoint");
+        }
+        long geometryBits = Long.parseUnsignedLong(
+                child.geometryIdentity().substring(0, 16), 16);
+        long samplingSeed = baselineSeed ^ geometryBits;
+        long walkerSeed = samplingSeed ^ 0x6a09e667f3bcc909L;
+        String checkpointSha = fileSha256(parentCheckpoint);
+        MessageDigest identity = sha256();
+        updateString(identity, checkpointSha);
+        updateString(identity, child.geometryIdentity());
+        updateLong(identity, samplingSeed);
+        updateLong(identity, walkerSeed);
+        return new BranchProvenance(
+                parentCheckpoint, checkpointSha,
+                parent.rootParameterChecksum(), parent.parameterChecksum(),
+                parent.geometryIdentity(), child.geometryIdentity(), child.key(),
+                samplingSeed, walkerSeed,
+                java.util.HexFormat.of().formatHex(identity.digest()));
+    }
+
+    static List<QuantumCoordinates> freshBranchWalkers(
+            FermiNetV1State state, long seed) {
+        List<QuantumCoordinates> walkers = new ArrayList<>(CANONICAL_WALKERS);
+        for (int attempt = 0; walkers.size() < CANONICAL_WALKERS; attempt++) {
+            if (attempt >= 1024) {
+                throw new IllegalStateException(
+                        "unable to initialize 64 nonsingular branch walkers");
+            }
+            long candidateSeed = seed + attempt;
+            var defaults = ReferenceFermiNetPretrainer.Configuration.referenceDefaults(
+                    1, candidateSeed);
+            var initialization = new ReferenceFermiNetPretrainer.Configuration(
+                    0, 1, defaults.learningRate(),
+                    defaults.moveWidthBohr(), defaults.initialWidthBohr(),
+                    defaults.scfFraction(), candidateSeed);
+            QuantumCoordinates candidate = new ReferenceFermiNetPretrainer()
+                    .begin(state, initialization).walkers().getFirst();
+            try {
+                FermiNetStateAccess.sampling(state, candidate);
+                FermiNetStateAccess.spatial(state, candidate);
+                boolean legacyInitializationAccepted =
+                        FermiNetStateAccess.orbitals(state, candidate)
+                                .determinants().stream()
+                                .allMatch(head -> head.sign() != 0
+                                        && head.logMagnitude() >= Math.log(1.0e-14));
+                if (!legacyInitializationAccepted) continue;
+                walkers.add(candidate);
+            } catch (IllegalArgumentException | IllegalStateException rejectedNode) {
+                // Deterministically redraw initial walkers that lie on a nodal singularity.
+            }
+        }
+        return List.copyOf(walkers);
+    }
+
+    private static void persistBranchProvenance(
+            Path output, BranchProvenance branch) throws IOException {
+        Map<String, Object> record = new LinkedHashMap<>();
+        record.put("schema", "prometheus-ferminet-h2o-geometry-branch-v1");
+        record.put("execution_mode", "BRANCH_FROM");
+        record.put("parent_checkpoint", branch.parentCheckpoint().toString());
+        record.put("parent_checkpoint_sha256", branch.parentCheckpointSha256());
+        record.put("root_pretrained_parameter_sha256", branch.rootParameterSha256());
+        record.put("parent_parameter_sha256", branch.parentParameterSha256());
+        record.put("parent_geometry_sha256", branch.parentGeometrySha256());
+        record.put("child_geometry_sha256", branch.childGeometrySha256());
+        record.put("geometry_key", branch.geometryKey());
+        record.put("branch_sampling_seed", branch.samplingSeed());
+        record.put("walker_initialization_seed", branch.walkerInitializationSeed());
+        record.put("branch_session_identity", branch.sessionIdentity());
+        JSON.writeValue(output.resolve("branch-provenance.json").toFile(), record);
+    }
+
+    private static void evaluateFinalBranchEnergy(
+            Path output,
+            FermiNetVariationalOptimizer.SamplingConfiguration sampling,
+            FermiNetVariationalOptimizer.CheckpointedIteration last) throws IOException {
+        FermiNetV1State state = last.result().updatedState();
+        FermiNetOptimizationCheckpoint checkpoint = last.checkpoint();
+        var request = new FermiNetRuntimeSampling.Request(
+                sampling.walkers(), sampling.warmupSweeps(),
+                sampling.retainedPerWalker(), sampling.sweepsBetweenRetained(),
+                sampling.stepSizeBohr(), sampling.baseSeed());
+        long started = System.nanoTime();
+        FermiNetRuntimeSampling.Continuation continuation;
+        try (var session = FermiNetRuntimeSampling.resumeSession(
+                state, request, checkpoint, VMC_PARALLELISM)) {
+            continuation = session.sample(state, 0, sampling.retainedPerWalker(),
+                    sampling.sweepsBetweenRetained());
+        }
+        requireOperationalAcceptance(continuation.result().acceptance(),
+                "final branch energy");
+        Path directory = output.resolve("final-energy");
+        Files.createDirectories(directory);
+        writeParameters(directory.resolve("parameters.hex"),
+                FermiNetStateAccess.parameterSnapshot(state));
+        writeWalkers(directory.resolve("retained-configurations.csv"),
+                continuation.result().samples());
+        writeEnergySamples(directory.resolve("local-energy-samples.csv"),
+                continuation.result().localEnergies());
+        EnergyStatistics energy = energyStatistics(continuation.result().localEnergies());
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("schema", "prometheus-ferminet-h2o-final-energy-v1");
+        summary.put("parameter_checksum",
+                FermiNetPretrainingQualification.parameterChecksum(state));
+        summary.put("geometry_identity",
+                FermiNetPretrainingQualification.geometryIdentity(state.molecule()));
+        summary.put("sample_count", energy.count());
+        summary.put("mean_energy_hartree", energy.mean());
+        summary.put("standard_error_hartree", energy.standardError());
+        summary.put("standard_deviation_hartree", energy.standardDeviation());
+        summary.put("acceptance", continuation.result().acceptance());
+        summary.put("warmup_sweeps", 0);
+        summary.put("proposed", continuation.proposed());
+        summary.put("accepted", continuation.accepted());
+        summary.put("elapsed_nanos", System.nanoTime() - started);
+        summary.put("local_energy_tails", localEnergyTails(
+                continuation.result().localEnergies()));
+        JSON.writeValue(directory.resolve("energy-summary.json").toFile(), summary);
+    }
+
+    private static Map<String, Object> localEnergyTails(
+            List<LocalEnergyComponents> energies) {
+        double[] values = energies.stream().mapToDouble(
+                LocalEnergyComponents::totalHartree).sorted().toArray();
+        double mean = java.util.Arrays.stream(values).average().orElseThrow();
+        double variance = 0.0;
+        for (double value : values) variance += (value - mean) * (value - mean);
+        double standardDeviation = Math.sqrt(variance / values.length);
+        int beyondFive = 0, beyondTen = 0;
+        for (double value : values) {
+            double deviation = Math.abs(value - mean);
+            if (deviation > 5.0 * standardDeviation) beyondFive++;
+            if (deviation > 10.0 * standardDeviation) beyondTen++;
+        }
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("minimum", values[0]);
+        result.put("percentile_0_1", percentile(values, 0.001));
+        result.put("percentile_1", percentile(values, 0.01));
+        result.put("median", percentile(values, 0.5));
+        result.put("percentile_99", percentile(values, 0.99));
+        result.put("percentile_99_9", percentile(values, 0.999));
+        result.put("maximum", values[values.length - 1]);
+        result.put("beyond_5_sigma", beyondFive);
+        result.put("beyond_10_sigma", beyondTen);
+        return result;
+    }
+
+    private static double percentile(double[] values, double probability) {
+        double position = probability * (values.length - 1);
+        int lower = (int) Math.floor(position);
+        int upper = (int) Math.ceil(position);
+        if (lower == upper) return values[lower];
+        return values[lower] + (position - lower) * (values[upper] - values[lower]);
     }
 
     static void verifyProvenance(
@@ -561,6 +798,17 @@ public final class FermiNetH2oSrDriver {
         return java.util.HexFormat.of().formatHex(digest.digest());
     }
 
+    private static String fileSha256(Path path) throws IOException {
+        MessageDigest digest = sha256();
+        try (InputStream input = Files.newInputStream(path)) {
+            byte[] buffer = new byte[8192];
+            for (int count; (count = input.read(buffer)) >= 0;) {
+                if (count > 0) digest.update(buffer, 0, count);
+            }
+        }
+        return java.util.HexFormat.of().formatHex(digest.digest());
+    }
+
     private static MessageDigest sha256() {
         try {
             return MessageDigest.getInstance("SHA-256");
@@ -573,6 +821,12 @@ public final class FermiNetH2oSrDriver {
         for (int shift = 56; shift >= 0; shift -= 8) {
             digest.update((byte) (value >>> shift));
         }
+    }
+
+    private static void updateString(MessageDigest digest, String value) {
+        byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        updateLong(digest, bytes.length);
+        digest.update(bytes);
     }
 
     static FermiNetRuntimeSampling.Result sampleCanonicalVmc(
@@ -883,12 +1137,26 @@ public final class FermiNetH2oSrDriver {
             double standardDeviation,
             double standardError) {}
 
+    record BranchProvenance(
+            Path parentCheckpoint,
+            String parentCheckpointSha256,
+            String rootParameterSha256,
+            String parentParameterSha256,
+            String parentGeometrySha256,
+            String childGeometrySha256,
+            String geometryKey,
+            long samplingSeed,
+            long walkerInitializationSeed,
+            String sessionIdentity) {}
+
     private record Arguments(
             String preset,
             Path parameterFile,
             Path walkerFile,
             Path outputDirectory,
             Path resumeCheckpoint,
+            Path branchFromCheckpoint,
+            String geometryKey,
             int iterations,
             int sampleCount,
             int retainedPerWalker,
@@ -914,6 +1182,8 @@ public final class FermiNetH2oSrDriver {
             Path output = repositoryRoot.resolve(
                     "artifacts/prometheus/h2o/ferminet/sr/latest");
             Path resume = null;
+            Path branchFrom = null;
+            String geometry = null;
             int iterations = 1;
             int sampleCount = 1024;
             int retainedPerWalker = 16;
@@ -934,6 +1204,9 @@ public final class FermiNetH2oSrDriver {
                     case "--walkers" -> walkers = Path.of(value(args, ++i, "--walkers"));
                     case "--output" -> output = Path.of(value(args, ++i, "--output"));
                     case "--resume" -> resume = Path.of(value(args, ++i, "--resume"));
+                    case "--branch-from" -> branchFrom = Path.of(
+                            value(args, ++i, "--branch-from"));
+                    case "--geometry" -> geometry = value(args, ++i, "--geometry");
                     case "--iterations" -> iterations = integer(args, ++i, "--iterations");
                     case "--sample-count" -> sampleCount = integer(args, ++i, "--sample-count");
                     case "--retained-per-walker" -> retainedPerWalker = integer(args, ++i, "--retained-per-walker");
@@ -949,6 +1222,13 @@ public final class FermiNetH2oSrDriver {
                     default -> throw usage("unknown argument: " + args[i]);
                 }
             }
+            if (resume != null && branchFrom != null) {
+                throw usage("--resume and --branch-from are mutually exclusive");
+            }
+            if ((branchFrom == null) != (geometry == null)) {
+                throw usage("--geometry and --branch-from must be specified together");
+            }
+            if (geometry != null) FermiNetH2oGeometryManifest.require(geometry);
             if (!"qualified-hf-n1024".equals(preset)) throw usage("unknown preset: " + preset);
             if (iterations < 1 || sampleCount < 2 || retainedPerWalker < 1
                     || sampleCount % retainedPerWalker != 0
@@ -966,6 +1246,8 @@ public final class FermiNetH2oSrDriver {
                     walkers.toAbsolutePath().normalize(),
                     output.toAbsolutePath().normalize(),
                     resume == null ? null : resume.toAbsolutePath().normalize(),
+                    branchFrom == null ? null : branchFrom.toAbsolutePath().normalize(),
+                    geometry,
                     iterations,
                     sampleCount, retainedPerWalker, warmupSweeps, sweepsBetweenRetained,
                     stepSizeBohr, baselineSeed, postSrSeed, learningRate, damping,
@@ -1006,6 +1288,7 @@ public final class FermiNetH2oSrDriver {
                     --preset qualified-hf-n1024
                     --parameters PATH --walkers PATH --output PATH
                     [--resume CHECKPOINT]
+                    [--geometry FROZEN_KEY --branch-from CHECKPOINT]
                     [--iterations N]
                     [--sample-count N] [--retained-per-walker N]
                     [--warmup-sweeps N] [--sweeps-between-retained N]

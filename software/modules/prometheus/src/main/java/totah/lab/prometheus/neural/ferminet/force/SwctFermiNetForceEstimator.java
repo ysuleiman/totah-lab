@@ -293,7 +293,7 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         finite[component][sample] = true;
     }
 
-    private static void evaluateSample(
+    static void evaluateSample(
             FermiNetV1State state,
             Molecule molecule,
             FermiNetDerivativeEngine derivativeEngine,
@@ -314,16 +314,26 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         FermiNetStateAccess.DirectionalBatchSnapshot derivativeBatch;
         try {
             weights = warpWeights(molecule, coordinates);
+        } catch (IllegalArgumentException exception) {
+            if (!"SWCT singular at nucleus".equals(exception.getMessage())) {
+                throw exception;
+            }
+            markSampleNonfinite(localEnergies, kineticDirectional,
+                    coulombDirectional, wavefunctionLog,
+                    jacobianHalfDivergence, finite, components, sample);
+            return;
+        }
+        try {
             derivativeBatch = derivativeEngine.directionalBatch(
                     state, coordinates, nuclearDirections,
                     electronDirections(weights));
-        } catch (RuntimeException exception) {
-            localEnergies[sample] = Double.NaN;
-            for (int component = 0; component < components; component++) {
-                markNonfinite(kineticDirectional, coulombDirectional,
-                        wavefunctionLog, jacobianHalfDivergence, finite,
-                        component, sample);
+        } catch (IllegalArgumentException exception) {
+            if (!isNonfiniteFermiNetEvaluation(exception)) {
+                throw exception;
             }
+            markSampleNonfinite(localEnergies, kineticDirectional,
+                    coulombDirectional, wavefunctionLog,
+                    jacobianHalfDivergence, finite, components, sample);
             return;
         }
         double localEnergy;
@@ -331,7 +341,10 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
             localEnergy = FermiNetRuntimeSampling.localEnergyWithLog(
                     state, coordinates, derivativeBatch.spatial())
                     .localEnergy().totalHartree();
-        } catch (RuntimeException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            if (!isExpectedLocalEnergyPathology(exception)) {
+                throw exception;
+            }
             localEnergy = Double.NaN;
         }
         localEnergies[sample] = localEnergy;
@@ -344,18 +357,12 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
                             component, sample);
                     continue;
                 }
-                try {
-                    evaluateComponent(molecule, coordinates, weights,
-                            derivativeBatch.directions().get(component),
-                            nucleus, axis, kineticDirectional,
-                            coulombDirectional, wavefunctionLog,
-                            jacobianHalfDivergence, finite,
-                            component, sample);
-                } catch (RuntimeException exception) {
-                    markNonfinite(kineticDirectional, coulombDirectional,
-                            wavefunctionLog, jacobianHalfDivergence, finite,
-                            component, sample);
-                }
+                evaluateComponent(molecule, coordinates, weights,
+                        derivativeBatch.directions().get(component),
+                        nucleus, axis, kineticDirectional,
+                        coulombDirectional, wavefunctionLog,
+                        jacobianHalfDivergence, finite,
+                        component, sample);
             }
         }
     }
@@ -387,7 +394,7 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         return List.copyOf(result);
     }
 
-    private record SampleInput(
+    record SampleInput(
             int sample,
             int chain,
             int retained,
@@ -402,6 +409,36 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
         wavefunctionLog[component][sample] = Double.NaN;
         jacobianHalfDivergence[component][sample] = Double.NaN;
         finite[component][sample] = false;
+    }
+
+    private static void markSampleNonfinite(
+            double[] localEnergies,
+            double[][] kineticDirectional, double[][] coulombDirectional,
+            double[][] wavefunctionLog, double[][] jacobianHalfDivergence,
+            boolean[][] finite, int components, int sample) {
+        localEnergies[sample] = Double.NaN;
+        for (int component = 0; component < components; component++) {
+            markNonfinite(kineticDirectional, coulombDirectional,
+                    wavefunctionLog, jacobianHalfDivergence, finite,
+                    component, sample);
+        }
+    }
+
+    private static boolean isNonfiniteFermiNetEvaluation(
+            IllegalArgumentException exception) {
+        String message = exception.getMessage();
+        return message != null
+                && message.startsWith("non-finite FermiNet ")
+                && message.endsWith(" evaluation");
+    }
+
+    private static boolean isExpectedLocalEnergyPathology(
+            RuntimeException exception) {
+        return "Coulomb singularity".equals(exception.getMessage())
+                || "non-finite local-energy component".equals(
+                        exception.getMessage())
+                || "local energy components must be finite".equals(
+                        exception.getMessage());
     }
 
     /** Locked normalized r^-4 space-warp weights for every electron/nucleus pair. */
@@ -691,8 +728,10 @@ public final class SwctFermiNetForceEstimator implements FermiNetNuclearForceEst
                             / (finiteCount - 1))
                     : Double.NaN;
             double chainSquares = 0.0;
+            int expectedChainCount = chainCounts[0];
             for (int chain = 0; chain < walkers; chain++) {
-                if (chainCounts[chain] == 0) {
+                if (chainCounts[chain] == 0
+                        || chainCounts[chain] != expectedChainCount) {
                     return new ComponentStatistics(mean, Double.NaN, variance);
                 }
                 double difference = chainSums[chain] / chainCounts[chain] - mean;

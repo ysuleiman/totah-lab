@@ -2,6 +2,9 @@ package totah.lab.prometheus.neural.ferminet.force;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,9 +28,12 @@ import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFdConfig
 import totah.lab.prometheus.neural.ferminet.reference.FermiNetCorrelatedFiniteDifferenceForceReference;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetOptimizationCheckpoint;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeConfiguration;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngines;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngineType;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameterLayout;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetParameters;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetStateAccess;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1Configuration;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
 import totah.lab.prometheus.variational.QuantumCoordinates;
@@ -36,6 +42,57 @@ import totah.lab.prometheus.variational.force.GeneralAnalyticDifferentialSwctFor
 import totah.lab.prometheus.variational.force.GeneralMolecularSpaceWarp;
 
 final class SwctFermiNetForceEstimatorTest {
+
+    @Test
+    void unexpectedDerivativeEngineFailurePropagatesUnchanged() {
+        Molecule molecule = h2();
+        NullPointerException failure = new NullPointerException("injected corruption");
+        ThrowingDerivativeEngine engine = new ThrowingDerivativeEngine(failure);
+        SampleArrays arrays = new SampleArrays(6, 1);
+
+        NullPointerException actual = assertThrows(NullPointerException.class,
+                () -> SwctFermiNetForceEstimator.evaluateSample(
+                        null, molecule, engine,
+                        nuclearDirections(2),
+                        new SwctFermiNetForceEstimator.SampleInput(
+                                0, 0, 0, fixtureSamples().get(0)),
+                        arrays.chains(), arrays.localEnergies(),
+                        arrays.kinetic(), arrays.coulomb(), arrays.wavefunction(),
+                        arrays.jacobian(), arrays.finite()));
+
+        assertSame(failure, actual);
+    }
+
+    @Test
+    void physicalSpaceWarpSingularityRemainsNonfiniteEvidence() {
+        Molecule molecule = h2();
+        ThrowingDerivativeEngine engine = new ThrowingDerivativeEngine(
+                new AssertionError("derivative engine must not be called"));
+        SampleArrays arrays = new SampleArrays(6, 1);
+        QuantumCoordinates singular = new QuantumCoordinates(List.of(
+                new QuantumCoordinates.ParticleCoordinate(
+                        0, 0.0, 0.0, -0.7, SpinProjection.ALPHA),
+                new QuantumCoordinates.ParticleCoordinate(
+                        1, 0.4, 0.2, 0.3, SpinProjection.BETA)));
+
+        SwctFermiNetForceEstimator.evaluateSample(
+                null, molecule, engine,
+                nuclearDirections(2),
+                new SwctFermiNetForceEstimator.SampleInput(0, 0, 0, singular),
+                arrays.chains(), arrays.localEnergies(), arrays.kinetic(),
+                arrays.coulomb(), arrays.wavefunction(), arrays.jacobian(),
+                arrays.finite());
+
+        assertEquals(0, engine.calls());
+        assertEquals(Double.NaN, arrays.localEnergies()[0]);
+        for (int component = 0; component < 6; component++) {
+            assertFalse(arrays.finite()[component][0]);
+            assertEquals(Double.NaN, arrays.kinetic()[component][0]);
+            assertEquals(Double.NaN, arrays.coulomb()[component][0]);
+            assertEquals(Double.NaN, arrays.wavefunction()[component][0]);
+            assertEquals(Double.NaN, arrays.jacobian()[component][0]);
+        }
+    }
 
     /**
      * The SWCT term assembly, Coulomb directional derivative, and warp
@@ -316,6 +373,77 @@ final class SwctFermiNetForceEstimatorTest {
                 nucleus(0, 0, 0, -0.7), nucleus(1, 0, 0, 0.7)),
                 new MolecularCharge(0), new ElectronCount(2),
                 new SpinSector(1, 1, 1));
+    }
+
+    private static List<FermiNetStateAccess.NuclearDirection> nuclearDirections(
+            int nuclei) {
+        List<FermiNetStateAccess.NuclearDirection> result = new ArrayList<>();
+        for (int component = 0; component < 3 * nuclei; component++) {
+            double[] values = new double[3 * nuclei];
+            values[component] = 1.0;
+            result.add(new FermiNetStateAccess.NuclearDirection(values));
+        }
+        return result;
+    }
+
+    private record SampleArrays(
+            int[] chains,
+            double[] localEnergies,
+            double[][] kinetic,
+            double[][] coulomb,
+            double[][] wavefunction,
+            double[][] jacobian,
+            boolean[][] finite) {
+        private SampleArrays(int components, int samples) {
+            this(new int[samples], new double[samples],
+                    new double[components][samples],
+                    new double[components][samples],
+                    new double[components][samples],
+                    new double[components][samples],
+                    new boolean[components][samples]);
+        }
+    }
+
+    private static final class ThrowingDerivativeEngine
+            implements FermiNetDerivativeEngine {
+        private final RuntimeException failure;
+        private int calls;
+
+        private ThrowingDerivativeEngine(RuntimeException failure) {
+            this.failure = failure;
+        }
+
+        private ThrowingDerivativeEngine(AssertionError failure) {
+            this(new IllegalStateException(failure));
+        }
+
+        int calls() { return calls; }
+        @Override public FermiNetDerivativeEngineType type() {
+            return FermiNetDerivativeEngineType.BATCHED_FORWARD;
+        }
+        @Override public int sampleParallelism() { return 1; }
+        @Override public FermiNetStateAccess.SpatialSnapshot spatial(
+                FermiNetV1State state, QuantumCoordinates coordinates) {
+            throw new UnsupportedOperationException();
+        }
+        @Override public FermiNetStateAccess.NuclearSnapshot nuclear(
+                FermiNetV1State state, QuantumCoordinates coordinates) {
+            throw new UnsupportedOperationException();
+        }
+        @Override public FermiNetStateAccess.DirectionalSnapshot directional(
+                FermiNetV1State state, QuantumCoordinates coordinates,
+                FermiNetStateAccess.NuclearDirection nuclearDirection,
+                FermiNetStateAccess.ElectronDirection electronDirection) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public FermiNetStateAccess.DirectionalBatchSnapshot directionalBatch(
+                FermiNetV1State state, QuantumCoordinates coordinates,
+                List<FermiNetStateAccess.NuclearDirection> nuclearDirections,
+                List<FermiNetStateAccess.ElectronDirection> electronDirections) {
+            calls++;
+            throw failure;
+        }
     }
 
     private static NuclearCenter nucleus(int index, double x, double y, double z) {

@@ -19,6 +19,7 @@ import totah.lab.prometheus.neural.ferminet.runtime.FermiNetRuntimeSampling;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetStateAccess;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetDerivativeEngine;
 import totah.lab.prometheus.neural.ferminet.runtime.FermiNetV1State;
+import totah.lab.prometheus.neural.ferminet.runtime.FermiNetPhysicalSingularityException;
 import totah.lab.prometheus.variational.QuantumCoordinates;
 
 /**
@@ -129,7 +130,7 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
                 }
                 localEnergies[sample] = localEnergy;
                 logGradients[sample] = logGradient;
-            } catch (RuntimeException exception) {
+            } catch (FermiNetPhysicalSingularityException exception) {
                 localEnergies[sample] = Double.NaN;
                 logGradients[sample] = null;
             }
@@ -163,7 +164,7 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
                     contraction = AcZvFermiNetForceEstimator.auxiliaryContraction(
                             molecule, configurations[sample],
                             logGradients[sample], nucleus, axis);
-                } catch (RuntimeException exception) {
+                } catch (FermiNetPhysicalSingularityException exception) {
                     forceSamples[component][sample] = Double.NaN;
                     continue;
                 }
@@ -433,8 +434,10 @@ public final class AcZvzbFermiNetForceEstimator implements FermiNetNuclearForceE
                             / (finiteCount - 1))
                     : Double.NaN;
             double chainSquares = 0.0;
+            int expectedChainCount = chainCounts[0];
             for (int chain = 0; chain < walkers; chain++) {
-                if (chainCounts[chain] == 0) {
+                if (chainCounts[chain] == 0
+                        || chainCounts[chain] != expectedChainCount) {
                     return new ComponentStatistics(mean, Double.NaN, variance);
                 }
                 double difference = chainSums[chain] / chainCounts[chain] - mean;

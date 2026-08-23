@@ -66,7 +66,7 @@ public final class CorrelatedFdFermiNetForceEstimator
                     value.nucleus(), value.axis(), value.energyPlusHartree(),
                     value.energyMinusHartree(), value.energyContributionCovariance(),
                     value.plusEffectiveSampleSize(), value.minusEffectiveSampleSize(),
-                    value.pairedEffectiveSampleSize(), value.plusGeometryChecksum(),
+                    value.conservativeMarginalEffectiveSampleSize(), value.plusGeometryChecksum(),
                     value.minusGeometryChecksum()));
         }
         return new NuclearForceResult(

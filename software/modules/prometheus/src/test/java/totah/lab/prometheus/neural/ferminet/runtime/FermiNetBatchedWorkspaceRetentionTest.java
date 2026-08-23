@@ -18,6 +18,64 @@ import totah.lab.prometheus.variational.SpinProjection;
 final class FermiNetBatchedWorkspaceRetentionTest {
 
     @Test
+    void activeShapeCanBeEvictedAndReleasedWithoutLosingPoolAccounting() {
+        BatchedForwardFermiNetDerivativeEngine engine =
+                new BatchedForwardFermiNetDerivativeEngine(2);
+        FermiNetBatchedJetWorkspace first = engine.acquireWorkspace(30, 9);
+        FermiNetBatchedJetWorkspace second = engine.acquireWorkspace(30, 9);
+        double[] firstDirections = new double[9];
+        firstDirections[0] = 1.25;
+        double[] secondDirections = new double[9];
+        secondDirections[0] = -2.5;
+        FermiNetBatchedSpatialJet firstResult = FermiNetBatchedSpatialJet.constant(
+                first, 11.0, 30, firstDirections);
+        FermiNetBatchedSpatialJet secondResult = FermiNetBatchedSpatialJet.constant(
+                second, 22.0, 30, secondDirections);
+
+        releaseCompetingShape(engine, 30, 1, 31.0);
+        releaseCompetingShape(engine, 30, 2, 32.0);
+        releaseCompetingShape(engine, 30, 3, 33.0);
+
+        assertEquals(11.0, firstResult.value(), 0.0);
+        assertEquals(1.25, firstResult.directionalValue(0), 0.0);
+        assertEquals(22.0, secondResult.value(), 0.0);
+        assertEquals(-2.5, secondResult.directionalValue(0), 0.0);
+        assertEquals(2, engine.retainedWorkspaceCount());
+        assertEquals(2, engine.retainedShapeCount());
+
+        engine.releaseWorkspace(30, 9, first);
+        assertEquals(2, engine.retainedWorkspaceCount());
+        engine.releaseWorkspace(30, 9, second);
+        assertEquals(2, engine.retainedWorkspaceCount());
+        assertEquals(1, engine.retainedShapeCount());
+
+        FermiNetBatchedJetWorkspace reusedFirst = engine.acquireWorkspace(30, 9);
+        FermiNetBatchedJetWorkspace reusedSecond = engine.acquireWorkspace(30, 9);
+        double[] reusedFirstDirections = new double[9];
+        reusedFirstDirections[0] = 4.5;
+        double[] reusedSecondDirections = new double[9];
+        reusedSecondDirections[0] = -7.5;
+        FermiNetBatchedSpatialJet reusedFirstResult =
+                FermiNetBatchedSpatialJet.constant(
+                        reusedFirst, 101.0, 30, reusedFirstDirections);
+        FermiNetBatchedSpatialJet reusedSecondResult =
+                FermiNetBatchedSpatialJet.constant(
+                        reusedSecond, 202.0, 30, reusedSecondDirections);
+        assertEquals(101.0, reusedFirstResult.value(), 0.0);
+        assertEquals(4.5, reusedFirstResult.directionalValue(0), 0.0);
+        assertEquals(202.0, reusedSecondResult.value(), 0.0);
+        assertEquals(-7.5, reusedSecondResult.directionalValue(0), 0.0);
+
+        engine.releaseWorkspace(30, 9, reusedFirst);
+        engine.releaseWorkspace(30, 9, reusedSecond);
+        assertEquals(2, engine.retainedWorkspaceCount());
+        assertEquals(2L * (1L << 20) * Double.BYTES,
+                engine.retainedPrimitiveBytes());
+        System.out.printf("Workspace eviction race: retained=%d bytes=%d%n",
+                engine.retainedWorkspaceCount(), engine.retainedPrimitiveBytes());
+    }
+
+    @Test
     void resetReusesTheExistingJetSlicesWithoutGrowingChunks() {
         FermiNetBatchedJetWorkspace workspace = new FermiNetBatchedJetWorkspace();
         int peakJets = 5_000;
@@ -122,6 +180,15 @@ final class FermiNetBatchedWorkspaceRetentionTest {
             result.add(new FermiNetStateAccess.NuclearDirection(values));
         }
         return result;
+    }
+
+    private static void releaseCompetingShape(
+            BatchedForwardFermiNetDerivativeEngine engine,
+            int dimensions, int directions, double value) {
+        FermiNetBatchedJetWorkspace workspace =
+                engine.acquireWorkspace(dimensions, directions);
+        workspace.acquire(value, -value, dimensions, directions);
+        engine.releaseWorkspace(dimensions, directions, workspace);
     }
 
     private static List<FermiNetStateAccess.ElectronDirection> electronDirections(

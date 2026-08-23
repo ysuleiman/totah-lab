@@ -6,5 +6,6 @@ public enum NuclearForceEstimatorType {
     SWCT,
     AC_ZV,
     AC_ZVZB,
+    AC_ZVZB_DERIV,
     ZVZB_SWCT
 }

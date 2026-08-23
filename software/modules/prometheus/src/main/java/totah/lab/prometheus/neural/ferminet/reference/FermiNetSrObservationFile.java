@@ -42,6 +42,10 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
     private final long derivativeBytes;
     private final long neuralEvaluations;
     private final Timing timing;
+    private final ThreadLocal<ByteBuffer> parameterReadBuffers =
+            ThreadLocal.withInitial(() ->
+                    ByteBuffer.allocateDirect(Double.BYTES)
+                            .order(ByteOrder.nativeOrder()));
 
     private boolean closed;
 
@@ -802,15 +806,24 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
                         length,
                         Double.BYTES);
 
-        ByteBuffer bytes =
-                ByteBuffer.allocateDirect(blockBytes)
-                        .order(ByteOrder.nativeOrder());
+        ByteBuffer bytes = parameterReadBuffers.get();
+
+        if (bytes.capacity() < blockBytes) {
+            bytes = ByteBuffer.allocateDirect(blockBytes)
+                    .order(ByteOrder.nativeOrder());
+            parameterReadBuffers.set(bytes);
+        }
+
+        bytes.clear();
+
+        DoubleBuffer doubles = bytes.asDoubleBuffer();
 
         for (int sample = 0;
              sample < sampleCount;
              sample++) {
 
             bytes.clear();
+            bytes.limit(blockBytes);
 
             long elementOffset =
                     Math.addExact(
@@ -831,8 +844,8 @@ public final class FermiNetSrObservationFile implements AutoCloseable {
 
             bytes.flip();
 
-            DoubleBuffer doubles =
-                    bytes.asDoubleBuffer();
+            doubles.clear();
+            doubles.limit(length);
 
             doubles.get(
                     destination,

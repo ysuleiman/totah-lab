@@ -51,7 +51,7 @@ final class FermiNetH2oSrDriverWiringTest {
 
         assertTrue(source.contains("int iterations = 1;"));
         assertTrue(source.contains(
-                "if (arguments.iterations() > 1 || resumeCheckpoint != null)"));
+                "if (arguments.iterations() > 1 || resumeCheckpoint != null || branch != null)"));
         assertTrue(source.contains("optimizer.optimizeCheckpointed("));
         assertTrue(source.contains("sampleCanonicalVmc("),
                 "one-step mode must retain independent post-SR validation");

@@ -75,12 +75,18 @@ public final class FermiNetH2oForceQualificationDriver {
                 state, checkpoint.parameterChecksum(), checkpoint.geometryIdentity(),
                 arguments.dataset(), dataset, sha256(arguments.checkpoint()),
                 checkpoint.rootParameterChecksum());
+        context.verifyDataset();
+        var provenanceVerification = context.verifyCheckpoint(arguments.checkpoint());
         NuclearForceConfiguration configuration = switch (arguments.estimator()) {
             case CORRELATED_FD -> NuclearForceConfiguration.correlatedFd(
                     FermiNetCorrelatedFiniteDifferenceForceReference.STEP_BOHR);
             case SWCT -> NuclearForceConfiguration.swct();
             case AC_ZV -> NuclearForceConfiguration.acZv();
             case AC_ZVZB -> NuclearForceConfiguration.acZvzb();
+            case AC_ZVZB_DERIV -> arguments.pathakWagner()
+                    ? NuclearForceConfiguration.acZvzbDerivPathakWagner(
+                            0.100, 0.050, 0.020, 0.010, 0.005)
+                    : NuclearForceConfiguration.acZvzbDeriv();
             default -> NuclearForceConfiguration.unsupported(arguments.estimator());
         };
         var derivativeConfiguration = new FermiNetDerivativeConfiguration(
@@ -88,6 +94,8 @@ public final class FermiNetH2oForceQualificationDriver {
         var result = new FermiNetNuclearForcePipeline().estimate(
                 context, configuration, derivativeConfiguration);
         var validation = FermiNetNuclearForceValidation.validate(molecule, result);
+        var physicalDiagnostics = FermiNetNuclearForceValidation
+                .physicalDiagnostics(molecule, result);
         Path output = arguments.output() == null
                 ? Path.of("artifacts/prometheus/h2o/ferminet/forces")
                         .resolve(dataset.sha256()).resolve(arguments.estimator().name())
@@ -97,7 +105,9 @@ public final class FermiNetH2oForceQualificationDriver {
         if (Files.exists(resultFile)) {
             throw new IOException("refusing to overwrite force result: " + resultFile);
         }
-        JSON.writeValue(resultFile.toFile(), new Artifact(result, validation));
+        JSON.writeValue(resultFile.toFile(), new Artifact(result, validation,
+                physicalDiagnostics, context.declaredProvenance(),
+                provenanceVerification));
         System.out.printf(Locale.ROOT, """
                 FERMINET H2O FORCE QUALIFICATION
                 estimator             : %s
@@ -117,7 +127,11 @@ public final class FermiNetH2oForceQualificationDriver {
 
     private record Artifact(
             totah.lab.prometheus.neural.ferminet.force.NuclearForceResult result,
-            FermiNetNuclearForceValidation.Result validation) {}
+            FermiNetNuclearForceValidation.Result validation,
+            FermiNetNuclearForceValidation.PhysicalDiagnostics physicalDiagnostics,
+            FermiNetForceEvaluationContext.DeclaredProvenance declaredProvenance,
+            FermiNetForceEvaluationContext.ProvenanceVerification
+                    cryptographicVerification) {}
 
     private static void verifyCheckpoint(
             FermiNetOptimizationCheckpoint checkpoint, Molecule molecule) {
@@ -164,11 +178,13 @@ public final class FermiNetH2oForceQualificationDriver {
             Path checkpoint,
             Path dataset,
             Path output,
+            boolean pathakWagner,
             FermiNetDerivativeEngineType derivativeEngine,
             int forceParallelism) {
         private static Arguments parse(String[] args) {
             NuclearForceEstimatorType estimator = NuclearForceEstimatorType.CORRELATED_FD;
             Path checkpoint = DEFAULT_CHECKPOINT, dataset = DEFAULT_DATASET, output = null;
+            boolean pathakWagner = false;
             FermiNetDerivativeEngineType derivativeEngine =
                     FermiNetDerivativeEngineType.BATCHED_FORWARD;
             int forceParallelism = 6;
@@ -179,6 +195,7 @@ public final class FermiNetH2oForceQualificationDriver {
                     case "--checkpoint" -> checkpoint = Path.of(args[++i]);
                     case "--dataset" -> dataset = Path.of(args[++i]);
                     case "--output" -> output = Path.of(args[++i]);
+                    case "--pathak-wagner" -> pathakWagner = true;
                     case "--derivative-engine" -> derivativeEngine =
                             FermiNetDerivativeEngineType.valueOf(
                                     args[++i].toUpperCase(Locale.ROOT));
@@ -187,8 +204,12 @@ public final class FermiNetH2oForceQualificationDriver {
                     default -> throw new IllegalArgumentException("unknown option: " + args[i]);
                 }
             }
+            if (pathakWagner && estimator != NuclearForceEstimatorType.AC_ZVZB_DERIV) {
+                throw new IllegalArgumentException(
+                        "--pathak-wagner requires --estimator AC_ZVZB_DERIV");
+            }
             return new Arguments(estimator, checkpoint, dataset, output,
-                    derivativeEngine, forceParallelism);
+                    pathakWagner, derivativeEngine, forceParallelism);
         }
     }
 }
