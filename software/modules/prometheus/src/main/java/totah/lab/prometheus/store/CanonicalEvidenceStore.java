@@ -89,6 +89,7 @@ public final class CanonicalEvidenceStore {
     public LoadedEvidence loadGeneration(Path generationDirectory) throws IOException {
         EvidenceStoreManifest manifest = mapper.readValue(
                 generationDirectory.resolve(MANIFEST).toFile(), EvidenceStoreManifest.class);
+        verifyManifestPayloads(generationDirectory, manifest);
         EvidenceBundle bundle = new EvidenceBundle();
         readQuantum(generationDirectory.resolve(QUANTUM), manifest, bundle);
         readClassical(generationDirectory.resolve(CLASSICAL), manifest, bundle);
@@ -203,6 +204,25 @@ public final class CanonicalEvidenceStore {
         String expected = manifest.recordSha256().get(relative);
         if (expected == null || !expected.equals(sha256(Files.readAllBytes(path)))) {
             throw new IOException("canonical evidence checksum mismatch: " + relative);
+        }
+    }
+
+    private static void verifyManifestPayloads(Path generation, EvidenceStoreManifest manifest)
+            throws IOException {
+        Path normalizedGeneration = generation.toAbsolutePath().normalize();
+        for (Map.Entry<String, String> entry : manifest.recordSha256().entrySet()) {
+            String relative = entry.getKey().replace('\\', '/');
+            Path payload = normalizedGeneration.resolve(relative).normalize();
+            if (!payload.startsWith(normalizedGeneration)) {
+                throw new IOException("canonical evidence manifest path escapes generation: " + relative);
+            }
+            if (!Files.isRegularFile(payload)) {
+                throw new IOException("canonical evidence payload missing: " + relative);
+            }
+            String actual = sha256(Files.readAllBytes(payload));
+            if (!entry.getValue().equals(actual)) {
+                throw new IOException("canonical evidence checksum mismatch: " + relative);
+            }
         }
     }
 

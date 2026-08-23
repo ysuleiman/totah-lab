@@ -154,14 +154,7 @@ public final class ForceCampaignPreflightRunner {
         Path gradientPath = sourceBase.resolve("final_gradient_hartree_per_bohr.txt");
         JsonNode result = mapper.readTree(resultPath.toFile());
         double energy = requiredFiniteDouble(result, "energy_hartree");
-        List<Double> gradient = new ArrayList<>();
-        for (String line : Files.readAllLines(gradientPath)) {
-            if (line.isBlank()) continue;
-            for (String value : line.trim().split("\\s+")) gradient.add(Double.parseDouble(value));
-        }
-        if (gradient.size() != identity.geometry().atomCount() * 3) {
-            throw new IOException("MIN02 authoritative gradient length mismatch");
-        }
+        List<Double> gradient = readFiniteGradient(gradientPath, identity.geometry().atomCount() * 3);
         EvidenceProvenance provenance = new EvidenceProvenance(resultPath.toString(),
                 ArtifactChecksums.sha256(resultPath), Instant.now(), List.of(),
                 "energy from result.json; full gradient from final_gradient_hartree_per_bohr.txt; "
@@ -169,8 +162,30 @@ public final class ForceCampaignPreflightRunner {
         return new QuantumEvidence(identity, provenance,
                 totah.lab.prometheus.evidence.ConvergenceStatus.CONVERGED,
                 EvidenceAcceptanceState.ACCEPTED, Optional.of(energy),
-                Optional.of(List.copyOf(gradient)), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.of(gradient), Optional.empty(), Optional.empty(), Optional.empty(),
                 "authoritative MIN02 protocol-control result");
+    }
+
+    static List<Double> readFiniteGradient(Path gradientPath, int expectedComponents) throws IOException {
+        List<Double> gradient = new ArrayList<>();
+        for (String line : Files.readAllLines(gradientPath)) {
+            if (line.isBlank()) continue;
+            for (String value : line.trim().split("\\s+")) {
+                try {
+                    double component = Double.parseDouble(value);
+                    if (!Double.isFinite(component)) {
+                        throw new IOException("MIN02 authoritative gradient contains non-finite component");
+                    }
+                    gradient.add(component);
+                } catch (NumberFormatException exception) {
+                    throw new IOException("MIN02 authoritative gradient contains non-numeric component", exception);
+                }
+            }
+        }
+        if (gradient.size() != expectedComponents) {
+            throw new IOException("MIN02 authoritative gradient length mismatch");
+        }
+        return List.copyOf(gradient);
     }
 
     static double requiredFiniteDouble(JsonNode object, String field) throws IOException {

@@ -26,11 +26,14 @@ final class QuantumScientificIdentity {
                 .append('\n').append("counterpoise=").append(specification.protocol().counterpoise())
                 .append('\n').append("calculationType=").append(specification.calculationType())
                 .append('\n').append("solverMode=").append(solverMode);
-        specification.constraints().forEach(item -> value.append('\n').append("constraint=").append(item));
-        specification.requiredOutputs().forEach(item -> value.append('\n').append("requiredOutput=").append(item));
+        specification.constraints().stream().sorted()
+                .forEach(item -> value.append('\n').append("constraint=").append(item));
+        specification.requiredOutputs().stream().sorted()
+                .forEach(item -> value.append('\n').append("requiredOutput=").append(item));
         observables.stream().sorted(Comparator.comparing(Enum::name))
                 .forEach(item -> value.append('\n').append("observable=").append(item));
-        specification.acceptanceGates().forEach(item -> value.append('\n').append("gate=").append(item));
+        specification.acceptanceGates().stream().sorted()
+                .forEach(item -> value.append('\n').append("gate=").append(item));
         return CanonicalHashing.sha256Hex(value.toString());
     }
 }

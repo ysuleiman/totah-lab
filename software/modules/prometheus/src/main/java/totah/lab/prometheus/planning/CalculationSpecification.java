@@ -2,6 +2,7 @@ package totah.lab.prometheus.planning;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.TreeSet;
 
 import totah.lab.prometheus.evidence.CalculationType;
 import totah.lab.prometheus.evidence.QmProtocol;
@@ -18,6 +19,14 @@ import totah.lab.prometheus.identity.MoleculeIdentity;
  * lists). Executors receive this frozen object and MUST NOT alter it or any
  * derived copy of its scientific content: an executor performs the specified
  * calculation and nothing else.
+ *
+ * <p>{@code constraints}, {@code requiredOutputs}, and {@code acceptanceGates}
+ * are sets of independent scientific clauses, not execution sequences. Their
+ * encounter order and duplicate presentation have no scientific meaning, so
+ * the constructor stores each as a unique lexicographically sorted list. This
+ * decision is part of the identity contract; executors that need procedural
+ * ordering must encode that ordering inside a single clause or introduce a
+ * separately specified ordered field.
  *
  * <p>{@link #checksum()} is the scientific content hash: SHA-256 over the
  * canonical serialization of every field EXCEPT {@code specificationId}. Two
@@ -56,10 +65,10 @@ public record CalculationSpecification(
         Objects.requireNonNull(molecule, "molecule");
         Objects.requireNonNull(geometry, "geometry");
         Objects.requireNonNull(protocol, "protocol");
-        constraints = List.copyOf(Objects.requireNonNull(constraints, "constraints"));
+        constraints = canonicalClauses(constraints, "constraints");
         Objects.requireNonNull(calculationType, "calculationType");
-        requiredOutputs = List.copyOf(Objects.requireNonNull(requiredOutputs, "requiredOutputs"));
-        acceptanceGates = List.copyOf(Objects.requireNonNull(acceptanceGates, "acceptanceGates"));
+        requiredOutputs = canonicalClauses(requiredOutputs, "requiredOutputs");
+        acceptanceGates = canonicalClauses(acceptanceGates, "acceptanceGates");
         if (acceptanceGates.isEmpty()) {
             throw new IllegalArgumentException(
                     "acceptanceGates must be non-empty: every calculation carries its acceptance gates");
@@ -83,5 +92,16 @@ public record CalculationSpecification(
                 CanonicalHashing.format(estimatedCost.expectedWallHours()),
                 CanonicalHashing.format(estimatedCost.expectedLocalRuntimeHours()),
                 CanonicalHashing.format(estimatedCost.estimatedRemoteCostUsd()))));
+    }
+
+    private static List<String> canonicalClauses(List<String> clauses, String label) {
+        Objects.requireNonNull(clauses, label);
+        TreeSet<String> canonical = new TreeSet<>();
+        for (String clause : clauses) {
+            Objects.requireNonNull(clause, label + " item");
+            if (clause.isBlank()) throw new IllegalArgumentException(label + " contains a blank item");
+            canonical.add(clause);
+        }
+        return List.copyOf(canonical);
     }
 }

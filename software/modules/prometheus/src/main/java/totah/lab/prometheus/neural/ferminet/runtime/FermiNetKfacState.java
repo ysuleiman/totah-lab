@@ -58,6 +58,11 @@ public final class FermiNetKfacState {
             dampedOutputCholesky = copy(
                     dampedOutputCholesky, Math.multiplyExact(outputs, outputs));
         }
+
+        @Override public double[] inputFactor() { return inputFactor.clone(); }
+        @Override public double[] outputFactor() { return outputFactor.clone(); }
+        @Override public double[] dampedInputCholesky() { return dampedInputCholesky.clone(); }
+        @Override public double[] dampedOutputCholesky() { return dampedOutputCholesky.clone(); }
     }
 
     record DiagonalBlock(double[] curvature) {
@@ -67,6 +72,8 @@ public final class FermiNetKfacState {
                 throw new IllegalArgumentException("empty diagonal KFAC block");
             }
         }
+
+        @Override public double[] curvature() { return curvature.clone(); }
     }
 
     private static double[] copy(double[] values, int expectedLength) {

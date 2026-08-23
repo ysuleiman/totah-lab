@@ -28,7 +28,7 @@ Each row records the required `FINDING`, `REPRODUCTION_TEST`, `CONFIRMED`,
 | 11 | PCG `solution()` exposed its mutable internal array; **CONFIRMED=true** | Mutating an accessor return changed later reads pre-fix. | Record constructor cloned once but generated accessor returned the field. | Accessor clones on every call; mutation regression added. The analogous diagnostic solver result was also hardened during the suspicious-pattern sweep. | Downstream numerical diagnostics could be mutated in memory; persisted current evidence was not shown affected. **RECOMPUTATION_REQUIRED=false**. |
 | 12 | Quantum scientific identity omitted `requiredOutputs`; **CONFIRMED=true** | Two specifications differing only in requested outputs collided when solver observables were held constant. | Identity hashed observables and gates but not the specification output contract. | Required outputs now participate in identity; collision regression added. | Registry reuse identities for requests with different output contracts were potentially affected. **RECOMPUTATION_REQUIRED=true for reused evidence whose requests differed only by required outputs; otherwise false**. |
 | 13 | Force-estimator finite-count and zero/norm guards were incomplete; **CONFIRMED=true** | Count/value mismatch and overflowing log-gradient norm were accepted into downstream arithmetic. | Callers supplied counts separately; squared norm could overflow after individually finite inputs. | Count equality is verified before statistics/tails; nodal squared norm must remain finite; invalid buffers are NaN. Tests cover invalid positions and count disagreement. | Same estimator artifacts as findings 2/7; current zero-nonfinite artifacts unchanged. **RECOMPUTATION_REQUIRED=false for inventoried files**. |
-| 14 | Four-body sulfur angle-pair topology was not representable by the generic implementation; **CONFIRMED=true** | Locked protocol and preserved Python preflight independently define `P_l(cos 9-10-26) P_m(cos 11-10-26)`, while Java computed `9-10-11` and `9-10-26`. | One `ANGLE_PAIR` topology was incorrectly assumed for two preregistered motifs. | After provenance recovery, explicit `ANGLE_PAIR_SHARED_FOURTH` was added and analytically derived; test geometry gives the hand-computable first feature `0.5`. Existing shared-first behavior remains explicit. | No production four-body model was trained or frozen, so no model artifact is affected. **RECOMPUTATION_REQUIRED=false**. |
+| 14 | Intended chemical meaning of generic `ANGLE_PAIR`; **CONFIRMED=false, SPECIFICATION_BLOCKED** | Preserved sources describe more than one angle-pair topology, but do not establish that the generic enum value was intended to denote one unique motif. | The authoritative chemical specification for the generic name has not been recovered. | No change is made merely to satisfy a test. The separately named, explicitly defined topology does not resolve or reinterpret generic `ANGLE_PAIR`. | No production four-body model was trained or frozen. **RECOMPUTATION_REQUIRED=false; specification decision required before changing generic `ANGLE_PAIR`**. |
 | 15 | Canonical force production did not require checkpoint verification; **CONFIRMED=true** | Estimator dispatch accepted a context containing only declared checksum strings. | Verification was an optional driver-side call, not a type-level pipeline prerequisite. | Unverified pipeline overloads fail closed. The production overload accepts only an externally unforgeable `Verified` context created by dataset plus checkpoint/payload verification. Regression proves unverified dispatch cannot invoke an estimator. | Driver-generated artifacts already persisted verification, but alternative callers could emit ambiguous evidence. **RECOMPUTATION_REQUIRED=false for driver artifacts; unknown for external callers**. |
 | 16 | Force validation checked vector length but not Cartesian identity uniqueness/range; **CONFIRMED=true** | A same-length list with a duplicated `(nucleus,axis)` passed pre-fix. | Cardinality was treated as identity completeness. | Both validation paths require every in-range pair exactly once. Duplicate/missing adversarial test added. | Malformed externally constructed results could receive finite/physical diagnostics. Current canonical estimator ordering is complete. **RECOMPUTATION_REQUIRED=false**. |
 | 17 | The z-coordinate diagnostic claimed generic molecular planarity; **CONFIRMED=true** | A molecule planar in the yz plane was not represented by the z-only criterion, and out-of-plane force meant z-force. | Orientation was hard-coded. | Plane normal is derived from molecular coordinates; all atoms are tested by perpendicular distance; force is projected onto that normal. Rotated-plane test verifies a hand-computable maximum of 3.0. | Diagnostic metadata, not force values, is affected. **RECOMPUTATION_REQUIRED=true for previously persisted planarity/out-of-plane diagnostics if interpreted scientifically**. |
@@ -69,12 +69,12 @@ confirmed scientific corruption.
 
 ## Test evidence
 
-- Complete Prometheus suite: **463 run, 461 passed, 0 failed/errors, 2
+- Complete Prometheus suite: **560 run, 558 passed, 0 failed/errors, 2
   skipped** (`BUILD SUCCESS`).
 - Atlas validation-integrity suite: **4 run, 4 passed, 0 failed, 0
   skipped**. The overflow warnings are intentionally induced by the absurd
   held-out-label mutation control; the invariance assertions pass.
-- Combined: **467 run, 465 passed, 0 failed/errors, 2 skipped**.
+- Combined: **564 run, 562 passed, 0 failed/errors, 2 skipped**.
 - Scientific qualification registry: **8 `RUN_AND_PASS`; 2
   `NOT_RUN_MISSING_REQUIRED_ARTIFACT`**. The two tests not run are
   `LockedFermiNetH2oEnergyQualificationTest.measureMatchedBeforeAndAfterNeuralVmc`
@@ -92,3 +92,40 @@ confirmed scientific corruption.
    requests could differ only by their required-output contract.
 4. No new QM or model training was performed, so this audit does not establish
    scientific model accuracy.
+
+## Scientific result completeness extension
+
+The re-audit now includes the machine-enforced completeness contract in
+`SCIENTIFIC_RESULT_COMPLETENESS_CONTRACT.md` and the historical recovery table
+in `HISTORICAL_SCIENTIFIC_RESULT_COMPLETENESS_INVENTORY.csv`. A successful fit
+cannot be reported through the Delta persistence seam until its atomic
+`FitArtifact` bundle has been checksum-verified and read back. The generic gate
+separately classifies missing model state, derivatives, component decomposition,
+optimizer state and provenance. Historical metrics were not regenerated or
+silently upgraded to reproducible models.
+
+## External adversarial acceptance closure
+
+Kimi's 81-test suite was executed unchanged with `mvn test -Dtest='Adversarial*'`:
+**81 run, 81 passed, 0 failed/errors, 0 skipped**. The complete Maven suite
+subsequently included those tests and also passed.
+
+- `BLOCKING_FAILED = 0`
+- `HIGH_VALUE_FAILED = 0`
+- `SPECIFICATION_BLOCKED = C6 generic ANGLE_PAIR intended chemical motif`
+- `FIT_PERSISTENCE_COMPLETE = true`
+- `PRODUCTION_FIT_PERSISTENCE_ENFORCED = false`
+
+The persistence boundary itself is fail-closed and checksum-verified, and the
+Delta integration exposes that boundary. The remaining architectural caveat is
+that `DeltaModelTrainer.train(...)` still returns an in-memory fitted model; a
+caller can therefore bypass `persistSuccessfulFit(...)` and treat that object as
+a successful fit outside the publication seam. Production-wide enforcement
+requires making successful fit publication/result status structurally dependent
+on a verified persistence receipt without changing the existing public API.
+
+The B3 semantic decision is explicit: `constraints`, `requiredOutputs`, and
+`acceptanceGates` are set-like collections of independent clauses. Their
+canonical form is unique, lexicographically sorted, and duplicate-free in both
+calculation checksums and quantum scientific identities. Reordering therefore
+preserves identity, while changing or removing an item changes identity.
