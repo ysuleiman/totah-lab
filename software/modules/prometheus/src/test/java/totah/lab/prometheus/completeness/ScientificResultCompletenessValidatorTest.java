@@ -24,7 +24,7 @@ class ScientificResultCompletenessValidatorTest {
             "geometry.xyz", "atom_order", "charge", "multiplicity", "method", "basis", "grid",
             "dispersion_configuration", "scf_configuration", "electronic_energy", "electronic_gradient",
             "dispersion_energy", "dispersion_gradient", "total_energy", "total_gradient", "force",
-            "convergence_diagnostics", "hardware_runtime_identity"));
+            "convergence_diagnostics", "hardware_runtime_identity", "hessian_requested"));
     private static final List<String> FIT = concat(PROVENANCE, List.of(
             "model_family", "basis_functions", "basis_ordering", "fitted_coefficients", "parameter_names",
             "parameter_units", "frozen_parameters", "bounds_constraints", "regularization",
@@ -44,6 +44,93 @@ class ScientificResultCompletenessValidatorTest {
     @Test
     void completeQmBundleIsChecksumVerified() throws Exception {
         ScientificResultManifest manifest = manifest(ScientificResultType.QM_CALCULATION, QM);
+        assertThat(validator.validate(temp, manifest).status())
+                .isEqualTo(ScientificResultCompleteness.REPRODUCIBLE_COMPLETE);
+    }
+
+    @Test
+    void pbeD3MetadataWithPbeOnlyHessianFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        manifest = withoutArtifacts(manifest, "dispersion_hessian", "total_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void pbeD3WithAllThreeConsistentHessiansPasses() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        assertThat(validator.validate(temp, manifest).status())
+                .isEqualTo(ScientificResultCompleteness.REPRODUCIBLE_COMPLETE);
+    }
+
+    @Test
+    void missingDispersionHessianFailsClosed() throws Exception {
+        ScientificResultManifest manifest = withoutArtifacts(hessianManifest(true), "dispersion_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void incorrectHessianComponentSumFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("total_hessian"), "9 0 0\n0 9 0\n0 0 9\n");
+        manifest = replaceDigest(manifest, "total_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void wrongHessianDimensionsFailClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("hessian_dimensions"), "6x6\n");
+        manifest = replaceDigest(manifest, "hessian_dimensions");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void nonfiniteHessianFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("dispersion_hessian"), "NaN 0 0\n0 0.2 0\n0 0 0.2\n");
+        manifest = replaceDigest(manifest, "dispersion_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void infiniteHessianFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("dispersion_hessian"), "Infinity 0 0\n0 0.2 0\n0 0 0.2\n");
+        manifest = replaceDigest(manifest, "dispersion_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void asymmetricHessianFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("dispersion_hessian"), "0.2 0.01 0\n0 0.2 0\n0 0 0.2\n");
+        manifest = replaceDigest(manifest, "dispersion_hessian");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void hessianGeometryIdentityMismatchFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(true);
+        Files.writeString(temp.resolve("hessian_geometry_identity"), "wrong-geometry\n");
+        manifest = replaceDigest(manifest, "hessian_geometry_identity");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void mislabeledPbeOnlyEvidenceFailsClosed() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(false);
+        String geometrySha = sha256(temp.resolve("geometry.xyz"));
+        Files.writeString(temp.resolve("hessian_component_identity"),
+                "electronic_identity=TRUSTED_PBE_ONLY_HESSIAN\n"
+                        + "electronic_geometry_sha256=" + geometrySha + "\n"
+                        + "total_identity=PBE_D3_BJ_TOTAL_HESSIAN\n");
+        manifest = replaceDigest(manifest, "hessian_component_identity");
+        assertIncomplete(manifest, ScientificResultCompleteness.INCOMPLETE_MISSING_COMPONENT_DECOMPOSITION);
+    }
+
+    @Test
+    void purePbeElectronicHessianPassesWhenExplicitlyPbeOnly() throws Exception {
+        ScientificResultManifest manifest = hessianManifest(false);
         assertThat(validator.validate(temp, manifest).status())
                 .isEqualTo(ScientificResultCompleteness.REPRODUCIBLE_COMPLETE);
     }
@@ -132,7 +219,51 @@ class ScientificResultCompletenessValidatorTest {
             Files.writeString(file, name + "\n");
             artifacts.put(name, new ScientificArtifactReference(Path.of(name), sha256(file)));
         }
+        if (type == ScientificResultType.QM_CALCULATION) {
+            Files.writeString(temp.resolve("hessian_requested"), "false\n");
+            artifacts.put("hessian_requested", new ScientificArtifactReference(
+                    Path.of("hessian_requested"), sha256(temp.resolve("hessian_requested"))));
+        }
         return new ScientificResultManifest("fixture", type, artifacts);
+    }
+
+    private ScientificResultManifest hessianManifest(boolean composite) throws Exception {
+        ScientificResultManifest manifest = manifest(ScientificResultType.QM_CALCULATION, QM);
+        Map<String, ScientificArtifactReference> artifacts = new LinkedHashMap<>(manifest.artifacts());
+        writeArtifact(artifacts, "hessian_requested", "true\n");
+        writeArtifact(artifacts, "method", composite ? "PBE-D3(BJ)\n" : "PBE\n");
+        writeArtifact(artifacts, "dispersion_configuration", composite ? "D3(BJ)\n" : "NONE\n");
+        writeArtifact(artifacts, "atom_order", "H\n");
+        writeArtifact(artifacts, "geometry.xyz", "1\nfixture\nH 0 0 0\n");
+        String geometrySha = sha256(temp.resolve("geometry.xyz"));
+        writeArtifact(artifacts, "hessian_units", "hartree/bohr^2\n");
+        writeArtifact(artifacts, "hessian_dimensions", "3x3\n");
+        writeArtifact(artifacts, "hessian_geometry_identity", geometrySha + "\n");
+        writeArtifact(artifacts, "electronic_hessian", "1 0 0\n0 1 0\n0 0 1\n");
+        String identities = "electronic_identity=TRUSTED_PBE_ONLY_HESSIAN\n"
+                + "electronic_geometry_sha256=" + geometrySha + "\n";
+        if (composite) {
+            writeArtifact(artifacts, "dispersion_hessian", "0.2 0 0\n0 0.2 0\n0 0 0.2\n");
+            writeArtifact(artifacts, "total_hessian", "1.2 0 0\n0 1.2 0\n0 0 1.2\n");
+            identities += "dispersion_identity=D3_BJ_ONLY_HESSIAN\n"
+                    + "dispersion_geometry_sha256=" + geometrySha + "\n"
+                    + "total_identity=PBE_D3_BJ_TOTAL_HESSIAN\n"
+                    + "total_geometry_sha256=" + geometrySha + "\n";
+        }
+        writeArtifact(artifacts, "hessian_component_identity", identities);
+        return new ScientificResultManifest("hessian-fixture", ScientificResultType.QM_CALCULATION, artifacts);
+    }
+
+    private void writeArtifact(Map<String, ScientificArtifactReference> artifacts, String name, String content)
+            throws Exception {
+        Files.writeString(temp.resolve(name), content);
+        artifacts.put(name, new ScientificArtifactReference(Path.of(name), sha256(temp.resolve(name))));
+    }
+
+    private ScientificResultManifest withoutArtifacts(ScientificResultManifest manifest, String... names) {
+        Map<String, ScientificArtifactReference> artifacts = new LinkedHashMap<>(manifest.artifacts());
+        for (String name : names) artifacts.remove(name);
+        return new ScientificResultManifest(manifest.resultId(), manifest.type(), artifacts);
     }
 
     private ScientificResultManifest replaceDigest(ScientificResultManifest manifest, String name)

@@ -198,7 +198,7 @@ public final class EvidenceReviewPackageAssembler {
                         "RESP does not provide a coherent bonded/torsion/LJ model.")),
                 new StrategyComparisonRow("modified-seminario", "modified Seminario",
                         "EVALUATED_FAILED_EXISTING_EVIDENCE", hessians, List.of(), List.of(
-                        "Three verified analytic Hessians are reusable.",
+                        "Three verified PBE-only electronic Hessians are preserved; composite PBE-D3(BJ) reuse requires an explicit D3 Hessian component.",
                         "Archived bonded-only V3 concludes HARMONIC_BONDED_FORM_INSUFFICIENT.")),
                 new StrategyComparisonRow("qforce-style", "Q-Force",
                         "NOT_SELECTED_FUNCTIONAL_FORM_AND_INTEGRATION_UNRESOLVED", hessians,

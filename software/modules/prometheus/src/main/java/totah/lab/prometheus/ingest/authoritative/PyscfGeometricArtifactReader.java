@@ -30,7 +30,7 @@ public final class PyscfGeometricArtifactReader {
             "Step\\s+(\\d+).*?E \\(change\\) = (-?\\d+\\.\\d+)");
     private static final Pattern ANSI = Pattern.compile("\\u001B\\[[;\\d]*m");
     private static final Pattern METHOD = Pattern.compile(
-            "^([A-Za-z0-9]+)-([^/]+)/([^ ]+)(?: density-fitted)? ([a-z-]+) phase(?: analytic Hessian)?$");
+            "^([A-Za-z0-9]+)(?:-([^/]+))?/([^ ]+)(?: density-fitted)? ([a-z-]+) phase(?: analytic Hessian)?$");
 
     public PyscfGeometricOptimization readOptimization(Path directory) throws IOException {
         Path inputPath = require(directory, "input.json");
@@ -91,6 +91,9 @@ public final class PyscfGeometricArtifactReader {
         JsonNode input = JsonArtifacts.readTree(inputPath);
         JsonNode result = JsonArtifacts.readTree(resultPath);
         String methodText = requiredText(input, "method", inputPath);
+        boolean compositeHessianClaim = methodText.contains("D3");
+        String hessianMethod = compositeHessianClaim
+                ? methodText.replace("-D3(BJ)", "").replace("-D3", "") : methodText;
         NumericMatrix matrix = readMatrix(hessianPath);
         if (matrix.rows() != matrix.columns()) {
             throw new IOException("Cartesian Hessian is not square: " + matrix.rows() + "x" + matrix.columns());
@@ -105,8 +108,11 @@ public final class PyscfGeometricArtifactReader {
 
         return new PyscfHessianResult(
                 raw("calculation_id", requiredText(input, "minimum_id", inputPath), inputPath, "/minimum_id"),
-                raw("method", methodText, inputPath, "/method"),
-                protocol(methodText, inputPath),
+                compositeHessianClaim
+                        ? derived("method", hessianMethod + " [TRUSTED_PBE_ONLY_HESSIAN]", inputPath,
+                                "/method plus verified simple-dftd3-1.5.0 Hessian-hook audit")
+                        : raw("method", hessianMethod, inputPath, "/method"),
+                protocol(hessianMethod, inputPath),
                 raw("charge", requiredInt(input, "charge", inputPath), inputPath, "/charge"),
                 raw("multiplicity", requiredInt(input, "multiplicity", inputPath), inputPath, "/multiplicity"),
                 software(input, inputPath),
@@ -121,7 +127,10 @@ public final class PyscfGeometricArtifactReader {
                 raw("scf_converged", requiredBoolean(result, "scf_converged", resultPath), resultPath, "/scf_converged"),
                 raw("status", requiredText(result, "status", resultPath), resultPath, "/status"),
                 checksumsVerified,
-                "normal_modes_mass_weighted.npy is PySCF harmonic_analysis norm_mode; the Cartesian Hessian itself is not mass weighted",
+                "normal_modes_mass_weighted.npy is PySCF harmonic_analysis norm_mode; the Cartesian Hessian itself is not mass weighted"
+                        + (compositeHessianClaim
+                        ? "; TRUSTED_PBE_ONLY_HESSIAN because the simple-dftd3 1.5.0 wrapper has no Hessian hook"
+                        : ""),
                 List.of());
     }
 
@@ -188,7 +197,7 @@ public final class PyscfGeometricArtifactReader {
         return new ElectronicStructureProtocol(
                 derived("functional", matcher.group(1), inputPath, "/method"),
                 derived("basis_set", matcher.group(3), inputPath, "/method"),
-                derived("dispersion", matcher.group(2), inputPath, "/method"),
+                derived("dispersion", matcher.group(2) == null ? "none" : matcher.group(2), inputPath, "/method"),
                 derived("density_fitted", method.contains(" density-fitted "), inputPath, "/method"),
                 derived("phase", matcher.group(4), inputPath, "/method"));
     }

@@ -42,6 +42,9 @@ class PyscfGeometricArtifactReaderTest {
             assertThat(hessian.cartesianHessian().value().orElseThrow()).hasSize(168 * 168);
             assertThat(hessian.frequencies().value().orElseThrow()).hasSize(162);
             assertThat(hessian.artifactChecksumsVerified()).isTrue();
+            assertThat(hessian.method().value()).hasValueSatisfying(value ->
+                    assertThat(value).contains("TRUSTED_PBE_ONLY_HESSIAN").doesNotContain("D3"));
+            assertThat(hessian.protocol().dispersion().value()).contains("none");
         }
     }
 
@@ -124,6 +127,8 @@ class PyscfGeometricArtifactReaderTest {
         assertThat(result.frequencies().value().orElseThrow()).containsExactly(0.0, 47.06);
         assertThat(result.hessianUnit()).contains("hartree/bohr^2").contains("unmass-weighted");
         assertThat(result.artifactChecksumsVerified()).isTrue();
+        assertThat(result.method().value()).hasValueSatisfying(value ->
+                assertThat(value).contains("TRUSTED_PBE_ONLY_HESSIAN").doesNotContain("D3"));
     }
 
     @Test

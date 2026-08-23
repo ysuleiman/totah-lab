@@ -325,6 +325,14 @@ public final class LegacyPhase2ArchiveIngester {
                             ctx.relativize(hessianDir), "hessian input.json has no method; skipped"));
                     continue;
                 }
+                boolean compositeHessianClaim = method.contains("D3");
+                if (compositeHessianClaim) {
+                    method = method.replace("-D3(BJ)", "").replace("-D3", "");
+                    ctx.issues.add(IngestionIssue.warning(
+                            ctx.relativize(hessianDir),
+                            "legacy single-matrix Hessian relabeled TRUSTED_PBE_ONLY_HESSIAN; "
+                                    + "simple-dftd3 1.5.0 supplied no dispersion Hessian hook"));
+                }
                 QmProtocol protocol = QmProtocolParser.fromMethodString(
                         method, "PySCF", softwareVersion(input, "pyscf"));
                 registerProtocol(ctx, protocol, method);
@@ -350,6 +358,7 @@ public final class LegacyPhase2ArchiveIngester {
                         provenance(ctx, resultFile,
                                 List.of(ctx.minimaEvidenceHashes.getOrDefault(minimumId, "")),
                                 "minimum_id=" + minimumId
+                                        + (compositeHessianClaim ? "; hessian_component_identity=TRUSTED_PBE_ONLY_HESSIAN" : "")
                                         + (classification.isEmpty() ? ""
                                         : "; provisional_frequency_classification=" + classification)),
                         convergence,
