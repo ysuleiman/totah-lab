@@ -1,0 +1,77 @@
+{
+  "schema": "tsl-rsh-min02-min04-stationary-qualification-v1",
+  "status": "PREPARED_NOT_EXECUTED",
+  "scope": ["MIN02", "MIN04"],
+  "sealed_min01_commit": "806d90deddb02fbaf54f50f436f07be639441e21",
+  "sealed_min01_bundle_sha256": "815fd3b59376008f09543a44e9fd60be17d5a8160211ec89855a7d761f04c430",
+  "protocol_core_sha256": "1152a47df222b7431c2f1cbe7d30a69d081e547ba71811395bfadcb1dc97f73a",
+  "inputs": {
+    "MIN02": {
+      "path": "analysis/mettl7-phase2/execution-unit-05O/qm-native-minima/MIN02/final.xyz",
+      "sha256": "38336cb66b98c55b5d1d15edd9fbcbdc55e6f7840894af6b43f02372cfd9f3f8"
+    },
+    "MIN04": {
+      "path": "analysis/mettl7-phase2/execution-unit-05O/qm-native-minima/MIN04/final.xyz",
+      "sha256": "b54a3b68c7508151b8ba17b568d50d201a542e3291dccd57e35a9888470aaf27"
+    }
+  },
+  "protocol": {
+    "method": "PBE",
+    "dispersion": "D3(BJ)",
+    "basis": "def2-SVP",
+    "density_fitting_auxbasis": "def2-SVP-JKFIT",
+    "grid_level": 5,
+    "grid_response_gradient": true,
+    "grid_response_hessian": true,
+    "scf_conv_tol": 1e-8,
+    "scf_max_cycle": 160,
+    "initial_guess": "MINAO",
+    "simple_dftd3_version": "1.5.0",
+    "mass_convention": "PySCF isotope-average atomic masses; mol.atom_mass_list(isotope_avg=True)",
+    "charge": 0,
+    "multiplicity": 1
+  },
+  "optimizer_convergence": {
+    "energy_hartree": 1e-5,
+    "maximum_gradient_hartree_per_bohr": 0.004,
+    "rms_gradient_hartree_per_bohr": 0.001,
+    "maximum_displacement_angstrom": 0.005,
+    "rms_displacement_angstrom": 0.002
+  },
+  "endpoint_gradient_audit": {
+    "columns_zero_based": [27, 28, 29, 75, 76, 77, 165, 166, 167],
+    "h_bohr": 0.001,
+    "half_h_bohr": 0.0005,
+    "criteria": {
+      "rms_difference_hartree_per_bohr_max": 5e-6,
+      "max_difference_hartree_per_bohr_max": 1e-5,
+      "step_convergence_max_hartree_per_bohr": 2e-6
+    },
+    "failure_action": "STOP_STRUCTURE_BEFORE_HESSIAN"
+  },
+  "stationary_point_gates": {
+    "optimization_converged": true,
+    "endpoint_derivative_audit_pass": true,
+    "hessian_components_complete": true,
+    "negative_vibrational_mode_count": 0,
+    "frequency_mode_integrity_pass": true,
+    "publication_evidence_complete": true
+  },
+  "basin_identity": {
+    "linkage": "complete",
+    "heavy_atom_rmsd_angstrom_max": 0.10,
+    "phi_psi_chi_difference_deg_max": 10.0,
+    "s_h_s_c_difference_angstrom_max": 0.03,
+    "local_angle_difference_deg_max": 3.0,
+    "energy_difference_kcal_per_mol_max": 0.25,
+    "source": "execution-unit-05O/STAGE1_COMPLETION_GATES_LOCKED.md"
+  },
+  "prohibitions": {
+    "MIN01_rerun": true,
+    "model_fit": true,
+    "force_field_fit": true,
+    "GPU60_recompute": true,
+    "CURVATURE76_recompute": true,
+    "threshold_change": true
+  }
+}
