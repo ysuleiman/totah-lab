@@ -1,0 +1,28 @@
+{
+  "schema": "tsl-rsh-min01-stationary-deterministic-recovery-v1",
+  "status": "POSTPROCESSING_ONLY",
+  "source_results_archive_sha256": "da2e98b4bbc7ec2664aaa0d55294c1a61e62e112a4612d4fcfa2d5f7d5e67b51",
+  "executed_package_sha256": "093888caf9497986edd95b899d3d82b702092f55188a5a0ecc63cafec3bf9224",
+  "mass_vector_sha256": "97aeb1dfa06c145e9c7b2712959968acbcc31c987493f6c4d855811f3f019e05",
+  "allowed_operations": [
+    "checksum verification", "Hessian component arithmetic verification",
+    "mass weighting", "rigid-body projection", "eigendecomposition",
+    "signed frequency conversion", "normal-mode construction", "reporting"
+  ],
+  "forbidden_operations": [
+    "SCF", "gradient evaluation", "endpoint finite-difference evaluation",
+    "electronic Hessian evaluation", "D3 Hessian evaluation", "optimization",
+    "MIN02", "MIN04", "model fitting"
+  ],
+  "classification": {
+    "verified_minimum": "optimization converged, endpoint audit passed, components complete, no negative signed projected vibrational modes, integrity passed, publication evidence complete",
+    "negative_frequency_policy": "any negative projected vibrational frequency prevents VERIFIED_LOCAL_MINIMUM",
+    "exact_projected_zero_policy": "fail closed"
+  },
+  "numerical_tolerances": {
+    "Hessian_component_sum_absolute": 1e-12,
+    "stored_recomputed_eigenvalue_absolute": 1e-12,
+    "stored_recomputed_frequency_absolute_cm-1": 1e-8,
+    "stored_recomputed_mode_sign_invariant_max_absolute": 1e-9
+  }
+}
