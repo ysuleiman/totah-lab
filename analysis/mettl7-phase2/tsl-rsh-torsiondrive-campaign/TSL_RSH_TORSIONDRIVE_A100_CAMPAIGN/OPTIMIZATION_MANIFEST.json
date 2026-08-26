@@ -1,0 +1,94 @@
+{
+  "schema": "tsl-rsh-min01-stationary-optimization-qualification-v1",
+  "status": "FROZEN_NOT_EXECUTED",
+  "scope": ["MIN01"],
+  "authorization_evidence": {
+    "archive": "immutable-evidence/TSL_RSH_MIN01_LEVEL5_GRID_CONVERGENCE_CLOSURE_RESULTS.zip",
+    "archive_sha256": "cad8ef25f951c2de31d51343f8652c74f7ce32d86c8be984c8e53f612f61f6cd",
+    "required_decision": "LEVEL5_DERIVATIVE_GRID_QUALIFIED",
+    "energy_difference_hartree": 6.510636012535542e-7,
+    "gradient_rms_difference_hartree_per_bohr": 5.97465749898247e-6
+  },
+  "input_sha256": {
+    "input/ATOM_ORDER.csv": "15200ef8e35cbdd9ea10e3750cbc20e3e29fa7c8bcd5180935d0caf06324ece6",
+    "input/MASS_VECTOR.json": "97aeb1dfa06c145e9c7b2712959968acbcc31c987493f6c4d855811f3f019e05",
+    "input/MIN01_historical_saddle.xyz": "36331712f69fa6a0f1ded7eb5df44f7dae7bdd0927507dd21eb7218be2320bdd",
+    "immutable-evidence/TSL_RSH_MIN01_LEVEL5_GRID_CONVERGENCE_CLOSURE_RESULTS.zip": "cad8ef25f951c2de31d51343f8652c74f7ce32d86c8be984c8e53f612f61f6cd"
+  },
+  "protocol": {
+    "functional": "PBE", "basis": "def2-SVP", "auxiliary_basis": "def2-SVP-JKFIT",
+    "density_fitting": true, "grid_level": 5,
+    "grid_semantics": "NWChem pruning; original Becke partition; Treutler-Ahlrichs radial grid; Treutler atomic-radii adjustment",
+    "grid_response_gradient": true, "grid_response_hessian": true,
+    "scf_tolerance": 1e-8, "scf_max_cycles": 160, "initial_guess": "MINAO",
+    "charge": 0, "spin": 0, "multiplicity": 1,
+    "dispersion": {
+      "model": "D3(BJ)", "implementation": "simple-dftd3 1.5.0",
+      "parameters": {"s6": 1.0, "s8": 0.7875, "s9": 0.0, "a1": 0.4289, "a2": 4.4407, "alp": 14.0},
+      "atm": false,
+      "parameter_database_sha256": "b1d9d1b9882dcad5361a99c34745ad44f8a274d80c907d9d0187255e4323d645"
+    }
+  },
+  "mass_convention": "PySCF isotope-average atomic masses; mol.atom_mass_list(isotope_avg=True)",
+  "mass_vector_artifact": "input/MASS_VECTOR.json",
+  "mass_vector_sha256": "97aeb1dfa06c145e9c7b2712959968acbcc31c987493f6c4d855811f3f019e05",
+  "optimization": {
+    "algorithm": "geomeTRIC translation/rotation internal coordinates",
+    "maximum_iterations": 300,
+    "convergence_energy_hartree": 1e-5,
+    "convergence_gmax_hartree_per_bohr": 0.004,
+    "convergence_grms_hartree_per_bohr": 0.001,
+    "convergence_dmax_angstrom": 0.005,
+    "convergence_drms_angstrom": 0.002,
+    "persist_every_calculated_step": true
+  },
+  "endpoint_gradient_audit": {
+    "columns_zero_based": [27, 28, 29, 75, 76, 77, 165, 166, 167],
+    "chemical_scope": "C10, S26 and H56 Cartesian x/y/z components in preserved atom order",
+    "central_difference_h_bohr": 0.001,
+    "central_difference_half_h_bohr": 0.0005,
+    "criteria": {
+      "rms_difference_hartree_per_bohr_max": 5e-6,
+      "max_difference_hartree_per_bohr_max": 1e-5,
+      "step_convergence_max_hartree_per_bohr": 2e-6
+    },
+    "failure_action": "STOP_BEFORE_HESSIAN"
+  },
+  "hessian_qualification": {
+    "condition": "endpoint_gradient_audit.pass == true",
+    "components": ["electronic_hessian", "dispersion_hessian", "total_hessian"],
+    "units": "hartree/bohr^2", "dimensions": [168, 168],
+    "composition": "total=electronic+dispersion",
+    "dispersion_fd_h_bohr": 0.001,
+    "dispersion_fd_half_h_bohr": 0.0005,
+    "dispersion_convergence_columns_zero_based": [27, 28, 29, 75, 76, 77, 165, 166, 167]
+  },
+  "stationary_point_classification": {
+    "signed_frequencies_required": true,
+    "exact_projected_zero_rejected": true,
+    "verified_local_minimum": "all projected vibrational frequencies are strictly positive",
+    "saddle": "at least one projected vibrational frequency is negative",
+    "legacy_minus20_minus50_magnitude_bands": "persisted as diagnostics only; never used to relabel negative curvature as a verified minimum"
+  },
+  "verified_minimum_required_gates": {
+    "optimization_converged": true,
+    "endpoint_derivative_audit_pass": true,
+    "hessian_components_complete": true,
+    "negative_vibrational_mode_count": 0,
+    "frequency_mode_integrity_pass": true,
+    "publication_evidence_complete": true
+  },
+  "publication_persistence": {
+    "stdout_only_scientific_results_forbidden": true,
+    "every_optimization_step_requires_optimizer_state_and_execution_receipt": true,
+    "Hessian_component_execution_provenance_required": true,
+    "rigid_body_projection_diagnostics_required": true,
+    "all_required_artifacts_must_be_checksum_listed": true,
+    "missing_or_unlisted_artifact_fails_closed": true
+  },
+  "prohibitions": {
+    "MIN02": true, "MIN04": true, "model_fit": true,
+    "GPU60_recomputation": true, "CURVATURE76_recomputation": true,
+    "continue_after_failed_gradient_audit": true
+  }
+}
