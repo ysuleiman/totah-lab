@@ -141,6 +141,22 @@ class CandidateObjective:
         self.count, self.cache, self.trajectory = 0, {}, []
         self.root = C2 / f"candidate_{candidate_id}" / "evaluations"
         self.root.mkdir(parents=True, exist_ok=True)
+        self._load_completed_evaluations()
+
+    def _load_completed_evaluations(self) -> None:
+        """Resume only complete, parseable evaluation receipts."""
+        for path in sorted(self.root.glob("EVAL_*/EVALUATION.json")):
+            record = json.loads(path.read_text())
+            if record.get("candidate_id") != self.candidate_id:
+                raise RuntimeError(f"resume candidate identity mismatch: {path}")
+            if len(record.get("points", [])) != 56:
+                raise RuntimeError(f"incomplete persisted C2 evaluation: {path}")
+            key = tuple(round(float(record["parameters"][name]), 12) for name in self.fit_ids)
+            self.cache[key] = record
+            self.trajectory.append({"evaluation_id": record["evaluation_id"], "purpose": record["purpose"],
+                                    **record["parameters"], "equal_surface_profile_mse": record["equal_surface_profile_mse"],
+                                    "regularization": record["regularization"], "objective": record["objective"]})
+            self.count = max(self.count, int(record["evaluation_id"].split("_")[-1]))
 
     def evaluate(self, values, purpose="optimization") -> dict:
         key = tuple(round(float(x), 12) for x in values)
