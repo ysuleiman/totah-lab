@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 import csv
+import copy
 import hashlib
 import json
+import math
+import tempfile
 import unittest
 from pathlib import Path
+
+import parmed as pmd
 
 import close_publication_gates as gates
 import run_first_pass as first
@@ -82,6 +87,56 @@ class PublicationGateTests(unittest.TestCase):
         self.assertFalse(decision["fit_run"])
         self.assertFalse(decision["raw_qm_artifacts_modified"])
         self.assertFalse(decision["source_force_field_modified"])
+
+    def test_multiple_fourier_terms_on_same_quartet_are_independent(self):
+        surfaces = first.raw_surface_records()
+        source = min(surfaces["CHI"], key=lambda row: row["qm_energy_hartree"])
+        _, coordinates = first.read_xyz_bytes(source["xyz"])
+        quartet = (8, 9, 25, 55)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original = pmd.load_file(str(first.BASELINE))
+            base_term = next(t for t in gates.proper_terms(original) if gates.canonical_term(t) == quartet)
+            extra_type = copy.copy(base_term.type)
+            extra_type.phi_k = 0.2
+            extra_type.per = 1
+            extra_type.phase = 180.0
+            original.dihedral_types.append(extra_type)
+            extra = pmd.topologyobjects.Dihedral(base_term.atom1, base_term.atom2, base_term.atom3,
+                                                  base_term.atom4, type=extra_type)
+            extra.ignore_end = True
+            original.dihedrals.append(extra)
+            original.dihedral_types.claim()
+            original_path = root / "multi-term.parm7"
+            original.save(str(original_path), overwrite=True)
+            readback = pmd.load_file(str(original_path))
+            same_quartet = [(identity, term) for identity, term in gates.term_identity_records(readback)
+                            if gates.canonical_term(term) == quartet]
+            self.assertEqual(2, len(same_quartet))
+            self.assertEqual({1.0, 3.0}, {float(term.type.per) for _, term in same_quartet})
+
+            before = gates.torsion_snapshot(readback)
+            target_identity, target = next(item for item in same_quartet if float(item[1].type.per) == 1.0)
+            changed_type = copy.copy(target.type)
+            changed_type.phi_k += gates.CLONE_TEST_DELTA
+            readback.dihedral_types.append(changed_type)
+            target.type = changed_type
+            readback.dihedral_types.claim()
+            changed_path = root / "multi-term-changed.parm7"
+            readback.save(str(changed_path), overwrite=True)
+            after_topology = pmd.load_file(str(changed_path))
+            after = gates.torsion_snapshot(after_topology)
+            changed = [identity for identity in before if before[identity] != after[identity]]
+            self.assertEqual([target_identity], changed)
+            other_identity = next(identity for identity, term in same_quartet if float(term.type.per) == 3.0)
+            self.assertEqual(before[other_identity], after[other_identity])
+            unrelated = [identity for identity in before if not identity.startswith("8-9-25-55|")]
+            self.assertTrue(all(before[identity] == after[identity] for identity in unrelated))
+
+            delta = gates.isolated_total_energy(changed_path, coordinates) - gates.isolated_total_energy(original_path, coordinates)
+            phi = first.dihedral(coordinates, quartet)
+            expected = gates.CLONE_TEST_DELTA * (1.0 + math.cos(phi - math.pi))
+            self.assertAlmostEqual(expected, delta, places=10)
 
 
 if __name__ == "__main__":

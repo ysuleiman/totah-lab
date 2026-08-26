@@ -61,25 +61,40 @@ def canonical_term(term) -> tuple[int, int, int, int]:
     return min(ids, ids[::-1])
 
 
-def mapped_instances(mapping: list[dict]) -> dict[int, dict]:
-    result: dict[int, dict] = {}
-    for row in mapping:
-        ids = tuple(int(x) for x in row["instance_atoms_zero_based"].split("-"))
-        result[canonical_tuple(ids)] = row
-    return result
-
-
 def canonical_tuple(ids: tuple[int, ...]) -> tuple[int, ...]:
     return min(ids, ids[::-1])
 
 
+def term_identity_records(top: pmd.Structure) -> list[tuple[str, object]]:
+    """Return multiplicity-safe identities for every proper Fourier term.
+
+    Amber permits multiple Fourier terms on one physical quartet.  Type-table
+    indices can change on serialization, so the persistent identity uses the
+    canonical quartet, periodicity, phase, and a stable occurrence ordinal
+    among otherwise identical terms.
+    """
+    occurrences: dict[tuple, int] = {}
+    records = []
+    for term in proper_terms(top):
+        base = (canonical_term(term), float(term.type.per), float(term.type.phase))
+        occurrence = occurrences.get(base, 0)
+        occurrences[base] = occurrence + 1
+        identity = (f"{'-'.join(map(str, base[0]))}|n={base[1]:.12g}|"
+                    f"phase={base[2]:.12g}|occurrence={occurrence}")
+        records.append((identity, term))
+    return records
+
+
 def torsion_snapshot(top: pmd.Structure) -> dict:
     out = {}
-    for term in proper_terms(top):
-        out["-".join(map(str, canonical_term(term)))] = {
+    for identity, term in term_identity_records(top):
+        if identity in out:
+            raise RuntimeError(f"duplicate torsion identity: {identity}")
+        out[identity] = {
+            "canonical_atoms": list(canonical_term(term)),
             "phi_k": float(term.type.phi_k), "periodicity": float(term.type.per),
             "phase": float(term.type.phase), "scee": float(term.type.scee),
-            "scnb": float(term.type.scnb),
+            "scnb": float(term.type.scnb), "ignore_end": bool(term.ignore_end),
         }
     return out
 
@@ -109,15 +124,27 @@ def isolated_total_energy(topology: Path, coordinates: np.ndarray) -> float:
 
 def gate1(top: pmd.Structure, mapping: list[dict], representative: dict) -> dict:
     out_dir = HERE / "02_TOPOLOGY_MAPPING"
-    selected = mapped_instances(mapping)
+    diagnostic_dir = out_dir / "serialization-tests"
+    if diagnostic_dir.exists():
+        shutil.rmtree(diagnostic_dir)
+    selected = {}
+    for row in mapping:
+        ids = canonical_tuple(tuple(int(x) for x in row["instance_atoms_zero_based"].split("-")))
+        key = (ids, float(row["periodicity"]), float(row["phase_degrees"]))
+        selected.setdefault(key, []).append(row)
     before_non = first.frozen_non_torsional(top)
     before_terms = torsion_snapshot(top)
     assignments = []
-    for term in proper_terms(top):
-        key = canonical_term(term)
+    selected_occurrences = {}
+    for identity, term in term_identity_records(top):
+        key = (canonical_term(term), float(term.type.per), float(term.type.phase))
         if key not in selected:
             continue
-        row = selected[key]
+        occurrence = selected_occurrences.get(key, 0)
+        selected_occurrences[key] = occurrence + 1
+        if occurrence >= len(selected[key]):
+            raise RuntimeError(f"ambiguous mapped torsion multiplicity for {key}")
+        row = selected[key][occurrence]
         assignments.append({
             "axis": row["axis"], "source_parameter_id": row["parameter_id"],
             "source_type_index": int(row["type_index"]),
@@ -126,7 +153,8 @@ def gate1(top: pmd.Structure, mapping: list[dict], representative: dict) -> dict
             "atom_types": [term.atom1.type, term.atom2.type, term.atom3.type, term.atom4.type],
             "periodicity": float(term.type.per), "phase_degrees": float(term.type.phase),
             "amplitude_kcal_mol": float(term.type.phi_k),
-            "local_clone_id": f"LOCAL_{row['axis']}_{'-'.join(map(str, canonical_term(term)))}",
+            "term_identity": identity,
+            "local_clone_id": f"LOCAL_{row['axis']}_{hashlib.sha256(identity.encode()).hexdigest()[:16]}",
             "serialization_identity": "physical atom tuple + periodicity + phase + amplitude + SCEE + SCNB",
         })
     first.atomic_json(out_dir / "LOCAL_CLONE_ASSIGNMENTS.json", {
@@ -140,9 +168,9 @@ def gate1(top: pmd.Structure, mapping: list[dict], representative: dict) -> dict
     base_total = isolated_total_energy(BASELINE, coords)
     for assignment in assignments:
         mutated = pmd.load_file(str(BASELINE))
-        target = canonical_tuple(tuple(assignment["atoms_zero_based"]))
-        for term in proper_terms(mutated):
-            if canonical_term(term) == target:
+        target_identity = assignment["term_identity"]
+        for identity, term in term_identity_records(mutated):
+            if identity == target_identity:
                 cloned = copy.copy(term.type)
                 cloned.phi_k = float(cloned.phi_k) + CLONE_TEST_DELTA
                 # AmberParm writers serialize by the registered type table.
@@ -151,13 +179,13 @@ def gate1(top: pmd.Structure, mapping: list[dict], representative: dict) -> dict
                 mutated.dihedral_types.append(cloned)
                 term.type = cloned
         mutated.dihedral_types.claim()
-        path = out_dir / "serialization-tests" / f"{assignment['local_clone_id']}.parm7"
+        path = diagnostic_dir / f"{assignment['local_clone_id']}.parm7"
         path.parent.mkdir(parents=True, exist_ok=True)
         mutated.save(str(path), overwrite=True)
         readback = pmd.load_file(str(path))
         after_terms = torsion_snapshot(readback)
         changed = [key for key in before_terms if before_terms[key] != after_terms[key]]
-        expected = "-".join(map(str, target))
+        expected = target_identity
         frozen_equal = first.frozen_non_torsional(readback)["components"] == before_non["components"]
         new_total = isolated_total_energy(path, coords)
         phi = first.dihedral(coords, tuple(assignment["atoms_zero_based"]))
@@ -390,6 +418,14 @@ def gate2_and_3(top: pmd.Structure, surfaces: dict[str, list[dict]], frozen: lis
 
 
 def gate4() -> dict:
+    locked_path = HERE / "00_PROTOCOL/LOCKED_ACCEPTANCE_PROTOCOL.json"
+    if locked_path.exists():
+        if sha(locked_path) != "859fbc97a8f3480f9e168c22b93a421d597494856d151db1842bb3ead61bbbc4":
+            raise RuntimeError("locked acceptance protocol identity changed")
+        protocol = json.loads(locked_path.read_text())
+        if protocol.get("locked") is not True:
+            raise RuntimeError("acceptance protocol is not locked")
+        return protocol
     protocol = {
         "schema": "tsl-rsh-torsion-locked-acceptance-protocol-v1", "created_utc": now(), "locked": True,
         "literature_method": {
