@@ -1,0 +1,119 @@
+{
+  "ambertools_version": "26.0",
+  "controls": "TSL-RSH restrained MM profile minimization\n&cntrl\n imin=1, maxcyc=100000, ncyc=500, ntmin=2,\n cut=999.0, ntb=0, igb=0, nmropt=1,\n ntpr=100, ntwx=0, ntx=1, irest=0, drms=1.0e-3,\n/\n&wt type='END' /\nDISANG=restraint.RST\nLISTOUT=POUT\n",
+  "convergence": {
+    "drms_kcal_mol_angstrom": 0.001,
+    "failure": "fail closed",
+    "maxcyc": 100000
+  },
+  "created_utc": "2026-08-26T16:20:56.957290+00:00",
+  "determinism": "PASS",
+  "energy_extraction": "independent unrestrained Sander Python API single point on final restart",
+  "metrics": {
+    "CHI": {
+      "mae_kcal_mol": 0.7969219209258718,
+      "max_abs_kcal_mol": 1.609355786578587,
+      "point_count": 24,
+      "rmse_kcal_mol": 0.968468054004977
+    },
+    "PHI": {
+      "mae_kcal_mol": 2.5449053894972895,
+      "max_abs_kcal_mol": 9.236705543465064,
+      "point_count": 18,
+      "rmse_kcal_mol": 3.7562691940171673
+    },
+    "PSI": {
+      "mae_kcal_mol": 2.9844333166197425,
+      "max_abs_kcal_mol": 10.151160227716161,
+      "point_count": 14,
+      "rmse_kcal_mol": 4.301351481502508
+    }
+  },
+  "non_target_motion": {
+    "max_atom_displacement_angstrom": 1.0117004796987583,
+    "rmsd_range_angstrom": [
+      0.15701384908024868,
+      0.3730274168348735
+    ]
+  },
+  "periodic_convention": "unwrapped restraint bounds target +/-180; reported angles wrapped to [-180,180)",
+  "point_count": 56,
+  "representative_repeat_tests": [
+    {
+      "angle_degrees": 45,
+      "axis": "CHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": 75,
+      "axis": "CHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": 135,
+      "axis": "CHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": -75,
+      "axis": "PHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": -60,
+      "axis": "PHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": 0,
+      "axis": "PHI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": -60,
+      "axis": "PSI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": -30,
+      "axis": "PSI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    },
+    {
+      "angle_degrees": 90,
+      "axis": "PSI",
+      "coordinate_max_abs_difference_angstrom": 0.0,
+      "energy_abs_difference_kcal_mol": 0.0,
+      "pass": true
+    }
+  ],
+  "restart_format": "Amber rst7",
+  "restart_readback": "PASS",
+  "restraint": {
+    "flat_half_width_degrees": 0.5,
+    "force_constant_kcal_mol_rad2": 500.0,
+    "mechanism": "Amber NMR &rst",
+    "target_tolerance_degrees": 0.75
+  },
+  "restraint_selection_record": "The literature-supported 500 kcal/mol/rad^2 force constant is retained. A finite restraint can balance physical torsional torque outside the requested angle, so its center is deterministically corrected (at most six independent minimizations from the same authoritative geometry) until the independently measured physical dihedral is within 0.75 degree. This controller rule was frozen before any fit.",
+  "sander_executable": "/Users/yazan/totah-lab/analysis/dcmb/selectivity_validation/.conda-md/bin/sander",
+  "sander_relaxed_profile_contract": "PASS",
+  "schema": "tsl-rsh-sander-relaxed-profile-contract-receipt-v1",
+  "target_angle_reproduction": "PASS"
+}

@@ -1,0 +1,72 @@
+{
+  "c1": "six instance-local amplitudes; existing periodicities and phases; all non-torsional terms frozen",
+  "c1_to_c2_admission": {
+    "additional_requirements": [
+      "chemical/functional-form rationale",
+      "full-rank sensitivity",
+      "complexity and conditioning audit"
+    ],
+    "allowed": [
+      "locked low-energy gate failure",
+      "locked authoritative minimum/topology failure",
+      "locked barrier gate failure",
+      "locked unsampled-region pathology"
+    ],
+    "prohibited": [
+      "prettier curve",
+      "slight training-RMSE improvement"
+    ],
+    "requires_registered_c1_failure": true
+  },
+  "created_utc": "2026-08-26T16:20:56.958212+00:00",
+  "fit_run": false,
+  "identifiability_status": "CONCERN",
+  "literature_method": {
+    "energy_weighting": "adopt BespokeFit-style: weight 1 through 1 kcal/mol, smooth attenuation to zero at 10 kcal/mol, zero above 10; secondary objective only",
+    "objective": "MM-relaxed and independently minimum-referenced QM/MM torsion profiles",
+    "sources": [
+      "https://doi.org/10.1021/acs.jcim.2c01153",
+      "https://doi.org/10.1021/acs.jctc.3c00039",
+      "https://doi.org/10.1002/jcc.23775",
+      "https://doi.org/10.1021/acs.jcim.6c00528"
+    ]
+  },
+  "locked": true,
+  "postfit_identifiability": [
+    "parameter covariance/correlation",
+    "structured angular resampling",
+    "leave-region-out sensitivity",
+    "equal-point vs equal-surface weighting",
+    "coefficient sign/magnitude stability",
+    "predicted-profile stability"
+  ],
+  "project_preregistered_acceptance_gate": {
+    "low_energy": {
+      "mae_kcal_mol_max": 0.75,
+      "minimum_angle_error_degrees_max": 15.0,
+      "weighted_rmse_kcal_mol_max": 1.0
+    },
+    "low_energy_definition": "authoritative cells with QM relative energy <=10 kcal/mol; core subset <=1 kcal/mol reported separately",
+    "unsampled_region": {
+      "action": "set NEW_QM_REQUIRED=true and stop; never synthesize a QM target",
+      "domain": "complete periodic 15-degree MM-relaxed grid",
+      "fail_closed_events": [
+        "nonfinite energy",
+        "minimization failure",
+        "connectivity or chirality change"
+      ],
+      "new_qm_trigger": "an unsampled strict local minimum >0.5 kcal/mol below the lowest authoritative-sampled MM minimum, or >1.0 kcal/mol below periodic linear interpolation of bracketing authoritative cells",
+      "no_synthetic_qm": true
+    },
+    "whole_profile": {
+      "major_barrier_height_error_kcal_mol_max": 1.0,
+      "major_barrier_location_error_degrees_max": 15.0,
+      "minimum_angle_error_degrees_max": 15.0,
+      "per_surface_mae_kcal_mol_max": 0.75,
+      "per_surface_max_abs_kcal_mol_max": 2.0,
+      "per_surface_rmse_kcal_mol_max": 1.0,
+      "periodic_closure_kcal_mol_max": 0.1
+    }
+  },
+  "schema": "tsl-rsh-torsion-locked-acceptance-protocol-v1"
+}
