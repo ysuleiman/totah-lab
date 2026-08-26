@@ -1,0 +1,151 @@
+{
+  "acceptance_gates_locked": false,
+  "baseline_force_field_identified": true,
+  "baseline_force_field_sha256": "2f4882aed1ea80e7b582a7b2cafa3dfd58ce4d918e5c9312186bcf3e28c88097",
+  "blockers": [
+    "explicit review/lock of proposed acceptance gates",
+    "production Sander MM-relaxation restraint/minimization convention and restart tests",
+    "final choice between C1 and conditional C2 model-selection protocol",
+    "instance-local torsion-type cloning/read-back equivalence gate for generic shared types"
+  ],
+  "identifiability": {
+    "active_columns": [
+      "PRMTOP_DIHEDRAL_TYPE_1_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_2_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_7_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_12_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_17_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_30_AMPLITUDE"
+    ],
+    "active_parameter_count": 6,
+    "column_cosine_correlation_matrix": [
+      [
+        1.0,
+        0.5945339959465353,
+        0.6933449145720951,
+        0.8959846873213462,
+        -0.10557090828053975,
+        -0.1359535394965124
+      ],
+      [
+        0.5945339959465353,
+        0.9999999999999999,
+        0.5855170731059857,
+        0.5057052776660708,
+        -0.061692974005739754,
+        -0.022075885439290333
+      ],
+      [
+        0.6933449145720951,
+        0.5855170731059857,
+        0.9999999999999999,
+        0.5548573530372871,
+        -0.14652165775091,
+        -0.12081554207086713
+      ],
+      [
+        0.8959846873213462,
+        0.5057052776660708,
+        0.5548573530372871,
+        1.0,
+        -0.04183098463228606,
+        -0.1512426032310486
+      ],
+      [
+        -0.10557090828053975,
+        -0.061692974005739754,
+        -0.14652165775091,
+        -0.04183098463228606,
+        0.9999999999999998,
+        0.9698344004080642
+      ],
+      [
+        -0.1359535394965124,
+        -0.022075885439290333,
+        -0.12081554207086713,
+        -0.1512426032310486,
+        0.9698344004080642,
+        1.0
+      ]
+    ],
+    "columns": [
+      "PRMTOP_DIHEDRAL_TYPE_1_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_2_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_7_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_12_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_17_AMPLITUDE",
+      "PRMTOP_DIHEDRAL_TYPE_30_AMPLITUDE"
+    ],
+    "condition_number": 52.15700983400338,
+    "diagnostic_only": true,
+    "equal_point_weighting": {
+      "condition_number": 52.15700983400338,
+      "policy": "each authoritative point has unit weight",
+      "rank": 6,
+      "singular_values": [
+        24.672660383813465,
+        8.157092702900552,
+        5.624952865133019,
+        3.0775220071320795,
+        2.205397782754157,
+        0.473045913911428
+      ]
+    },
+    "equal_surface_weighting": {
+      "condition_number": 56.415377136884274,
+      "policy": "each surface squared-error sum divided by its authoritative point count",
+      "primary_for_production": true,
+      "rank": 6,
+      "singular_values": [
+        6.1739216437553734,
+        1.7226286875836163,
+        1.363771157437077,
+        0.7906167660615171,
+        0.5375822223466316,
+        0.10943685847876526
+      ]
+    },
+    "full_column_rank": true,
+    "interpretation": "This fixed-geometry matrix is a diagnostic local sensitivity only; the production MM-relaxed objective is nonlinear and must be reevaluated after every parameter update.",
+    "model": "instance-local clones of existing AMBER dihedral-type amplitude directions",
+    "numerical_rank": 6,
+    "observation_count": 56,
+    "parameter_count": 6,
+    "schema": "tsl-rsh-torsion-prefit-identifiability-v1",
+    "serialization_requirement": "Each direction must be a cloned prmtop dihedral type assigned only to mapped physical instances; generic source types remain immutable.",
+    "singular_values": [
+      24.672660383813465,
+      8.157092702900552,
+      5.624952865133019,
+      3.0775220071320795,
+      2.205397782754157,
+      0.473045913911428
+    ]
+  },
+  "identifiability_classification": "CONCERN",
+  "new_qm_required": false,
+  "prefit_metrics": {
+    "CHI": {
+      "mae_kcal_mol": 0.92999256128448,
+      "max_abs_kcal_mol": 1.6794955829305849,
+      "point_count": 24,
+      "rmse_kcal_mol": 1.0643736337196916
+    },
+    "PHI": {
+      "mae_kcal_mol": 5.205646520313025,
+      "max_abs_kcal_mol": 18.23288079903051,
+      "point_count": 18,
+      "rmse_kcal_mol": 7.723843845033811
+    },
+    "PSI": {
+      "mae_kcal_mol": 6.944252824642516,
+      "max_abs_kcal_mol": 22.6654100082103,
+      "point_count": 14,
+      "rmse_kcal_mol": 9.975600598767386
+    }
+  },
+  "publication_inputs_verified": true,
+  "raw_qm_artifacts_modified": false,
+  "ready_to_fit": false,
+  "shared_torsion_parameters": []
+}
