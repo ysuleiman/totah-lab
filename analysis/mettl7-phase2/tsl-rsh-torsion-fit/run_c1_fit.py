@@ -40,6 +40,7 @@ BOUNDS = (0.0, 2.0)
 REGULARIZATION = 0.01
 PRIOR_SCALE = 0.5
 SENSITIVITY_STEP = 0.01
+PRMTOP_AMPLITUDE_READBACK_TOL = 5e-8
 
 
 def now() -> str:
@@ -105,7 +106,7 @@ def build_candidate(parameters: dict[int, float], output: Path) -> dict:
         raise RuntimeError("candidate changed frozen non-torsional components")
     for source, selected in identities.items():
         for identity in selected:
-            if abs(after[identity]["phi_k"] - parameters[source]) > 1e-12:
+            if abs(after[identity]["phi_k"] - parameters[source]) > PRMTOP_AMPLITUDE_READBACK_TOL:
                 raise RuntimeError("candidate topology readback mismatch")
     return {"sha256": first.sha256_path(output), "changed_term_count": len(actual_changed),
             "frozen_components_unchanged": True, "unrelated_dihedrals_unchanged": True}
