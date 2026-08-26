@@ -259,13 +259,14 @@ def aligned_motion(initial: np.ndarray, final: np.ndarray) -> tuple[float, float
     return float(np.sqrt(np.mean(norms ** 2))), float(np.max(norms))
 
 
-def minimize_point(top: pmd.Structure, record: dict, run_dir: Path, suffix: str = "") -> dict:
+def minimize_point(top: pmd.Structure, record: dict, run_dir: Path, suffix: str = "",
+                   topology_path: Path = BASELINE) -> dict:
     directory = run_dir if not suffix else run_dir.with_name(run_dir.name + suffix)
     directory.mkdir(parents=True, exist_ok=True)
     elements, initial = first.read_xyz_bytes(record["xyz"])
     write_rst7(top, initial, directory / "input.rst7")
     first.atomic_text(directory / "mdin", MDIN)
-    command = [str(SANDER), "-O", "-i", "mdin", "-o", "mdout", "-p", str(BASELINE), "-c", "input.rst7", "-r", "final.rst7", "-inf", "mdinfo"]
+    command = [str(SANDER), "-O", "-i", "mdin", "-o", "mdout", "-p", str(topology_path), "-c", "input.rst7", "-r", "final.rst7", "-inf", "mdinfo"]
     desired_target = float(record["angle_degrees"])
     restraint_center = desired_target
     correction_history = []
@@ -291,7 +292,7 @@ def minimize_point(top: pmd.Structure, record: dict, run_dir: Path, suffix: str 
     if final.shape != (56, 3) or not np.isfinite(final).all():
         raise RuntimeError("invalid restart coordinates")
     angle = math.degrees(first.dihedral(final, first.AXES[record["axis"]]["atoms"]))
-    energies, forces = energy_at(BASELINE, final)
+    energies, forces = energy_at(topology_path, final)
     rmsd, max_move = aligned_motion(initial, final)
     result = {
         "axis": record["axis"], "angle_degrees": int(record["angle_degrees"]),

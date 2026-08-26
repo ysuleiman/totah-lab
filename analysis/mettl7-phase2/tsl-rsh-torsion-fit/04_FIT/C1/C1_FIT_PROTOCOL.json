@@ -1,0 +1,41 @@
+{
+  "schema": "tsl-rsh-c1-fit-protocol-v1",
+  "status": "FROZEN_BEFORE_FIRST_C1_EVALUATION",
+  "model": "C1",
+  "production_objective": "Sander MM-relaxed relative torsion profiles",
+  "authoritative_point_counts": {"CHI": 24, "PHI": 18, "PSI": 14, "total": 56},
+  "primary_weighting": "equal-surface: arithmetic mean of the three per-surface mean squared residuals",
+  "parameters": [
+    {"id": "LOCAL_TYPE_1", "axis": "PHI", "periodicity": 3, "phase_degrees": 0.0, "initial_kcal_mol": 0.13},
+    {"id": "LOCAL_TYPE_2", "axis": "PSI", "periodicity": 2, "phase_degrees": 0.0, "initial_kcal_mol": 0.0},
+    {"id": "LOCAL_TYPE_7", "axis": "PSI", "periodicity": 3, "phase_degrees": 0.0, "initial_kcal_mol": 0.15},
+    {"id": "LOCAL_TYPE_12", "axis": "PHI", "periodicity": 3, "phase_degrees": 0.0, "initial_kcal_mol": 0.155555556},
+    {"id": "LOCAL_TYPE_17", "axis": "CHI", "periodicity": 3, "phase_degrees": 0.0, "initial_kcal_mol": 0.25},
+    {"id": "LOCAL_TYPE_30", "axis": "CHI", "periodicity": 3, "phase_degrees": 0.0, "initial_kcal_mol": 0.143}
+  ],
+  "bounds_kcal_mol": [0.0, 2.0],
+  "bounds_rationale": "nonnegative native Amber barrier amplitudes with a 2 kcal/mol per-instance ceiling; mapped multiplicities make this a conservative profile-scale bound",
+  "regularization": {
+    "form": "0.01 * sum(((k-k_baseline)/0.5)^2) per independently optimized surface block",
+    "prior_center": "baseline amplitude",
+    "prior_scale_kcal_mol": 0.5,
+    "purpose": "parsimonious baseline movement and protection against opposing correlated CHI coefficients"
+  },
+  "optimizer": {
+    "algorithm": "scipy.optimize.minimize L-BFGS-B, independently on the three exactly separable two-parameter surface blocks",
+    "scipy_version": "1.18.0",
+    "max_iterations_per_surface": 20,
+    "max_function_evaluations_per_surface": 90,
+    "ftol": 1e-8,
+    "gtol": 1e-4,
+    "finite_difference_step_kcal_mol": 0.002,
+    "random_seed": null,
+    "deterministic": true
+  },
+  "low_energy_weight_function": "w=1 for E<=1; w=0.5*(1+cos(pi*(E-1)/9)) for 1<E<10; w=0 for E>=10 kcal/mol",
+  "sensitivity_finite_difference_step_kcal_mol": 0.01,
+  "locked_acceptance_protocol_sha256": "859fbc97a8f3480f9e168c22b93a421d597494856d151db1842bb3ead61bbbc4",
+  "baseline_topology_sha256": "2f4882aed1ea80e7b582a7b2cafa3dfd58ce4d918e5c9312186bcf3e28c88097",
+  "step0_commit": "7e574822dd5c3e24da38ddb762f92644dfd77f2e",
+  "prohibitions": ["C2", "new periodicities", "phase changes", "non-torsional changes", "generic source-type mutation", "new QM", "MD"]
+}
