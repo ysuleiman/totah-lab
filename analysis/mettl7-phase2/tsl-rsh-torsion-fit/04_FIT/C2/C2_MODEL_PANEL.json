@@ -1,0 +1,34 @@
+{
+  "schema": "tsl-rsh-c2-model-panel-v1",
+  "source_c1_commit": "47274c77719104de31ce8ab34ad00e71daa38e72",
+  "primary_objective": "equal_surface_sander_mm_relaxed",
+  "chi_policy": "freeze all C1 CHI instance-local amplitudes",
+  "fixed_phase_policy": "AMBER-compatible fixed phases; phase optimization prohibited",
+  "candidates": [
+    {
+      "candidate_id": "C2A_PHI_N2",
+      "new_terms": [{"axis": "PHI", "periodicity": 2, "phase_degrees": 180, "initial_amplitude_kcal_mol": 0.0, "bounds_kcal_mol": [0.0, 2.0]}],
+      "rationale": "PHI n=2 is the strongest absent one-term residual projection; addresses whole-profile/barrier failure"
+    },
+    {
+      "candidate_id": "C2B_PHI_N1_N2",
+      "new_terms": [
+        {"axis": "PHI", "periodicity": 1, "phase_degrees": 0, "initial_amplitude_kcal_mol": 0.0, "bounds_kcal_mol": [0.0, 2.0]},
+        {"axis": "PHI", "periodicity": 2, "phase_degrees": 180, "initial_amplitude_kcal_mol": 0.0, "bounds_kcal_mol": [0.0, 2.0]}
+      ],
+      "admission_rule": "run only if C2A fails a PHI-specific locked whole-profile, barrier, closure, or stability gate",
+      "rationale": "minimal complete n=1/n=2 increment if the leading n=2 direction alone is insufficient"
+    },
+    {
+      "candidate_id": "C2C_MINIMAL_COMBINED",
+      "new_terms": [{"axis": "PSI", "periodicity": 1, "phase_degrees": 0, "initial_amplitude_kcal_mol": 0.0, "bounds_kcal_mol": [0.0, 6.0]}],
+      "phi_source_rule": "smallest preceding PHI candidate satisfying PHI-specific locked gates; otherwise lowest-parameter PHI candidate with the lower primary objective",
+      "rationale": "PSI n=1 explains 0.589869 of residual variance and directly targets its whole-profile/barrier failure"
+    }
+  ],
+  "regularization": {"form": "0.01 * sum(((k-k_initial)/prior_scale)^2)", "existing_prior_scale_kcal_mol": 0.5, "new_prior_scale_kcal_mol": 1.0},
+  "optimizer": {"algorithm": "L-BFGS-B", "maxiter": 20, "maxfun": 90, "ftol": 1e-8, "gtol": 1e-4, "finite_difference_step": 0.002, "maxls": 10},
+  "selection_rule": "select the smallest candidate passing every locked gate and predictive-stability gate; never select by RMSE alone",
+  "higher_periodicities_authorized": false,
+  "phase_optimization_authorized": false
+}

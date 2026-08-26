@@ -239,11 +239,12 @@ def nearest_record(records: list[dict], angle: int) -> dict:
     return min(records, key=lambda r: periodic_error(float(r["angle_degrees"]), angle))
 
 
-def full_domain(final_topology: Path, surfaces: dict[str, list[dict]], authoritative_rows: list[dict]) -> tuple[list[dict], dict]:
+def full_domain(final_topology: Path, surfaces: dict[str, list[dict]], authoritative_rows: list[dict],
+                output_root: Path | None = None) -> tuple[list[dict], dict]:
     topology = pmd.load_file(str(final_topology))
     output = []
     closure = {}
-    root = VALIDATION / "full-domain-runs"
+    root = output_root if output_root is not None else VALIDATION / "full-domain-runs"
     authoritative = {(r["axis"], int(r["angle_degrees"])): r for r in authoritative_rows}
     for axis in first.AXES:
         for angle in range(-180, 180, 15):
