@@ -311,7 +311,7 @@ def minimize_point(top: pmd.Structure, record: dict, run_dir: Path, suffix: str 
         "mm_other_kcal_mol_absolute": float(energies["tot"] - sum(energies[k] for k in first.ENERGY_FIELDS[:-1])),
         "input_rst7_sha256": sha(directory / "input.rst7"), "final_rst7_sha256": sha(directory / "final.rst7"),
         "mdout_sha256": sha(directory / "mdout"), "restraint_sha256": sha(directory / "restraint.RST"),
-        "run_directory": str(directory.relative_to(HERE)),
+        "run_directory": str(directory.relative_to(HERE)) if directory.is_relative_to(HERE) else str(directory),
     }
     first.atomic_json(directory / "RESULT.json", result)
     files = sorted(p for p in directory.iterdir() if p.is_file() and p.name != "SHA256SUMS")
