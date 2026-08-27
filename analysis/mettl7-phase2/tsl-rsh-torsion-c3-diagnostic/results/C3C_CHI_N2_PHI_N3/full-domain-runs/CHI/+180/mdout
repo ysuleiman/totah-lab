@@ -1,0 +1,817 @@
+
+          -------------------------------------------------------
+          Amber 26 SANDER                              2026
+          -------------------------------------------------------
+
+| Run on 08/27/2026 at 16:05:15
+
+|   Executable path: /Users/yazan/totah-lab/analysis/dcmb/selectivity_validation/.conda-md/bin/sander
+| Working directory: /Users/yazan/totah-lab/analysis/mettl7-phase2/tsl-rsh-torsion-c3-diagnostic/results/C3C_CHI_N2_PHI_N3/full-domain-runs/CHI/+180
+|          Hostname: Unknown
+  [-O]verwriting output
+
+File Assignments:
+|  MDIN: mdin                                                                  
+| MDOUT: mdout                                                                 
+|INPCRD: input.rst7                                                            
+|  PARM: /Users/yazan/totah-lab/analysis/mettl7-phase2/tsl-rsh-torsion-c3-diagn
+|RESTRT: final.rst7                                                            
+|  REFC: refc                                                                  
+| MDVEL: mdvel                                                                 
+| MDFRC: mdfrc                                                                 
+|  MDEN: mden                                                                  
+| MDCRD: mdcrd                                                                 
+|MDINFO: mdinfo                                                                
+|  MTMD: mtmd                                                                  
+|INPDIP: inpdip                                                                
+|RSTDIP: rstdip                                                                
+|INPTRA: inptraj                                                               
+
+
+ Here is the input file:
+
+TSL-RSH restrained MM profile minimization                                     
+&cntrl                                                                         
+ imin=1, maxcyc=100000, ncyc=500, ntmin=2,                                     
+ cut=999.0, ntb=0, igb=0, nmropt=1,                                            
+ ntpr=100, ntwx=0, ntx=1, irest=0, drms=1.0e-3,                                
+/                                                                              
+&wt type='END' /                                                               
+DISANG=restraint.RST                                                           
+LISTOUT=POUT                                                                   
+
+--------------------------------------------------------------------------------
+   1.  RESOURCE   USE: 
+--------------------------------------------------------------------------------
+
+| Flags:                                                                        
+|    NONPERIODIC   ntb=0 and igb=0: Setting up nonperiodic simulation
+|  *** cutoff > system size, list only builds once
+|Largest sphere to fit in unit cell has radius =    32.884
+| New format PARM file being parsed.
+| Version =    1.000 Date = 08/27/26 Time = 15:59:37
+ NATOM  =      56 NTYPES =       9 NBONH =      30 MBONA  =      30
+ NTHETH =      72 MTHETA =      50 NPHIH =     154 MPHIA  =      95
+ NHPARM =       0 NPARM  =       0 NNB   =     382 NRES   =       1
+ NBONA  =      30 NTHETA =      50 NPHIA =      95 NUMBND =      20
+ NUMANG =      40 NPTRA  =      38 NATYP =      13 NPHB   =       0
+ IFBOX  =       0 NMXRS  =      56 IFCAP =       0 NEXTRA =       0
+ NCOPY  =       0
+
+
+|     Memory Use     Allocated
+|     Real              708107
+|     Hollerith            171
+|     Integer            33954
+|     Max Pairs           1540
+|     nblistReal           672
+|     nblist Int       1057938
+|       Total             9809 kbytes
+
+| Note: 1-4 EEL scale factors are being read from the topology file.
+
+| Note: 1-4 VDW scale factors are being read from the topology file.
+| Duplicated    0 dihedrals
+| Duplicated    0 dihedrals
+
+--------------------------------------------------------------------------------
+   2.  CONTROL  DATA  FOR  THE  RUN
+--------------------------------------------------------------------------------
+
+TSH                                                                             
+
+General flags:
+     imin    =       1, nmropt  =       1
+
+Nature and format of input:
+     ntx     =       1, irest   =       0, ntrx    =       1
+
+Nature and format of output:
+     ntxo    =       2, ntpr    =     100, ntrx    =       1, ntwr    =       1
+     iwrap   =       0, ntwx    =       0, ntwv    =       0, ntwe    =       0
+     ioutfm  =       1, ntwprt  =       0, idecomp =       0, rbornstat=      0
+
+Potential function:
+     ntf     =       1, ntb     =       0, igb     =       0, nsnb    =      25
+     ipol    =       0, gbsa    =       0, iesp    =       0
+     dielc   =   1.00000, cut     = 999.00000, intdiel =   1.00000
+
+Frozen or restrained atoms:
+     ibelly  =       0, ntr     =       0
+
+Energy minimization:
+     maxcyc  =  100000, ncyc    =     500, ntmin   =       2
+     dx0     =   0.01000, drms    =   0.00100
+
+NMR refinement options:
+     iscale  =       0, noeskp  =       1, ipnlty  =       1, mxsub   =       1
+     scalm   = 100.00000, pencut  =   0.10000, tausw   =   0.10000
+|  INFO: Old style inpcrd file read
+
+
+--------------------------------------------------------------------------------
+   3.  ATOMIC COORDINATES AND VELOCITIES
+--------------------------------------------------------------------------------
+
+                                                                                
+ begin time read from input coords =     0.000 ps
+
+
+
+           Begin reading energy term weight changes/NMR restraints
+ WEIGHT CHANGES:
+                         ** No weight changes given **
+
+ RESTRAINTS:
+ Requested file redirections:
+  DISANG    = restraint.RST
+  LISTOUT   = POUT
+ Restraints will be read from file: restraint.RST
+Here are comments from the DISANG input file:
+
+                       Number of restraints read =     1
+
+                  Done reading weight changes/NMR restraints
+
+
+ Number of triangulated 3-point waters found:        0
+
+     Sum of charges from parm topology file =  -0.00000100
+     Forcing neutrality...
+
+--------------------------------------------------------------------------------
+   4.  RESULTS
+--------------------------------------------------------------------------------
+
+ ---------------------------------------------------
+
+     eedmeth=4: Setting switch to one everywhere
+
+ ---------------------------------------------------
+| Local SIZE OF NONBOND LIST =       1166
+| TOTAL SIZE OF NONBOND LIST =       1166
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+      1       8.7624E+01     9.6906E+00     3.7302E+01     C15        16
+
+ BOND    =        2.7223  ANGLE   =       13.4841  DIHED      =       91.8700
+ VDWAALS =       -0.7380  EEL     =      -49.5760  HBOND      =        0.0000
+ 1-4 VDW =       13.7089  1-4 EEL =       16.1524  RESTRAINT  =        0.0000
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    100       6.9068E+01     4.1124E-01     1.5728E+00     H30        56
+
+ BOND    =        3.4459  ANGLE   =       13.5968  DIHED      =       81.2358
+ VDWAALS =       -5.0964  EEL     =      -48.3735  HBOND      =        0.0000
+ 1-4 VDW =       10.8982  1-4 EEL =       13.3616  RESTRAINT  =        0.0000
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    200       6.7875E+01     7.4228E-01     6.2106E+00     C5          5
+
+ BOND    =        3.5893  ANGLE   =       13.8760  DIHED      =       79.6878
+ VDWAALS =       -5.0493  EEL     =      -48.4230  HBOND      =        0.0000
+ 1-4 VDW =       10.8931  1-4 EEL =       13.3012  RESTRAINT  =        0.0000
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    300       6.7383E+01     6.5792E-01     5.2247E+00     C5          5
+
+ BOND    =        3.6438  ANGLE   =       13.9711  DIHED      =       78.9531
+ VDWAALS =       -4.9648  EEL     =      -48.4698  HBOND      =        0.0000
+ 1-4 VDW =       10.9307  1-4 EEL =       13.3189  RESTRAINT  =        0.0001
+ EAMBER  =       67.3830
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    400       6.7123E+01     1.1746E-01     4.4610E-01     H10        36
+
+ BOND    =        3.6374  ANGLE   =       14.0468  DIHED      =       78.5585
+ VDWAALS =       -4.8924  EEL     =      -48.5121  HBOND      =        0.0000
+ 1-4 VDW =       10.9590  1-4 EEL =       13.3262  RESTRAINT  =        0.0001
+ EAMBER  =       67.1234
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    500       6.6972E+01     1.8641E-01     1.2931E+00     C21        22
+
+ BOND    =        3.6366  ANGLE   =       14.0830  DIHED      =       78.3074
+ VDWAALS =       -4.8331  EEL     =      -48.5336  HBOND      =        0.0000
+ 1-4 VDW =       10.9782  1-4 EEL =       13.3338  RESTRAINT  =        0.0002
+ EAMBER  =       66.9723
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    600       6.6874E+01     1.0037E-01     4.9526E-01     O2         23
+
+ BOND    =        3.6511  ANGLE   =       14.0836  DIHED      =       78.1461
+ VDWAALS =       -4.7868  EEL     =      -48.5450  HBOND      =        0.0000
+ 1-4 VDW =       10.9913  1-4 EEL =       13.3332  RESTRAINT  =        0.0002
+ EAMBER  =       66.8734
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    700       6.6805E+01     8.3596E-02     4.9135E-01     C21        22
+
+ BOND    =        3.6477  ANGLE   =       14.0968  DIHED      =       78.0251
+ VDWAALS =       -4.7502  EEL     =      -48.5489  HBOND      =        0.0000
+ 1-4 VDW =       10.9999  1-4 EEL =       13.3347  RESTRAINT  =        0.0003
+ EAMBER  =       66.8050
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    800       6.6756E+01     7.1533E-02     3.5097E-01     O2         23
+
+ BOND    =        3.6550  ANGLE   =       14.0954  DIHED      =       77.9382
+ VDWAALS =       -4.7207  EEL     =      -48.5499  HBOND      =        0.0000
+ 1-4 VDW =       11.0065  1-4 EEL =       13.3311  RESTRAINT  =        0.0003
+ EAMBER  =       66.7556
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+    900       6.6719E+01     6.2342E-02     3.7054E-01     C21        22
+
+ BOND    =        3.6525  ANGLE   =       14.1026  DIHED      =       77.8676
+ VDWAALS =       -4.6970  EEL     =      -48.5472  HBOND      =        0.0000
+ 1-4 VDW =       11.0111  1-4 EEL =       13.3291  RESTRAINT  =        0.0003
+ EAMBER  =       66.7187
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1000       6.6691E+01     5.5378E-02     2.7699E-01     O2         23
+
+ BOND    =        3.6582  ANGLE   =       14.1001  DIHED      =       77.8145
+ VDWAALS =       -4.6775  EEL     =      -48.5438  HBOND      =        0.0000
+ 1-4 VDW =       11.0151  1-4 EEL =       13.3239  RESTRAINT  =        0.0003
+ EAMBER  =       66.6904
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1100       6.6669E+01     7.2237E-02     5.3237E-01     C21        22
+
+ BOND    =        3.6549  ANGLE   =       14.1063  DIHED      =       77.7681
+ VDWAALS =       -4.6613  EEL     =      -48.5384  HBOND      =        0.0000
+ 1-4 VDW =       11.0179  1-4 EEL =       13.3208  RESTRAINT  =        0.0003
+ EAMBER  =       66.6684
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1200       6.6651E+01     3.3734E-02     1.0383E-01     O2         23
+
+ BOND    =        3.6600  ANGLE   =       14.1032  DIHED      =       77.7337
+ VDWAALS =       -4.6478  EEL     =      -48.5335  HBOND      =        0.0000
+ 1-4 VDW =       11.0205  1-4 EEL =       13.3149  RESTRAINT  =        0.0003
+ EAMBER  =       66.6511
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1300       6.6637E+01     2.9879E-02     9.2440E-02     O2         23
+
+ BOND    =        3.6605  ANGLE   =       14.1046  DIHED      =       77.7033
+ VDWAALS =       -4.6363  EEL     =      -48.5278  HBOND      =        0.0000
+ 1-4 VDW =       11.0225  1-4 EEL =       13.3103  RESTRAINT  =        0.0003
+ EAMBER  =       66.6371
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1400       6.6626E+01     2.6973E-02     8.1611E-02     H5         31
+
+ BOND    =        3.6627  ANGLE   =       14.1041  DIHED      =       77.6783
+ VDWAALS =       -4.6264  EEL     =      -48.5223  HBOND      =        0.0000
+ 1-4 VDW =       11.0243  1-4 EEL =       13.3053  RESTRAINT  =        0.0003
+ EAMBER  =       66.6259
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1500       6.6617E+01     3.0470E-02     1.7797E-01     C21        22
+
+ BOND    =        3.6627  ANGLE   =       14.1057  DIHED      =       77.6561
+ VDWAALS =       -4.6179  EEL     =      -48.5166  HBOND      =        0.0000
+ 1-4 VDW =       11.0257  1-4 EEL =       13.3009  RESTRAINT  =        0.0003
+ EAMBER  =       66.6166
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1600       6.6610E+01     8.7706E-02     7.0751E-01     C21        22
+
+ BOND    =        3.6608  ANGLE   =       14.1092  DIHED      =       77.6365
+ VDWAALS =       -4.6107  EEL     =      -48.5109  HBOND      =        0.0000
+ 1-4 VDW =       11.0269  1-4 EEL =       13.2975  RESTRAINT  =        0.0003
+ EAMBER  =       66.6094
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1700       6.6604E+01     7.5426E-02     5.7513E-01     C21        22
+
+ BOND    =        3.6696  ANGLE   =       14.1012  DIHED      =       77.6239
+ VDWAALS =       -4.6042  EEL     =      -48.5067  HBOND      =        0.0000
+ 1-4 VDW =       11.0285  1-4 EEL =       13.2908  RESTRAINT  =        0.0003
+ EAMBER  =       66.6032
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1800       6.6598E+01     1.9586E-02     7.8456E-02     O2         23
+
+ BOND    =        3.6674  ANGLE   =       14.1046  DIHED      =       77.6090
+ VDWAALS =       -4.5986  EEL     =      -48.5016  HBOND      =        0.0000
+ 1-4 VDW =       11.0294  1-4 EEL =       13.2878  RESTRAINT  =        0.0003
+ EAMBER  =       66.5980
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   1900       6.6594E+01     5.4861E-02     4.1292E-01     C21        22
+
+ BOND    =        3.6706  ANGLE   =       14.1025  DIHED      =       77.5980
+ VDWAALS =       -4.5937  EEL     =      -48.4974  HBOND      =        0.0000
+ 1-4 VDW =       11.0305  1-4 EEL =       13.2834  RESTRAINT  =        0.0003
+ EAMBER  =       66.5939
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2000       6.6591E+01     4.7714E-02     3.8261E-01     C21        22
+
+ BOND    =        3.6666  ANGLE   =       14.1077  DIHED      =       77.5856
+ VDWAALS =       -4.5894  EEL     =      -48.4927  HBOND      =        0.0000
+ 1-4 VDW =       11.0312  1-4 EEL =       13.2814  RESTRAINT  =        0.0003
+ EAMBER  =       66.5904
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2100       6.6588E+01     4.5014E-02     3.3880E-01     C21        22
+
+ BOND    =        3.6718  ANGLE   =       14.1032  DIHED      =       77.5782
+ VDWAALS =       -4.5856  EEL     =      -48.4893  HBOND      =        0.0000
+ 1-4 VDW =       11.0323  1-4 EEL =       13.2769  RESTRAINT  =        0.0003
+ EAMBER  =       66.5876
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2200       6.6586E+01     3.5807E-02     2.8557E-01     C21        22
+
+ BOND    =        3.6688  ANGLE   =       14.1073  DIHED      =       77.5686
+ VDWAALS =       -4.5822  EEL     =      -48.4853  HBOND      =        0.0000
+ 1-4 VDW =       11.0330  1-4 EEL =       13.2751  RESTRAINT  =        0.0003
+ EAMBER  =       66.5852
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2300       6.6584E+01     2.9384E-02     2.1270E-01     C21        22
+
+ BOND    =        3.6724  ANGLE   =       14.1043  DIHED      =       77.5627
+ VDWAALS =       -4.5792  EEL     =      -48.4824  HBOND      =        0.0000
+ 1-4 VDW =       11.0339  1-4 EEL =       13.2715  RESTRAINT  =        0.0003
+ EAMBER  =       66.5833
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2400       6.6582E+01     2.6380E-02     2.0822E-01     C21        22
+
+ BOND    =        3.6705  ANGLE   =       14.1071  DIHED      =       77.5553
+ VDWAALS =       -4.5766  EEL     =      -48.4791  HBOND      =        0.0000
+ 1-4 VDW =       11.0346  1-4 EEL =       13.2698  RESTRAINT  =        0.0003
+ EAMBER  =       66.5816
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2500       6.6581E+01     1.3178E-02     7.1447E-02     O2         23
+
+ BOND    =        3.6728  ANGLE   =       14.1055  DIHED      =       77.5504
+ VDWAALS =       -4.5742  EEL     =      -48.4765  HBOND      =        0.0000
+ 1-4 VDW =       11.0353  1-4 EEL =       13.2670  RESTRAINT  =        0.0003
+ EAMBER  =       66.5803
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2600       6.6579E+01     1.1038E-02     6.7345E-02     C21        22
+
+ BOND    =        3.6725  ANGLE   =       14.1065  DIHED      =       77.5451
+ VDWAALS =       -4.5722  EEL     =      -48.4739  HBOND      =        0.0000
+ 1-4 VDW =       11.0360  1-4 EEL =       13.2651  RESTRAINT  =        0.0003
+ EAMBER  =       66.5791
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2700       6.6579E+01     8.1546E-03     3.6352E-02     O1          6
+
+ BOND    =        3.6735  ANGLE   =       14.1061  DIHED      =       77.5408
+ VDWAALS =       -4.5703  EEL     =      -48.4716  HBOND      =        0.0000
+ 1-4 VDW =       11.0366  1-4 EEL =       13.2631  RESTRAINT  =        0.0003
+ EAMBER  =       66.5782
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2800       6.6578E+01     7.1767E-03     3.3927E-02     O1          6
+
+ BOND    =        3.6737  ANGLE   =       14.1065  DIHED      =       77.5366
+ VDWAALS =       -4.5687  EEL     =      -48.4694  HBOND      =        0.0000
+ 1-4 VDW =       11.0372  1-4 EEL =       13.2614  RESTRAINT  =        0.0003
+ EAMBER  =       66.5774
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   2900       6.6577E+01     6.5645E-03     3.1556E-02     O1          6
+
+ BOND    =        3.6743  ANGLE   =       14.1065  DIHED      =       77.5331
+ VDWAALS =       -4.5672  EEL     =      -48.4674  HBOND      =        0.0000
+ 1-4 VDW =       11.0378  1-4 EEL =       13.2598  RESTRAINT  =        0.0003
+ EAMBER  =       66.5768
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3000       6.6577E+01     2.5291E-02     1.9607E-01     C21        22
+
+ BOND    =        3.6758  ANGLE   =       14.1054  DIHED      =       77.5303
+ VDWAALS =       -4.5659  EEL     =      -48.4657  HBOND      =        0.0000
+ 1-4 VDW =       11.0384  1-4 EEL =       13.2579  RESTRAINT  =        0.0003
+ EAMBER  =       66.5762
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3100       6.6576E+01     2.1208E-02     1.7245E-01     C21        22
+
+ BOND    =        3.6739  ANGLE   =       14.1079  DIHED      =       77.5264
+ VDWAALS =       -4.5648  EEL     =      -48.4638  HBOND      =        0.0000
+ 1-4 VDW =       11.0389  1-4 EEL =       13.2573  RESTRAINT  =        0.0003
+ EAMBER  =       66.5758
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3200       6.6576E+01     1.8455E-02     1.4134E-01     C21        22
+
+ BOND    =        3.6761  ANGLE   =       14.1060  DIHED      =       77.5245
+ VDWAALS =       -4.5638  EEL     =      -48.4625  HBOND      =        0.0000
+ 1-4 VDW =       11.0395  1-4 EEL =       13.2555  RESTRAINT  =        0.0003
+ EAMBER  =       66.5754
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3300       6.6575E+01     1.5424E-02     1.2454E-01     C21        22
+
+ BOND    =        3.6748  ANGLE   =       14.1078  DIHED      =       77.5215
+ VDWAALS =       -4.5629  EEL     =      -48.4609  HBOND      =        0.0000
+ 1-4 VDW =       11.0399  1-4 EEL =       13.2549  RESTRAINT  =        0.0003
+ EAMBER  =       66.5750
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3400       6.6575E+01     1.3494E-02     1.0169E-01     C21        22
+
+ BOND    =        3.6764  ANGLE   =       14.1065  DIHED      =       77.5199
+ VDWAALS =       -4.5621  EEL     =      -48.4598  HBOND      =        0.0000
+ 1-4 VDW =       11.0404  1-4 EEL =       13.2535  RESTRAINT  =        0.0003
+ EAMBER  =       66.5748
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3500       6.6575E+01     1.2632E-02     1.0177E-01     C21        22
+
+ BOND    =        3.6755  ANGLE   =       14.1079  DIHED      =       77.5174
+ VDWAALS =       -4.5614  EEL     =      -48.4584  HBOND      =        0.0000
+ 1-4 VDW =       11.0407  1-4 EEL =       13.2529  RESTRAINT  =        0.0003
+ EAMBER  =       66.5745
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3600       6.6575E+01     9.7801E-03     7.1982E-02     C21        22
+
+ BOND    =        3.6767  ANGLE   =       14.1069  DIHED      =       77.5160
+ VDWAALS =       -4.5608  EEL     =      -48.4575  HBOND      =        0.0000
+ 1-4 VDW =       11.0412  1-4 EEL =       13.2518  RESTRAINT  =        0.0003
+ EAMBER  =       66.5743
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3700       6.6575E+01     8.4557E-03     6.6644E-02     C21        22
+
+ BOND    =        3.6761  ANGLE   =       14.1078  DIHED      =       77.5141
+ VDWAALS =       -4.5603  EEL     =      -48.4564  HBOND      =        0.0000
+ 1-4 VDW =       11.0415  1-4 EEL =       13.2513  RESTRAINT  =        0.0003
+ EAMBER  =       66.5742
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3800       6.6574E+01     4.1960E-03     2.2153E-02     C21        22
+
+ BOND    =        3.6768  ANGLE   =       14.1073  DIHED      =       77.5128
+ VDWAALS =       -4.5598  EEL     =      -48.4555  HBOND      =        0.0000
+ 1-4 VDW =       11.0419  1-4 EEL =       13.2504  RESTRAINT  =        0.0003
+ EAMBER  =       66.5740
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   3900       6.6574E+01     3.6489E-03     2.2053E-02     C21        22
+
+ BOND    =        3.6767  ANGLE   =       14.1077  DIHED      =       77.5114
+ VDWAALS =       -4.5594  EEL     =      -48.4546  HBOND      =        0.0000
+ 1-4 VDW =       11.0423  1-4 EEL =       13.2499  RESTRAINT  =        0.0003
+ EAMBER  =       66.5739
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4000       6.6574E+01     2.6905E-03     1.4577E-02     O1          6
+
+ BOND    =        3.6770  ANGLE   =       14.1076  DIHED      =       77.5102
+ VDWAALS =       -4.5590  EEL     =      -48.4539  HBOND      =        0.0000
+ 1-4 VDW =       11.0426  1-4 EEL =       13.2493  RESTRAINT  =        0.0003
+ EAMBER  =       66.5738
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4100       6.6574E+01     2.4081E-03     1.3632E-02     O1          6
+
+ BOND    =        3.6771  ANGLE   =       14.1077  DIHED      =       77.5091
+ VDWAALS =       -4.5587  EEL     =      -48.4531  HBOND      =        0.0000
+ 1-4 VDW =       11.0429  1-4 EEL =       13.2488  RESTRAINT  =        0.0003
+ EAMBER  =       66.5737
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4200       6.6574E+01     3.0480E-03     1.6126E-02     C21        22
+
+ BOND    =        3.6774  ANGLE   =       14.1076  DIHED      =       77.5081
+ VDWAALS =       -4.5584  EEL     =      -48.4525  HBOND      =        0.0000
+ 1-4 VDW =       11.0432  1-4 EEL =       13.2482  RESTRAINT  =        0.0003
+ EAMBER  =       66.5736
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4300       6.6574E+01     8.1484E-03     6.3264E-02     C21        22
+
+ BOND    =        3.6778  ANGLE   =       14.1074  DIHED      =       77.5073
+ VDWAALS =       -4.5582  EEL     =      -48.4519  HBOND      =        0.0000
+ 1-4 VDW =       11.0435  1-4 EEL =       13.2477  RESTRAINT  =        0.0003
+ EAMBER  =       66.5736
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4400       6.6574E+01     7.0542E-03     5.7019E-02     C21        22
+
+ BOND    =        3.6771  ANGLE   =       14.1081  DIHED      =       77.5062
+ VDWAALS =       -4.5580  EEL     =      -48.4512  HBOND      =        0.0000
+ 1-4 VDW =       11.0437  1-4 EEL =       13.2475  RESTRAINT  =        0.0003
+ EAMBER  =       66.5735
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4500       6.6574E+01     5.9494E-03     4.5484E-02     C21        22
+
+ BOND    =        3.6779  ANGLE   =       14.1075  DIHED      =       77.5057
+ VDWAALS =       -4.5578  EEL     =      -48.4508  HBOND      =        0.0000
+ 1-4 VDW =       11.0440  1-4 EEL =       13.2470  RESTRAINT  =        0.0003
+ EAMBER  =       66.5735
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4600       6.6574E+01     5.1595E-03     4.1229E-02     C21        22
+
+ BOND    =        3.6774  ANGLE   =       14.1081  DIHED      =       77.5047
+ VDWAALS =       -4.5577  EEL     =      -48.4502  HBOND      =        0.0000
+ 1-4 VDW =       11.0442  1-4 EEL =       13.2468  RESTRAINT  =        0.0003
+ EAMBER  =       66.5734
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4700       6.6574E+01     4.6141E-03     3.4835E-02     C21        22
+
+ BOND    =        3.6780  ANGLE   =       14.1077  DIHED      =       77.5043
+ VDWAALS =       -4.5575  EEL     =      -48.4498  HBOND      =        0.0000
+ 1-4 VDW =       11.0444  1-4 EEL =       13.2464  RESTRAINT  =        0.0003
+ EAMBER  =       66.5734
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4800       6.6574E+01     3.7280E-03     2.9221E-02     C21        22
+
+ BOND    =        3.6777  ANGLE   =       14.1081  DIHED      =       77.5035
+ VDWAALS =       -4.5574  EEL     =      -48.4493  HBOND      =        0.0000
+ 1-4 VDW =       11.0446  1-4 EEL =       13.2462  RESTRAINT  =        0.0003
+ EAMBER  =       66.5733
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   4900       6.6574E+01     2.0596E-03     1.2411E-02     C21        22
+
+ BOND    =        3.6780  ANGLE   =       14.1079  DIHED      =       77.5031
+ VDWAALS =       -4.5573  EEL     =      -48.4490  HBOND      =        0.0000
+ 1-4 VDW =       11.0448  1-4 EEL =       13.2459  RESTRAINT  =        0.0003
+ EAMBER  =       66.5733
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   5000       6.6574E+01     1.6199E-03     9.6398E-03     C21        22
+
+ BOND    =        3.6779  ANGLE   =       14.1080  DIHED      =       77.5025
+ VDWAALS =       -4.5573  EEL     =      -48.4486  HBOND      =        0.0000
+ 1-4 VDW =       11.0450  1-4 EEL =       13.2457  RESTRAINT  =        0.0003
+ EAMBER  =       66.5733
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   5100       6.6574E+01     1.2097E-03     6.9502E-03     O1          6
+
+ BOND    =        3.6781  ANGLE   =       14.1080  DIHED      =       77.5021
+ VDWAALS =       -4.5572  EEL     =      -48.4483  HBOND      =        0.0000
+ 1-4 VDW =       11.0452  1-4 EEL =       13.2455  RESTRAINT  =        0.0003
+ EAMBER  =       66.5733
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   5200       6.6574E+01     1.0808E-03     6.5181E-03     O1          6
+
+ BOND    =        3.6781  ANGLE   =       14.1080  DIHED      =       77.5017
+ VDWAALS =       -4.5571  EEL     =      -48.4480  HBOND      =        0.0000
+ 1-4 VDW =       11.0453  1-4 EEL =       13.2453  RESTRAINT  =        0.0003
+ EAMBER  =       66.5733
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   5300       6.6574E+01     1.3104E-03     6.6744E-03     C21        22
+
+ BOND    =        3.6782  ANGLE   =       14.1080  DIHED      =       77.5013
+ VDWAALS =       -4.5571  EEL     =      -48.4477  HBOND      =        0.0000
+ 1-4 VDW =       11.0455  1-4 EEL =       13.2451  RESTRAINT  =        0.0003
+ EAMBER  =       66.5732
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+
+
+                    FINAL RESULTS
+
+
+
+   NSTEP       ENERGY          RMS            GMAX         NAME    NUMBER
+   5329       6.6574E+01     9.9346E-04     5.9897E-03     O1          6
+
+ BOND    =        3.6781  ANGLE   =       14.1080  DIHED      =       77.5012
+ VDWAALS =       -4.5571  EEL     =      -48.4476  HBOND      =        0.0000
+ 1-4 VDW =       11.0455  1-4 EEL =       13.2451  RESTRAINT  =        0.0003
+ EAMBER  =       66.5732
+ NMR restraints: Bond =    0.000   Angle =     0.000   Torsion =     0.000
+===============================================================================
+ ------------------------------------------------------------------------------
+
+
+ Final Restraint Analysis for coords: final.rst7                              
+
+
+ Restraints, deviations, and energy contributions:    pencut =    0.10
+
+ ------------------------------------------------------------------------------
+     First atom        Last atom    curr. value target deviation  penalty
+ ------------------------------------------------------------------------------
+                                       Total torsion  penalty:      0.000
+|                               RMS deviation from ideal bonds :      0.0164
+|                               RMS deviation from ideal angles:      2.583
+ ------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+   5.  TIMINGS
+--------------------------------------------------------------------------------
+
+|    Read coords time           0.00 ( 0.03% of Total)
+|                Build the list             0.00 (40.93% of List )
+|                Other                      0.00 (59.07% of List )
+|             List time                  0.00 ( 0.31% of Nonbo)
+|                   Short_ene time             0.10 (98.84% of Direc)
+|                   Other                      0.00 ( 1.16% of Direc)
+|                Direct Ewald time          0.10 (89.56% of Ewald)
+|                Force Adjust               0.00 ( 0.11% of Ewald)
+|                Virial junk                0.00 ( 0.15% of Ewald)
+|                Start synchronizatio       0.00 ( 0.15% of Ewald)
+|                Other                      0.01 (10.03% of Ewald)
+|             Ewald time                 0.11 (99.07% of Nonbo)
+|             IPS excludes               0.00 ( 0.09% of Nonbo)
+|             Other                      0.00 ( 0.52% of Nonbo)
+|          Nonbond force              0.11 (55.44% of Force)
+|          Bond/Angle/Dihedral        0.08 (43.01% of Force)
+|          Other                      0.00 ( 1.55% of Force)
+|       Force time                 0.20 (100.0% of Runmd)
+|    Runmd Time                 0.20 (26.70% of Total)
+|    Other                      0.54 (73.27% of Total)
+| Total time                 0.74 (100.0% of ALL  )
+
+| Number of list builds   :          1
+
+| Highest rstack allocated:        240
+| Highest istack allocated:         48
+|           Job began  at 16:05:15.980  on 08/27/2026
+|           Setup done at 16:05:15.988  on 08/27/2026
+|           Run   done at 16:05:16.720  on 08/27/2026
+|     wallclock() was called  122602 times
+
+|3D-RISM memory allocation summary
+|Type          Maximum        Current   
+|Integer       0.00000 GB     0.00000 GB
+|Real          0.00000 GB     0.00000 GB
+|Logical       0.00000 GB     0.00000 GB
+|Character     0.00000 GB     0.00000 GB
+|---------------------------------------
+|Total         0.00000 GB     0.00000 GB
