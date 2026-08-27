@@ -1,0 +1,66 @@
+name: Build sealed TSL-RSH PHI-PSI 2D GPU image
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  PACKAGE: analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip
+  PACKAGE_SHA256: e8e88b17702c0038e0c87e87f2b8f05a2bb4b05d7503873666ca7a5f79e1dc9a
+  IMAGE: ghcr.io/ysuleiman/totah-lab-tsl-rsh-phipsi-2d
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify immutable payload
+        run: echo "${PACKAGE_SHA256}  ${PACKAGE}" | sha256sum --check --strict
+      - name: Extract build context
+        run: |
+          mkdir build-context
+          unzip -q "${PACKAGE}" -d build-context
+      - uses: docker/setup-buildx-action@v3
+      - name: Build linux/amd64 image
+        run: docker buildx build --platform linux/amd64 --load --tag "${IMAGE}:${GITHUB_SHA}" build-context/TSL_RSH_PHIPSI_2D_GPU_PACKAGE
+      - name: Execute non-GPU verification inside image
+        run: docker run --rm --entrypoint python3 "${IMAGE}:${GITHUB_SHA}" self_verify.py --offline
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push immutable source tag and record digest
+        run: |
+          docker push "${IMAGE}:${GITHUB_SHA}"
+          docker buildx imagetools inspect "${IMAGE}:${GITHUB_SHA}" --format '{{json .Manifest}}' > manifest.json
+          DIGEST=$(docker buildx imagetools inspect "${IMAGE}:${GITHUB_SHA}" --format '{{.Manifest.Digest}}')
+          test -n "${DIGEST}"
+          printf '%s@%s\n' "${IMAGE}" "${DIGEST}" > IMAGE_DIGEST.txt
+          printf 'SOURCE_COMMIT=%s\nPACKAGE_SHA256=%s\n' "${GITHUB_SHA}" "${PACKAGE_SHA256}" > BUILD_RECEIPT.txt
+          cat IMAGE_DIGEST.txt >> BUILD_RECEIPT.txt
+          cat BUILD_RECEIPT.txt >> "${GITHUB_STEP_SUMMARY}"
+      - name: Make benchmark image pullable by RunPod without embedded credentials
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl --fail-with-body --request PATCH \
+            --url https://api.github.com/user/packages/container/totah-lab-tsl-rsh-phipsi-2d/visibility \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --data '{"visibility":"public"}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tsl-rsh-phipsi-2d-image-receipt-${{ github.sha }}
+          path: |
+            IMAGE_DIGEST.txt
+            BUILD_RECEIPT.txt
+            manifest.json
+          retention-days: 90

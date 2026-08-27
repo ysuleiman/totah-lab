@@ -1,0 +1,100 @@
+{
+  "basis": "def2-SVP",
+  "candidate_optimization": "geomeTRIC constrained relaxed scan; maximum 300 iterations",
+  "charge": 0,
+  "constraints": {
+    "PHI_zero_based": [
+      25,
+      9,
+      8,
+      7
+    ],
+    "PSI_zero_based": [
+      9,
+      8,
+      7,
+      1
+    ],
+    "all_other_coordinates": "unconstrained",
+    "two_dihedrals_fixed_simultaneously": true
+  },
+  "convergence_definition": "GPU SCF converged and geomeTRIC constrained optimization converged under frozen criteria",
+  "density_fitting_basis": "def2-SVP-JKFIT",
+  "dispersion": {
+    "a1": 0.4289,
+    "a2": 4.4407,
+    "alp": 14.0,
+    "atm": false,
+    "damping": "BJ",
+    "implementation": "simple-dftd3 1.5.0",
+    "s6": 1.0,
+    "s8": 0.7875,
+    "s9": 0.0
+  },
+  "electronic_state": "neutral closed-shell singlet; 202 electrons",
+  "energy_decrease_threshold_hartree": 1e-05,
+  "energy_extraction": "total_hartree = converged PBE electronic energy + explicit simple-dftd3 D3(BJ) energy",
+  "environment_model": "gas phase; no implicit or explicit solvent",
+  "grid_degrees": [
+    -180,
+    -165,
+    -150,
+    -135,
+    -120,
+    -105,
+    -90,
+    -75,
+    -60,
+    -45,
+    -30,
+    -15,
+    0,
+    15,
+    30,
+    45,
+    60,
+    75,
+    90,
+    105,
+    120,
+    135,
+    150,
+    165
+  ],
+  "grid_level": 5,
+  "grid_response_gradient": true,
+  "grid_spacing_degrees": 15,
+  "initial_guess": "MINAO",
+  "method": "PBE-D3(BJ)",
+  "multiplicity": 1,
+  "optimization_thresholds": {
+    "dmax": 0.005,
+    "drms": 0.002,
+    "energy": 1e-05,
+    "gmax": 0.004,
+    "grms": 0.001,
+    "max_iterations": 300
+  },
+  "propagation_energy_upper_limit_hartree": 0.05,
+  "provenance": {
+    "derivative_qualification_manifest": "analysis/mettl7-phase2/tsl-rsh-min01-derivative-qualification/QUALIFICATION_MANIFEST.json",
+    "derivative_qualification_manifest_sha256": "00fb5c59863502d166d164d446bd67762d9048ea35bf1974acf171700b29f7dc",
+    "sealed_CHI_archive_sha256": "6cc680aec6a161147d45564755276b22b9b46f46a7fb502fdb77f9d349f96fa3",
+    "sealed_PHI_archive_sha256": "22d7e15d275611c909fd96d7f3597f30acb153b2e0090df38793ce627835f65e",
+    "sealed_PSI_archive_sha256": "1e339fc04bf495521095f8f6e6ff93286b0da7f2252fc27b0a90c450ddd55818",
+    "torsion_manifest": "analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_PUBLICATION_REPRODUCIBILITY_MANIFEST.json",
+    "torsion_manifest_sha256": "d049039d0b7391cb85369a050b99098f3176167bdaccd6abdf03ab269345eb66"
+  },
+  "restart_checkpoint": "atomic per-step energy/gradient/geometry evidence; checksum-verified candidate and wavefront state; completed candidates never rerun",
+  "scf_max_cycles": 160,
+  "scf_tolerance": 1e-08,
+  "schema": "tsl-rsh-final-qm-protocol-v1",
+  "software": {
+    "CuPy": "13.4.1",
+    "GPU4PySCF": "1.8.0",
+    "PySCF": "2.14.0",
+    "cutensor": "2.2.0",
+    "geomeTRIC": "1.1.1",
+    "simple-dftd3": "1.5.0"
+  }
+}
