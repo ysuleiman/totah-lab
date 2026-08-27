@@ -258,6 +258,8 @@ def full_domain(final_topology: Path, surfaces: dict[str, list[dict]], authorita
             record.update({"angle_degrees": angle, "candidate_id": f"MM_ONLY_{axis}_{angle:+04d}",
                            "archive_member": source["archive_member"], "qm_energy_hartree": 0.0})
             result = gates.minimize_point(topology, record, root/axis/f"{angle:+04d}", topology_path=final_topology)
+            if not result["minimization_converged"] or not result["target_angle_pass"]:
+                raise RuntimeError(f"unconverged full-domain sweep at {axis} {angle:+d}")
             output.append({"axis": axis, "angle_degrees": angle, "mm_absolute_kcal_mol": result["mm_tot_kcal_mol_absolute"],
                            "target_angle_degrees": result["target_angle_after_minimization_degrees"], "converged": result["minimization_converged"],
                            "target_pass": result["target_angle_pass"], "authoritative_qm": False,
@@ -270,6 +272,8 @@ def full_domain(final_topology: Path, surfaces: dict[str, list[dict]], authorita
         source = nearest_record(surfaces[axis], 180)
         record = dict(source); record.update({"angle_degrees":180,"candidate_id":f"MM_ONLY_{axis}_+180","qm_energy_hartree":0.0})
         plus = gates.minimize_point(topology, record, root/axis/"+180", topology_path=final_topology)
+        if not plus["minimization_converged"] or not plus["target_angle_pass"]:
+            raise RuntimeError(f"unconverged periodic-closure sweep at {axis} +180")
         minus = next(r for r in axis_rows if r["angle_degrees"] == -180)
         minus_abs = minus.get("mm_absolute_kcal_mol", minus.get("mm_absolute_energy_kcal_mol"))
         closure[axis] = abs(plus["mm_tot_kcal_mol_absolute"] - minus_abs)

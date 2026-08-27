@@ -10,6 +10,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,6 +60,35 @@ def canonical_atoms(atoms) -> tuple[int, int, int, int]:
     return min(values, reverse)
 
 
+def one_four_defining_counts(topology: pmd.Structure) -> dict[tuple[int, int, int, int], int]:
+    """Count proper torsion entries that define each end-group 1-4 pair."""
+    counts: dict[tuple[int, int, int, int], int] = {}
+    for term in topology.dihedrals:
+        if term.improper:
+            continue
+        quartet = canonical_atoms((term.atom1.idx, term.atom2.idx, term.atom3.idx, term.atom4.idx))
+        counts.setdefault(quartet, 0)
+        if not term.ignore_end:
+            counts[quartet] += 1
+    return counts
+
+
+def assert_added_term_one_four_integrity(topology: pmd.Structure, added_receipts: list[dict],
+                                         expected_counts: dict[tuple[int, int, int, int], int]) -> None:
+    """Fail closed if a C2 continuation term duplicates an end-group interaction."""
+    observed = one_four_defining_counts(topology)
+    for receipt in added_receipts:
+        for atoms in receipt["physical_quartets_zero_based"]:
+            quartet = canonical_atoms(atoms)
+            expected = expected_counts.get(quartet, 0)
+            actual = observed.get(quartet, 0)
+            if expected != 1 or actual != expected:
+                raise RuntimeError(
+                    f"C2 1-4-defining-entry invariant failed for quartet {quartet}: "
+                    f"expected baseline count {expected}, observed {actual}"
+                )
+
+
 def new_term_specs(model: dict) -> list[dict]:
     result = []
     for spec in model["new_terms"]:
@@ -68,8 +98,23 @@ def new_term_specs(model: dict) -> list[dict]:
     return result
 
 
+def isolated_energy_components(topology: Path, coordinates: np.ndarray) -> dict[str, float]:
+    """Evaluate all Amber energy components in a fresh libsander process."""
+    code = (
+        "import json,numpy as np,sander,sys; "
+        "x=np.asarray(json.load(sys.stdin),dtype=float); o=sander.gas_input(); o.cut=999.; "
+        "sander.setup(sys.argv[1],x,None,o); e,_=sander.energy_forces(as_numpy=True); "
+        f"print(json.dumps({{k:float(getattr(e,k)) for k in {first.ENERGY_FIELDS!r}}})); "
+        "sander.cleanup()"
+    )
+    run = subprocess.run([sys.executable, "-c", code, str(topology)], input=json.dumps(coordinates.tolist()),
+                         text=True, capture_output=True, check=True)
+    return json.loads(run.stdout)
+
+
 def build_candidate(parameters: dict[str, float], added_terms: list[dict], output: Path) -> dict:
     topology = pmd.load_file(str(C1_TOPOLOGY))
+    baseline_one_four_counts = one_four_defining_counts(topology)
     before = gates.torsion_snapshot(topology)
     assignment_rows = json.loads((HERE / "02_TOPOLOGY_MAPPING/LOCAL_CLONE_ASSIGNMENTS.json").read_text())["assignments"]
     by_source: dict[int, list[str]] = {}
@@ -101,8 +146,10 @@ def build_candidate(parameters: dict[str, float], added_terms: list[dict], outpu
         for quartet in quartets:
             physical = next(term for term in topology.dihedrals
                             if not term.improper and canonical_atoms((term.atom1.idx, term.atom2.idx, term.atom3.idx, term.atom4.idx)) == quartet)
+            # Amber multi-term continuation: the added Fourier entry must not
+            # define the quartet's end-group electrostatic/LJ interaction.
             topology.dihedrals.append(pmd.Dihedral(physical.atom1, physical.atom2, physical.atom3, physical.atom4,
-                                                   improper=False, ignore_end=physical.ignore_end, type=term_type))
+                                                   improper=False, ignore_end=True, type=term_type))
         added_receipts.append({"parameter_id": parameter_id, "axis": axis, "periodicity": spec["periodicity"],
                                "phase_degrees": spec["phase_degrees"], "physical_instance_count": len(quartets),
                                "physical_quartets_zero_based": [list(x) for x in quartets]})
@@ -110,6 +157,7 @@ def build_candidate(parameters: dict[str, float], added_terms: list[dict], outpu
     output.parent.mkdir(parents=True, exist_ok=True)
     topology.save(str(output), overwrite=True)
     readback = pmd.load_file(str(output))
+    assert_added_term_one_four_integrity(readback, added_receipts, baseline_one_four_counts)
     frozen_before = first.frozen_non_torsional(pmd.load_file(str(first.BASELINE)))["components"]
     frozen_after = first.frozen_non_torsional(readback)["components"]
     if frozen_before != frozen_after:
@@ -130,6 +178,7 @@ def build_candidate(parameters: dict[str, float], added_terms: list[dict], outpu
             raise RuntimeError(f"C2 added-term readback mismatch for {spec['parameter_id']}")
     return {"sha256": first.sha256_path(output), "added_terms": added_receipts,
             "frozen_components_unchanged": True, "source_force_field_modified": False,
+            "one_four_defining_entries_unchanged": True,
             "c1_term_count_before": len(before), "proper_term_count_after": len(snapshot)}
 
 
@@ -244,6 +293,8 @@ def candidate_analysis(candidate: dict, surfaces: dict) -> dict:
     root=VALIDATION/candidate["candidate_id"]/"authoritative-final-runs"
     for axis in first.AXES:
         results=[gates.minimize_point(topology,record,root/axis/f"{int(record['angle_degrees']):+04d}",topology_path=candidate["topology_path"]) for record in surfaces[axis]]
+        if not all(x["minimization_converged"] and x["target_angle_pass"] for x in results):
+            raise RuntimeError(f"unconverged C2 authoritative validation sweep for {axis}")
         rel=c1.relative_rows(axis,results)
         for row in rel:
             absolute=next(x["mm_tot_kcal_mol_absolute"] for x in results if x["angle_degrees"]==row["angle_degrees"])

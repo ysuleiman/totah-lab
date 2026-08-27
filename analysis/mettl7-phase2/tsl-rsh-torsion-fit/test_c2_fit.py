@@ -5,6 +5,7 @@ import math
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import parmed as pmd
 
@@ -55,6 +56,86 @@ class C2PreexecutionTests(unittest.TestCase):
             self.assertTrue(all("|n=2|" in key and
                                 abs(float(key.split("phase=")[1].split("|")[0]) - 180.0) < 1e-6
                                 for key in changed_terms))
+
+    def test_every_added_term_is_a_non_14_defining_continuation_after_readback(self):
+        parameters = c2.load_c1_parameters()
+        baseline = pmd.load_file(str(c2.C1_TOPOLOGY))
+        baseline_counts = c2.one_four_defining_counts(baseline)
+        for model in self.panel["candidates"]:
+            specs = c2.new_term_specs(model)
+            candidate_parameters = dict(parameters)
+            candidate_parameters.update({spec["parameter_id"]: 0.0 for spec in specs})
+            with self.subTest(candidate=model["candidate_id"]), tempfile.TemporaryDirectory() as temporary:
+                path = Path(temporary) / "candidate.parm7"
+                receipt = c2.build_candidate(candidate_parameters, specs, path)
+                readback = pmd.load_file(str(path))
+                observed = c2.one_four_defining_counts(readback)
+                self.assertTrue(receipt["one_four_defining_entries_unchanged"])
+                for added in receipt["added_terms"]:
+                    for atoms in added["physical_quartets_zero_based"]:
+                        quartet = c2.canonical_atoms(atoms)
+                        self.assertEqual(1, baseline_counts[quartet])
+                        self.assertEqual(baseline_counts[quartet], observed[quartet])
+
+    def test_duplicate_14_defining_continuation_fails_closed(self):
+        model = self.panel["candidates"][0]
+        specs = c2.new_term_specs(model)
+        parameters = c2.load_c1_parameters()
+        parameters.update({spec["parameter_id"]: 0.0 for spec in specs})
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "candidate.parm7"
+            receipt = c2.build_candidate(parameters, specs, path)
+            topology = pmd.load_file(str(path))
+            target = c2.canonical_atoms(receipt["added_terms"][0]["physical_quartets_zero_based"][0])
+            continuation = next(term for term in topology.dihedrals
+                                if c2.canonical_atoms((term.atom1.idx, term.atom2.idx,
+                                                       term.atom3.idx, term.atom4.idx)) == target
+                                and term.ignore_end)
+            continuation.ignore_end = False
+            with self.assertRaisesRegex(RuntimeError, "1-4-defining-entry invariant"):
+                c2.assert_added_term_one_four_integrity(
+                    topology, receipt["added_terms"], c2.one_four_defining_counts(pmd.load_file(str(c2.C1_TOPOLOGY)))
+                )
+
+    def test_zero_extension_preserves_energy_and_14_decomposition(self):
+        model = self.panel["candidates"][-1]
+        specs = c2.new_term_specs(model)
+        parameters = c2.load_c1_parameters()
+        parameters.update({spec["parameter_id"]: 0.0 for spec in specs})
+        source = min(first.raw_surface_records()["PSI"], key=lambda row: row["qm_energy_hartree"])
+        _, coordinates = first.read_xyz_bytes(source["xyz"])
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "candidate.parm7"
+            c2.build_candidate(parameters, specs, path)
+            expected = c2.isolated_energy_components(c2.C1_TOPOLOGY, coordinates)
+            observed = c2.isolated_energy_components(path, coordinates)
+            for component in first.ENERGY_FIELDS:
+                self.assertAlmostEqual(expected[component], observed[component], places=10)
+
+    def test_zero_extension_preserves_all_unrelated_parameters(self):
+        model = self.panel["candidates"][1]
+        specs = c2.new_term_specs(model)
+        parameters = c2.load_c1_parameters()
+        parameters.update({spec["parameter_id"]: 0.0 for spec in specs})
+        baseline = pmd.load_file(str(c2.C1_TOPOLOGY))
+        frozen_before = first.frozen_non_torsional(baseline)["components"]
+        torsions_before = gates.torsion_snapshot(baseline)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "candidate.parm7"
+            c2.build_candidate(parameters, specs, path)
+            readback = pmd.load_file(str(path))
+            self.assertEqual(frozen_before, first.frozen_non_torsional(readback)["components"])
+            torsions_after = gates.torsion_snapshot(readback)
+            for identity, state in torsions_before.items():
+                self.assertIn(identity, torsions_after)
+                self.assertEqual(state, torsions_after[identity])
+
+    def test_unconverged_full_domain_sweep_fails_closed(self):
+        failed = {"minimization_converged": False, "target_angle_pass": True,
+                  "mm_tot_kcal_mol_absolute": 0.0, "target_angle_after_minimization_degrees": -180.0}
+        with mock.patch.object(c2.c1.gates, "minimize_point", return_value=failed):
+            with self.assertRaisesRegex(RuntimeError, "unconverged full-domain sweep"):
+                c2.c1.full_domain(c2.C1_TOPOLOGY, first.raw_surface_records(), [], Path("unused"))
 
     def test_locked_contract_identities(self):
         self.assertEqual("859fbc97a8f3480f9e168c22b93a421d597494856d151db1842bb3ead61bbbc4",
