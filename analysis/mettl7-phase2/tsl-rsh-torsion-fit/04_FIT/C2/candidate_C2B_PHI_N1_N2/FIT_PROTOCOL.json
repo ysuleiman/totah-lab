@@ -1,0 +1,48 @@
+{
+  "candidate": {
+    "admission_rule": "run only if C2A fails a PHI-specific locked whole-profile, barrier, closure, or stability gate",
+    "candidate_id": "C2B_PHI_N1_N2",
+    "new_terms": [
+      {
+        "axis": "PHI",
+        "bounds_kcal_mol": [
+          0.0,
+          2.0
+        ],
+        "initial_amplitude_kcal_mol": 0.0,
+        "periodicity": 1,
+        "phase_degrees": 0
+      },
+      {
+        "axis": "PHI",
+        "bounds_kcal_mol": [
+          0.0,
+          2.0
+        ],
+        "initial_amplitude_kcal_mol": 0.0,
+        "periodicity": 2,
+        "phase_degrees": 180
+      }
+    ],
+    "rationale": "minimal complete n=1/n=2 increment if the leading n=2 direction alone is insufficient"
+  },
+  "fit_parameter_order": [
+    "LOCAL_TYPE_1",
+    "LOCAL_TYPE_12",
+    "PHI_N1_PHASE0",
+    "PHI_N2_PHASE180"
+  ],
+  "frozen_sander_contract_sha256": "8bc0175ca3d52dd5410fca4098ae1a8c0e990c496dc59d6434ffdbc29e822280",
+  "objective": "mean of per-surface mean squared relaxed-profile residual + frozen regularization",
+  "optimizer": {
+    "algorithm": "L-BFGS-B",
+    "finite_difference_step": 0.002,
+    "ftol": 1e-08,
+    "gtol": 0.0001,
+    "maxfun": 90,
+    "maxiter": 20,
+    "maxls": 10
+  },
+  "primary_weighting": "equal_surface",
+  "schema": "tsl-rsh-c2-candidate-fit-protocol-v1"
+}
