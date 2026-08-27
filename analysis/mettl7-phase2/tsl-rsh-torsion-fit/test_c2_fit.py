@@ -137,6 +137,36 @@ class C2PreexecutionTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "unconverged full-domain sweep"):
                 c2.c1.full_domain(c2.C1_TOPOLOGY, first.raw_surface_records(), [], Path("unused"))
 
+    def test_candidate_rejects_unconverged_sweep_without_metrics(self):
+        candidate = {
+            "candidate_id": "TEST_FAIL_CLOSED", "topology_path": c2.C1_TOPOLOGY,
+            "rows": [],
+        }
+        surfaces = first.raw_surface_records()
+        for axis in first.AXES:
+            for record in surfaces[axis]:
+                candidate["rows"].append({
+                    "axis": axis, "angle_degrees": int(record["angle_degrees"]),
+                    "qm_relative_kcal_mol": 0.0, "mm_relative_kcal_mol": 0.0,
+                    "residual_kcal_mol": 0.0, "converged": True, "target_pass": True,
+                })
+        def good_result(_topology, record, *_args, **_kwargs):
+            return {**record, "minimization_converged": True, "target_angle_pass": True,
+                    "mm_tot_kcal_mol_absolute": 0.0,
+                    "target_angle_after_minimization_degrees": record["angle_degrees"],
+                    "qm_energy_hartree": 0.0}
+        with tempfile.TemporaryDirectory() as temporary, \
+                mock.patch.object(c2.gates, "minimize_point", side_effect=good_result), \
+                mock.patch.object(c2.c1, "full_domain", side_effect=RuntimeError("unconverged full-domain sweep")), \
+                mock.patch.object(c2, "VALIDATION", Path(temporary)):
+            result = c2.candidate_analysis(candidate, surfaces)
+        self.assertFalse(result["locked_gate_pass"])
+        self.assertFalse(result["unsampled"]["pass"])
+        self.assertFalse(result["unsampled"]["metrics_computed"])
+        self.assertEqual([], result["domain"])
+        self.assertEqual("FAIL", result["gates"]["periodic_closure"])
+        self.assertEqual("FAIL", result["gates"]["unsampled_region"])
+
     def test_locked_contract_identities(self):
         self.assertEqual("859fbc97a8f3480f9e168c22b93a421d597494856d151db1842bb3ead61bbbc4",
                          first.sha256_path(c2.HERE / "00_PROTOCOL/LOCKED_ACCEPTANCE_PROTOCOL.json"))

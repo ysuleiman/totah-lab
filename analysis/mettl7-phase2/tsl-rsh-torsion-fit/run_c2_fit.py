@@ -301,13 +301,24 @@ def candidate_analysis(candidate: dict, surfaces: dict) -> dict:
             absolute_rows.append({**row,"mm_absolute_energy_kcal_mol":absolute})
     candidate["rows"]=absolute_rows
     whole,low,critical=c1.validation_analysis(absolute_rows)
-    domain,unsampled=c1.full_domain(candidate["topology_path"],surfaces,absolute_rows,
-                                    VALIDATION/candidate["candidate_id"]/"full-domain-runs")
+    validation_failure = None
+    try:
+        domain,unsampled=c1.full_domain(candidate["topology_path"],surfaces,absolute_rows,
+                                        VALIDATION/candidate["candidate_id"]/"full-domain-runs")
+    except RuntimeError as exc:
+        # An unconverged sweep must contribute to no closure or unsampled-domain
+        # statistic. Reject this candidate, preserve the reason, and allow the
+        # preregistered panel to continue to the next candidate.
+        validation_failure = str(exc)
+        domain = []
+        unsampled = {"periodic_closure_kcal_mol": {}, "pathology_triggers": [],
+                     "pass": False, "validation_failure": validation_failure,
+                     "metrics_computed": False}
     whole_pass=all(x["rmse_kcal_mol"]<=1 and x["mae_kcal_mol"]<=.75 and x["max_abs_kcal_mol"]<=2 for x in whole.values())
     low_pass=all(x["weighted_rmse_kcal_mol"]<=1 and x["mae_kcal_mol"]<=.75 and critical[a]["global_minimum_angle_error_degrees"]<=15 for a,x in low.items())
     minimum_pass=all(x["global_minimum_angle_error_degrees"]<=15 for x in critical.values())
     barrier_pass=all(x["major_barrier_angle_error_degrees"]<=15 and x["major_barrier_height_error_kcal_mol"]<=1 for x in critical.values())
-    closure_pass=all(x<=.1 for x in unsampled["periodic_closure_kcal_mol"].values())
+    closure_pass=validation_failure is None and all(x<=.1 for x in unsampled["periodic_closure_kcal_mol"].values())
     gates_out={"low_energy":"PASS" if low_pass else "FAIL","whole_profile":"PASS" if whole_pass else "FAIL",
                "minimum_topology":"PASS" if minimum_pass else "FAIL","barrier":"PASS" if barrier_pass else "FAIL",
                "periodic_closure":"PASS" if closure_pass else "FAIL","unsampled_region":"PASS" if unsampled["pass"] else "FAIL"}
@@ -317,6 +328,8 @@ def candidate_analysis(candidate: dict, surfaces: dict) -> dict:
 
 
 def phi_specific_pass(candidate: dict) -> bool:
+    if candidate["unsampled"].get("validation_failure"):
+        return False
     w,l,k=candidate["whole"]["PHI"],candidate["low"]["PHI"],candidate["critical"]["PHI"]
     return w["rmse_kcal_mol"]<=1 and w["mae_kcal_mol"]<=.75 and w["max_abs_kcal_mol"]<=2 and l["weighted_rmse_kcal_mol"]<=1 and l["mae_kcal_mol"]<=.75 and k["global_minimum_angle_error_degrees"]<=15 and k["major_barrier_angle_error_degrees"]<=15 and k["major_barrier_height_error_kcal_mol"]<=1 and candidate["unsampled"]["periodic_closure_kcal_mol"]["PHI"]<=.1
 
@@ -351,7 +364,8 @@ def write_candidate(candidate: dict) -> None:
     validation.mkdir(parents=True,exist_ok=True)
     first.write_csv(validation/"POINTWISE_VALIDATION.csv",candidate["rows"],sorted(set().union(*(r.keys() for r in candidate["rows"]))))
     first.atomic_json(validation/"LOW_ENERGY_METRICS.json",candidate["low"]);first.atomic_json(validation/"WHOLE_PROFILE_METRICS.json",candidate["whole"]);first.atomic_json(validation/"CRITICAL_POINTS.json",candidate["critical"])
-    first.write_csv(validation/"UNSAMPLED_DOMAIN_VALIDATION.csv",candidate["domain"],sorted(set().union(*(r.keys() for r in candidate["domain"]))))
+    domain_columns = sorted(set().union(*(r.keys() for r in candidate["domain"]))) if candidate["domain"] else ["axis", "angle_degrees", "converged", "target_pass"]
+    first.write_csv(validation/"UNSAMPLED_DOMAIN_VALIDATION.csv",candidate["domain"],domain_columns)
     first.atomic_json(validation/"IDENTIFIABILITY.json",candidate["ident"]);first.atomic_json(validation/"SENSITIVITY_ANALYSIS.json",candidate["ident"])
     files=sorted(p for p in directory.rglob('*') if p.is_file() and p.name!='SHA256SUMS');first.atomic_text(directory/"SHA256SUMS",''.join(f"{first.sha256_path(p)}  {p.relative_to(directory)}\n" for p in files))
 

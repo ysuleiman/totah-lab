@@ -1,0 +1,57 @@
+{
+  "candidate": {
+    "candidate_id": "C2C_MINIMAL_COMBINED",
+    "new_terms": [
+      {
+        "axis": "PHI",
+        "bounds_kcal_mol": [
+          0.0,
+          2.0
+        ],
+        "initial_amplitude_kcal_mol": 0.0,
+        "periodicity": 1,
+        "phase_degrees": 0
+      },
+      {
+        "axis": "PHI",
+        "bounds_kcal_mol": [
+          0.0,
+          2.0
+        ],
+        "initial_amplitude_kcal_mol": 0.0,
+        "periodicity": 2,
+        "phase_degrees": 180
+      },
+      {
+        "axis": "PSI",
+        "bounds_kcal_mol": [
+          0.0,
+          6.0
+        ],
+        "initial_amplitude_kcal_mol": 0.0,
+        "periodicity": 1,
+        "phase_degrees": 0
+      }
+    ],
+    "phi_source_rule": "smallest preceding PHI candidate satisfying PHI-specific locked gates; otherwise lowest-parameter PHI candidate with the lower primary objective",
+    "rationale": "PSI n=1 explains 0.589869 of residual variance and directly targets its whole-profile/barrier failure"
+  },
+  "fit_parameter_order": [
+    "LOCAL_TYPE_2",
+    "LOCAL_TYPE_7",
+    "PSI_N1_PHASE0"
+  ],
+  "frozen_sander_contract_sha256": "8bc0175ca3d52dd5410fca4098ae1a8c0e990c496dc59d6434ffdbc29e822280",
+  "objective": "mean of per-surface mean squared relaxed-profile residual + frozen regularization",
+  "optimizer": {
+    "algorithm": "L-BFGS-B",
+    "finite_difference_step": 0.002,
+    "ftol": 1e-08,
+    "gtol": 0.0001,
+    "maxfun": 90,
+    "maxiter": 20,
+    "maxls": 10
+  },
+  "primary_weighting": "equal_surface",
+  "schema": "tsl-rsh-c2-candidate-fit-protocol-v1"
+}
