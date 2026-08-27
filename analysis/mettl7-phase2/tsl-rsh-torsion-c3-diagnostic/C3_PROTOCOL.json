@@ -1,0 +1,82 @@
+{
+  "schema": "tsl-rsh-c3-diagnostic-protocol-v1",
+  "scientific_role": "low-energy causal attribution diagnostic; not C1/C2 revision",
+  "source_commits": {
+    "c2_repair": "d3a32edff",
+    "corrected_c2_result": "2639692614bb65cdab81bef6c7a6a72d7b068476"
+  },
+  "dataset": {
+    "CHI": 24,
+    "PHI": 18,
+    "PSI": 14,
+    "total": 56,
+    "interpolation": false
+  },
+  "c1_policy": "all six fitted C1 coefficients frozen exactly",
+  "candidates": [
+    {
+      "candidate_id": "C3A_CHI_N2",
+      "adjustable_parameters": ["CHI_N2_RESIDUAL"],
+      "primary_domains": ["CHI_QM_LE_10"]
+    },
+    {
+      "candidate_id": "C3B_PHI_N3",
+      "adjustable_parameters": ["PHI_N3_RESIDUAL"],
+      "primary_domains": ["PHI_QM_LE_10"],
+      "coverage_status": "COVERAGE_LIMITED"
+    },
+    {
+      "candidate_id": "C3C_CHI_N2_PHI_N3",
+      "adjustable_parameters": ["CHI_N2_RESIDUAL", "PHI_N3_RESIDUAL"],
+      "primary_domains": ["CHI_QM_LE_10", "PHI_QM_LE_10"]
+    }
+  ],
+  "parameters": {
+    "CHI_N2_RESIDUAL": {
+      "periodicity": 2,
+      "phase_degrees": 264.7015068837035,
+      "initial_amplitude_kcal_mol": 0.8191069363322407,
+      "bounds_kcal_mol": [0.7666918105468012, 0.8741307416071354],
+      "bound_basis": "closed empirical envelope of leave-one-point residual-projection amplitudes",
+      "amber_continuation_ignore_end": true
+    },
+    "PHI_N3_RESIDUAL": {
+      "periodicity": 3,
+      "phase_degrees": 234.77376015930093,
+      "initial_amplitude_kcal_mol": 0.8565341766746641,
+      "bounds_kcal_mol": [0.8113007966591012, 0.9473238681753261],
+      "bound_basis": "closed empirical envelope of leave-one-point residual-projection amplitudes on the six observed low-energy cells",
+      "amber_continuation_ignore_end": true
+    }
+  },
+  "phase_policy": "fixed from a*cos(n*theta)+b*sin(n*theta) = R*cos(n*theta-phase), R=hypot(a,b), phase=atan2(b,a)",
+  "objective": {
+    "C3A_CHI_N2": "mean squared relaxed-profile residual over observed CHI points with QM relative energy <=10 kcal/mol",
+    "C3B_PHI_N3": "mean squared relaxed-profile residual over observed PHI points with QM relative energy <=10 kcal/mol",
+    "C3C_CHI_N2_PHI_N3": "equal mean of CHI<=10 and observed PHI<=10 mean squared relaxed-profile residuals",
+    "regularization": "none; amplitude is constrained to the preregistered LOO envelope"
+  },
+  "optimizer": {
+    "algorithm": "SciPy L-BFGS-B",
+    "maxiter": 20,
+    "maxfun": 90,
+    "ftol": 1e-8,
+    "gtol": 1e-4,
+    "finite_difference_step": 0.002,
+    "maxls": 10,
+    "deterministic_resume": true
+  },
+  "diagnostic_support_rule": {
+    "numerical_materiality_kcal_mol": 0.0001,
+    "tolerance_provenance": "accepted C2 relaxed-profile deterministic replay tolerance",
+    "C3A": "CHI<=10 RMSE improves by > tolerance and PHI/PSI<=10 do not worsen by > tolerance",
+    "C3B": "observed PHI<=10 RMSE improves by > tolerance, every frozen-fit LOO evaluation improves directionally, and CHI/PSI<=10 do not worsen by > tolerance",
+    "C3C": "both CHI<=10 and observed PHI<=10 improve by > tolerance and PSI<=10 does not worsen by > tolerance"
+  },
+  "publication_gates": "unchanged gates from tsl-rsh-torsion-fit/00_PROTOCOL/LOCKED_ACCEPTANCE_PROTOCOL.json",
+  "edge_exclusions": ["PHI_0", "PSI_90"],
+  "new_qm": false,
+  "md": false,
+  "psi_term_authorized": false,
+  "automatic_c4": false
+}

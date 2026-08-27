@@ -1,0 +1,29 @@
+{
+  "schema": "tsl-rsh-c3-amber-phase-derivation-v1",
+  "equations": {
+    "projection": "a*cos(n*theta) + b*sin(n*theta)",
+    "polar": "R*cos(n*theta-phase)",
+    "amplitude": "R = sqrt(a^2+b^2)",
+    "phase": "phase = atan2(b,a)",
+    "amber": "E = phi_k * (1 + cos(n*theta-phase)); the additive constant cancels from relative energies",
+    "divisor": "ParmEd phi_k is Amber's already-divided Vn/2 amplitude"
+  },
+  "parameters": {
+    "CHI_N2_RESIDUAL": {
+      "a_kcal_mol": -0.07563993838577755,
+      "b_kcal_mol": -0.8156069965789806,
+      "periodicity": 2,
+      "amplitude_phi_k_kcal_mol": 0.8191069363322407,
+      "phase_degrees": 264.7015068837035
+    },
+    "PHI_N3_RESIDUAL": {
+      "a_kcal_mol": -0.49405446762381705,
+      "b_kcal_mol": -0.6996863431800648,
+      "periodicity": 3,
+      "amplitude_phi_k_kcal_mol": 0.8565341766746641,
+      "phase_degrees": 234.77376015930093
+    }
+  },
+  "phase_optimization": false,
+  "oracle_required_before_fit": true
+}
