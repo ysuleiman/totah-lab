@@ -65,13 +65,22 @@ class Campaign:
  def __init__(self,root,protocol_sha,executor): self.root=Path(root);self.protocol_sha=protocol_sha;self.executor=executor
  @property
  def state_path(self):return self.root/'WAVEFRONT_STATE.json'
- def init(self,seeds):
+ def init(self,seeds,initial_records=()):
   if self.state_path.exists():return self.load()
-  if self.root.exists() and any(self.root.iterdir()):raise RuntimeError('partial state without checkpoint')
+  if self.root.exists() and any(p.name!='candidates' for p in self.root.iterdir()):raise RuntimeError('partial state without checkpoint')
   self.root.mkdir(parents=True,exist_ok=True); queue=[]
   for s in sorted(seeds):
    target=cell(*seeds[s]['target']);tid=task_id(s,target);queue.append({'task_id':tid,'parent_id':s,'parent_cell':None,'target_cell':list(target),'source_geometry':seeds[s]['geometry']})
-  state={'schema':'phipsi-wavefront-v1','protocol_sha256':self.protocol_sha,'round':0,'cells':{},'queue':queue,'completed':[],'failed':[]}
+  cells={}; active=[]; completed=[]
+  for record in initial_records:
+   geometry_gate(record); c=cell(record['target_phi_degrees'],record['target_psi_degrees'])
+   k=key(c); old=cells.get(k)
+   if old is None or (record['energy_hartree'],record['task_id'])<(old['energy_hartree'],old['task_id']): cells[k]=record
+   active.append(c); completed.append(record['task_id'])
+  queue=[t for t in queue if key(cell(*t['target_cell'])) not in cells]
+  queue.extend(propagate(cells,active))
+  dedup={t['task_id']:t for t in queue}
+  state={'schema':'phipsi-wavefront-v1','protocol_sha256':self.protocol_sha,'round':0,'cells':cells,'queue':[dedup[k] for k in sorted(dedup)],'completed':sorted(set(completed)),'failed':[]}
   self.save(state);return state
  def save(self,state):
   atomic_json(self.state_path,state);atomic_json(self.root/'STATE_RECEIPT.json',{'state_sha256':sha(self.state_path),'protocol_sha256':self.protocol_sha})
@@ -97,4 +106,25 @@ class Campaign:
     if stop_after is not None and count>=stop_after:raise KeyboardInterrupt('deliberate interruption')
    state['cells'],active=reduce_round(state['cells'],finished);queue=propagate(state['cells'],active)
    state['queue']=[t for t in queue if t['task_id'] not in state['completed'] and t['task_id'] not in state['failed']];state['round']+=1;self.save(state)
+  return state
+ def advance_one(self,seeds,initial_records=()):
+  """Complete at most one candidate, preserving a round barrier across processes."""
+  state=self.init(seeds,initial_records)
+  if not state['queue']: return state
+  task=next((t for t in state['queue'] if t['task_id'] not in state['completed'] and t['task_id'] not in state['failed']),None)
+  if task is not None:
+   out=self.root/'candidates'/task['task_id']; tmp=out.with_name(out.name+'.in_progress')
+   if out.exists(): raise RuntimeError(f'unrecorded completed candidate {out}')
+   if tmp.exists(): raise RuntimeError(f'incomplete candidate {tmp}')
+   try:r=self.executor(task,tmp)
+   except Exception as e:
+    fail=self.root/'failures'/task['task_id'];atomic_json(fail/'FAILURE.json',{'task':task,'error':type(e).__name__,'message':str(e)});checksum_dir(fail);state['failed'].append(task['task_id']);self.save(state);return state
+   r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'parent_cell':task['parent_cell'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1]})
+   geometry_gate(r);atomic_json(tmp/'RECORD.json',r);checksum_dir(tmp);os.replace(tmp,out);state['completed'].append(task['task_id']);self.save(state);return state
+  finished=[]
+  for task in state['queue']:
+   if task['task_id'] in state['completed']:
+    out=self.root/'candidates'/task['task_id'];verify_dir(out);finished.append(json.loads((out/'RECORD.json').read_text()))
+  state['cells'],active=reduce_round(state['cells'],finished);queue=propagate(state['cells'],active)
+  state['queue']=[t for t in queue if t['task_id'] not in state['completed'] and t['task_id'] not in state['failed']];state['round']+=1;self.save(state)
   return state

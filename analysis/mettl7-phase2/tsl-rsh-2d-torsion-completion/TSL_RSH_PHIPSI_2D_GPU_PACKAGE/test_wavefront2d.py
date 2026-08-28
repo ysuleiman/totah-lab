@@ -56,4 +56,15 @@ with tempfile.TemporaryDirectory() as td:
  state=w.Campaign(Path(td)/'fail','p',flaky).run(seeds)
  assert len(state['failed'])==1 and calls[state['failed'][0]]==1
 checks+=1
+
+with tempfile.TemporaryDirectory() as td:
+ seed_record=dict(base,task_id='reused',energy_hartree=-101,target_phi_degrees=0,target_psi_degrees=0,actual_phi_degrees=0,actual_psi_degrees=0,geometry='reused.xyz')
+ campaign=w.Campaign(Path(td)/'stepped','p',executor)
+ state=campaign.init(seeds,[seed_record])
+ assert state['cells']['+000,+000']['task_id']=='reused' and 'reused' in state['completed']
+ while state['queue']:
+  before=len(state['completed']);state=campaign.advance_one(seeds)
+  assert len(state['completed'])<=before+1
+ assert len(state['cells'])>1
+checks+=2
 print(f'WAVEFRONT_TESTS_PASS={checks}')

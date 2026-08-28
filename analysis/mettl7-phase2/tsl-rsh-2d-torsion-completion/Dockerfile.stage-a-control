@@ -1,0 +1,31 @@
+FROM ghcr.io/ysuleiman/totah-lab-tsl-rsh-phipsi-2d@sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8
+
+USER root
+RUN python3 - <<'PY'
+import hashlib, importlib, json, pathlib, subprocess, sys
+mods = ['pyscf', 'gpu4pyscf', 'cupy', 'dftd3', 'geometric', 'numpy']
+paths = {m: str(pathlib.Path(importlib.import_module(m).__file__).resolve()) for m in mods}
+receipt = {
+  'python_executable': str(pathlib.Path(sys.executable).resolve()),
+  'python_sha256': hashlib.sha256(pathlib.Path(sys.executable).read_bytes()).hexdigest(),
+  'module_paths': paths,
+  'module_sha256': {m: hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for m,p in paths.items()},
+  'pip_freeze': sorted(subprocess.check_output([sys.executable,'-m','pip','freeze','--all'],text=True).splitlines()),
+  'scientific_parent_digest': 'sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8'
+}
+pathlib.Path('/opt/STAGE_A_PARENT_SCIENTIFIC_MANIFEST.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
+PY
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-server rsync procps ca-certificates && rm -rf /var/lib/apt/lists/* && mkdir -p /run/sshd /root/.ssh && chmod 700 /root/.ssh
+COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip
+RUN echo '10012b2d6366781fd53f536fd3cf565f9fade1e3e293596966c3a08ac5b2b826  /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip' | sha256sum --check --strict \
+ && cd /opt/stage-a && python3 -m zipfile -e TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip . \
+ && python3 /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE/self_verify.py --offline
+COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage_a_scientific_equivalence.py /usr/local/bin/stage_a_scientific_equivalence.py
+COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage_a_control_entrypoint.sh /usr/local/bin/stage_a_control_entrypoint.sh
+RUN chmod 0755 /usr/local/bin/stage_a_control_entrypoint.sh /usr/local/bin/stage_a_scientific_equivalence.py \
+ && /usr/local/bin/stage_a_scientific_equivalence.py --offline-build
+LABEL org.totah-lab.scientific-parent-digest="sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8" \
+      org.totah-lab.stage-a-package-sha256="10012b2d6366781fd53f536fd3cf565f9fade1e3e293596966c3a08ac5b2b826"
+EXPOSE 22
+ENTRYPOINT ["/usr/local/bin/stage_a_control_entrypoint.sh"]
+CMD ["sleep", "infinity"]

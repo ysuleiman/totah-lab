@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Production PHI x PSI GPU runner; benchmark is a separate hard gate."""
 from __future__ import annotations
-import argparse, importlib.util, json, os, platform, time
+import argparse, importlib.util, json, os, platform, shutil, time
 from importlib.metadata import version
 from pathlib import Path
 import numpy as np
@@ -9,6 +9,7 @@ import wavefront2d as wf
 
 ROOT=Path(__file__).resolve().parent;INPUT=ROOT/'input';RESULTS=Path(os.environ.get('TSL_RESULTS_ROOT',ROOT/'results'))
 PHI=(25,9,8,7);PSI=(9,8,7,1)
+BENCHMARK_CELLS=((-60,-60),(-90,-60),(-60,-90),(0,0),(120,120),(-180,-180))
 def load_core():
  spec=importlib.util.spec_from_file_location('qualified_core',ROOT/'qualified_level5_derivative_core.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);m.INPUT=INPUT;m.OUTPUT=RESULTS/'_core';return m
 def read_xyz(path):
@@ -49,24 +50,71 @@ def runtime():
  name=cp.cuda.runtime.getDeviceProperties(0)['name'];name=name.decode() if isinstance(name,bytes) else str(name)
  if 'A100' not in name:raise RuntimeError(f'A100 required: {name}')
  return {'gpu_model':name,'gpu_count':1,'python':platform.python_version(),'PySCF':version('pyscf'),'GPU4PySCF':version('gpu4pyscf-cuda12x'),'CuPy':version('cupy-cuda12x'),'dftd3':version('dftd3'),'geomeTRIC':version('geometric')}
+def benchmark_tasks(seeds):
+ tasks=[]
+ for c in BENCHMARK_CELLS:
+  parent=min(seeds,key=lambda s:wf.angular_error(seeds[s]['target'][0],c[0])**2+wf.angular_error(seeds[s]['target'][1],c[1])**2)
+  tasks.append({'task_id':wf.task_id('BENCH_'+parent,c),'parent_id':parent,'parent_cell':None,'target_cell':list(c),'source_geometry':seeds[parent]['geometry']})
+ return tasks
+def completed_benchmark_record(task):
+ d=RESULTS/'benchmark'/task['task_id']
+ if not d.exists():return None
+ wf.verify_dir(d);r=json.loads((d/'RECORD.json').read_text());wf.geometry_gate(r)
+ if (r['target_phi_degrees'],r['target_psi_degrees'])!=tuple(task['target_cell']):raise RuntimeError('completed benchmark identity mismatch')
+ return r
+def run_benchmark_task(core,task):
+ existing=completed_benchmark_record(task)
+ if existing is not None:return existing
+ d=RESULTS/'benchmark'/task['task_id'];tmp=d.with_name(d.name+'.in_progress')
+ if tmp.exists():raise RuntimeError(f'incomplete benchmark attempt requires external recovery: {tmp}')
+ r=executor(core)(task,tmp);r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1],'geometry':str(d/'final.xyz')})
+ wf.geometry_gate(r);wf.atomic_json(tmp/'RECORD.json',r);wf.checksum_dir(tmp);os.replace(tmp,d);return r
+def import_benchmark_records(root,production_root):
+ records=[]
+ for source in sorted((Path(root)/'benchmark').iterdir()):
+  if not (source/'RECORD.json').is_file():continue
+  wf.verify_dir(source);r=json.loads((source/'RECORD.json').read_text());wf.geometry_gate(r)
+  target=(r['target_phi_degrees'],r['target_psi_degrees'])
+  if target not in BENCHMARK_CELLS:raise RuntimeError(f'unauthorized reuse cell {target}')
+  dest=production_root/'candidates'/r['task_id']
+  if not dest.exists():
+   dest.parent.mkdir(parents=True,exist_ok=True);shutil.copytree(source,dest)
+  wf.verify_dir(dest);r=json.loads((dest/'RECORD.json').read_text());r['geometry']=str(dest/'final.xyz')
+  records.append(r)
+ return records
 def main():
- ap=argparse.ArgumentParser();ap.add_argument('--benchmark',action='store_true');ap.add_argument('--production',action='store_true');ap.add_argument('--authorization-receipt');a=ap.parse_args()
+ ap=argparse.ArgumentParser();ap.add_argument('--benchmark',action='store_true');ap.add_argument('--benchmark-cell',nargs=2,type=int,metavar=('PHI','PSI'));ap.add_argument('--benchmark-finalize',action='store_true');ap.add_argument('--production',action='store_true');ap.add_argument('--production-step',action='store_true');ap.add_argument('--production-status',action='store_true');ap.add_argument('--reuse-benchmark-root');ap.add_argument('--authorization-receipt');a=ap.parse_args()
  rt=runtime();core=load_core();protocol=wf.sha(ROOT/'FINAL_QM_PROTOCOL.json');wf.atomic_json(RESULTS/'RUNTIME.json',rt)
  seeds={}
  for name in ('MIN01','MIN02','MIN04'):
   path=INPUT/f'{name}_verified.xyz';_,x=read_xyz(path);seeds[name]={'target':(min(wf.GRID,key=lambda z:wf.angular_error(dih(x,PHI),z)),min(wf.GRID,key=lambda z:wf.angular_error(dih(x,PSI),z))),'geometry':str(path)}
- if a.production:
+ if a.production or a.production_step or a.production_status:
   if not a.authorization_receipt:raise RuntimeError('production grid requires explicit post-benchmark authorization receipt')
   receipt=json.loads(Path(a.authorization_receipt).read_text())
   if receipt.get('production_grid_authorized') is not True or receipt.get('scientific_protocol_sha256')!=protocol:raise RuntimeError('production authorization receipt invalid')
-  state=wf.Campaign(RESULTS/'production',protocol,executor(core)).run(seeds)
-  wf.atomic_json(RESULTS/'PRODUCTION_RESULT.json',{'status':'COMPLETE','cell_count':len(state['cells']),'rounds':state['round']});wf.checksum_dir(RESULTS);return
+  campaign=wf.Campaign(RESULTS/'production',protocol,executor(core)); initial=[]
+  if not campaign.state_path.exists():
+   if not a.reuse_benchmark_root:raise RuntimeError('initial production state requires verified benchmark reuse root')
+   initial=import_benchmark_records(a.reuse_benchmark_root,RESULTS/'production')
+  if a.production_status:
+   state=campaign.load() if campaign.state_path.exists() else campaign.init(seeds,initial);print(json.dumps({'round':state['round'],'cells':len(state['cells']),'queue':len(state['queue']),'completed':len(state['completed']),'failed':len(state['failed'])},sort_keys=True));return
+  state=campaign.advance_one(seeds,initial) if a.production_step else campaign.run(seeds)
+  if not state['queue']:
+   wf.atomic_json(RESULTS/'PRODUCTION_RESULT.json',{'status':'COMPLETE','cell_count':len(state['cells']),'rounds':state['round']});wf.checksum_dir(RESULTS)
+  return
+ tasks=benchmark_tasks(seeds)
+ if a.benchmark_cell:
+  target=tuple(a.benchmark_cell)
+  if target not in BENCHMARK_CELLS:raise RuntimeError(f'unauthorized benchmark cell {target}')
+  task=next(t for t in tasks if tuple(t['target_cell'])==target);run_benchmark_task(core,task);return
  if a.benchmark:
-  cells=[(-60,-60),(-90,-60),(-60,-90),(0,0),(120,120),(-180,-180)];tasks=[]
-  for c in cells:
-   parent=min(seeds,key=lambda s:wf.angular_error(seeds[s]['target'][0],c[0])**2+wf.angular_error(seeds[s]['target'][1],c[1])**2);tasks.append({'task_id':wf.task_id('BENCH_'+parent,c),'parent_id':parent,'parent_cell':None,'target_cell':list(c),'source_geometry':seeds[parent]['geometry']})
+  out=[run_benchmark_task(core,t) for t in tasks]
+  wf.atomic_json(RESULTS/'BENCHMARK_RESULT.json',{'status':'COMPLETE','production_grid_started':False,'runtime':rt,'cells':out});wf.checksum_dir(RESULTS);return
+ if a.benchmark_finalize:
   out=[]
-  for t in tasks:
-   d=RESULTS/'benchmark'/t['task_id'];r=executor(core)(t,d.with_name(d.name+'.in_progress'));r.update({'task_id':t['task_id'],'parent_id':t['parent_id'],'target_phi_degrees':t['target_cell'][0],'target_psi_degrees':t['target_cell'][1]});wf.geometry_gate(r);wf.atomic_json(d.with_name(d.name+'.in_progress')/'RECORD.json',r);wf.checksum_dir(d.with_name(d.name+'.in_progress'));os.replace(d.with_name(d.name+'.in_progress'),d);out.append(r)
-  wf.atomic_json(RESULTS/'BENCHMARK_RESULT.json',{'status':'COMPLETE','production_grid_started':False,'runtime':rt,'cells':out});wf.checksum_dir(RESULTS)
+  for task in tasks:
+   record=completed_benchmark_record(task)
+   if record is None:raise RuntimeError(f'missing benchmark cell {tuple(task["target_cell"])}')
+   out.append(record)
+  wf.atomic_json(RESULTS/'BENCHMARK_RESULT.json',{'status':'COMPLETE','production_grid_started':False,'runtime':rt,'cells':out});wf.checksum_dir(RESULTS);return
 if __name__=='__main__':main()
