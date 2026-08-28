@@ -28,8 +28,8 @@ assert w.propagate(high,[(-30,0)])==[];checks+=1
 def executor(task,out):
  p,q=task['target_cell'];out.mkdir(parents=True)
  energy=-100+((p+60)%360-180)**2/1e7+((q+60)%360-180)**2/1e7
- (out/'geometry.xyz').write_text(f'{p},{q}\n')
- return {'energy_hartree':energy,'actual_phi_degrees':p,'actual_psi_degrees':q,'connectivity_pass':True,'chirality_pass':True,'geometry':f'geom/{p},{q}','attempt_provenance':{'parent_id':task['parent_id']}}
+ (out/'final.xyz').write_text(f'{p},{q}\n')
+ return {'energy_hartree':energy,'actual_phi_degrees':p,'actual_psi_degrees':q,'connectivity_pass':True,'chirality_pass':True,'geometry':str(out/'final.xyz'),'attempt_provenance':{'parent_id':task['parent_id']}}
 seeds={'A':{'target':(-60,-60),'geometry':'A'}}
 with tempfile.TemporaryDirectory() as td:
  full=w.Campaign(Path(td)/'full','p',executor).run(seeds)
@@ -40,7 +40,11 @@ with tempfile.TemporaryDirectory() as td:
  try:w.Campaign(Path(td)/'resume','p',counted).run(seeds,stop_after=7)
  except KeyboardInterrupt:pass
  resumed=w.Campaign(Path(td)/'resume','p',counted).run(seeds)
- for state in (full,resumed):state.pop('completed',None)
+ for state in (full,resumed):
+  for record in state['cells'].values(): assert Path(record['geometry']).is_file() and '.in_progress' not in record['geometry']
+ for state in (full,resumed):
+  state.pop('completed',None)
+  for record in state['cells'].values():record['geometry']=Path(record['geometry']).parent.name+'/final.xyz'
  assert full==resumed and len(resumed['cells'])>1
  assert max(resume_calls.values())==1
  candidate=next((Path(td)/'resume/candidates').iterdir())

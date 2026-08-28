@@ -16,6 +16,7 @@ def main():
  protocol=json.loads((ROOT/'FINAL_QM_PROTOCOL.json').read_text());assert protocol['grid_level']==5 and protocol['grid_response_gradient'] is True and protocol['constraints']['two_dihedrals_fixed_simultaneously'] is True
  subprocess.check_call([sys.executable,str(ROOT/'test_wavefront2d.py')])
  subprocess.check_call([sys.executable,str(ROOT/'test_external_cell_watchdog.py')])
+ subprocess.check_call([sys.executable,str(ROOT/'test_propagated_geometry_paths.py')])
  if not a.offline:
   import cupy as cp
   if cp.cuda.runtime.getDeviceCount()<1:raise RuntimeError('GPU absent')

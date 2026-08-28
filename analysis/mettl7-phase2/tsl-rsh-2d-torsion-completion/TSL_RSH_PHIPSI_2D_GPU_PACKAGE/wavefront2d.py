@@ -101,7 +101,7 @@ class Campaign:
     try:r=self.executor(task,tmp)
     except Exception as e:
      fail=self.root/'failures'/task['task_id'];atomic_json(fail/'FAILURE.json',{'task':task,'error':type(e).__name__,'message':str(e)});checksum_dir(fail);state['failed'].append(task['task_id']);self.save(state);continue
-    r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'parent_cell':task['parent_cell'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1]})
+    r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'parent_cell':task['parent_cell'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1],'geometry':str(out/'final.xyz')})
     geometry_gate(r);atomic_json(tmp/'RECORD.json',r);checksum_dir(tmp);os.replace(tmp,out);state['completed'].append(task['task_id']);self.save(state);finished.append(r);count+=1
     if stop_after is not None and count>=stop_after:raise KeyboardInterrupt('deliberate interruption')
    state['cells'],active=reduce_round(state['cells'],finished);queue=propagate(state['cells'],active)
@@ -119,7 +119,7 @@ class Campaign:
    try:r=self.executor(task,tmp)
    except Exception as e:
     fail=self.root/'failures'/task['task_id'];atomic_json(fail/'FAILURE.json',{'task':task,'error':type(e).__name__,'message':str(e)});checksum_dir(fail);state['failed'].append(task['task_id']);self.save(state);return state
-   r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'parent_cell':task['parent_cell'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1]})
+   r.update({'task_id':task['task_id'],'parent_id':task['parent_id'],'parent_cell':task['parent_cell'],'target_phi_degrees':task['target_cell'][0],'target_psi_degrees':task['target_cell'][1],'geometry':str(out/'final.xyz')})
    geometry_gate(r);atomic_json(tmp/'RECORD.json',r);checksum_dir(tmp);os.replace(tmp,out);state['completed'].append(task['task_id']);self.save(state);return state
   finished=[]
   for task in state['queue']:
