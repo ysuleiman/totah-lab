@@ -2,14 +2,19 @@ FROM ghcr.io/ysuleiman/totah-lab-tsl-rsh-phipsi-2d@sha256:3644dfc04abfc9d1f9fe86
 
 USER root
 RUN python3 - <<'PY'
-import hashlib, importlib, json, pathlib, subprocess, sys
-mods = ['pyscf', 'gpu4pyscf', 'cupy', 'dftd3', 'geometric', 'numpy']
-paths = {m: str(pathlib.Path(importlib.import_module(m).__file__).resolve()) for m in mods}
+import hashlib, importlib.metadata as md, json, pathlib, subprocess, sys
+dists = ['pyscf', 'gpu4pyscf-cuda12x', 'cupy-cuda12x', 'dftd3', 'geometric', 'numpy']
+def distribution_hash(name):
+ d=md.distribution(name); h=hashlib.sha256()
+ for rel in sorted(str(x) for x in (d.files or ()) if str(x).endswith(('.py','.so','.json'))):
+  p=pathlib.Path(d.locate_file(rel))
+  if p.is_file(): h.update(rel.encode()+b'\0'+p.read_bytes())
+ return h.hexdigest()
 receipt = {
   'python_executable': str(pathlib.Path(sys.executable).resolve()),
   'python_sha256': hashlib.sha256(pathlib.Path(sys.executable).read_bytes()).hexdigest(),
-  'module_paths': paths,
-  'module_sha256': {m: hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for m,p in paths.items()},
+  'distribution_versions': {d:md.version(d) for d in dists},
+  'distribution_sha256': {d:distribution_hash(d) for d in dists},
   'pip_freeze': sorted(subprocess.check_output([sys.executable,'-m','pip','freeze','--all'],text=True).splitlines()),
   'scientific_parent_digest': 'sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8'
 }
