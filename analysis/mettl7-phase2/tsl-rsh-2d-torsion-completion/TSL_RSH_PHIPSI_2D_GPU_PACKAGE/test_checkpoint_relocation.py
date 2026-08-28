@@ -26,6 +26,7 @@ with tempfile.TemporaryDirectory() as td:
     while state['round']==0: state=campaign_a.advance_one(seeds_a)
     state=campaign_a.advance_one(seeds_a)
     assert state['round']==1 and len(state['completed'])>=2
+    referenced_id=next(iter(state['cells'].values()))['task_id']
     hashes_a=candidate_hashes(root_a); queue_a=copy.deepcopy(state['queue'])
 
     # Interrupted candidates are never finalized and must fail closed until archived by recovery policy.
@@ -57,12 +58,12 @@ with tempfile.TemporaryDirectory() as td:
     assert candidate_hashes(legacy)==hashes_a
 
     missing=td/'MISSING/production';shutil.copytree(root_a,missing)
-    victim=next(missing.glob('candidates/*/final.xyz'));victim.unlink()
+    victim=missing/'candidates'/referenced_id/'final.xyz';victim.unlink()
     try:w.Campaign(missing,'protocol',executor).load(seeds_b);raise AssertionError('missing parent accepted')
     except RuntimeError:pass
 
     wrong=td/'WRONG/production';shutil.copytree(root_a,wrong)
-    victim=next(wrong.glob('candidates/*/final.xyz'));victim.write_text('wrong geometry')
+    victim=wrong/'candidates'/referenced_id/'final.xyz';victim.write_text('wrong geometry')
     try:w.Campaign(wrong,'protocol',executor).load(seeds_b);raise AssertionError('wrong parent hash accepted')
     except RuntimeError:pass
 

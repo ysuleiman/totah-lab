@@ -22,7 +22,7 @@ pathlib.Path('/opt/STAGE_A_PARENT_SCIENTIFIC_MANIFEST.json').write_text(json.dum
 PY
 RUN apt-get update && apt-get install -y --no-install-recommends openssh-server rsync procps ca-certificates && rm -rf /var/lib/apt/lists/* && mkdir -p /run/sshd /root/.ssh && chmod 700 /root/.ssh
 COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip
-RUN echo '41670dfdc0adc57239f8421b8af1e17ffc3cfb1438ff3b3c7eae4aca50adc497  /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip' | sha256sum --check --strict \
+RUN echo '5d702d436aad2b943a7031f541f01f192abee181399bca4dcb3eb1fa7ebba694  /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip' | sha256sum --check --strict \
  && cd /opt/stage-a && python3 -m zipfile -e TSL_RSH_PHIPSI_2D_GPU_PACKAGE.zip . \
  && python3 /opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE/self_verify.py --offline
 COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage_a_scientific_equivalence.py /usr/local/bin/stage_a_scientific_equivalence.py
@@ -30,7 +30,7 @@ COPY analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage_a_control_entryp
 RUN chmod 0755 /usr/local/bin/stage_a_control_entrypoint.sh /usr/local/bin/stage_a_scientific_equivalence.py \
  && /usr/local/bin/stage_a_scientific_equivalence.py --offline-build
 LABEL org.totah-lab.scientific-parent-digest="sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8" \
-      org.totah-lab.stage-a-package-sha256="41670dfdc0adc57239f8421b8af1e17ffc3cfb1438ff3b3c7eae4aca50adc497"
+      org.totah-lab.stage-a-package-sha256="5d702d436aad2b943a7031f541f01f192abee181399bca4dcb3eb1fa7ebba694"
 EXPOSE 22
 ENTRYPOINT ["/usr/local/bin/stage_a_control_entrypoint.sh"]
 CMD ["sleep", "infinity"]
