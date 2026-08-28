@@ -2,7 +2,7 @@
 import argparse, hashlib, importlib.metadata as md, json, pathlib, subprocess, sys
 
 PARENT = 'sha256:3644dfc04abfc9d1f9fe8653de165ffc196fbf6a5d8cb85b4ed10e1f50542ce8'
-PACKAGE_SHA = '10012b2d6366781fd53f536fd3cf565f9fade1e3e293596966c3a08ac5b2b826'
+PACKAGE_SHA = '96c2b966287f4c3b80322bb93f0a52129fca40b3e9cf773facda2111b6940196'
 PROTOCOL_SHA = '503294e0bbdc0207841c6116c164bf232cac381ce4d7b42ea53b03303816e369'
 ROOT = pathlib.Path('/opt/stage-a')
 PKG = ROOT/'TSL_RSH_PHIPSI_2D_GPU_PACKAGE'
