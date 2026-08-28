@@ -29,5 +29,5 @@ with tempfile.TemporaryDirectory() as td:
     assert len(calls)-calls_before==10
     for record in state['cells'].values():
         assert '.in_progress' not in record['geometry']
-        assert Path(record['geometry']).is_file()
+        assert (root/'campaign'/record['geometry']).is_file()
 print('PROPAGATED_GEOMETRY_PATH_REGRESSION_PASS=10/10')

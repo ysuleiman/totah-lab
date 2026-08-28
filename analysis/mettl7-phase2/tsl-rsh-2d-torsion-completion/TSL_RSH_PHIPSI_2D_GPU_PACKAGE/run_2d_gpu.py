@@ -79,7 +79,7 @@ def import_benchmark_records(root,production_root):
   dest=production_root/'candidates'/r['task_id']
   if not dest.exists():
    dest.parent.mkdir(parents=True,exist_ok=True);shutil.copytree(source,dest)
-  wf.verify_dir(dest);r=json.loads((dest/'RECORD.json').read_text());r['geometry']=str(dest/'final.xyz')
+  wf.verify_dir(dest);r=json.loads((dest/'RECORD.json').read_text());r['geometry']=wf.candidate_geometry_ref(r['task_id']);r['geometry_sha256']=wf.sha(dest/'final.xyz')
   records.append(r)
  return records
 def main():
@@ -97,7 +97,7 @@ def main():
    if not a.reuse_benchmark_root:raise RuntimeError('initial production state requires verified benchmark reuse root')
    initial=import_benchmark_records(a.reuse_benchmark_root,RESULTS/'production')
   if a.production_status:
-   state=campaign.load() if campaign.state_path.exists() else campaign.init(seeds,initial);print(json.dumps({'round':state['round'],'cells':len(state['cells']),'queue':len(state['queue']),'completed':len(state['completed']),'failed':len(state['failed'])},sort_keys=True));return
+   state=campaign.load(seeds) if campaign.state_path.exists() else campaign.init(seeds,initial);print(json.dumps({'round':state['round'],'cells':len(state['cells']),'queue':len(state['queue']),'completed':len(state['completed']),'failed':len(state['failed'])},sort_keys=True));return
   state=campaign.advance_one(seeds,initial) if a.production_step else campaign.run(seeds)
   if not state['queue']:
    wf.atomic_json(RESULTS/'PRODUCTION_RESULT.json',{'status':'COMPLETE','cell_count':len(state['cells']),'rounds':state['round']});wf.checksum_dir(RESULTS)

@@ -5,14 +5,16 @@ TOKEN_FILE=/Users/yazan/access_tokens/runpod/acces_token
 KEY=/Users/yazan/.ssh/codex_10_0_0_241
 KNOWN=/private/tmp/tsl_stagea_wrapper_known_hosts
 CREATE_JSON=/private/tmp/tsl-stage-a-wrapper-create.json
-LOCAL_ROOT=/Users/yazan/totah-lab/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage-a-live-evidence
+LOCAL_ROOT=${LOCAL_ROOT:-/Users/yazan/totah-lab/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/stage-a-live-evidence}
 PKG=/opt/stage-a/TSL_RSH_PHIPSI_2D_GPU_PACKAGE
-REMOTE_BASE=/workspace/tsl-stage-a
-RATE=1.59
-TIMEOUT=1200
-POD_ID=hn837ck13cwsjs
-HOST=185.216.23.121
-PORT=22177
+REMOTE_BASE=${REMOTE_BASE:-/workspace/tsl-stage-a}
+RATE=${RATE:-1.59}
+TIMEOUT=${TIMEOUT:-1200}
+MAX_COST=${MAX_COST:-35}
+CANARY_MODE=${CANARY_MODE:-false}
+POD_ID=${POD_ID:-hn837ck13cwsjs}
+HOST=${HOST:-185.216.23.121}
+PORT=${PORT:-22177}
 STAGE_START=$(date +%s)
 
 mkdir -p "$LOCAL_ROOT/results" "$LOCAL_ROOT/logs"
@@ -71,7 +73,7 @@ while :; do
   now=$(date +%s)
   elapsed=$((now-STAGE_START))
   cost=$(awk -v s="$elapsed" -v r="$RATE" 'BEGIN{printf "%.8f",s/3600*r}')
-  if awk -v c="$cost" 'BEGIN{exit !(c>=35)}'; then
+  if awk -v c="$cost" -v m="$MAX_COST" 'BEGIN{exit !(c>=m)}'; then
     sync_results || true
     api DELETE "https://rest.runpod.io/v1/pods/$POD_ID" >/dev/null || true
     printf 'BUDGET_STOP cost=%s\n' "$cost" | tee -a "$LOCAL_ROOT/SUPERVISOR.log"
@@ -94,6 +96,11 @@ while :; do
       timed_out=true
       printf '%s attempt=%d RUNTIME_TIMEOUT\n' "$(date -u +%FT%TZ)" "$attempt" | tee -a "$LOCAL_ROOT/SUPERVISOR.log"
       kill "$pid" 2>/dev/null || true
+      if [ "$CANARY_MODE" = true ]; then
+        sync_results || true
+        api DELETE "https://rest.runpod.io/v1/pods/$POD_ID" >/dev/null || true
+        exit 71
+      fi
       recreate_pod
       break
     fi

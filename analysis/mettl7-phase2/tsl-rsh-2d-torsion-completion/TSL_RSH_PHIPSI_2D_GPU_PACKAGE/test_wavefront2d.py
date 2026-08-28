@@ -30,8 +30,8 @@ def executor(task,out):
  energy=-100+((p+60)%360-180)**2/1e7+((q+60)%360-180)**2/1e7
  (out/'final.xyz').write_text(f'{p},{q}\n')
  return {'energy_hartree':energy,'actual_phi_degrees':p,'actual_psi_degrees':q,'connectivity_pass':True,'chirality_pass':True,'geometry':str(out/'final.xyz'),'attempt_provenance':{'parent_id':task['parent_id']}}
-seeds={'A':{'target':(-60,-60),'geometry':'A'}}
 with tempfile.TemporaryDirectory() as td:
+ seed=Path(td)/'A.xyz';seed.write_text('seed A\n');seeds={'A':{'target':(-60,-60),'geometry':str(seed)}}
  full=w.Campaign(Path(td)/'full','p',executor).run(seeds)
  resume_calls={}
  def counted(task,out):
@@ -40,11 +40,9 @@ with tempfile.TemporaryDirectory() as td:
  try:w.Campaign(Path(td)/'resume','p',counted).run(seeds,stop_after=7)
  except KeyboardInterrupt:pass
  resumed=w.Campaign(Path(td)/'resume','p',counted).run(seeds)
- for state in (full,resumed):
-  for record in state['cells'].values(): assert Path(record['geometry']).is_file() and '.in_progress' not in record['geometry']
- for state in (full,resumed):
-  state.pop('completed',None)
-  for record in state['cells'].values():record['geometry']=Path(record['geometry']).parent.name+'/final.xyz'
+ for root,state in ((Path(td)/'full',full),(Path(td)/'resume',resumed)):
+  for record in state['cells'].values(): assert (root/record['geometry']).is_file() and '.in_progress' not in record['geometry']
+ for state in (full,resumed): state.pop('completed',None)
  assert full==resumed and len(resumed['cells'])>1
  assert max(resume_calls.values())==1
  candidate=next((Path(td)/'resume/candidates').iterdir())
@@ -52,6 +50,7 @@ with tempfile.TemporaryDirectory() as td:
 checks+=3
 
 with tempfile.TemporaryDirectory() as td:
+ seed=Path(td)/'A.xyz';seed.write_text('seed A\n');seeds={'A':{'target':(-60,-60),'geometry':str(seed)}}
  calls={}
  def flaky(task,out):
   calls[task['task_id']]=calls.get(task['task_id'],0)+1
@@ -62,8 +61,11 @@ with tempfile.TemporaryDirectory() as td:
 checks+=1
 
 with tempfile.TemporaryDirectory() as td:
- seed_record=dict(base,task_id='reused',energy_hartree=-101,target_phi_degrees=0,target_psi_degrees=0,actual_phi_degrees=0,actual_psi_degrees=0,geometry='reused.xyz')
- campaign=w.Campaign(Path(td)/'stepped','p',executor)
+ seed=Path(td)/'A.xyz';seed.write_text('seed A\n');seeds={'A':{'target':(-60,-60),'geometry':str(seed)}}
+ stepped=Path(td)/'stepped';reused=stepped/'candidates/reused';reused.mkdir(parents=True);(reused/'final.xyz').write_text('reused\n')
+ seed_record=dict(base,task_id='reused',energy_hartree=-101,target_phi_degrees=0,target_psi_degrees=0,actual_phi_degrees=0,actual_psi_degrees=0,geometry='candidates/reused/final.xyz',geometry_sha256=w.sha(reused/'final.xyz'))
+ (reused/'RECORD.json').write_text(json.dumps(seed_record));w.checksum_dir(reused)
+ campaign=w.Campaign(stepped,'p',executor)
  state=campaign.init(seeds,[seed_record])
  assert state['cells']['+000,+000']['task_id']=='reused' and 'reused' in state['completed']
  while state['queue']:

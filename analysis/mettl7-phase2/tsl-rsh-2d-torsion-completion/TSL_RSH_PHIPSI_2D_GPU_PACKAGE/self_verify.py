@@ -17,6 +17,7 @@ def main():
  subprocess.check_call([sys.executable,str(ROOT/'test_wavefront2d.py')])
  subprocess.check_call([sys.executable,str(ROOT/'test_external_cell_watchdog.py')])
  subprocess.check_call([sys.executable,str(ROOT/'test_propagated_geometry_paths.py')])
+ subprocess.check_call([sys.executable,str(ROOT/'test_checkpoint_relocation.py')])
  if not a.offline:
   import cupy as cp
   if cp.cuda.runtime.getDeviceCount()<1:raise RuntimeError('GPU absent')
