@@ -66,7 +66,7 @@ class Stage12jInteractionRegressionTest {
         assertThat(families).hasSize(30);
         List<Map<String, String>> golden = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "analysis/mettl7-closure/stage12j_static_dcmb_chemistry/family-interaction-fingerprints.csv",
+                        "stage12j/family-interaction-fingerprints.csv",
                         CATEGORY, "golden_fingerprints"));
         assertThat(golden).hasSize(353);
 
@@ -87,7 +87,7 @@ class Stage12jInteractionRegressionTest {
                     + family.get("family");
             PdbqtModel pose = RegressionHarness.model(
                     RegressionHarness.readPdbqt(RegressionHarness.requireInput(
-                            "analysis/mettl7-closure/stage4/raw/"
+                            "stage12j/raw/"
                                     + family.get("system") + "_"
                                     + family.get("enantiomer") + "_s"
                                     + family.get("representative_seed")
@@ -470,7 +470,7 @@ class Stage12jInteractionRegressionTest {
     private Structure preparedReceptor(String target) {
         PdbqtFile file = RegressionHarness.readPdbqt(
                 RegressionHarness.requireInput(
-                        "analysis/mettl7-closure/stage4/prepared/" + target
+                        "stage12j/" + target
                                 + "_WT_SAM_BOUND.pdbqt",
                         CATEGORY, "receptor_" + target));
         Structure structure = PdbqtGaiaMapper.toStructure(file);
@@ -488,7 +488,7 @@ class Stage12jInteractionRegressionTest {
 
     private List<Map<String, String>> families() {
         return RegressionHarness.readCsv(RegressionHarness.requireInput(
-                "analysis/mettl7-closure/stage4/family_results.csv",
+                "stage12j/family_results.csv",
                 CATEGORY, "family_results")).stream()
                 .filter(row -> "7A_WT".equals(row.get("system"))
                         || "7B_WT".equals(row.get("system")))

@@ -46,7 +46,7 @@ class DcmbContactRegressionTest {
     @Test
     void f43AndF199MinimumDistancesReproduce() {
         Path receptorPath = RegressionHarness.requireInput(
-                "analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb",
+                "shared/WT_METTL7A_SAM_BOUND.pdb",
                 CATEGORY, "receptor");
         List<RegressionHarness.PdbAtom> protein = RegressionHarness.heavy(
                 RegressionHarness.pdbAtoms(receptorPath)).stream()
@@ -61,7 +61,7 @@ class DcmbContactRegressionTest {
         assertThat(f199).isNotEmpty();
 
         Path familiesPath = RegressionHarness.requireInput(
-                "analysis/dcmb/controlled_campaign/family_results.csv",
+                "shared/dcmb-controlled-campaign/family_results.csv",
                 CATEGORY, "family_results");
         List<Map<String, String>> families =
                 RegressionHarness.readCsv(familiesPath).stream()
@@ -77,7 +77,7 @@ class DcmbContactRegressionTest {
             assertThat(expected).as("expected values for %s", familyId)
                     .isNotNull();
             Path posePath = RegressionHarness.requireInput(
-                    "analysis/dcmb/controlled_campaign/raw/7A_WT_SAM_BOUND_"
+                    "shared/dcmb-controlled-campaign/raw/7A_WT_SAM_BOUND_"
                             + family.get("enantiomer") + "_s"
                             + family.get("representative_seed") + ".pdbqt",
                     CATEGORY, familyId + "_pose");

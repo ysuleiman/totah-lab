@@ -52,23 +52,23 @@ class NetarsudilContactRegressionTest {
     @Test
     void inPoseNearAttackTableReproduces() {
         recordNacRow("7B_ACCEPTED_7B_FAMILY5", "N5", 16.8565, 98.454,
-                poseAtom("research/mettl7-netarsudil-sam-mechanism/vina-matched/raw/7B_neutral_seed483271.pdbqt",
+                poseAtom("netarsudil/7B_neutral_seed483271.pdbqt",
                         5, "N5"),
-                sam("analysis/dcmb/sam_state/validated/WT_METTL7B_SAM_BOUND.pdb"));
+                sam("netarsudil/WT_METTL7B_SAM_BOUND.pdb"));
         recordNacRow("7B_ACCEPTED_7B_FAMILY5", "N6", 17.0993, 119.451,
-                poseAtom("research/mettl7-netarsudil-sam-mechanism/vina-matched/raw/7B_neutral_seed483271.pdbqt",
+                poseAtom("netarsudil/7B_neutral_seed483271.pdbqt",
                         5, "N6"),
-                sam("analysis/dcmb/sam_state/validated/WT_METTL7B_SAM_BOUND.pdb"));
+                sam("netarsudil/WT_METTL7B_SAM_BOUND.pdb"));
         recordNacRow("7A_MATCHED_7A_LOWEST_STRAIN_CONTROL", "N5",
                 9.282, 56.181,
-                poseAtom("research/mettl7-netarsudil-sam-mechanism/local-architecture/prepared/corrected_7A_lowest_strain_mode15.pdbqt",
+                poseAtom("netarsudil/corrected_7A_lowest_strain_mode15.pdbqt",
                         1, "N5"),
-                sam("analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb"));
+                sam("shared/WT_METTL7A_SAM_BOUND.pdb"));
         recordNacRow("7A_MATCHED_7A_LOWEST_STRAIN_CONTROL", "N6",
                 15.1994, 97.58,
-                poseAtom("research/mettl7-netarsudil-sam-mechanism/local-architecture/prepared/corrected_7A_lowest_strain_mode15.pdbqt",
+                poseAtom("netarsudil/corrected_7A_lowest_strain_mode15.pdbqt",
                         1, "N6"),
-                sam("analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb"));
+                sam("shared/WT_METTL7A_SAM_BOUND.pdb"));
     }
 
     private void recordNacRow(
@@ -109,14 +109,14 @@ class NetarsudilContactRegressionTest {
     @Test
     void c202C203FamilyGeometryReproduces() {
         Path receptorPath = RegressionHarness.requireInput(
-                "research/mettl7-netarsudil-sam-mechanism/vina-matched/prepared/METTL7B_SAM_receptor.pdbqt",
+                "netarsudil/METTL7B_SAM_receptor.pdbqt",
                 CATEGORY, "receptor_7B");
         List<PdbqtAtom> receptor = RegressionHarness.readPdbqt(receptorPath)
                 .models().stream().flatMap(model -> model.atoms().stream())
                 .toList();
         List<Map<String, String>> golden = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/vina-matched/analysis/c202_c203_family_geometry.csv",
+                        "netarsudil/c202_c203_family_geometry.csv",
                         CATEGORY, "golden"));
         assertThat(golden).hasSize(5);
 
@@ -127,7 +127,7 @@ class NetarsudilContactRegressionTest {
                     .heavyNetarsudilConvention(RegressionHarness.model(
                             RegressionHarness.readPdbqt(
                                     RegressionHarness.requireInput(
-                                            "research/mettl7-netarsudil-sam-mechanism/vina-matched/raw/7B_neutral_seed"
+                                            "netarsudil/7B_neutral_seed"
                                                     + row.get("seed") + ".pdbqt",
                                             CATEGORY, metric + "_pose")),
                             Integer.parseInt(row.get("mode"))).atoms());
@@ -161,20 +161,20 @@ class NetarsudilContactRegressionTest {
     void representativeWallContactsReproduce() {
         List<PdbqtAtom> receptor = RegressionHarness.readPdbqt(
                 RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/vina-matched/prepared/METTL7B_SAM_receptor.pdbqt",
+                        "netarsudil/METTL7B_SAM_receptor.pdbqt",
                         CATEGORY, "receptor_7B"))
                 .models().stream().flatMap(model -> model.atoms().stream())
                 .toList();
         List<Point3D> pose = RegressionHarness.heavyNetarsudilConvention(
                 RegressionHarness.model(RegressionHarness.readPdbqt(
                         RegressionHarness.requireInput(
-                                "research/mettl7-netarsudil-sam-mechanism/vina-matched/raw/7B_neutral_seed483271.pdbqt",
+                                "netarsudil/7B_neutral_seed483271.pdbqt",
                                 CATEGORY, "pose_483271_5")), 5).atoms())
                 .stream().map(PdbqtAtom::position).toList();
 
         List<Map<String, String>> golden = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/vina-matched/analysis/representative_local_wall_classification.csv",
+                        "netarsudil/representative_local_wall_classification.csv",
                         CATEGORY, "golden_wall"));
         assertThat(golden).hasSize(54);
         for (Map<String, String> row : golden) {
@@ -208,19 +208,19 @@ class NetarsudilContactRegressionTest {
     void corrected7aContactsReproduce() {
         List<PdbqtAtom> receptor = RegressionHarness.readPdbqt(
                 RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/vina-7a-native-box-correction/prepared/METTL7A_SAM_receptor.pdbqt",
+                        "netarsudil/METTL7A_SAM_receptor.pdbqt",
                         CATEGORY, "receptor_7A_corrected"))
                 .models().stream().flatMap(model -> model.atoms().stream())
                 .toList();
         List<Point3D> pose = RegressionHarness.heavyNetarsudilConvention(
                 RegressionHarness.readPdbqt(RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/local-architecture/prepared/corrected_7A_lowest_strain_mode15.pdbqt",
+                        "netarsudil/corrected_7A_lowest_strain_mode15.pdbqt",
                         CATEGORY, "pose_7A_corrected")).firstModel().atoms())
                 .stream().map(PdbqtAtom::position).toList();
 
         List<Map<String, String>> golden = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "research/mettl7-netarsudil-sam-mechanism/local-architecture/analysis/corrected_7a_vs_accepted_7b_residues.csv",
+                        "netarsudil/corrected_7a_vs_accepted_7b_residues.csv",
                         CATEGORY, "golden_corrected_7a")).stream()
                 .filter(row -> "7A_CORRECTED_LOWEST_STRAIN".equals(
                         row.get("reference")))

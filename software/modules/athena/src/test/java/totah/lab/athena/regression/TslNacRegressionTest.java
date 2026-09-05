@@ -56,7 +56,7 @@ class TslNacRegressionTest {
     @Test
     void allThirtySixAcceptedStatesReproduce() {
         Path statesCsv = RegressionHarness.requireInput(
-                "analysis/mettl7-closure/stage3/all_states.csv",
+                "tsl-nac/all_states.csv",
                 CATEGORY, "all_states");
         List<Map<String, String>> passRows =
                 RegressionHarness.readCsv(statesCsv).stream()
@@ -69,8 +69,7 @@ class TslNacRegressionTest {
             String system = row.get("system");
             String state = row.get("state");
             Path statePdb = RegressionHarness.requireInput(
-                    "analysis/mettl7-closure/stage3/" + system + "/" + system
-                            + "_SAM_TSL_" + state + ".pdb",
+                    "tsl-nac/states/" + system + "_SAM_TSL_" + state + ".pdb",
                     CATEGORY, system + "_state" + state);
             List<RegressionHarness.PdbAtom> atoms =
                     RegressionHarness.pdbAtoms(statePdb);
@@ -116,7 +115,7 @@ class TslNacRegressionTest {
     @Test
     void samDonorBondConstantReproduces() {
         Path path = RegressionHarness.requireInput(
-                "analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb",
+                "shared/WT_METTL7A_SAM_BOUND.pdb",
                 CATEGORY, "sam_validated_7A");
         List<RegressionHarness.PdbAtom> atoms =
                 RegressionHarness.pdbAtoms(path);

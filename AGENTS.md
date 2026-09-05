@@ -19,7 +19,9 @@
 - athena regression tests (totah.lab.athena.regression) parse historical
   PDBQT/PDB inputs via hermes readers; hermes is a TEST-SCOPED athena
   dependency (hermes depends on gaia, never on athena — keep it acyclic).
-  They append compared numbers to
+  Regression inputs are committed fixtures under athena
+  src/test/resources/mettl7-v2-regression/ (see MANIFEST.csv there for
+  provenance and checksums). They append compared numbers to
   ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv at the repo root.
 
 ## Domain

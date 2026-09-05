@@ -61,7 +61,7 @@ class BricsAnchorRegressionTest {
     @Test
     void retainedPlacementSetIsEmpty() {
         Path retained = RegressionHarness.requireInput(
-                "analysis/mettl7-closure/stage12d_region1_fragments/retained-region1-placements.csv",
+                "brics/retained-region1-placements.csv",
                 CATEGORY, "retained_placements");
         List<Map<String, String>> rows = RegressionHarness.readCsv(retained);
         RegressionHarness.record(CATEGORY, "retained_region1_placements",
@@ -80,11 +80,11 @@ class BricsAnchorRegressionTest {
         parseTransform(rotation, translation);
 
         List<RegressionHarness.PdbAtom> protein7a = atoms(
-                "analysis/mettl7-closure/stage2/prepared/7A_WT_SAM_BOUND.pdb",
+                "brics/7A_WT_SAM_BOUND.pdb",
                 rotation, translation, false, "7A").stream()
                 .filter(atom -> !"SAM".equals(atom.residue())).toList();
         List<RegressionHarness.PdbAtom> atoms7b = atoms(
-                "analysis/mettl7-closure/stage2/prepared/7B_WT_SAM_BOUND.pdb",
+                "brics/7B_WT_SAM_BOUND.pdb",
                 rotation, translation, true, "7B");
         List<RegressionHarness.PdbAtom> protein7b = atoms7b.stream()
                 .filter(atom -> !"SAM".equals(atom.residue())).toList();
@@ -93,7 +93,7 @@ class BricsAnchorRegressionTest {
 
         List<Map<String, String>> anchors = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "analysis/mettl7-closure/stage12d_region1_fragments/shared-site-anchor-fragments.csv",
+                        "brics/shared-site-anchor-fragments.csv",
                         CATEGORY, "anchors"));
         assertThat(anchors).hasSize(6);
 
@@ -188,7 +188,7 @@ class BricsAnchorRegressionTest {
 
     private void parseTransform(double[][] rotation, double[] translation) {
         Path path = RegressionHarness.requireInput(
-                "analysis/mettl7-closure/stage0/superpocket_transfer.json",
+                "brics/superpocket_transfer.json",
                 CATEGORY, "transfer");
         String json;
         try {

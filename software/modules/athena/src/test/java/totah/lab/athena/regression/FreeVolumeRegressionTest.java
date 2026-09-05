@@ -74,7 +74,7 @@ class FreeVolumeRegressionTest {
     void localCavityVolumesFixedAndRelaxed() {
         List<Point3D> protein = originalProtein();
         Path familiesPath = RegressionHarness.requireInput(
-                "analysis/dcmb/controlled_campaign/family_results.csv",
+                "shared/dcmb-controlled-campaign/family_results.csv",
                 CATEGORY_3A, "family_results");
         List<Map<String, String>> families =
                 RegressionHarness.readCsv(familiesPath).stream()
@@ -82,7 +82,7 @@ class FreeVolumeRegressionTest {
                 .toList();
         List<Map<String, String>> compatibility = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "analysis/dcmb/dcmb_tsl_interference/state_compatibility.csv",
+                        "free-volume/state_compatibility.csv",
                         CATEGORY_3A, "state_compatibility"));
 
         for (Map<String, String> family : families) {
@@ -91,7 +91,7 @@ class FreeVolumeRegressionTest {
                     RegressionHarness.model(
                             RegressionHarness.readPdbqt(
                                     RegressionHarness.requireInput(
-                                            "analysis/dcmb/controlled_campaign/raw/7A_WT_SAM_BOUND_"
+                                            "shared/dcmb-controlled-campaign/raw/7A_WT_SAM_BOUND_"
                                                     + family.get("enantiomer")
                                                     + "_s" + family.get(
                                                             "representative_seed")
@@ -183,10 +183,10 @@ class FreeVolumeRegressionTest {
     @Test
     void reciprocalMutationAccessibleVolumes() {
         Path path7a = RegressionHarness.requireInput(
-                "resources/shared-resources/src/main/resources/Q9H8H3/Q9H8H3_TMT1A_HUMAN.pdb",
+                "free-volume/Q9H8H3_TMT1A_HUMAN.pdb",
                 CATEGORY_3B, "receptor_7A");
         Path path7b = RegressionHarness.requireInput(
-                "experiments/METTL7B-v6_diffdock/target_protein.pdb",
+                "free-volume/METTL7B_diffdock_target_protein.pdb",
                 CATEGORY_3B, "receptor_7B");
 
         List<RegressionHarness.PdbAtom> atoms7a =
@@ -209,13 +209,13 @@ class FreeVolumeRegressionTest {
         kabsch(moving, fixed, rotation, translation);
 
         Path rank1Path = RegressionHarness.requireInput(
-                "analysis/dcmb/artifacts/diffdock/DCMB_diffdock_7A_rank1.pdbqt",
+                "free-volume/DCMB_diffdock_7A_rank1.pdbqt",
                 CATEGORY_3B, "pose_7A_rank1");
         PdbqtFile rank1 = RegressionHarness.readPdbqt(rank1Path);
         List<Point3D> pose7a = RegressionHarness.heavyPosePoints(
                 rank1.firstModel());
         Path sdfPath = RegressionHarness.requireInput(
-                "experiments/METTL7B-v6_diffdock/rank2_confidence-0.3576555848121643.sdf",
+                "free-volume/METTL7B_diffdock_rank2.sdf",
                 CATEGORY_3B, "pose_7B_rank2");
         List<Point3D> pose7b = sdfHeavyAtoms(sdfPath);
         assertThat(pose7a).as("DCMB heavy atoms in rank1 PDBQT")
@@ -229,16 +229,16 @@ class FreeVolumeRegressionTest {
         }
         List<AccessibleCase> cases = List.of(
                 new AccessibleCase("WT_METTL7A",
-                        "resources/shared-resources/src/main/resources/Q9H8H3/Q9H8H3_TMT1A_HUMAN.pdb",
+                        "free-volume/Q9H8H3_TMT1A_HUMAN.pdb",
                         false),
                 new AccessibleCase("METTL7A_F43L",
-                        "analysis/dcmb/reciprocal_mutation/METTL7A_F43L_fixed_backbone.pdb",
+                        "free-volume/METTL7A_F43L_fixed_backbone.pdb",
                         false),
                 new AccessibleCase("WT_METTL7B",
-                        "experiments/METTL7B-v6_diffdock/target_protein.pdb",
+                        "free-volume/METTL7B_diffdock_target_protein.pdb",
                         true),
                 new AccessibleCase("METTL7B_L43F",
-                        "analysis/dcmb/reciprocal_mutation/METTL7B_L43F_fixed_backbone.pdb",
+                        "free-volume/METTL7B_L43F_fixed_backbone.pdb",
                         true));
         for (AccessibleCase accessibleCase : cases) {
             List<Point3D> proteinPoints = RegressionHarness.points(
@@ -511,7 +511,7 @@ class FreeVolumeRegressionTest {
 
     private List<Point3D> originalProtein() {
         Path receptorPath = RegressionHarness.requireInput(
-                "analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb",
+                "shared/WT_METTL7A_SAM_BOUND.pdb",
                 CATEGORY_3A, "receptor");
         return RegressionHarness.points(RegressionHarness.heavy(
                 RegressionHarness.pdbAtoms(receptorPath)).stream()
@@ -522,7 +522,7 @@ class FreeVolumeRegressionTest {
 
     private List<Point3D> relaxedProtein(int state) {
         Path path = RegressionHarness.requireInput(
-                "analysis/dcmb/tsl_conformational_response/WT_METTL7A_SAM_TSL_relaxed_"
+                "shared/tsl-relaxed/WT_METTL7A_SAM_TSL_relaxed_"
                         + state + ".pdb",
                 CATEGORY_3A, "relaxed_" + state);
         return RegressionHarness.points(RegressionHarness.heavy(

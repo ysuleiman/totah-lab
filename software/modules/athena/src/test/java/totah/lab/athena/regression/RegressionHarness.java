@@ -7,6 +7,7 @@ import totah.lab.hermes.file.pdbqt.PdbqtModel;
 import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,6 +23,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Shared support for the Athena v2 regression tests against the frozen
  * historical METTL7 analysis outputs (golden source:
  * {@code tmp/athena-v2-regression-reference/REFERENCE.md}).
+ *
+ * <p>All input files are committed fixtures on the test classpath under
+ * {@code /mettl7-v2-regression/} (see the {@code MANIFEST.csv} there for
+ * provenance and checksums); {@link #requireInput} materializes them to a
+ * temporary directory so the Path-based readers work from any clone.</p>
  *
  * <p>Parsing deliberately mirrors the historical Python conventions:
  * PDB atom records are read by fixed columns (element from columns
@@ -42,6 +48,12 @@ final class RegressionHarness {
     static final Path RESULTS_CSV =
             REPO_ROOT.resolve("ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv");
 
+    /** Classpath root of the committed regression fixtures. */
+    static final String FIXTURE_ROOT = "/mettl7-v2-regression/";
+
+    private static final Map<String, Path> extractedFixtures =
+            new LinkedHashMap<>();
+    private static Path fixtureTempDir;
     private static boolean csvInitialized;
 
     private RegressionHarness() {
@@ -50,9 +62,8 @@ final class RegressionHarness {
     private static Path locateRepoRoot() {
         for (Path current = Path.of("").toAbsolutePath();
                 current != null; current = current.getParent()) {
-            if (Files.isDirectory(current.resolve("analysis"))
-                    && Files.isDirectory(
-                            current.resolve("software/modules/athena"))) {
+            if (Files.isDirectory(
+                    current.resolve("software/modules/athena"))) {
                 return current;
             }
         }
@@ -198,19 +209,41 @@ final class RegressionHarness {
     }
 
     /**
-     * Verifies a regression input exists; on absence records a
+     * Resolves a committed fixture from the test classpath
+     * ({@code /mettl7-v2-regression/<fixturePath>}) and materializes it to
+     * a temporary file for the Path-based readers. On absence records a
      * NOT_COMPUTABLE row and fails the test with a clear message.
      */
-    static Path requireInput(
-            String repoRelativePath, String category, String metric) {
-        Path path = REPO_ROOT.resolve(repoRelativePath);
-        if (!Files.isRegularFile(path)) {
-            record(category, metric, "", "",
-                    "input file missing: " + repoRelativePath,
-                    "NOT_COMPUTABLE_MISSING_INPUT");
-            fail("Missing regression input: " + path);
+    static synchronized Path requireInput(
+            String fixturePath, String category, String metric) {
+        Path extracted = extractedFixtures.get(fixturePath);
+        if (extracted != null) {
+            return extracted;
         }
-        return path;
+        String resource = FIXTURE_ROOT + fixturePath;
+        try (InputStream stream =
+                RegressionHarness.class.getResourceAsStream(resource)) {
+            if (stream == null) {
+                record(category, metric, "", "",
+                        "fixture missing from classpath: " + resource,
+                        "NOT_COMPUTABLE_MISSING_INPUT");
+                fail("Missing regression fixture on classpath: " + resource);
+            }
+            if (fixtureTempDir == null) {
+                fixtureTempDir = Files.createTempDirectory(
+                        "athena-v2-regression-fixtures");
+                fixtureTempDir.toFile().deleteOnExit();
+            }
+            Path target = fixtureTempDir.resolve(fixturePath);
+            if (target.getParent() != null) {
+                Files.createDirectories(target.getParent());
+            }
+            Files.copy(stream, target);
+            extractedFixtures.put(fixturePath, target);
+            return target;
+        } catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 
     static double parseDouble(String value) {

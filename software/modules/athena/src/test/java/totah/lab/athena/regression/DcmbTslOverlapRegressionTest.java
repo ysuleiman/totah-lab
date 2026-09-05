@@ -51,11 +51,11 @@ class DcmbTslOverlapRegressionTest {
                 originalProteinAtoms();
         List<Map<String, String>> pairwise = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "analysis/dcmb/dcmb_tsl_interference/dcmb_tsl_pairwise.csv",
+                        "dcmb-tsl-overlap/dcmb_tsl_pairwise.csv",
                         CATEGORY, "pairwise"));
         List<Map<String, String>> swept = RegressionHarness.readCsv(
                 RegressionHarness.requireInput(
-                        "analysis/dcmb/dcmb_tsl_interference/swept_volume.csv",
+                        "dcmb-tsl-overlap/swept_volume.csv",
                         CATEGORY, "swept"));
         assertThat(pairwise).hasSize(55);
         assertThat(swept).hasSize(55);
@@ -66,7 +66,7 @@ class DcmbTslOverlapRegressionTest {
         for (int state = 1; state <= 5; state++) {
             relaxedByState.put(state, RegressionHarness.heavy(
                     RegressionHarness.pdbAtoms(RegressionHarness.requireInput(
-                            "analysis/dcmb/tsl_conformational_response/WT_METTL7A_SAM_TSL_relaxed_"
+                            "shared/tsl-relaxed/WT_METTL7A_SAM_TSL_relaxed_"
                                     + state + ".pdb",
                             CATEGORY, "relaxed_" + state))));
         }
@@ -221,7 +221,7 @@ class DcmbTslOverlapRegressionTest {
 
     private List<RegressionHarness.PdbAtom> originalProteinAtoms() {
         Path receptorPath = RegressionHarness.requireInput(
-                "analysis/dcmb/sam_state/validated/WT_METTL7A_SAM_BOUND.pdb",
+                "shared/WT_METTL7A_SAM_BOUND.pdb",
                 CATEGORY, "receptor");
         return RegressionHarness.heavy(RegressionHarness.pdbAtoms(receptorPath))
                 .stream()
@@ -232,7 +232,7 @@ class DcmbTslOverlapRegressionTest {
 
     private Map<String, List<Point3D>> posesByFamily() {
         Path familiesPath = RegressionHarness.requireInput(
-                "analysis/dcmb/controlled_campaign/family_results.csv",
+                "shared/dcmb-controlled-campaign/family_results.csv",
                 CATEGORY, "family_results");
         Map<String, List<Point3D>> poses = new LinkedHashMap<>();
         for (Map<String, String> family : RegressionHarness.readCsv(
@@ -245,7 +245,7 @@ class DcmbTslOverlapRegressionTest {
                     RegressionHarness.model(
                             RegressionHarness.readPdbqt(
                                     RegressionHarness.requireInput(
-                                            "analysis/dcmb/controlled_campaign/raw/7A_WT_SAM_BOUND_"
+                                            "shared/dcmb-controlled-campaign/raw/7A_WT_SAM_BOUND_"
                                                     + family.get("enantiomer")
                                                     + "_s" + family.get(
                                                             "representative_seed")
