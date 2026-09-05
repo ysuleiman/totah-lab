@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# DEPRECATED FOR V2 USE (2026-09-05): near-attack geometry in this script is superseded by
+# athena.tmt.NearAttackGeometry / NearAttackAssessor / EnsembleNacAnalyzer (Java).
+# See ATHENA_NEAR_ATTACK_MIGRATION_NOTE.md. Retained for historical regression reproduction only.
 """Run the locked productive-TSL feasibility workflow across all eight systems."""
 from __future__ import annotations
 

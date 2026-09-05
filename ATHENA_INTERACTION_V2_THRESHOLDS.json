@@ -1,0 +1,70 @@
+{
+  "version": "athena-interaction-v2",
+  "frozen": "2026-09-05",
+  "thresholdSets": {
+    "athenaDefaults": {
+      "provenance": "athena-defaults-1.0 (PLIP-3.0.1 literature values for non-HB types; HB = athena legacy)",
+      "hydrogenBond": {
+        "hydrogenAcceptorCutoffAngstroms": 2.5,
+        "donorAcceptorCutoffAngstroms": 3.5,
+        "minDonorAngleDegrees": 120.0,
+        "donorBondCutoffAngstroms": 1.35
+      },
+      "hydrophobic": { "distMaxAngstroms": 4.0 },
+      "saltBridge": { "distMaxAngstroms": 5.5 },
+      "piStacking": {
+        "distMaxAngstroms": 5.5,
+        "parallelAngleDevDegrees": 30.0,
+        "tShapedAngleDevDegrees": 30.0,
+        "offsetMaxAngstroms": 2.0
+      },
+      "piCation": {
+        "distMaxAngstroms": 6.0,
+        "offsetMaxAngstroms": 2.0,
+        "tertamineAngleMaxDegrees": 30.0
+      },
+      "halogenBond": {
+        "distMaxAngstroms": 4.0,
+        "acceptorAngleDegrees": 120.0,
+        "donorAngleDegrees": 165.0,
+        "angleDevDegrees": 30.0
+      },
+      "minDistAngstroms": 0.5,
+      "bindingSiteCutoffAngstroms": 7.5
+    },
+    "plipReference": {
+      "provenance": "plip-3.0.1-reference",
+      "hydrogenBond": {
+        "hydrogenAcceptorCutoffAngstroms": "POSITIVE_INFINITY (A...H never gated in PLIP)",
+        "donorAcceptorCutoffAngstroms": 4.1,
+        "minDonorAngleDegrees": 100.0,
+        "donorBondCutoffAngstroms": 1.35
+      },
+      "note": "exact PLIP 3.0.1 values for every field; used only for oracle validation, never as METTL7 defaults"
+    }
+  },
+  "boundConventions": {
+    "distances": "minDist < d <= max (lower exclusive, upper inclusive, uniform across detectors)",
+    "angles": "inclusive both ends",
+    "note": "PLIP uses strict bounds everywhere; exact strictness parity explicitly not claimed"
+  },
+  "nearAttack": {
+    "authoritativeImplementation": "athena.tmt.NearAttackGeometry / NearAttackAssessor / EnsembleNacAnalyzer",
+    "thresholds": "caller-supplied via NearAttackCriteria with mandatory provenance string; no built-in defaults by design",
+    "historicalPythonGates": "see ATHENA_NEAR_ATTACK_MIGRATION_NOTE.md (13 deprecated scripts, gates ranged 2.7-3.5 A / 145-150 deg floors)"
+  },
+  "gridVolume": {
+    "authoritativeImplementation": "athena.geometry.GridVolume",
+    "defaults": { "spacingAngstroms": 0.5, "paddingAngstroms": 3.0, "clearanceAngstroms": 2.0, "envelopeRadiusAngstroms": 1.7 },
+    "documentedDeviation": "ligand atoms treated as occupied (historical Python did not); historical convention reproducible by passing protein-only environment"
+  },
+  "escapeRoute": {
+    "authoritativeImplementation": "athena.pocket.architecture.EscapeRouteAnalyzer",
+    "defaults": { "spacingAngstroms": 0.5, "probeRadiusAngstroms": 1.7, "marginAngstroms": 8.0 },
+    "provenance": "ported from analysis/mettl7-closure/stage8_11_design/run_structural_design.py + PROTOCOL.json; 26-connected origin-seeded flood fill (stage8_11 used 6-connected boundary-seeded); widest-path max-min Dijkstra 6-connected"
+  },
+  "mettl7Sectors": {
+    "implementation": "totah.lab.mettl7.sectors.Mettl7Sectors (config only, METTL7A numbering)",
+    "frozen": { "39-47": 9, "144-175": 32, "195-207": 13, "228-237": 10 }
+  }
+}

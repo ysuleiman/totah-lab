@@ -8,26 +8,37 @@
         <artifactId>totah-lab</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
-    <artifactId>athena</artifactId>
-
+    <artifactId>mettl7</artifactId>
+    <name>METTL7 domain</name>
+    <description>METTL7A/B-specific evidence interpretation and ligand triage</description>
     <dependencies>
         <dependency>
             <groupId>totah.lab</groupId>
             <artifactId>gaia</artifactId>
         </dependency>
-        <!-- Test-scoped only: regression tests parse PDBQT/PDB inputs via
-             hermes readers to build gaia structures. hermes depends on
-             gaia, never on athena, so the module graph stays acyclic. -->
         <dependency>
             <groupId>totah.lab</groupId>
             <artifactId>hermes</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
+            <groupId>totah.lab</groupId>
+            <artifactId>proteus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>totah.lab</groupId>
+            <artifactId>athena</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>totah.lab</groupId>
+            <artifactId>daedalus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>totah.lab</groupId>
+            <artifactId>prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

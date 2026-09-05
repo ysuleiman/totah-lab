@@ -16,6 +16,11 @@
 ## Testing
 - Add JUnit 5 tests for new functionality.
 - Test resources are under src/test/resources.
+- athena regression tests (totah.lab.athena.regression) parse historical
+  PDBQT/PDB inputs via hermes readers; hermes is a TEST-SCOPED athena
+  dependency (hermes depends on gaia, never on athena — keep it acyclic).
+  They append compared numbers to
+  ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv at the repo root.
 
 ## Domain
 - This project implements a molecular docking pipeline.
