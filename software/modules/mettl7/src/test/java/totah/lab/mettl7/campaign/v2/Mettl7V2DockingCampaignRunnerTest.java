@@ -36,7 +36,15 @@ class Mettl7V2DockingCampaignRunnerTest {
                   if [ "$1" = "--out" ]; then shift; out="$1"; fi
                   shift
                 done
-                echo 'POSE' > "$out"
+                cat > "$out" <<'EOF'
+                MODEL 1
+                REMARK VINA RESULT:    -5.000      0.000      0.000
+                ROOT
+                ATOM      1  C   UNL     1       0.000   0.000   0.000  1.00  0.00     0.000 C
+                ENDROOT
+                TORSDOF 0
+                ENDMDL
+                EOF
                 echo '   mode |   affinity | dist from best mode'
                 echo '      1        -5.0      0.000      0.000'
                 """);

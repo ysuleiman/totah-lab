@@ -7,6 +7,7 @@ import totah.lab.daedalus.docking.PocketGridBox;
 import totah.lab.daedalus.docking.VinaDockingOptions;
 import totah.lab.daedalus.docking.VinaDockingRunner;
 import totah.lab.daedalus.docking.VinaExecutionOptions;
+import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ import java.util.concurrent.Executors;
 public final class Mettl7V2DockingCampaignRunner {
     private final ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
+    private final PdbqtReader pdbqtReader = new PdbqtReader();
 
     public static void main(String[] args) throws Exception {
         if (args.length != 7) {
@@ -65,6 +67,7 @@ public final class Mettl7V2DockingCampaignRunner {
                 .toList();
         List<Mettl7CartesianLedgerGenerator.Row> pending = executable.stream()
                 .filter(row -> !completedValid(output, row.runId())).toList();
+        int validBeforeInvocation = executable.size() - pending.size();
         Instant started = Instant.now();
         int completedThisInvocation = 0;
         int failedThisInvocation = 0;
@@ -86,11 +89,8 @@ public final class Mettl7V2DockingCampaignRunner {
                 }
             }
         }
-        int valid = 0;
-        int failed = 0;
-        for (var row : executable) {
-            if (completedValid(output, row.runId())) valid++; else failed++;
-        }
+        int valid = validBeforeInvocation + completedThisInvocation;
+        int failed = failedThisInvocation;
         Summary summary = new Summary(plan.rows().size(), executable.size(),
                 plan.rows().size() - executable.size(), valid, failed,
                 executable.size() - valid - failed, workers, cpuPerJob,
@@ -127,11 +127,13 @@ public final class Mettl7V2DockingCampaignRunner {
                     Mettl7MechanisticMatrixV2Protocol.poseOutputOptions(),
                     new VinaExecutionOptions(cpuPerJob), poses);
             Files.writeString(directory.resolve("vina.log"), result.output());
+            int emittedPoseCount = Files.isRegularFile(poses)
+                    ? pdbqtReader.read(poses).models().size() : 0;
             String status = result.exitCode() == 0 && Files.isRegularFile(poses)
-                    && Files.size(poses) > 0 && !result.poses().isEmpty()
+                    && Files.size(poses) > 0 && emittedPoseCount > 0
                     ? "COMPLETED_VALID" : "COMPLETED_INVALID";
             RunReceipt receipt = new RunReceipt(row.runId(), status,
-                    result.exitCode(), result.poses().size(), receptor.toString(),
+                    result.exitCode(), emittedPoseCount, receptor.toString(),
                     row.receptor().sha256(), ligand.toString(), row.species().sha256(),
                     Files.isRegularFile(poses) ? sha256(poses) : "",
                     row.seed(), cpuPerJob,

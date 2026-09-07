@@ -42,6 +42,31 @@ public final class VinaDockingRunner {
             DockingInput input,
             VinaDockingOptions options,
             Path poseOutput) throws IOException, InterruptedException {
+        return run(input, options, null, poseOutput);
+    }
+
+    /**
+     * Runs Vina with explicit output controls. Existing overloads intentionally
+     * retain their historical behavior and continue to use Vina defaults.
+     */
+    public VinaDockingResult run(
+            DockingInput input,
+            VinaDockingOptions options,
+            VinaPoseOutputOptions outputOptions,
+            Path poseOutput) throws IOException, InterruptedException {
+        return run(input, options, outputOptions, null, poseOutput);
+    }
+
+    /**
+     * Runs Vina with explicit pose and per-process resource controls. This is
+     * additive so existing callers retain Vina's historical CPU default.
+     */
+    public VinaDockingResult run(
+            DockingInput input,
+            VinaDockingOptions options,
+            VinaPoseOutputOptions outputOptions,
+            VinaExecutionOptions executionOptions,
+            Path poseOutput) throws IOException, InterruptedException {
         Objects.requireNonNull(input, "input");
         Objects.requireNonNull(options, "options");
         requireFile(vinaExecutable, "Vina executable");
@@ -73,18 +98,28 @@ public final class VinaDockingRunner {
             command.add("--seed");
             command.add(Integer.toString(options.seed()));
         }
+        if (outputOptions != null) {
+            command.add("--num_modes");
+            command.add(Integer.toString(outputOptions.maximumModes()));
+            command.add("--energy_range");
+            command.add(Double.toString(
+                    outputOptions.energyRangeKcalPerMol()));
+        }
+        if (executionOptions != null) {
+            command.add("--cpu");
+            command.add(Integer.toString(executionOptions.cpuThreads()));
+        }
 
         Process process = new ProcessBuilder(command)
                 .redirectErrorStream(true)
                 .start();
         String output;
         int exitCode;
-        try {
-            output = new String(
-                    process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        try (var processOutput = process.getInputStream()) {
+            output = new String(processOutput.readAllBytes(), StandardCharsets.UTF_8);
             exitCode = process.waitFor();
         } catch (InterruptedException exception) {
-            process.destroy();
+            process.destroyForcibly();
             Thread.currentThread().interrupt();
             throw exception;
         }

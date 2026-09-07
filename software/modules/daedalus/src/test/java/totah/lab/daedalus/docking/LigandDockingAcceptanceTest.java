@@ -1,6 +1,7 @@
 package totah.lab.daedalus.docking;
 
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.hephaestus.client.HephaestusClient;
@@ -30,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * alpha-sphere centroid computed from pocket2_vert.pqr and sized
  * 24 x 26 x 24 A to enclose the pocket-2 alpha-sphere hull.
  */
+@Tag("docking-integration")
 class LigandDockingAcceptanceTest {
 
     private static final Path DEFAULT_VINA = Path.of("/Users/yazan/bin/vina");

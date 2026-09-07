@@ -1,6 +1,7 @@
 package totah.lab.daedalus.docking;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.io.TempDir;
 import totah.lab.hephaestus.client.HephaestusClient;
 import totah.lab.hephaestus.client.HephaestusClients;
@@ -42,6 +43,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * <p>Runs only when the machine-local chemflow artifacts and a vina
  * executable exist.</p>
  */
+@Tag("docking-integration")
 class Brics0049RedockVerificationTest {
 
     private static final Path STORAGE = Path.of(

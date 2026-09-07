@@ -104,6 +104,61 @@ class VinaDockingRunnerTest {
     }
 
     @Test
+    void passesExplicitPoseOutputControlsWithoutChangingLegacyOverloads()
+            throws Exception {
+        Path receptor = touch("controlled-receptor.pdbqt");
+        Path ligand = touch("controlled-ligand.pdbqt");
+        Path argumentsFile = temporaryDirectory.resolve("controlled-args.txt");
+        Path poseOutput = temporaryDirectory.resolve("controlled-poses.pdbqt");
+        Path fakeVina = fakeVina("""
+                #!/bin/bash
+                printf '%%s\n' "$@" > "%s"
+                exit 0
+                """.formatted(argumentsFile));
+
+        new VinaDockingRunner(fakeVina).run(
+                new DockingInput(receptor, ligand, Optional.empty()),
+                VinaDockingOptions.ofBox(
+                        0.0, 0.0, 0.0, 20.0, 20.0, 20.0),
+                new VinaPoseOutputOptions(9, 3.0),
+                poseOutput);
+
+        List<String> arguments = Files.readAllLines(argumentsFile);
+        assertEquals("9", arguments.get(arguments.indexOf("--num_modes") + 1));
+        assertEquals("3.0",
+                arguments.get(arguments.indexOf("--energy_range") + 1));
+    }
+
+    @Test
+    void passesExplicitPerProcessCpuControl() throws Exception {
+        Path receptor = touch("cpu-receptor.pdbqt");
+        Path ligand = touch("cpu-ligand.pdbqt");
+        Path argumentsFile = temporaryDirectory.resolve("cpu-args.txt");
+        Path fakeVina = fakeVina("""
+                #!/bin/bash
+                printf '%%s\n' "$@" > "%s"
+                exit 0
+                """.formatted(argumentsFile));
+
+        new VinaDockingRunner(fakeVina).run(
+                new DockingInput(receptor, ligand, Optional.empty()),
+                VinaDockingOptions.ofBox(
+                        0.0, 0.0, 0.0, 20.0, 20.0, 20.0),
+                new VinaPoseOutputOptions(9, 3.0),
+                new VinaExecutionOptions(4),
+                temporaryDirectory.resolve("cpu-poses.pdbqt"));
+
+        List<String> arguments = Files.readAllLines(argumentsFile);
+        assertEquals("4", arguments.get(arguments.indexOf("--cpu") + 1));
+    }
+
+    @Test
+    void rejectsNonPositiveCpuControl() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new VinaExecutionOptions(0));
+    }
+
+    @Test
     void reportsNonZeroExitCode() throws Exception {
         Path receptor = touch("receptor.pdbqt");
         Path ligand = touch("ligand.pdbqt");

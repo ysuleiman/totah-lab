@@ -47,6 +47,14 @@ public final class PdbReader
     private static final Object CHEM_COMP_PROVIDER_LOCK =
             new Object();
 
+    static {
+        // BioJava otherwise lazily installs a network-first provider when
+        // getChemCompProvider() is first called. Hermes defaults are offline;
+        // establish that default before any read or test can trigger I/O.
+        ChemCompGroupFactory.setChemCompProvider(
+                new org.biojava.nbio.structure.chem.ReducedChemCompProvider());
+    }
+
     private final StructureReaderOptions options;
 
     public PdbReader() {

@@ -1,6 +1,7 @@
 package totah.lab.daedalus.cli;
 
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * fpocket pocket-2 box (the box of LigandDockingAcceptanceTest).
  * Skipped when no vina binary is available.
  */
+@Tag("docking-integration")
 class DaedalusCliVinaAcceptanceTest {
 
     private static final Path DEFAULT_VINA =
