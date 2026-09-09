@@ -1,0 +1,48 @@
+{
+  "frozen_before_mutant_outcome_inspection": true,
+  "question": "Does C203 or the surrounding 196-199 architecture explain local survival of the accepted 7B neutral netarsudil/SAM family?",
+  "starting_pose": "7B neutral family 5, seed 483271, mode 5",
+  "systems": [
+    "7B_WT",
+    "7B_C203N",
+    "7B_RECIP_196_199",
+    "7B_RECIP_196_199_C203N",
+    "7A_WT_TRANSFER",
+    "7A_N203C_TRANSFER"
+  ],
+  "mutations": {
+    "7B_C203N": ["C203N"],
+    "7B_RECIP_196_199": ["K196H", "H197L", "I198L", "G199F"],
+    "7B_RECIP_196_199_C203N": ["K196H", "H197L", "I198L", "G199F", "C203N"],
+    "7A_N203C_TRANSFER": ["N203C"]
+  },
+  "mutation_coordinate_method": "Reciprocal donor side-chain coordinates transplanted in the target residue's N-CA-C local frame; target backbone unchanged; local side chains subsequently flexible.",
+  "refinement": {
+    "method": "AutoDock Vina local_only",
+    "global_redocking": false,
+    "seeds": [314159, 271828, 161803],
+    "cpu": 1,
+    "num_modes": 1,
+    "protein_backbone": "rigid",
+    "sam": "explicit and rigid at canonical coordinates",
+    "ligand": "neutral netarsudil, fully internally flexible",
+    "flexible_region": "same established local neighborhood, including every side-chain-bearing residue 196-208"
+  },
+  "acceptance_gate": {
+    "ligand_centroid_displacement_max_a": 3.0,
+    "ligand_symmetry_aware_heavy_rmsd_max_a": 4.0,
+    "minimum_retained_starting_neighborhood_contacts": 3,
+    "protein_ligand_heavy_pairs_lt_1p8_a": 0,
+    "sam_ligand_heavy_pairs_lt_2p0_a": 0,
+    "sam_heavy_rmsd_max_a": 0.25,
+    "ligand_mmff94s_strain_max_kcal_mol": 15.0,
+    "replicate_pass_rule": "PASS if at least 2 of 3 attempts pass every gate; FAIL if 0 of 3; otherwise INDETERMINATE"
+  },
+  "causal_rules": {
+    "C203_supported": "C203N converts 7B WT PASS to FAIL or produces reproducible material migration/contact loss/strain above gate, and N203C produces a reciprocal improvement in the fair 7A transfer.",
+    "surrounding_supported": "The reciprocal 196-199 block weakens 7B more than C203N alone under separate metrics.",
+    "distributed_supported": "Neither single C203 exchange is sufficient, while the 196-199 block or combined probe reproducibly alters several independent structural dimensions.",
+    "indeterminate": "Mutation outcomes are non-reciprocal, preparation-limited, or do not discriminate the hypotheses."
+  },
+  "interpretation_boundary": "Structural compatibility only; no affinity, activation, allostery, catalysis, biochemical selectivity, or RNA inference."
+}

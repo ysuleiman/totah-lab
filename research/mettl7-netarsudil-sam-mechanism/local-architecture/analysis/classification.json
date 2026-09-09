@@ -1,0 +1,179 @@
+{
+  "frozen_protocol": {
+    "frozen_before_mutant_outcome_inspection": true,
+    "question": "Does C203 or the surrounding 196-199 architecture explain local survival of the accepted 7B neutral netarsudil/SAM family?",
+    "starting_pose": "7B neutral family 5, seed 483271, mode 5",
+    "systems": [
+      "7B_WT",
+      "7B_C203N",
+      "7B_RECIP_196_199",
+      "7B_RECIP_196_199_C203N",
+      "7A_WT_TRANSFER",
+      "7A_N203C_TRANSFER"
+    ],
+    "mutations": {
+      "7B_C203N": [
+        "C203N"
+      ],
+      "7B_RECIP_196_199": [
+        "K196H",
+        "H197L",
+        "I198L",
+        "G199F"
+      ],
+      "7B_RECIP_196_199_C203N": [
+        "K196H",
+        "H197L",
+        "I198L",
+        "G199F",
+        "C203N"
+      ],
+      "7A_N203C_TRANSFER": [
+        "N203C"
+      ]
+    },
+    "mutation_coordinate_method": "Reciprocal donor side-chain coordinates transplanted in the target residue's N-CA-C local frame; target backbone unchanged; local side chains subsequently flexible.",
+    "refinement": {
+      "method": "AutoDock Vina local_only",
+      "global_redocking": false,
+      "seeds": [
+        314159,
+        271828,
+        161803
+      ],
+      "cpu": 1,
+      "num_modes": 1,
+      "protein_backbone": "rigid",
+      "sam": "explicit and rigid at canonical coordinates",
+      "ligand": "neutral netarsudil, fully internally flexible",
+      "flexible_region": "same established local neighborhood, including every side-chain-bearing residue 196-208"
+    },
+    "acceptance_gate": {
+      "ligand_centroid_displacement_max_a": 3.0,
+      "ligand_symmetry_aware_heavy_rmsd_max_a": 4.0,
+      "minimum_retained_starting_neighborhood_contacts": 3,
+      "protein_ligand_heavy_pairs_lt_1p8_a": 0,
+      "sam_ligand_heavy_pairs_lt_2p0_a": 0,
+      "sam_heavy_rmsd_max_a": 0.25,
+      "ligand_mmff94s_strain_max_kcal_mol": 15.0,
+      "replicate_pass_rule": "PASS if at least 2 of 3 attempts pass every gate; FAIL if 0 of 3; otherwise INDETERMINATE"
+    },
+    "causal_rules": {
+      "C203_supported": "C203N converts 7B WT PASS to FAIL or produces reproducible material migration/contact loss/strain above gate, and N203C produces a reciprocal improvement in the fair 7A transfer.",
+      "surrounding_supported": "The reciprocal 196-199 block weakens 7B more than C203N alone under separate metrics.",
+      "distributed_supported": "Neither single C203 exchange is sufficient, while the 196-199 block or combined probe reproducibly alters several independent structural dimensions.",
+      "indeterminate": "Mutation outcomes are non-reciprocal, preparation-limited, or do not discriminate the hypotheses."
+    },
+    "interpretation_boundary": "Structural compatibility only; no affinity, activation, allostery, catalysis, biochemical selectivity, or RNA inference."
+  },
+  "systems": {
+    "7B_WT": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 14.027432430928094,
+      "median_ligand_rmsd_a": 0.11578618733022777,
+      "median_centroid_displacement_a": 0.08309843768700316,
+      "median_sam_distance_a": 3.7937797774778663,
+      "median_burial_percent": 60.63442560101402,
+      "median_local_free_volume_a3": 2297.875
+    },
+    "7B_C203N": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.71246462553416,
+      "median_ligand_rmsd_a": 0.725717434073102,
+      "median_centroid_displacement_a": 0.6325990909427487,
+      "median_sam_distance_a": 4.051703962532307,
+      "median_burial_percent": 58.68675371703985,
+      "median_local_free_volume_a3": 2377.875
+    },
+    "7B_RECIP_196_199": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.573810929229587,
+      "median_ligand_rmsd_a": 0.22480540604762012,
+      "median_centroid_displacement_a": 0.1800629887866892,
+      "median_sam_distance_a": 3.754374648326936,
+      "median_burial_percent": 59.40278836226709,
+      "median_local_free_volume_a3": 2317.125
+    },
+    "7B_RECIP_196_199_C203N": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.223758924493431,
+      "median_ligand_rmsd_a": 0.7382834024634044,
+      "median_centroid_displacement_a": 0.660935046591681,
+      "median_sam_distance_a": 3.9794630291032993,
+      "median_burial_percent": 55.74512493914285,
+      "median_local_free_volume_a3": 2371.375
+    },
+    "7A_WT_TRANSFER": {
+      "classification": "FAIL",
+      "passing_replicates": 0,
+      "median_final_strain_kcal_mol": 15.557174827985271,
+      "median_ligand_rmsd_a": 7.788994199963101,
+      "median_centroid_displacement_a": 6.802180643508406,
+      "median_sam_distance_a": 6.625638535265865,
+      "median_burial_percent": 51.483907101092505,
+      "median_local_free_volume_a3": 2414.625
+    },
+    "7A_N203C_TRANSFER": {
+      "classification": "FAIL",
+      "passing_replicates": 0,
+      "median_final_strain_kcal_mol": 21.78308320847848,
+      "median_ligand_rmsd_a": 7.991283227219959,
+      "median_centroid_displacement_a": 6.929911315322533,
+      "median_sam_distance_a": 6.90024492318932,
+      "median_burial_percent": 49.947045348391924,
+      "median_local_free_volume_a3": 2411.375
+    },
+    "7B_K196H": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.80756036373267,
+      "median_ligand_rmsd_a": 0.17710100142540808,
+      "median_centroid_displacement_a": 0.13333521120361583,
+      "median_sam_distance_a": 3.8333840141577267,
+      "median_burial_percent": 59.37395029741033,
+      "median_local_free_volume_a3": 2315.875
+    },
+    "7B_H197L_I198L": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.764828710094953,
+      "median_ligand_rmsd_a": 0.10478549517943793,
+      "median_centroid_displacement_a": 0.058634475610373174,
+      "median_sam_distance_a": 3.7609496141267313,
+      "median_burial_percent": 60.16271458307209,
+      "median_local_free_volume_a3": 2304.625
+    },
+    "7B_G199F": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.819172036950114,
+      "median_ligand_rmsd_a": 0.1310030309483223,
+      "median_centroid_displacement_a": 0.06250622806339284,
+      "median_sam_distance_a": 3.862287534609509,
+      "median_burial_percent": 60.83596173185765,
+      "median_local_free_volume_a3": 2296.125
+    },
+    "7B_T208S": {
+      "classification": "PASS",
+      "passing_replicates": 3,
+      "median_final_strain_kcal_mol": 13.422075175393111,
+      "median_ligand_rmsd_a": 0.12741952477590582,
+      "median_centroid_displacement_a": 0.04598913855522619,
+      "median_sam_distance_a": 3.8743696261456524,
+      "median_burial_percent": 60.66839255205329,
+      "median_local_free_volume_a3": 2301.0
+    }
+  },
+  "NETARSUDIL_7B_LOCAL_SELECTIVITY_MECHANISM": "DISTRIBUTED_196_207",
+  "C203_CAUSAL_SUPPORT": "NOT_SUPPORTED",
+  "hypothesis_tests": {
+    "C203_N203_DIRECT_EFFECT": "NOT_SUPPORTED",
+    "SURROUNDING_196_207_PACKING_EFFECT": "NOT_SUPPORTED_AS_SIDECHAIN_IDENTITY_EFFECT",
+    "DISTRIBUTED_LOCAL_EXTENSION_EFFECT": "SUPPORTED_AT_STRUCTURAL_CONTEXT_LEVEL",
+    "NO_LOCAL_EXPLANATION": "NOT_SUPPORTED"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "frozen_before_outcome_inspection": true,
+  "method": "AutoDock Vina local_only with explicit flexible side-chain partition",
+  "vina_version": "AutoDock Vina v1.2.5-17-gda92a68",
+  "starting_hypothesis": "7B / neutral / family 5; representative seed 483271 mode 5",
+  "systems": [
+    "7B_neutral",
+    "7B_plus1",
+    "7A_neutral_transfer",
+    "7A_plus1_transfer"
+  ],
+  "replicate_seeds": [314159, 271828, 161803],
+  "search": {
+    "mode": "local_only",
+    "global_redocking": false,
+    "autobox": true,
+    "num_modes": 1,
+    "cpu": 1,
+    "ligand_internal_flexibility": "all PDBQT rotatable bonds",
+    "protein_backbone": "rigid",
+    "sam": "explicit, rigid canonical PDBQT coordinates",
+    "distant_protein": "rigid"
+  },
+  "flexible_residue_rule": "All non-Gly/Pro METTL7B residues with a heavy atom within 5.0 A of the accepted representative, plus side-chain-bearing residues 149-151 and 196-207; identical residue numbers in aligned METTL7A.",
+  "acceptance_gate": {
+    "ligand_centroid_displacement_max_a": 3.0,
+    "ligand_symmetry_aware_heavy_rmsd_max_a": 4.0,
+    "minimum_retained_starting_neighborhood_contacts": 3,
+    "protein_ligand_heavy_pairs_lt_1p8_a": 0,
+    "sam_ligand_heavy_pairs_lt_2p0_a": 0,
+    "sam_heavy_rmsd_max_a": 0.25,
+    "ligand_mmff94s_strain_max_kcal_mol": 15.0,
+    "replicate_pass_rule": "PASS if at least 2 of 3 fixed-seed attempts pass every gate; FAIL if 0 of 3 pass; otherwise INDETERMINATE"
+  },
+  "hypothesis_update_rule": {
+    "material_strain_reduction_kcal_mol": 2.0,
+    "STRENGTHENED": "7B neutral is PASS and its median final strain is at least 2.0 kcal/mol below the 14.04 kcal/mol starting value",
+    "WEAKENED": "7B neutral is FAIL",
+    "UNCHANGED": "all other outcomes"
+  },
+  "evidence_dimensions": "reported separately; no composite score",
+  "interpretation_boundary": "local structural survival only; not affinity, catalysis, activation, allostery, biochemical selectivity, or RNA engagement"
+}
