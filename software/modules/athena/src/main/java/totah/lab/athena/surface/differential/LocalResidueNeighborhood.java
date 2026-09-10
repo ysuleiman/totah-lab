@@ -6,6 +6,7 @@ import totah.lab.gaia.structure.ResidueId;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,9 +38,10 @@ public final class LocalResidueNeighborhood {
                             central.residue(), candidate.residue()));
                 }
             }
-            result.put(central.id(), Map.copyOf(distances));
+            result.put(central.id(), Collections.unmodifiableMap(
+                    new LinkedHashMap<>(distances)));
         }
-        return Map.copyOf(result);
+        return Collections.unmodifiableMap(new LinkedHashMap<>(result));
     }
 
     public static double minimumIncludedAtomDistance(Residue first, Residue second) {

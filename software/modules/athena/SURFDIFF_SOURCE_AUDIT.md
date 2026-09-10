@@ -7,7 +7,7 @@ The source implementation, not the paper, is normative for
 
 | Upstream source behavior | Frozen definition | Athena owner |
 |---|---|---|
-| `compare.SurfDiffConfig` | CA neighborhood 7 Å; scoring cutoff 5 Å; exclude N/C/O/OXT from neighborhood atom index; symmetry on; neighborhood update off; mutations-only off | `DifferentialSurfaceOptions.SURFDIFF_COMPATIBLE` |
+| `compare.SurfDiffConfig` | CA neighborhood 7 Å; scoring cutoff 5 Å; exclude N/C/O from neighborhood atom index (OXT remains eligible); symmetry on; neighborhood update off; mutations-only off | `DifferentialSurfaceOptions.SURFDIFF_COMPATIBLE` |
 | `fragmentation.fragmentation_neighbourhood` | CA-to-CA distance selects residue membership within 7 Å. Reported residue distance is the minimum pair distance after excluding N/C/O from both residues; CA and OXT remain eligible for the reported minimum. Self distance is 0. | `LocalResidueNeighborhood` |
 | `analysis.Residue_Uniqueness_Potential_calculation` | Fixed 21×21 physicochemical matrix divided by 18. Unknown correspondence (`XXX`) is distance 1. With default `neighbourhood_update=false`, only entries whose clipped distance weight equals 1 enter RUP, normally the central residue. | `SurfDiffPhysicochemicalDifference`, `DifferentialSurfaceAnalyzer` |
 | `analysis.calc_weight_distance` | `clip(1 - (x - 1)/(xMax - 1), 0, 1)` | `SurfDiffWeights.distance` |

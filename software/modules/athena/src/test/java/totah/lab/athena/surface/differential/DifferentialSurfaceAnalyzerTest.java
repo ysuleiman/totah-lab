@@ -65,6 +65,19 @@ class DifferentialSurfaceAnalyzerTest {
         assertThat(neighborhoods.get(first.id())).doesNotContainKey(second.id());
     }
 
+    @Test
+    void neighborhoodsRetainDeterministicResidueOrder() {
+        SurfaceResidue third = surface("A", 3, "ALA", 1.0);
+        SurfaceResidue first = surface("A", 1, "ALA", 0.0);
+        SurfaceResidue second = surface("A", 2, "ALA", 0.5);
+        Map<ResidueId, Map<ResidueId, Double>> neighborhoods =
+                LocalResidueNeighborhood.build(List.of(third, first, second), 7.0);
+        assertThat(neighborhoods.keySet()).containsExactly(
+                third.id(), first.id(), second.id());
+        assertThat(neighborhoods.get(first.id()).keySet()).containsExactly(
+                first.id(), second.id(), third.id());
+    }
+
     private static SurfaceResidue surface(
             String chain, int number, String name, double x) {
         Atom atom = Atom.builder().pdbSerial(number).name("CA")

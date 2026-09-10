@@ -2,14 +2,12 @@ package totah.lab.mettl7.surface;
 
 import totah.lab.athena.surface.differential.DifferentialResidueScore;
 import totah.lab.athena.surface.differential.DifferentialSurfaceAnalyzer;
+import totah.lab.athena.surface.differential.DifferentialSurfaceEvidenceWriter;
 import totah.lab.athena.surface.differential.DifferentialSurfaceMap;
 import totah.lab.athena.surface.differential.DifferentialSurfaceOptions;
 import totah.lab.athena.surface.differential.ExplicitResidueCorrespondence;
-import totah.lab.athena.surface.differential.LocalResidueNeighborhood;
 import totah.lab.athena.surface.differential.SurfaceResidue;
 import totah.lab.athena.surface.differential.SurfDiffCompatibleSasa;
-import totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifference;
-import totah.lab.athena.surface.differential.SurfDiffWeights;
 import totah.lab.gaia.structure.ResidueId;
 import totah.lab.gaia.structure.Structure;
 import totah.lab.hermes.file.pdb.reader.PdbReader;
@@ -41,6 +39,11 @@ public final class Mettl7DifferentialSurfaceCli {
     }
 
     public static void run(Path aPath, Path bPath, Path output) throws IOException {
+        String runtimeHash = genericBytecodeHash();
+        if (!Mettl7SurfDiffPolicy.GENERIC_RUNTIME_BYTECODE_SHA256.equals(runtimeHash)) {
+            throw new IOException("SURFDIFF_COMPATIBLE bytecode does not match frozen policy: "
+                    + runtimeHash);
+        }
         Files.createDirectories(output);
         DifferentialSurfaceOptions options =
                 DifferentialSurfaceOptions.SURFDIFF_COMPATIBLE;
@@ -57,7 +60,7 @@ public final class Mettl7DifferentialSurfaceCli {
         analyze("METTL7B_VS_METTL7A", b, a, bToA, output, options);
         analyze("METTL7A_VS_METTL7B", a, b, aToB, output, options);
         writeReceipt(output.resolve("analysis_receipt.txt"), aPath, bPath,
-                a.size(), b.size(), aToB.queryToSubject().size());
+                a.size(), b.size(), aToB.queryToSubject().size(), output);
     }
 
     private static void analyze(
@@ -73,14 +76,6 @@ public final class Mettl7DifferentialSurfaceCli {
                 .analyze(query, subject, scoringCorrespondence, options);
         Map<ResidueId, SurfaceResidue> queryById = index(query);
         Map<ResidueId, SurfaceResidue> subjectById = index(subject);
-        Map<ResidueId, Map<ResidueId, Double>> queryNeighborhoods =
-                LocalResidueNeighborhood.build(query.stream()
-                        .filter(row -> row.isSurface(options)).toList(),
-                        options.neighborhoodRadiusAngstroms());
-        Map<ResidueId, Map<ResidueId, Double>> subjectNeighborhoods =
-                LocalResidueNeighborhood.build(subject.stream()
-                        .filter(row -> row.isSurface(options)).toList(),
-                        options.neighborhoodRadiusAngstroms());
 
         try (BufferedWriter writer = Files.newBufferedWriter(
                 output.resolve(direction + "_residue_scores.csv"))) {
@@ -100,53 +95,9 @@ public final class Mettl7DifferentialSurfaceCli {
                         score.rup(), score.rus(), score.rss(), sector(q.id().residueNumber())));
             }
         }
-        try (BufferedWriter writer = Files.newBufferedWriter(
-                output.resolve(direction + "_neighborhood_evidence.csv"))) {
-            writer.write("direction,central_query,central_subject,member_side,member_number,member_name,distance_A,distance_weight,relative_sasa,exposure_weight,physchem_difference,status\n");
-            for (DifferentialResidueScore score : map.residues()) {
-                ResidueId central = score.queryResidue();
-                ResidueId subjectCentral = score.subjectResidue().orElse(null);
-                for (Map.Entry<ResidueId, Double> member
-                        : queryNeighborhoods.get(central).entrySet()) {
-                    SurfaceResidue q = queryById.get(member.getKey());
-                    SurfaceResidue s = scoringCorrespondence.subjectOf(member.getKey())
-                            .map(subjectById::get).orElse(null);
-                    writeMember(writer, direction, central, subjectCentral, "QUERY",
-                            q, s, member.getValue(), options);
-                }
-                if (subjectCentral != null && subjectNeighborhoods.containsKey(subjectCentral)) {
-                    for (Map.Entry<ResidueId, Double> member
-                            : subjectNeighborhoods.get(subjectCentral).entrySet()) {
-                        if (!scoringCorrespondence.queryToSubject().containsValue(member.getKey())) {
-                            SurfaceResidue s = subjectById.get(member.getKey());
-                            writeMember(writer, direction, central, subjectCentral,
-                                    "SUBJECT_ONLY", null, s, member.getValue(), options);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private static void writeMember(
-            BufferedWriter writer, String direction, ResidueId central,
-            ResidueId subjectCentral, String side, SurfaceResidue query,
-            SurfaceResidue subject, double distance,
-            DifferentialSurfaceOptions options) throws IOException {
-        SurfaceResidue exposure = query == null ? subject : query;
-        double difference = query == null || subject == null ? 1.0
-                : SurfDiffPhysicochemicalDifference.betweenThreeLetter(
-                        query.residue().getName(), subject.residue().getName());
-        writer.write(String.format(Locale.ROOT,
-                "%s,%d,%s,%s,%d,%s,%.12f,%.12f,%.12f,%.12f,%.12f,%s%n",
-                direction, central.residueNumber(), subjectCentral == null ? ""
-                        : Integer.toString(subjectCentral.residueNumber()),
-                side, exposure.id().residueNumber(), exposure.residue().getName(),
-                distance, SurfDiffWeights.distance(distance,
-                        options.scoringRadiusAngstroms()),
-                exposure.relativeSasa(), SurfDiffWeights.exposure(exposure.relativeSasa()),
-                difference, query == null ? "SUBJECT_ONLY" : subject == null
-                        ? "QUERY_ONLY" : "MAPPED"));
+        DifferentialSurfaceEvidenceWriter.write(
+                output.resolve(direction + "_neighborhood_evidence.csv"),
+                direction, query, subject, scoringCorrespondence, options);
     }
 
     private static void writeCorrespondence(
@@ -169,12 +120,16 @@ public final class Mettl7DifferentialSurfaceCli {
     }
 
     private static void writeReceipt(
-            Path path, Path a, Path b, int aCount, int bCount, int mapped)
+            Path path, Path a, Path b, int aCount, int bCount, int mapped,
+            Path output)
             throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write("mode=SURFDIFF_COMPATIBLE\n");
-            writer.write("generic_commit=da5a1e60b\n");
-            writer.write("upstream_surfdiff_commit=b8dceec575de43dff1b5297774affe356a183466\n");
+            writer.write("mode=" + Mettl7SurfDiffPolicy.MODE + "\n");
+            writer.write("generic_baseline_commit="
+                    + Mettl7SurfDiffPolicy.GENERIC_BASELINE_COMMIT + "\n");
+            writer.write("generic_runtime_bytecode_sha256=" + genericBytecodeHash() + "\n");
+            writer.write("upstream_surfdiff_commit="
+                    + Mettl7SurfDiffPolicy.UPSTREAM_COMMIT + "\n");
             writer.write("correspondence=" + Mettl7ResidueCorrespondenceAdapter.DEFINITION + "\n");
             writer.write("mettl7a_path=" + a.toAbsolutePath() + "\n");
             writer.write("mettl7a_sha256=" + sha256(a) + "\n");
@@ -183,7 +138,13 @@ public final class Mettl7DifferentialSurfaceCli {
             writer.write("a_residues=" + aCount + "\n");
             writer.write("b_residues=" + bCount + "\n");
             writer.write("mapped=" + mapped + "\n");
-            writer.write("coverage=1.0\n");
+            writer.write("coverage=" + ((double) mapped / Math.max(aCount, bCount)) + "\n");
+            writer.write("a_vs_b_scores_sha256=" + sha256(output.resolve(
+                    "METTL7A_VS_METTL7B_residue_scores.csv")) + "\n");
+            writer.write("b_vs_a_scores_sha256=" + sha256(output.resolve(
+                    "METTL7B_VS_METTL7A_residue_scores.csv")) + "\n");
+            writer.write("correspondence_sha256=" + sha256(output.resolve(
+                    "METTL7_AB_CORRESPONDENCE_V1.csv")) + "\n");
         }
     }
 
@@ -230,5 +191,30 @@ public final class Mettl7DifferentialSurfaceCli {
         } catch (NoSuchAlgorithmException exception) {
             throw new IllegalStateException("SHA-256 unavailable", exception);
         }
+    }
+
+    private static String genericBytecodeHash() throws IOException {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("SHA-256 unavailable", exception);
+        }
+        List<Class<?>> classes = List.of(DifferentialSurfaceAnalyzer.class,
+                DifferentialSurfaceEvidenceWriter.class,
+                DifferentialSurfaceOptions.class,
+                ExplicitResidueCorrespondence.class,
+                totah.lab.athena.surface.differential.LocalResidueNeighborhood.class,
+                totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifference.class,
+                totah.lab.athena.surface.differential.SurfDiffWeights.class,
+                SurfaceResidue.class, SurfDiffCompatibleSasa.class);
+        for (Class<?> type : classes) {
+            String resource = "/" + type.getName().replace('.', '/') + ".class";
+            try (var stream = type.getResourceAsStream(resource)) {
+                if (stream == null) throw new IOException("missing class resource " + resource);
+                digest.update(stream.readAllBytes());
+            }
+        }
+        return HexFormat.of().formatHex(digest.digest());
     }
 }

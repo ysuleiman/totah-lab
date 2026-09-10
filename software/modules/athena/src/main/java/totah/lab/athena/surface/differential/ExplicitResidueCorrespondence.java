@@ -3,6 +3,7 @@ package totah.lab.athena.surface.differential;
 import totah.lab.gaia.structure.ResidueId;
 
 import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public record ExplicitResidueCorrespondence(Map<ResidueId, ResidueId> queryToSub
         if (copy.values().stream().distinct().count() != copy.size()) {
             throw new IllegalArgumentException("correspondence must be one-to-one");
         }
-        queryToSubject = Map.copyOf(copy);
+        queryToSubject = Collections.unmodifiableMap(new LinkedHashMap<>(copy));
     }
 
     public Optional<ResidueId> subjectOf(ResidueId query) {

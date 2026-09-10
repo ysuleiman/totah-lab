@@ -78,7 +78,7 @@ public final class DifferentialSurfaceAnalyzer {
                 queryNeighborhoods);
     }
 
-    private static double rup(
+    static double rup(
             SurfaceResidue query,
             ExplicitResidueCorrespondence correspondence,
             Map<ResidueId, SurfaceResidue> subjectById) {
@@ -89,7 +89,7 @@ public final class DifferentialSurfaceAnalyzer {
                 .orElseGet(SurfDiffPhysicochemicalDifference::unmatched);
     }
 
-    private static List<Member> combinedMembers(
+    static List<Member> combinedMembers(
             ResidueId central,
             Map<ResidueId, Map<ResidueId, Double>> queryNeighborhoods,
             Map<ResidueId, Map<ResidueId, Double>> subjectNeighborhoods,
@@ -103,7 +103,8 @@ public final class DifferentialSurfaceAnalyzer {
                 : queryNeighborhoods.get(central).entrySet()) {
             SurfaceResidue residue = queryById.get(entry.getKey());
             members.put(new MemberKey(entry.getKey(), null),
-                    new Member(entry.getKey(), null, entry.getValue(),
+                    new Member(entry.getKey(), null, entry.getValue(), null,
+                            entry.getValue(),
                             residue.relativeSasa()));
         }
         if (!options.symmetricNeighborhood()) {
@@ -121,24 +122,27 @@ public final class DifferentialSurfaceAnalyzer {
                 Member existing = members.get(queryKey);
                 if (existing != null) {
                     members.put(queryKey, new Member(mappedQuery, entry.getKey(),
+                            existing.queryDistance(), entry.getValue(),
                             Math.min(existing.distance(), entry.getValue()),
                             existing.relativeSasa()));
                 } else {
                     SurfaceResidue residue = queryById.get(mappedQuery);
                     members.put(queryKey, new Member(mappedQuery, entry.getKey(),
-                            entry.getValue(), residue.relativeSasa()));
+                            null, entry.getValue(), entry.getValue(),
+                            residue.relativeSasa()));
                 }
             } else {
                 SurfaceResidue residue = subjectById.get(entry.getKey());
                 members.put(new MemberKey(null, entry.getKey()),
-                        new Member(null, entry.getKey(), entry.getValue(),
+                        new Member(null, entry.getKey(), null, entry.getValue(),
+                                entry.getValue(),
                                 residue.relativeSasa()));
             }
         }
         return List.copyOf(members.values());
     }
 
-    private static Map<ResidueId, SurfaceResidue> index(List<SurfaceResidue> residues) {
+    static Map<ResidueId, SurfaceResidue> index(List<SurfaceResidue> residues) {
         LinkedHashMap<ResidueId, SurfaceResidue> result = new LinkedHashMap<>();
         for (SurfaceResidue residue : residues) {
             if (result.put(residue.id(), residue) != null) {
@@ -158,7 +162,7 @@ public final class DifferentialSurfaceAnalyzer {
         }
     }
 
-    private static Map<ResidueId, ResidueId> reverse(
+    static Map<ResidueId, ResidueId> reverse(
             ExplicitResidueCorrespondence correspondence) {
         HashMap<ResidueId, ResidueId> result = new HashMap<>();
         correspondence.queryToSubject().forEach((query, subject) -> result.put(subject, query));
@@ -168,9 +172,11 @@ public final class DifferentialSurfaceAnalyzer {
     private record MemberKey(ResidueId query, ResidueId subject) {
     }
 
-    private record Member(
+    record Member(
             ResidueId query,
             ResidueId subject,
+            Double queryDistance,
+            Double subjectDistance,
             double distance,
             double relativeSasa) {
     }
