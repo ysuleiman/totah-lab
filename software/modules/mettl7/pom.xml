@@ -19,6 +19,13 @@
         <dependency>
             <groupId>totah.lab</groupId>
             <artifactId>hermes</artifactId>
+            <exclusions>
+                <!-- METTL7 also uses Spring Boot/Logback through daedalus. -->
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j2-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>totah.lab</groupId>
