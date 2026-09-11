@@ -46,3 +46,23 @@ workspace/output/
 **/.conda-*/
 **/__pycache__/
 *.py[cod]
+
+# Local scratch and recoverable campaign backups. Tracked reference fixtures
+# under tmp/ remain tracked; this prevents new scratch output from entering Git.
+/tmp/
+/TSL_RSH_TORSIONDRIVE_BACKUP/
+
+# Locally installed third-party tool environments are reproducible dependencies,
+# not project source. Keep the project-owned tools/scripts content trackable.
+/tools/haddock3/
+
+# Large runtime-only molecular simulation products. Protocols, manifests,
+# compact tables, and frozen evidence remain eligible for version control.
+**/trajectories/
+**/*.dcd
+**/*.xtc
+**/*.trr
+**/*.nc
+**/*.netcdf
+**/*.chk
+**/*.checkpoint
