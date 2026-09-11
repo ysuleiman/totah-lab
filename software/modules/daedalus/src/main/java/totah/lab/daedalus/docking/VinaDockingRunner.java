@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Minimal AutoDock Vina runner: builds the process from a validated
@@ -19,9 +21,15 @@ import java.util.Objects;
 public final class VinaDockingRunner {
 
     private final Path vinaExecutable;
+    private final Duration defaultExecutionTimeout;
 
     public VinaDockingRunner(Path vinaExecutable) {
+        this(vinaExecutable, VinaExecutionOptions.DEFAULT_EXECUTION_TIMEOUT);
+    }
+
+    public VinaDockingRunner(Path vinaExecutable, Duration defaultExecutionTimeout) {
         this.vinaExecutable = Objects.requireNonNull(vinaExecutable, "vinaExecutable");
+        this.defaultExecutionTimeout = requirePositive(defaultExecutionTimeout);
     }
 
     public static VinaDockingRunner fromProperties(DockingProperties properties) {
@@ -110,18 +118,27 @@ public final class VinaDockingRunner {
             command.add(Integer.toString(executionOptions.cpuThreads()));
         }
 
-        Process process = new ProcessBuilder(command)
-                .redirectErrorStream(true)
-                .start();
         String output;
         int exitCode;
-        try (var processOutput = process.getInputStream()) {
-            output = new String(processOutput.readAllBytes(), StandardCharsets.UTF_8);
-            exitCode = process.waitFor();
+        Path processLog = Files.createTempFile("vina-process-", ".log");
+        Process process = null;
+        Duration timeout = executionOptions == null ? defaultExecutionTimeout
+                : executionOptions.executionTimeout();
+        try {
+            process = new ProcessBuilder(command).redirectErrorStream(true)
+                    .redirectOutput(processLog.toFile()).start();
+            if (!process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+                terminate(process);
+                throw new IOException("Vina process timed out after " + timeout);
+            }
+            output = Files.readString(processLog, StandardCharsets.UTF_8);
+            exitCode = process.exitValue();
         } catch (InterruptedException exception) {
-            process.destroyForcibly();
+            if (process != null) terminateWithoutWaiting(process);
             Thread.currentThread().interrupt();
             throw exception;
+        } finally {
+            Files.deleteIfExists(processLog);
         }
         return new VinaDockingResult(
                 exitCode, VinaOutputParser.parse(output), output);
@@ -144,5 +161,23 @@ public final class VinaDockingRunner {
             throw new IllegalArgumentException(
                     description + " does not exist: " + path);
         }
+    }
+
+    private static Duration requirePositive(Duration timeout) {
+        Objects.requireNonNull(timeout, "defaultExecutionTimeout");
+        if (timeout.isZero() || timeout.isNegative()) {
+            throw new IllegalArgumentException("defaultExecutionTimeout must be positive");
+        }
+        return timeout;
+    }
+
+    private static void terminate(Process process) throws InterruptedException {
+        terminateWithoutWaiting(process);
+        process.waitFor(10, TimeUnit.SECONDS);
+    }
+
+    private static void terminateWithoutWaiting(Process process) {
+        process.descendants().forEach(ProcessHandle::destroyForcibly);
+        process.destroyForcibly();
     }
 }

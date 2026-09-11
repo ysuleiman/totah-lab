@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Optional;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -156,6 +157,24 @@ class VinaDockingRunnerTest {
     void rejectsNonPositiveCpuControl() {
         assertThrows(IllegalArgumentException.class,
                 () -> new VinaExecutionOptions(0));
+    }
+
+    @Test
+    void rejectsNonPositiveExecutionTimeout() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new VinaExecutionOptions(1, Duration.ZERO));
+    }
+
+    @Test
+    void terminatesVinaWhenExecutionDeadlineExpires() throws Exception {
+        Path receptor = touch("timeout-receptor.pdbqt");
+        Path ligand = touch("timeout-ligand.pdbqt");
+        Path fakeVina = fakeVina("#!/bin/bash\nsleep 5\n");
+        IOException failure = assertThrows(IOException.class, () -> new VinaDockingRunner(fakeVina).run(
+                new DockingInput(receptor, ligand, Optional.empty()),
+                VinaDockingOptions.ofBox(0, 0, 0, 20, 20, 20), null,
+                new VinaExecutionOptions(1, Duration.ofMillis(50)), null));
+        assertTrue(failure.getMessage().contains("timed out"));
     }
 
     @Test
