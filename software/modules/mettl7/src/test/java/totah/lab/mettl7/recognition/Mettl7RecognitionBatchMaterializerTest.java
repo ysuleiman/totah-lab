@@ -66,15 +66,19 @@ class Mettl7RecognitionBatchMaterializerTest {
                 .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
         assertThat(summary.outcomes().stream().filter(o -> o.arm().equals("NETARSUDIL_A")))
                 .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
-        assertThat(summary.outcomes().stream().filter(o -> o.arm().startsWith("DCMB"))
-                .filter(o -> o.status().startsWith("ADMITTED_")))
+        assertThat(summary.outcomes().stream().filter(o -> o.arm().startsWith("DCMB")))
                 .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
-        assertThat(Files.readString(summary.receipt())).contains("dcmb_pi_evidence=ADEQUATE")
-                .contains("scientific_definitions_added=false");
+        assertThat(Files.readString(summary.receipt())).contains("DCMB_B_S={ADMITTED_ADEQUATE=26}")
+                .contains("scientific_definitions_added=false")
+                .contains("halogen_assignment_audit_pose_count=33")
+                .contains("halogen_assignment_audit_interaction_count=40");
+        assertThat(Files.readAllLines(output.resolve("DCMB_HALOGEN_ASSIGNMENT_AUDIT.csv")))
+                .hasSize(41)
+                .allSatisfy(line -> assertThat(line).doesNotContain("AMBIGUOUS_FEATURE_ASSIGNMENT"));
         assertThat(detailed.evidence()).hasSize((int) summary.outcomes().stream()
                 .filter(o -> o.status().startsWith("ADMITTED_")).count());
         assertThat(summary.outcomes().stream().filter(o -> o.status().startsWith("ADMITTED_")).count())
-                .isGreaterThanOrEqualTo(194);
+                .isEqualTo(227);
         assertThat(detailed.evidence()).allSatisfy(evidence -> {
             assertThat(evidence.observation().graph().edges()).noneMatch(edge ->
                     edge.environment().kind() == totah.lab.athena.recognition.RecognitionNode.Kind.SAM_FEATURE);

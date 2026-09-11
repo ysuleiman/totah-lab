@@ -83,14 +83,21 @@ public final class Mettl7RecognitionBatchMaterializer {
     }
 
     public static EvidenceSummary runWithEvidence(Path repositoryRoot, Path outputDirectory) throws IOException {
+        return runSources(repositoryRoot, outputDirectory, sources(repositoryRoot.toAbsolutePath().normalize()));
+    }
+
+    public static EvidenceSummary runWithEvidence(Path repositoryRoot, Path outputDirectory,
+            List<ManifestSource> manifestSources) throws IOException {
+        return runSources(repositoryRoot,outputDirectory,manifestSources.stream().map(ManifestSource::toSource).toList());
+    }
+
+    private static EvidenceSummary runSources(Path repositoryRoot, Path outputDirectory,
+            List<Source> sources) throws IOException {
         Path root = repositoryRoot.toAbsolutePath().normalize();
         Path output = outputDirectory.toAbsolutePath().normalize();
         Files.createDirectories(output);
 
-        List<Source> sources = sources(root);
-        if (sources.stream().mapToInt(Source::expectedModels).sum() != 227) {
-            throw new IOException("bounded inventory is not 227 poses");
-        }
+        int expectedPoseCount=sources.stream().mapToInt(Source::expectedModels).sum();
 
         PdbqtReader pdbqtReader = new PdbqtReader();
         SdfLigandReader sdfReader = new SdfLigandReader();
@@ -100,8 +107,9 @@ public final class Mettl7RecognitionBatchMaterializer {
         Mettl7RecognitionStateAdapter stateAdapter = new Mettl7RecognitionStateAdapter();
         Mettl7FrozenDifferentialSurfaceLoader surfaceLoader=new Mettl7FrozenDifferentialSurfaceLoader();
         var surfaceA=surfaceLoader.load(root,"A");var surfaceB=surfaceLoader.load(root,"B");
-        List<Outcome> outcomes = new ArrayList<>(227);
-        List<MaterializedEvidence> materialized = new ArrayList<>(227);
+        List<Outcome> outcomes = new ArrayList<>(expectedPoseCount);
+        List<MaterializedEvidence> materialized = new ArrayList<>(expectedPoseCount);
+        List<HalogenAssignmentAudit> halogenAudits = new ArrayList<>();
         for (Source source : sources) {
             PdbqtFile poseFile;
             try {
@@ -126,7 +134,7 @@ public final class Mettl7RecognitionBatchMaterializer {
                 continue;
             }
             StableContext stable;
-            try { stable = stableContext(stableLigandId(source.arm()), sdf); }
+            try { stable = stableContext(source.ligandId()!=null?source.ligandId():stableLigandId(source.arm()), sdf); }
             catch (RuntimeException exception) {
                 addFileFailure(outcomes, source, "REJECTED", "STABLE_FEATURE_PERCEPTION_FAILED: "+message(exception)); continue;
             }
@@ -134,7 +142,9 @@ public final class Mettl7RecognitionBatchMaterializer {
             for (PdbqtModel model : poseFile.models()) {
                 String poseId = source.arm() + ":" + source.seed() + ":model-" + model.modelNumber();
                 try {
-                    Mapping mapping = source.arm().startsWith("NETARSUDIL")
+                    Mapping mapping = source.preparedLigand()!=null
+                            ? preparedLigandMapping(source,sdf,model,pdbqtReader,atomMapper)
+                            : source.arm().startsWith("NETARSUDIL")
                             ? netarsudilMapping(root, source, sdf, model, pdbqtReader)
                             : dcmbMapping(atomMapper.map(source.ligandSdf(), source.poseFile(), model));
                     if (!mapping.successful()) {
@@ -153,23 +163,39 @@ public final class Mettl7RecognitionBatchMaterializer {
                     Map<Integer,String> assigned=new LinkedHashMap<>(); Map<Integer,EvidenceQuality> qualities=new LinkedHashMap<>();
                     List<String> ambiguities=new ArrayList<>(); boolean unavailable=false;
                     for(int i=0;i<profile.interactions().size();i++){
-                        var interaction=profile.interactions().get(i); Set<String> participating=new LinkedHashSet<>();
+                        var interaction=profile.interactions().get(i); Map<Integer,String> participating=new LinkedHashMap<>();
                         for(Atom atom:interaction.ligandAtoms()) if(atom.isHeavyAtom()){
                             Integer sdfIndex=mapping.poseSerialToSdfIndex().get(atom.getPdbSerial());
-                            if(sdfIndex!=null) participating.add(stable.orbits().get("sdf:"+sdfIndex));
+                            if(sdfIndex!=null) participating.put(atom.getPdbSerial(),stable.orbits().get("sdf:"+sdfIndex));
                         }
                         EvidenceQuality q=EvidenceQuality.ADEQUATE;
                         var assignment=featureAssigner.assign(interaction,participating,stable.features(),q); qualities.put(i,q);
+                        if (interaction.type() == InteractionType.HALOGEN_BOND) {
+                            Set<String> legacyParticipants = new LinkedHashSet<>(participating.values());
+                            var legacyAssignment = featureAssigner.assign(interaction, legacyParticipants,
+                                    stable.features(), q);
+                            if (!legacyAssignment.assigned() && assignment.assigned()) {
+                                halogenAudits.add(new HalogenAssignmentAudit(poseId, source.arm(), source.seed(),
+                                        model.modelNumber(), atomEvidence(interaction.ligandAtoms()),
+                                        atomEvidence(interaction.proteinAtoms()), interaction.residue().toString(),
+                                        stable.features().features().stream()
+                                                .filter(f -> f.type() == totah.lab.athena.design.feature.LigandFeature.Type.HALOGEN)
+                                                .map(f -> f.stableId()+":"+f.canonicalAtomOrbits()).sorted().toList(),
+                                        legacyParticipants, legacyAssignment.status().name(), assignment.status().name(),
+                                        "ATOM_TO_FEATURE_PARTICIPANT_ROLE: legacy assignment included donor carbon; "
+                                                + "canonical Interaction contract identifies ligandAtoms=[halogen, donor carbon]"));
+                            }
+                        }
                         if(assignment.assigned()) assigned.put(i,assignment.stableFeatureId().orElseThrow());
                         else {unavailable=true;ambiguities.add(i+":"+interaction.type()+":"+assignment.status()
-                                +":orbits="+participating+":candidates="+assignment.candidateFeatureIds());}
+                                +":atom_orbits="+participating+":candidates="+assignment.candidateFeatureIds());}
                     }
                     if(unavailable){outcomes.add(new Outcome(poseId,source.arm(),source.seed(),model.modelNumber(),source.poseFile(),sha256(source.poseFile()),"PENDING_EXTERNAL_EVIDENCE","FEATURE_ASSIGNMENT_UNAVAILABLE: "+ambiguities,mapping.poseSerialToSdfIndex().size(),sdf.atomCount(),profile.interactions().size(),profile.anyPerceptionDegraded(),mapping.hash(),"NOT_CREATED"));continue;}
-                    String stableLigandId=stableLigandId(source.arm());
+                    String stableLigandId=source.ligandId()!=null?source.ligandId():stableLigandId(source.arm());
                     var receipt=Mettl7RecognitionStateAdapter.PoseFeatureReceipt.create(stableLigandId,poseId,sha256(source.ligandSdf()),stable.idCode(),mapping.poseSerialToSdfIndex(),model.atoms().size(),sdf.atomCount(),assigned,stable.features(),ambiguities);
                     Map<ResidueId,ResidueId> identity=new LinkedHashMap<>(); profile.interactions().forEach(x->identity.put(x.residue(),x.residue()));
                     EvidenceQuality overall=profile.anyPerceptionDegraded()?EvidenceQuality.DEGRADED:EvidenceQuality.ADEQUATE;
-                    String paralog=source.arm().contains("_A")?"A":"B";
+                    String paralog=paralog(source);
                     var surface=paralog.equals("A")?surfaceA:surfaceB;
                     var adapted=stateAdapter.adapt(new Mettl7RecognitionStateAdapter.Input(
                             new Mettl7RecognitionStateAdapter.Artifact(poseId,source.poseFile(),sha256(source.poseFile())),
@@ -200,9 +226,11 @@ public final class Mettl7RecognitionBatchMaterializer {
             }
         }
         outcomes.sort(Comparator.comparing(Outcome::poseId));
-        validateAccounting(outcomes);
+        validateAccounting(outcomes,expectedPoseCount);
         Path accounting = output.resolve("MATERIALIZATION_OUTCOMES.csv");
         writeAccounting(accounting, outcomes);
+        Path halogenAudit = output.resolve("DCMB_HALOGEN_ASSIGNMENT_AUDIT.csv");
+        writeHalogenAudit(halogenAudit, halogenAudits);
         writeDiagnostics(output, materialized);
         Path receipt = output.resolve("BATCH_RECEIPT.txt");
         Files.writeString(receipt, String.join("\n",
@@ -214,16 +242,50 @@ public final class Mettl7RecognitionBatchMaterializer {
                         Outcome::arm, java.util.TreeMap::new, java.util.stream.Collectors.groupingBy(
                                 Outcome::status, java.util.TreeMap::new, java.util.stream.Collectors.counting()))),
                 "accounting_sha256=" + sha256(accounting),
+                "halogen_assignment_audit_pose_count=" + halogenAudits.stream()
+                        .map(HalogenAssignmentAudit::poseId).distinct().count(),
+                "halogen_assignment_audit_interaction_count=" + halogenAudits.size(),
+                "halogen_assignment_audit_sha256=" + sha256(halogenAudit),
                 "pairwise_diagnostics_sha256=" + sha256(output.resolve("PAIRWISE_DIAGNOSTICS.csv")),
                 "diagnostic_summary_sha256=" + sha256(output.resolve("DIAGNOSTIC_SUMMARY.txt")),
                 "blockers=" + outcomes.stream().map(Outcome::reason).distinct().sorted().toList(),
-                "scientific_definitions_added=false",
-                "dcmb_pi_evidence=ADEQUATE; canonical ligand bond graph and canonical receptor chemistry; no degraded ring perception") + "\n", StandardCharsets.UTF_8);
+                "scientific_definitions_added=false") + "\n", StandardCharsets.UTF_8);
         return new EvidenceSummary(new Summary(outcomes, accounting, receipt), materialized);
     }
 
+    private static Mapping preparedLigandMapping(Source source,SdfLigand sdf,PdbqtModel pose,
+            PdbqtReader reader,CanonicalSdfMeekoAtomMapper mapper)throws IOException{
+        PdbqtModel prepared=reader.read(source.preparedLigand()).firstModel();
+        var receipt=mapper.map(source.ligandSdf(),source.preparedLigand(),prepared);
+        Mapping canonical=receipt.status()==CanonicalSdfMeekoAtomMapper.Status.TOPOLOGY_ABSENT
+                ?coordinateElementMapping(source.preparedLigand(),sdf,prepared):dcmbMapping(receipt);
+        if(!canonical.successful())return canonical;
+        if(pose.atoms().size()!=prepared.atoms().size())return new Mapping(false,Map.of(),canonical.hash(),
+                "POSE_ORDER_MISMATCH","atom count");
+        for(int i=0;i<prepared.atoms().size();i++){
+            var a=prepared.atoms().get(i);var b=pose.atoms().get(i);
+            if(a.serial()!=b.serial()||!a.element().equals(b.element())||!a.autodockType().equals(b.autodockType()))
+                return new Mapping(false,Map.of(),canonical.hash(),"POSE_ORDER_MISMATCH","serial/type at "+i);
+        }
+        return new Mapping(true,canonical.poseSerialToSdfIndex(),canonical.hash(),canonical.status(),
+                canonical.detail()+"; prepared-to-pose serial/element/type equality");
+    }
+
+    private static Mapping coordinateElementMapping(Path preparedPath,SdfLigand sdf,PdbqtModel prepared)throws IOException{
+        List<Atom>sdfAtoms=sdf.ligand().structure().getChains().getFirst().residues().getFirst().getAtoms();
+        Map<Integer,Integer> map=new LinkedHashMap<>();Set<Integer> used=new LinkedHashSet<>();
+        for(var p:prepared.atoms()){int best=-1;double bd=Double.POSITIVE_INFINITY;for(int i=0;i<sdfAtoms.size();i++){
+            Atom a=sdfAtoms.get(i);if(used.contains(i)||!a.getElement().symbol().equalsIgnoreCase(p.element()))continue;
+            double d=a.getPosition().distance(p.position());if(d<bd){bd=d;best=i;}}
+            if(best<0||bd>0.002)return new Mapping(false,Map.of(),sha256(preparedPath),
+                    "PREPARED_SDF_CORRESPONDENCE_FAILED","coordinate/element mismatch "+p.serial());
+            used.add(best);map.put(p.serial(),best);}
+        return new Mapping(true,map,Mettl7RecognitionStateAdapter.mappingHash(map),"UNIQUE_MAPPING",
+                "existing prepared/SDF coordinate-element bijection (0.002 A)" );
+    }
+
     private static Structure loadReceptor(Path root, Source source) throws IOException {
-        String paralog = source.arm().contains("_A") ? "A" : "B";
+        String paralog = paralog(source);
         Path canonical = root.resolve("software/modules/daedalus/src/test/resources/ligand/SAM.sdf");
         Path preparedSam = root.resolve("analysis/dcmb/controlled_campaign/prepared/7" + paralog + "_SAM.sdf");
         Path proteinTopology = "A".equals(paralog)
@@ -233,6 +295,11 @@ public final class Mettl7RecognitionBatchMaterializer {
                         + "METTL7B_SAM_TOPOLOGY_COMPLETE_EXACT_COORDS.pdb");
         return new Mettl7SamTopologyRestorer().restore(
                 canonical, preparedSam, source.receptorFile(), proteinTopology).structure();
+    }
+
+    private static String paralog(Source source){
+        if(source.preparedLigand()!=null)return source.arm().endsWith("_A")?"A":"B";
+        return source.arm().contains("_A")?"A":"B";
     }
 
     private static StableContext stableContext(String ligandId,SdfLigand sdf){
@@ -255,8 +322,8 @@ public final class Mettl7RecognitionBatchMaterializer {
     private static Mapping netarsudilMapping(Path root,Source source,SdfLigand sdf,PdbqtModel pose,PdbqtReader reader)throws IOException{
         Path prepared=root.resolve("research/mettl7-netarsudil-sam-mechanism/vina-matched/prepared/netarsudil_neutral.pdbqt");
         if(!sha256(prepared).equals("4c35ff1aebb273aa8bfca60311bd4017b93b7dacc27b57d40e3e2cfc3b00939c"))return new Mapping(false,Map.of(),sha256(prepared),"PROVENANCE_HASH_MISMATCH","prepared ligand hash");
-        PdbqtModel prep=reader.read(prepared).firstModel();List<Atom>sdfAtoms=sdf.ligand().structure().getChains().getFirst().residues().getFirst().getAtoms();Map<Integer,Integer> map=new LinkedHashMap<>();Set<Integer> used=new LinkedHashSet<>();
-        for(var p:prep.atoms()){int best=-1;double bd=Double.POSITIVE_INFINITY;for(int i=0;i<sdfAtoms.size();i++){Atom a=sdfAtoms.get(i);if(used.contains(i)||!a.getElement().symbol().equalsIgnoreCase(p.element()))continue;double d=a.getPosition().distance(p.position());if(d<bd){bd=d;best=i;}}if(best<0||bd>0.002)return new Mapping(false,Map.of(),sha256(prepared),"PREPARED_SDF_CORRESPONDENCE_FAILED","coordinate/element mismatch "+p.serial());used.add(best);map.put(p.serial(),best);}
+        PdbqtModel prep=reader.read(prepared).firstModel();Mapping preparedMapping=coordinateElementMapping(prepared,sdf,prep);
+        if(!preparedMapping.successful())return preparedMapping;Map<Integer,Integer> map=preparedMapping.poseSerialToSdfIndex();
         if(pose.atoms().size()!=prep.atoms().size())return new Mapping(false,Map.of(),sha256(prepared),"POSE_ORDER_MISMATCH","atom count");
         for(int i=0;i<prep.atoms().size();i++){var a=prep.atoms().get(i);var b=pose.atoms().get(i);if(a.serial()!=b.serial()||!a.element().equals(b.element())||!a.autodockType().equals(b.autodockType()))return new Mapping(false,Map.of(),sha256(prepared),"POSE_ORDER_MISMATCH","serial/type at "+i);}
         return new Mapping(true,map,Mettl7RecognitionStateAdapter.mappingHash(map),"UNIQUE_MAPPING","manifest ligand hash + prepared/SDF coordinate-element bijection + pose serial/type equality");
@@ -360,7 +427,9 @@ public final class Mettl7RecognitionBatchMaterializer {
                 +" policyD=UNAVAILABLE_NO_CANONICAL_DEFINING_FEATURES");
         for(var e:aggregate.entrySet())lines.add(e.getKey()+" "+e.getValue().render());
         lines.add("historical_family_diagnostics=UNAVAILABLE_NO_FAMILY_PROVENANCE");
-        lines.add("dcmb_pi_evidence=ADEQUATE; canonical ligand bond graph and canonical receptor chemistry; no degraded ring perception");
+        lines.add("evaluated_arm_quality_counts=" + observations.stream().collect(java.util.stream.Collectors.groupingBy(
+                MaterializedEvidence::arm, java.util.TreeMap::new, java.util.stream.Collectors.groupingBy(
+                        e -> e.observation().quality(), java.util.TreeMap::new, java.util.stream.Collectors.counting()))));
         Files.write(summary,lines,StandardCharsets.UTF_8);
     }
 
@@ -445,7 +514,7 @@ public final class Mettl7RecognitionBatchMaterializer {
             for (String seed : List.of("172904", "483271", "806519")) {
                 result.add(new Source("NETARSUDIL_" + paralog, seed,
                         netRaw.resolve("7" + paralog + "_neutral_seed" + seed + ".pdbqt"), netSdf,
-                        netPrepared.resolve("METTL7" + paralog + "_SAM_receptor.pdbqt"), 20));
+                        netPrepared.resolve("METTL7" + paralog + "_SAM_receptor.pdbqt"), 20,null,null));
             }
         }
 
@@ -458,7 +527,7 @@ public final class Mettl7RecognitionBatchMaterializer {
                             dcmb.resolve("raw/7" + paralog + "_WT_SAM_BOUND_" + enantiomer + "_s" + seed + ".pdbqt"),
                             root.resolve("research/mettl7-selectivity-forensics/dcmb-analog-program/sah-campaign-v1/ligands/DCMB_"
                                     + enantiomer + "_NEUTRAL.sdf"),
-                            dcmb.resolve("prepared/7" + paralog + "_WT_SAM_BOUND.pdbqt"), models));
+                            dcmb.resolve("prepared/7" + paralog + "_WT_SAM_BOUND.pdbqt"), models,null,null));
                 }
             }
         }
@@ -477,8 +546,8 @@ public final class Mettl7RecognitionBatchMaterializer {
         }
     }
 
-    private static void validateAccounting(List<Outcome> outcomes) throws IOException {
-        if (outcomes.size() != 227) throw new IOException("expected 227 outcomes, observed " + outcomes.size());
+    private static void validateAccounting(List<Outcome> outcomes,int expected) throws IOException {
+        if (outcomes.size() != expected) throw new IOException("expected "+expected+" outcomes, observed " + outcomes.size());
         Set<String> ids = new LinkedHashSet<>();
         for (Outcome outcome : outcomes) {
             if (!ids.add(outcome.poseId())) throw new IOException("duplicate pose outcome " + outcome.poseId());
@@ -500,6 +569,25 @@ public final class Mettl7RecognitionBatchMaterializer {
                         o.perceptionDegraded(), o.featureReceipt(), o.recognitionObservation()));
             }
         }
+    }
+
+    private static void writeHalogenAudit(Path path, List<HalogenAssignmentAudit> audits) throws IOException {
+        audits.sort(Comparator.comparing(HalogenAssignmentAudit::poseId));
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            writer.write(csv("pose_id", "arm", "seed", "model", "ligand_atoms", "protein_atoms",
+                    "protein_residue", "existing_halogen_features", "legacy_participant_orbits",
+                    "legacy_status", "repaired_status", "classified_failure_mode"));
+            for (HalogenAssignmentAudit audit : audits) {
+                writer.write(csv(audit.poseId(), audit.arm(), audit.seed(), audit.model(), audit.ligandAtoms(),
+                        audit.proteinAtoms(), audit.proteinResidue(), audit.existingHalogenFeatures(),
+                        audit.legacyParticipantOrbits(), audit.legacyStatus(), audit.repairedStatus(),
+                        audit.classifiedFailureMode()));
+            }
+        }
+    }
+
+    private static List<String> atomEvidence(List<Atom> atoms) {
+        return atoms.stream().map(atom -> atom.getPdbSerial()+":"+atom.getName()+":"+atom.getElement()).toList();
     }
 
     private static String csv(Object... values) {
@@ -538,8 +626,28 @@ public final class Mettl7RecognitionBatchMaterializer {
         return exception.getClass().getSimpleName() + (message == null ? "" : ": " + message);
     }
 
+    private record HalogenAssignmentAudit(String poseId, String arm, String seed, int model,
+            List<String> ligandAtoms, List<String> proteinAtoms, String proteinResidue,
+            List<String> existingHalogenFeatures, Set<String> legacyParticipantOrbits,
+            String legacyStatus, String repairedStatus, String classifiedFailureMode) {
+        private HalogenAssignmentAudit {
+            ligandAtoms = List.copyOf(ligandAtoms);
+            proteinAtoms = List.copyOf(proteinAtoms);
+            existingHalogenFeatures = List.copyOf(existingHalogenFeatures);
+            legacyParticipantOrbits = Set.copyOf(legacyParticipantOrbits);
+        }
+    }
+
     private record Source(String arm, String seed, Path poseFile, Path ligandSdf,
-                          Path receptorFile, int expectedModels) { }
+                          Path receptorFile, int expectedModels,Path preparedLigand,String ligandId) { }
+
+    public record ManifestSource(String arm,String seed,Path poseFile,Path ligandSdf,Path receptorFile,
+            int expectedModels,Path preparedLigand,String ligandId){
+        public ManifestSource{Objects.requireNonNull(arm);Objects.requireNonNull(seed);Objects.requireNonNull(poseFile);
+            Objects.requireNonNull(ligandSdf);Objects.requireNonNull(receptorFile);Objects.requireNonNull(preparedLigand);
+            Objects.requireNonNull(ligandId);if(expectedModels<1)throw new IllegalArgumentException("expectedModels");}
+        private Source toSource(){return new Source(arm,seed,poseFile,ligandSdf,receptorFile,expectedModels,preparedLigand,ligandId);}
+    }
 
     public record Outcome(String poseId, String arm, String seed, int model, Path source,
                           String sourceSha256, String status, String reason, int mappedAtoms,

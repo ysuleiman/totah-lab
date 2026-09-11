@@ -9,13 +9,45 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 /** Assigns an existing interaction to an existing stable feature by canonical atom orbit. */
 public final class InteractionStableFeatureAssigner {
-    public static final String VERSION="INTERACTION_STABLE_FEATURE_ASSIGNER_V1";
+    public static final String VERSION="INTERACTION_STABLE_FEATURE_ASSIGNER_V2";
+
+    /**
+     * Assigns from the canonical interaction atom contract.  The mapping is
+     * keyed by the ligand atom PDB serial used in {@code interaction}; it
+     * prevents participant-role information from being discarded before
+     * feature assignment.
+     */
+    public Result assign(Interaction interaction, Map<Integer, String> ligandAtomSerialToOrbit,
+            StableLigandFeatureMap features, EvidenceQuality interactionQuality) {
+        Objects.requireNonNull(interaction);
+        Objects.requireNonNull(ligandAtomSerialToOrbit);
+        Set<String> participating = new LinkedHashSet<>();
+        for (var atom : interaction.ligandAtoms()) {
+            if (!atom.isHeavyAtom()) {
+                continue;
+            }
+            if (interaction.type() == InteractionType.HALOGEN_BOND
+                    && (atom.getElement() == null || !atom.getElement().isHalogen())) {
+                continue;
+            }
+            String orbit = ligandAtomSerialToOrbit.get(atom.getPdbSerial());
+            if (orbit != null) {
+                participating.add(orbit);
+            }
+        }
+        if (participating.isEmpty()) {
+            return unavailable(interaction, participating, interactionQuality);
+        }
+        return assign(interaction, participating, features, interactionQuality);
+    }
 
     public Result assign(Interaction interaction, Set<String> participatingLigandAtomOrbits,
             StableLigandFeatureMap features, EvidenceQuality interactionQuality) {
@@ -37,6 +69,14 @@ public final class InteractionStableFeatureAssigner {
         String canonical=interaction.type()+"|"+participatingLigandAtomOrbits.stream().sorted().toList()+"|"
                 +candidates.stream().map(StableLigandFeatureMap.Feature::stableId).sorted().toList()+"|"+status+"|"+interactionQuality;
         return new Result(status,selected,candidates.stream().map(StableLigandFeatureMap.Feature::stableId).sorted().toList(),
+                interactionQuality,sha256(canonical),VERSION);
+    }
+
+    private Result unavailable(Interaction interaction, Set<String> participating,
+            EvidenceQuality interactionQuality) {
+        String canonical=interaction.type()+"|"+participating.stream().sorted().toList()+"|[]|"
+                +Status.FEATURE_ASSIGNMENT_UNAVAILABLE+"|"+interactionQuality;
+        return new Result(Status.FEATURE_ASSIGNMENT_UNAVAILABLE,Optional.empty(),List.of(),
                 interactionQuality,sha256(canonical),VERSION);
     }
 
