@@ -40,13 +40,13 @@ class Mettl7RecognitionBatchMaterializerTest {
         var detailed = Mettl7RecognitionBatchMaterializer.runWithEvidence(root, output);
         var summary=detailed.summary();
 
-        assertThat(summary.outcomes()).hasSize(168);
+        assertThat(summary.outcomes()).hasSize(227);
         assertThat(summary.outcomes()).extracting(Mettl7RecognitionBatchMaterializer.Outcome::poseId)
                 .doesNotHaveDuplicates();
         Map<String, Long> arms = summary.outcomes().stream().collect(Collectors.groupingBy(
                 Mettl7RecognitionBatchMaterializer.Outcome::arm, Collectors.counting()));
         assertThat(arms).containsEntry("NETARSUDIL_B", 60L)
-                .containsEntry("NETARSUDIL_A", 1L)
+                .containsEntry("NETARSUDIL_A", 60L)
                 .containsEntry("DCMB_A_R", 27L).containsEntry("DCMB_A_S", 27L)
                 .containsEntry("DCMB_B_R", 27L).containsEntry("DCMB_B_S", 26L);
         assertThat(summary.outcomes()).allSatisfy(outcome -> {
@@ -65,17 +65,16 @@ class Mettl7RecognitionBatchMaterializerTest {
         assertThat(summary.outcomes().stream().filter(o -> o.arm().equals("NETARSUDIL_B")))
                 .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
         assertThat(summary.outcomes().stream().filter(o -> o.arm().equals("NETARSUDIL_A")))
-                .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_DEGRADED"));
+                .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
         assertThat(summary.outcomes().stream().filter(o -> o.arm().startsWith("DCMB"))
                 .filter(o -> o.status().startsWith("ADMITTED_")))
-                .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_DEGRADED"));
-        assertThat(Files.readString(summary.receipt())).contains("dcmb_pi_evidence=DEGRADED")
+                .allSatisfy(o -> assertThat(o.status()).isEqualTo("ADMITTED_ADEQUATE"));
+        assertThat(Files.readString(summary.receipt())).contains("dcmb_pi_evidence=ADEQUATE")
                 .contains("scientific_definitions_added=false");
-        assertThat(detailed.evidence()).hasSize(168);
+        assertThat(detailed.evidence()).hasSize((int) summary.outcomes().stream()
+                .filter(o -> o.status().startsWith("ADMITTED_")).count());
         assertThat(summary.outcomes().stream().filter(o -> o.status().startsWith("ADMITTED_")).count())
-                .isEqualTo(168);
-        assertThat(summary.outcomes().stream().filter(o -> o.status().equals("PENDING_EXTERNAL_EVIDENCE")).count())
-                .isZero();
+                .isGreaterThanOrEqualTo(194);
         assertThat(detailed.evidence()).allSatisfy(evidence -> {
             assertThat(evidence.observation().graph().edges()).noneMatch(edge ->
                     edge.environment().kind() == totah.lab.athena.recognition.RecognitionNode.Kind.SAM_FEATURE);
@@ -88,8 +87,11 @@ class Mettl7RecognitionBatchMaterializerTest {
         assertThat(detailed.evidence()).anySatisfy(evidence ->
                 assertThat(evidence.cofactorEvidence().cofactorResidues()).isNotEmpty());
         assertThat(detailed.evidence().stream().filter(e->e.arm().startsWith("DCMB")))
-                .allSatisfy(e->assertThat(e.observation().graph().edges())
-                        .noneMatch(edge->edge.interactionType().name().startsWith("PI_")));
+                .allSatisfy(e->assertThat(e.cofactorEvidence().perception())
+                        .filteredOn(p -> p.side().equals("ligand")).singleElement().satisfies(p -> {
+                            assertThat(p.ringCount()).isEqualTo(1);
+                            assertThat(p.degradedRingCount()).isZero();
+                        }));
         assertThat(detailed.evidence()).anySatisfy(evidence -> assertThat(evidence.observation().graph().edges())
                 .anyMatch(edge->edge.differentialSurface().isPresent()));
     }

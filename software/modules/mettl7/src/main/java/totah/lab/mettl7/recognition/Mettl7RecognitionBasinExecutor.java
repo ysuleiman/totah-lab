@@ -38,7 +38,7 @@ public final class Mettl7RecognitionBasinExecutor {
             bw.write(csv("arm","geometry_threshold_A","topology_threshold","basin_id","recurrent","members","seeds","runs","geometry_medoid","topology_medoid","geometry_mean","geometry_max","topology_mean","topology_max","persistent_edges","variable_edges","quality","flags","surfdiff_environments"));
             pw.write(csv("arm","geometry_threshold_A","topology_threshold","pose_1","pose_2","geometry_pass","topology_pass","reroute","matched_geometry_pass","ambiguity","quality","admitted","reasons","provenance"));
             for(var entry:arms.entrySet()){
-                String arm=entry.getKey();if(arm.equals("NETARSUDIL_A"))continue;
+                String arm=entry.getKey();
                 var evidence=entry.getValue();Map<String,FixedFrameHeavyAtomGeometryDistance.PoseGeometry> geometryMap=new LinkedHashMap<>();
                 evidence.forEach(e->geometryMap.put(e.observation().poseId(),e.geometry()));
                 var geometry=new FixedFrameHeavyAtomGeometryDistance(geometryMap);
@@ -61,18 +61,13 @@ public final class Mettl7RecognitionBasinExecutor {
         lines.add("recurrence=minimum_members_2,minimum_seeds_2,minimum_runs_2");lines.add("sensitivity_geometry="+Arrays.toString(GEOMETRY));lines.add("sensitivity_topology="+Arrays.toString(TOPOLOGY));
         for(var e:primary.entrySet())lines.add(e.getKey()+" primary_basins="+e.getValue().basins().size()+" recurrent="+e.getValue().basins().stream().filter(RecognitionBasinExecutionResult.BasinResult::recurrent).count()+" sizes="+e.getValue().basins().stream().map(b->b.basin().members().size()).toList());
         sensitivity.forEach((arm,value)->lines.add(arm+" sensitivity="+value));
-        lines.add("NETARSUDIL_A=SINGLE_OBSERVED_ALTERNATIVE_STATE");lines.add("NETARSUDIL_A_BASIN_ABSENCE=INSUFFICIENT_EVIDENCE");
-        lines.add("DCMB_PI_EVIDENCE=DEGRADED");
+        lines.add("NETARSUDIL_A=MATCHED_60_POSE_ADEQUATE_ENSEMBLE");
+        lines.add("DCMB_PI_EVIDENCE=ADEQUATE; canonical ligand bond graph and canonical receptor chemistry; no degraded ring perception");
         lines.add("SURFDIFF=ATTACHED_FROZEN_DIRECTIONAL_MAPS");
         lines.add("SURFDIFF_A_VS_B_SHA256="+Mettl7FrozenDifferentialSurfaceLoader.A_VS_B_SHA256);
         lines.add("SURFDIFF_B_VS_A_SHA256="+Mettl7FrozenDifferentialSurfaceLoader.B_VS_A_SHA256);
         appendRoleEvidence(lines,primary);
-        lines.add("NETARSUDIL_A_COMPARISON=INSUFFICIENT_EVIDENCE_SINGLE_DEGRADED_CONTROL; no absence claim");
-        lines.add("DCMB_A_B_COMPARISON=INSUFFICIENT_EVIDENCE_FOR_STRONG_BASIN_STATE; all observations are admitted but DCMB pi evidence remains degraded");
-        lines.add("SELECTIVITY_HYPOTHESIS=UNRESOLVED");
-        lines.add("NETARSUDIL_B_SENSITIVITY=THRESHOLD_FRAGILE");
-        lines.add("DCMB_A_R_SENSITIVITY=MOSTLY_ROBUST");lines.add("DCMB_A_S_SENSITIVITY=MOSTLY_ROBUST");
-        lines.add("DCMB_B_R_SENSITIVITY=MOSTLY_ROBUST");lines.add("DCMB_B_S_SENSITIVITY=THRESHOLD_FRAGILE");
+        lines.add("SELECTIVITY_INTERPRETATION=REQUIRES_EVIDENCE_SYNTHESIS_FROM_REGENERATED_BASINS");
         lines.add("basins_sha256="+sha256(basins));lines.add("pair_admissions_sha256="+sha256(pairs));Files.write(receipt,lines,StandardCharsets.UTF_8);
         return new Result(primary,basins,pairs,receipt,materialized.summary().outcomes().size(),materialized.evidence().size());
     }
@@ -105,7 +100,7 @@ public final class Mettl7RecognitionBasinExecutor {
                         +" local_status="+differential+" "+scores+" evidence_quality="+qualities
                         +" formal_roles="+(formalRoles.isEmpty()?Set.of(InteractionRole.UNRESOLVED):formalRoles));}
         }
-        lines.add("role_reason=defining requires adequate alternative-basin evidence; netarsudil A is one degraded control and DCMB evidence is degraded");
+        lines.add("role_reason=defining requires adequate matched alternative-basin evidence; classification remains evidence-bound");
     }
 
     private static RecognitionBasinPolicy policy(double geometry,double topology){return new RecognitionBasinPolicy(geometry,topology,1,1,

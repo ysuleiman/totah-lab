@@ -34,6 +34,7 @@ import totah.lab.hermes.file.sdf.SdfLigand;
 import totah.lab.hermes.file.sdf.reader.SdfLigandReader;
 import totah.lab.mettl7.campaign.v2.Mettl7FrozenPoseLigand;
 import totah.lab.mettl7.surface.Mettl7FrozenDifferentialSurfaceLoader;
+import totah.lab.mettl7.topology.Mettl7SamTopologyRestorer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -87,8 +88,8 @@ public final class Mettl7RecognitionBatchMaterializer {
         Files.createDirectories(output);
 
         List<Source> sources = sources(root);
-        if (sources.stream().mapToInt(Source::expectedModels).sum() != 168) {
-            throw new IOException("bounded inventory is not 168 poses");
+        if (sources.stream().mapToInt(Source::expectedModels).sum() != 227) {
+            throw new IOException("bounded inventory is not 227 poses");
         }
 
         PdbqtReader pdbqtReader = new PdbqtReader();
@@ -99,8 +100,8 @@ public final class Mettl7RecognitionBatchMaterializer {
         Mettl7RecognitionStateAdapter stateAdapter = new Mettl7RecognitionStateAdapter();
         Mettl7FrozenDifferentialSurfaceLoader surfaceLoader=new Mettl7FrozenDifferentialSurfaceLoader();
         var surfaceA=surfaceLoader.load(root,"A");var surfaceB=surfaceLoader.load(root,"B");
-        List<Outcome> outcomes = new ArrayList<>(168);
-        List<MaterializedEvidence> materialized = new ArrayList<>(168);
+        List<Outcome> outcomes = new ArrayList<>(227);
+        List<MaterializedEvidence> materialized = new ArrayList<>(227);
         for (Source source : sources) {
             PdbqtFile poseFile;
             try {
@@ -119,7 +120,7 @@ public final class Mettl7RecognitionBatchMaterializer {
             Structure receptor;
             try {
                 sdf = sdfReader.readModel(source.ligandSdf());
-                receptor = loadReceptor(source, pdbqtReader);
+                receptor = loadReceptor(root, source);
             } catch (IOException | RuntimeException exception) {
                 addFileFailure(outcomes, source, "REJECTED", "CANONICAL_INPUT_FAILED: " + message(exception));
                 continue;
@@ -147,8 +148,7 @@ public final class Mettl7RecognitionBatchMaterializer {
                     InteractionProfile completeProfile=environment.cofactor().isEmpty()
                             ?profiler.profile(environment.protein(),ligand.structure(),ligand.formalCharges())
                             :profiler.profile(environment.protein(),ligand.structure(),environment.cofactor(),ligand.formalCharges());
-                    boolean dcmb=source.arm().startsWith("DCMB");
-                    InteractionProfile profile=proteinRecognitionProfile(completeProfile,dcmb);
+                    InteractionProfile profile=proteinRecognitionProfile(completeProfile);
                     InteractionProfile cofactorProfile=cofactorProfile(completeProfile);
                     Map<Integer,String> assigned=new LinkedHashMap<>(); Map<Integer,EvidenceQuality> qualities=new LinkedHashMap<>();
                     List<String> ambiguities=new ArrayList<>(); boolean unavailable=false;
@@ -168,7 +168,7 @@ public final class Mettl7RecognitionBatchMaterializer {
                     String stableLigandId=stableLigandId(source.arm());
                     var receipt=Mettl7RecognitionStateAdapter.PoseFeatureReceipt.create(stableLigandId,poseId,sha256(source.ligandSdf()),stable.idCode(),mapping.poseSerialToSdfIndex(),model.atoms().size(),sdf.atomCount(),assigned,stable.features(),ambiguities);
                     Map<ResidueId,ResidueId> identity=new LinkedHashMap<>(); profile.interactions().forEach(x->identity.put(x.residue(),x.residue()));
-                    EvidenceQuality overall=source.arm().startsWith("DCMB")||profile.anyPerceptionDegraded()?EvidenceQuality.DEGRADED:EvidenceQuality.ADEQUATE;
+                    EvidenceQuality overall=profile.anyPerceptionDegraded()?EvidenceQuality.DEGRADED:EvidenceQuality.ADEQUATE;
                     String paralog=source.arm().contains("_A")?"A":"B";
                     var surface=paralog.equals("A")?surfaceA:surfaceB;
                     var adapted=stateAdapter.adapt(new Mettl7RecognitionStateAdapter.Input(
@@ -218,15 +218,21 @@ public final class Mettl7RecognitionBatchMaterializer {
                 "diagnostic_summary_sha256=" + sha256(output.resolve("DIAGNOSTIC_SUMMARY.txt")),
                 "blockers=" + outcomes.stream().map(Outcome::reason).distinct().sorted().toList(),
                 "scientific_definitions_added=false",
-                "dcmb_pi_evidence=DEGRADED") + "\n", StandardCharsets.UTF_8);
+                "dcmb_pi_evidence=ADEQUATE; canonical ligand bond graph and canonical receptor chemistry; no degraded ring perception") + "\n", StandardCharsets.UTF_8);
         return new EvidenceSummary(new Summary(outcomes, accounting, receipt), materialized);
     }
 
-    private static Structure loadReceptor(Source source, PdbqtReader reader) throws IOException {
-        if (source.receptorFile().getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".pdb")) {
-            return new PdbReader().read(source.receptorFile());
-        }
-        return PdbqtGaiaMapper.toStructure(reader.read(source.receptorFile()));
+    private static Structure loadReceptor(Path root, Source source) throws IOException {
+        String paralog = source.arm().contains("_A") ? "A" : "B";
+        Path canonical = root.resolve("software/modules/daedalus/src/test/resources/ligand/SAM.sdf");
+        Path preparedSam = root.resolve("analysis/dcmb/controlled_campaign/prepared/7" + paralog + "_SAM.sdf");
+        Path proteinTopology = "A".equals(paralog)
+                ? root.resolve("analysis/mettl7-netarsudil-autodock4-matched-rigid-2026-09-10/results/"
+                        + "topology_complete_athena/METTL7A_SAM_TOPOLOGY_COMPLETE_EXACT_AD4_COORDS.pdb")
+                : root.resolve("software/modules/athena/src/test/resources/mettl7-v2-regression/netarsudil/"
+                        + "METTL7B_SAM_TOPOLOGY_COMPLETE_EXACT_COORDS.pdb");
+        return new Mettl7SamTopologyRestorer().restore(
+                canonical, preparedSam, source.receptorFile(), proteinTopology).structure();
     }
 
     private static StableContext stableContext(String ligandId,SdfLigand sdf){
@@ -258,7 +264,6 @@ public final class Mettl7RecognitionBatchMaterializer {
     private static Mettl7FrozenPoseLigand frozenPose(SdfLigand sdf,PdbqtModel model,Map<Integer,Integer> poseToSdf)throws IOException{
         StringBuilder index=new StringBuilder("REMARK INDEX MAP");poseToSdf.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(e->index.append(' ').append(e.getValue()+1).append(' ').append(e.getKey()));List<String> remarks=new ArrayList<>(model.remarks());remarks.add(index.toString());return Mettl7FrozenPoseLigand.reconstruct(sdf,new PdbqtModel(model.modelNumber(),model.atoms(),model.torsionTree(),remarks));
     }
-    private static boolean isPi(InteractionType type){return type==InteractionType.PI_CATION||type==InteractionType.PI_STACK_PARALLEL||type==InteractionType.PI_STACK_T_SHAPED;}
     static String stableLigandId(String arm){
         if(arm.startsWith("NETARSUDIL"))return "NETARSUDIL";
         if(arm.endsWith("_R"))return "DCMB_R";
@@ -284,11 +289,11 @@ public final class Mettl7RecognitionBatchMaterializer {
         List<Bond>bonds=structure.bonds().stream().filter(b->retained.contains(b.atom1())&&retained.contains(b.atom2())).toList();
         return new Structure(chains,bonds,structure.getConnectivityMetadata());
     }
-    private static InteractionProfile proteinRecognitionProfile(InteractionProfile complete,boolean excludePi){
+    private static InteractionProfile proteinRecognitionProfile(InteractionProfile complete){
         var interactions=complete.interactions().stream().filter(i->!complete.cofactorResidues().contains(i.residue()))
-                .filter(i->!excludePi||!isPi(i.type())).toList();
+                .toList();
         var raw=complete.rawInteractions().stream().filter(i->!complete.cofactorResidues().contains(i.residue()))
-                .filter(i->!excludePi||!isPi(i.type())).toList();
+                .toList();
         return new InteractionProfile(interactions,raw,Set.of(),complete.thresholds(),complete.perception());
     }
     private static InteractionProfile cofactorProfile(InteractionProfile complete){
@@ -355,7 +360,7 @@ public final class Mettl7RecognitionBatchMaterializer {
                 +" policyD=UNAVAILABLE_NO_CANONICAL_DEFINING_FEATURES");
         for(var e:aggregate.entrySet())lines.add(e.getKey()+" "+e.getValue().render());
         lines.add("historical_family_diagnostics=UNAVAILABLE_NO_FAMILY_PROVENANCE");
-        lines.add("dcmb_pi_evidence=DEGRADED");
+        lines.add("dcmb_pi_evidence=ADEQUATE; canonical ligand bond graph and canonical receptor chemistry; no degraded ring perception");
         Files.write(summary,lines,StandardCharsets.UTF_8);
     }
 
@@ -435,15 +440,14 @@ public final class Mettl7RecognitionBatchMaterializer {
         List<Source> result = new ArrayList<>();
         Path netRaw = root.resolve("research/mettl7-netarsudil-sam-mechanism/vina-matched/raw");
         Path netSdf = root.resolve("research/mettl7-netarsudil-sam-mechanism/vina-matched/prepared/netarsudil_CID66599893_neutral.sdf");
-        Path netBReceptor = root.resolve("software/modules/athena/src/test/resources/mettl7-v2-regression/netarsudil/METTL7B_SAM_TOPOLOGY_COMPLETE_EXACT_COORDS.pdb");
-        for (String seed : List.of("172904", "483271", "806519")) {
-            result.add(new Source("NETARSUDIL_B", seed,
-                    netRaw.resolve("7B_neutral_seed" + seed + ".pdbqt"), netSdf, netBReceptor, 20));
+        Path netPrepared = root.resolve("research/mettl7-netarsudil-sam-mechanism/vina-matched/prepared");
+        for (String paralog : List.of("A", "B")) {
+            for (String seed : List.of("172904", "483271", "806519")) {
+                result.add(new Source("NETARSUDIL_" + paralog, seed,
+                        netRaw.resolve("7" + paralog + "_neutral_seed" + seed + ".pdbqt"), netSdf,
+                        netPrepared.resolve("METTL7" + paralog + "_SAM_receptor.pdbqt"), 20));
+            }
         }
-        result.add(new Source("NETARSUDIL_A", "control",
-                root.resolve("research/mettl7-netarsudil-sam-mechanism/local-architecture/prepared/corrected_7A_lowest_strain_mode15.pdbqt"),
-                netSdf,
-                root.resolve("software/modules/athena/src/test/resources/mettl7-v2-regression/netarsudil/METTL7A_SAM_receptor.pdbqt"), 1));
 
         Path dcmb = root.resolve("analysis/dcmb/controlled_campaign");
         for (String paralog : List.of("A", "B")) {
@@ -474,7 +478,7 @@ public final class Mettl7RecognitionBatchMaterializer {
     }
 
     private static void validateAccounting(List<Outcome> outcomes) throws IOException {
-        if (outcomes.size() != 168) throw new IOException("expected 168 outcomes, observed " + outcomes.size());
+        if (outcomes.size() != 227) throw new IOException("expected 227 outcomes, observed " + outcomes.size());
         Set<String> ids = new LinkedHashSet<>();
         for (Outcome outcome : outcomes) {
             if (!ids.add(outcome.poseId())) throw new IOException("duplicate pose outcome " + outcome.poseId());

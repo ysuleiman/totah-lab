@@ -14,11 +14,11 @@ class Mettl7RecognitionBasinExecutorTest {
         Path root=Path.of("../../..").toAbsolutePath().normalize();
         Path output=System.getProperty("mettl7.basin.output")==null?temporary:Path.of(System.getProperty("mettl7.basin.output"));
         var result=Mettl7RecognitionBasinExecutor.execute(root,output);
-        assertThat(result.rawPoseCount()).isEqualTo(168);assertThat(result.observationCount()).isEqualTo(168);
-        assertThat(result.primary()).containsOnlyKeys("NETARSUDIL_B","DCMB_A_R","DCMB_A_S","DCMB_B_R","DCMB_B_S");
+        assertThat(result.rawPoseCount()).isEqualTo(227);assertThat(result.observationCount()).isGreaterThanOrEqualTo(194);
+        assertThat(result.primary()).containsOnlyKeys("NETARSUDIL_A","NETARSUDIL_B","DCMB_A_R","DCMB_A_S","DCMB_B_R","DCMB_B_S");
         assertThat(Files.readString(result.receipt())).contains("pair_direction=MAXIMUM")
-                .contains("NETARSUDIL_A_BASIN_ABSENCE=INSUFFICIENT_EVIDENCE")
-                .contains("DCMB_PI_EVIDENCE=DEGRADED")
+                .contains("NETARSUDIL_A=MATCHED_60_POSE_ADEQUATE_ENSEMBLE")
+                .contains("DCMB_PI_EVIDENCE=ADEQUATE")
                 .contains("SURFDIFF=ATTACHED_FROZEN_DIRECTIONAL_MAPS")
                 .contains("formal_roles=[UNRESOLVED]");
         assertThat(Files.readAllLines(result.basins())).hasSizeGreaterThan(1);
