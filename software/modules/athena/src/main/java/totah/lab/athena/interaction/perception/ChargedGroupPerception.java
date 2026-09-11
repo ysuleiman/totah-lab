@@ -87,7 +87,19 @@ public final class ChargedGroupPerception {
      * @return perceived charged groups in deterministic order
      */
     public List<ChargedGroup> perceive(Structure structure) {
+        return perceive(structure, FormalChargeAssignments.EMPTY);
+    }
+
+    /**
+     * Perceives groups using explicit per-atom formal charges when supplied.
+     * The additive overload prevents neutral esters/amides from being inferred
+     * as ions merely from their bond pattern.
+     */
+    public List<ChargedGroup> perceive(
+            Structure structure,
+            FormalChargeAssignments formalCharges) {
         Objects.requireNonNull(structure, "structure");
+        Objects.requireNonNull(formalCharges, "formalCharges");
 
         boolean connectivityUsable = switch (
                 structure.getConnectivityMetadata().provenance()) {
@@ -109,7 +121,7 @@ public final class ChargedGroupPerception {
                     perceiveTemplate(residue, owner, template, groups);
                 } else if (connectivityUsable) {
                     perceiveFromBonds(chain.id(), residue, owner,
-                            neighbors, groups);
+                            neighbors, formalCharges, groups);
                 } else {
                     perceiveChargeSumFallback(residue, owner,
                             structure.getConnectivityMetadata().provenance(),
@@ -149,6 +161,7 @@ public final class ChargedGroupPerception {
             Residue residue,
             ResidueId owner,
             Map<AtomReference, Set<AtomReference>> neighbors,
+            FormalChargeAssignments formalCharges,
             List<ChargedGroup> groups) {
 
         Map<AtomReference, Atom> atomsByReference =
@@ -168,10 +181,21 @@ public final class ChargedGroupPerception {
             List<Atom> carbonNeighbors = heavyNeighborsOf(
                     atomNeighbors, atomsByReference, Element.C);
 
+            int atomFormalCharge = formalCharges.charge(reference);
+            int oxygenFormalCharge = atomNeighbors.stream()
+                    .filter(atomsByReference::containsKey)
+                    .filter(neighbor -> atomsByReference.get(neighbor).getElement() == Element.O)
+                    .mapToInt(formalCharges::charge).sum();
+            int nitrogenFormalCharge = atomNeighbors.stream()
+                    .filter(atomsByReference::containsKey)
+                    .filter(neighbor -> atomsByReference.get(neighbor).getElement() == Element.N)
+                    .mapToInt(formalCharges::charge).sum();
+
             if (atom.getElement() == Element.C
-                    && oxygenNeighbors.size() == 2) {
+                    && oxygenNeighbors.size() == 2
+                    && (formalCharges.charges().isEmpty() || oxygenFormalCharge < 0)) {
                 List<Atom> groupAtoms = new ArrayList<>();
-                groupAtoms.add(atom);
+                if (formalCharges.charges().isEmpty()) groupAtoms.add(atom);
                 groupAtoms.addAll(oxygenNeighbors);
                 groups.add(new ChargedGroup(
                         ChargeSign.NEGATIVE,
@@ -180,9 +204,12 @@ public final class ChargedGroupPerception {
                         groupAtoms,
                         centroid(groupAtoms),
                         PerceptionProvenance.BOND_GRAPH,
-                        "carbon bonded to exactly 2 oxygens"));
+                        formalCharges.charges().isEmpty()
+                                ? "carbon bonded to exactly 2 oxygens; formal charge unavailable"
+                                : "carboxylate oxygens carry explicit negative formal charge"));
             } else if (atom.getElement() == Element.C
-                    && nitrogenNeighbors.size() == 3) {
+                    && nitrogenNeighbors.size() == 3
+                    && (formalCharges.charges().isEmpty() || atomFormalCharge + nitrogenFormalCharge > 0)) {
                 List<Atom> groupAtoms = new ArrayList<>();
                 groupAtoms.add(atom);
                 groupAtoms.addAll(nitrogenNeighbors);
@@ -191,11 +218,12 @@ public final class ChargedGroupPerception {
                         ChargedGroupType.GUANIDINIUM,
                         owner,
                         groupAtoms,
-                        centroid(groupAtoms),
+                        formalCharges.charges().isEmpty() ? centroid(groupAtoms) : atom.getPosition(),
                         PerceptionProvenance.BOND_GRAPH,
                         "carbon bonded to exactly 3 nitrogens"));
             } else if (atom.getElement() == Element.N
-                    && atomNeighbors.size() == 4) {
+                    && atomNeighbors.size() == 4
+                    && (formalCharges.charges().isEmpty() || atomFormalCharge > 0)) {
                 List<Atom> groupAtoms = new ArrayList<>();
                 groupAtoms.add(atom);
                 groupAtoms.addAll(heavyNeighbors(
@@ -205,12 +233,13 @@ public final class ChargedGroupPerception {
                         ChargedGroupType.AMINE,
                         owner,
                         groupAtoms,
-                        centroid(groupAtoms),
+                        formalCharges.charges().isEmpty() ? centroid(groupAtoms) : atom.getPosition(),
                         PerceptionProvenance.BOND_GRAPH,
                         "nitrogen with bond degree 4 (quaternary or "
                                 + "protonated amine)"));
             } else if (atom.getElement() == Element.S
-                    && carbonNeighbors.size() == 3) {
+                    && carbonNeighbors.size() == 3
+                    && (formalCharges.charges().isEmpty() || atomFormalCharge > 0)) {
                 List<Atom> groupAtoms = new ArrayList<>();
                 groupAtoms.add(atom);
                 groupAtoms.addAll(carbonNeighbors);
@@ -219,11 +248,31 @@ public final class ChargedGroupPerception {
                         ChargedGroupType.SULFONIUM,
                         owner,
                         groupAtoms,
-                        centroid(groupAtoms),
+                        formalCharges.charges().isEmpty() ? centroid(groupAtoms) : atom.getPosition(),
                         PerceptionProvenance.BOND_GRAPH,
                         "sulfur bonded to exactly 3 carbons"));
             }
         }
+
+        if (!formalCharges.charges().isEmpty()) {
+            Set<AtomReference> represented = groups.stream()
+                    .flatMap(group -> group.atoms().stream())
+                    .map(atom -> referenceOf(chainId, residue, atom)).collect(java.util.stream.Collectors.toSet());
+            for (Map.Entry<AtomReference, Atom> entry : atomsByReference.entrySet()) {
+                int charge = formalCharges.charge(entry.getKey());
+                if (charge != 0 && !represented.contains(entry.getKey())) {
+                    groups.add(new ChargedGroup(charge > 0 ? ChargeSign.POSITIVE : ChargeSign.NEGATIVE,
+                            ChargedGroupType.FORMAL_CHARGE_ATOM, owner, List.of(entry.getValue()),
+                            entry.getValue().getPosition(), PerceptionProvenance.BOND_GRAPH,
+                            "explicit per-atom formal charge " + charge));
+                }
+            }
+        }
+    }
+
+    private static AtomReference referenceOf(String chainId, Residue residue, Atom atom) {
+        return new AtomReference(chainId, residue.getNumber(),
+                residue.getInsertionCode() == null ? ' ' : residue.getInsertionCode(), atom.getName());
     }
 
     private void perceiveChargeSumFallback(

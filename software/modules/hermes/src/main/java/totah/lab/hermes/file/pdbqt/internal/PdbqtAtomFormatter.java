@@ -5,6 +5,8 @@ import totah.lab.hermes.file.pdbqt.AtomRecordType;
 import totah.lab.hermes.file.pdbqt.PdbqtAtom;
 
 import java.util.Locale;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public final class PdbqtAtomFormatter {
     public String format(PdbqtAtom atom) {
@@ -34,7 +36,12 @@ public final class PdbqtAtomFormatter {
         line.append(insertionCode==null?' ':insertionCode); line.append("   ");
         decimal(line,position.x(),8,3); decimal(line,position.y(),8,3); decimal(line,position.z(),8,3);
         decimal(line,occupancy,6,2); decimal(line,bFactor,6,2); line.append("    ");
-        right(line,String.format(Locale.US,"%+.4f",charge),7); line.append(' ');
+        if (Math.abs(charge) >= 10.0) {
+            throw new IllegalArgumentException("PDBQT partial charge does not fit legacy field: " + charge);
+        }
+        String formattedCharge = new BigDecimal(charge)
+                .setScale(3, RoundingMode.HALF_EVEN).toPlainString();
+        right(line,formattedCharge,6); line.append(' ');
         right(line,ad4Type,2); line.append(System.lineSeparator()); return line.toString();
     }
     private String atomName(String value){if(value==null)return"    ";if(value.length()==1)return" "+value+"  ";if(value.length()==2)return" "+value+" ";if(value.length()==3)return value+" ";return value.substring(0,4);}

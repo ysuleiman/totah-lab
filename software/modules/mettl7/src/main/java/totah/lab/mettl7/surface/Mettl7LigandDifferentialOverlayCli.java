@@ -34,11 +34,15 @@ import java.util.HexFormat;
 import java.util.stream.Collectors;
 
 /** Overlays canonical Athena interactions on frozen METTL7 SurfDiff evidence. */
+@Deprecated(forRemoval = true)
 public final class Mettl7LigandDifferentialOverlayCli {
     private Mettl7LigandDifferentialOverlayCli() {
     }
 
     public static void main(String[] args) throws IOException {
+        if (!Boolean.getBoolean("mettl7.legacy.overlay.enabled")) {
+            throw new IllegalStateException("NONCANONICAL_LEGACY_OVERLAY_DISABLED; use Mettl7RecognitionBatchMaterializer");
+        }
         if (args.length != 2) {
             throw new IllegalArgumentException("usage: <regression fixture root> <surface output>");
         }
@@ -133,7 +137,7 @@ public final class Mettl7LigandDifferentialOverlayCli {
                     + ".pdbqt");
             manifest.verify(root.relativize(pose).toString());
             int mode = Integer.parseInt(row.get("representative_mode"));
-            Structure ligand = PdbqtGaiaMapper.toLigand(
+            Structure ligand = PdbqtGaiaMapper.toLigandWithMeekoTopology(
                     model(new PdbqtReader().read(pose), mode), family).structure();
             profileAndWrite("DCMB", paralog, family, pose, mode, mode, false,
                     "SAM_COMPATIBLE",
@@ -323,6 +327,8 @@ public final class Mettl7LigandDifferentialOverlayCli {
         Path temporary = Files.createTempFile(output, "overlay-receipt-", ".tmp");
         try (BufferedWriter writer = Files.newBufferedWriter(temporary)) {
             writer.write("overlay_schema=METTL7_LIGAND_DIFFERENTIAL_OVERLAY_V2\n");
+            writer.write("canonical_status=NONCANONICAL_LEGACY_OVERLAY\n");
+            writer.write("replacement=Mettl7RecognitionBatchMaterializer canonical chemical correspondence + SurfDiff attachment\n");
             writer.write("surface_policy_bytecode_sha256="
                     + Mettl7SurfDiffPolicy.GENERIC_RUNTIME_BYTECODE_SHA256 + "\n");
             writer.write("fixture_manifest_sha256="

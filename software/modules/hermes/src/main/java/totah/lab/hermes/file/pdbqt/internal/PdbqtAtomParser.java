@@ -30,15 +30,13 @@ public final class PdbqtAtomParser {
             Double charge = optionalDouble(field(line, 70, 76).trim());
             String autodockType = field(line, 77, line.length()).trim();
 
-            if (charge == null || autodockType.isEmpty()) {
-                String[] tokens = line.trim().split("\\s+");
-                if (tokens.length >= 2) {
-                    if (charge == null) {
-                        charge = optionalDouble(tokens[tokens.length - 2]);
-                    }
-                    if (autodockType.isEmpty()) {
-                        autodockType = tokens[tokens.length - 1];
-                    }
+            String[] tokens = line.trim().split("\\s+");
+            if (tokens.length >= 2) {
+                Double trailingCharge = optionalDouble(tokens[tokens.length - 2]);
+                String trailingType = tokens[tokens.length - 1];
+                if (trailingCharge != null) {
+                    charge = trailingCharge;
+                    autodockType = trailingType;
                 }
             }
             if (charge == null) {

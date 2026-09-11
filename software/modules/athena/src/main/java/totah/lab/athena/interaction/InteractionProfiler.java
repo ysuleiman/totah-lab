@@ -6,6 +6,7 @@ import totah.lab.athena.interaction.perception.ChargedGroup;
 import totah.lab.athena.interaction.perception.ChargedGroupPerception;
 import totah.lab.athena.interaction.perception.HydrophobicAtomPerception;
 import totah.lab.athena.interaction.perception.HydrophobicAtoms;
+import totah.lab.athena.interaction.perception.FormalChargeAssignments;
 import totah.lab.gaia.geometry.Point3D;
 import totah.lab.gaia.structure.Atom;
 import totah.lab.gaia.structure.AtomReference;
@@ -124,18 +125,25 @@ public final class InteractionProfiler {
      * profiled as environment.
      */
     public InteractionProfile profile(Structure receptor, Structure ligand) {
+        return profile(receptor, ligand, FormalChargeAssignments.EMPTY);
+    }
+
+    /** Profiles a ligand with authoritative per-atom formal-charge assignments. */
+    public InteractionProfile profile(Structure receptor, Structure ligand,
+                                      FormalChargeAssignments ligandFormalCharges) {
         Objects.requireNonNull(receptor, "receptor");
         Objects.requireNonNull(ligand, "ligand");
+        Objects.requireNonNull(ligandFormalCharges, "ligandFormalCharges");
 
         SideResult result = profileSide(
-                receptor, ligand, PerceptionSummary.RECEPTOR);
+                receptor, ligand, PerceptionSummary.RECEPTOR, ligandFormalCharges);
         return new InteractionProfile(
                 result.refined(),
                 result.raw(),
                 Set.of(),
                 thresholds,
                 List.of(result.summary(),
-                        perceiveSide(ligand, PerceptionSummary.LIGAND)));
+                        perceiveSide(ligand, PerceptionSummary.LIGAND, ligandFormalCharges)));
     }
 
     /**
@@ -149,14 +157,22 @@ public final class InteractionProfiler {
             Structure ligand,
             Structure cofactor) {
 
+        return profile(receptor, ligand, cofactor, FormalChargeAssignments.EMPTY);
+    }
+
+    /** Separate-cofactor profiling with authoritative ligand formal charges. */
+    public InteractionProfile profile(Structure receptor, Structure ligand, Structure cofactor,
+            FormalChargeAssignments ligandFormalCharges) {
+
         Objects.requireNonNull(receptor, "receptor");
         Objects.requireNonNull(ligand, "ligand");
         Objects.requireNonNull(cofactor, "cofactor");
+        Objects.requireNonNull(ligandFormalCharges, "ligandFormalCharges");
 
         SideResult receptorResult = profileSide(
-                receptor, ligand, PerceptionSummary.RECEPTOR);
+                receptor, ligand, PerceptionSummary.RECEPTOR, ligandFormalCharges);
         SideResult cofactorResult = profileSide(
-                cofactor, ligand, PerceptionSummary.COFACTOR);
+                cofactor, ligand, PerceptionSummary.COFACTOR, ligandFormalCharges);
 
         List<Interaction> refined = new ArrayList<>(
                 receptorResult.refined());
@@ -170,7 +186,7 @@ public final class InteractionProfiler {
                 residueIds(cofactor),
                 thresholds,
                 List.of(receptorResult.summary(),
-                        perceiveSide(ligand, PerceptionSummary.LIGAND),
+                        perceiveSide(ligand, PerceptionSummary.LIGAND, ligandFormalCharges),
                         cofactorResult.summary()));
     }
 
@@ -199,7 +215,8 @@ public final class InteractionProfiler {
     private SideResult profileSide(
             Structure environment,
             Structure ligand,
-            String sideLabel) {
+            String sideLabel,
+            FormalChargeAssignments ligandFormalCharges) {
 
         Structure site = preselect(environment, ligand);
 
@@ -212,7 +229,7 @@ public final class InteractionProfiler {
         List<ChargedGroup> environmentGroups =
                 chargedGroupPerception.perceive(site);
         List<ChargedGroup> ligandGroups =
-                chargedGroupPerception.perceive(ligand);
+                chargedGroupPerception.perceive(ligand, ligandFormalCharges);
 
         List<Interaction> saltBridges = saltBridgeDetector.detect(
                 environmentGroups, ligandGroups, thresholds);
@@ -249,11 +266,12 @@ public final class InteractionProfiler {
                         environmentRings, environmentGroups));
     }
 
-    private PerceptionSummary perceiveSide(Structure ligand, String side) {
+    private PerceptionSummary perceiveSide(Structure ligand, String side,
+                                           FormalChargeAssignments formalCharges) {
         HydrophobicAtoms hydrophobic = hydrophobicPerception.perceive(ligand);
         return summary(side, hydrophobic,
                 ringPerception.perceive(ligand),
-                chargedGroupPerception.perceive(ligand));
+                chargedGroupPerception.perceive(ligand, formalCharges));
     }
 
     private static PerceptionSummary summary(

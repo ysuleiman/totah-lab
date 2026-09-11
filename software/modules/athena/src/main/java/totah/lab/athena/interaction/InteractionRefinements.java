@@ -184,11 +184,6 @@ public final class InteractionRefinements {
      *
      * <p>Deviations from PLIP 3.0.1:
      * <ul>
-     *   <li>an isolated contacting ligand atom (no bonded neighbor among
-     *   the other contacting ligand atoms of the same protein atom)
-     *   forms its own singleton cluster and is kept; PLIP's cluster
-     *   branch silently drops such contacts. The quirk is not
-     *   reproduced;</li>
      *   <li>the per-cluster representative is deterministically the
      *   closest contact; PLIP's representative may not be the globally
      *   closest;</li>
@@ -258,6 +253,9 @@ public final class InteractionRefinements {
                 refined.add(group.get(0));
                 continue;
             }
+            // PLIP builds clusters from bonded contact pairs. In the
+            // multi-contact branch, an isolated ligand atom therefore
+            // belongs to no emitted cluster.
             for (List<Interaction> cluster
                     : clusters(group, ligandNeighbors)) {
                 Interaction closest = cluster.get(0);
@@ -315,8 +313,9 @@ public final class InteractionRefinements {
     /**
      * Clusters the contacting ligand atoms of one protein atom by bond
      * connectivity (connected components over the ligand bond graph
-     * restricted to the contacting atoms). An isolated contacting atom is
-     * a singleton cluster and is kept — PLIP silently drops it.
+     * restricted to the contacting atoms). As in PLIP's multi-contact
+     * branch, components are seeded only by bonded contacting pairs;
+     * isolated contacting atoms therefore produce no cluster.
      */
     private static List<List<Interaction>> clusters(
             List<Interaction> group,
@@ -327,10 +326,24 @@ public final class InteractionRefinements {
             contactByLigandAtom.put(contact.ligandAtoms().get(0), contact);
         }
         Set<Atom> contacting = contactByLigandAtom.keySet();
+        Set<Atom> paired = java.util.Collections.newSetFromMap(
+                new IdentityHashMap<>());
+        for (Atom atom : contacting) {
+            for (Atom neighbor : ligandNeighbors.getOrDefault(
+                    atom, List.of())) {
+                if (contacting.contains(neighbor)) {
+                    paired.add(atom);
+                    paired.add(neighbor);
+                }
+            }
+        }
         Set<Atom> visited = new HashSet<>();
         List<List<Interaction>> clusters = new ArrayList<>();
         for (Interaction contact : group) {
             Atom seed = contact.ligandAtoms().get(0);
+            if (!paired.contains(seed)) {
+                continue;
+            }
             if (!visited.add(seed)) {
                 continue;
             }
@@ -342,7 +355,7 @@ public final class InteractionRefinements {
                 Atom current = frontier.poll();
                 for (Atom neighbor : ligandNeighbors.getOrDefault(
                         current, List.of())) {
-                    if (contacting.contains(neighbor) && visited.add(neighbor)) {
+                    if (paired.contains(neighbor) && visited.add(neighbor)) {
                         frontier.add(neighbor);
                         cluster.add(contactByLigandAtom.get(neighbor));
                     }

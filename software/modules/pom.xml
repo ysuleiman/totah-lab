@@ -14,6 +14,7 @@
         <module>euclid</module>
         <module>gaia</module>
         <module>athena</module>
+        <module>athena-openchemlib</module>
         <module>mettl7</module>
         <module>proteus</module>
         <module>hermes</module>
@@ -30,6 +31,7 @@
         <assertj.version>3.27.7</assertj.version>
         <junit.version>5.13.4</junit.version>
         <openpdf.version>2.0.4</openpdf.version>
+        <openchemlib.version>2026.7.2</openchemlib.version>
         <apache-poi.version>5.5.1</apache-poi.version>
         <spring-ai.version>1.0.9</spring-ai.version>
     </properties>
@@ -98,6 +100,16 @@
             </dependency>
             <dependency>
                 <groupId>totah.lab</groupId>
+                <artifactId>athena-openchemlib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.actelion.research</groupId>
+                <artifactId>openchemlib</artifactId>
+                <version>${openchemlib.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>totah.lab</groupId>
                 <artifactId>hermes</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -159,6 +171,25 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>require-java-21</id>
+                        <goals><goal>enforce</goal></goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[21,22)</version>
+                                    <message>totah-lab scientific builds require Java 21 exactly.</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

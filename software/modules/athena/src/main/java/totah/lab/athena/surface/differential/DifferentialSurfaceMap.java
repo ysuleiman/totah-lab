@@ -19,6 +19,10 @@ public record DifferentialSurfaceMap(
         Objects.requireNonNull(mode, "mode");
         Objects.requireNonNull(options, "options");
         residues = List.copyOf(Objects.requireNonNull(residues, "residues"));
+        if (residues.stream().map(DifferentialResidueScore::queryResidue).distinct().count()
+                != residues.size()) {
+            throw new IllegalArgumentException("duplicate query residue score");
+        }
         Objects.requireNonNull(queryNeighborhoods, "queryNeighborhoods");
         LinkedHashMap<ResidueId, Map<ResidueId, Double>> ordered =
                 new LinkedHashMap<>();

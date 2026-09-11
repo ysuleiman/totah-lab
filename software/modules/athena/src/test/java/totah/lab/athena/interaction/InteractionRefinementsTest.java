@@ -244,12 +244,12 @@ class InteractionRefinementsTest {
     }
 
     @Test
-    void patchClusteringKeepsClosestPerClusterAndRetainsIsolatedAtoms() {
+    void patchClusteringKeepsClosestPerClusterAndDropsIsolatedAtomsLikePlip() {
         Atom proteinAtom = carbon(0, 0, 0);
         Atom ligandA = carbon(3.9, 0, 0);
         Atom ligandB = carbon(3.0, 0, 0);
         // Isolated: no bonded neighbor among the contacting ligand atoms.
-        // PLIP silently drops this contact; Athena keeps it.
+        // PLIP's bonded-pair clustering branch does not emit it.
         Atom ligandIsolated = carbon(0, 2.5, 0);
 
         Interaction contactA = hydrophobic(new ResidueId("A", 10, null),
@@ -271,10 +271,8 @@ class InteractionRefinementsTest {
                         List.of(contactA, contactB, contactIsolated),
                         List.of(), ligand);
 
-        // Cluster {ligandA, ligandB} keeps the closest (contactB); the
-        // isolated contact survives as a singleton cluster.
-        assertThat(refined).containsExactlyInAnyOrder(
-                contactB, contactIsolated);
+        // Cluster {ligandA, ligandB} keeps the closest; isolated drops.
+        assertThat(refined).containsExactly(contactB);
     }
 
     @Test

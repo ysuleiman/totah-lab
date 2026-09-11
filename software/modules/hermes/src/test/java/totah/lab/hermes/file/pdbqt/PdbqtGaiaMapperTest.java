@@ -2,13 +2,17 @@ package totah.lab.hermes.file.pdbqt;
 
 import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
 import org.junit.jupiter.api.Test;
+import totah.lab.gaia.chemistry.BondOrder;
 import totah.lab.gaia.molecule.Ligand;
+import totah.lab.gaia.structure.ConnectivityProvenance;
 import totah.lab.gaia.structure.Structure;
 
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,6 +43,132 @@ class PdbqtGaiaMapperTest {
         assertEquals(1.7, atoms.get(1).getPosition().x(), 1e-9);
         assertEquals(-0.1, atoms.get(1).getCharge(), 1e-9);
         assertEquals("Cl", atoms.get(1).getAutoDockType());
+    }
+
+    @Test
+    void reconstructsCompleteDcmbGraphFromFrozenMeekoEvidence()
+            throws Exception {
+        Path path = Path.of(getClass().getResource(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").toURI());
+        PdbqtModel model = new PdbqtReader().read(path).firstModel();
+
+        Ligand ligand = PdbqtGaiaMapper.toLigandWithMeekoTopology(
+                model, "DCMB_R");
+        Structure structure = ligand.structure();
+
+        assertEquals(ConnectivityProvenance.EXPLICIT,
+                structure.getConnectivityMetadata().provenance());
+        assertEquals(13, structure.getChains().getFirst().residues()
+                .getFirst().getAtomCount());
+        assertEquals(13, structure.getBonds().size());
+        assertEquals(6, structure.getBonds().stream()
+                .filter(bond -> bond.order() == BondOrder.AROMATIC).count());
+        assertEquals(2, structure.getBonds().stream()
+                .filter(bond -> bond.atom1().atomName().startsWith("H")
+                        || bond.atom2().atomName().startsWith("H"))
+                .count());
+        assertEquals(2, structure.getBonds().stream()
+                .filter(bond -> (bond.atom1().atomName().startsWith("H")
+                        && bond.atom2().atomName().equals("N"))
+                        || (bond.atom2().atomName().startsWith("H")
+                        && bond.atom1().atomName().equals("N")))
+                .count());
+        assertTrue(structure.getConnectivityMetadata().diagnostics().contains(
+                "SMILES=C[C@@H](N)c1cccc(Cl)c1Cl"));
+    }
+
+    @Test
+    void preservesEachEmbeddedDcmbStereochemicalIdentity() throws Exception {
+        String rInput = new String(getClass().getResourceAsStream(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").readAllBytes());
+        String sInput = rInput.replace(
+                "C[C@@H](N)c1cccc(Cl)c1Cl",
+                "C[C@H](N)c1cccc(Cl)c1Cl");
+
+        Structure r = topology(rInput, "DCMB_R");
+        Structure s = topology(sInput, "DCMB_S");
+
+        assertTrue(r.getConnectivityMetadata().diagnostics().contains(
+                "SMILES=C[C@@H](N)c1cccc(Cl)c1Cl"));
+        assertTrue(s.getConnectivityMetadata().diagnostics().contains(
+                "SMILES=C[C@H](N)c1cccc(Cl)c1Cl"));
+        assertEquals(r.getBonds(), s.getBonds());
+    }
+
+    @Test
+    void rejectsIncompleteHeavyAtomMapping() throws Exception {
+        String input = new String(getClass().getResourceAsStream(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").readAllBytes())
+                .replace(" 3 11\n", "\n");
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> topology(input, "DCMB_R"));
+        assertTrue(error.getMessage().contains(
+                "Incomplete Meeko heavy-atom mapping"));
+    }
+
+    @Test
+    void rejectsDuplicateAndOutOfRangeHeavyAtomMappings() throws Exception {
+        String input = new String(getClass().getResourceAsStream(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").readAllBytes());
+
+        assertTrue(assertThrows(IllegalArgumentException.class,
+                () -> topology(input.replace(" 3 11\n", " 2 11\n"),
+                        "duplicate"))
+                .getMessage().contains("Duplicate SMILES atom index"));
+        assertTrue(assertThrows(IllegalArgumentException.class,
+                () -> topology(input.replace(" 3 11\n", " 99 11\n"),
+                        "out-of-range"))
+                .getMessage().contains("SMILES atom index out of range"));
+    }
+
+    @Test
+    void rejectsElementAndHydrogenParentContradictions() throws Exception {
+        String input = new String(getClass().getResourceAsStream(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").readAllBytes());
+
+        assertTrue(assertThrows(IllegalArgumentException.class,
+                () -> topology(input.replace(
+                                "11 9 9 10 3 11",
+                                "11 9 3 10 9 11"),
+                        "element"))
+                .getMessage().contains("Element mismatch"));
+        assertTrue(assertThrows(IllegalArgumentException.class,
+                () -> topology(input.replace(
+                                "REMARK H PARENT 3 12 3 13",
+                                "REMARK H PARENT 99 12 3 13"),
+                        "hydrogen-parent"))
+                .getMessage().contains(
+                        "Hydrogen parent references unmapped SMILES atom"));
+    }
+
+    @Test
+    void rejectsTorsionTreeContradiction() throws Exception {
+        String input = new String(getClass().getResourceAsStream(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").readAllBytes())
+                .replace("BRANCH   1  11", "BRANCH   2  11")
+                .replace("ENDBRANCH   1  11", "ENDBRANCH   2  11");
+
+        IllegalArgumentException error = assertThrows(
+                IllegalArgumentException.class,
+                () -> topology(input, "DCMB_R"));
+        assertTrue(error.getMessage().contains(
+                "Torsion-tree bond is absent"));
+    }
+
+    @Test
+    void legacyAtomOnlyMappingRemainsConnectivityAbsent() throws Exception {
+        Path path = Path.of(getClass().getResource(
+                "/vina/dcmb-diffdock-vina_out.pdbqt").toURI());
+        PdbqtModel model = new PdbqtReader().read(path).firstModel();
+
+        Structure structure = PdbqtGaiaMapper.toLigand(model, "DCMB")
+                .structure();
+
+        assertEquals(ConnectivityProvenance.ABSENT,
+                structure.getConnectivityMetadata().provenance());
+        assertTrue(structure.getBonds().isEmpty());
     }
 
     @Test
@@ -83,5 +213,13 @@ class PdbqtGaiaMapperTest {
                 serial, name, residueName, chain, residueNumber,
                 x, y, z, charge, type
         );
+    }
+
+    private static Structure topology(String input, String name)
+            throws Exception {
+        PdbqtModel model = new PdbqtReader().read(new StringReader(input))
+                .firstModel();
+        return PdbqtGaiaMapper.toLigandWithMeekoTopology(model, name)
+                .structure();
     }
 }

@@ -13,6 +13,7 @@ import totah.lab.gaia.structure.Residue;
 import totah.lab.gaia.structure.Structure;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -127,6 +128,28 @@ class ChargedGroupPerceptionTest {
                     assertThat(group.atoms())
                             .extracting(Atom::getName)
                             .containsExactlyInAnyOrder("C1", "O1", "O2");
+                });
+    }
+
+    @Test
+    void explicitFormalChargesDistinguishNeutralEsterFromCarboxylate() {
+        Structure structure = ligandStructure(
+                List.of(atom("C1", Element.C, 0, 0, 0, 0),
+                        atom("O1", Element.O, 1.3, 0, 0, 0),
+                        atom("O2", Element.O, 0, 1.3, 0, 0)),
+                List.of(bond("C1", "O1"), bond("C1", "O2")));
+        AtomReference oxygen = new AtomReference("A", 501, ' ', "O2");
+
+        assertThat(perception.perceive(structure,
+                new FormalChargeAssignments(Map.of()))).hasSize(1);
+        assertThat(perception.perceive(structure,
+                new FormalChargeAssignments(Map.of(oxygen, 0)))).isEmpty();
+        assertThat(perception.perceive(structure,
+                new FormalChargeAssignments(Map.of(oxygen, -1))))
+                .singleElement().satisfies(group -> {
+                    assertThat(group.type()).isEqualTo(ChargedGroupType.CARBOXYLATE);
+                    assertThat(group.atoms()).extracting(Atom::getName)
+                            .containsExactlyInAnyOrder("O1", "O2");
                 });
     }
 

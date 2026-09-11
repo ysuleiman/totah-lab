@@ -1,7 +1,6 @@
 package totah.lab.euclid.spatial;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -76,43 +75,13 @@ public final class RmsdClusterer {
             }
         }
 
-        List<List<Integer>> clusters = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            List<Integer> singleton = new ArrayList<>();
-            singleton.add(i);
-            clusters.add(singleton);
+        List<List<Double>> matrix = new ArrayList<>(count);
+        for (double[] row : rmsd) {
+            List<Double> values = new ArrayList<>(count);
+            for (double value : row) values.add(value);
+            matrix.add(values);
         }
-
-        while (true) {
-            int bestA = -1;
-            int bestB = -1;
-            double bestDistance = Double.MAX_VALUE;
-            for (int a = 0; a < clusters.size(); a++) {
-                for (int b = a + 1; b < clusters.size(); b++) {
-                    double distance = completeLinkage(
-                            clusters.get(a),
-                            clusters.get(b),
-                            rmsd
-                    );
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestA = a;
-                        bestB = b;
-                    }
-                }
-            }
-            if (bestA < 0 || bestDistance > thresholdAngstroms) {
-                break;
-            }
-            clusters.get(bestA).addAll(clusters.get(bestB));
-            clusters.remove(bestB);
-        }
-
-        clusters.sort(Comparator
-                .<List<Integer>>comparingInt(List::size)
-                .reversed()
-                .thenComparingInt(List::getFirst));
-        return new Clustering(clusters);
+        return new Clustering(new CompleteLinkClusterer().cluster(matrix, thresholdAngstroms));
     }
 
     /**
@@ -166,17 +135,4 @@ public final class RmsdClusterer {
         }
     }
 
-    private static double completeLinkage(
-            List<Integer> first,
-            List<Integer> second,
-            double[][] rmsd
-    ) {
-        double maximum = 0.0;
-        for (int a : first) {
-            for (int b : second) {
-                maximum = Math.max(maximum, rmsd[a][b]);
-            }
-        }
-        return maximum;
-    }
 }

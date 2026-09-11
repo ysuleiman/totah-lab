@@ -16,6 +16,9 @@ public enum ChargedGroupType {
     AMINE,
     SULFONIUM,
 
+    /** Explicit non-template atom carrying a formal charge. */
+    FORMAL_CHARGE_ATOM,
+
     /** Degraded per-residue partial-charge-sum pseudo-group. */
     CHARGE_SUM
 }

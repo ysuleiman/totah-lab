@@ -4,6 +4,7 @@ import totah.lab.hermes.file.pdbqt.PdbqtWriteOptions;
 import totah.lab.hermes.file.pdbqt.PdbqtWriteResult;
 import totah.lab.hermes.file.pdbqt.PdbqtGaiaMapper;
 import totah.lab.hermes.file.pdbqt.writer.PdbqtWriter;
+import totah.lab.hermes.file.pdbqt.reader.PdbqtReader;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -64,8 +65,10 @@ class PdbqtWriterTest {
         assertEquals("TER", lines.get(1));
         assertTrue(lines.get(2).startsWith("ATOM      2  H   GLY B   2"));
         assertEquals("END", lines.get(3));
-        assertTrue(lines.get(0).endsWith("-0.1000  C"));
-        assertTrue(lines.get(2).endsWith("+0.1000 HD"));
+        assertTrue(lines.get(0).endsWith("-0.100  C"));
+        assertTrue(lines.get(2).endsWith(" 0.100 HD"));
+        assertEquals(" C", lines.get(0).substring(77, 79));
+        assertEquals("HD", lines.get(2).substring(77, 79));
         assertEquals(output.toAbsolutePath().normalize(), result.rigidOutput());
         assertEquals(2, result.rigidAtomCount());
         assertEquals(0, result.flexibleAtomCount());
@@ -94,6 +97,18 @@ class PdbqtWriterTest {
                 () -> new PdbqtWriter().write(structure,
                         temporaryDirectory.resolve("coordinate-overflow.pdbqt"),
                         PdbqtWriteOptions.defaults()));
+    }
+
+    @Test
+    void readsShiftedFourDecimalChargeWithoutTruncation() throws Exception {
+        Path input = temporaryDirectory.resolve("four-decimal.pdbqt");
+        Files.writeString(input,
+                "ATOM      1 C20  PAR L   1      -4.933  -0.373  -0.364  1.00  0.00    -0.0377  A\n");
+
+        var atom = new PdbqtReader().read(input).firstModel().atoms().getFirst();
+
+        assertEquals(-0.0377, atom.partialCharge(), 1e-12);
+        assertEquals("A", atom.autodockType());
     }
 
     private Atom atom(

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
 class SurfDiffSubjectAggregatorTest {
@@ -30,6 +31,16 @@ class SurfDiffSubjectAggregatorTest {
                 List.of(score(0.1, 0.1), score(0.1, 0.2)),
                 List.of(score(0.1, 0.8), score(0.1, 0.7)));
         assertThat(result).isCloseTo(0.5, within(1.0e-15));
+    }
+
+    @Test
+    void duplicateQueryResidueScoresAreRejectedAtMapBoundary() {
+        assertThatThrownBy(() -> new DifferentialSurfaceMap(
+                DifferentialSurfaceMode.SURFDIFF_COMPATIBLE,
+                DifferentialSurfaceOptions.SURFDIFF_COMPATIBLE,
+                List.of(score(0.1, 0.2), score(0.3, 0.4)), Map.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("duplicate query residue");
     }
 
     private static DifferentialResidueScore score(double rup, double rus) {
