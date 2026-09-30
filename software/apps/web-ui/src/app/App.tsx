@@ -8,6 +8,8 @@ import { SimilarPocketsPage } from '../features/similar/SimilarPocketsPage'
 import { StructureWorkspace } from '../features/structure/StructureWorkspace'
 import { StructureComparisonPage } from '../features/structure/StructureComparisonPage'
 import { DcmbReportPage } from '../features/report/DcmbReportPage'
+import { Mettl7EvidenceReportPage } from '../features/report/Mettl7EvidenceReportPage'
+import { Mettl7FunctionalContactsPage } from '../features/report/Mettl7FunctionalContactsPage'
 
 const STRUCTURE_PATH = /^\/structures\/([1-9]\d*)$/
 const STRUCTURE_COMPARE_PATH = /^\/structures\/([1-9]\d*)\/compare\/([1-9]\d*)$/
@@ -64,6 +66,10 @@ export function App() {
     content = <LigandAnalysisPage />
   } else if (pathname === '/reports/dcmb') {
     content = <DcmbReportPage />
+  } else if (pathname === '/reports/mettl7-evidence') {
+    content = <Mettl7EvidenceReportPage />
+  } else if (pathname === '/reports/mettl7-contact-chemistry') {
+    content = <Mettl7FunctionalContactsPage />
   } else {
     const structureId = structureMatch
       ? Number(structureMatch[1])

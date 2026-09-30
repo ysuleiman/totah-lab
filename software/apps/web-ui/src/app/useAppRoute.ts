@@ -18,6 +18,8 @@ function normalizePath(pathname: string): string {
     pathname === '/selectivity'
     || pathname === '/ligands'
     || pathname === '/reports/dcmb'
+    || pathname === '/reports/mettl7-evidence'
+    || pathname === '/reports/mettl7-contact-chemistry'
   ) {
     return pathname
   }

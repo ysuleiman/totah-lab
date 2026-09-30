@@ -35,6 +35,18 @@ const NAVIGATION: NavigationItem[] = [
     active: (pathname) => pathname === '/reports/dcmb',
   },
   {
+    label: 'RNA evidence',
+    description: 'Papers & activator audit',
+    path: '/reports/mettl7-evidence',
+    active: (pathname) => pathname === '/reports/mettl7-evidence',
+  },
+  {
+    label: 'Contact chemistry',
+    description: 'Ligand groups by residue',
+    path: '/reports/mettl7-contact-chemistry',
+    active: (pathname) => pathname === '/reports/mettl7-contact-chemistry',
+  },
+  {
     label: 'Structures',
     description: 'Browse structures',
     path: `/structures/${DEFAULT_STRUCTURE_ID}`,
