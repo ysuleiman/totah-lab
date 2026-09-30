@@ -12,7 +12,14 @@ public record GraphEditReceipt(String editId, String editableVectorId, String tr
                                Map<String, String> parentToProductBondIds,
                                Set<String> addedAtomIds, Set<String> deletedAtomIds,
                                Set<String> addedBondIds, Set<String> deletedBondIds,
-                               List<String> validations) {
+                               List<String> validations, MolecularGraph.Delta delta) {
+    /** Compatibility constructor: historical receipts have no replay snapshot. */
+    public GraphEditReceipt(String editId, String editableVectorId, String transformation,
+            Map<String,String> parentToProductAtomIds, Map<String,String> parentToProductBondIds,
+            Set<String> addedAtomIds, Set<String> deletedAtomIds, Set<String> addedBondIds,
+            Set<String> deletedBondIds, List<String> validations) {
+        this(editId, editableVectorId, transformation, parentToProductAtomIds, parentToProductBondIds, addedAtomIds, deletedAtomIds, addedBondIds, deletedBondIds, validations, null);
+    }
     public GraphEditReceipt {
         parentToProductAtomIds = Map.copyOf(parentToProductAtomIds);
         parentToProductBondIds = Map.copyOf(parentToProductBondIds);

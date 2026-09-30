@@ -11,19 +11,26 @@ import java.util.Set;
 
 /** Deterministic Athena-owned implementation of the bounded graph-edit vocabulary. */
 public final class GraphEditTransactionEngine {
+    public enum RejectionKind { AUTHORIZATION, TOPOLOGY, CHEMISTRY }
+    /** Typed failures retain IllegalArgumentException compatibility for historical callers. */
+    public static final class Rejected extends IllegalArgumentException {
+        private final RejectionKind kind;
+        public Rejected(RejectionKind kind, String message) { super(message); this.kind = kind; }
+        public RejectionKind kind() { return kind; }
+    }
     public Result apply(MolecularGraph parent, GraphEdit edit, Authorization authorization) {
         Objects.requireNonNull(parent); Objects.requireNonNull(edit); Objects.requireNonNull(authorization);
         validateGraph(parent);
         if (!authorization.editableVectorId().equals(edit.editableVectorId())) {
-            throw new IllegalArgumentException("edit vector is not authorized");
+            throw new Rejected(RejectionKind.AUTHORIZATION, "edit vector is not authorized");
         }
         if (!authorization.allowedTypes().contains(edit.type())) {
-            throw new IllegalArgumentException("transformation is not authorized: " + edit.type());
+            throw new Rejected(RejectionKind.AUTHORIZATION, "transformation is not authorized: " + edit.type());
         }
         rejectProtected(edit.affectedAtomIds(), authorization.protectedAtomIds(), "atom");
         rejectProtected(edit.affectedBondIds(), authorization.protectedBondIds(), "bond");
         if (!authorization.permittedEditAtomIds().containsAll(edit.affectedAtomIds())) {
-            throw new IllegalArgumentException("edit affects atoms outside permitted region");
+            throw new Rejected(RejectionKind.AUTHORIZATION, "edit affects atoms outside permitted region");
         }
         String validatedAnchor = validateAttachmentAnchor(parent, edit, authorization);
 
@@ -48,10 +55,10 @@ public final class GraphEditTransactionEngine {
         var product = new MolecularGraph(List.copyOf(atoms.values()), List.copyOf(bonds.values()), parent.properties());
         validateGraph(product);
         authorization.protectedAtomIds().forEach(id -> {
-            if (!product.atom(id).equals(parent.atom(id))) throw new IllegalStateException("protected atom changed: " + id);
+            if (!product.atom(id).equals(parent.atom(id))) throw new Rejected(RejectionKind.AUTHORIZATION, "protected atom changed: " + id);
         });
         authorization.protectedBondIds().forEach(id -> {
-            if (!product.bond(id).equals(parent.bond(id))) throw new IllegalStateException("protected bond changed: " + id);
+            if (!product.bond(id).equals(parent.bond(id))) throw new Rejected(RejectionKind.AUTHORIZATION, "protected bond changed: " + id);
         });
         var atomMap = unchanged(parent.atoms().stream().map(MolecularGraph.Atom::id).toList(), atoms.keySet());
         var bondMap = unchanged(parent.bonds().stream().map(MolecularGraph.Bond::id).toList(), bonds.keySet());
@@ -62,7 +69,7 @@ public final class GraphEditTransactionEngine {
         }
         var receipt = new GraphEditReceipt(edit.editId(), edit.editableVectorId(), edit.type().name(),
                 atomMap, bondMap, addedAtoms, deletedAtoms, addedBonds, deletedBonds,
-                validations);
+                validations, MolecularGraph.Delta.between(parent, product));
         return new Result(product, receipt);
     }
 
@@ -75,11 +82,11 @@ public final class GraphEditTransactionEngine {
                 ? exactlyOne(edit.affectedAtomIds(), "atom substitution requires one atom unless substitutionAtomId is supplied")
                 : configured;
         if (!edit.affectedAtomIds().contains(id)) {
-            throw new IllegalArgumentException("substitutionAtomId is not in affectedAtomIds");
+            throw new Rejected(RejectionKind.TOPOLOGY, "substitutionAtomId is not in affectedAtomIds");
         }
         var atom = required(atoms, id, "atom");
         if (edit.replacementElement() == null || edit.replacementElement().isBlank()) {
-            throw new IllegalArgumentException("replacement element missing");
+            throw new Rejected(RejectionKind.TOPOLOGY, "replacement element missing");
         }
         atoms.put(id, new MolecularGraph.Atom(atom.id(), edit.replacementElement(), atom.isotope(),
                 atom.formalCharge(), atom.explicitHydrogens(), atom.aromatic(), atom.stereochemistry(),
@@ -88,17 +95,17 @@ public final class GraphEditTransactionEngine {
             if (leavingId.equals(id)) continue;
             var leaving = required(atoms, leavingId, "leaving atom");
             if (!leaving.element().equals("H")) {
-                throw new IllegalArgumentException("atom-substitution leaving atom must be explicit hydrogen: " + leavingId);
+                throw new Rejected(RejectionKind.TOPOLOGY, "atom-substitution leaving atom must be explicit hydrogen: " + leavingId);
             }
             var incident = bonds.values().stream().filter(b -> b.firstAtomId().equals(leavingId)
                     || b.secondAtomId().equals(leavingId)).sorted(java.util.Comparator.comparing(MolecularGraph.Bond::id))
                     .toList();
-            if (incident.size() != 1) throw new IllegalArgumentException("leaving hydrogen must be terminal: " + leavingId);
+            if (incident.size() != 1) throw new Rejected(RejectionKind.TOPOLOGY, "leaving hydrogen must be terminal: " + leavingId);
             var leavingBond = incident.getFirst();
             String neighbor = leavingBond.firstAtomId().equals(leavingId)
                     ? leavingBond.secondAtomId() : leavingBond.firstAtomId();
             if (!neighbor.equals(id)) {
-                throw new IllegalArgumentException("leaving hydrogen is not bonded to substitution atom: " + leavingId);
+                throw new Rejected(RejectionKind.TOPOLOGY, "leaving hydrogen is not bonded to substitution atom: " + leavingId);
             }
             bonds.remove(leavingBond.id()); deletedBonds.add(leavingBond.id());
             atoms.remove(leavingId); deletedAtoms.add(leavingId);
@@ -108,7 +115,7 @@ public final class GraphEditTransactionEngine {
     private static void modifyBond(Map<String, MolecularGraph.Bond> bonds, GraphEdit edit) {
         String id = exactlyOne(edit.affectedBondIds(), "bond modification requires one bond");
         var bond = required(bonds, id, "bond");
-        if (edit.replacementBondOrder() == null) throw new IllegalArgumentException("replacement bond order missing");
+        if (edit.replacementBondOrder() == null) throw new Rejected(RejectionKind.TOPOLOGY, "replacement bond order missing");
         bonds.put(id, new MolecularGraph.Bond(bond.id(), bond.firstAtomId(), bond.secondAtomId(),
                 edit.replacementBondOrder(), edit.replacementBondOrder() == MolecularGraph.BondOrder.AROMATIC,
                 bond.stereochemistry(), bond.properties()));
@@ -116,9 +123,9 @@ public final class GraphEditTransactionEngine {
 
     private static void prune(Map<String, MolecularGraph.Atom> atoms, Map<String, MolecularGraph.Bond> bonds,
                               GraphEdit edit, Set<String> deletedAtoms, Set<String> deletedBonds) {
-        if (edit.affectedAtomIds().isEmpty()) throw new IllegalArgumentException("prune region is empty");
+        if (edit.affectedAtomIds().isEmpty()) throw new Rejected(RejectionKind.TOPOLOGY, "prune region is empty");
         for (String id : edit.affectedAtomIds()) {
-            if (atoms.remove(id) == null) throw new IllegalArgumentException("atom missing: " + id);
+            if (atoms.remove(id) == null) throw new Rejected(RejectionKind.TOPOLOGY, "atom missing: " + id);
             deletedAtoms.add(id);
         }
         var incident = bonds.values().stream().filter(bond -> deletedAtoms.contains(bond.firstAtomId())
@@ -129,25 +136,25 @@ public final class GraphEditTransactionEngine {
     private static void attach(Map<String, MolecularGraph.Atom> atoms, Map<String, MolecularGraph.Bond> bonds,
                                GraphEdit edit, Set<String> addedAtoms, Set<String> addedBonds) {
         if (edit.anchorAtomId() == null || !atoms.containsKey(edit.anchorAtomId())) {
-            throw new IllegalArgumentException("attachment anchor missing");
+            throw new Rejected(RejectionKind.TOPOLOGY, "attachment anchor missing");
         }
         if (edit.fragment() == null || edit.fragment().atoms().isEmpty()) {
-            throw new IllegalArgumentException("attachment fragment missing");
+            throw new Rejected(RejectionKind.TOPOLOGY, "attachment fragment missing");
         }
         String fragmentAnchor = edit.parameters().get("fragmentAnchorAtomId");
         if (fragmentAnchor == null || edit.fragment().atom(fragmentAnchor).isEmpty()) {
-            throw new IllegalArgumentException("fragmentAnchorAtomId missing or invalid");
+            throw new Rejected(RejectionKind.TOPOLOGY, "fragmentAnchorAtomId missing or invalid");
         }
         for (var atom : edit.fragment().atoms()) {
-            if (atoms.putIfAbsent(atom.id(), atom) != null) throw new IllegalArgumentException("duplicate atom id: " + atom.id());
+            if (atoms.putIfAbsent(atom.id(), atom) != null) throw new Rejected(RejectionKind.TOPOLOGY, "duplicate atom id: " + atom.id());
             addedAtoms.add(atom.id());
         }
         for (var bond : edit.fragment().bonds()) {
-            if (bonds.putIfAbsent(bond.id(), bond) != null) throw new IllegalArgumentException("duplicate bond id: " + bond.id());
+            if (bonds.putIfAbsent(bond.id(), bond) != null) throw new Rejected(RejectionKind.TOPOLOGY, "duplicate bond id: " + bond.id());
             addedBonds.add(bond.id());
         }
         String bondId = edit.parameters().getOrDefault("attachmentBondId", edit.editId() + ":attachment");
-        if (bonds.containsKey(bondId)) throw new IllegalArgumentException("duplicate attachment bond id");
+        if (bonds.containsKey(bondId)) throw new Rejected(RejectionKind.TOPOLOGY, "duplicate attachment bond id");
         var order = edit.replacementBondOrder() == null ? MolecularGraph.BondOrder.SINGLE : edit.replacementBondOrder();
         bonds.put(bondId, new MolecularGraph.Bond(bondId, edit.anchorAtomId(), fragmentAnchor,
                 order, order == MolecularGraph.BondOrder.AROMATIC, "UNSPECIFIED", Map.of()));
@@ -155,20 +162,13 @@ public final class GraphEditTransactionEngine {
     }
 
     private static void validateGraph(MolecularGraph graph) {
-        var atomIds = new HashSet<String>();
-        graph.atoms().forEach(atom -> { if (!atomIds.add(atom.id())) throw new IllegalArgumentException("duplicate atom: " + atom.id()); });
-        var bondIds = new HashSet<String>();
-        graph.bonds().forEach(bond -> {
-            if (!bondIds.add(bond.id())) throw new IllegalArgumentException("duplicate bond: " + bond.id());
-            if (!atomIds.contains(bond.firstAtomId()) || !atomIds.contains(bond.secondAtomId())) {
-                throw new IllegalArgumentException("bond endpoint missing: " + bond.id());
-            }
-        });
+        try { graph.validateTopology(false); }
+        catch (IllegalArgumentException error) { throw new Rejected(RejectionKind.TOPOLOGY, error.getMessage()); }
     }
 
     private static void rejectProtected(Set<String> affected, Set<String> protectedIds, String label) {
         var overlap = new HashSet<>(affected); overlap.retainAll(protectedIds);
-        if (!overlap.isEmpty()) throw new IllegalArgumentException("protected " + label + " affected: " + overlap);
+        if (!overlap.isEmpty()) throw new Rejected(RejectionKind.AUTHORIZATION, "protected " + label + " affected: " + overlap);
     }
     private static String validateAttachmentAnchor(MolecularGraph parent, GraphEdit edit,
                                                    Authorization authorization) {
@@ -179,21 +179,21 @@ public final class GraphEditTransactionEngine {
         }
         String anchor = edit.anchorAtomId();
         if (anchor == null || parent.atom(anchor).isEmpty()) {
-            throw new IllegalArgumentException("attachment anchor missing: " + anchor);
+            throw new Rejected(RejectionKind.TOPOLOGY, "attachment anchor missing: " + anchor);
         }
         if (!authorization.permittedEditAtomIds().contains(anchor)) {
-            throw new IllegalArgumentException("attachment anchor outside permitted region: " + anchor);
+            throw new Rejected(RejectionKind.AUTHORIZATION, "attachment anchor outside permitted region: " + anchor);
         }
         if (authorization.protectedAtomIds().contains(anchor)) {
-            throw new IllegalArgumentException("attachment anchor is protected: " + anchor);
+            throw new Rejected(RejectionKind.AUTHORIZATION, "attachment anchor is protected: " + anchor);
         }
         return anchor;
     }
     private static String exactlyOne(Set<String> values, String error) {
-        if (values.size() != 1) throw new IllegalArgumentException(error); return values.iterator().next();
+        if (values.size() != 1) throw new Rejected(RejectionKind.TOPOLOGY, error); return values.iterator().next();
     }
     private static <T> T required(Map<String, T> values, String id, String label) {
-        T value = values.get(id); if (value == null) throw new IllegalArgumentException(label + " missing: " + id); return value;
+        T value = values.get(id); if (value == null) throw new Rejected(RejectionKind.TOPOLOGY, label + " missing: " + id); return value;
     }
     private static Map<String, String> unchanged(List<String> parent, Set<String> product) {
         var result = new LinkedHashMap<String, String>(); parent.stream().filter(product::contains).forEach(id -> result.put(id, id)); return result;

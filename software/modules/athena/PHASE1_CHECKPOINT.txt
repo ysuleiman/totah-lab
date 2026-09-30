@@ -1,0 +1,151 @@
+Athena Phase 1 checkpoint — 2026-09-30
+
+Scope and starting point
+Frozen parent: f2b50b5315d4b734698e6131bb10a120d451c38b
+Branch: codex/athena-phase1-provenance
+Recovered input: workspace/preservation/athena-phase1-interrupted-20260930/resume-phase1.patch
+The patch passed git apply --check before application. All eight recovered files were inspected.
+No new Maven module, dependency, generator, molecular representation, or target policy was introduced.
+No WELD migration, METTL7 changes, scientific campaign runs, or scientific artifact edits belong to this change.
+The authoritative software/baseline records are unchanged.
+
+Recovered implementation
+The eight recovered files added full graph snapshots/deltas, receipt extensions, bounded attributed-graph
+correspondence, provenance/design states, execution outcomes, and a shared graph/topology generation path.
+They had no Phase 1 acceptance tests. The recovered generator referenced missing typed rejection classes,
+encoded canonical identity in a diagnostic message, allowed undocumented backend chemical mutations,
+misclassified topology failures, and could drop incident bonds under an anchor's additions permission.
+The recovered correspondence did not account for index-relative tetrahedral parity.
+
+Completed behavior and public contracts
+MolecularGraph now owns structural validation and Delta. Full before/after snapshots preserve ordering,
+metadata, element, isotope, charge, hydrogen annotation, aromaticity, stereo, coordinates, endpoints,
+orders, additions and deletions. Atom chemical changes exclude coordinates, which have a separate list.
+Replay requires the exact parent snapshot. Metadata changes remain conservatively visible as graph changes.
+GraphEditReceipt and TopologyEditReceipt carry the same Delta, rather than competing change models.
+Both existing transaction engines emit typed Rejected failures (AUTHORIZATION, TOPOLOGY, CHEMISTRY).
+
+MolecularDesignTree owns Reference, RetainedAnchor, Provenance, DesignState, Attempt, Outcome and
+Termination. References require IDs and versions. Provenance contains hypothesis, evidence, anchor,
+authorized rule, resource and geometry-constraint references plus opaque design intent. An Attempt embeds
+its entire parent design state, operation/authorization, raw and resulting graph states, edit receipt,
+transaction/validation/final deltas, evidence, canonical key, representative correspondence, and composed
+parent lineage. Scientifically different derivations keep distinct DesignStates even when sharing a Node.
+No A/B, residue, compound, or target vocabulary enters these generic contracts.
+
+MolecularDesignGraphGenerator.generateTraced is the shared bounded path, with a state-aware planner,
+synchronous OutcomeSink and GeometryValidator. Existing graph/topology editors remain the only editors.
+Every executed operation and every known queued operation blocked by a limit gets a receipt. Root and
+planner failures are explicit. Backend evidence is required. Invalid topology is checked even when
+multiple components are allowed. Sanitization cannot silently alter graph chemistry or stable ordering;
+coordinate-only changes have their own delta and go through geometry evaluation. Requested constraints
+must all be reported evaluated. Runtime failures become receipts; persistence I/O failures propagate.
+Operation IDs can repeat under different hypotheses; execution IDs remain unique within a run.
+
+CanonicalIdentityService owns Correspondence/Mapping and one bounded attributed-graph proof search.
+It is not another canonical identity implementation. The default search checks element, isotope, formal
+charge, hydrogen count, aromaticity, stereo, connectivity, bond order and endpoints, ignoring coordinates
+and source metadata. All found symmetry alternatives are retained, with an exhaustive flag and visited
+state count; caps are 100,000 search states and 256 mappings. Stable-ID order chooses a representative
+mapping but does not assert unique physical atom lineage. Each alternative can compose the stored
+parent-to-attempt mapping. Equal canonical keys without a graph proof produce LINEAGE_MAPPING_FAILURE.
+
+OclMolecularBackend remains the concrete identity/sanitization authority. It proves canonical equality and
+converts relative tetrahedral parity to OCL CIP labels before reusing the shared correspondence search.
+Unknown/unresolved relative stereo fails closed. Explicit bond-stereo descriptors unsupported by the
+mapper now fail rather than silently disappearing. Positive hydrogen annotations must match OCL's inferred
+unrepresented hydrogens; zero retains the historical unspecified-count convention. These checks apply to
+identity/sanitization, leaving historical force-field calculation behavior unchanged.
+
+Durability
+MolecularDesignTree.Journal is a concrete OutcomeSink using Athena's existing Jackson dependency.
+Use try-with-resources and a fresh Path per run. It writes schema athena-design-journal/1 JSON lines for
+started, state, planned, receipt and terminated events. Every event is FileChannel.force(true)'d before
+execution advances. CREATE_NEW refuses overwrite. Receipts round-trip through Jackson and replay after
+reading from disk. A planned event without a receipt, missing terminated event, or trailing partial line
+indicates interruption; it must not be interpreted as successful completion. Automatic crash recovery,
+resumption, multi-process appending and cross-run deduplication are not implemented. File durability is
+subject to the host filesystem/hardware guarantees. Event JSON is versioned but not a canonical byte-hash
+format; arrays preserve molecular order. Hosts may provide another transactional OutcomeSink.
+
+Reuse and why no additional production package/class was needed
+The existing MolecularGraph owns validation/deltas; receipt records own transaction evidence;
+CanonicalIdentityService owns correspondence; MolecularDesignTree owns derivations and the nested Journal;
+MolecularDesignGraphGenerator owns bounded execution; the two transaction engines own mutations;
+OclGraphMapper/OclMolecularBackend own toolkit semantics. Existing full-graph representative correspondence
+was not supplied by SMARTS matching or stable atom orbits, so that missing behavior extends identity's
+contract and is shared with OCL. Journal is a nested resource-owning sink because the existing sink
+interface had no persistence implementation; it is not another candidate/provenance model. Jackson was
+already used by DesignGrammarJsonCodec; a design-grammar codec cannot own execution receipts.
+Only three new top-level Java classes were added, all tests: end-to-end provenance acceptance, graph-delta
+acceptance, and bounded correspondence acceptance. Existing OCL and architecture tests were extended.
+
+Backward compatibility
+Old graph/topology receipt constructors, tree/edge constructors, AuthorizedEdit constructor, legacy
+planner and generate() entry point remain source-compatible. Historical receipt constructors expose
+null delta, and old tree construction explicitly marks LEGACY_UNRECORDED. Legacy generate() returns
+in-memory receipts and marks provenance UNSPECIFIED; it is not the durable production entry point.
+Legacy identity-only expansion behavior remains; traced derivations can expand separately within budgets.
+Rejected extends IllegalArgumentException. Some formerly generic/protected-state failures now use the
+specific typed exception. Stronger structural checks intentionally reject self/parallel bonds and invalid
+IDs. Exact replay of new receipts requires complete new snapshots; legacy receipts cannot supply missing
+historical graph/provenance data. Changed record schemas require consumers to rebuild; binary or old
+serialized-record compatibility is not claimed. Schema v1 journals do not invent missing old provenance.
+
+Legacy target-policy migration plan (not executed)
+Mettl7bEnrichmentGate remains unchanged in Athena's legacy ligand/screening package. Its three existing
+compatibility tests run in the bounded suite. The design package cannot reference it or known target
+concepts, and Athena production dependency checks now also forbid the METTL7 package.
+A separately reviewed change should make the existing downstream Mettl7bEnrichmentPolicy the production
+authority, with explicit versioned thresholds/evidence and adapters for historical DTOs. First add parity
+fixtures for all boundaries, rejection reasons and preferences; then migrate downstream callers without
+changing frozen campaigns. Keep the old Athena gate frozen solely for historical replay until consumers
+and serialized type dependencies have been audited. Never make Athena delegate back into METTL7.
+Retire the legacy gate only after compatibility approval; do not maintain two active production policies.
+No policy migration, deletion, threshold change or conclusion change occurred in Phase 1.
+
+Validation
+Exact commands, aggregate and per-suite results, failed developmental runs, source hashes, preserved
+scientific hashes, and exclusions are in phase1-validation.json. The final Athena bounded suite includes
+the existing three Mettl7bEnrichmentGate tests and all new acceptance tests. The full athena-openchemlib
+suite includes force-field/conformer tests as well as new charge/stereo/correspondence tests.
+Regression-package tests that append scientific CSVs and *IntegrationTest campaigns were excluded.
+No full repository suite, Aether long-running numerical suite, external chemistry parity campaign,
+scientific regeneration, production disk-failure injection, or power-loss simulation was performed.
+
+Acceptance coverage
+Distinct hypotheses including a repeated operation ID; explicit anchor retention; identical products
+from differently ordered parents; symmetric/ambiguous mappings and truncated correspondence search;
+renamed topology atoms/bonds and lineage composition; canonical collisions without graph proof;
+complete before/after replay and JSON round trip; in-place atom/bond changes; charge/isotope/H/aromaticity/
+stereo/order/endpoint/add/delete dimensions; coordinate-only changes; authorization, topology, chemistry,
+backend, geometry, planner and unexpected failures; persistence errors; rejected/budget receipts on disk;
+deterministic enumeration; node/depth/attempt limits; target leakage; OCL tetrahedral parity under atom
+reordering, enantiomer distinction, supported H annotations and unsupported bond stereo.
+
+Known limitations and Phase 2 implications
+* Production callers must supply reviewed non-legacy provenance, a fresh durable journal (or transactional
+  sink), bounded deterministic planner and appropriate geometry validator. Evidence/rule IDs and opaque
+  intent are references, not a target-science approval engine. The host owns the run namespace.
+* A planner returns a finite list; its own runtime/output size is not governed by an Athena timeout.
+  Receipts cover known planned operations, not an infinite unenumerated search space. Geometry evidence
+  is a caller-supplied assessment; this phase adds no placement/clash algorithms or scoring objective.
+* Correspondence is conservative, bounded and potentially ambiguous. It does not equate tautomers,
+  alternative aromatic encodings, unspecified versus positive H annotations, or unsupported stereo.
+  Non-exhaustive alternatives do not establish unique lineage. Automatic stereo enumeration is rejected
+  by this generation path even though historical direct topology operations expose that disposition.
+* OCL validate() currently requires total charge balance. Net-charged molecules therefore receive a
+  backend validation failure; the limitation is tested, not bypassed or hidden. Charge-balanced examples
+  verify that individual formal charges survive generation and deduplication.
+* Existing force-field behavior was not scientifically requalified. Positive H annotations in design
+  validation are now checked, but this phase does not rewrite force-field hydrogen preparation.
+* General E/Z bond-stereo encoding and normalization lineage are not implemented. A future resource
+  provider must reject unsupported inputs or qualify extensions in OCL before enabling them.
+* The legacy target gate remains architectural debt outside the generic design path. Architecture token
+  checks cover known target concepts and dependencies, not semantic detection of every possible policy.
+
+Phase 2 must remain a separate reviewed work unit. Resource integration can feed this single Java-native
+path; WELD must not become a runtime dependency or another generator. Before enabling a resource class,
+qualify its charge/H/stereo/aromaticity semantics and mapping behavior against OCL, search existing Java
+owners first, and review unsupported cases above. No WELD resource, placement, SMIRKS, reaction, scaffold-
+hopping or target-compound generation capability was enabled here. Stop at this checkpoint.

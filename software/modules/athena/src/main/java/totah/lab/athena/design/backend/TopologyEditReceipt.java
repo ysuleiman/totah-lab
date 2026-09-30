@@ -10,7 +10,15 @@ public record TopologyEditReceipt(String editId, String transformation,
         Map<String,String> parentToChildAtomLineage, Map<String,String> parentToChildBondLineage,
         Map<String,String> attachmentPointMapping, Set<String> addedAtomIds, Set<String> deletedAtomIds,
         Set<String> addedBondIds, Set<String> deletedBondIds,
-        TopologyEdit.StereoDisposition stereoDisposition, List<String> validations) {
+        TopologyEdit.StereoDisposition stereoDisposition, List<String> validations, MolecularGraph.Delta delta) {
+    /** Compatibility constructor: historical receipts have no replay snapshot. */
+    public TopologyEditReceipt(String editId, String transformation, String parentCanonicalIdentity, String childCanonicalIdentity,
+            Map<String,String> parentToChildAtomLineage, Map<String,String> parentToChildBondLineage,
+            Map<String,String> attachmentPointMapping, Set<String> addedAtomIds, Set<String> deletedAtomIds,
+            Set<String> addedBondIds, Set<String> deletedBondIds, TopologyEdit.StereoDisposition stereoDisposition,
+            List<String> validations) {
+        this(editId, transformation, parentCanonicalIdentity, childCanonicalIdentity, parentToChildAtomLineage, parentToChildBondLineage, attachmentPointMapping, addedAtomIds, deletedAtomIds, addedBondIds, deletedBondIds, stereoDisposition, validations, null);
+    }
     public TopologyEditReceipt { parentToChildAtomLineage=Map.copyOf(parentToChildAtomLineage);
         parentToChildBondLineage=Map.copyOf(parentToChildBondLineage);attachmentPointMapping=Map.copyOf(attachmentPointMapping);
         addedAtomIds=Set.copyOf(addedAtomIds);deletedAtomIds=Set.copyOf(deletedAtomIds);

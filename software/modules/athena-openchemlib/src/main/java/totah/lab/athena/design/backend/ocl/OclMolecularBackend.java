@@ -34,6 +34,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
             throws MolecularBackendException {
         try {
             var mapping = mapper.toOcl(graph);
+            mapper.validateHydrogenCounts(mapping);
             if (graph.atoms().stream().allMatch(atom -> atom.stereochemistry().equals("UNSPECIFIED")
                     || atom.stereochemistry().equals("NONE"))) {
                 mapping.molecule().stripStereoInformation();
@@ -61,6 +62,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     @Override
     public CanonicalIdentityService.Result identify(MolecularGraph graph) throws MolecularBackendException {
         var mapping = mapper.toOcl(graph);
+        mapper.validateHydrogenCounts(mapping);
         try {
             mapping.molecule().ensureHelperArrays(Molecule.cHelperCIP);
             String idCode = new Canonizer(mapping.molecule()).getIDCode();
@@ -69,6 +71,38 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
         } catch (RuntimeException exception) {
             throw new MolecularBackendException("OCL canonicalization failed", exception);
         }
+    }
+
+    /** OCL resolves index-relative tetrahedral parity before the shared graph correspondence search. */
+    @Override
+    public CanonicalIdentityService.Correspondence correspondence(MolecularGraph attempted, MolecularGraph representative)
+            throws MolecularBackendException {
+        if (!identify(attempted).canonicalKey().equals(identify(representative).canonicalKey()))
+            return new CanonicalIdentityService.Correspondence(List.of(), true, 0);
+        return CanonicalIdentityService.super.correspondence(absoluteStereo(attempted), absoluteStereo(representative));
+    }
+
+    private MolecularGraph absoluteStereo(MolecularGraph graph) throws MolecularBackendException {
+        var mapping = mapper.toOcl(graph);
+        var molecule = mapping.molecule();
+        molecule.ensureHelperArrays(Molecule.cHelperCIP);
+        var stereo = new java.util.HashMap<String, String>();
+        for (int i = 0; i < molecule.getAllAtoms(); i++) {
+            String id = mapping.idByMapNumber().get(molecule.getAtomMapNo(i));
+            var original = graph.atom(id).orElseThrow();
+            String label = original.stereochemistry();
+            if (label.startsWith("PARITY_")) {
+                label = switch (molecule.getAtomCIPParity(i)) {
+                    case Molecule.cAtomCIPParityRorM -> "CIP_R_OR_M";
+                    case Molecule.cAtomCIPParitySorP -> "CIP_S_OR_P";
+                    default -> throw new MolecularBackendException("unresolved tetrahedral stereo: " + id);
+                };
+            }
+            stereo.put(id, label);
+        }
+        return new MolecularGraph(graph.atoms().stream().map(a -> new MolecularGraph.Atom(a.id(), a.element(),
+                a.isotope(), a.formalCharge(), a.explicitHydrogens(), a.aromatic(), stereo.get(a.id()),
+                a.coordinates(), a.properties())).toList(), graph.bonds(), graph.properties());
     }
 
     @Override

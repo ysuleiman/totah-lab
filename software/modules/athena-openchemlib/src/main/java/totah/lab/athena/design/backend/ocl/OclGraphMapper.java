@@ -15,6 +15,7 @@ import java.util.Map;
 final class OclGraphMapper {
     Mapping toOcl(MolecularGraph graph) throws MolecularBackendException {
         try {
+            graph.validateTopology(false);
             var molecule = new StereoMolecule(graph.atoms().size(), graph.bonds().size());
             var indexById = new LinkedHashMap<String, Integer>();
             var idByMapNumber = new LinkedHashMap<Integer, String>();
@@ -32,6 +33,8 @@ final class OclGraphMapper {
                 indexById.put(atom.id(), index); idByMapNumber.put(mapNumber, atom.id()); mapNumber++;
             }
             for (var bond : graph.bonds()) {
+                if (!bond.stereochemistry().equals("UNSPECIFIED") && !bond.stereochemistry().equals("NONE"))
+                    throw new MolecularBackendException("unsupported bond stereo descriptor: " + bond.stereochemistry());
                 Integer first = indexById.get(bond.firstAtomId()); Integer second = indexById.get(bond.secondAtomId());
                 if (first == null || second == null) throw new MolecularBackendException("bond endpoint missing: " + bond.id());
                 molecule.addBond(first, second, bondType(bond));
@@ -44,6 +47,21 @@ final class OclGraphMapper {
             throw exception;
         } catch (RuntimeException exception) {
             throw new MolecularBackendException("OCL graph conversion failed", exception);
+        }
+    }
+
+    void validateHydrogenCounts(Mapping mapping) throws MolecularBackendException {
+        var graph = mapping.source();
+        var molecule = mapping.molecule();
+        var idByMapNumber = mapping.idByMapNumber();
+        // A positive count constrains hydrogens not represented as graph atoms. Zero is
+        // the historical unspecified count. Do not silently accept counts OCL would alter.
+        molecule.ensureHelperArrays(Molecule.cHelperNeighbours);
+        for (int i = 0; i < molecule.getAllAtoms(); i++) {
+            var atom = graph.atom(idByMapNumber.get(molecule.getAtomMapNo(i))).orElseThrow();
+            if (atom.explicitHydrogens() < 0 || (atom.explicitHydrogens() > 0
+                    && atom.explicitHydrogens() != molecule.getImplicitHydrogens(i)))
+                throw new MolecularBackendException("hydrogen-count annotation disagrees with OCL: " + atom.id());
         }
     }
 

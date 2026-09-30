@@ -79,6 +79,79 @@ class OclMolecularBackendAcceptanceTest {
         assertThat(result.evidence().backend()).isEqualTo("OPEN_CHEM_LIB");
     }
 
+    @Test
+    void correspondenceRepairsStableIdsAcrossDifferentAtomOrders() throws Exception {
+        var original = ethanol();
+        var reordered = new MolecularGraph(List.of(atom("oxygen", "O", 0), atom("middle", "C", 0), atom("end", "C", 0)),
+                List.of(bond("new2", "middle", "oxygen", MolecularGraph.BondOrder.SINGLE, false),
+                        bond("new1", "end", "middle", MolecularGraph.BondOrder.SINGLE, false)), Map.of());
+        assertThat(backend.identify(original).canonicalKey()).isEqualTo(backend.identify(reordered).canonicalKey());
+        var mapping = backend.correspondence(reordered, original);
+        assertThat(mapping.exhaustive()).isTrue(); assertThat(mapping.ambiguous()).isFalse();
+        assertThat(mapping.selected().atoms()).isEqualTo(Map.of("oxygen", "o1", "middle", "c2", "end", "c1"));
+        assertThat(mapping.selected().bonds()).isEqualTo(Map.of("new2", "b2", "new1", "b1"));
+    }
+
+    @Test
+    void symmetryAndTetrahedralParityAreProvedByTheBackend() throws Exception {
+        assertThat(backend.correspondence(benzene(), benzene()).alternatives()).hasSize(12);
+        var center = new MolecularGraph.Atom("center", "C", null, 0, 0, false, "PARITY_1", null, Map.of());
+        var original = new MolecularGraph(List.of(center, atom("f", "F", 0), atom("cl", "Cl", 0), atom("br", "Br", 0), atom("i", "I", 0)),
+                List.of(bond("bf", "center", "f", MolecularGraph.BondOrder.SINGLE, false), bond("bcl", "center", "cl", MolecularGraph.BondOrder.SINGLE, false),
+                        bond("bbr", "center", "br", MolecularGraph.BondOrder.SINGLE, false), bond("bi", "center", "i", MolecularGraph.BondOrder.SINGLE, false)), Map.of());
+        var reversedParity = new MolecularGraph.Atom("center", "C", null, 0, 0, false, "PARITY_2", null, Map.of());
+        var reordered = new MolecularGraph(List.of(reversedParity, original.atoms().get(2), original.atoms().get(1), original.atoms().get(3), original.atoms().get(4)),original.bonds(),Map.of());
+        assertThat(backend.identify(original).canonicalKey()).isEqualTo(backend.identify(reordered).canonicalKey());
+        assertThat(backend.correspondence(reordered, original).selected().atoms().get("center")).isEqualTo("center");
+        var opposite = new MolecularGraph(List.of(reversedParity, original.atoms().get(1), original.atoms().get(2), original.atoms().get(3), original.atoms().get(4)),original.bonds(),Map.of());
+        assertThat(backend.identify(original).canonicalKey()).isNotEqualTo(backend.identify(opposite).canonicalKey());
+        assertThat(backend.correspondence(opposite,original).alternatives()).isEmpty();
+    }
+
+    @Test
+    void unsupportedHydrogenCountsAndBondStereoFailClosed() {
+        var hydrogenCount = new MolecularGraph(List.of(new MolecularGraph.Atom("n", "N", null, 1, 5, false, "UNSPECIFIED", null, Map.of())),List.of(),Map.of());
+        assertThatThrownBy(() -> backend.identify(hydrogenCount)).hasMessageContaining("hydrogen-count annotation");
+        var stereo = new MolecularGraph(ethanol().atoms(),List.of(new MolecularGraph.Bond("b1","c1","c2",MolecularGraph.BondOrder.SINGLE,false,"E",Map.of()),ethanol().bonds().get(1)),Map.of());
+        assertThatThrownBy(() -> backend.sanitize(stereo,new MolecularSanitizer.SanitizationPolicy(Set.of(),true))).hasMessageContaining("unsupported bond stereo");
+    }
+
+    @Test
+    void chargedProductsRetainMultipleReceiptedDerivationsThroughOcl() throws Exception {
+        var root = new MolecularGraph(List.of(atom("n", "N", 1), atom("c", "C", 0), atom("negative", "O", -1)), List.of(bond("nc", "n", "c", MolecularGraph.BondOrder.SINGLE, false), bond("co", "c", "negative", MolecularGraph.BondOrder.SINGLE, false)), Map.of());
+        var provenance = new totah.lab.athena.design.generation.MolecularDesignTree.Provenance(
+                new totah.lab.athena.design.generation.MolecularDesignTree.Reference("hypothesis", "1"),List.of(),List.of(),
+                new totah.lab.athena.design.generation.MolecularDesignTree.Reference("rule", "1"),List.of(),"retain charged anchor",List.of(),false);
+        var edits = java.util.stream.Stream.of("first","second").map(id -> {
+            var edit = new totah.lab.athena.design.backend.GraphEdit(id,"v",totah.lab.athena.design.backend.GraphEdit.Type.ATOM_SUBSTITUTION,Set.of("c"),Set.of(),null,null,"N",null,Map.of());
+            return new totah.lab.athena.design.generation.MolecularDesignGraphGenerator.AuthorizedEdit(edit,
+                    new totah.lab.athena.design.backend.GraphEditTransactionEngine.Authorization("v",Set.of(edit.type()),Set.of("c"),Set.of("n"),Set.of()),0,provenance);
+        }).toList();
+        var generator = new totah.lab.athena.design.generation.MolecularDesignGraphGenerator(new totah.lab.athena.design.backend.GraphEditTransactionEngine(),backend,backend);
+        var tree = generator.generateTraced(root,provenance,new totah.lab.athena.design.generation.MolecularDesignGraphGenerator.Configuration(
+                totah.lab.athena.design.generation.GenerationStrategy.ENUMERATIVE,8,1,8,false,new MolecularSanitizer.SanitizationPolicy(Set.of(),true)),
+                state -> state.depth()==0 ? edits : List.of(), a -> {}, (p,e,g) -> new totah.lab.athena.design.generation.MolecularDesignGraphGenerator.GeometryResult(true,List.of(),Set.of()));
+        assertThat(tree.attempts()).hasSize(2);
+        assertThat(tree.attempts().get(1).outcome()).isEqualTo(totah.lab.athena.design.generation.MolecularDesignTree.Outcome.DEDUPLICATED);
+        assertThat(tree.states()).hasSize(3);
+        assertThat(tree.states().get(2).graph().atom("n").orElseThrow().formalCharge()).isEqualTo(1);
+    }
+
+    @Test
+    void positiveHydrogenCountsMustMatchInferredHydrogensAndArePreserved() throws Exception {
+        var graph = new MolecularGraph(List.of(new MolecularGraph.Atom("c","C",null,0,4,false,"UNSPECIFIED",null,Map.of())),List.of(),Map.of());
+        assertThat(backend.sanitize(graph,new MolecularSanitizer.SanitizationPolicy(Set.of(),true)).graph()).isEqualTo(graph);
+        assertThat(backend.identify(graph).canonicalKey()).isNotBlank();
+    }
+
+    @Test
+    void existingNetChargeValidationLimitationIsExplicit() {
+        var graph = new MolecularGraph(List.of(atom("n","N",1)),List.of(),Map.of());
+        assertThatThrownBy(() -> backend.sanitize(graph,new MolecularSanitizer.SanitizationPolicy(Set.of(),true)))
+                .isInstanceOf(totah.lab.athena.design.backend.MolecularBackendException.class)
+                .hasMessageContaining("OCL sanitization failed");
+    }
+
     private static MolecularGraph ethanol() {
         return new MolecularGraph(List.of(atom("c1", "C", 0), atom("c2", "C", 0), atom("o1", "O", 0)),
                 List.of(bond("b1", "c1", "c2", MolecularGraph.BondOrder.SINGLE, false),

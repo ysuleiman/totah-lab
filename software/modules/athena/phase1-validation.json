@@ -1,0 +1,3520 @@
+{
+  "baseline": "f2b50b5315d4b734698e6131bb10a120d451c38b",
+  "branch": "codex/athena-phase1-provenance",
+  "recovery_patch": "workspace/preservation/athena-phase1-interrupted-20260930/resume-phase1.patch",
+  "recovery_patch_sha256": "dcbc06490f0c3f7ccc480db3c3fb366137535d219fdbe1b7c15e979f1fa02966",
+  "files_changed": [
+    "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclGraphMapper.java",
+    "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclMolecularBackend.java",
+    "software/modules/athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/OclMolecularBackendAcceptanceTest.java",
+    "software/modules/athena/PHASE1_CHECKPOINT.txt",
+    "software/modules/athena/phase1-validation.json",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/CanonicalIdentityService.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/GraphEditReceipt.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/GraphEditTransactionEngine.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/MolecularGraph.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/TopologyEditReceipt.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/TopologyEditTransactionEngine.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/generation/MolecularDesignGraphGenerator.java",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/generation/MolecularDesignTree.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/architecture/AthenaDependencyTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/backend/CanonicalCorrespondenceTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/backend/MolecularGraphDeltaTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/generation/DesignProvenanceAcceptanceTest.java"
+  ],
+  "validated_source_sha256": {
+    "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclGraphMapper.java": "1b707c2ddeaa59eb239a5a7f5f7f05d99db3ec7ed7374ed2975ec637c4ed827d",
+    "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclMolecularBackend.java": "afd59b4d02a2a70fd492a7eec6e18e43553ce58d05a949fdba749ed23f00a137",
+    "software/modules/athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/OclMolecularBackendAcceptanceTest.java": "bfd239bdf02c71381823a8de6b8aa62afffa33040c30fbe17a1973797ee3f2e8",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/CanonicalIdentityService.java": "5fc41a82fdf387e13c70f13c3c313fc1265c1c263906b8b6644668bf44dfdfa7",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/GraphEditReceipt.java": "6134292fba76909cadff11e5d03deb4b40a68eafec9e7832a1d91d8a143e3d3d",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/GraphEditTransactionEngine.java": "de0890d30c6552ef0a62510553bf2b52cfbdf4933c35b332b5a02b90f9e1cab6",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/MolecularGraph.java": "a3ee665dc5307730405f310f9a283f82740533a7be8dfafbee308cb958767eaf",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/TopologyEditReceipt.java": "0d44354b1304154b1466e66fd6deb5b801615b9b34bd63e03ab5903c3c7a03ff",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/backend/TopologyEditTransactionEngine.java": "bb3e530d6a5e85f962e992aec1ed07a486c84784220cb32672f3d986732d448b",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/generation/MolecularDesignGraphGenerator.java": "ecea66c03e4f804392e53a49b24bb1abd97cd9dce38b45a687df19d0bbaf7409",
+    "software/modules/athena/src/main/java/totah/lab/athena/design/generation/MolecularDesignTree.java": "8d775d66ae7816ed8bbc11b14eb0cc6305b05a57bda951f6bd86da05ba969eae",
+    "software/modules/athena/src/test/java/totah/lab/athena/architecture/AthenaDependencyTest.java": "35e00c442ac71519213da45a42a62fbdbfe65c78a1da076c0c1fd31e0f8cc092",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/backend/CanonicalCorrespondenceTest.java": "690f1765d8af022e0f1e2a01d76908f2fa09d3a07ad4cda5d3e25d232ede3560",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/backend/MolecularGraphDeltaTest.java": "53dbaa0633793e20f118f6737b26a3cc8bd11549dce193752b1cb4e9ad9fa083",
+    "software/modules/athena/src/test/java/totah/lab/athena/design/generation/DesignProvenanceAcceptanceTest.java": "5617a359d88b9973ac461bfb9c6ed3c917cc909171039023a713521f5f34fd91"
+  },
+  "commands": [
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml test -Dtest=GraphEditTransactionEngineTest,TopologyEditTransactionEngineTest,MolecularDesignGraphGeneratorTest > /tmp/phase1-first-test.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Initial repaired implementation: legacy transaction/generation tests.",
+      "summary": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:17:27+03:00",
+      "duration": "6.869 s",
+      "log_sha256": "dd1ff9f67bc158087e53ca7e5f882b00f849265d9750da01dbb08f6b1cc4278c",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.TopologyEditTransactionEngineTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.057"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.GraphEditTransactionEngineTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.041"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.015"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml test -Dtest=DesignProvenanceAcceptanceTest,MolecularGraphDeltaTest,CanonicalCorrespondenceTest,AthenaDependencyTest > /tmp/phase1-acceptance.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Initial new acceptance tests.",
+      "summary": {
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:20:49+03:00",
+      "duration": "4.177 s",
+      "log_sha256": "3184e04eec61bb23f7eb8305be2ea6dacefbb117652a46218cb3281ba7ea6cef",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.CanonicalCorrespondenceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.042"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.MolecularGraphDeltaTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.045"
+        },
+        {
+          "name": "totah.lab.athena.architecture.AthenaDependencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.115"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install -DskipTests > /tmp/phase1-athena-install.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Local dependency build for OCL; not a test run.",
+      "summary": null,
+      "finished_at": "2026-09-30T16:22:11+03:00",
+      "duration": "0.917 s",
+      "log_sha256": "e6ebf97c147e70273a57a35458f84492ee07e086c5c921147dcdb2b0fce01654",
+      "suites": []
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test > /tmp/phase1-ocl-tests.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 1,
+      "note": "FAILED development run: overbroad H-count guard broke two MMFF tests; new net-charge fixture exposed existing OCL total-charge restriction.",
+      "summary": {
+        "tests": 16,
+        "failures": 2,
+        "errors": 1,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:22:41+03:00",
+      "duration": "2.244 s",
+      "log_sha256": "5045fc35e25da764d5e1950c8e06b8f75d4dc87720bfeb310bed0336653fe8a7",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.052"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 10,
+          "failures": 1,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.410"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 1,
+          "errors": 1,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test > /tmp/phase1-ocl-tests-2.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 1,
+      "note": "FAILED development run: helper-array initialization in the common mapper altered two legacy MMFF test paths. Moved H-count validation to design identity/sanitization.",
+      "summary": {
+        "tests": 16,
+        "failures": 1,
+        "errors": 1,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:23:55+03:00",
+      "duration": "2.217 s",
+      "log_sha256": "fa3ae393930a0922f4f99122a0eb49863d19d5f85f0f7cad199a11856cf3390c",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.048"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.389"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 1,
+          "errors": 1,
+          "skipped": 0,
+          "seconds": "0.020"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml test '-Dtest=*,!**/regression/**,!*IntegrationTest' > /tmp/phase1-athena-suite.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Bounded suite before final parent-context/journal additions.",
+      "summary": {
+        "tests": 657,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:24:07+03:00",
+      "duration": "7.162 s",
+      "log_sha256": "2fb1e74e4196794c6e7999934deca6cae74a3ca046eb61a97baa663b7bfe5ef3",
+      "suites": [
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAlignmentEvidenceFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.046"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalSiteGrammarFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalStructuralVariabilityCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.EvidenceChannelTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.011"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketResidueEvidenceFactoryTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.Mettl7PocketComparisonEvidenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.076"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentRulesTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.022"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.009"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketEvidenceModelTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.LigandContactTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketFunctionalEvidenceFactoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchSignatureFactoryTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.037"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchComparatorTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchCategoriesTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchResidueGroupTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketShapeDistanceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketRetrievalDistanceTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ExperimentalBindingSiteGrouperTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ComponentPocketGeometryAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureFrameConsistencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.022"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.Mettl7PocketArchitectureRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.049"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandSpaceComparatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LoopRegionAnalyzerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.EscapeRouteAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.020"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.BackboneArchitectureAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.WallGeometryAnalyzerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.SameSitePoseComparatorTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PrincipalComponentsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandAtomCorrespondenceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.AlphaSphereArchitectureAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KabschRigidPointAlignerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.CompositePocketAlignerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryClassifierTest",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.034"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculatorTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.AlignedResidueCorrespondenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueMatchTypeOfTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryScorerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.MultiHypothesisPocketAlignerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.015"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KnownTransformAlignmentTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.selection.PocketResidueSelectionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketShapeStatisticsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryStrategyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.ExecutableScaffoldGrammarValidatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.PredockGrammarEngineTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.159"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.CanonicalCorrespondenceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.009"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.MolecularGraphDeltaTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.TopologyEditTransactionEngineTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.GraphEditTransactionEngineTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.LineageAwareFeatureMapperTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.CounterRecognitionEnsembleEvaluatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.GrammarDrivenCandidateGeneratorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.IndexedGraphDryRunTransformerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.013"
+        },
+        {
+          "name": "totah.lab.athena.energy.EnergyFoundationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmResponseValidatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmProcessExecutorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.073"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmSystemManifestLoaderTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.016"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmEnergyEvaluatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfoniumStereochemistryAssessmentTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.TorsionProfileAssessmentTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfurStateTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SamStereochemistryRegressionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.ParameterizationProvenanceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.NearAttackAssessorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.tmt.EnsembleNacAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffCompatibleReferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.183"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceAnalyzerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffSubjectAggregatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceEvidenceWriterTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffWeightsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.thermo.ThermodynamicCoreTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.architecture.AthenaDependencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.069"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.ProteinDefinedMaskTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.012"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.LocalRelaxationProtocolContractTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.DisplacementCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.PhysicalValidityEvaluatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.fragment.FragmentRegionFitTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentInterfaceTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.052"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentMultipleUnitsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.084"
+        },
+        {
+          "name": "totah.lab.athena.clash.StericClashAnalysisTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.recognition.InteractionStableFeatureAssignerTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.recognition.RecognitionBasinModelTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.019"
+        },
+        {
+          "name": "totah.lab.athena.recognition.DifferentialRecognitionComparatorTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.landscape.CoordinateRealizerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.geometry.GridVolumeTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.sasa.ShrakeRupleySasaTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.sequence.NeedlemanWunschSequenceAlignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.contact.DefaultContactAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketScorerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandPocketOccupancyAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultCrossProteinPoseComparatorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketAssignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandGeometryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.AlphaSphereMetricsTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultMutationPoseComparatorTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultLigandContactAlignmentAnalyzerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.Mettl7ContactAlignmentRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.MutationCandidateRankerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.ContactStringRendererTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.PoseReferenceSimilarityAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.interaction.DefaultLigandInteractionAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.ScreeningGatesTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.LigandDiversitySelectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.CandidateFilterTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.Mettl7bEnrichmentGateTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HalogenBondDetectorTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.interaction.ContactMatrixTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrophobicContactDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionThresholdsTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionProfilerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.012"
+        },
+        {
+          "name": "totah.lab.athena.interaction.SaltBridgeDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiCationDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiStackingDetectorTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionRefinementsTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrogenBondDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionFingerprintTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.HydrophobicAtomPerceptionTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.AromaticRingPerceptionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.ChargedGroupPerceptionTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test > /tmp/phase1-ocl-tests-3.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "OCL suite after narrowing mapper changes.",
+      "summary": {
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:24:38+03:00",
+      "duration": "2.178 s",
+      "log_sha256": "1d32a5e6175c3b12f25461edb8e63127e7921a0d271158bba9cd3968deb08a7a",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.049"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.347"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.015"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest' > /tmp/phase1-athena-final.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Parent design context and additional failure/coordinate coverage; local install.",
+      "summary": {
+        "tests": 660,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:26:39+03:00",
+      "duration": "7.255 s",
+      "log_sha256": "7dddcd6a44469c4272808c6d547d6fd32387c728644c2d2270c1e33639ce50ff",
+      "suites": [
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAlignmentEvidenceFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.043"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalSiteGrammarFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalStructuralVariabilityCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.EvidenceChannelTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketResidueEvidenceFactoryTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.Mettl7PocketComparisonEvidenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.060"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentRulesTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketEvidenceModelTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.012"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.LigandContactTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketFunctionalEvidenceFactoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchSignatureFactoryTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.033"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchComparatorTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.011"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchCategoriesTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchResidueGroupTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketShapeDistanceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketRetrievalDistanceTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ExperimentalBindingSiteGrouperTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ComponentPocketGeometryAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureFrameConsistencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.019"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.Mettl7PocketArchitectureRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.049"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandSpaceComparatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LoopRegionAnalyzerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.EscapeRouteAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.019"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.BackboneArchitectureAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.WallGeometryAnalyzerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.SameSitePoseComparatorTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PrincipalComponentsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandAtomCorrespondenceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.AlphaSphereArchitectureAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KabschRigidPointAlignerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.CompositePocketAlignerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryClassifierTest",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.032"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculatorTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.AlignedResidueCorrespondenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueMatchTypeOfTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryScorerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.MultiHypothesisPocketAlignerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.016"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KnownTransformAlignmentTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.selection.PocketResidueSelectionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketShapeStatisticsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryStrategyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.ExecutableScaffoldGrammarValidatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.PredockGrammarEngineTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.159"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.CanonicalCorrespondenceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.009"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.MolecularGraphDeltaTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.TopologyEditTransactionEngineTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.GraphEditTransactionEngineTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.LineageAwareFeatureMapperTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.CounterRecognitionEnsembleEvaluatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.GrammarDrivenCandidateGeneratorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.IndexedGraphDryRunTransformerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.015"
+        },
+        {
+          "name": "totah.lab.athena.energy.EnergyFoundationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmResponseValidatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmProcessExecutorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.073"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmSystemManifestLoaderTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.015"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmEnergyEvaluatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfoniumStereochemistryAssessmentTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.TorsionProfileAssessmentTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfurStateTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SamStereochemistryRegressionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.tmt.ParameterizationProvenanceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.tmt.NearAttackAssessorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.EnsembleNacAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffCompatibleReferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.170"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceAnalyzerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffSubjectAggregatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceEvidenceWriterTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffWeightsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.thermo.ThermodynamicCoreTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.architecture.AthenaDependencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.033"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.ProteinDefinedMaskTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.017"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.LocalRelaxationProtocolContractTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.DisplacementCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.PhysicalValidityEvaluatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.fragment.FragmentRegionFitTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentInterfaceTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.054"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentMultipleUnitsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.099"
+        },
+        {
+          "name": "totah.lab.athena.clash.StericClashAnalysisTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.recognition.InteractionStableFeatureAssignerTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.recognition.RecognitionBasinModelTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.020"
+        },
+        {
+          "name": "totah.lab.athena.recognition.DifferentialRecognitionComparatorTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.landscape.CoordinateRealizerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.geometry.GridVolumeTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.sasa.ShrakeRupleySasaTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.sequence.NeedlemanWunschSequenceAlignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.contact.DefaultContactAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketScorerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandPocketOccupancyAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultCrossProteinPoseComparatorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketAssignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandGeometryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.AlphaSphereMetricsTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultMutationPoseComparatorTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultLigandContactAlignmentAnalyzerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.Mettl7ContactAlignmentRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.MutationCandidateRankerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.ContactStringRendererTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.PoseReferenceSimilarityAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.interaction.DefaultLigandInteractionAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.ScreeningGatesTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.LigandDiversitySelectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.CandidateFilterTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.Mettl7bEnrichmentGateTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HalogenBondDetectorTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.ContactMatrixTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrophobicContactDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionThresholdsTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionProfilerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.012"
+        },
+        {
+          "name": "totah.lab.athena.interaction.SaltBridgeDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiCationDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiStackingDetectorTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionRefinementsTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrogenBondDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionFingerprintTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.HydrophobicAtomPerceptionTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.AromaticRingPerceptionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.ChargedGroupPerceptionTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test > /tmp/phase1-ocl-final.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Expanded OCL suite.",
+      "summary": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:27:20+03:00",
+      "duration": "1.889 s",
+      "log_sha256": "25f22d77073cf5e46d6e7de4ca3202efb2aa3e8615ac6808ba98371da0eb818c",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.050"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.346"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml test -Dtest=DesignProvenanceAcceptanceTest > /tmp/phase1-journal.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "Durable-journal acceptance tests.",
+      "summary": {
+        "tests": 19,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:29:28+03:00",
+      "duration": "5.798 s",
+      "log_sha256": "8023333f2de853d4905b835a85f1da4b01c7a4032af457664081e6f051b891ea",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.389"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest' > /tmp/phase1-athena-checkpoint.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "FINAL Athena source: bounded suite and local install.",
+      "summary": {
+        "tests": 662,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:30:13+03:00",
+      "duration": "2.765 s",
+      "log_sha256": "a117bd1cd38b57b0bcd8f75ecb444850dbff63e2e9b4ff076f2b9db0e2d84f6e",
+      "suites": [
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAlignmentEvidenceFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.048"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalSiteGrammarFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalStructuralVariabilityCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.EvidenceChannelTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.011"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketResidueEvidenceFactoryTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.008"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.Mettl7PocketComparisonEvidenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.057"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentRulesTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.008"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketEvidenceModelTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.LigandContactTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketFunctionalEvidenceFactoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchSignatureFactoryTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.035"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchComparatorTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.012"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchCategoriesTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchResidueGroupTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketShapeDistanceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketRetrievalDistanceTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ExperimentalBindingSiteGrouperTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ComponentPocketGeometryAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureFrameConsistencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.024"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.Mettl7PocketArchitectureRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.045"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandSpaceComparatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LoopRegionAnalyzerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.EscapeRouteAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.021"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.BackboneArchitectureAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.WallGeometryAnalyzerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.SameSitePoseComparatorTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PrincipalComponentsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandAtomCorrespondenceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.AlphaSphereArchitectureAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KabschRigidPointAlignerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.CompositePocketAlignerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryClassifierTest",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.032"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculatorTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.AlignedResidueCorrespondenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueMatchTypeOfTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryScorerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.MultiHypothesisPocketAlignerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.016"
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KnownTransformAlignmentTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.pocket.selection.PocketResidueSelectionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketShapeStatisticsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryStrategyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.ExecutableScaffoldGrammarValidatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.PredockGrammarEngineTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.162"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.CanonicalCorrespondenceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.MolecularGraphDeltaTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.008"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.TopologyEditTransactionEngineTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.010"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.GraphEditTransactionEngineTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.007"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.LineageAwareFeatureMapperTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.feature.CounterRecognitionEnsembleEvaluatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.GrammarDrivenCandidateGeneratorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.IndexedGraphDryRunTransformerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.187"
+        },
+        {
+          "name": "totah.lab.athena.energy.EnergyFoundationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.008"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmResponseValidatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmProcessExecutorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.069"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmSystemManifestLoaderTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmEnergyEvaluatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfoniumStereochemistryAssessmentTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.tmt.TorsionProfileAssessmentTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfurStateTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.SamStereochemistryRegressionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.ParameterizationProvenanceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.tmt.NearAttackAssessorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.tmt.EnsembleNacAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffCompatibleReferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.162"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceAnalyzerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffSubjectAggregatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceEvidenceWriterTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffWeightsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.thermo.ThermodynamicCoreTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.architecture.AthenaDependencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.034"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.ProteinDefinedMaskTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.LocalRelaxationProtocolContractTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.DisplacementCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.relaxation.PhysicalValidityEvaluatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.fragment.FragmentRegionFitTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentInterfaceTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.050"
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentMultipleUnitsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.067"
+        },
+        {
+          "name": "totah.lab.athena.clash.StericClashAnalysisTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.recognition.InteractionStableFeatureAssignerTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.recognition.RecognitionBasinModelTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.022"
+        },
+        {
+          "name": "totah.lab.athena.recognition.DifferentialRecognitionComparatorTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.006"
+        },
+        {
+          "name": "totah.lab.athena.landscape.CoordinateRealizerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.geometry.GridVolumeTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.sasa.ShrakeRupleySasaTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.sequence.NeedlemanWunschSequenceAlignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.contact.DefaultContactAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketScorerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandPocketOccupancyAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultCrossProteinPoseComparatorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketAssignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandGeometryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.AlphaSphereMetricsTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultMutationPoseComparatorTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultLigandContactAlignmentAnalyzerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.Mettl7ContactAlignmentRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.MutationCandidateRankerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.ContactStringRendererTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.PoseReferenceSimilarityAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.ligand.interaction.DefaultLigandInteractionAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.ScreeningGatesTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.LigandDiversitySelectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.CandidateFilterTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.Mettl7bEnrichmentGateTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HalogenBondDetectorTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.ContactMatrixTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrophobicContactDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionThresholdsTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionProfilerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.016"
+        },
+        {
+          "name": "totah.lab.athena.interaction.SaltBridgeDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiCationDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.001"
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiStackingDetectorTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionRefinementsTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrogenBondDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.004"
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionFingerprintTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.HydrophobicAtomPerceptionTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.002"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.AromaticRingPerceptionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.005"
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.ChargedGroupPerceptionTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.009"
+        }
+      ]
+    },
+    {
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test > /tmp/phase1-ocl-checkpoint.log 2>&1",
+      "cwd": "/Users/yazan/totah-lab",
+      "exit_code": 0,
+      "note": "FINAL OCL suite against final locally installed Athena.",
+      "summary": {
+        "tests": 18,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "finished_at": "2026-09-30T16:31:43+03:00",
+      "duration": "1.184 s",
+      "log_sha256": "c6be1f8fdc58b2f3337da49b0739f8591ad7a15fb88a2cb3a7e8beaf16097ec8",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.048"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.359"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.014"
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "seconds": "0.003"
+        }
+      ]
+    }
+  ],
+  "new_test_methods": 33,
+  "preserved_preexisting_scientific_modifications_sha256": {
+    "ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv": "6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d",
+    "analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh": "b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9",
+    "analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv": "dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f"
+  },
+  "scientific_changes_in_phase1": false,
+  "legacy_gate_sha256": "8c549b0d0cc25e11d94bc84c22cf9391a3ce03e78a6a4aaccfb6a6213e9923af",
+  "excluded_athena_test_sources": [
+    "software/modules/athena/src/test/java/totah/lab/athena/energy/openmm/ProcessOpenMmBackendIntegrationTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/BricsAnchorRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/ContactMatrixCompatibilityTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/DcmbContactRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/DcmbTslOverlapRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/FreeVolumeRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/NetarsudilContactRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/NetarsudilParentFingerprintTopologyTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/RegressionHarness.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/Stage12jInteractionRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/regression/TslNacRegressionTest.java",
+    "software/modules/athena/src/test/java/totah/lab/athena/relaxation/ProcessOpenMmLocalRelaxationEngineIntegrationTest.java"
+  ],
+  "additional_exclusions": [
+    "No full-repository/Aether long-running suites",
+    "No scientific campaigns or fixture regeneration",
+    "No WELD/RDKit parity migration",
+    "No power-loss or production filesystem failure simulation"
+  ],
+  "workspace_note": "Three pre-existing tracked scientific modifications remain byte-identical; 2928 pre-existing untracked software artifacts remain preserved as recorded by baseline. No cleanup performed.",
+  "architecture_report": "software/modules/athena/PHASE1_CHECKPOINT.txt"
+}

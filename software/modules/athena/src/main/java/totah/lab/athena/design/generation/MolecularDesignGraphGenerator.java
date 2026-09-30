@@ -1,142 +1,296 @@
 package totah.lab.athena.design.generation;
 
-import totah.lab.athena.design.backend.CanonicalIdentityService;
-import totah.lab.athena.design.backend.GraphEdit;
-import totah.lab.athena.design.backend.GraphEditTransactionEngine;
-import totah.lab.athena.design.backend.MolecularBackendException;
-import totah.lab.athena.design.backend.MolecularGraph;
-import totah.lab.athena.design.backend.MolecularSanitizer;
+import totah.lab.athena.design.backend.*;
+import static totah.lab.athena.design.generation.MolecularDesignTree.*;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.*;
 
-/**
- * Bounded, target-independent generation with in-generation canonical deduplication.
- * The planner supplies grammar-authorized edits and priorities; the chemistry backend
- * validates only after Athena has executed an edit.
- */
+/** One bounded execution path for graph and topology edits, with explicit attempt outcomes. */
 public final class MolecularDesignGraphGenerator {
     private final GraphEditTransactionEngine editor;
+    private final TopologyEditTransactionEngine topologyEditor;
     private final MolecularSanitizer sanitizer;
     private final CanonicalIdentityService identityService;
 
-    public MolecularDesignGraphGenerator(GraphEditTransactionEngine editor,
-                                         MolecularSanitizer sanitizer,
+    public MolecularDesignGraphGenerator(GraphEditTransactionEngine editor, MolecularSanitizer sanitizer,
                                          CanonicalIdentityService identityService) {
-        this.editor = editor; this.sanitizer = sanitizer; this.identityService = identityService;
+        this.editor = Objects.requireNonNull(editor); this.sanitizer = Objects.requireNonNull(sanitizer);
+        this.identityService = Objects.requireNonNull(identityService);
+        this.topologyEditor = new TopologyEditTransactionEngine(identityService);
     }
 
+    /** Compatibility entry point. Unspecified scientific context remains explicitly marked. */
     public MolecularDesignTree generate(MolecularGraph root, Configuration configuration,
                                         AuthorizedEditPlanner planner) throws MolecularBackendException {
-        var rootIdentity = identityService.identify(root).canonicalKey();
-        var mutableNodes = new LinkedHashMap<String, MutableNode>();
-        var keyToNode = new LinkedHashMap<String, String>();
-        var edges = new ArrayList<MolecularDesignTree.Edge>();
-        var rootNode = new MutableNode("node-0000", rootIdentity, root, 0);
-        mutableNodes.put(rootNode.id, rootNode); keyToNode.put(rootIdentity, rootNode.id);
+        try {
+            return generateTraced(root, Provenance.legacy(), configuration,
+                    state -> planner.editsFor(state.graph(), state.depth()), attempt -> { },
+                    (state, operation, product) -> new GeometryResult(operation.provenance().geometryConstraints().isEmpty(),
+                            List.of(), Set.of()));
+        } catch (IOException exception) { throw new UncheckedIOException(exception); }
+    }
 
-        var sequence = new long[]{0};
-        Queue queue = configuration.strategy() == GenerationStrategy.ENUMERATIVE
-                ? new FifoQueue() : new PriorityEditQueue();
-        enqueue(queue, rootNode, planner, sequence);
-        int attempted = 0;
-        while (!queue.isEmpty() && mutableNodes.size() < configuration.maximumNodes()
-                && attempted < configuration.maximumAttemptedEdits()) {
-            Planned planned = queue.remove(); attempted++;
-            var parent = mutableNodes.get(planned.parentNodeId());
-            if (parent.depth >= configuration.maximumDepth()) continue;
-            GraphEditTransactionEngine.Result edited;
-            try {
-                edited = editor.apply(parent.graph, planned.edit().edit(), planned.edit().authorization());
-            } catch (IllegalArgumentException | IllegalStateException rejected) {
-                continue;
-            }
-            if (!configuration.disconnectedProductsAllowed() && !connected(edited.product())) continue;
-            MolecularSanitizer.Result sanitized;
-            try {
-                sanitized = sanitizer.sanitize(edited.product(), configuration.sanitizationPolicy());
-            } catch (MolecularBackendException rejected) {
-                continue;
-            }
-            if (!sanitized.valid()) continue;
-            String key = identityService.identify(sanitized.graph()).canonicalKey();
-            String existing = keyToNode.get(key);
-            if (existing != null) {
-                edges.add(new MolecularDesignTree.Edge(parent.id, existing, edited.receipt()));
-                continue; // critically, do not re-expand an equivalent graph
-            }
-            String childId = "node-" + String.format("%04d", mutableNodes.size());
-            var child = new MutableNode(childId, key, sanitized.graph(), parent.depth + 1);
-            mutableNodes.put(childId, child); keyToNode.put(key, childId);
-            edges.add(new MolecularDesignTree.Edge(parent.id, childId, edited.receipt()));
-            enqueue(queue, child, planner, sequence);
+    public MolecularDesignTree generateTraced(MolecularGraph root, Provenance rootProvenance,
+            Configuration configuration, StateAwarePlanner planner, OutcomeSink sink,
+            GeometryValidator geometry) throws IOException {
+        Objects.requireNonNull(root); Objects.requireNonNull(rootProvenance); Objects.requireNonNull(configuration);
+        Objects.requireNonNull(planner); Objects.requireNonNull(sink); Objects.requireNonNull(geometry);
+        var nodes = new ArrayList<Node>(); var edges = new ArrayList<Edge>();
+        var attempts = new ArrayList<Attempt>(); var states = new ArrayList<DesignState>();
+        var identities = new LinkedHashMap<String,String>();
+        var queue = new PriorityQueue<Planned>(Comparator
+                .comparingInt((Planned p) -> configuration.strategy() == GenerationStrategy.ENUMERATIVE ? 0 : p.edit.priority())
+                .thenComparingLong(Planned::sequence));
+        sink.started(root, rootProvenance);
+        String rootKey;
+        Outcome rootStage = Outcome.INVALID_TOPOLOGY;
+        var rootEvidence = new ArrayList<BackendEvidence>();
+        try {
+            root.validateTopology(!configuration.disconnectedProductsAllowed());
+            rootStage = Outcome.BACKEND_VALIDATION_FAILURE;
+            var checked = sanitizer.sanitize(root, configuration.sanitizationPolicy()); addEvidence(rootEvidence, checked.evidence());
+            rootStage = Outcome.INVALID_CHEMISTRY;
+            if (!checked.valid() || !root.equals(checked.graph()))
+                throw new IllegalArgumentException("root must already be a valid, unmodified molecular state");
+            rootStage = Outcome.BACKEND_VALIDATION_FAILURE;
+            var identity = identityService.identify(root); addEvidence(rootEvidence, identity.evidence()); rootKey = identity.canonicalKey();
+            if (rootKey == null || rootKey.isBlank()) throw new MolecularBackendException("backend returned empty root identity");
+        } catch (MolecularBackendException | RuntimeException failure) {
+            var attempt = new Attempt("root-validation", "state-0000", null, null,
+                    failure instanceof MolecularBackendException ? Outcome.BACKEND_VALIDATION_FAILURE
+                            : failure instanceof IllegalArgumentException ? rootStage : Outcome.UNEXPECTED_EXECUTION_FAILURE,
+                    message(failure), root, null, null, null, null, null, null, null,
+                    Map.of(), Map.of(), rootEvidence, List.of(), null,
+                    new DesignState("state-0000", null, null, root, rootProvenance, 0));
+            sink.record(attempt); attempts.add(attempt);
+            var termination = new Termination(TerminationReason.ROOT_VALIDATION_FAILURE, 0, 0, message(failure));
+            sink.terminated(termination);
+            return new MolecularDesignTree("node-0000", nodes, edges, identities, attempts,
+                    List.of(new DesignState("state-0000", null, null, root, rootProvenance, 0)), termination);
         }
-        var nodes = mutableNodes.values().stream().map(node ->
-                new MolecularDesignTree.Node(node.id, node.key, node.graph, node.depth, node.expanded)).toList();
-        return new MolecularDesignTree(rootNode.id, nodes, edges, keyToNode);
+        nodes.add(new Node("node-0000", rootKey, root, 0, false)); identities.put(rootKey, "node-0000");
+        var initial = new DesignState("state-0000", "node-0000", null, root, rootProvenance, 0); states.add(initial); sink.state(initial);
+        long[] sequence = {0}; int executed = 0, blocked = 0; boolean depthLimited = false, plannerFailed = false;
+        var expanded = new HashSet<String>();
+        plannerFailed = !enqueue(queue, initial, planner, sequence, attempts, sink);
+        if (!plannerFailed) expanded.add(initial.representativeNodeId());
+        while (!queue.isEmpty()) {
+            Planned planned = queue.remove(); var parent = planned.parent; var operation = planned.edit;
+            TerminationReason limit = nodes.size() >= configuration.maximumNodes() ? TerminationReason.MAXIMUM_NODES
+                    : executed >= configuration.maximumAttemptedEdits() ? TerminationReason.MAXIMUM_ATTEMPTS
+                    : parent.depth() >= configuration.maximumDepth() ? TerminationReason.MAXIMUM_DEPTH : null;
+            sink.planned("attempt-" + planned.sequence, parent, operation);
+            Attempt attempt;
+            if (limit != null) {
+                blocked++; depthLimited |= limit == TerminationReason.MAXIMUM_DEPTH;
+                attempt = failure("attempt-" + planned.sequence, parent, operation,
+                        Outcome.SEARCH_BUDGET_TERMINATION, limit.name());
+            } else {
+                executed++;
+                attempt = execute("attempt-" + planned.sequence, parent, operation, configuration, geometry,
+                        nodes, identities, "state-" + String.format("%04d", states.size()));
+            }
+            // Persistence is outside the execution catch: never hide an unsuccessful receipt write.
+            sink.record(attempt); attempts.add(attempt);
+            if (attempt.outcome() == Outcome.ACCEPTED || attempt.outcome() == Outcome.DEDUPLICATED) {
+                String key = attempt.canonicalKey();
+                String representative = identities.get(key);
+                if (representative == null) {
+                    representative = "node-" + String.format("%04d", nodes.size());
+                    identities.put(key, representative);
+                    nodes.add(new Node(representative, key, attempt.resultingProduct(), parent.depth() + 1, false));
+                }
+                var child = new DesignState(attempt.resultingStateId(), representative, parent.stateId(),
+                        attempt.resultingProduct(), operation.provenance(), parent.depth() + 1);
+                states.add(child); sink.state(child);
+                edges.add(new Edge(parent.representativeNodeId(), representative, attempt.graphReceipt(),
+                        attempt.topologyReceipt(), attempt.attemptId()));
+                // Legacy identity-only expansion remains compatible. Scientific requests expand each
+                // derivation in its own stable-ID frame, bounded by the same depth/attempt/node budgets.
+                if (attempt.outcome() != Outcome.DEDUPLICATED || !operation.provenance().legacyUnspecified()) {
+                    boolean success = enqueue(queue, child, planner, sequence, attempts, sink);
+                    plannerFailed |= !success;
+                    if (success) expanded.add(child.representativeNodeId());
+                }
+            }
+        }
+        var reason = plannerFailed ? TerminationReason.PLANNER_FAILURE
+                : blocked > 0 && nodes.size() >= configuration.maximumNodes() ? TerminationReason.MAXIMUM_NODES
+                : blocked > 0 && executed >= configuration.maximumAttemptedEdits() ? TerminationReason.MAXIMUM_ATTEMPTS
+                : depthLimited ? TerminationReason.MAXIMUM_DEPTH : TerminationReason.EXHAUSTED;
+        var termination = new Termination(reason, executed, blocked, "Known queued operations are receipted; descendants of unexecuted operations were not enumerated.");
+        sink.terminated(termination);
+        var finalNodes = nodes.stream().map(n -> new Node(n.nodeId(), n.canonicalKey(), n.graph(), n.depth(), expanded.contains(n.nodeId()))).toList();
+        return new MolecularDesignTree("node-0000", finalNodes, edges, identities, attempts, states, termination);
     }
 
-    private static void enqueue(Queue queue, MutableNode node, AuthorizedEditPlanner planner, long[] sequence) {
-        var edits = planner.editsFor(node.graph, node.depth).stream()
-                .sorted(Comparator.comparingInt(AuthorizedEdit::priority)
-                        .thenComparing(edit -> edit.edit().editId())).toList();
-        edits.forEach(edit -> queue.add(new Planned(node.id, edit, sequence[0]++)));
-        node.expanded = !edits.isEmpty();
+    private Attempt execute(String id, DesignState parent, AuthorizedEdit op, Configuration config,
+                            GeometryValidator geometry, List<Node> nodes, Map<String,String> keys, String stateId) {
+        MolecularGraph product = null, result = null; GraphEditReceipt graphReceipt = null;
+        TopologyEditReceipt topologyReceipt = null; var evidence = new ArrayList<BackendEvidence>();
+        List<String> geometryEvidence = List.of(); MolecularGraph.Delta validationDelta = null;
+        Outcome stage = Outcome.AUTHORIZATION_REJECTED;
+        try {
+            checkAnchors(parent.graph(), parent.graph(), op.provenance(), false);
+            if (op.topologyEdit() != null && op.topologyEdit().stereoDisposition() == TopologyEdit.StereoDisposition.ENUMERATION_REQUIRED)
+                throw new GraphEditTransactionEngine.Rejected(GraphEditTransactionEngine.RejectionKind.CHEMISTRY,
+                        "stereo enumeration is not supported in bounded Phase 1 execution");
+            if (op.edit() != null) {
+                var edited = editor.apply(parent.graph(), op.edit(), op.authorization());
+                product = edited.product(); graphReceipt = edited.receipt();
+            } else {
+                var edited = topologyEditor.apply(parent.graph(), op.topologyEdit(), op.topologyAuthorization());
+                product = edited.product(); topologyReceipt = edited.receipt();
+            }
+            checkAnchors(parent.graph(), product, op.provenance(), true);
+            stage = Outcome.INVALID_TOPOLOGY;
+            product.validateTopology(!config.disconnectedProductsAllowed());
+            stage = Outcome.BACKEND_VALIDATION_FAILURE;
+            var sanitized = sanitizer.sanitize(product, config.sanitizationPolicy()); addEvidence(evidence, sanitized.evidence());
+            result = sanitized.graph(); validationDelta = MolecularGraph.Delta.between(product, result);
+            stage = Outcome.INVALID_CHEMISTRY;
+            if (!sanitized.valid()) throw new IllegalArgumentException("backend rejected chemical state");
+            // Phase 1 accepts validation, not an implicit second chemistry operation. Coordinate
+            // changes are distinct and may proceed to the requested geometry evaluation.
+            if (validationDelta.chemicalGraphChanged()
+                    || !product.atoms().stream().map(MolecularGraph.Atom::id).toList()
+                            .equals(result.atoms().stream().map(MolecularGraph.Atom::id).toList())
+                    || !product.bonds().stream().map(MolecularGraph.Bond::id).toList()
+                            .equals(result.bonds().stream().map(MolecularGraph.Bond::id).toList()))
+                throw new IllegalArgumentException("backend changed chemical state or stable ordering without authorization");
+            stage = Outcome.AUTHORIZATION_REJECTED;
+            checkAnchors(parent.graph(), result, op.provenance(), true);
+            stage = Outcome.INVALID_TOPOLOGY;
+            result.validateTopology(!config.disconnectedProductsAllowed());
+            stage = Outcome.GEOMETRY_FAILURE;
+            var measured = geometry.evaluate(parent, op, result); geometryEvidence = measured.evidence();
+            if (!measured.valid() || !measured.evaluatedConstraints().containsAll(op.provenance().geometryConstraints()))
+                throw new IllegalArgumentException("geometry rejected or requested constraints not evaluated");
+            stage = Outcome.BACKEND_VALIDATION_FAILURE;
+            var identity = identityService.identify(result); addEvidence(evidence, identity.evidence());
+            if (identity.canonicalKey() == null || identity.canonicalKey().isBlank())
+                throw new IllegalArgumentException("backend returned empty canonical identity");
+            String existing = keys.get(identity.canonicalKey());
+            var atoms = graphReceipt != null ? graphReceipt.parentToProductAtomIds() : topologyReceipt.parentToChildAtomLineage();
+            var bonds = graphReceipt != null ? graphReceipt.parentToProductBondIds() : topologyReceipt.parentToChildBondLineage();
+            CanonicalIdentityService.Correspondence mapping = null;
+            Map<String,String> composedAtoms = atoms, composedBonds = bonds;
+            if (existing != null) {
+                stage = Outcome.LINEAGE_MAPPING_FAILURE;
+                var representative = nodes.stream().filter(n -> n.nodeId().equals(existing)).findFirst().orElseThrow();
+                mapping = identityService.correspondence(result, representative.graph());
+                if (mapping.alternatives().isEmpty()) throw new IllegalArgumentException("canonical key matched but no verified isomorphism; exhaustive=" + mapping.exhaustive());
+                composedAtoms = mapping.selected().composeAtoms(atoms); composedBonds = mapping.selected().composeBonds(bonds);
+            }
+            return new Attempt(id, parent.stateId(), stateId, op,
+                    existing == null ? Outcome.ACCEPTED : Outcome.DEDUPLICATED,
+                    existing == null ? "validated product" : "verified representative mapping; symmetry alternatives retained",
+                    parent.graph(), product, result, graphReceipt, topologyReceipt,
+                    MolecularGraph.Delta.between(parent.graph(), result), validationDelta, mapping,
+                    composedAtoms, composedBonds, evidence, geometryEvidence, identity.canonicalKey(), parent);
+        } catch (GraphEditTransactionEngine.Rejected exception) {
+            stage = switch (exception.kind()) {
+                case AUTHORIZATION -> Outcome.AUTHORIZATION_REJECTED;
+                case TOPOLOGY -> Outcome.INVALID_TOPOLOGY;
+                case CHEMISTRY -> Outcome.INVALID_CHEMISTRY;
+            };
+            return rejected(id, parent, op, stage, exception, product, result, graphReceipt, topologyReceipt, validationDelta, evidence, geometryEvidence);
+        } catch (MolecularBackendException exception) {
+            return rejected(id, parent, op, stage == Outcome.LINEAGE_MAPPING_FAILURE ? stage : Outcome.BACKEND_VALIDATION_FAILURE, exception, product, result, graphReceipt, topologyReceipt, validationDelta, evidence, geometryEvidence);
+        } catch (IllegalArgumentException exception) {
+            return rejected(id, parent, op, stage, exception, product, result, graphReceipt, topologyReceipt, validationDelta, evidence, geometryEvidence);
+        } catch (RuntimeException exception) {
+            return rejected(id, parent, op, Outcome.UNEXPECTED_EXECUTION_FAILURE, exception, product, result, graphReceipt, topologyReceipt, validationDelta, evidence, geometryEvidence);
+        }
     }
-
-    private static boolean connected(MolecularGraph graph) {
-        if (graph.atoms().isEmpty()) return false;
-        var adjacent = new LinkedHashMap<String, List<String>>();
-        graph.atoms().forEach(atom -> adjacent.put(atom.id(), new ArrayList<>()));
-        graph.bonds().forEach(bond -> {
-            adjacent.get(bond.firstAtomId()).add(bond.secondAtomId());
-            adjacent.get(bond.secondAtomId()).add(bond.firstAtomId());
-        });
-        var seen = new java.util.HashSet<String>(); var pending = new ArrayDeque<String>();
-        pending.add(graph.atoms().getFirst().id());
-        while (!pending.isEmpty()) { String id = pending.removeFirst(); if (seen.add(id)) pending.addAll(adjacent.get(id)); }
-        return seen.size() == graph.atoms().size();
+    private static Attempt rejected(String id, DesignState parent, AuthorizedEdit op, Outcome outcome, Exception error,
+            MolecularGraph product, MolecularGraph result, GraphEditReceipt gr, TopologyEditReceipt tr,
+            MolecularGraph.Delta validationDelta, List<BackendEvidence> evidence, List<String> geometry) {
+        return new Attempt(id, parent.stateId(), null, op, outcome, message(error), parent.graph(), product, result,
+                gr, tr, result == null ? null : MolecularGraph.Delta.between(parent.graph(), result), validationDelta,
+                null, Map.of(), Map.of(), evidence, geometry, null, parent);
     }
-
+    private static boolean enqueue(PriorityQueue<Planned> queue, DesignState state, StateAwarePlanner planner,
+                                   long[] sequence, List<Attempt> attempts, OutcomeSink sink) throws IOException {
+        List<AuthorizedEdit> edits;
+        try {
+            edits = planner.editsFor(state).stream().sorted(Comparator.comparingInt(AuthorizedEdit::priority)
+                    .thenComparing(AuthorizedEdit::operationId)).toList();
+            // The same rule/edit ID may be authorized by distinct hypotheses. Attempt IDs,
+            // rather than operation IDs, identify executions.
+        } catch (RuntimeException error) {
+            var attempt = failure("planner-" + state.stateId(), state, null, Outcome.UNEXPECTED_EXECUTION_FAILURE, message(error));
+            sink.record(attempt); attempts.add(attempt); return false;
+        }
+        for (var edit : edits) queue.add(new Planned(state, edit, sequence[0]++));
+        return true;
+    }
+    private static Attempt failure(String id, DesignState state, AuthorizedEdit op, Outcome outcome, String reason) {
+        return new Attempt(id, state.stateId(), null, op, outcome, reason, state.graph(), null, null,
+                null, null, null, null, null, Map.of(), Map.of(), List.of(), List.of(), null, state);
+    }
+    private static void checkAnchors(MolecularGraph before, MolecularGraph after, Provenance context, boolean compare) {
+        for (var anchor : context.retainedAnchors()) {
+            for (String id : anchor.atomIds()) {
+                var original = before.atom(id).orElseThrow(() -> new IllegalArgumentException("retained anchor atom missing: " + id));
+                if (compare && !after.atom(id).map(a -> chemicalAtom(a).equals(chemicalAtom(original))).orElse(false))
+                    throw new GraphEditTransactionEngine.Rejected(GraphEditTransactionEngine.RejectionKind.AUTHORIZATION, "retained anchor atom changed: " + id);
+                if (compare) {
+                    if (!(anchor.allowNewIncidentBonds() ? incident(after, id).containsAll(incident(before, id))
+                            : incident(before, id).equals(incident(after, id)))) throw new GraphEditTransactionEngine.Rejected(GraphEditTransactionEngine.RejectionKind.AUTHORIZATION, "retained anchor neighborhood changed: " + id);
+                }
+            }
+            for (String id : anchor.bondIds()) {
+                var original = before.bond(id).orElseThrow(() -> new IllegalArgumentException("retained anchor bond missing: " + id));
+                if (compare && !after.bond(id).equals(Optional.of(original))) throw new GraphEditTransactionEngine.Rejected(GraphEditTransactionEngine.RejectionKind.AUTHORIZATION, "retained anchor bond changed: " + id);
+            }
+        }
+    }
+    private static MolecularGraph.Atom chemicalAtom(MolecularGraph.Atom a) {
+        return new MolecularGraph.Atom(a.id(), a.element(), a.isotope(), a.formalCharge(), a.explicitHydrogens(), a.aromatic(), a.stereochemistry(), null, a.properties());
+    }
+    private static Set<MolecularGraph.Bond> incident(MolecularGraph g, String id) {
+        return g.bonds().stream().filter(b -> b.firstAtomId().equals(id) || b.secondAtomId().equals(id)).collect(java.util.stream.Collectors.toSet());
+    }
+    private static void addEvidence(List<BackendEvidence> evidence, BackendEvidence entry) throws MolecularBackendException {
+        if (entry == null) throw new MolecularBackendException("backend omitted validation evidence");
+        evidence.add(entry);
+    }
+    private static String message(Exception e) { return e.getClass().getSimpleName() + ": " + Objects.toString(e.getMessage(), "no detail"); }
     public record Configuration(GenerationStrategy strategy, int maximumNodes, int maximumDepth,
                                 int maximumAttemptedEdits, boolean disconnectedProductsAllowed,
                                 MolecularSanitizer.SanitizationPolicy sanitizationPolicy) {
         public Configuration {
-            if (maximumNodes < 1 || maximumDepth < 0 || maximumAttemptedEdits < 0) {
-                throw new IllegalArgumentException("invalid generation bounds");
-            }
+            Objects.requireNonNull(strategy); Objects.requireNonNull(sanitizationPolicy);
+            if (maximumNodes < 1 || maximumDepth < 0 || maximumAttemptedEdits < 0) throw new IllegalArgumentException("invalid generation bounds");
         }
     }
     public record AuthorizedEdit(GraphEdit edit, GraphEditTransactionEngine.Authorization authorization,
-                                 int priority) { }
-    @FunctionalInterface public interface AuthorizedEditPlanner {
-        List<AuthorizedEdit> editsFor(MolecularGraph parent, int depth);
-    }
-    private static final class MutableNode {
-        private final String id; private final String key; private final MolecularGraph graph; private final int depth;
-        private boolean expanded;
-        private MutableNode(String id, String key, MolecularGraph graph, int depth) {
-            this.id = id; this.key = key; this.graph = graph; this.depth = depth;
+                                 int priority, TopologyEdit topologyEdit,
+                                 TopologyEditTransactionEngine.Authorization topologyAuthorization, Provenance provenance) {
+        public AuthorizedEdit {
+            Objects.requireNonNull(provenance);
+            if ((edit == null) == (topologyEdit == null)) throw new IllegalArgumentException("exactly one operation required");
+            if (edit != null) Objects.requireNonNull(authorization); else Objects.requireNonNull(topologyAuthorization);
         }
+        public AuthorizedEdit(GraphEdit edit, GraphEditTransactionEngine.Authorization authorization, int priority) {
+            this(edit, authorization, priority, null, null, Provenance.legacy());
+        }
+        public AuthorizedEdit(GraphEdit edit, GraphEditTransactionEngine.Authorization authorization, int priority, Provenance provenance) {
+            this(edit, authorization, priority, null, null, provenance);
+        }
+        public AuthorizedEdit(TopologyEdit edit, TopologyEditTransactionEngine.Authorization authorization, int priority, Provenance provenance) {
+            this(null, null, priority, edit, authorization, provenance);
+        }
+        public String operationId() { return edit != null ? edit.editId() : topologyEdit.editId(); }
     }
-    private record Planned(String parentNodeId, AuthorizedEdit edit, long sequence) { }
-    private interface Queue { void add(Planned value); Planned remove(); boolean isEmpty(); }
-    private static final class FifoQueue implements Queue {
-        private final ArrayDeque<Planned> values = new ArrayDeque<>();
-        public void add(Planned value) { values.addLast(value); }
-        public Planned remove() { return values.removeFirst(); }
-        public boolean isEmpty() { return values.isEmpty(); }
+    @FunctionalInterface public interface AuthorizedEditPlanner { List<AuthorizedEdit> editsFor(MolecularGraph parent, int depth); }
+    @FunctionalInterface public interface StateAwarePlanner { List<AuthorizedEdit> editsFor(DesignState parent); }
+    @FunctionalInterface public interface GeometryValidator { GeometryResult evaluate(DesignState parent, AuthorizedEdit edit, MolecularGraph product); }
+    public record GeometryResult(boolean valid, List<String> evidence, Set<Reference> evaluatedConstraints) {
+        public GeometryResult { evidence = List.copyOf(evidence); evaluatedConstraints = Set.copyOf(evaluatedConstraints); }
     }
-    private static final class PriorityEditQueue implements Queue {
-        private final PriorityQueue<Planned> values = new PriorityQueue<>(Comparator
-                .comparingInt((Planned value) -> value.edit().priority()).thenComparingLong(Planned::sequence));
-        public void add(Planned value) { values.add(value); }
-        public Planned remove() { return values.remove(); }
-        public boolean isEmpty() { return values.isEmpty(); }
-    }
+    private record Planned(DesignState parent, AuthorizedEdit edit, long sequence) { }
 }
