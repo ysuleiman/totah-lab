@@ -1,0 +1,261 @@
+{
+  "oracle": "Fresh PySCF/libcint scf.hf.get_jk, hermi=1; supplied spin-summed densities",
+  "status": "SCREENING_ONLY",
+  "pyscf": "2.10.0",
+  "python": "3.12.13",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "h5py": "3.16.0"
+  },
+  "threads": 1,
+  "density_convention": "P=2*sum_occupied(C_i C_i^T)",
+  "future_fock_convention": "F=Hcore+J-0.5*K; not implemented in Aether",
+  "external_h2_rhf_converged": true,
+  "external_h2_rhf_tolerance": 1e-13,
+  "j_entries": 56,
+  "k_entries": 56,
+  "absolute_tolerance_hartree": 5e-13,
+  "coordinate_unit": "Bohr",
+  "result_unit": "hartree",
+  "density_unit": "dimensionless",
+  "inputs": [
+    {
+      "case": "h2_zero",
+      "system": "h2",
+      "density": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_diagonal",
+      "system": "h2",
+      "density": [
+        [
+          1.2,
+          0.0
+        ],
+        [
+          0.0,
+          0.3
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_arbitrary",
+      "system": "h2",
+      "density": [
+        [
+          1.1,
+          -0.27
+        ],
+        [
+          -0.27,
+          0.4
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_off_diagonal",
+      "system": "h2",
+      "density": [
+        [
+          0.0,
+          0.75
+        ],
+        [
+          0.75,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_indefinite",
+      "system": "h2",
+      "density": [
+        [
+          -0.6,
+          0.2
+        ],
+        [
+          0.2,
+          1.3
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_rhf",
+      "system": "h2",
+      "density": [
+        [
+          0.602657161418937,
+          0.6026571614189368
+        ],
+        [
+          0.6026571614189368,
+          0.6026571614189364
+        ]
+      ],
+      "source": "PySCF RHF make_rdm1"
+    },
+    {
+      "case": "h4_arbitrary",
+      "system": "h4",
+      "density": [
+        [
+          0.8,
+          0.13,
+          -0.22,
+          0.31
+        ],
+        [
+          0.13,
+          0.4,
+          0.07,
+          -0.16
+        ],
+        [
+          -0.22,
+          0.07,
+          -0.2,
+          0.19
+        ],
+        [
+          0.31,
+          -0.16,
+          0.19,
+          1.1
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h4_off_diagonal",
+      "system": "h4",
+      "density": [
+        [
+          0.0,
+          0.2,
+          -0.3,
+          0.4
+        ],
+        [
+          0.2,
+          0.0,
+          0.1,
+          -0.2
+        ],
+        [
+          -0.3,
+          0.1,
+          0.0,
+          0.5
+        ],
+        [
+          0.4,
+          -0.2,
+          0.5,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    }
+  ],
+  "systems": {
+    "h2": {
+      "atom": "H 0 0 0; H 1.4 0 0",
+      "basis": "sto-3g",
+      "charge": 0,
+      "multiplicity": 1,
+      "nuclei": [
+        {
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            1.4,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        }
+      ],
+      "ao_labels": [
+        "0  H 1s    ",
+        "1  H 1s    "
+      ]
+    },
+    "h4": {
+      "atom": "H 0 0 0; H 0.4 -0.7 1.1; H -0.8 0.5 0.2; H 1.2 0.3 -0.6",
+      "basis": "sto-3g",
+      "charge": 0,
+      "multiplicity": 1,
+      "nuclei": [
+        {
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            0.4,
+            -0.7,
+            1.1
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            -0.8,
+            0.5,
+            0.2
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            1.2,
+            0.3,
+            -0.6
+          ],
+          "charge": 1
+        }
+      ],
+      "ao_labels": [
+        "0  H 1s    ",
+        "1  H 1s    ",
+        "2  H 1s    ",
+        "3  H 1s    "
+      ]
+    }
+  },
+  "basis_source": "https://github.com/pyscf/pyscf/blob/v2.10.0/pyscf/gto/basis/sto-3g.dat",
+  "basis_resource_sha256": "28eda9121e200c2260a03f96367b52ab4756e3b5446e9c2f90fa839b6be4fd4c",
+  "hashes": {
+    "generate_jk_reference.py": "714ad3a3d2baa7b93c873692c2d3c37f062d4accfc6eebd45a29f8fb03e254c5",
+    "eri-manifest.json": "c89b767075eabbdf6be371cf3ffc8e19378abbf639833fc3fbd690ab1186f76f",
+    "jk-density.csv": "fd0d30bf3b259e065c10ae538d0a7b2f4cc71afae8ec94b2f829480b3bcb1fe9",
+    "jk.csv": "7e83483af1ebcdcac9c971108a48e098145797a0784e85839409c2f423c19587"
+  }
+}

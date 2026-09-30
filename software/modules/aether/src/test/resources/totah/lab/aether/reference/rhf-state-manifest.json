@@ -1,0 +1,349 @@
+{
+  "status": "SCREENING_ONLY",
+  "oracle": "PySCF RHF.make_rdm1, energy_elec, energy_tot, Mole.energy_nuc; libcint integrals",
+  "pyscf": "2.10.0",
+  "python": "3.12.13",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "h5py": "3.16.0"
+  },
+  "threads": 1,
+  "entries": 146,
+  "systems": {
+    "h2": {
+      "atom": "H 0 0 0; H 1.4 0 0",
+      "basis": "sto-3g",
+      "charge": 0,
+      "multiplicity": 1,
+      "nuclei": [
+        {
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            1.4,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        }
+      ],
+      "ao_labels": [
+        "0  H 1s    ",
+        "1  H 1s    "
+      ]
+    },
+    "h4": {
+      "atom": "H 0 0 0; H 0.4 -0.7 1.1; H -0.8 0.5 0.2; H 1.2 0.3 -0.6",
+      "basis": "sto-3g",
+      "charge": 0,
+      "multiplicity": 1,
+      "nuclei": [
+        {
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            0.4,
+            -0.7,
+            1.1
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            -0.8,
+            0.5,
+            0.2
+          ],
+          "charge": 1
+        },
+        {
+          "center": [
+            1.2,
+            0.3,
+            -0.6
+          ],
+          "charge": 1
+        }
+      ],
+      "ao_labels": [
+        "0  H 1s    ",
+        "1  H 1s    ",
+        "2  H 1s    ",
+        "3  H 1s    "
+      ]
+    }
+  },
+  "inputs": [
+    {
+      "case": "h2_zero",
+      "system": "h2",
+      "density": [
+        [
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_diagonal",
+      "system": "h2",
+      "density": [
+        [
+          1.2,
+          0.0
+        ],
+        [
+          0.0,
+          0.3
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_arbitrary",
+      "system": "h2",
+      "density": [
+        [
+          1.1,
+          -0.27
+        ],
+        [
+          -0.27,
+          0.4
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_off_diagonal",
+      "system": "h2",
+      "density": [
+        [
+          0.0,
+          0.75
+        ],
+        [
+          0.75,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_indefinite",
+      "system": "h2",
+      "density": [
+        [
+          -0.6,
+          0.2
+        ],
+        [
+          0.2,
+          1.3
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_rhf",
+      "system": "h2",
+      "density": [
+        [
+          0.602657161418937,
+          0.6026571614189368
+        ],
+        [
+          0.6026571614189368,
+          0.6026571614189364
+        ]
+      ],
+      "source": "PySCF RHF make_rdm1"
+    },
+    {
+      "case": "h4_arbitrary",
+      "system": "h4",
+      "density": [
+        [
+          0.8,
+          0.13,
+          -0.22,
+          0.31
+        ],
+        [
+          0.13,
+          0.4,
+          0.07,
+          -0.16
+        ],
+        [
+          -0.22,
+          0.07,
+          -0.2,
+          0.19
+        ],
+        [
+          0.31,
+          -0.16,
+          0.19,
+          1.1
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h4_off_diagonal",
+      "system": "h4",
+      "density": [
+        [
+          0.0,
+          0.2,
+          -0.3,
+          0.4
+        ],
+        [
+          0.2,
+          0.0,
+          0.1,
+          -0.2
+        ],
+        [
+          -0.3,
+          0.1,
+          0.0,
+          0.5
+        ],
+        [
+          0.4,
+          -0.2,
+          0.5,
+          0.0
+        ]
+      ],
+      "source": "Explicit supplied symmetric matrix"
+    },
+    {
+      "case": "h2_fresh_rhf",
+      "system": "h2",
+      "density": [
+        [
+          0.602657161418937,
+          0.6026571614189368
+        ],
+        [
+          0.6026571614189368,
+          0.6026571614189364
+        ]
+      ]
+    },
+    {
+      "case": "h4_fresh_rhf",
+      "system": "h4",
+      "density": [
+        [
+          0.6002048122764138,
+          0.16055927595791464,
+          0.5128047159970065,
+          -0.1257893173697317
+        ],
+        [
+          0.16055927595791464,
+          0.4335512691173838,
+          -0.5715338525783774,
+          0.7368206320871971
+        ],
+        [
+          0.5128047159970065,
+          -0.5715338525783774,
+          1.724033900183692,
+          -1.5054281340971514
+        ],
+        [
+          -0.1257893173697317,
+          0.7368206320871971,
+          -1.5054281340971514,
+          1.5461363986446182
+        ]
+      ]
+    }
+  ],
+  "independently_converged_references": {
+    "h2_fresh_rhf": {
+      "external_reference_converged": true,
+      "energy_total": -1.1167143250625515
+    },
+    "h4_fresh_rhf": {
+      "external_reference_converged": true,
+      "energy_total": -1.4167346115739896
+    }
+  },
+  "diagnostics": {
+    "h2_zero": {
+      "input_to_built_density_max_difference": 0.602657161418937,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h2_diagonal": {
+      "input_to_built_density_max_difference": 0.6012434523782261,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h2_arbitrary": {
+      "input_to_built_density_max_difference": 0.8715410178759413,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h2_off_diagonal": {
+      "input_to_built_density_max_difference": 0.6026571614189372,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h2_indefinite": {
+      "input_to_built_density_max_difference": 1.0914792267270377,
+      "idempotency_error": 1.1102230246251565e-16
+    },
+    "h2_rhf": {
+      "input_to_built_density_max_difference": 5.551115123125783e-16,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h4_arbitrary": {
+      "input_to_built_density_max_difference": 2.670825392006167,
+      "idempotency_error": 3.552713678800501e-15
+    },
+    "h4_off_diagonal": {
+      "input_to_built_density_max_difference": 2.8430622273396917,
+      "idempotency_error": 3.552713678800501e-15
+    },
+    "h2_fresh_rhf": {
+      "input_to_built_density_max_difference": 5.551115123125783e-16,
+      "idempotency_error": 2.220446049250313e-16
+    },
+    "h4_fresh_rhf": {
+      "input_to_built_density_max_difference": 1.1989242931775834e-10,
+      "idempotency_error": 1.3322676295501878e-15
+    }
+  },
+  "basis_resource_sha256": "28eda9121e200c2260a03f96367b52ab4756e3b5446e9c2f90fa839b6be4fd4c",
+  "units": "bohr;hartree;spin-summed doubled AO density",
+  "tolerance": 1e-10,
+  "hashes": {
+    "generate_rhf_state_reference.py": "deaf932922b4d18c9074610bb0da405068364807a0af23b0d91afa0e23376473",
+    "jk-manifest.json": "a34610983260d8dcfbc58d444b1f0f955688a6b804dfc87f598eea550b2684b9",
+    "rhf-state.csv": "819f553b31fa10a259b7d27ad504dcc2ecad59fa443cf969e4580cacd36962a8",
+    "rhf-state-input.csv": "1b4a8f116477178365639536586a411842ad9ed9d64d11f0b6dad61656394f4b"
+  }
+}

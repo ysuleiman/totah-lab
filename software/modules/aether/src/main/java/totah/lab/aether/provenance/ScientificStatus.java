@@ -1,0 +1,6 @@
+package totah.lab.aether.provenance;
+
+public enum ScientificStatus {
+    VALIDATED_REFERENCE, VALIDATED_WORKING, SCREENING_ONLY, UNAVAILABLE,
+    NONCONVERGED, NUMERICAL_FAILURE, UNSUPPORTED_CHEMISTRY
+}
