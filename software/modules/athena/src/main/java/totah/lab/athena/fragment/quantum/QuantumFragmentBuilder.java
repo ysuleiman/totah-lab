@@ -20,8 +20,11 @@ public final class QuantumFragmentBuilder {
         var atoms=QuantumEnvironment.atoms(structure(environment,component)).keySet();
         return build(environment,component,id,atoms,atoms,List.of());
     }
+    /** Selects distinct explicit units in source atom order; disconnected units retain independent caps. */
     public static PreparedQuantumFragment receptorUnits(QuantumEnvironment environment,List<ResidueId> units,boolean sidechains,String id) {
-        if(units.isEmpty()||units.size()>2||new HashSet<>(units).size()!=units.size())throw new IllegalArgumentException("One or two distinct explicit receptor units required");
+        // Preserve legacy diagnostics as well as receipts for existing 1/2-unit callers.
+        if(units.isEmpty()||new HashSet<>(units).size()!=units.size())throw new IllegalArgumentException(
+                units.size()<=2?"One or two distinct explicit receptor units required":"Distinct explicit receptor units required");
         var structure=environment.state().receptor();var all=QuantumEnvironment.atoms(structure);var residues=FragmentSelection.residues(structure);
         var retain=new LinkedHashSet<AtomReference>();var scope=new LinkedHashSet<AtomReference>();var problems=new ArrayList<String>();
         for(var unit:units) {
