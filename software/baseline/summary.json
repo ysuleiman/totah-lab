@@ -1,0 +1,47 @@
+{
+  "objective": "Known tested software baseline; scientific workspace intentionally remains untracked/modified as before.",
+  "source_commit_before_metadata": "f831809531ae6dfc65c95323e37828a38aa8e865",
+  "starting_head": "af6386455884e7c7fabbd7ebd9ad1b27abe0fc64",
+  "baseline_locator": "The commit adding this metadata is the designated baseline; obtain its SHA with git log -1 --format=%H -- software/baseline/summary.json.",
+  "ownership": "No new module created, no Daedalus repurposing, no WELD migration, no Phase 1 implementation resumed.",
+  "aether_scope": "Preserved the existing coherent Aether module and its complete standard source/test/resources, plus parent reactor registration and Athena dependency declarations. This is the minimal Maven module boundary without deleting existing APIs or selectively excluding production classes. The HEAD-only dependency gap included ContentHash and ScientificStatus. Optional numerical validation outputs were not committed.",
+  "commands": {
+    "java": "Set JAVA_HOME to Java 21 (macOS: export JAVA_HOME=$(/usr/libexec/java_home -v 21)); Maven otherwise selected a different JVM on this machine.",
+    "bootstrap": [
+      "mvn -B -f software/modules/pom.xml -N install",
+      "mvn -B -f resources/shared-resources/pom.xml -DskipTests install",
+      "mvn -B -f software/modules/pom.xml -pl aether,athena-openchemlib,mettl7,hephaestus,prometheus -am -DskipTests install"
+    ],
+    "aether": "mvn -B -f software/modules/aether/pom.xml test -Dtest=AetherBoysF0Test,AetherCoreHamiltonianTest,AetherD3Test,AetherDirectExactTest,AetherElectronRepulsionTest,AetherJkTest,AetherKineticTest,AetherNuclearAttractionTest,AetherOneShotRhfTest,AetherOverlapTest,AetherPreparedBufferTest,AetherRhfScfTest,AetherRhfStateTest,AetherConstructionEvidenceTest,AetherDef2AngularTest,AetherDiisAlgebraTest,AetherExactWorkersTest,AetherFragmentAssemblyTest,AetherGhostBasisTest,AetherIncrementalHashTest,AetherOccupiedDensityGuardsTest,AetherOneShotNumericsTest,AetherPbeInvarianceTest,AetherPermutationCacheTest,AetherQuadratureRuleTest,AetherSemiDirectCacheTest,M17FixtureTest,AetherInteractionRegressionTest",
+    "athena": "mvn -B -f software/modules/athena/pom.xml test '-Dtest=*,!**/regression/**,!*IntegrationTest'",
+    "ocl": "mvn -B -f software/modules/athena-openchemlib/pom.xml test",
+    "mettl7": "mvn -B -f software/modules/mettl7/pom.xml test '-Dtest=**/design/*Test,**/landscape/*Test,Phase2MatchedSarPolicyTest'",
+    "hephaestus": "mvn -B -f software/modules/hephaestus/pom.xml test -Dtest=SidechainHydrogenGeometryRepairTest",
+    "prometheus": "mvn -B -f software/modules/prometheus/pom.xml test -Dtest=AdversarialHessianLayoutAcceptanceTest,EvidenceBundleCollisionTest,EvidenceBundleQueryTest,PyscfForceTargetEvidenceMapperTest,AdversarialFrequencyIntegrityAcceptanceTest,AcZvAnalyticOracleTest,AcZvzbDerivExtrapolationOracleTest,AcZvzbDerivNonFiniteEnergyProbeTest,AcZvzbNonFiniteEnergyProbeTest,CrossEstimatorFdAgreementTest,SwctAnalyticOracleTest,SwctClassificationBranchTest,SwctSerialParallelEqualityTest,CanonicalEvidenceStoreVerificationTest,GeneratedEvidenceRegistryBatchTest",
+    "web_api_prerequisites": [
+      "mvn -B -f software/apps/pom.xml -N install",
+      "mvn -B -f software/apps/lab-report/pom.xml -DskipTests install"
+    ],
+    "web_api": "mvn -B -f software/apps/web-api/pom.xml test -Dtest=Mettl7FunctionalContactControllerTest",
+    "web_ui": "From software/apps/web-ui: npm ci; npm test -- --run; npm run build. This task reused the existing node_modules installation; npm ci was not run.",
+    "fresh_export_compile": "Git-exported committed software/ and resources/shared-resources/ into a new temporary directory, with no existing target directories. Ran the same selected reactor with -DskipTests package. All 12 modules passed (main and test compilation; tests skipped in this fresh export).",
+    "fresh_export_caveat": "Maven used the existing local external dependency cache; this was a clean source/output build, not an empty-cache/network bootstrap test."
+  },
+  "input_hash_verification": {
+    "files": 428,
+    "all_unchanged_after_tests": true
+  },
+  "scope_limitations": [
+    "Aether full expensive numerical suite not completed; selected foundation tests pass.",
+    "Athena scientific-output-writing regression package excluded.",
+    "External OpenMM integration tests excluded; process timeout unit test passed with macOS process-inspection permission.",
+    "METTL7 frozen-corpus tests require the separately preserved files enumerated in external-test-inputs.json; ordinary source compilation does not require campaign artifacts.",
+    "Pre-existing optional tests outside the selected scope have source reference sites catalogued, but their full transitive scientific inputs were not resolved.",
+    "Research-report database integration was not run; controller test uses a stub service. Existing SQL runtime tooling outside software remains untouched.",
+    "OCL descriptor calculator has no dedicated newly added acceptance test; existing OCL suite passed.",
+    "No scientific conclusions or datasets changed."
+  ],
+  "remaining_software": "All normal production source/test/configuration work is committed. Exactly 2928 historical reports/validation artifacts/experimental outputs remain untracked, individually listed in preserved-software-artifacts.json. Standalone historical probes there are not Maven source roots.",
+  "crash_recovery": "All 12 software commits and all eight interrupted Phase 1 backups survived. Temporary logs were lost. Test summaries recovered from retained Surefire XML and completed task outputs. Fresh source export/build and recovery-patch check were performed after restart.",
+  "preservation": "No stash, force operation, history rewrite, worktree pruning or nested-repository change. Scientific files and line endings left untouched."
+}

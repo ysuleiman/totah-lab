@@ -1,0 +1,543 @@
+{
+  "note": "Reference-site inventory includes symbolic evidence labels and optional/expensive historical tests. It is not a claim that every literal names an opened file. Resolved changed-test dependencies are in external-test-inputs.json.",
+  "sources": [
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7GenerationPersistenceArtifactTest.java",
+      "reference_sites": [
+        {
+          "line": 16,
+          "text": "Path campaign=repository.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7PersistedFeatureMappingArtifactTest.java",
+      "reference_sites": [
+        {
+          "line": 16,
+          "text": "Path campaign=repository.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7bGrammarConfigurationLoaderTest.java",
+      "reference_sites": [
+        {
+          "line": 10,
+          "text": "Path d=root.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7bRepresentationRepairTest.java",
+      "reference_sites": [
+        {
+          "line": 22,
+          "text": "private static final Path CAMPAIGN = ROOT.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7GeneratedFeatureMappingTest.java",
+      "reference_sites": [
+        {
+          "line": 20,
+          "text": "var frozen=new ObjectMapper().readValue(root.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1/METTL7B_BRICS0040_EXECUTABLE_SCAFFOLD_GRAMMAR.json\").toFile(),ExecutableScaffoldGrammar.class);"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/design/Mettl7bExecutableGrammarValidationTest.java",
+      "reference_sites": [
+        {
+          "line": 12,
+          "text": "@Test void compiledFrozenParentIsValidAndRoundTrips()throws Exception{Path root=Path.of(System.getProperty(\"user.dir\")).resolve(\"../../../\").normalize();Path path=root.resolve(\"analysis/mettl7/mettl7b_design_campaign_v1/METTL7B_BRICS0040_EXECUTABLE_SCAFFOLD_GRAMMAR.json\");var mapper=new ObjectMapper();var first=mapper.readValue(path.toFile(),ExecutableScaffoldGrammar.class);byte[]serialized=mapper.writeValueAsBytes(first);var second=mapper.readValue(serialized,ExecutableScaffoldGrammar.class);assertThat(second).isEqualTo(first);var validation=new ExecutableScaffoldGrammarValidator().validate(first);assertThat(validation.valid()).isTrue();assertThat(new GrammarDrivenCandidateGenerator().inspect(first).ready()).isTrue();assertThat(first.editableVectors()).hasSize(12).allMatch(v->!v.attachmentBonds().isEmpty()&&!v.protectedNeighborhood().isEmpty()&&!v.allowedTransformationClasses().isEmpty());assertThat(first.featureProtections()).allMatch(f->first.parentGraph().atoms().stream().anyMatch(a->a.id().equals(f.atomId())));}"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/topology/Mettl7SamTopologyRestorerTest.java",
+      "reference_sites": [
+        {
+          "line": 151,
+          "text": "private static Path campaign(String path) { return root().resolve(\"analysis/dcmb/controlled_campaign\").resolve(path); }"
+        },
+        {
+          "line": 152,
+          "text": "private static Path netarsudil(String path) { return root().resolve(\"analysis/mettl7-netarsudil-autodock4-matched-rigid-2026-09-10\").resolve(path); }"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/surface/Mettl7LigandDifferentialOverlayCliTest.java",
+      "reference_sites": [
+        {
+          "line": 22,
+          "text": "Path prepared = Path.of(\"../../..\", \"research/mettl7-netarsudil-sam-mechanism\","
+        },
+        {
+          "line": 65,
+          "text": "Path prepared = Path.of(\"../../..\", \"research/mettl7-netarsudil-sam-mechanism\","
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/surface/Mettl7ResidueCorrespondenceAdapterTest.java",
+      "reference_sites": [
+        {
+          "line": 18,
+          "text": "\"research/mettl7-netarsudil-sam-mechanism/local-flexibility/prepared\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/surface/Mettl7DifferentialSurfaceCliTest.java",
+      "reference_sites": [
+        {
+          "line": 12,
+          "text": "\"research/mettl7-netarsudil-sam-mechanism/local-flexibility/prepared\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/recognition/Mettl7RecognitionGraphRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 38,
+          "text": "\"research/mettl7-surfdiff-compatible-v1/LIGAND_INTERACTION_DIFFERENTIAL_OVERLAY.csv\";"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/mettl7/src/test/java/totah/lab/mettl7/recognition/GenericRecognitionLigandManifestAdapterTest.java",
+      "reference_sites": [
+        {
+          "line": 39,
+          "text": "root.resolve(\"research/mettl7-netarsudil-sam-mechanism/phase2-matched-sar/run_manifest.json\"),"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/aether/src/test/java/totah/lab/aether/AetherInteractionRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 11,
+          "text": "var historical=Files.readString(Path.of(\"validation/milestone-10.2\",name+\"-fixed.receipt\"));"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/aether/src/test/java/totah/lab/aether/AetherDiisTest.java",
+      "reference_sites": [
+        {
+          "line": 93,
+          "text": "assertEquals(Files.readString(Path.of(\"validation/milestone-10.1/\"+name+\"-plain.receipt\")),result.receipt().toString());"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/ingest/TslArchiveIngesterTest.java",
+      "reference_sites": [
+        {
+          "line": 528,
+          "text": "05D_RSH_0,05D,analysis/mettl7-phase2/execution-unit-05D/full-molecule-dft/TSL_RSH/point-000.xyz,%s,PBE/3-21G,12.318482,RELATIVE_KCAL_MOL,one constrained torsion; all other coordinates relaxed,CONVERGED,INCLUDE_SEPARATE_LOW_LEVEL_SUBSET,,15.876000,RELATIVE_KCAL_MOL"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/execution/AdversarialSplitManifestAcceptanceTest.java",
+      "reference_sites": [
+        {
+          "line": 30,
+          "text": "* at {@code analysis/mettl7-phase2/execution-unit-05O/force-cloud-qm/}"
+        },
+        {
+          "line": 219,
+          "text": "\"analysis/mettl7-phase2/execution-unit-05O/force-cloud-qm\");"
+        },
+        {
+          "line": 226,
+          "text": "\"E5 fixture absent: analysis/mettl7-phase2/execution-unit-05O/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/drivers/FermiNetH2oGeometryBranchTest.java",
+      "reference_sites": [
+        {
+          "line": 91,
+          "text": "String relative = \"artifacts/prometheus/h2o/ferminet/sr/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/drivers/FermiNetH2oDisplacedDeterminantValidationTest.java",
+      "reference_sites": [
+        {
+          "line": 144,
+          "text": "String relative = \"artifacts/prometheus/h2o/ferminet/sr/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/drivers/FermiNetH2oDeterminantFailureRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 100,
+          "text": "String relative = \"artifacts/prometheus/h2o/ferminet/sr/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/runtime/FermiNetDirectionalDerivativeTest.java",
+      "reference_sites": [
+        {
+          "line": 28,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 31,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/runtime/FermiNetSrObservationFileParallelBenchmark.java",
+      "reference_sites": [
+        {
+          "line": 63,
+          "text": "\"software/modules/analysis/prometheus-ferminet-h2o-pretraining\");"
+        },
+        {
+          "line": 66,
+          "text": "\"software/modules/analysis/prometheus-ferminet-h2o-sr-pilot\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/diagnostics/FermiNetH2oSrStepScanDriver.java",
+      "reference_sites": [
+        {
+          "line": 114,
+          "text": "\"software/modules/analysis/\""
+        },
+        {
+          "line": 119,
+          "text": "\"software/modules/analysis/\""
+        },
+        {
+          "line": 124,
+          "text": "\"software/modules/analysis/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/diagnostics/FermiNetH2oOldVsSampleSpaceSrRegressionDriver.java",
+      "reference_sites": [
+        {
+          "line": 71,
+          "text": "\"software/modules/analysis/\""
+        },
+        {
+          "line": 76,
+          "text": "\"software/modules/analysis/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/force/FermiNetNuclearForcePipelineTest.java",
+      "reference_sites": [
+        {
+          "line": 42,
+          "text": "Path force = root.resolve(\"artifacts/prometheus/h2o/ferminet/forces/\""
+        },
+        {
+          "line": 45,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/force/AcZvFermiNetForceEstimatorTest.java",
+      "reference_sites": [
+        {
+          "line": 254,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 257,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/force/SwctFermiNetForceEstimatorTest.java",
+      "reference_sites": [
+        {
+          "line": 210,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 213,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/force/AcZvzbDerivFermiNetForceEstimatorTest.java",
+      "reference_sites": [
+        {
+          "line": 104,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 107,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        },
+        {
+          "line": 266,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 269,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/neural/ferminet/force/AcZvzbFermiNetForceEstimatorTest.java",
+      "reference_sites": [
+        {
+          "line": 321,
+          "text": "Path checkpointFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/sr/\""
+        },
+        {
+          "line": 324,
+          "text": "Path configurationsFile = root.resolve(\"artifacts/prometheus/h2o/ferminet/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/ingest/authoritative/AuthoritativeProbeReaderTest.java",
+      "reference_sites": [
+        {
+          "line": 21,
+          "text": "Path aws = root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/vdw-probe-validation-aws\");"
+        },
+        {
+          "line": 26,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/\""
+        },
+        {
+          "line": 42,
+          "text": "Path aws = root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/vdw-probe-validation-aws\");"
+        },
+        {
+          "line": 47,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/\""
+        },
+        {
+          "line": 60,
+          "text": "Path aws = root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/vdw-probe-validation-aws\");"
+        },
+        {
+          "line": 65,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/\""
+        },
+        {
+          "line": 69,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/\""
+        },
+        {
+          "line": 79,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/vdw-probe-validation-aws\"),"
+        },
+        {
+          "line": 80,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05O/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/ingest/authoritative/AuthoritativeOptimizationReaderTest.java",
+      "reference_sites": [
+        {
+          "line": 21,
+          "text": "\"analysis/mettl7-phase2/execution-unit-05H/points/phi060_psi-060\");"
+        },
+        {
+          "line": 38,
+          "text": "Path root = repositoryRoot().resolve(\"analysis/mettl7-phase2\");"
+        },
+        {
+          "line": 46,
+          "text": "Path points = root.resolve(\"analysis/mettl7-phase2/execution-unit-05L/points\");"
+        },
+        {
+          "line": 52,
+          "text": "\"analysis/mettl7-phase2/execution-unit-05H/points/phi060_psi+060\"))"
+        },
+        {
+          "line": 55,
+          "text": "\"analysis/mettl7-phase2/execution-unit-05H/points/phi300_psi+060\"))"
+        },
+        {
+          "line": 59,
+          "text": "root.resolve(\"analysis/mettl7-phase2/execution-unit-05L/SPARSE_TWO_ANGLE_QM_RESULTS.csv\"),"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/ingest/authoritative/PyscfGeometricArtifactReaderTest.java",
+      "reference_sites": [
+        {
+          "line": 28,
+          "text": "Path unit = root.resolve(\"analysis/mettl7-phase2/execution-unit-05O\");"
+        },
+        {
+          "line": 155,
+          "text": "while (current != null && !Files.isDirectory(current.resolve(\"analysis/mettl7-phase2\"))) {"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/recovery/authoritative/AuthoritativeScientificAuditRunnerTest.java",
+      "reference_sites": [
+        {
+          "line": 19,
+          "text": "root.resolve(\"analysis/mettl7-phase2\"),"
+        },
+        {
+          "line": 20,
+          "text": "root.resolve(\"analysis/prometheus/evidence-store\"), output);"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/prometheus/src/test/java/totah/lab/prometheus/recovery/authoritative/AuthoritativeEvidenceEnricherTest.java",
+      "reference_sites": [
+        {
+          "line": 21,
+          "text": "Path archive = repositoryRoot().resolve(\"analysis/mettl7-phase2\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/hermes/src/test/java/totah/lab/AlphaFoldImporter.java",
+      "reference_sites": [
+        {
+          "line": 98,
+          "text": "importDirectory(Path.of(\"/Users/yazan/artifacts/UP000005640_9606_HUMAN_v6\"));"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/hermes/src/test/java/totah/lab/AlphaFoldReader.java",
+      "reference_sites": [
+        {
+          "line": 15,
+          "text": "Path directory = Path.of(\"/Users/yazan/artifacts/UP000005640_9606_HUMAN_v6\");"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/hermes/src/test/java/totah/lab/ParallelFpocketRunner.java",
+      "reference_sites": [
+        {
+          "line": 377,
+          "text": "\"/Users/yazan/artifacts/\""
+        },
+        {
+          "line": 382,
+          "text": "\"/Users/yazan/artifacts/\""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/hermes/src/test/java/totah/lab/hermes/file/pdbqt/meeko/CanonicalSdfMeekoAtomMapperTest.java",
+      "reference_sites": [
+        {
+          "line": 37,
+          "text": "Path charged = root.resolve(\"analysis/dcmb/sar_experiment/ligands/DCMB_R.sdf\");"
+        },
+        {
+          "line": 53,
+          "text": "Path pdbqt = root.resolve(\"research/mettl7-netarsudil-sam-mechanism/vina-matched/raw/7B_neutral_seed172904.pdbqt\");"
+        },
+        {
+          "line": 96,
+          "text": "private Path sdf(String stereo){return root.resolve(\"research/mettl7-selectivity-forensics/dcmb-analog-program/sah-campaign-v1/ligands/DCMB_\"+stereo+\"_NEUTRAL.sdf\");}"
+        },
+        {
+          "line": 97,
+          "text": "private Path posePath(String stereo){return root.resolve(\"analysis/dcmb/controlled_campaign/raw/7A_WT_SAM_BOUND_\"+stereo+\"_s1.pdbqt\");}"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/athena/src/test/java/totah/lab/athena/regression/DcmbContactRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 17,
+          "text": "* produced by analysis/dcmb/dcmb_tsl_interference/analyze_interference.py"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/athena/src/test/java/totah/lab/athena/regression/TslNacRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 19,
+          "text": "* frozen stage3 state PDBs ({code analysis/mettl7-closure/stage3/"
+        },
+        {
+          "line": 49,
+          "text": "\"analysis/mettl7-closure/stage3 run_tsl_matrix.py / \""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/athena/src/test/java/totah/lab/athena/regression/NetarsudilContactRegressionTest.java",
+      "reference_sites": [
+        {
+          "line": 24,
+          "text": "* research/mettl7-netarsudil-sam-mechanism/vina-matched/analysis/"
+        },
+        {
+          "line": 26,
+          "text": "* local-architecture/analysis/corrected_7a_vs_accepted_7b_residues.csv,"
+        },
+        {
+          "line": 27,
+          "text": "* and research/mettl7-reaction-competence-v1/"
+        },
+        {
+          "line": 41,
+          "text": "\"research/mettl7-reaction-competence-v1/protocol.json: \""
+        },
+        {
+          "line": 49,
+          "text": "+ \"from analysis/dcmb/sam_state/validated PDB; \""
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/athena/src/test/java/totah/lab/athena/pocket/evidence/Mettl7PocketComparisonEvidenceTest.java",
+      "reference_sites": [
+        {
+          "line": 38,
+          "text": "* METTL7A pocket vs METTL7B pocket regression fixtures (analysis/"
+        }
+      ]
+    },
+    {
+      "test_source": "software/modules/athena/src/test/java/totah/lab/athena/pocket/compare/MultiHypothesisPocketAlignerTest.java",
+      "reference_sites": [
+        {
+          "line": 37,
+          "text": "* Reference validation target (analysis/mettl7-correspondence):"
+        }
+      ]
+    }
+  ]
+}
