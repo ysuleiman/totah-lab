@@ -219,12 +219,7 @@ public final class HypothesisDirectedPlanner implements StateAwarePlanner {
         return Set.copyOf(result);
     }
     private static boolean preservesState(MolecularGraph a, MolecularGraph b, CanonicalIdentityService.Mapping mapping) {
-        if (!mapping.atoms().keySet().equals(a.atoms().stream().map(MolecularGraph.Atom::id).collect(java.util.stream.Collectors.toSet()))
-                || !new HashSet<>(mapping.atoms().values()).equals(b.atoms().stream().map(MolecularGraph.Atom::id).collect(java.util.stream.Collectors.toSet()))
-                || mapping.atoms().size() != b.atoms().size()
-                || !mapping.bonds().keySet().equals(a.bonds().stream().map(MolecularGraph.Bond::id).collect(java.util.stream.Collectors.toSet()))
-                || !new HashSet<>(mapping.bonds().values()).equals(b.bonds().stream().map(MolecularGraph.Bond::id).collect(java.util.stream.Collectors.toSet()))
-                || mapping.bonds().size() != b.bonds().size() || !a.properties().equals(b.properties())) return false;
+        if (!mapping.completeFor(a, b) || !a.properties().equals(b.properties())) return false;
         for (var atom : a.atoms()) {
             var other = b.atom(mapping.atoms().get(atom.id())).orElseThrow();
             if (!Objects.equals(atom.coordinates(), other.coordinates()) || !atom.properties().equals(other.properties())) return false;

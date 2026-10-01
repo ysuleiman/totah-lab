@@ -4,6 +4,21 @@ import java.util.*;
 
 public interface CanonicalIdentityService {
     Result identify(MolecularGraph graph) throws MolecularBackendException;
+    /** Toolkit-backed source decoding for identity certification, not sanitization or edit enumeration.
+     * Unsupported or lossy representations must fail; successful decoding is not execution authorization.
+     */
+    default MolecularGraph decodeStructure(String format, String text) throws MolecularBackendException {
+        throw new MolecularBackendException("backend does not support source structure decoding");
+    }
+    record Association(Result source, Result subject, Correspondence correspondence, boolean proven, String reason) { }
+    default Association associate(MolecularGraph source, MolecularGraph subject) throws MolecularBackendException {
+        var a = identify(source); var b = identify(subject); var mapping = correspondence(source, subject);
+        boolean proven = a.canonicalKey().equals(b.canonicalKey()) && a.evidence().backend().equals(b.evidence().backend())
+                && a.evidence().version().equals(b.evidence().version()) && mapping.exhaustive() && mapping.alternatives().size() == 1
+                && mapping.selected().completeFor(source, subject);
+        return new Association(a, b, mapping, proven, proven ? "unique exhaustive structural correspondence"
+                : "structural identity/correspondence missing, ambiguous or incomplete");
+    }
     record Result(String canonicalKey, BackendEvidence evidence) { }
 
     /**
@@ -20,6 +35,14 @@ public interface CanonicalIdentityService {
 
     record Mapping(Map<String,String> atoms, Map<String,String> bonds) {
         public Mapping { atoms = Map.copyOf(atoms); bonds = Map.copyOf(bonds); }
+        public boolean completeFor(MolecularGraph source, MolecularGraph target) {
+            return atoms.size() == source.atoms().size() && atoms.size() == target.atoms().size()
+                    && bonds.size() == source.bonds().size() && bonds.size() == target.bonds().size()
+                    && atoms.keySet().equals(source.atoms().stream().map(MolecularGraph.Atom::id).collect(java.util.stream.Collectors.toSet()))
+                    && new HashSet<>(atoms.values()).equals(target.atoms().stream().map(MolecularGraph.Atom::id).collect(java.util.stream.Collectors.toSet()))
+                    && bonds.keySet().equals(source.bonds().stream().map(MolecularGraph.Bond::id).collect(java.util.stream.Collectors.toSet()))
+                    && new HashSet<>(bonds.values()).equals(target.bonds().stream().map(MolecularGraph.Bond::id).collect(java.util.stream.Collectors.toSet()));
+        }
         public Map<String,String> composeAtoms(Map<String,String> parentToAttempt) {
             return compose(parentToAttempt, atoms);
         }

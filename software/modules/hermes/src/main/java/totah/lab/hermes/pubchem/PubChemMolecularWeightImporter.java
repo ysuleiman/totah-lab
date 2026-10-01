@@ -40,12 +40,39 @@ public final class PubChemMolecularWeightImporter {
     public ObjectNode readVerified(Path path) throws IOException {
         JsonNode stored;
         try (var input = Files.newInputStream(path)) { stored = JSON.readTree(input); }
+        return verifyReceipt(stored);
+    }
+
+    public ObjectNode verifyReceipt(JsonNode stored) throws IOException {
+        if (stored == null || !stored.isObject()) throw new IOException("source receipt object required");
         try {
             var reconstructed = parse(Base64.getDecoder().decode(stored.path("rawBase64").asText()),
                     Instant.parse(stored.path("importedAt").asText()));
             if (!reconstructed.equals(stored)) throw new IOException("source receipt does not match original bytes and importer semantics");
             return reconstructed;
         } catch (IllegalArgumentException error) { throw new IOException("invalid source receipt", error); }
+    }
+
+    /** Dedicated structural accompaniment to the same CID property; no general endpoint importer. */
+    public ObjectNode structure(Path path, String expectedIdentifier) throws IOException {
+        byte[] raw = Files.readAllBytes(path);
+        return verifyStructure(raw, expectedIdentifier);
+    }
+    public ObjectNode verifyStructure(byte[] raw, String expectedIdentifier) throws IOException {
+        var document = JSON.readTree(raw);
+        if (document == null || !document.isObject()) throw new IOException("source structure object required");
+        var values = document.path("PropertyTable").path("Properties");
+        if (!values.isArray() || values.size() != 1 || !values.get(0).path("CID").isIntegralNumber()
+                || !values.get(0).path("CID").canConvertToLong() || values.get(0).path("CID").asLong() <= 0
+                || !("CID:" + values.get(0).path("CID").asLong()).equals(expectedIdentifier)
+                || !values.get(0).path("SMILES").isTextual() || values.get(0).path("SMILES").asText().isBlank())
+            throw new IOException("one matching CID with source isomeric SMILES required");
+        var result = JSON.createObjectNode(); result.put("identifier", expectedIdentifier);
+        result.put("smiles", values.get(0).path("SMILES").asText());
+        result.put("rawBase64", Base64.getEncoder().encodeToString(raw)); result.put("sha256", hash(raw));
+        result.put("parser", "PubChemMolecularWeightImporter/" + VERSION + ":structure/1");
+        result.put("uri", "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/" + values.get(0).path("CID").asLong() + "/property/IsomericSMILES/JSON");
+        return result;
     }
 
     private ObjectNode parse(byte[] raw, Instant importedAt) throws IOException {

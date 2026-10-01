@@ -26,6 +26,12 @@ public class PipelineFactory {
         this.properties = properties;
     }
 
+    /** Normal host entry for governed design reasoning; registry is bound to this factory's workspace. */
+    public GovernedDesignWorkflow openDesignReasoningRun(totah.lab.athena.design.backend.CanonicalIdentityService identity)
+            throws java.io.IOException {
+        return new GovernedDesignWorkflow(properties.workspace(), PipelineRunDirectoryFactory.create(properties.workspace()), identity);
+    }
+
     /**
      * The docking pipeline without docking execution: target load,
      * receptor preparation, ligand preparation and docking-input

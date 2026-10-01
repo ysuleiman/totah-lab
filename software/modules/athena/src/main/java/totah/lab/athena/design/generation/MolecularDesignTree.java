@@ -131,6 +131,12 @@ public record MolecularDesignTree(String rootNodeId, List<Node> nodes, List<Edge
         public void sourceReview(totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceDecision decision) throws IOException {
             write("source-review", decision);
         }
+        public void interpretation(totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.Interpretation interpretation) throws IOException {
+            write("interpretation", interpretation);
+        }
+        public void protocolFailure(String operation, String reason) throws IOException {
+            write("evidence-protocol-failure", Map.of("operation", operation, "reason", reason));
+        }
         public void planningDecision(totah.lab.athena.design.reasoning.HypothesisDirectedPlanner.Decision decision) throws IOException {
             write("planning-decision", decision);
         }

@@ -38,7 +38,7 @@ class AthenaDependencyTest {
     @Test
     void genericDesignCannotImportLegacyTargetPolicyOrEmbedKnownTargetConcepts() throws IOException {
         var root = Path.of(System.getProperty("basedir")).resolve("src/main/java/totah/lab/athena/design");
-        var forbidden = List.of("mettl7", "netarsudil", "dcmb", "totah.lab.daedalus", "enrichmentgate");
+        var forbidden = List.of("mettl7", "netarsudil", "dcmb", "captopril", "thiospironolactone", "tmt1a", "tmt1b", "totah.lab.daedalus", "enrichmentgate");
         try (var paths = Files.walk(root)) {
             for (var path : paths.filter(p -> p.toString().endsWith(".java")).toList()) {
                 var source = Files.readString(path).toLowerCase(java.util.Locale.ROOT);

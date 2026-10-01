@@ -30,6 +30,43 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     private final OclGraphMapper mapper = new OclGraphMapper();
 
     @Override
+    public MolecularGraph decodeStructure(String format, String text) throws MolecularBackendException {
+        try {
+            StereoMolecule molecule;
+            if (format.equals("SMILES")) {
+                var parser = new SmilesParser(SmilesParser.SMARTS_MODE_IS_SMILES);
+                parser.setRandomSeed(1L);
+                molecule = parser.parseMolecule(text);
+            }
+            else throw new MolecularBackendException("unsupported structure format: " + format);
+            if (molecule == null || molecule.getAllAtoms() == 0 || molecule.isFragment())
+                throw new MolecularBackendException("a concrete molecule is required");
+            // Source decoding certifies representation, not chemical acceptability. The existing
+            // sanitizer remains the validation authority for molecular execution. In particular,
+            // OCL validate() rejects net ions and may reject a SMILES drawing's 2D layout.
+            molecule.ensureHelperArrays(Molecule.cHelperCIP);
+            for (int bond = 0; bond < molecule.getAllBonds(); bond++) {
+                if (molecule.getBondParity(bond) != Molecule.cBondParityNone && !molecule.isSmallRingBond(bond))
+                    throw new MolecularBackendException("source bond stereochemistry is not supported by the graph mapper");
+            }
+            String original = new Canonizer(molecule).getIDCode();
+            // The existing graph mapper is the sole toolkit-to-design representation boundary.
+            var ids = new LinkedHashMap<Integer, String>();
+            for (int i = 0; i < molecule.getAllAtoms(); i++) {
+                molecule.setAtomMapNo(i, i + 1, false); ids.put(i + 1, "source-atom-" + i);
+            }
+            var graph = mapper.fromOcl(new OclGraphMapper.Mapping(molecule,
+                    new MolecularGraph(List.of(), List.of(), Map.of()), ids), molecule);
+            graph.validateTopology(true);
+            // Refuse information the current graph/backend contract cannot round-trip (for example E/Z bonds).
+            if (!identify(graph).canonicalKey().equals("OCL_IDCODE:" + original))
+                throw new MolecularBackendException("source chemistry cannot be faithfully represented by current backend");
+            return graph;
+        } catch (MolecularBackendException error) { throw error; }
+        catch (Exception error) { throw new MolecularBackendException("source structure decoding failed", error); }
+    }
+
+    @Override
     public MolecularSanitizer.Result sanitize(MolecularGraph graph, SanitizationPolicy policy)
             throws MolecularBackendException {
         try {

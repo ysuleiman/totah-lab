@@ -1,5 +1,22 @@
 package totah.lab.mettl7.evidence;
 
+import totah.lab.athena.design.reasoning.DesignKnowledge.Semantics;
+import totah.lab.athena.design.reasoning.DesignKnowledge.ValueKind;
+import totah.lab.athena.design.reasoning.DesignKnowledge.EvidenceKind;
+import totah.lab.athena.design.reasoning.DesignKnowledge.ReviewStatus;
+import totah.lab.athena.design.reasoning.DesignKnowledge.Evidence;
+import totah.lab.athena.design.reasoning.DesignKnowledge.Qualification;
+import totah.lab.athena.design.reasoning.DesignKnowledge.Value;
+import totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.Interpretation;
+import totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceReview;
+import totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.UncertaintyKind;
+import totah.lab.athena.design.generation.MolecularDesignTree.Reference;
+import totah.lab.athena.pocket.evidence.EvidenceMethod;
+import totah.lab.aether.provenance.ScientificStatus;
+import totah.lab.aether.provenance.ContentHash;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,6 +83,51 @@ public final class Mettl7EvidenceCatalog {
                         "direct Rheem lab result supplied 2026-09-04", List.of(RUN_KEY),
                         "improve B potency from approximately 20 uM while preserving METTL7A sparing")
         );
+    }
+
+    /** One reviewed source-summary interpretation, not an assay reader or new selectivity policy. */
+    public static final String PRODUCT_REPORT_POLICY = "CAPTOPRIL_REPORTED_PRODUCT_ASSAY_SCOPE_1";
+    public static final String PRODUCT_REPORT_CLAIM = "Catalog reports S-methylation product in both specified overexpression assays; no direct-binding or selectivity claim";
+
+    public Semantics sharedProductSemantics() {
+        var ref = new Reference("paired-overexpression-product-report", VERSION);
+        return new Semantics(
+                new EvidenceMethod("reported LC-MS/MS product readout", VERSION,
+                        Map.of("interpretation-policy", PRODUCT_REPORT_POLICY)),
+                new Reference("reported-product-detection", "1"), ref,
+                Map.of("cell-system", "TMT1A/TMT1B-overexpressing HeLa cells", "nominal-concentration", "500 uM",
+                        "cofactor-scope", "SAM methyl donor; SAH product state not tested", "temperature-and-duration", "NOT_REPORTED_IN_CATALOG"),
+                "categorical", ValueKind.QUALITATIVE);
+    }
+
+    public Interpretation reviewSharedProductReport(
+            Reference evidenceId,
+            SourceReview review) throws IOException {
+        var source = find("captopril").orElseThrow();
+        if (!review.approve() || !source.canonicalIdentity().equals(review.scientificSubject()) || review.subject() == null
+                || !sharedProductSemantics().equals(review.semantics())
+                || review.status() != ScientificStatus.SCREENING_ONLY
+                || review.uncertaintyKind() != UncertaintyKind.QUALITATIVE
+                || !PRODUCT_REPORT_CLAIM.equals(review.claimBoundary()) || review.limitations() == null || review.limitations().isBlank()
+                || review.uncertaintyNote() == null || review.uncertaintyNote().isBlank())
+            throw new IllegalArgumentException("review must preserve this catalog's compound, assay scope, qualitative uncertainty and bounded claim");
+        String raw = new ObjectMapper().writeValueAsString(source);
+        String hash = ContentHash.sha256(raw);
+        var evidence = new Evidence(evidenceId,
+                EvidenceKind.EXPERIMENTAL,
+                ReviewStatus.REVIEWED, PRODUCT_REPORT_CLAIM,
+                "reviewed paired product-detection catalog report",
+                new Reference("catalog-record:" + source.canonicalIdentity(), hash),
+                "Experimental catalog summary, not raw instrument data; " + source.source() + "; catalog=" + VERSION
+                        + "; runKeys=" + source.runKeys() + "; no rate, replicate uncertainty, direct binding or potency inferred; "
+                        + "assay microstate/protonation not established; molecular-state attribution is reviewer supplied, not proven by this catalog; "
+                        + review.limitations(),
+                new Qualification(sharedProductSemantics(), review.status(),
+                        review.subject(), review.reference(), "Qualitative reported product observation; error/replicates unavailable in catalog. " + review.uncertaintyNote()),
+                new Value(null, null, "reported-product-in-both"));
+        return new Interpretation(review,
+                new Reference(PRODUCT_REPORT_POLICY, VERSION),
+                Mettl7CompoundEvidence.class.getName(), raw, hash, PRODUCT_REPORT_CLAIM, evidence);
     }
 
     private static String normalize(String value) {

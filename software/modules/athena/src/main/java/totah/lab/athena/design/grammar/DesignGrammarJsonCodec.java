@@ -48,19 +48,15 @@ public final class DesignGrammarJsonCodec {
             Path registry, totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceReceipt receipt,
             totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceReview review,
             totah.lab.athena.design.generation.MolecularDesignTree.Reference evidenceReference) throws IOException {
-        var decision = totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.reviewSource(receipt, review, evidenceReference);
-        java.nio.file.Files.createDirectories(registry);
-        var path = reservationPath(registry, evidenceReference);
-        byte[] bytes = mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(decision);
-        try (var channel = java.nio.channels.FileChannel.open(path, java.nio.file.StandardOpenOption.CREATE_NEW,
-                java.nio.file.StandardOpenOption.WRITE)) {
-            var buffer = java.nio.ByteBuffer.wrap(bytes);
-            while (buffer.hasRemaining()) channel.write(buffer);
-            channel.force(true);
-        } catch (java.nio.file.FileAlreadyExistsException exists) {
-            var previous = readSourceReview(registry, evidenceReference);
-            if (!previous.equals(decision)) throw new IOException("evidence ID/version already reserved for different immutable content: " + evidenceReference);
-        }
+        return registerSourceReview(registry, receipt, review, evidenceReference, null);
+    }
+    public totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceDecision registerSourceReview(
+            Path registry, totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceReceipt receipt,
+            totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceReview review,
+            totah.lab.athena.design.generation.MolecularDesignTree.Reference evidenceReference,
+            totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceAssociation association) throws IOException {
+        var decision = totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.reviewSource(receipt, review, evidenceReference, association);
+        reserve(registry, evidenceReference, decision);
         return decision;
     }
 
@@ -73,7 +69,38 @@ public final class DesignGrammarJsonCodec {
         }
     }
 
-    /** Governed one-source snapshots require every evidence item to match an approved immutable reservation. */
+    /** Downstream reviewed evidence shares the exact same identity namespace as source reviews. */
+    public void registerInterpretation(Path registry, totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.Interpretation interpretation) throws IOException {
+        reserve(registry, interpretation.evidence().reference(), interpretation);
+    }
+    private void reserve(Path registry, totah.lab.athena.design.generation.MolecularDesignTree.Reference reference,
+                         Object value) throws IOException {
+        java.nio.file.Files.createDirectories(registry);
+        var path = reservationPath(registry, reference);
+        byte[] bytes = mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
+        try (var channel = java.nio.channels.FileChannel.open(path, java.nio.file.StandardOpenOption.CREATE_NEW, java.nio.file.StandardOpenOption.WRITE)) {
+            var buffer = java.nio.ByteBuffer.wrap(bytes); while (buffer.hasRemaining()) channel.write(buffer); channel.force(true);
+        } catch (java.nio.file.FileAlreadyExistsException exists) {
+            try (var input = java.nio.file.Files.newInputStream(path)) {
+                if (!mapper.readValue(input, value.getClass()).equals(value))
+                    throw new IOException("evidence ID/version already reserved for different immutable content: " + reference);
+            }
+        }
+    }
+
+    public totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.Interpretation readInterpretation(
+            Path registry, totah.lab.athena.design.generation.MolecularDesignTree.Reference reference) throws IOException {
+        try (var input = java.nio.file.Files.newInputStream(reservationPath(registry, reference))) {
+            var interpretation = mapper.readValue(input, totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.Interpretation.class);
+            if (!reference.equals(interpretation.evidence().reference())) throw new IOException("registry key/content mismatch");
+            return interpretation;
+        }
+    }
+    public boolean isSourceReview(Path registry, totah.lab.athena.design.generation.MolecularDesignTree.Reference reference) throws IOException {
+        try (var input = java.nio.file.Files.newInputStream(reservationPath(registry, reference))) { return mapper.readTree(input).has("receipt"); }
+    }
+
+    /** Governed snapshots require every evidence item to match its approved immutable reservation. */
     public totah.lab.athena.design.reasoning.DesignKnowledge readKnowledge(Path path, Path registry) throws IOException {
         var knowledge = readKnowledge(path); validateRegisteredEvidence(knowledge, registry); return knowledge;
     }
@@ -82,7 +109,8 @@ public final class DesignGrammarJsonCodec {
     }
     private void validateRegisteredEvidence(totah.lab.athena.design.reasoning.DesignKnowledge knowledge, Path registry) throws IOException {
         for (var evidence : knowledge.evidence()) {
-            var registered = readSourceReview(registry, evidence.reference()).evidence();
+            var registered = isSourceReview(registry, evidence.reference()) ? readSourceReview(registry, evidence.reference()).evidence()
+                    : readInterpretation(registry, evidence.reference()).evidence();
             if (!evidence.equals(registered)) throw new IOException("knowledge evidence differs from approved immutable reservation: " + evidence.reference());
         }
     }

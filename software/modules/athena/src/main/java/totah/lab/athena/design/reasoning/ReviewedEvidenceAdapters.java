@@ -95,23 +95,57 @@ public final class ReviewedEvidenceAdapters {
             if (reason == null || reason.isBlank()) throw new IllegalArgumentException("review reason required");
         }
     }
+    /** Full structural source and backend proof; molecular relevance still requires a separate review. */
+    public record SourceAssociation(String rawBase64, String sha256, String uri, String parser,
+                                    totah.lab.athena.design.backend.MolecularGraph graph,
+                                    totah.lab.athena.design.backend.CanonicalIdentityService.Association proof) {
+        public SourceAssociation {
+            if (!totah.lab.aether.provenance.ContentHash.sha256(java.util.Base64.getDecoder().decode(rawBase64)).equals(sha256))
+                throw new IllegalArgumentException("structure source hash mismatch");
+            java.util.Objects.requireNonNull(graph); java.util.Objects.requireNonNull(proof);
+        }
+    }
+    /** Opaque downstream interpretation: Athena does not implement the domain policy or parse its raw record. */
+    public record Interpretation(SourceReview review, Reference policy, String inputType, String rawJson, String sha256,
+                                 String claimBoundary, Evidence evidence) {
+        public Interpretation {
+            java.util.Objects.requireNonNull(review); java.util.Objects.requireNonNull(policy);
+            if (inputType == null || inputType.isBlank() || claimBoundary == null || claimBoundary.isBlank()
+                    || !totah.lab.aether.provenance.ContentHash.sha256(rawJson).equals(sha256)
+                    || !review.approve() || evidence.qualification() == null || !evidence.qualification().review().equals(review.reference())
+                    || !evidence.qualification().subject().equals(review.subject())
+                    || !evidence.qualification().semantics().equals(review.semantics())
+                    || evidence.qualification().status() != review.status() || !claimBoundary.equals(review.claimBoundary())
+                    || !evidence.source().version().equals(sha256) || !evidence.claim().equals(claimBoundary))
+                throw new IllegalArgumentException("interpreted evidence must preserve source/review/claim attribution");
+        }
+    }
+
     /** Both approvals and rejections carry the original bytes and complete review, ready for durable persistence. */
     public record SourceDecision(SourceReceipt receipt, SourceReview review, Reference evidenceReference,
-                                 Evidence evidence, java.util.List<String> reasons) {
+                                 Evidence evidence, java.util.List<String> reasons, SourceAssociation association) {
         public SourceDecision {
             java.util.Objects.requireNonNull(receipt); java.util.Objects.requireNonNull(review);
             java.util.Objects.requireNonNull(evidenceReference); reasons = java.util.List.copyOf(reasons);
-            var expected = rejectionReasons(receipt, review);
+            var expected = rejectionReasons(receipt, review, association);
             if (!reasons.equals(expected) || !java.util.Objects.equals(evidence, qualified(receipt, review, evidenceReference, expected)))
                 throw new IllegalArgumentException("source decision must preserve reviewed qualification");
         }
+        public SourceDecision(SourceReceipt receipt, SourceReview review, Reference evidenceReference,
+                              Evidence evidence, java.util.List<String> reasons) {
+            this(receipt, review, evidenceReference, evidence, reasons, null);
+        }
     }
     public static SourceDecision reviewSource(SourceReceipt receipt, SourceReview review, Reference evidenceReference) {
-        var reasons = rejectionReasons(receipt, review);
-        return new SourceDecision(receipt, review, evidenceReference, qualified(receipt, review, evidenceReference, reasons), reasons);
+        return reviewSource(receipt, review, evidenceReference, null);
     }
-    private static java.util.List<String> rejectionReasons(SourceReceipt source, SourceReview review) {
+    public static SourceDecision reviewSource(SourceReceipt receipt, SourceReview review, Reference evidenceReference, SourceAssociation association) {
+        var reasons = rejectionReasons(receipt, review, association);
+        return new SourceDecision(receipt, review, evidenceReference, qualified(receipt, review, evidenceReference, reasons), reasons, association);
+    }
+    private static java.util.List<String> rejectionReasons(SourceReceipt source, SourceReview review, SourceAssociation association) {
         var reasons = new java.util.ArrayList<String>();
+        if (association != null && !association.proof().proven()) reasons.add("structural association not proven: " + association.proof().reason());
         if (!review.approve()) reasons.add("reviewer rejected: " + review.reason());
         if (!source.errors().isEmpty()) reasons.add("source parse errors: " + source.errors());
         if (!"PubChem".equals(source.provider()) || !source.importer().equals(new Reference("PubChemMolecularWeightImporter", "1"))

@@ -1,0 +1,220 @@
+ATHENA PHASE 2.4 — GOVERNED WORKFLOW AND ONE DOWNSTREAM INTERPRETATION
+
+Parent: 519e9c111ffbca4533bee89e5cf8a329e9466222
+Branch: codex/athena-phase2-resources
+The commit containing this report is the separate Phase 2.4 checkpoint.
+STOP after this commit: no Phase 2.5, WELD migration, Hephaestus consolidation or design campaign.
+
+OWNER AND REUSE
+
+DAEDALUS PipelineFactory is the existing cross-module composition owner. Inspected Pipeline,
+Stage, PipelineContext, PipelineRunDirectoryFactory, DaedalusCli and DefaultPocketEvidenceAssembler.
+Docking stages and the pocket-specific evidence assembler do not own molecular-design review.
+PipelineFactory.openDesignReasoningRun(identity) now creates a GovernedDesignWorkflow session.
+The session is the only new production top-level class. It is needed to own a closeable durable
+journal and a fixed registry across review, snapshot loading, planning and evaluation; the existing
+factory is not itself a run/session and its docking Pipeline must not be repurposed. The constructor
+is package-private. Existing factory workspace and run-directory allocation are reused.
+
+No new generator, graph, candidate, canonicalizer, atom matcher, scientific scoring engine or module.
+- Athena CanonicalIdentityService: existing Result/Correspondence and attributed-graph mapping search.
+  completeFor centralizes existing planner coverage checks; associate composes existing services.
+- OclMolecularBackend/OclGraphMapper: existing OCL parser, Canonizer and sole graph conversion boundary.
+- DesignKnowledge: unchanged requirement, criterion, five-outcome evaluation and revision semantics.
+- HypothesisDirectedPlanner: unchanged hypothesis authorization, apart from reusing completeFor.
+- DesignGrammarJsonCodec: extended single existing immutable ID/version registry and snapshot codec.
+- MolecularDesignTree.Journal: existing CREATE_NEW/forced writer, additive interpretation/failure events.
+- Hermes PubChemMolecularWeightImporter: same source owner, receipt reconstruction, raw-byte hashes.
+- METTL7 Mettl7EvidenceCatalog/Mettl7CompoundEvidence: existing observation source and interpretation owner.
+
+New nested records extend existing owners rather than creating parallel models:
+Association holds existing identity Results and Correspondence; SourceAssociation adds raw structural
+capture/proof to SourceDecision; Interpretation carries an opaque reviewed downstream typed source,
+policy and Evidence. PubChem's source-specific receipt cannot honestly represent an assay catalog.
+There is no general assay importer or ontology and no target logic in these generic records.
+
+ENFORCED NORMAL PROTOCOL
+
+factory workspace / design-evidence-registry is fixed for every run from that factory. No operation
+accepts a caller-selected registry. A distinct configured workspace is intentionally a distinct scope.
+
+reviewPubChem:
+1. Hermes imports the exact raw property bytes into a CREATE_NEW run-local receipt.
+2. Hermes reparses/reconstructs that receipt; source errors stop before the reviewer callback.
+3. Hermes verifies one matching positive CID and an isomeric-SMILES structural accompaniment.
+4. An explicitly supplied reviewer callback supplies separate scientific relevance and state attribution.
+5. The injected chemistry service decodes the source and proves identity/correspondence to that state.
+6. Existing registry reserves the full accepted/rejected decision, including source and structural proof.
+7. The forced journal records the review before returning the decision.
+
+saveKnowledge/load/plan/evaluate/revise require qualified schema-2 knowledge and governed loading.
+Every Evidence must equal its immutable reservation. For PubChem, every load reparses property and
+structural raw bytes through Hermes and reproduces graph, identity and complete correspondence with
+the injected backend; uncertified legacy reservations cannot enter the normal production path.
+For downstream evidence, every load checks the reviewed Interpretation and exact Evidence reservation.
+Reviews/interpretations are journaled before full knowledge; knowledge precedes planning/evaluation.
+An evaluated snapshot journals its complete evaluation, including the original execution Attempt.
+Failures during PubChem review/loading produce protocol-failure events; mismatch/truncated association
+produces a durable rejected source decision. This is not a new universal failure/transaction framework.
+
+Source reviews and downstream interpretations use the SAME ID/version namespace and CREATE_NEW
+reservation writer. Conflicting cross-kind entries fail. Exact existing content is idempotent.
+Legacy JSON without the new optional association property retains typed equality/idempotency.
+No registry entry or snapshot is overwritten to recover an inconsistency.
+
+MOLECULAR ASSOCIATION
+
+Captured PubChem isomeric-SMILES responses for CID 702 (CCO) and 6343 (CCS) accompany the frozen
+Phase 2.3 molecular-weight captures. STRUCTURE_CAPTURE.json records URLs, capture times and raw
+SHA256 values. The original Phase 2.3 property captures are unchanged. Hermes performs no chemistry.
+
+Injected CanonicalIdentityService.decodeStructure and associate reuse OCL identity and the existing
+bounded attributed-graph correspondence. Acceptance requires matching backend/version/canonical key,
+exhaustive correspondence, EXACTLY ONE alternative, and total bijective atom AND bond coverage.
+Canonical equality alone, mass, name or CID alone cannot prove association. Multiple symmetry mappings,
+truncation, unequal structures, unsupported/lossy representations or unavailable services fail closed.
+The full attempted source-to-reviewed-state atom/bond mapping and alternatives are retained.
+
+OCL decoding is deliberately SMILES-only in production. It has a fixed parser seed, maps through the
+existing OclGraphMapper, validates connected topology and requires original-to-round-trip canonical
+identity equality. External E/Z/bond stereo that the mapper cannot represent is rejected. Small-ring
+bond parity is topology constrained and remains subject to the same canonical round-trip check.
+Tests cover ordering, symmetry, isotope, charge, tetrahedral stereo, aromaticity and determinism.
+Coordinates and metadata do not establish chemical identity, and no normalization-equivalence claim
+is introduced. This source association is not design-state applicability transfer or physical lineage.
+
+Decoding/certifying source identity is NOT sanitization or execution authorization. In particular,
+OCL validate() rejects net ions and can reject a SMILES drawing's 2D stereo layout. The decoder does
+not use that execution validator as an identity predicate. The existing MolecularSanitizer and all
+execution validation behavior remain unchanged. Charged source identity is retained, not neutralized.
+The old prepared TSL MOLFILE did not round-trip exactly in an exploratory check; arbitrary prepared
+3D MOLFILE ingestion is excluded rather than silently weakening the canonical equality check.
+
+DOWNSTREAM EXAMPLE AND EXACT CLAIM
+
+ONE selected existing typed observation: Mettl7EvidenceCatalog's captopril Mettl7CompoundEvidence.
+Catalog: METTL7_COMPOUND_EVIDENCE_V1_2026_09_04.
+Source attribution already in that record:
+Manuscript_Final.docx sha256=59cf114c47fc1d7f7f43b45d25c1b8a0deb7209b5ed5ee027df054d6fe3daf59.
+Run key: METTL7_MANUSCRIPT_NETARSUDIL_EVIDENCE_UPDATE_V1_2026_09_04.
+This is the catalog's manuscript attribution, not a new verification of raw manuscript/instrument data.
+
+Recorded observation: robust S-methylation at 500 uM in TMT1A-overexpressing HeLa cells AND the
+specified TMT1B-overexpressing HeLa assay; direct LC-MS/MS product readout; SAM methyl donor;
+SAH product state not tested. Temperature/duration and replicate/error estimates are unavailable.
+
+Exact generic claim:
+"Catalog reports S-methylation product in both specified overexpression assays; no direct-binding or selectivity claim"
+
+METTL7 owns CAPTOPRIL_REPORTED_PRODUCT_ASSAY_SCOPE_1, sharedProductSemantics and reviewSharedProductReport.
+It requires explicit review of this compound, these semantics, this bounded claim, qualitative
+uncertainty and limitations. It cannot upgrade the source to a potency/selectivity/binding result.
+The typed raw catalog record, its hash, original manuscript/run attribution, policy, reviewer/process/
+time, chemical subject, conditions and limitations survive the immutable registry and journal.
+EvidenceKind is EXPERIMENTAL because this is an experimental catalog report, not a calculation.
+ScientificStatus is conservatively SCREENING_ONLY: this integration does not revalidate the assay.
+Value is the qualitative category reported-product-in-both; no numerical confidence or master score.
+Assay protonation/microstate is not established, and molecular-state attribution is reviewer supplied,
+not proven by this name-based catalog. This differs explicitly from PubChem structural certification.
+
+Integration test example:
+existing captopril record -> explicit SourceReview -> downstream policy -> reviewed Interpretation
+-> factory registration -> governed knowledge -> exact experimental/assay requirement -> planner.
+A versioned qualitative criterion carries the same assay scope. Wrong source kind or endpoint fails
+qualification. The rule is intentionally DISABLED: matching evidence reaches INELIGIBLE_TRANSFORMATION,
+not a molecular proposal. No new METTL7 compound is generated or evaluated as an inhibitor.
+
+The test copies existing CAPTOPRIL_RSH.sdf verbatim, with source path/hash in SOURCE.json. Existing OCL
+MolfileParser/IsomericSmilesCreator define a reviewer-supplied chemical subject for the test; production
+imports no SDF here. The prepared source is a carboxylate (-1), preserved by the decoder. No assay
+microstate match, coordinate transfer or prepared-state atom correspondence is asserted. The source
+file was not modified or regenerated. The initially considered TSL example was not adopted.
+
+DEPENDENCIES / COMPATIBILITY
+
+DAEDALUS already depends on Hermes and Athena. It injects CanonicalIdentityService; OCL is added only
+as a DAEDALUS TEST dependency. METTL7's existing dependencies supply the adapter/integration test.
+Hermes does not depend on Athena; Athena imports no Hermes, DAEDALUS, METTL7 or concrete OCL types.
+Architecture guards now also forbid captopril/thiospironolactone/TMT1A/TMT1B in generic design source.
+No Aether/Hephaestus/Gaia/Euclid production code changes, new Maven module or dependency restructuring.
+
+CanonicalIdentityService new methods are defaults (legacy implementations decline decoding).
+SourceDecision retains its old constructor, reviewSource and codec overloads. Optional association
+can be absent in historical JSON. Legacy planners and ungoverned codec APIs remain for replay.
+New production sessions reject those uncertified records; they are never automatically promoted.
+All existing scientific backend IDs, Phase 1 guarantees and frozen Phase 2.1/2.2/2.3 artifacts remain.
+
+VALIDATION
+
+Exact commands, completion times, individual test-class counts and log hashes are in phase2_4-validation.json.
+From repository root, Java 21, offline Maven:
+1. mvn -o -B -f software/modules/hermes/pom.xml install
+   189 tests, 0 failures, 0 errors, 2 existing RcsbQueryFactoryTest skips.
+2. mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest'
+   684 tests, 0 failures/errors/skips; includes architecture and existing provenance/registry tests.
+3. mvn -o -B -f software/modules/athena-openchemlib/pom.xml install
+   53 tests, 0 failures/errors/skips; includes all existing Phase 1/2 reasoning and five new association tests.
+4. mvn -o -B -f software/modules/daedalus/pom.xml install -Dtest=GovernedDesignWorkflowTest,PipelineFactoryTest,DefaultPocketEvidenceAssemblerTest,DaedalusCliTest
+   23 tests, 0 failures/errors/skips; includes six new governed workflow tests.
+5. mvn -o -B -f software/modules/mettl7/pom.xml test -Dtest=Mettl7EvidenceCatalogTest
+   5 tests, 0 failures/errors/skips; includes two new downstream integration/review tests.
+TOTAL: 954 tests reported, 952 executed, 0 failures, 0 errors, 2 skips. Code/text diff whitespace checks pass excluding the verbatim copied SDF fixture.
+The staged SDF has four inherited trailing-space warnings at data-field headers (63, 66, 69, 72).
+These are intentionally preserved to retain exact source bytes and checksum; no normalization.
+
+The workflow evaluation test reuses the frozen synthetic CCS -> CCO example with authored test
+observations to assert SUPPORTS, CONTRADICTS, UNRESOLVED, FAILED_INVALID and NOT_MEASURED through
+governed save/evaluate/reload. Missing independent Y remains NOT_MEASURED in every case. This is test
+execution of an existing toy fixture, not a new scientific design campaign. Existing OCL tests also
+retain interval, revision, lineage and source-status semantics. Downstream acceptance does not claim
+successful evaluation of a nonexistent candidate: it proves a real observation satisfies a scoped
+requirement while candidate authorization remains disabled.
+
+Development failures were used to tighten boundaries: initial charge/E-Z decoding assertions, the
+unrepresentable prepared TSL state and old-JSON optional-field compatibility. Final results above are
+from the final source; no tests were skipped to hide these findings. Source parsing and execution
+sanitization are distinct responsibilities. No historical campaign was rerun to make fixtures pass.
+
+Intentionally excluded: artifact-writing Athena regressions and *IntegrationTest classes; full
+DAEDALUS/METTL7 suites; real Vina/docking acceptance; OpenMM/quantum/wet-lab work; scientific-data
+normalization; WELD; Hephaestus consolidation. Existing CLI/pocket unit tests operate in temporary test
+workspaces, not scientific campaign directories. All source-dependent tests are offline fixtures.
+
+PRESERVATION / STATUS
+
+All 114871 pre-existing untracked paths remain. Three pre-existing tracked scientific modifications
+remain untouched and must not be cleaned up as part of this work. Their hashes and the PDF sentinel:
+ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+  6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d
+analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+  b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9
+analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+  dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f
+CMDC-21-e70466.pdf
+  a31c7e38c8199d9c9190a203c46d5311acc345022dec6eb36e97b2ac270c7990
+Existing captopril source SHA256: 0f624e60f74f9bbd2dd0f6668df0ca2e52020d3c3e221b96ae2e40c712086e70.
+Existing TSL source SHA256: 015bc59afaf81562f408ad2a4c130d4cee3b3e8632ed1fea22cbc3103547bf45.
+All checked after validation; source copies are byte-identical. No claim of hashing all 114871 files.
+Only the explicitly listed Phase 2.4 software paths are included in the commit.
+
+LIMITS / RECOMMENDATION FOR PHASE 2.5
+
+- This is an enforced factory session protocol, not a CLI command, server identity system or access-control
+  boundary. Legacy APIs remain callable deliberately. Filesystem administrators and trusted code can
+  write arbitrary registries; this implementation prevents accidental use, not hostile local tampering.
+- The registry is shared per configured workspace, not global/distributed. A crash can leave a partial
+  reservation that fails closed; there is no automated overwrite/recovery or cross-file atomic transaction.
+- Raw hashes verify captured-byte consistency, not PubChem authenticity or immutable CID release history.
+  The separate structural response has capture provenance, not a signed version or property/structure
+  atomic snapshot. Molecular weight is never used as an identity proof.
+- Downstream interpretations are reviewed trusted adapter output. Athena does not recompute METTL7 policy
+  or prove manuscript/catalog truth. The selected assay subject binding remains explicitly reviewer supplied.
+- Symmetry, unsupported E/Z and normalization-dependent correspondences decline. No broad chemistry fix,
+  general SDF decoder or atom correspondence algorithm was introduced to force a real example through.
+- Source identity certification does not certify valid chemistry, geometry, biological relevance or measured
+  microstate; execution sanitizer and authorization remain mandatory. Scientific uncertainty remains explicit.
+
+Recommend a separately approved Phase 2.5 to review deployment/application exposure of this factory
+protocol, stronger source/reviewer attribution and a bounded downstream subject-binding policy. Characterize
+unsupported charged/stereo/prepared-state semantics before expanding chemistry or ingesting fragment libraries.
+Do not treat this observation or successful infrastructure tests as a license for a new inhibitor campaign.

@@ -75,4 +75,22 @@ class PubChemMolecularWeightImporterTest {
             assertFalse(importBytes(JSON.writeValueAsBytes(doc)).path("errors").isEmpty());
         }
     }
+    @Test void structureCaptureRequiresOneMatchingCidAndStereoCapableField() throws Exception {
+        assertThrows(java.io.IOException.class,()->importer.verifyReceipt(null));
+        var path=fixture().resolveSibling("cid-702-structure.json");
+        byte[] raw=Files.readAllBytes(path);var structure=importer.verifyStructure(raw,"CID:702");
+        assertEquals("CCO",structure.path("smiles").asText());
+        assertArrayEquals(raw,Base64.getDecoder().decode(structure.path("rawBase64").asText()));
+        assertEquals(structure,importer.structure(path,"CID:702"));
+        assertThrows(java.io.IOException.class,()->importer.verifyStructure(raw,"CID:6343"));
+        for(String malformed:List.of("", "null", "[]", "{}", "{} {}",
+                "{\"PropertyTable\":{\"Properties\":[{\"CID\":18446744073709552318,\"SMILES\":\"CCO\"}]}}",
+                "{\"PropertyTable\":{\"Properties\":[{\"CID\":702,\"ConnectivitySMILES\":\"CCO\"}]}}")) {
+            assertThrows(java.io.IOException.class,()->importer.verifyStructure(malformed.getBytes(java.nio.charset.StandardCharsets.UTF_8),"CID:702"));
+        }
+        ObjectNode duplicate=JSON.readValue(raw,ObjectNode.class);
+        var entries=(com.fasterxml.jackson.databind.node.ArrayNode)duplicate.path("PropertyTable").path("Properties");
+        entries.add(entries.get(0).deepCopy());
+        assertThrows(java.io.IOException.class,()->importer.verifyStructure(JSON.writeValueAsBytes(duplicate),"CID:702"));
+    }
 }
