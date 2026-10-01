@@ -1,0 +1,8 @@
+package totah.lab.athena.design.backend.ocl;
+import com.actelion.research.chem.*;
+import totah.lab.athena.design.backend.*;
+import java.util.*;import java.nio.file.*;
+class Probe {
+ static void dump(String tag,StereoMolecule m){m.ensureHelperArrays(Molecule.cHelperCIP);System.out.println(tag+" ID="+new Canonizer(m).getIDCode()+" SMILES="+new IsomericSmilesCreator(m).getSmiles());for(int i=0;i<m.getAllAtoms();i++)System.out.println("A "+i+" "+m.getAtomLabel(i)+" q="+m.getAtomCharge(i)+" mass="+m.getAtomMass(i)+" h="+m.getImplicitHydrogens(i)+" ar="+m.isAromaticAtom(i)+" p="+m.getAtomParity(i)+" val="+m.getAtomAbnormalValence(i));for(int i=0;i<m.getAllBonds();i++)System.out.println("B "+i+" "+m.getBondAtom(0,i)+"-"+m.getBondAtom(1,i)+" type="+m.getBondType(i)+" order="+m.getBondOrder(i)+" ar="+m.isAromaticBond(i)+" del="+m.isDelocalizedBond(i)+" parity="+m.getBondParity(i)+" cip="+m.getBondCIPParity(i)+" small="+m.isSmallRingBond(i));}
+ public static void main(String[] args)throws Exception{for(String line:Files.readAllLines(Path.of(args[0]))){var x=line.split("\t");System.out.println("INPUT "+x[0]+" "+x[1]);var m=new SmilesParser(SmilesParser.SMARTS_MODE_IS_SMILES).parseMolecule(x[1]);dump("PARSED",m);var ids=new LinkedHashMap<Integer,String>();for(int i=0;i<m.getAllAtoms();i++){m.setAtomMapNo(i,i+1,false);ids.put(i+1,"a"+i);}var mapper=new OclGraphMapper();var g=mapper.fromOcl(new OclGraphMapper.Mapping(m,new MolecularGraph(List.of(),List.of(),Map.of()),ids),m);System.out.println("GRAPH "+g);var back=mapper.toOcl(g).molecule();dump("REBUILT",back);System.out.println("RESOLVER_SUCCESS="+new AromaticityResolver(back).locateDelocalizedDoubleBonds(null,false,false));dump("RESOLVED",back);}}
+}

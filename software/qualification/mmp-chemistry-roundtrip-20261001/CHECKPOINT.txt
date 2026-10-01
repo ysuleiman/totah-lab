@@ -1,0 +1,139 @@
+BOUNDED CHEMISTRY ROUND-TRIP CHECKPOINT — 2026-10-01
+Parent: c11813a3af4d59fd15b43cf8e5619d04af3a7c6c
+Branch: codex/mmp-chemistry-roundtrip
+
+ROOT CAUSES AND EXACT INPUTS
+CHEMBL3718162: O=C(NC(=S)N1CCNC1=S)c1ccno1
+CHEMBL3717282: O=C(NC(=S)N1CCNC1=S)c1cc2ccccc2s1
+CHEMBL3717763: O=C(NC(=S)N1CCNC1=S)c1cccs1
+All parse successfully with OCL 2026.7.2. One shared adapter defect affects
+isoxazole, benzothiophene and thiophene aromatic bond reconstruction.
+fromOcl correctly records perceived aromaticity using AROMATIC bonds.
+toOcl previously emitted cBondTypeDelocalized placeholders without resolving
+their valence/bond orders. Perceived aromatic flags can remain true while
+implicit H and canonical IDCode differ. Atom ordering, formal charge,
+isotope and atom stereo are not the source of these three failures.
+Hydrogen differences are a consequence of unresolved aromatic bond typing.
+This is not source normalization or an unsupported source structure.
+
+before-probe.txt records exact parsed OCL IDCodes, graph conversion and old
+rebuilt OCL atom/bond tables for all 21 rejected inputs. Probe.java.txt is the
+standalone diagnostic source used before the fix. minimal-probe.txt records
+small-ring reproductions plus resolver results. chemistry-diagnostics.json
+records exact input, parsed OCL state, graph state and current reconstruction
+for each excluded/recovered compound. The deliberate unguarded mapper probe
+is diagnostic only; production decoding still rejects unsupported stereo.
+
+FIX / CONTRACT
+Only OclGraphMapper production code changed. Existing OCL AromaticityResolver
+resolves declared aromatic/delocalized bonds before canonicalization and
+hydrogen inference; mayChangeAtomCharges=false, allHydrogensAreExplicit=false.
+Failure returns a MolecularBackendException. The resolver runs only when a
+graph contains aromatic bonds. No new algorithm, dependency, public API or
+normalization policy. No source atom/bond additions/deletions. Parsed source
+canonical identity, charge, mass, H counts and order are regression checked.
+Exact aromatic Kekule bond assignment is not a persistent graph contract;
+canonical identity and aromaticity are. No broad aromatic/tautomer equivalence
+claim is made. Corrected adapter behavior can change previously incorrect
+identities for affected inputs; historical provenance must not be rewritten.
+
+An initial unconditional resolver invocation disturbed a nonaromatic explicit-H
+MMFF path (two existing tests failed); restricting resolution to aromatic
+graphs restored it. One new test initially used unspecified CC=CC, which OCL
+marks with unknown double-bond stereo and the existing guard rejects. Its
+manual bond-descriptor rejection control now uses terminal C=C. These were
+test/development findings, not changes to the supported stereo contract.
+Both initial and final logs are retained. Existing test assertions unchanged.
+
+E/Z: ONE EXCLUSION CLASS, 18 COMPOUNDS
+All 18 have one specified exocyclic imine C=N: OCL bond order 2, relative
+parity 2 (Zor2), CIP parity 2 (ZorM, here Z), smallRing=false. Each also has
+one endocyclic small-ring C=N with relative parity 1 and CIP parity 0. The
+latter is topology-related and is not the exclusion trigger. Full individual
+IDs, exact slash/backslash SMILES and bond tables are in diagnostics.
+OCL parses and distinguishes explicit imine E/Z; the control tests prove it.
+MolecularGraph stores an unstructured bond stereo string but has no accepted
+E/Z reference-substituent/direction semantics. fromOcl emits UNSPECIFIED for
+bonds; toOcl rejects descriptors other than NONE/UNSPECIFIED. The source
+round-trip guard correctly rejects non-small-ring bond parity before this
+loss can enter production. JSON preserves the graph string but cannot restore
+source information lost upstream. Identity/correspondence depend on the
+mapper. Sanitization also needs review: stripping stereo when all atom stereo
+is unspecified is not safe for future bond-only stereo support.
+Primary limitation: graph semantic contract + mapper, NOT OCL parsing or JSON.
+No stereo support extension implemented. A reviewed public stereo contract,
+mapper, correspondence and sanitizer characterization are prerequisites.
+
+FROZEN BENCHMARK RERUN
+Same 116 rows, 29 compounds, four assays; identical fixture bytes, code,
+assay contexts, tolerance 0.3, variable fragment limit 8, estimators and support
+behavior. Both held-out chemical identities excluded from ALL training effects.
+                       Before    After
+Supported compounds         8       11
+Rejected compounds         21       18
+Structural pair paths      19       36
+Effects                    76      144
+Comparability rejects     228      432
+Unconditional coverage   0/76    0/144
+Contextual coverage      0/76    0/144
+Prediction MAE          undefined, both before/after
+Zero-change MAE (all) .9957894736842107 -> .8172222222222223 pIC50
+Zero-change baseline is not a model prediction; changing eligible rows makes
+this an inappropriate before/after model-quality comparison. All held-out
+training-pair counts remain zero. No tuning or weakened comparability rules.
+Before report remains frozen in ../mmp-context-checkpoint-20261001/benchmark.json.
+After report is benchmark-after.json. Predictive recommendation NOT established.
+Extraction remains qualified only in bounded single-cut scope; contextual
+analysis remains descriptive. No Athena recommendation/planner connection.
+
+NEXT DATASET CANDIDATE — NOT YET QUALIFIED OR EXECUTED
+Preselect ChEMBL32 human wild-type EGFR (CHEMBL203) binding IC50 assay-level
+literature data from the official frozen release, DOI 10.6019/CHEMBL.database.32.
+Use the full relational source, not the prior reduced author CSV: retain
+original activity, assay, document/study, molecule IDs and structures.
+Primary release/schema references:
+https://chembl.gitbook.io/chembl-interface-documentation/downloads
+https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/schema-questions-and-sql-examples
+https://chembl.gitbook.io/chembl-interface-documentation/web-services/chembl-data-web-services
+These establish availability of structures, assay and document linkage, not
+recurrence or predictive performance in this proposed subset.
+
+Fixed selection BEFORE viewing any prediction result:
+- Human single-protein wild-type EGFR, literature source, direct binding assay,
+  exact positive IC50 in nM; no target variants, cellular endpoints or pooling.
+- Retain assay description/conditions and document IDs; missing comparability
+  metadata is a rejection, not an inferred match. Keep assays/studies separate.
+- One unambiguous value per canonical identity within an assay; unresolved
+  replicates rejected under existing policy, no choosing most potent value.
+- Consider complete assays containing 40–128 distinct supported compounds;
+  do not truncate larger assays or select compounds by potency.
+- Require >=90% source structures to pass the current strict representation;
+  preserve exclusions; never strip E/Z, salts or stereochemistry to qualify.
+- Apply existing bounded single-cut extraction without reading response values
+  for selection. Require >=10 distinct held-out chemical pairs whose same
+  directional transformation retains at least two independent compound pairs
+  after removing BOTH test identities, within the same assay. Report whether
+  retained-shell1 context has that support separately; never relax the rule.
+- Select the lowest numeric assay ID meeting all criteria; freeze complete
+  input IDs, checksums, exclusions and recurrence audit before prediction.
+- If no assay qualifies, stop. Do not shop targets/thresholds after prediction.
+
+This is a concrete candidate release/target and preregistered selection plan,
+NOT a claimed qualifying benchmark. The actual assay and recurrence have not
+been established; no larger dataset has yet been demonstrated to satisfy all
+requirements. Downloading/curating and qualifying the subset is a separate
+bounded checkpoint. Do not run prediction on it yet. The old reduced CSV
+cannot supply missing original-study provenance by assertion.
+
+VALIDATION AND PRESERVATION
+Exact command and checksums: preservation-and-validation.json.
+Final: Athena design 78 + athena-openchemlib 74 = 152 tests; zero failures,
+errors or skips. New class: three regression methods covering minimal aromatic
+rings/order/isotope controls, all 21 frozen rejected inputs, E/Z distinction,
+fail-closed behavior and serialization. Existing MMP/context tests unchanged.
+No historical regression/campaign suite run; no scientific data regenerated.
+Pre-existing tracked binary diff byte-identical; resource/fixture/previous
+checkpoint hashes verified. Untracked historical workspace files untouched.
+Full git diff --check notices existing scientific CSV CRLF whitespace; it was
+not normalized. Only this checkpoint's paths are staged.
+STOP: no Matsy, SARM, WELD migration, generation, or planner activation.

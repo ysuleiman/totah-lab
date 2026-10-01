@@ -1,6 +1,7 @@
 package totah.lab.athena.design.backend.ocl;
 
 import com.actelion.research.chem.Molecule;
+import com.actelion.research.chem.AromaticityResolver;
 import com.actelion.research.chem.StereoMolecule;
 import totah.lab.athena.design.backend.MolecularBackendException;
 import totah.lab.athena.design.backend.MolecularGraph;
@@ -39,6 +40,11 @@ final class OclGraphMapper {
                 if (first == null || second == null) throw new MolecularBackendException("bond endpoint missing: " + bond.id());
                 molecule.addBond(first, second, bondType(bond));
             }
+            // AROMATIC bonds are delocalized input placeholders, not resolved OCL valence.
+            // Resolve them before H inference/canonicalization; never infer or change charges.
+            if (graph.bonds().stream().anyMatch(bond -> bond.order() == MolecularGraph.BondOrder.AROMATIC || bond.aromatic())
+                    && !new AromaticityResolver(molecule).locateDelocalizedDoubleBonds(null, false, false))
+                throw new MolecularBackendException("OCL could not resolve declared aromatic bonds");
             for (var atom : graph.atoms()) {
                 applyParity(molecule, indexById.get(atom.id()), atom.stereochemistry());
             }
