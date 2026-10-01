@@ -1,0 +1,8 @@
+Bounded MMP characterization/benchmark fixtures; no prospective molecules generated.
+
+MANIFEST.json identifies pinned sources, algorithms, runtime versions, commands and SHA256 values.
+chembl32-maximal-CHEMBL3714130.csv.gz is the unchanged published ChEMBL32-derived target file from Jnelen/ChEMBL_MatchedPairsAnalysis. Attribution: Nelen et al., https://doi.org/10.1186/s13321-025-00956-y; underlying ChEMBL32 https://doi.org/10.6019/CHEMBL.database.32. Preserve applicable ChEMBL CC BY-SA3.0 attribution/terms. The inspected upstream tree supplies no separate dataset LICENSE; no broader redistribution clearance is asserted.
+mmpdb-test_data.smi is the unchanged reference repository fixture, pinned commit in manifest. mmpdb code is MIT licensed; retain upstream attribution. The name cyclopentanol describes an amine SMILES in the upstream fixture: no correction and no use of that label as chemical truth.
+mmpdb-single-cut-pairs.tsv and mmpdb-reference-transformations.tsv were derived offline from pinned mmpdb3.1.4. See qualification/mmp-context-checkpoint-20261001/export_reference.py and CHECKPOINT.txt for scope restrictions. Pair parity is not complete algorithm or mapping parity.
+
+The public fixture omits original experimental study IDs and raw assay condition text. Assays stay separate; unknown studies are not counted as independent. Censored/replicate behavior is tested with explicitly synthetic tests, not invented public measurements. Existing lossless graph limits reject unsupported structures. Prediction coverage may be zero; that is a result to report, not an assertion to remove.

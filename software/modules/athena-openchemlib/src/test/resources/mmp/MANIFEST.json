@@ -1,0 +1,59 @@
+{
+  "dataset": {
+    "url": "https://raw.githubusercontent.com/Jnelen/ChEMBL_MatchedPairsAnalysis/0a77cdd28abf40a1562aadce727d032cd668815c/IC50_MaximalCuration/Datasets/target_CHEMBL3714130-1_IC50_MaximalCuration.csv.gz",
+    "repositoryCommit": "0a77cdd28abf40a1562aadce727d032cd668815c",
+    "gitBlob": "f504e720c41dc6de279b1ccbda5fef17deb16d7c",
+    "publication": "https://doi.org/10.1186/s13321-025-00956-y",
+    "underlyingDataset": "ChEMBL32",
+    "selection": "Complete single target file CHEMBL3714130 from published IC50_MaximalCuration; 116 rows, four assays, 29 molecules. No selection based on prediction success.",
+    "qualification": "Published derived pChEMBL values and conditions hash; original activity IDs, experimental-study IDs, replicate records and condition text not resolved. Exact same assay only; study unresolved. Not production evidence."
+  },
+  "reference": {
+    "mmpdb": "3.1.4",
+    "rdkit": "2026.03.4",
+    "numpy": "2.5.1",
+    "scipy": "1.18.1",
+    "peewee": "4.5.2",
+    "click": "8.5.0",
+    "fixtureCommit": "583dc1c0a82fc06a3ddfcc1f194af2f616c9e371",
+    "fixtureURL": "https://raw.githubusercontent.com/rdkit/mmpdb/583dc1c0a82fc06a3ddfcc1f194af2f616c9e371/tests/test_data.smi",
+    "releaseArtifacts": [
+      {
+        "filename": "mmpdb-3.1.4-py3-none-any.whl",
+        "sha256": "b8a2cd36e3b1cbafbacc248221a118e5c030158ccf6df7330eb4b4fb80420d87"
+      },
+      {
+        "filename": "mmpdb-3.1.4.tar.gz",
+        "sha256": "474d26ee64441011faee561fa5bfbcd2f1281f81526b15848f790e5cc6bc0a1e"
+      }
+    ],
+    "overlap": "one cut; retained core >=4 heavy atoms; variable 1..8 heavy atoms; no virtual H replacements; molecular-pair comparison, not full atom mapping parity",
+    "commands": [
+      "PYTHONPATH=/tmp/mmp-reference-runtime python3 -m mmpdblib fragment /tmp/mmp-reference.smi -o /tmp/mmp-reference.fragdb --num-cuts 1",
+      "PYTHONPATH=/tmp/mmp-reference-runtime python3 -m mmpdblib index /tmp/mmp-reference.fragdb -o /tmp/mmp-reference.mmpdb --max-variable-heavies 8",
+      "PYTHONPATH=/tmp/mmp-reference-runtime python3 export_reference.py /tmp/mmp-reference.mmpdb OUTPUT_DIRECTORY"
+    ]
+  },
+  "files": [
+    {
+      "path": "README.txt",
+      "sha256": "1e78a108c07af98c04d0e0ae905dd089725ba55db3e4d51ebbae27821fa93359"
+    },
+    {
+      "path": "chembl32-maximal-CHEMBL3714130.csv.gz",
+      "sha256": "08039e4481277c885a27f5a0411df3739c1c2f81259e3037feac709b7321a5e9"
+    },
+    {
+      "path": "mmpdb-reference-transformations.tsv",
+      "sha256": "7c5956f41b08915290efc0fd27e0e7c849281b216936720f03ac89f6ab3ccdd3"
+    },
+    {
+      "path": "mmpdb-single-cut-pairs.tsv",
+      "sha256": "eeea7a3e93332c1149da8fc5e001e9784ee648fa8a4e9d2142351c81251af20c"
+    },
+    {
+      "path": "mmpdb-test_data.smi",
+      "sha256": "0ddacd33ebcc6de7af818cc48af23ebbd413204b947c4da83454276f8bd89fcc"
+    }
+  ]
+}

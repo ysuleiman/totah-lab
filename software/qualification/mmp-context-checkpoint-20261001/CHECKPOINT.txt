@@ -1,0 +1,79 @@
+BOUNDED MMP / CONTEXTUAL EFFECT CHECKPOINT — 2026-10-01
+Branch: codex/mmp-context-bounded-checkpoint
+Parent: 8f96baf9bdadafc21346b9b1985cd52e4fd815b6
+Scope: executable extraction and effect analysis plus one empirical diagnostic. No planner activation, prospective ligand generation, WELD migration, full MedChem import, Matsy, SARM, module consolidation or Mnemosyne expansion.
+
+RESULT
+There is now a real Java path from existing molecular graphs and source references through OCL MMP fragmentation/enumeration to source-mapped structural pairs, qualified-context paired differences, and contextual/unconditional estimates. It is not a new molecular editor or generator.
+The public benchmark does NOT qualify predictive recommendations: zero predictions survive the strict two-molecule holdout. This is an explicit negative readiness result, not success inferred from passing software tests.
+
+NEW CLASSES / WHY EXISTING CLASSES DID NOT OWN THESE BEHAVIORS
+1. Athena design.knowledge.MatchedPairExtractor: minimal additive structural-extraction contract with nested immutable Source, Fragment, Pair, Issue, Extraction records. Existing MolecularGraph remains the graph; CanonicalIdentityService remains identity/correspondence. DesignState and AuthorizedEdit describe design execution, not historical pairs; they were deliberately not repurposed. Pair carries source datasets/observations, chemical identities, fragments, atom partitions, cut bond/anchor IDs, core mapping alternatives, chemical context and extraction version.
+2. athena-openchemlib design.backend.ocl.OclMatchedPairExtractor: the concrete implementation behind that contract. Uses existing OclGraphMapper, OclMolecularBackend sanitation/identity/correspondence, OCL MMPFragmenter and MMPEnumerator. Kept adjacent to existing mapper to avoid another graph conversion. No existing molecular-backend interface changed. Matching/partition verification is adapter lineage work, not another MMP fragmentation algorithm.
+3. Athena design.knowledge.ContextualTransformationEffects: deterministic pairing, interval differences and context-conditioned summaries. Existing DesignKnowledge handles reviewed hypotheses/evaluation, not dataset statistics. OCL MMPReader's averaging does not enforce these scientific comparability requirements. It was not used as an empirical-effect authority. OCL MMPPropertyCalculator computes descriptors, not measured assay deltas; CoreBasedSARAnalyzer is deferred.
+No existing public API was changed. The additive extraction/statistics contracts are the narrowly authorized integration, with nested value types rather than a new package hierarchy/framework or persistence schema. Observation references remain opaque source references; no claim that the benchmark records have been imported/reviewed in Mnemosyne.
+
+EXACT EXTRACTOR SCOPE
+- Java21; OCL2026.7.2, MMPFragmenter.getMoleculeIndexesID(false), MMPEnumerator version1.1.
+- OCL chooses nonring single-bond cuts and requires retained key size>=4 heavy atoms.
+- Whole-molecule/H-replacement variations disabled. No virtual hydrogen substitutions.
+- Application publishes only single-cut pairs. OCL double cuts are characterized on a two-phenyl linker and reported as available but attachment mapping unqualified; never silently published as single cuts.
+- Caller chooses maximum variable atoms1..16; benchmark uses8. Inputs bounded to128 sources,80 atoms/source,1024 fragment occurrences and4096 pair paths. Exceeded global fragment/pair bounds return explicit issues, never a silently truncated result advertised as complete.
+- Graphs must be connected, supported by existing chemistry sanitation and source mapping. Explicit H graph atoms abstain because OCL removes them. Invalid H annotations reject. Net ions remain subject to the existing sanitizer's known limitation. No charge/stereo/isotope stripping.
+- Identical canonical chemicals do not become matched pairs. Duplicate source IDs reject. Multiple eligible cut occurrences and ambiguous core correspondences remain explicit.
+- Transformation direction is deterministic lexical order of toolkit variable identity, NOT medicinal preference. Canonical identity includes the backend/version context; do not compare these encodings blindly with another toolkit.
+- Local context is a deliberately narrow retained-side radius-one signature: anchor element/isotope/charge/H annotation/aromaticity/stereo plus sorted neighboring atom/bond labels excluding the cut. It is NOT claimed equivalent to mmpdb radius3/Morgan environments and does not capture distal effects.
+
+MAPPING FINDING
+The first atom/bond-order permutation test failed when the adapter trusted OCL's valueAtomIndexes hint. OCL's fragment ordering need not follow the original bond endpoint order. The adapter now partitions the source at the toolkit-selected cut and uses OCL canonical identities of capped components to prove which side is constant/variable. It does not invent cuts or another identity algorithm. Toolkit subset copying marks a fragment as a query; the mapping verification explicitly restores the concrete capped-fragment flag to match MMP's concrete fragments. Membership that cannot be proved rejects the source.
+Existing exhaustive core correspondence is then filtered to map the declared attachment anchors. Atom/bond mappings and symmetry alternatives are retained. This is structural correspondence, not a claim of unique physical atom lineage between historical molecules.
+
+REFERENCE COMPARISON
+Pinned executable: mmpdb3.1.4, RDKit2026.03.4, installed only in /tmp/mmp-reference-runtime. No project dependency added. Runtime versions and release SHA256 values are in fixture MANIFEST.json.
+Pinned upstream nine-structure fixture: rdkit/mmpdb commit583dc1c0a82fc06a3ddfcc1f194af2f616c9e371, tests/test_data.smi. Input bytes verified against the pinned commit.
+Commands:
+PYTHONPATH=/tmp/mmp-reference-runtime python3 -m mmpdblib fragment /tmp/mmp-reference.smi -o /tmp/mmp-reference.fragdb --num-cuts 1
+PYTHONPATH=/tmp/mmp-reference-runtime python3 -m mmpdblib index /tmp/mmp-reference.fragdb -o /tmp/mmp-reference.mmpdb --max-variable-heavies 8
+PYTHONPATH=/tmp/mmp-reference-runtime python3 export_reference.py /tmp/mmp-reference.mmpdb OUTPUT_DIRECTORY
+Export is a read-only SQLite query and fixture filter; source included. Only its output fixtures are used by Java tests.
+Reference returned51 distinct compound/variable/constant paths before scope filtering. Shared scope(core>=4,variables1..8,no H replacement) yields5 paths and5 molecular pairs. Java reproduces all5 molecular pairs. Full reference transformation strings are retained for inspection; test does not assert complete atom-mapping or toolkit canonical-string parity.
+Differences: OCL single/double vs reference configurable1/2/3 cuts; differing default cut/size policies; H variations disabled here; IDCode/custom pseudoatom labels vs SMILES dummies; our source mappings explicitly proved; our environment signature is not reference-environment equivalence. Fixture contains an upstream label 'cyclopentanol' attached to an amine structure; preserved verbatim and used structurally only. Its property values are not used.
+
+SCIENTIFIC EFFECT POLICY
+Context equality requires exact target, endpoint, method, assay, conditions reference/hash, units, scale and qualification reference. Pairing also requires same study/group and source-bound observation references. IC50 and Ki, cellular and biochemical assays, different targets/conditions/units cannot silently pool. No automatic unit conversion, logarithm or endpoint harmonization is hidden in the analyzer.
+Delta is right minus left on the declared scale. Increase/decrease is not benefit. The benchmark uses provided pChEMBL IC50 values (pIC50), not linear nM differences. Inputs preserve their original relation and bounds.
+Supported relations: exact point, lower/upper censoring or interval. Invalid/inconsistent relations reject. Delta bounds are [right.lower-left.upper,right.upper-left.lower]. Open censoring bounds use conservative closed envelopes; boundary cases may abstain. Exact-delta arithmetic overflow rejects. Censored effects remain visible and are excluded from point means; no midpoint imputation or fabricated error bar.
+Unresolved multiple measurements per molecule/context/study abstain rather than form Cartesian replicate pairs. Symmetry/site derivations do not multiply the same empirical comparison. Unconditional summaries also deduplicate observation pairs across alternative chemical interpretations while retaining the underlying effects.
+Summary reports pair count, known study count, known exact-study count, study-balanced mean of exact deltas and sample SD of exact study means only when >=2 known studies and no unresolved-study group contributes. No confidence interval, significance claim or universal confidence score. Pairs sharing compounds are dependent. Unknown study provenance is marked UNRESOLVED:...; it never increments known independent-study count, and suppresses study SD. Such a mean is descriptive only.
+Tolerance is explicit:0.3 pIC50 units in this diagnostic. WITHIN_TOLERANCE is a descriptive interval statement, not demonstrated biological equivalence or statistical non-significance.
+
+BOUNDED PUBLIC BENCHMARK
+Source: Nelen et al., Matched pairs demonstrate robustness against inter-assay variability, https://doi.org/10.1186/s13321-025-00956-y
+Repository: Jnelen/ChEMBL_MatchedPairsAnalysis, commit0a77cdd28abf40a1562aadce727d032cd668815c.
+Whole small file: IC50_MaximalCuration/Datasets/target_CHEMBL3714130-1_IC50_MaximalCuration.csv.gz,1065 compressed bytes. Git blob verified; SHA256 in MANIFEST.json. This is the author's ChEMBL32-derived fixture, not a fresh ChEMBL API reconstruction. The attempted direct API retrieval timed out; no API data were used.
+116 rows,29 molecules,4 assays, one target, one published condition hash. All four assays remain separate. Raw gzip is unchanged. Published rounded pChEMBL values are treated as supplied points for a diagnostic; unavailable original uncertainty is not invented. Original activity/study/replicate records and textual conditions were not independently resolved, so these are not production-qualified evidence records. No cross-assay transfer is presumed even though the source paper studies it.
+Results:
+- 8/29 molecular structures pass existing lossless decoding.
+- 21 rejected:18 unsupported E/Z bond stereo;3 canonical roundtrip mismatch. None repaired/normalized/stripped.
+- 19 structural pair paths among supported structures.
+- 76 within-assay effects;228 cross-context comparisons rejected.
+- Holdout excludes BOTH chemical identities of each test pair from ALL training effects, including other assays. Estimates then require same transformation and exact scientific context; contextual estimate additionally requires same local signature.
+- Unconditional coverage0/76; contextual coverage0/76. MAE/disagreement rates for these estimators are UNAVAILABLE, not zero. JSON records zero sign-disagreement count with zero coverage; this must not be read as perfect agreement.
+- Zero-change baseline MAE over all76 held effects:0.9957894736842107 pIC50 units.
+- No empirical advantage of contextual conditioning is established. A separate synthetic two-context test verifies the implemented arithmetic separates opposite effects instead of pooling them; it is not experimental validation.
+- This is a bounded diagnostic, not reproduction of the publication's full inter-assay benchmark, Matsy, or a general predictive benchmark. Independent-study holdout could not be assessed from these source fields.
+
+TESTS / EXACT COMMAND
+Java21 enforced via:
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home mvn -o -f software/modules/pom.xml -pl athena-openchemlib -am test '-Dtest=%regex[totah/lab/athena/design/.*Test.class]' -Dsurefire.failIfNoSpecifiedTests=false
+Final log: tests.log. This selects Athena design tests and all athena-openchemlib tests, not the entire Athena scientific regression suite.
+New tests: OclMatchedPairExtractorTest(5), ContextualTransformationEffectsTest(7), ContextualMmpBenchmarkTest(1).
+Coverage: single/double-cut characterization, permutations, phenyl symmetry, source partitions and anchor maps, isotope/charge/stereo retention in raw OCL fragments, existing E/Z abstention, aromatic ring cut exclusion, invalid H annotations, disconnected graph rejection, identical molecules, size limits, determinism, reference pair parity; source-bound evidence, exact comparability, replicate abstention, interval retention, conflicting/within-tolerance effects, context-specific vs unconditional arithmetic, overflow, target/toolkit/workflow leakage and empirical holdout.
+Results: Athena design78 tests; athena-openchemlib71 tests including13 new tests. All149 pass;0 failures/errors/skips. Initial characterization failures exposed the mapping issue and incorrect test expectation that a ring-only molecule should yield a nonring cut; both resolved and documented above.
+Excluded: historical Athena regression suite which appends scientific CSV, campaign reruns, physical calculations, WELD execution, external generation, Matsy/SARM, full database import and planner use. Existing generation acceptance tests use their historical synthetic fixtures; no prospective ligand family was generated.
+
+PRESERVATION / READINESS / EXACT NEXT STEP
+All three pre-existing tracked diffs were byte-for-byte unchanged (binary Git diff comparison). Original MedChem ZIP and ALCHIMIA PDF hashes remain unchanged. Preservation receipt includes hashes; historical untracked research material is not staged or removed. No existing production source changed: new additive classes/tests/resources only. No runtime dependency/module/POM changed. The offline Python parity exporter is a reproducibility utility only.
+Ready: reviewed inspection of extracted structural pairs and descriptive, explicitly scoped effects on supported inputs.
+NOT ready: predictive recommendation to Athena, production dataset mining, double-cut mapped integration, or ligand generation. No planner consumes these outputs.
+Recommended next separately reviewed step: choose whether to repair the concrete lossless-decoding cases exposed here or qualify a larger bounded, metadata-complete series resource within current chemistry support. Either way, require repeated transformations under a prespecified compound/study holdout before claiming predictive utility. Do not widen the dataset based on favorable scores. Investigate the three roundtrip failures with minimal reproductions; E/Z requires separate public-contract/chemistry review, not stripping. No need for Matsy, WELD migration or new architecture to resolve this checkpoint's limitations.
