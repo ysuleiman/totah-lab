@@ -11,14 +11,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FoundationArchitectureTest {
-    @Test void productionCodeIsJdkOnlyAndHasNoDomainOrTargetConcepts() throws Exception {
+    @Test void productionCodeUsesOnlyJdkAndExchangeJsonAndHasNoDomainOrTargetConcepts() throws Exception {
         Path base = Path.of(System.getProperty("basedir"));
         try (var files = Files.walk(base.resolve("src/main/java"))) {
             for (var file : files.filter(p -> p.toString().endsWith(".java")).toList()) {
                 String text = Files.readString(file);
                 for (var line : text.lines().filter(l -> l.startsWith("import ")).toList())
                     assertTrue(line.startsWith("import java.") || line.startsWith("import static totah.lab.mnemosyne.")
-                            || line.startsWith("import totah.lab.mnemosyne."), file + ": " + line);
+                            || line.startsWith("import totah.lab.mnemosyne.")
+                            || (file.getFileName().toString().equals("EvidenceExchange.java") && line.startsWith("import com.fasterxml.jackson.")), file + ": " + line);
                 for (var forbidden : List.of("mettl7", "netarsudil", "dcmb", "designstate", "moleculargraph", "quantumevidence", "openchemlib", "daedalus"))
                     assertFalse(text.toLowerCase().contains(forbidden), file + ": " + forbidden);
             }
@@ -38,14 +39,19 @@ class FoundationArchitectureTest {
                 "totah.lab.aether.provenance.ContentHash", "com.actelion.research.chem.StereoMolecule"))
             assertThrows(ClassNotFoundException.class, () -> Class.forName(name), name);
     }
-    @Test void foundationPomHasNoProductionDependencies() throws Exception {
+    @Test void foundationPomHasOnlyApprovedExchangeProductionDependencies() throws Exception {
         var factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         var document = factory.newDocumentBuilder().parse(Path.of(System.getProperty("basedir"), "pom.xml").toFile());
         var dependencies = document.getElementsByTagName("dependency");
         for (int i = 0; i < dependencies.getLength(); i++) {
             var dependency = (org.w3c.dom.Element) dependencies.item(i);
-            assertEquals("test", dependency.getElementsByTagName("scope").item(0).getTextContent());
+            var scope = dependency.getElementsByTagName("scope");
+            if (scope.getLength() > 0 && scope.item(0).getTextContent().equals("test")) continue;
+            var coordinate = dependency.getElementsByTagName("groupId").item(0).getTextContent() + ":"
+                    + dependency.getElementsByTagName("artifactId").item(0).getTextContent();
+            assertTrue(List.of("com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+                    "com.fasterxml.jackson.datatype:jackson-datatype-jsr310").contains(coordinate), coordinate);
         }
     }
 }

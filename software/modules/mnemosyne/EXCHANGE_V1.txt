@@ -1,0 +1,247 @@
+MNEMOSYNE EXCHANGE V1 — NORMATIVE PROFILE AND RESOLUTION BOUNDARY
+
+Scope
+-----
+Mnemosyne preserves immutable observations and attributed scientific history; it
+does not determine truth. This profile describes a bounded exchange document,
+not a database, journal replacement, repository, service or persistence choice.
+Detailed domain results remain authoritative outside Mnemosyne.
+
+New-class justification
+-----------------------
+EvidenceExchange owns encoding, the manifest and integrity of an immutable
+EvidenceHistory. None of the existing domain codecs can own this responsibility
+without reversing dependencies or changing historical domain schemas. It uses
+the repository's existing Jackson ecosystem, not a new serialization framework.
+ReferenceResolver owns an injected resolution protocol and identity consistency
+checks. ScientificReference itself remains a value; it cannot perform domain I/O.
+Domain ScientificReferenceResolution adapters own lookup and verification through
+their existing authorities. They do not reimplement source parsing, registries,
+chemical identity, calculation identity or scientific validity policies.
+
+The core records remain independent of Jackson annotations. Exchange-specific
+mix-ins describe uncertainty tags. Existing public signatures are unchanged;
+ScientificReference.Kind adds SNAPSHOT for explicitly scoped snapshot identities.
+
+1. Record envelope
+------------------
+A UTF-8 JSON object with exactly these fields:
+  schema: "mnemosyne-record/1"
+  type: REFERENCE | OBSERVATION | REVIEW | ASSESSMENT | REVIEW_CHANGE
+  data: the corresponding object below
+
+All named fields are required, including fields whose value may be null. Unknown
+fields/types/schema versions, duplicate JSON keys, missing fields, malformed
+references, numeric enums and coercion of scalar numbers to strings are rejected.
+The decoder never repairs an inconsistent record. Domain constructors remain
+responsible for their existing semantic invariants.
+
+REFERENCE: kind, namespace, id, version, all strings. Kind is the existing
+ScientificReference enum, including SNAPSHOT. No case folding, trimming, Unicode
+normalization or identifier replacement occurs.
+
+OBSERVATION: reference, subject, endpoint, method, context, activity, provenance,
+availability, value, uncertainty, limitations.
+  value: null or {text, unit}; both scalar members are strings. "62.140" stays
+    "62.140", not "62.14". This is a reported representation, not a number to
+    normalize during serialization.
+  uncertainty:
+    {kind:"UNKNOWN", reason}
+    {kind:"REPORTED_INTERVAL", lower:{text,unit}, upper:{text,unit}, description}
+    {kind:"REPORTED_ERROR", quantity:REFERENCE, error:{text,unit}, description}
+  provenance: source, artifact, receipt, projectionMethod, locator, derivedFrom.
+    Reference fields are full reference objects; derivedFrom is an ordered list
+    of references. Raw domain data is not copied into this exchange record.
+  availability: PRESENT | UNAVAILABLE | FAILED_INVALID, not scientific truth.
+
+REVIEW: reference, observation, reviewer, process, policy, scope, decision,
+reasons, reviewedAt, recordedAt, qualifications, limitations.
+ASSESSMENT: reference, observation (reference or null), review (reference or null),
+proposition, criterion, policy, context, outcome, reasons, recordedAt.
+NOT_MEASURED retains null observation and review; no fake measurement is inserted.
+REVIEW_CHANGE: reference, review, replacement (reference or null), agent, reason,
+effectiveAt, recordedAt. Null replacement means withdrawal; otherwise supersession.
+
+Every list preserves its order, including reasons, limitations and provenance
+links. Timestamps are ISO-8601 UTC strings emitted from Instant with nanosecond
+precision where present. Numeric timestamps are not an alternative encoding.
+Instant already has no original timezone spelling; this profile preserves its
+value, not lexical source timestamps stored in separate authoritative receipts.
+
+2. Bounded snapshot envelope and manifest
+----------------------------------------
+A UTF-8 JSON object with exactly:
+  schema: "mnemosyne-exchange/1"
+  manifest: object described below
+  manifestSha256: lowercase 64-character SHA-256 digest
+  records: list of record envelopes
+
+Manifest fields:
+  schema: "mnemosyne-exchange/1"
+  reference: reference with kind SNAPSHOT
+  creationActivity: reference with kind ACTIVITY
+  createdAt: Instant string
+  parent: SNAPSHOT reference or null
+  records: ordered entries {reference, type, sha256}
+
+Each body record appears once. The manifest contains only membership references,
+type and digest, not a duplicate copy of each scientific record. The snapshot is
+a pinned view, never a global truth state. The parent is an external reference;
+this slice does not claim to retrieve or prove an entire snapshot ancestry.
+
+Manifest and body cover exactly the same observation/review/assessment/change
+identities. Duplicate identities are rejected even if their content is equal:
+the exchange itself is unambiguous; Phase 1 in-memory re-import idempotency stays
+unchanged. Record arrays emitted by the writer and manifest entries are sorted
+by reference tuple (kind.name, namespace, id, version), each string compared by
+Java String natural UTF-16 order. Input body record order is immaterial; manifest
+membership must use this deterministic order. Standalone REFERENCE envelopes
+are supported but are not separate history members.
+
+Self-contained means observation/review/assessment/change relationships are closed
+within this snapshot. Subjects, sources, artifacts, methods, policies, criteria,
+propositions, agents, activities and parent snapshots remain external references;
+there are no invented placeholder records for them. Lookup is a separate action.
+
+3. Exact bytes, content digests and immutable identity
+----------------------------------------------------
+These are three different axes:
+- Exact exchange-byte digest: SHA-256 of the actual supplied file bytes, available
+  through EvidenceExchange.sha256. Whitespace changes this digest. It is external
+  transport metadata, not recursively embedded in its own file.
+- Record content digest: SHA-256 of canonical UTF-8 bytes of the complete record
+  envelope, including record schema/type and every data field. Record identity is
+  still (kind, namespace, id, version), not this digest. Two different payloads may
+  claim the same ID; that is a conflict, not permission to change the identity.
+- Raw-artifact digest: the artifact reference supplied by the source/domain. It
+  is not computed from the exchange and is not verified by parsing the document.
+
+Canonical profile v1:
+  Recursively sort every JSON object's keys by Java String natural UTF-16 order.
+  Preserve array order, except for the explicitly sorted history/manifest lists.
+  Emit compact JSON with Jackson's standard JSON escaping, no pretty whitespace,
+  BOM or trailing newline. Encode UTF-8, no Unicode normalization. Data numbers
+  remain Scalar.text strings. Optional empty references/values are explicit null.
+  Instants emit their UTC ISO-8601 representation with retained precision.
+
+All record fields participate, including timestamps, original scalar spelling,
+units, uncertainty, limitations, review reasons and all provenance references.
+There are no scientific-field exclusions. This is a schema-scoped content digest,
+not a claim that arbitrary mathematically equivalent scientific values hash alike.
+A frozen reference-byte golden test protects the emitted profile.
+
+manifestSha256 is SHA-256 of the canonical manifest object. It covers snapshot
+identity, schema, creation time/activity, parent and all member digests. It does
+not include itself. Decoding verifies this digest, each record's canonical content
+digest, exact membership and semantic linkage. Whitespace and input object-key
+order may differ without changing these content digests.
+
+SHA-256 uses the JDK MessageDigest primitive in a small local codec method. Reusing
+a domain module's wrapper would create an inappropriate reverse dependency. No
+hash algorithm or scientific identity authority is reimplemented or migrated.
+Historical domain identities/hashes remain unchanged.
+
+Integrity is not authentication: an attacker who replaces a document and all its
+checksums can produce a different internally consistent document. Trust in the
+expected snapshot/record reference or digest must come from outside that document.
+No signature, global immutable-ID reservation or cross-file conflict store is
+introduced. Duplicate identities within a self-contained snapshot fail closed;
+comparison of independent snapshots remains the caller's responsibility.
+
+4. Reconstruction and I/O
+-------------------------
+The codec reconstructs observations and reviews, then review changes, then
+assessments. Each assessment is validated against all changes known/effective at
+its recorded time, independent of file ordering. Earlier assessments are retained
+when withdrawal was learned later. Both knownAt and effectiveAt behavior survive.
+Snapshot equality compares the manifest and all four history maps semantically;
+Phase 1 EvidenceHistory object equality is not changed.
+
+A Phase 1 working set can contain an assessment added before a subsequently
+imported, backdated change. If its assessment was already inadmissible at the
+stated known/effective time, exchange publication fails rather than rewriting it.
+Same-time withdrawal applies inclusively; no undocumented insertion order is
+invented to break ties. This is a stricter exchange consistency check, not a
+migration or alteration of the Phase 1 objects.
+
+Exchange documents and standalone records are bounded at 16 MiB. Snapshot
+creation time cannot predate contained review/assessment/change recorded times.
+Path read/write helpers use checked IOException and write with CREATE_NEW. They
+do not create directories, overwrite files, provide transactional durability,
+maintain a catalog or establish a persistence architecture. Acceptance files are
+JUnit temporary files only. Retention, concurrency, crash recovery and signed
+manifests are intentionally outside this slice.
+
+5. Verified reference resolution
+--------------------------------
+ReferenceResolver<T> accepts an Authority<T>:
+  supports(reference)
+  find(reference) -> Optional<T>, checked I/O
+  identityOf(record, kind, namespace) -> identity derived from returned content
+  verify(record) -> Verification
+
+It returns RESOLVED, UNAVAILABLE, CONFLICTING or UNSUPPORTED. Only RESOLVED carries
+a domain record and verification detail. identityOf may not echo the requested
+ID/version; the resolver compares the independently derived identity with the
+request. Unknown kind/namespace/version returns UNSUPPORTED. Missing records or
+ordinary I/O failures return UNAVAILABLE; explicit verification conflicts and
+invalid returned identities produce CONFLICTING. No automatic repair is attempted.
+
+Verification lists the exact ARTIFACT references whose bytes the authority checked,
+plus a reason. A resolved reference with an empty list is linkage-only. This is an
+injected authority contract, not a cryptographic proof that an arbitrary malicious
+plugin actually performed its declared verification. No domain result is interpreted
+as biologically valid or made reusable by generic resolution.
+
+Athena resolver:
+- Pins an exchanged observation/review and existing evidence reservation ID.
+- Reads SourceDecision through DesignGrammarJsonCodec.readSourceReview.
+- Recomputes the existing projection and review association from that domain record.
+- Requires the host's source-verifier callback, exercised with the existing source
+  importer reparse/verification in tests. Athena gains no source-I/O dependency.
+- Resolves source, raw artifact, domain receipt and historical review references
+  to the existing SourceDecision (with its original SourceReceipt/SourceReview).
+- Separately reports the checked embedded raw artifact hash. A resolved historical
+  review can still be withdrawn for current use; admissibility is not lookup.
+
+Prometheus resolver:
+- Pins an exchanged observation and explicitly selected PRIMARY/AUXILIARY role.
+- Requires an existing registry file, then reopens GeneratedEvidenceRegistry so
+  existing payload/artifact verification runs. No new registry is created on miss.
+- Resolves source/artifact/receipt/specification/context references to the existing
+  GeneratedEvidenceEntry, exposing QuantumEvidence, EvidenceIdentity and lifecycle.
+- Checks specification/role/projection correspondence and requires source bytes to
+  be linked to the registry's verified artifact list before claiming verification.
+- Never executes, retries, registers or changes reuse eligibility. Its lowercase
+  registry-key prefix follows the existing authority's format.
+
+These are bounded resolvers for the two accepted paths, not namespace-wide public
+services. Resolver I/O and authority checks are not a distributed atomic snapshot;
+a later change in a source is not retroactively prevented by a successful result.
+
+6. Conceptual standards mapping (no ontology runtime)
+-----------------------------------------------------
+W3C PROV:
+- Observation, artifact, source capture, manifest, review and assessment records
+  can be represented as prov:Entity instances.
+- Observation.activity and manifest.creationActivity reference prov:Activity;
+  observation/projection provenance can describe prov:wasGeneratedBy / prov:used.
+- Review.reviewer and change.agent reference prov:Agent; association with a review
+  activity would require an explicitly represented activity, not an invented one.
+- derivedFrom references may map to prov:wasDerivedFrom when their domain relation
+  warrants it; a generic reference does not establish an arbitrary causal edge.
+- Review supersession and withdrawal can be exported as qualified history, but
+  admissibility and SUPPORTS/CONTRADICTS/UNRESOLVED are Mnemosyne policy-scoped
+  scientific semantics, not truth rules supplied by PROV.
+https://www.w3.org/TR/prov-overview/
+
+Identifiers.org-style IDs:
+namespace and id are separate, unmodified strings. Where the source actually
+uses a registered namespace, e.g. pubchem.compound plus accession 6343, an export
+adapter can build a namespace:accession resolver reference. Source/record version
+remains explicit metadata; resolver URLs do not prove equivalence or provide the
+whole source snapshot. Existing legacy namespaces are not silently renamed into
+registered ones, and no proprietary identifier replaces authoritative IDs.
+https://docs.identifiers.org/pages/identification_scheme.html
+
+No RDF/OWL/PROV/SEPIO runtime, universal ontology or automatic reasoning was added.

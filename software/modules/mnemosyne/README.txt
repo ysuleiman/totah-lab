@@ -68,8 +68,11 @@ or silently reinterpret them. Supersession is deliberately narrow: a later revie
 by the same reviewer of the same observation and scope. No generalized revision
 language or cycle-solving engine is provided.
 
-No production library dependency beyond the JDK. Athena and Prometheus depend
+The Phase 1 semantic records use only the JDK. The Phase 2 exchange codec uses
+the existing Jackson infrastructure (databind, JDK8 and Java-time modules);
+see EXCHANGE_V1.txt for the versioned contract. Athena and Prometheus depend
 on this module, never the reverse. The parent compiler's existing annotation
 processor configuration is inherited; it does not introduce domain runtime types.
-No new hashing algorithm, canonical chemistry, unit framework, storage format,
-source importer or executor is introduced.
+No new hashing algorithm, canonical chemistry, unit framework, source importer
+or executor is introduced. Phase 2 adds a bounded exchange format, not a storage
+engine or universal repository.

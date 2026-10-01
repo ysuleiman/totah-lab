@@ -84,4 +84,51 @@ class ScientificObservationProjectionTest {
         assertEquals(EvidenceAcceptanceState.FAILED_NUMERICALLY, failed.acceptance());
         assertThrows(IllegalArgumentException.class, () -> ScientificObservationAdapter.energy(failed, ref(OBSERVATION, "o"), ref(METHOD, "spec-is-not-run")));
     }
+    @Test void exchangedProjectionResolvesSpecResultArtifactsAndRoleWithoutChangingRegistry() throws Exception {
+        var evidence = fixture(); var directory = temporary.resolve("registry");
+        var registry = new GeneratedEvidenceRegistry(directory);
+        var artifact = new RawArtifact("result.json", evidence.provenance().sha256(), "result_json");
+        registry.register("frozen-spec", evidence, GeneratedEvidenceRole.PRIMARY, temporary, List.of(artifact), "fixture only");
+        registry.register("frozen-spec", evidence, GeneratedEvidenceRole.VALIDATION_AUXILIARY, temporary, List.of(artifact), "fixture only");
+        byte[] registryBefore = Files.readAllBytes(registry.registryFile());
+        var original = ScientificObservationAdapter.energy(evidence, ref(OBSERVATION, "exchange-o"), ref(ACTIVITY, "run"));
+        var exchange = new totah.lab.mnemosyne.EvidenceExchange();
+        var snapshot = exchange.snapshot(ref(SNAPSHOT, "snapshot"), ref(ACTIVITY, "export"), Instant.parse("2026-10-01T00:00:00Z"),
+                Optional.empty(), new EvidenceHistory().append(original));
+        var file = temporary.resolve("exchange.json"); exchange.write(file, snapshot);
+        var loaded = exchange.read(file); assertEquals(snapshot, loaded);
+        var o = loaded.history().observations().get(original.reference());
+        for (var role : GeneratedEvidenceRole.values()) {
+            var resolver = new totah.lab.mnemosyne.ReferenceResolver<>(new ScientificReferenceResolution(directory, o, role));
+            for (var reference : List.of(o.provenance().source(), o.provenance().receipt(), o.provenance().artifact(), o.method(), o.context())) {
+                var result = resolver.resolve(reference);
+                assertEquals(totah.lab.mnemosyne.ReferenceResolver.Status.RESOLVED, result.status(), result.reason());
+                var entry = result.record().orElseThrow();
+                assertEquals(evidence, entry.evidence().orElseThrow()); assertEquals(role, entry.role());
+                assertEquals(evidence.identity(), entry.evidence().orElseThrow().identity());
+                assertFalse(entry.lifecycle().isEmpty());
+                assertEquals(List.of(o.provenance().artifact()), result.verification().orElseThrow().verifiedArtifacts());
+            }
+        }
+        assertArrayEquals(registryBefore, Files.readAllBytes(registry.registryFile()));
+        assertEquals(evidence, new GeneratedEvidenceRegistry(directory).reusable(evidence.identity().evidenceHash()).orElseThrow());
+    }
+    @Test void rawArtifactTamperingAndUnavailableRegistryFailClosedWithoutCreatingAStore() throws Exception {
+        var evidence = fixture(); var directory = temporary.resolve("registry");
+        var registry = new GeneratedEvidenceRegistry(directory);
+        registry.register("frozen-spec", evidence, GeneratedEvidenceRole.PRIMARY, temporary,
+                List.of(new RawArtifact("result.json", evidence.provenance().sha256(), "result_json")), "fixture only");
+        var o = ScientificObservationAdapter.energy(evidence, ref(OBSERVATION, "o"), ref(ACTIVITY, "run"));
+        var resolver = new totah.lab.mnemosyne.ReferenceResolver<>(new ScientificReferenceResolution(directory, o, GeneratedEvidenceRole.PRIMARY));
+        Files.writeString(temporary.resolve("result.json"), "tampered");
+        assertEquals(totah.lab.mnemosyne.ReferenceResolver.Status.CONFLICTING, resolver.resolve(o.provenance().artifact()).status());
+        var missingDirectory = temporary.resolve("not-created");
+        var missing = new totah.lab.mnemosyne.ReferenceResolver<>(new ScientificReferenceResolution(missingDirectory, o, GeneratedEvidenceRole.PRIMARY));
+        assertEquals(totah.lab.mnemosyne.ReferenceResolver.Status.UNAVAILABLE, missing.resolve(o.method()).status());
+        assertFalse(Files.exists(missingDirectory));
+        var method = o.method();
+        assertEquals(totah.lab.mnemosyne.ReferenceResolver.Status.UNSUPPORTED,
+                resolver.resolve(new ScientificReference(method.kind(), method.namespace(), method.id(), "2")).status());
+    }
+
 }

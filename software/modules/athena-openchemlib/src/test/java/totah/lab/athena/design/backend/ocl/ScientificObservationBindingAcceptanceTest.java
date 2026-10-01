@@ -120,4 +120,67 @@ class ScientificObservationBindingAcceptanceTest {
         assertThrows(IllegalArgumentException.class, () -> ScientificObservationAdapter.review(altered, decision, shared(POLICY, "p"), TIME));
         assertEquals(o, ScientificObservationAdapter.project(source, o.reference(), o.activity()));
     }
+    @Test void exchangedHistoryResolvesVerifiedDomainSourceAndHistoricalReview() throws Exception {
+        var source = source(); var k = fixture();
+        var first = decision(source, k, "resolved-a", true); var second = decision(source, k, "resolved-b", false);
+        var o = ScientificObservationAdapter.project(source, shared(OBSERVATION, "exchange-o"), shared(ACTIVITY, "frozen-run"));
+        var a = ScientificObservationAdapter.review(o, first, shared(POLICY, "mass"), TIME);
+        var b = ScientificObservationAdapter.review(o, second, shared(POLICY, "biology"), TIME);
+        var h = new EvidenceHistory().append(o).append(a).append(b)
+                .append(assessment(o, a, "mass", Assessment.Outcome.SUPPORTS, "Mass is in the declared fixture window"))
+                .append(new EvidenceHistory.ReviewChange(shared(REVIEW_CHANGE, "withdraw"), a.reference(), Optional.empty(),
+                        a.reviewer(), "Review withdrawn later", TIME.plusSeconds(1), TIME.plusSeconds(2)));
+        var exchange = new EvidenceExchange(); var file = temporary.resolve("history.json");
+        var snapshot = exchange.snapshot(shared(SNAPSHOT, "source-exchange"), shared(ACTIVITY, "export"), TIME.plusSeconds(3), Optional.empty(), h);
+        exchange.write(file, snapshot); var loaded = new EvidenceExchange().read(file);
+        assertEquals(snapshot, loaded);
+        var observation = loaded.history().observations().get(o.reference());
+        var review = loaded.history().reviews().get(a.reference());
+        var verifier = new PubChemMolecularWeightImporter(); var mapper = new ObjectMapper();
+        var resolver = new ReferenceResolver<>(new totah.lab.athena.design.reasoning.ScientificReferenceResolution(
+                temporary.resolve("registry"), first.evidenceReference(), observation, review,
+                receipt -> verifier.verifyReceipt(mapper.valueToTree(receipt))));
+        for (var reference : List.of(observation.provenance().source(), observation.provenance().receipt(), observation.provenance().artifact(), review.reference())) {
+            var resolved = resolver.resolve(reference);
+            assertEquals(ReferenceResolver.Status.RESOLVED, resolved.status(), resolved.reason());
+            assertEquals(first, resolved.record().orElseThrow());
+            assertEquals(List.of(o.provenance().artifact()), resolved.verification().orElseThrow().verifiedArtifacts());
+        }
+        assertEquals(source.rawBase64(), resolver.resolve(o.provenance().artifact()).record().orElseThrow().receipt().rawBase64());
+        assertTrue(loaded.history().admissible(a.reference(), TIME, TIME));
+        assertFalse(loaded.history().admissible(a.reference(), TIME.plusSeconds(3), TIME.plusSeconds(3)));
+        assertEquals(h.assessmentsAsOf(TIME), loaded.history().assessmentsAsOf(TIME));
+        // Resolution of a historical review does not make it currently admissible.
+        assertThrows(IllegalArgumentException.class, () -> ScientificObservationAdapter.bind(loaded.history(), o.reference(), a.reference(),
+                TIME.plusSeconds(3), TIME.plusSeconds(3), first));
+        var requested = o.provenance().receipt();
+        assertEquals(ReferenceResolver.Status.UNSUPPORTED, resolver.resolve(new ScientificReference(requested.kind(), requested.namespace(), requested.id(), "unknown-version")).status());
+    }
+
+    @Test void domainResolutionRejectsForgedProjectionEvenWhenRawHashStillMatches() throws Exception {
+        var source = source(); var decision = decision(source, fixture(), "forged", true);
+        var o = ScientificObservationAdapter.project(source, shared(OBSERVATION, "o"), shared(ACTIVITY, "run"));
+        var review = ScientificObservationAdapter.review(o, decision, shared(POLICY, "mass"), TIME);
+        var mapper = new ObjectMapper(); var importer = new PubChemMolecularWeightImporter();
+        var resolver = new ReferenceResolver<>(new totah.lab.athena.design.reasoning.ScientificReferenceResolution(
+                temporary.resolve("registry"), decision.evidenceReference(), o, review,
+                receipt -> importer.verifyReceipt(mapper.valueToTree(receipt))));
+        var altered = (com.fasterxml.jackson.databind.node.ObjectNode) mapper.valueToTree(source);
+        altered.put("valueText", "1.0");
+        var forgedReceipt = mapper.treeToValue(altered, SourceReceipt.class);
+        var forged = reviewSource(forgedReceipt, decision.review(), decision.evidenceReference());
+        Path registration;
+        try (var files = java.nio.file.Files.list(temporary.resolve("registry"))) { registration = files.findFirst().orElseThrow(); }
+        java.nio.file.Files.writeString(registration, mapper.writeValueAsString(forged)); // temporary fixture mutation only
+        assertEquals(source.sha256(), forged.receipt().sha256());
+        var conflict = resolver.resolve(o.provenance().artifact());
+        assertEquals(ReferenceResolver.Status.CONFLICTING, conflict.status());
+        assertEquals("source importer verification failed", conflict.reason());
+        var absent = temporary.resolve("absent-registry");
+        var missing = new ReferenceResolver<>(new totah.lab.athena.design.reasoning.ScientificReferenceResolution(
+                absent, decision.evidenceReference(), o, review, receipt -> importer.verifyReceipt(mapper.valueToTree(receipt))));
+        assertEquals(ReferenceResolver.Status.UNAVAILABLE, missing.resolve(o.provenance().receipt()).status());
+        assertFalse(java.nio.file.Files.exists(absent));
+    }
+
 }

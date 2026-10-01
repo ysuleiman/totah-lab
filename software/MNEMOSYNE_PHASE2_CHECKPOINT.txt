@@ -1,0 +1,260 @@
+MNEMOSYNE PHASE 2 — VERSIONED EXCHANGE AND VERIFIED REFERENCE RESOLUTION
+Implementation and validation checkpoint — 2026-10-01
+
+Accepted parent: e798ddf19894b8799f4a0cd0b9c0214236576a48
+Branch: codex/mnemosyne-phase2-exchange
+Commit: the commit containing this report; resolve with:
+git log -1 --format=%H -- software/MNEMOSYNE_PHASE2_CHECKPOINT.txt
+
+This is the separately authorized Mnemosyne exchange slice. No universal
+persistence, scientific generator, Athena Phase 2.5, WELD migration or Hephaestus
+consolidation was started. Mnemosyne preserves records and attributed history;
+it does not determine scientific truth or absorb detailed domain results.
+
+CONTRACT AND SERIALIZATION
+New EvidenceExchange supplies the explicit version-1 profile:
+- mnemosyne-record/1 for standalone reference/observation/review/assessment/change;
+- mnemosyne-exchange/1 for a bounded history snapshot and manifest.
+The normative field, encoding, digest and consistency rules are documented in
+software/modules/mnemosyne/EXCHANGE_V1.txt.
+
+Jackson databind plus its JDK8 and Java-time modules are reused from the existing
+repository ecosystem. No new serialization framework was adopted. These are the
+only permitted production dependencies of Mnemosyne, confined to the exchange
+codec; core scientific records remain free of serialization annotations and
+scientific domain dependencies. Private uncertainty mix-ins define explicit tags.
+The existing architecture tests now enforce this narrower exchange-only exception.
+
+Existing public signatures and domain schemas are unchanged. The authorized
+manifest contract adds SNAPSHOT to ScientificReference.Kind. New public contracts:
+EvidenceExchange.RecordType; RecordDigest(reference,type,sha256);
+Manifest(schema,reference,creationActivity,createdAt,parent,records);
+Snapshot(manifest,history); snapshot/encode/decode/read/write operations and
+standalone record encoding/decoding/content digests. Snapshot equality explicitly
+compares all four history maps; Phase 1 EvidenceHistory equality is unchanged.
+
+ROUND-TRIP AND IDENTITY GUARANTEES
+Every reference namespace/ID/version, scalar spelling (including 62.140), unit,
+uncertainty choice/bounds/error, availability, reason, limitation, timestamp,
+policy/process reference, outcome and provenance link is preserved. No scientific
+value is normalized numerically during serialization. Unknown remains unknown.
+Unavailable values remain absent. NOT_MEASURED retains no observation/review.
+
+Immutable record reference identity is independent of its content digest. Record
+digests include the complete canonical record envelope and all fields, including
+timestamps and schema/type. Canonical objects sort keys by Java String UTF-16
+order; arrays retain order except manifest/history membership, which sorts by
+reference tuple. UTF-8 compact JSON, no BOM/newline, standard JSON escaping,
+no Unicode normalization, UTC Instant strings and explicit null optionals.
+
+Exact transport bytes have a separate optional caller-computed SHA-256; whitespace
+changes that digest but not record content. A referenced raw artifact's digest
+is neither the record digest nor the exchange digest. Historical Athena and
+Prometheus hashes/identities are not changed. The local codec uses the JDK SHA-256
+primitive because importing a domain hash wrapper would reverse dependencies.
+
+MANIFEST / INTEGRITY
+Manifest identifies schema, snapshot ID/version, creation activity/time, optional
+parent and member references/types/digests. Each actual record appears once in the
+body, not again in the manifest. manifestSha256 covers all manifest fields and
+member digests. Membership and every record digest are checked on read. A snapshot
+is a pinned view, not a globally current or true state.
+
+Internal observation/review/assessment/change references must resolve within the
+snapshot. External source, subject, method, policy, proposition, agent/activity,
+artifact and parent-snapshot references are intentionally not fabricated or copied
+into the common model. Their resolution is a separate boundary.
+
+Checksums protect integrity, not authentication: replacement of an entire document
+and all its checksums requires a trusted external expected identity/digest to
+detect. No signatures, cross-document immutable reservation service or global
+conflict store is claimed. The bounded reader/writer limit is 16 MiB. Files are
+written CREATE_NEW with checked I/O exceptions; there is no catalog, append store,
+overwrite policy, distributed transaction or crash-durability claim.
+
+REFERENCE RESOLUTION
+ReferenceResolver<T> uses injected Authority<T> methods supports, find, identityOf
+and verify. Results distinguish RESOLVED / UNAVAILABLE / CONFLICTING / UNSUPPORTED.
+Identity is derived from returned content and compared with the requested kind,
+namespace, ID and version. No record/verification payload accompanies a failure.
+Verification separately lists the ARTIFACT references whose bytes were checked.
+RESOLVED with an empty verification list proves linkage only.
+
+Athena ScientificReferenceResolution:
+- Reads the existing source-review reservation via DesignGrammarJsonCodec.
+- Resolves source, receipt, artifact and historical review references to the
+  authoritative SourceDecision/SourceReceipt/SourceReview.
+- Reprojects and compares exact exchanged observation/review fields.
+- Delegates source verification to the host through SourceVerifier. Acceptance
+  invokes the existing source importer's raw-byte reparse verification; Athena
+  gains no reverse source-I/O dependency and implements no new parser.
+- Rejects a forged parsed value even when its preserved raw hash still matches.
+- Historical resolution does not undo review withdrawal or confer current approval.
+
+Prometheus ScientificReferenceResolution:
+- Requires an existing GeneratedEvidenceRegistry file and reopens that authority
+  to repeat payload/raw artifact verification. A miss creates no directory/store.
+- Resolves source/artifact/receipt/specification/context to GeneratedEvidenceEntry,
+  including its QuantumEvidence, EvidenceIdentity and lifecycle records.
+- Requires explicit PRIMARY or VALIDATION_AUXILIARY selection; no role inference.
+- Verifies result/specification/role correspondence, exact projection, and that
+  source path/hash is covered by the registry's verified artifact list.
+- Does not register, run, retry, change acceptance or make auxiliary evidence reusable.
+
+Resolver authorities are trusted injected code. The foundation cannot independently
+prove that a malicious plugin performed its claimed verification. Ordinary lookup
+I/O failures are UNAVAILABLE; explicit domain integrity failures are CONFLICTING.
+No unsupported namespace/version falls back to a weaker identity match.
+
+HISTORICAL RECONSTRUCTION
+Temporary-file acceptance exchanges one unchanged observation, independent reviews,
+all five assessment outcomes, a later supersession and a withdrawal. Reloaded maps
+and manifest are semantically equal and canonical re-encoding is byte-identical.
+Tests preserve both knownAt and effectiveAt queries and historical assessments.
+The actual frozen source path also round-trips and resolves a later-withdrawn review
+without making it currently admissible for a new Athena binding.
+
+Reconstruction validates all changes before assessments, using explicit times rather
+than file order. A working set whose assessment was already inadmissible at its
+recorded/known time cannot be published; no automatic repair or invented event
+ordering occurs. Same-time withdrawals apply inclusively. This is an explicit
+exchange consistency restriction; Phase 1 objects and historical domain files
+are not migrated or rewritten.
+
+FAILURE COVERAGE
+Tests reject unknown exchange/record versions, malformed references, numeric enums
+and coerced numeric identifier/scalar text, numeric timestamps, null record data,
+unknown fields, duplicate JSON keys, duplicate conflicting identities, missing
+internal records even after integrity metadata is recomputed, corrupted body or
+manifest, returned resolver identity/version mismatch, unsupported namespaces/
+versions, source-projection forgery and changed raw artifacts. Existing source and
+registry authorities remain responsible for domain verification semantics.
+
+STANDARDS MAPPING
+EXCHANGE_V1.txt documents conceptual W3C PROV entities/activities/agents and qualified
+derivation links, and where scientific assessment/admissibility is intentionally
+not supplied by PROV. It also documents namespace/accession preservation suitable
+for Identifiers.org-style exports without replacing existing IDs. The official
+PROV overview and Identifiers.org scheme documentation were checked for this
+mapping. No scientific source was ingested; no ontology runtime was added.
+
+VALIDATION
+Final command, from repository root:
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/pom.xml -pl mnemosyne,athena-openchemlib,prometheus,daedalus -am test '-Dtest=EvidenceHistoryAcceptanceTest,FoundationArchitectureTest,EvidenceExchangeAcceptanceTest,ReferenceResolverTest,ScientificObservationBindingAcceptanceTest,ScientificObservationProjectionTest,AthenaDependencyTest,DesignProvenanceAcceptanceTest,CanonicalCorrespondenceTest,GraphEditTransactionEngineTest,MolecularGraphDeltaTest,TopologyEditTransactionEngineTest,MolecularDesignGraphGeneratorTest,HypothesisDirectedPlannerTest,ReviewedEvidenceAdaptersTest,HypothesisDirectedReplacementAcceptanceTest,QualifiedReasoningAcceptanceTest,RealSourceEvidenceAcceptanceTest,SourceAssociationAcceptanceTest,OclMolecularBackendAcceptanceTest,GeneratedEvidenceRegistryTest,GeneratedEvidenceRegistryBatchTest,GeneratedEvidenceLifecycleTest,CanonicalEvidenceStoreTest,CanonicalEvidenceStoreVerificationTest,EvidenceBundleCollisionTest,EvidenceBundleQueryTest,EvidenceIdentityTest,ProtocolComparabilityTest,GovernedDesignWorkflowTest' -Dsurefire.failIfNoSpecifiedTests=false
+
+Result: BUILD SUCCESS, exit 0. Java 21, offline Maven. Elapsed 15.132 seconds.
+219 tests, 0 failures, 0 errors, 0 skipped.
+Module totals: Mnemosyne 26; Athena 68; athena-openchemlib 52;
+DAEDALUS 6; Prometheus 67. Eighteen tests were added in this slice.
+Other reactor dependencies compiled as needed with no matching selected tests.
+
+Per-class final results: tests/failures/errors/skipped; seconds
+totah.lab.mnemosyne.EvidenceHistoryAcceptanceTest: 9/0/0/0; 0.068
+totah.lab.mnemosyne.ReferenceResolverTest: 3/0/0/0; 0.007
+totah.lab.mnemosyne.FoundationArchitectureTest: 3/0/0/0; 0.053
+totah.lab.mnemosyne.EvidenceExchangeAcceptanceTest: 11/0/0/0; 0.365
+totah.lab.athena.design.backend.CanonicalCorrespondenceTest: 3/0/0/0; 0.043
+totah.lab.athena.design.backend.MolecularGraphDeltaTest: 4/0/0/0; 0.031
+totah.lab.athena.design.backend.TopologyEditTransactionEngineTest: 7/0/0/0; 0.031
+totah.lab.athena.design.backend.GraphEditTransactionEngineTest: 8/0/0/0; 0.060
+totah.lab.athena.design.reasoning.HypothesisDirectedPlannerTest: 16/0/0/0; 0.318
+totah.lab.athena.design.reasoning.ReviewedEvidenceAdaptersTest: 6/0/0/0; 0.014
+totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest: 3/0/0/0; 0.008
+totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest: 19/0/0/0; 0.156
+totah.lab.athena.architecture.AthenaDependencyTest: 2/0/0/0; 0.103
+totah.lab.athena.design.backend.ocl.HypothesisDirectedReplacementAcceptanceTest: 9/0/0/0; 1.011
+totah.lab.athena.design.backend.ocl.ScientificObservationBindingAcceptanceTest: 5/0/0/0; 0.301
+totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest: 12/0/0/0; 0.338
+totah.lab.athena.design.backend.ocl.SourceAssociationAcceptanceTest: 5/0/0/0; 0.015
+totah.lab.athena.design.backend.ocl.QualifiedReasoningAcceptanceTest: 12/0/0/0; 0.518
+totah.lab.athena.design.backend.ocl.RealSourceEvidenceAcceptanceTest: 9/0/0/0; 0.366
+totah.lab.daedalus.GovernedDesignWorkflowTest: 6/0/0/0; 1.367
+totah.lab.prometheus.evidence.EvidenceBundleQueryTest: 6/0/0/0; 0.085
+totah.lab.prometheus.evidence.EvidenceIdentityTest: 5/0/0/0; 0.009
+totah.lab.prometheus.evidence.EvidenceBundleCollisionTest: 12/0/0/0; 0.015
+totah.lab.prometheus.evidence.ScientificObservationProjectionTest: 6/0/0/0; 0.387
+totah.lab.prometheus.comparability.ProtocolComparabilityTest: 9/0/0/0; 0.008
+totah.lab.prometheus.execution.GeneratedEvidenceLifecycleTest: 2/0/0/0; 0.038
+totah.lab.prometheus.store.CanonicalEvidenceStoreTest: 5/0/0/0; 0.058
+totah.lab.prometheus.store.GeneratedEvidenceRegistryTest: 8/0/0/0; 0.138
+totah.lab.prometheus.store.GeneratedEvidenceRegistryBatchTest: 6/0/0/0; 0.095
+totah.lab.prometheus.store.CanonicalEvidenceStoreVerificationTest: 8/0/0/0; 0.059
+
+Earlier validation:
+- JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/pom.xml -pl mnemosyne -am test
+  BUILD SUCCESS, 24 tests, 0 failures/errors/skips (before two final malformed-time
+  and record-shape tests were added).
+- The same full bounded command above initially ran 217 tests with one failure:
+  the new Prometheus resolver assumed uppercase role prefixes. Existing registry
+  prefixes are lowercase. Only the new adapter was corrected to respect that
+  existing format; the registry and historical records were not changed.
+- The corrected full run passed 219 tests (22.271 seconds). The final run above
+  repeated the same command after strengthening two assertions to require the
+  precise semantic/authority failure, rather than accepting any IOException or
+  conflict. It passed all 219 tests again.
+
+No campaigns, quantum calculations, docking, OpenMM, ML training, scientific source
+ingestion or artifact-writing historical regressions ran. Acceptance output is
+JUnit temporary data. No full numerical suite, production data migration, distributed
+storage, authentication or crash-recovery system is claimed to have been validated.
+
+PRESERVATION / WORKSPACE
+The three pre-existing tracked research modifications remain untouched and unstaged:
+ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+
+All 114,872 pre-existing untracked paths remain accounted for. One additional
+untracked file appeared independently during this work: latest-pub/ci6c00397.pdf.
+It was not created by this slice, remains untouched and is excluded from the commit.
+The accepted architecture audit report remains in its pre-existing untracked state.
+No cleanup, stash, destructive Git operation or research-artifact modification.
+
+Scientific sentinel SHA-256 values, unchanged before and after validation:
+ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+  6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d
+analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+  b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9
+analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+  dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f
+CMDC-21-e70466.pdf
+  a31c7e38c8199d9c9190a203c46d5311acc345022dec6eb36e97b2ac270c7990
+
+LIMITATIONS / RECOMMENDED PHASE 3
+- This is a bounded exchange profile, not a universal repository or persistence
+  format selected for production scale. Large scientific payloads stay external.
+- JSON interoperability is documented and golden-tested in Java; no independent
+  non-Java implementation or exhaustive Unicode conformance corpus was run.
+- Checksums are not signatures. Namespace trust and expected snapshot identity
+  must be supplied externally; cross-snapshot conflicts need consumer handling.
+- Resolvers cover pinned existing paths and explicit roles, not global namespace
+  discovery. Authority validation is point-in-time, not a distributed atomic read.
+- External method/policy/proposition/context semantics remain domain references;
+  a successful lookup is not proof of scientific truth or current admissibility.
+- Strict known-time consistency rejects ambiguous/backdated inconsistent history
+  rather than guessing insertion order. Detailed event ordering is not invented.
+
+Recommended Phase 3, only after review: a bounded cross-snapshot reconciliation
+and admission contract that checks expected parent/reference/digest, preserves
+branches and disagreements, and reports conflicts without silently merging them.
+Use frozen exchange fixtures and current authorities first. Do not choose a
+persistence backend merely to implement that semantic check.
+
+FILES CHANGED
+software/MNEMOSYNE_PHASE2_CHECKPOINT.txt
+software/modules/athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/ScientificObservationBindingAcceptanceTest.java
+software/modules/athena/src/main/java/totah/lab/athena/design/reasoning/ScientificReferenceResolution.java
+software/modules/mnemosyne/EXCHANGE_V1.txt
+software/modules/mnemosyne/README.txt
+software/modules/mnemosyne/pom.xml
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ReferenceResolver.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
+software/modules/mnemosyne/src/test/java/totah/lab/mnemosyne/EvidenceExchangeAcceptanceTest.java
+software/modules/mnemosyne/src/test/java/totah/lab/mnemosyne/FoundationArchitectureTest.java
+software/modules/mnemosyne/src/test/java/totah/lab/mnemosyne/ReferenceResolverTest.java
+software/modules/prometheus/src/main/java/totah/lab/prometheus/evidence/ScientificReferenceResolution.java
+software/modules/prometheus/src/test/java/totah/lab/prometheus/evidence/ScientificObservationProjectionTest.java
+
+STOP after the separately committed Phase 2 checkpoint. Persistence remains
+unselected; Athena Phase 2.5, WELD and Hephaestus work remain paused.
