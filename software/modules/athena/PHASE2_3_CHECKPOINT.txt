@@ -1,0 +1,257 @@
+ATHENA PHASE 2.3 — ONE REAL-SOURCE EVIDENCE INGESTION CONTRACT
+
+Accepted parent: 29f5b7e66dcf273b1c42acdb2bf81f9632a04c91
+Branch: codex/athena-phase2-resources
+The commit containing this report is the separate Phase 2.3 checkpoint.
+Scope: one source, one computed-property endpoint, explicit review and local identity governance.
+No transformation expansion, scientific campaign, module consolidation or resource-library migration.
+
+SELECTED SOURCE / WHY
+
+PubChem PUG-View, Computed Properties / Molecular Weight. Actual offline captures:
+- CID 6343, Ethanethiol: 62.14 g/mol.
+- CID 702, Ethanol: 46.07 g/mol.
+Both records identify the computation as PubChem 2.2, release 2025.04.14.
+URLs:
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/6343/JSON?heading=Molecular%20Weight
+https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/702/JSON?heading=Molecular%20Weight
+
+This endpoint has stable compound identities, explicit computation attribution, source release,
+literal units and preserved raw bytes. It provides a real scientific computational property with a
+narrow defensible claim, not a convenient stand-in for biological evidence. It needs neither a target
+policy nor a campaign. Two records of the SAME endpoint cover the existing parent/product fixture.
+The source lacks uncertainty and assay conditions; those absences remain explicit. No temperature,
+assay context, binding affinity or biological consequence is invented to make the records usable.
+
+The selected properties are PubChem's own computations, not third-party annotations. Source-use
+metadata acknowledges NCBI and links https://www.ncbi.nlm.nih.gov/home/about/policies/ . That policy
+permits redistribution of government-created material but does NOT grant a blanket license to
+third-party content in PubChem. Importer attribution checks exclude such third-party values.
+CAPTURE.json records URLs, capture time, attribution and exact body hashes. The JSON bodies were
+copied without reformatting from deliberately retrieved responses, not historical research outputs.
+
+INSPECTED EXISTING INFRASTRUCTURE / REUSE DECISIONS
+
+Hermes:
+- CcdDownloader/CcdClient already own remote chemistry acquisition, but CCD graph/coordinate
+  caching does not parse PubChem properties, preserve reviewable raw-property receipts or enforce
+  their scientific semantics. No downloader behavior was repurposed or modified.
+- BiohubPocketEvidenceReader and artifact readers show external-record parsing ownership, but
+  are source-specific and do not implement this endpoint or general immutable evidence identity.
+- Existing HTTP transport remains available for future hosts. This slice needs offline import
+  only; tests never fetch from a live network and no second HTTP client was introduced.
+
+Athena:
+- DesignKnowledge already owns Evidence, Qualification, Semantics, Value, Requirement, Criterion,
+  Evaluation and immutable revisions. These contracts and strict Phase 2.2 reasoning are unchanged.
+- ReviewedEvidenceAdapters is extended with the source-receipt/review boundary. No new reasoning
+  engine or separate candidate representation is added.
+- DesignGrammarJsonCodec already persists immutable knowledge snapshots. Its new overloads
+  implement the small local identity reservation and verify governed snapshot evidence.
+- MolecularDesignTree.Journal gains one additive source-review event using the existing forced writer.
+- EvidenceMethod and existing Reference/DesignState remain authoritative for methods/state identities.
+- pocket.evidence.EvidenceProvenance was inspected: it covers extraction metadata but not exact
+  raw payloads, rejected reviews or cross-snapshot reservations; no duplicate pocket pipeline added.
+
+Aether / downstream:
+- Aether ContentHash is reused by Athena. Its physics receipts and FragmentInteractionCalculator
+  concern computations, not PubChem import or external review. No calculations or physics changes.
+- METTL7 Mettl7CompoundEvidence retains target-specific interpretation; none is promoted upstream.
+- Prometheus GeneratedEvidenceRegistry was inspected. It requires QuantumEvidence, lifecycle roles,
+  artifact bundles and Prometheus domain dependencies; importing it would violate this narrow
+  boundary. Its immutable-content conflict principle is retained, not its domain model/database.
+
+Only one new production class is necessary: Hermes PubChemMolecularWeightImporter. No existing
+reader can own this endpoint without mixing unrelated source semantics. Review records are nested
+in the existing adapter, and reservation operations extend the existing codec instead of adding
+another store/registry subsystem. SHA256 in Hermes uses the JDK because its existing helpers are
+private/source-specific; importing Aether solely for hashing would add an inappropriate dependency.
+
+ARCHITECTURAL BOUNDARY
+
+Hermes parses external records and emits versioned JSON receipts. Athena consumes that local
+receipt contract for scientific review; it does not fetch or parse the PubChem raw response schema.
+Hermes never imports Athena, and Athena never imports Hermes in production. The host first calls
+Hermes readVerified to reparse/check the projection, then Athena readSourceReceipt/review operations.
+This schema boundary avoids moving external-data mechanics into Athena or adding evidence to Gaia.
+The OCL module has a new TEST-SCOPED Hermes dependency for the integration fixture only. No new
+production dependency, module, backend rename or graph/identity implementation is introduced.
+
+RAW RECEIPT CONTRACT
+
+Schema: pubchem-molecular-weight-source/1.
+Fields preserve provider, CID, title, release, endpoint URI, import time, exact raw bytes (Base64),
+raw SHA256, importer ID/version, endpoint ID/version, method/version/release, system identity,
+original value string/unit, conditions, uncertainty classification/text, source-use metadata,
+claim boundary, warnings and errors. The original representation is always distinguishable from
+its parsed projection. Import uses CREATE_NEW and FileChannel.force(true); overwrites fail.
+
+The importer selects precisely the computed molecular-weight section and its PubChem-owned reference.
+It rejects multiple values, missing/unsupported method or units, additional unknown observation/value
+metadata, duplicate JSON keys and trailing JSON. Even malformed input gets a receipt containing its
+original bytes and errors. readVerified reconstructs the projection from preserved bytes and import
+time, then requires equality; projected values cannot be edited independently of the source unnoticed.
+Athena SourceReceipt additionally verifies the raw hash when constructed/deserialized.
+
+REVIEW CONTRACT / CLAIM BOUNDARY
+
+SourceReview explicitly identifies review ID/version, reviewer, review process/version and time,
+approval/rejection intent and reason, source subject CID, associated DesignState, endpoint/method/
+system/conditions/unit/value-kind Semantics, ScientificStatus, uncertainty category/note, permitted
+claim and limitations. Missing mandatory scientific association produces a rejected decision.
+
+Only exact source semantics, matching source subject, POINT_UNKNOWN and SCREENING_ONLY can be
+accepted by this one-source adapter. Unsupported source errors cannot be repaired by filling in
+convenient review values. A reviewer cannot relabel the endpoint, change units, invent conditions,
+upgrade status, invent intervals or strengthen the claim. Explicit rejection remains stored.
+The reviewer is responsible for the CID-to-DesignState association: this endpoint does not supply
+an atom-correspondence proof, and the adapter does not pretend to infer one from a name or mass.
+
+SourceDecision holds the complete receipt, review, evidence ID/version, resulting Evidence (null
+on rejection) and rejection reasons. Its constructor rederives the deterministic decision; altered
+serialized evidence/conclusions cannot bypass the recorded review semantics. Successful Evidence
+references the provider/CID and raw hash, and retains source release, importer, review process,
+warnings and usage limits. Qualification links the exact subject state and review reference.
+Exact claim: PubChem-reported COMPUTED molecular weight only. Not experimentally measured mass,
+free energy, affinity, potency, functional retention or an ADME claim. Prediction remains separate.
+
+MINIMUM LOCAL GOVERNANCE
+
+registerSourceReview reserves one file per evidence ID/version in an explicitly shared registry
+folder. Filename is SHA256 of the encoded [id,version] tuple (no user path interpolation). The file
+contains the entire source decision, including rejected reviews, and is forced before return.
+CREATE_NEW gives one reservation winner. Reusing exactly the same complete content is idempotent;
+different raw data, review or evidence under the same ID/version fails with checked IOException.
+Rejected reservations cannot later be silently promoted; use an explicit new evidence version.
+
+Independent codec instances reload the file for comparison. No process-local index can mask a
+conflict. Concurrent different reservations have only one winner. A partial/corrupt reservation
+fails closed and is never overwritten or deleted automatically; recovery requires manual review.
+
+Governed readKnowledge(path,registry) / writeKnowledge(path,knowledge,registry) require EVERY evidence
+item to equal an accepted reservation. Thus an independently authored snapshot cannot silently
+rebind an existing evidence ID. A conflicting write is rejected before creating the output file.
+Legacy ungoverned codec methods remain for historical compatibility; this new one-source workflow
+must use the governed overloads and the same registry directory. This is not a global/distributed
+registry, signature system or protection against out-of-band privileged filesystem edits.
+
+UNIT / UNCERTAINTY POLICY
+
+No conversion is needed or performed. Original value text and 'g/mol' survive; every other or missing
+unit is preserved in the receipt but rejected as unusable. No unit aliases or normalization library.
+
+Actual records provide point values and no uncertainty. They are POINT_UNKNOWN, with empty reported
+uncertainty text. Equal numeric bounds in the reused Phase 2.2 Value merely encode a point and
+explicitly do NOT imply zero physical uncertainty. The raw decimal precision is not an error bar.
+Malformed/uninterpretable observations are UNAVAILABLE. The review taxonomy distinguishes reported
+interval, reported error, qualitative and unavailable states, but this importer does not interpret
+those additional formats: unknown annotations fail closed, with raw source intact. No confidence
+intervals, confidence scores or experimental conditions are manufactured.
+
+STRICT COMPARABILITY
+
+Phase 2.2 remains unchanged: method/version/parameters, endpoint, system, conditions, units, kind,
+status, context and applicable state must satisfy the exact hypothesis requirement. Empty source
+conditions mean unreported, not wildcard matching. A requirement for temperature/assay conditions
+cannot be satisfied by this receipt. The system may test the narrow computed-property criterion
+whose policy requires no unavailable assay context. Parent and product retain their separate CIDs.
+
+COMPLETE REAL-SOURCE EXAMPLE
+
+1. Preserve actual CID 6343 (ethanethiol) raw response, reported computed mass 62.14 g/mol.
+2. Import receipt and verify projection against raw bytes; explicitly review association with the
+   existing synthetic C-C-S parent state. Reserve prior-real@1 and journal source review.
+3. Hypothesis h@1 requires that exact reviewed computation, retains the C-C anchor and authorizes
+   the existing terminal S->O replacement. A versioned fixture policy asks for product mass in
+   [45,47] g/mol while keeping Y retention a separate unmeasured criterion. This is test policy,
+   not a new medicinal-chemistry rule or source-provided recommendation.
+4. Existing HypothesisDirectedPlanner, graph transaction, bounded generator, OCL validation,
+   canonical identity and durable receipt produce the same Phase 2.1 synthetic C-C-O product.
+5. Independently review the captured CID 702 (ethanol) record against the resulting DesignState;
+   reserve product-real@1. Preserve 46.07 g/mol, PubChem 2.2/release and unknown uncertainty.
+6. Existing evaluate gives SUPPORTS for the scoped source-reported mass criterion; Y is NOT_MEASURED.
+7. Explicit h@2 revision records the unresolved observation and preserves h@1, raw receipts,
+   reviews, evidence, attempted transformation and resulting state. Replanning h@2 declines.
+8. Save/reload the governed knowledge and registry; replay yields identical qualification,
+   evaluation and planning decisions. The journal holds both full source-review records.
+
+FILES CHANGED (relative to software/modules/)
+
+hermes/src/main/java/totah/lab/hermes/pubchem/PubChemMolecularWeightImporter.java
+hermes/src/test/java/totah/lab/hermes/pubchem/PubChemMolecularWeightImporterTest.java
+hermes/src/test/resources/pubchem/cid-702-molecular-weight.json
+hermes/src/test/resources/pubchem/cid-6343-molecular-weight.json
+hermes/src/test/resources/pubchem/CAPTURE.json
+athena/src/main/java/totah/lab/athena/design/reasoning/ReviewedEvidenceAdapters.java
+athena/src/main/java/totah/lab/athena/design/grammar/DesignGrammarJsonCodec.java
+athena/src/main/java/totah/lab/athena/design/generation/MolecularDesignTree.java
+athena-openchemlib/pom.xml (test dependency only)
+athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/RealSourceEvidenceAcceptanceTest.java
+athena/PHASE2_3_CHECKPOINT.txt
+athena/phase2_3-validation.json
+
+VALIDATION — EXACT COMMANDS FROM REPOSITORY ROOT
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/hermes/pom.xml install
+BUILD SUCCESS: 188 tests, 0 failures, 0 errors, 2 skipped (186 passed).
+The two existing RcsbQueryFactoryTest methods are disabled live-network exploration tests;
+integration-tagged tests are excluded by the existing Hermes POM. New importer tests: 6.
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest'
+BUILD SUCCESS: 684 tests, 0 failures, 0 errors, 0 skipped.
+Includes Phase 1 provenance (19), Phase 2.1 planner (16), Phase 2.2 adapter (6) and architecture
+coverage; chemistry/topology/correspondence acceptance remains intact. The final run includes
+sorted source-use rendering so review evidence text is independent of JVM map iteration order.
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test
+BUILD SUCCESS: 48 tests, 0 failures, 0 errors, 0 skipped.
+Includes Phase 2.1 OCL reasoning (9), Phase 2.2 qualification/binding (12), previous OCL backend
+coverage (18) and new real-source acceptance (9). Final run uses final Hermes/Athena artifacts.
+
+15 new tests total. Actual captured source inputs; no live network in tests. New coverage includes
+raw hashes/metadata, unaltered bytes, import/review rejection, no overwrite, unknown uncertainty,
+unsupported units/annotations, semantic mismatches, independent snapshot ID conflicts, concurrent
+reservations, corrupt storage, durable review journal, real OCL execution and immutable revision.
+The machine-readable validation file includes per-class results and exact log SHA256 values.
+No unrelated downstream source changed; OCL tests exercise the new Hermes/Athena boundary.
+No artifact-writing Athena regression, scientific campaign, METTL7 evaluation or Aether computation
+was executed. No WELD/Hephaestus work began.
+
+PRESERVATION
+
+CID 702 body SHA256:
+216e71490909a95ed03acb2728412128fb778f276c7f429e30eb6b858fdea5ad
+CID 6343 body SHA256:
+d97bd06a962e0a3b92cac020a9de5edc8f0ac6a61e196f62206b933ab2659ac9
+
+All four existing sentinel content hashes match the accepted pre-work values; full values appear
+in phase2_3-validation.json. All 114871 previously preserved untracked paths remain present.
+This is a complete path-presence comparison and four sentinel content checks, not an assertion
+that every historical untracked byte was rehashed. Only the 12 listed software/test/report files
+belong to this commit. The three preexisting tracked scientific modifications remain untouched.
+There was no cleanup, normalization, relocation or regeneration of scientific/research artifacts.
+The repository therefore remains non-clean for the same preserved preexisting work.
+
+LIMITATIONS / PHASE 2.4 RECOMMENDATION
+
+- One computed endpoint and source shape only; no assay ingestion or broad property import.
+- Reviewer identity, source origin and molecular association are recorded assertions, not digital
+  signatures or automated CID-to-graph certification. The host must use Hermes readVerified before
+  review. A hash proves byte integrity, not that a remote provider or reviewer is authentic.
+- Registry guarantees apply to cooperating callers using one protected local registry and governed
+  codec methods. Independent registries or legacy API bypass are not globally policed.
+- CREATE_NEW plus force gives immutable reservations; partial writes fail closed. Automatic crash
+  repair, cross-filesystem power-loss guarantees, distributed locking and tamper-resistant audit
+  storage are outside scope. Existing partial data is never destroyed automatically.
+- Snapshot-local hypothesis versioning and existing source-state applicability remain as Phase 2.2.
+- Strict conditions/method/unit equality and unknown uncertainty limit the claim. Support means only
+  that the explicitly scoped published-computation predicate is met, not physical certainty.
+- Rejection conflicts require a new evidence version; this slice adds no mutable approval workflow.
+- The adapter is deliberately source-specific and shared via JSON rather than adding forbidden
+  Hermes/Athena production dependencies. No generic ingestion bus or new Maven module was added.
+
+Recommend Phase 2.4 as a separately reviewed host-wiring/attribution checkpoint: select the existing
+workflow entry point that will enforce importer verification, the shared registry and durable journal
+as one documented protocol, and add reviewed molecular-subject association checks appropriate to the
+source's structure data. Do this before broader evidence ingestion or chemistry expansion. Do not
+start that work, WELD migration or Hephaestus consolidation automatically. STOP after this commit.

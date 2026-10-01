@@ -62,4 +62,91 @@ public final class ReviewedEvidenceAdapters {
                         subject, review, "point calculation only; zero interval width is not zero physical uncertainty"),
                 available ? new Value(value, value, "") : null);
     }
+
+    /** The raw source receipt is not evidence. The host must verify it with its named importer before review. */
+    public record SourceReceipt(String schema, String provider, String identifier, String sourceVersion,
+                                String uri, String title, String importedAt, String rawBase64, String sha256,
+                                Reference importer, Reference endpoint, EvidenceMethod method, Reference system,
+                                String context, Map<String,String> conditions, String unit, String valueText,
+                                ValueKind valueKind, UncertaintyKind uncertaintyKind, String uncertaintyText,
+                                String claimBoundary, Map<String,String> sourceUse, java.util.List<String> warnings,
+                                java.util.List<String> errors) {
+        public SourceReceipt {
+            if (!"pubchem-molecular-weight-source/1".equals(schema)) throw new IllegalArgumentException("unsupported source receipt schema");
+            java.time.Instant.parse(importedAt);
+            conditions = Map.copyOf(conditions); sourceUse = Map.copyOf(sourceUse);
+            warnings = java.util.List.copyOf(warnings); errors = java.util.List.copyOf(errors);
+            byte[] raw = java.util.Base64.getDecoder().decode(rawBase64);
+            if (!totah.lab.aether.provenance.ContentHash.sha256(raw).equals(sha256))
+                throw new IllegalArgumentException("raw source hash mismatch");
+            java.util.Objects.requireNonNull(importer); java.util.Objects.requireNonNull(endpoint);
+        }
+    }
+    public enum UncertaintyKind { POINT_UNKNOWN, REPORTED_INTERVAL, REPORTED_ERROR, QUALITATIVE, UNAVAILABLE }
+
+    /** Explicit scientific association, never a parser default. Missing qualifications cause a recorded rejection. */
+    public record SourceReview(Reference reference, Reference reviewer, Reference process, String reviewedAt,
+                               boolean approve, String reason, String scientificSubject, DesignState subject,
+                               Semantics semantics, ScientificStatus status, UncertaintyKind uncertaintyKind,
+                               String uncertaintyNote, String claimBoundary, String limitations) {
+        public SourceReview {
+            java.util.Objects.requireNonNull(reference); java.util.Objects.requireNonNull(reviewer);
+            java.util.Objects.requireNonNull(process); java.time.Instant.parse(reviewedAt);
+            if (reason == null || reason.isBlank()) throw new IllegalArgumentException("review reason required");
+        }
+    }
+    /** Both approvals and rejections carry the original bytes and complete review, ready for durable persistence. */
+    public record SourceDecision(SourceReceipt receipt, SourceReview review, Reference evidenceReference,
+                                 Evidence evidence, java.util.List<String> reasons) {
+        public SourceDecision {
+            java.util.Objects.requireNonNull(receipt); java.util.Objects.requireNonNull(review);
+            java.util.Objects.requireNonNull(evidenceReference); reasons = java.util.List.copyOf(reasons);
+            var expected = rejectionReasons(receipt, review);
+            if (!reasons.equals(expected) || !java.util.Objects.equals(evidence, qualified(receipt, review, evidenceReference, expected)))
+                throw new IllegalArgumentException("source decision must preserve reviewed qualification");
+        }
+    }
+    public static SourceDecision reviewSource(SourceReceipt receipt, SourceReview review, Reference evidenceReference) {
+        var reasons = rejectionReasons(receipt, review);
+        return new SourceDecision(receipt, review, evidenceReference, qualified(receipt, review, evidenceReference, reasons), reasons);
+    }
+    private static java.util.List<String> rejectionReasons(SourceReceipt source, SourceReview review) {
+        var reasons = new java.util.ArrayList<String>();
+        if (!review.approve()) reasons.add("reviewer rejected: " + review.reason());
+        if (!source.errors().isEmpty()) reasons.add("source parse errors: " + source.errors());
+        if (!"PubChem".equals(source.provider()) || !source.importer().equals(new Reference("PubChemMolecularWeightImporter", "1"))
+                || !source.endpoint().equals(new Reference("pubchem:MolecularWeight", "1"))
+                || source.method() == null || source.system() == null || !"g/mol".equals(source.unit())
+                || source.valueKind() != ValueKind.QUANTITATIVE || source.sourceVersion().isBlank())
+            reasons.add("unsupported or missing source semantics");
+        var semantics = review.semantics();
+        if (semantics == null || !java.util.Objects.equals(source.method(), semantics.method())
+                || !source.endpoint().equals(semantics.endpoint()) || !java.util.Objects.equals(source.system(), semantics.system())
+                || !source.conditions().equals(semantics.conditions()) || !source.unit().equals(semantics.unit())
+                || source.valueKind() != semantics.valueKind()) reasons.add("review may not invent or convert source semantics");
+        if (!java.util.Objects.equals(source.identifier(), review.scientificSubject()) || review.subject() == null)
+            reasons.add("explicit matching source subject and design-state association required");
+        if (review.status() != ScientificStatus.SCREENING_ONLY) reasons.add("computed source is screening-only");
+        if (source.uncertaintyKind() != UncertaintyKind.POINT_UNKNOWN || review.uncertaintyKind() != source.uncertaintyKind())
+            reasons.add("unsupported or strengthened uncertainty interpretation");
+        if (!java.util.Objects.equals(source.claimBoundary(), review.claimBoundary())
+                || review.limitations() == null || review.limitations().isBlank()
+                || review.uncertaintyNote() == null || review.uncertaintyNote().isBlank())
+            reasons.add("explicit source claim boundary, uncertainty note and review limitations required");
+        try {
+            if (!Double.isFinite(Double.parseDouble(source.valueText()))) reasons.add("nonfinite source value");
+        } catch (NumberFormatException error) { reasons.add("unusable source value"); }
+        return java.util.List.copyOf(reasons);
+    }
+    private static Evidence qualified(SourceReceipt source, SourceReview review, Reference id, java.util.List<String> reasons) {
+        if (!reasons.isEmpty()) return null;
+        double value = Double.parseDouble(source.valueText());
+        return new Evidence(id, EvidenceKind.COMPUTATIONAL, ReviewStatus.REVIEWED, source.claimBoundary(), source.context(),
+                new Reference(source.provider() + ":" + source.identifier(), source.sha256()),
+                "Source release=" + source.sourceVersion() + "; importer=" + source.importer() + "; review process=" + review.process()
+                        + "; warnings=" + source.warnings() + "; source use=" + new TreeMap<>(source.sourceUse()) + "; " + review.limitations(),
+                new Qualification(review.semantics(), review.status(), review.subject(), review.reference(),
+                        "POINT_UNKNOWN: no source uncertainty reported; equal bounds are a point representation, not zero physical uncertainty. " + review.uncertaintyNote()),
+                new Value(value, value, ""));
+    }
 }

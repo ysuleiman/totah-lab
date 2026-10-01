@@ -128,6 +128,9 @@ public record MolecularDesignTree(String rootNodeId, List<Node> nodes, List<Edge
         public void knowledge(totah.lab.athena.design.reasoning.DesignKnowledge knowledge) throws IOException {
             write("knowledge", knowledge);
         }
+        public void sourceReview(totah.lab.athena.design.reasoning.ReviewedEvidenceAdapters.SourceDecision decision) throws IOException {
+            write("source-review", decision);
+        }
         public void planningDecision(totah.lab.athena.design.reasoning.HypothesisDirectedPlanner.Decision decision) throws IOException {
             write("planning-decision", decision);
         }
