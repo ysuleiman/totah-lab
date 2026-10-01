@@ -1,0 +1,261 @@
+SCIENTIFIC EVIDENCE FOUNDATION — IMPLEMENTATION CHECKPOINT
+2026-10-01
+
+Accepted parent: 960e067fd71c27a2c32821292ca35d02c1a21136
+Branch: codex/scientific-evidence-foundation
+Implementation commit: the commit containing this report (resolve with git log
+-1 --format=%H -- software/SCIENTIFIC_EVIDENCE_FOUNDATION_CHECKPOINT.txt).
+This is a separate foundation work unit, NOT Athena Phase 2.5.
+
+MODULE AND BOUNDARY
+Mnemosyne follows the existing Greek architectural naming convention. The user
+confirmed its role: preserve immutable scientific observations, provenance,
+reviews, assessments and historical relationships; do not determine truth.
+It is not a home for detailed domain results. Athena and Prometheus gain a
+compile dependency on Mnemosyne; the foundation has only JDK production code.
+
+The final interface/dependency check found no suitable existing lower-level
+observation or review interface: Athena embeds DesignState, Prometheus embeds
+quantum semantics, Hermes owns I/O, Gaia structure, Aether physics and DAEDALUS
+execution. Class-by-class justification is in modules/mnemosyne/README.txt.
+No existing public Java signature was changed. New contracts/adapters implement
+the explicitly authorized slice; no historical classes or schemas were moved.
+
+EXACT PUBLIC CONTRACTS
+ScientificReference(kind, namespace, id, version). Kind discriminates ARTIFACT,
+SOURCE, SUBJECT, ENDPOINT, METHOD, CONTEXT, ACTIVITY, OBSERVATION, REVIEW,
+ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT and REVIEW_CHANGE.
+References are opaque and immutable; authoritative external IDs are retained.
+
+Observation(reference, subject, endpoint, method, context, activity, provenance,
+availability, Optional<Scalar> value, uncertainty, limitations).
+No DesignState, graph, protein, compound, assay or QuantumEvidence is required.
+Availability = PRESENT / UNAVAILABLE / FAILED_INVALID. Only PRESENT carries a
+scalar, and availability never implies domain validity or review approval.
+Scalar(text, unit) retains original spelling and parses with BigDecimal, rejecting
+nonfinite/unparseable values. No implicit numeric normalization or unit conversion.
+
+Provenance(source, artifact, receipt, projectionMethod, locator, derivedFrom).
+Raw artifact and source/version identities are separate from run/specification.
+The foundation only validates reference shape; existing domain services still
+verify bytes. No duplicate hash implementation was added. Athena reuses Aether
+ContentHash for stable method/context references; length-prefixed sorted inputs
+avoid delimiter ambiguity. Existing Hermes source verification is still required.
+
+Uncertainty is a sealed choice:
+- Unknown(reason), never interpreted as zero;
+- Interval(lower Scalar, upper Scalar, description), ordered and same-unit;
+- ReportedError(quantity reference, error Scalar, description), nonnegative and
+  named, e.g. a reported standard error rather than an invented confidence value.
+Quantitative uncertainty must use the observed scalar's unit. Both real adapter
+fixtures carry unknown uncertainty. Interval/error tests use labeled synthetic
+contract examples; no statistical quantities were invented for scientific data.
+
+Review(reference, observation, reviewer, process, policy, scope, decision,
+reasons, reviewedAt, recordedAt, qualifications, limitations).
+Decision = ACCEPTED / REJECTED. Two decisions can disagree over one observation.
+Reviewed time and knowledge/recorded time are distinct; reasons are mandatory.
+The review does not alter the observation or establish globally valid evidence.
+
+Assessment(reference, Optional observation, Optional review, proposition,
+criterion, policy, context, outcome, reasons, recordedAt).
+Outcome = SUPPORTS / CONTRADICTS / UNRESOLVED / FAILED_INVALID / NOT_MEASURED.
+Proposition and criterion are versioned references, not a new hypothesis language.
+NOT_MEASURED prohibits observation and review references. Other outcomes require
+both. EvidenceHistory validates referential linkage, scope/time and admissibility
+for substantive findings. No transitivity, majority vote or automatic scientific
+conclusion is implemented. Policies supplied in the acceptance tests are explicit
+fixture judgments about mass windows, not newly derived biological claims.
+
+EvidenceHistory holds immutable maps of observations, reviews, assessments and
+ReviewChange records. append overloads return new immutable working sets; exact
+re-import is idempotent and conflicting content under one identity fails closed.
+No disk persistence, SQL, graph engine or replacement registry exists here.
+
+ReviewChange(reference, review, Optional replacement, agent, reason, effectiveAt,
+recordedAt). Empty replacement is retraction; a replacement is scoped supersession.
+The previous observation/review/assessment remains addressable. admissible accepts
+knownAt and effectiveAt; assessmentsAsOf reconstructs recorded interpretations.
+Later-known corrections do not overwrite an earlier known view. Only one withdrawal
+of a review is accepted; revise its replacement for subsequent changes.
+
+ATHENA ADAPTER
+modules/athena/.../design/reasoning/ScientificObservationAdapter:
+project maps the host-verified PubChem molecular-weight receipt to Observation;
+review maps an explicit existing SourceDecision into a common Review;
+bind verifies exact projection, matching domain review and current admissibility,
+then returns Binding(observation ref, review ref, unchanged SourceDecision).
+The nested Binding keeps cross-layer traceability outside the generic observation.
+It is a historical linkage, not an unforgeable or perpetually current permission.
+
+Acceptance uses the already committed CID 6343 molecular-weight JSON and existing
+qualified-local-replacement knowledge fixture. One observation retains 62.14 g/mol
+and its raw checksum. Independent accepted policies produce SUPPORTS for [62,63]
+and CONTRADICTS for [60,61]; a biological-evidence review rejects the computed
+property as biological evidence. These are deliberately scoped fixture policies.
+The observation fields/raw payload remain unchanged. Existing DesignKnowledge,
+hypothesis requirements and planner consume its externally bound evidence.
+A later retraction blocks a new binding; an earlier as-of binding reconstructs.
+No new compounds are produced by the added adapter tests. Existing bounded
+acceptance tests still exercise their pre-existing synthetic edit fixtures.
+
+PROMETHEUS ADAPTER
+modules/prometheus/.../evidence/ScientificObservationAdapter.energy projects
+QuantumEvidence.energyHartree without modifying EvidenceIdentity, registry,
+acceptance, lifecycle, retry, PRIMARY/AUXILIARY or reuse semantics.
+The calculation-specification hash remains a method/context reference, never an
+automatic run or observation ID. Existing source path/hash, receipt identity,
+derivation hashes, convergence/acceptance and limitations remain traceable.
+Double.toString is used because the existing domain result holds Double; the
+original lexical representation, where available, remains in the raw artifact.
+
+The final acceptance fixture is the existing GeneratedEvidenceRegistryTest.fixture
+PRIMARY raw result: {"energy":-1.0} followed by newline, PBE/def2-SVP/D3(BJ), gas,
+PySCF 2.14.0, FORCE_EVALUATION with energy/gradient/forces outputs. It is
+materialized only in JUnit temporary storage, exactly as the existing test does.
+No quantum calculation is run. ArtifactChecksums verifies actual raw bytes.
+Tests show the projection does not change registry bytes or PRIMARY/AUXILIARY
+reuse eligibility. Legacy declared non-SHA placeholders can remain opaque
+references under a distinct namespace; the adapter never calls them verified SHA.
+
+IDENTITY / REPLICATES / COMPATIBILITY
+Equal values, byte hashes or specification hashes do not collapse independently
+identified runs and observations. Tests explicitly preserve two observations with
+the same value/specification and separate run IDs; exact re-import is idempotent;
+changed value or run under the same observation identity conflicts. Caller-supplied
+run identities are not proof that independent physical experiments occurred.
+
+Existing SourceReceipt, SourceReview, DesignKnowledge schemas 1/2, journal payloads,
+registry formats and Prometheus evidence remain unchanged. Adapter-first only.
+Legacy planning, source-review, structural association and journal/snapshot
+acceptance tests were rerun. Source and interpretation authorities remain in their
+original modules. No frozen artifacts, scientific conclusions or backend IDs changed.
+
+TEST RESULTS AND EXACT COMMANDS
+Final bounded command (from repository root):
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/pom.xml -pl mnemosyne,athena-openchemlib,prometheus,daedalus -am test '-Dtest=EvidenceHistoryAcceptanceTest,FoundationArchitectureTest,ScientificObservationBindingAcceptanceTest,ScientificObservationProjectionTest,AthenaDependencyTest,DesignProvenanceAcceptanceTest,CanonicalCorrespondenceTest,GraphEditTransactionEngineTest,MolecularGraphDeltaTest,TopologyEditTransactionEngineTest,MolecularDesignGraphGeneratorTest,HypothesisDirectedPlannerTest,ReviewedEvidenceAdaptersTest,HypothesisDirectedReplacementAcceptanceTest,QualifiedReasoningAcceptanceTest,RealSourceEvidenceAcceptanceTest,SourceAssociationAcceptanceTest,OclMolecularBackendAcceptanceTest,GeneratedEvidenceRegistryTest,GeneratedEvidenceRegistryBatchTest,GeneratedEvidenceLifecycleTest,CanonicalEvidenceStoreTest,CanonicalEvidenceStoreVerificationTest,EvidenceBundleCollisionTest,EvidenceBundleQueryTest,EvidenceIdentityTest,ProtocolComparabilityTest,GovernedDesignWorkflowTest' -Dsurefire.failIfNoSpecifiedTests=false
+
+Result: BUILD SUCCESS, exit 0, Java 21, offline Maven.
+201 tests; 0 failures; 0 errors; 0 skipped. 12.949 seconds Maven elapsed.
+Module totals: Mnemosyne 12; Athena 68; athena-openchemlib 50;
+DAEDALUS 6; Prometheus 65.
+19 new tests: foundation 12, Athena adapter 3, Prometheus adapter 4.
+Other reactor dependencies compiled as needed but had no matching selected tests.
+
+Exact per-class final results (tests/failures/errors/skipped; seconds):
+totah.lab.mnemosyne.EvidenceHistoryAcceptanceTest: 9/0/0/0; 0.062
+totah.lab.mnemosyne.FoundationArchitectureTest: 3/0/0/0; 0.044
+totah.lab.athena.design.backend.CanonicalCorrespondenceTest: 3/0/0/0; 0.045
+totah.lab.athena.design.backend.MolecularGraphDeltaTest: 4/0/0/0; 0.016
+totah.lab.athena.design.backend.TopologyEditTransactionEngineTest: 7/0/0/0; 0.025
+totah.lab.athena.design.backend.GraphEditTransactionEngineTest: 8/0/0/0; 0.042
+totah.lab.athena.design.reasoning.HypothesisDirectedPlannerTest: 16/0/0/0; 0.290
+totah.lab.athena.design.reasoning.ReviewedEvidenceAdaptersTest: 6/0/0/0; 0.016
+totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest: 3/0/0/0; 0.009
+totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest: 19/0/0/0; 0.151
+totah.lab.athena.architecture.AthenaDependencyTest: 2/0/0/0; 0.100
+totah.lab.athena.design.backend.ocl.HypothesisDirectedReplacementAcceptanceTest: 9/0/0/0; 0.968
+totah.lab.athena.design.backend.ocl.ScientificObservationBindingAcceptanceTest: 3/0/0/0; 0.154
+totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest: 12/0/0/0; 0.299
+totah.lab.athena.design.backend.ocl.SourceAssociationAcceptanceTest: 5/0/0/0; 0.015
+totah.lab.athena.design.backend.ocl.QualifiedReasoningAcceptanceTest: 12/0/0/0; 0.525
+totah.lab.athena.design.backend.ocl.RealSourceEvidenceAcceptanceTest: 9/0/0/0; 0.366
+totah.lab.daedalus.GovernedDesignWorkflowTest: 6/0/0/0; 1.267
+totah.lab.prometheus.evidence.EvidenceBundleQueryTest: 6/0/0/0; 0.078
+totah.lab.prometheus.evidence.EvidenceIdentityTest: 5/0/0/0; 0.007
+totah.lab.prometheus.evidence.EvidenceBundleCollisionTest: 12/0/0/0; 0.013
+totah.lab.prometheus.evidence.ScientificObservationProjectionTest: 4/0/0/0; 0.173
+totah.lab.prometheus.comparability.ProtocolComparabilityTest: 9/0/0/0; 0.007
+totah.lab.prometheus.execution.GeneratedEvidenceLifecycleTest: 2/0/0/0; 0.070
+totah.lab.prometheus.store.CanonicalEvidenceStoreTest: 5/0/0/0; 0.066
+totah.lab.prometheus.store.GeneratedEvidenceRegistryTest: 8/0/0/0; 0.140
+totah.lab.prometheus.store.GeneratedEvidenceRegistryBatchTest: 6/0/0/0; 0.090
+totah.lab.prometheus.store.CanonicalEvidenceStoreVerificationTest: 8/0/0/0; 0.059
+
+Earlier attempts, retained rather than hidden:
+1. mvn -o -B -f software/modules/pom.xml -pl mnemosyne -am install
+   Exit 1 before tests: Maven selected a JDK outside the required Java 21 range.
+2. JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/pom.xml -pl mnemosyne -am install
+   Exit 1 before tests: sandbox denied writing a temporary installation file in
+   ~/.m2/repository. No approval bypass or repository cleanup was attempted.
+3. Initial bounded reactor test (before strengthening raw provenance test):
+   JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/pom.xml -pl mnemosyne,athena-openchemlib,prometheus -am test '-Dtest=EvidenceHistoryAcceptanceTest,FoundationArchitectureTest,ScientificObservationBindingAcceptanceTest,ScientificObservationProjectionTest,DesignProvenanceAcceptanceTest,CanonicalCorrespondenceTest,GraphEditTransactionEngineTest,MolecularGraphDeltaTest,TopologyEditTransactionEngineTest,HypothesisDirectedPlannerTest,ReviewedEvidenceAdaptersTest,HypothesisDirectedReplacementAcceptanceTest,QualifiedReasoningAcceptanceTest,RealSourceEvidenceAcceptanceTest,SourceAssociationAcceptanceTest,OclMolecularBackendAcceptanceTest,GeneratedEvidenceRegistryTest,GeneratedEvidenceRegistryBatchTest,GeneratedEvidenceLifecycleTest,CanonicalEvidenceStoreTest,CanonicalEvidenceStoreVerificationTest,EvidenceBundleCollisionTest,EvidenceBundleQueryTest' -Dsurefire.failIfNoSpecifiedTests=false
+   Exit 0; 174 tests, 0 failures/errors/skips. Superseded by the final run above.
+
+Architecture tests check production imports/known target leakage markers, compiled
+domain references, unavailable domain classes on the foundation classpath, and
+no production POM dependencies. Existing Athena dependency tests also pass.
+These are enforceable dependency/known-marker checks, not a proof that every
+future scientific policy constant can be recognized automatically.
+
+Validation exclusions: no full Prometheus numerical/ML suite, scientific campaigns,
+docking, OpenMM, quantum executions, external network ingestion or artifact-writing
+Athena historical regressions. No universal persistence/distributed crash recovery
+or new interchange schema exists to validate in this slice. No unit conversion
+was necessary: fixture endpoints remain in g/mol and hartree separately, without
+claiming comparable methods/endpoints from their units.
+
+PRESERVATION
+All 114,872 pre-existing untracked paths remain accounted for, including the
+accepted architecture audit report, which is intentionally not swept into this
+implementation commit. The three pre-existing tracked research modifications are
+left unstaged. Status-set comparison before staging found no removed entries and
+only this work unit's new files/POM changes. No cleanup, stash or destructive Git
+operation was performed. Pre-existing whole-workspace diff-check warnings concern
+CRLF whitespace in TORSION_SURFACE_CONSISTENCY.csv; that file is untouched.
+
+The following SHA-256 sentinels match the frozen pre-work records:
+ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+  6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d
+analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+  b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9
+analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+  dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f
+CMDC-21-e70466.pdf
+  a31c7e38c8199d9c9190a203c46d5311acc345022dec6eb36e97b2ac270c7990
+
+KNOWN LIMITATIONS AND NEXT REVIEW
+- EvidenceHistory is bounded and in memory. No durable cross-domain schema/store,
+  restart recovery, authentication, signature or multi-writer guarantee is claimed.
+- Referenced source/protocol/context definitions resolve through existing domain
+  receipts/hosts; no universal catalog or reference resolver is introduced.
+- Assessments are attributed policy assertions, not automatic scientific evaluation.
+  Rejected/missing references and invalid linkage are checked, not truth of reasons.
+- Scalar-only values; error/interval descriptions preserve source meaning without
+  a complete statistics model. No automatic units or endpoint comparability.
+- Source import integrity remains Hermes' responsibility. The new Athena projector
+  cannot substitute for readVerified; binding reuses existing domain qualification.
+- Existing accepted snapshots remain historical: retractions do not mutate them.
+  New bindings must use the current appropriate history. Existing consumers are
+  not silently switched to a global continuously updated admissibility service.
+- Review supersession is deliberately limited to the same reviewer/observation/scope;
+  no broad hypothesis language, generalized revision DAG or inference engine.
+- Detailed quantum data, acceptance/training roles and reuse remain Prometheus-owned.
+
+Recommended next slice, only after review: a small versioned exchange/round-trip
+contract for these immutable records plus verified reference resolution to the
+existing domain receipts. Characterize exact-byte/semantic round trips and
+historical as-of reconstruction before selecting persistence. Do not add a
+universal database or expand observation payloads merely for completeness.
+
+FILES IN THIS WORK UNIT
+software/SCIENTIFIC_EVIDENCE_FOUNDATION_CHECKPOINT.txt
+software/modules/athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/ScientificObservationBindingAcceptanceTest.java
+software/modules/athena/pom.xml
+software/modules/athena/src/main/java/totah/lab/athena/design/reasoning/ScientificObservationAdapter.java
+software/modules/mnemosyne/README.txt
+software/modules/mnemosyne/pom.xml
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/Assessment.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/Observation.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/Review.java
+software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
+software/modules/mnemosyne/src/test/java/totah/lab/mnemosyne/EvidenceHistoryAcceptanceTest.java
+software/modules/mnemosyne/src/test/java/totah/lab/mnemosyne/FoundationArchitectureTest.java
+software/modules/pom.xml
+software/modules/prometheus/pom.xml
+software/modules/prometheus/src/main/java/totah/lab/prometheus/evidence/ScientificObservationAdapter.java
+software/modules/prometheus/src/test/java/totah/lab/prometheus/evidence/ScientificObservationProjectionTest.java
+
+STOP after this separately committed foundation checkpoint. Athena Phase 2.5,
+WELD migration and Hephaestus consolidation remain unstarted.
