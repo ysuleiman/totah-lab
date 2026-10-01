@@ -124,6 +124,13 @@ public record MolecularDesignTree(String rootNodeId, List<Node> nodes, List<Edge
         }
         @Override public void record(Attempt attempt) throws IOException { write("receipt", attempt); }
         @Override public void terminated(Termination termination) throws IOException { write("terminated", termination); }
+        /** Additive reasoning events use the same durable writer and run namespace as execution. */
+        public void knowledge(totah.lab.athena.design.reasoning.DesignKnowledge knowledge) throws IOException {
+            write("knowledge", knowledge);
+        }
+        public void planningDecision(totah.lab.athena.design.reasoning.HypothesisDirectedPlanner.Decision decision) throws IOException {
+            write("planning-decision", decision);
+        }
         private synchronized void write(String event, Object data) throws IOException {
             var entry = mapper.createObjectNode();
             entry.put("schema", SCHEMA); entry.put("sequence", sequence); entry.put("event", event);

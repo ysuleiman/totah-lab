@@ -1,0 +1,244 @@
+ATHENA PHASE 2.1 CHECKPOINT — HYPOTHESIS-DIRECTED LOCAL REPLACEMENT
+
+Parent checkpoint: 3b6f3aea392eeab2b547f47cf4d74436290bb3ca
+Branch: codex/athena-phase2-resources
+Scope: Java 21 reasoning vertical slice. No module, package or dependency migration.
+The commit containing this report is the Phase 2.1 checkpoint; its parent is pinned above.
+
+RESULT AND CLAIM BOUNDARY
+
+A planner constructs a local edit only after resolving reviewed evidence, a versioned
+scientist-authored hypothesis, the exact parent DesignState, a unique stable-ID site,
+retained structural anchors and an enabled replacement rule. It does not enumerate a
+library and then invent explanations. Missing justification produces a recorded decline.
+This checks explicit scientific input consistency/applicability; it does not establish
+that the scientific hypothesis is true or invent hypotheses automatically.
+
+CLASS OWNERSHIP / WHY NEW TYPES WERE NEEDED
+
+DesignKnowledge is the smallest missing payload behind Phase 1 Reference. Provenance
+already owns references/intent/anchors, but does not own scientific claims, observations,
+criteria or immutable hypothesis revisions. DesignGrammar owns feature and geometry
+constraints, not experimental feedback. Neither existing type is replaced. DesignKnowledge
+uses existing Reference, DesignState, RetainedAnchor and Attempt instead of parallel models.
+
+HypothesisDirectedPlanner implements the existing StateAwarePlanner. It supplies the missing
+concrete evidence-conditioned selection behavior. MolecularDesignGraphGenerator remains
+sole execution authority; no molecule mutation occurs in the planner. SiteRequirement is
+an explicit stable-ID selector, not a new attachment, exit-vector or molecular representation.
+
+DesignGrammarJsonCodec is extended for this related versioned payload rather than adding
+another codec. MolecularDesignTree.Journal is extended rather than adding a second journal.
+
+PUBLIC CONTRACTS / EXACT SCHEMA
+
+New package: totah.lab.athena.design.reasoning
+All payload records are immutable. No existing public signature or constructor was removed.
+DesignKnowledge fields:
+  schema: exactly "athena-design-knowledge/1"
+  reference: existing Reference(id, version), the versioned input snapshot
+  evidence: List<Evidence>
+  hypotheses: List<Hypothesis>
+  rules: List<ReplacementRule>
+  evaluations: List<Evaluation>
+Lists of referenced objects are sorted by ID then version. References are unique across
+object categories and cannot replace an existing object inside an updated snapshot.
+
+Evidence fields:
+  reference, kind, reviewStatus, claim, context, source: Reference, limitations
+EvidenceKind: EXPERIMENTAL, COMPUTATIONAL, LITERATURE, SYNTHETIC_TEST
+ReviewStatus: REVIEWED, UNREVIEWED, WITHDRAWN
+The source identifies supporting material; this slice does not fetch or authenticate it.
+
+Hypothesis fields:
+  reference, previousVersion: nullable Reference, claim, context,
+  supportingEvidence: List<Reference>, conflictingEvidence: List<Reference>,
+  applicableParent: existing complete DesignState,
+  site: SiteRequirement(vectorId, candidateAtomIds),
+  retainedAnchors: List<existing RetainedAnchor>, eligibleRule: Reference,
+  geometryConstraints: List<Reference>, intendedConsequence,
+  prediction: nullable Prediction(statement, method: Reference, limitations),
+  limitations, evaluationCriteria: List<Criterion(id, description, retainedFunction)>
+Criteria must be nonempty with unique IDs. A functional-retention criterion is an obligation
+to evaluate, not proof that a retained structural anchor preserves biological function.
+Previous versions must resolve, retain the same hypothesis ID, and form an acyclic chain.
+
+ReplacementRule fields:
+  reference, sourceElement, replacementElement, enabled, source: Reference, limitations
+This slice supports only mechanical ATOM_SUBSTITUTION of a neutral nonaromatic terminal
+atom, with no isotope, no positive explicit-H annotation, unspecified/NONE atom and bond
+stereo, and exactly one nonaromatic single bond. Source and replacement elements must differ.
+Rule eligibility is not chemical validation: OCL still rejects unsupported/invalid products.
+No universal SAR, metabolic, potency or selectivity claim is encoded.
+
+Evaluation fields:
+  reference, hypothesis: Reference, runId, attempt: existing complete Attempt,
+  evaluator: Reference, kind: EvidenceKind, reviewStatus, findings: List<Finding>, limitations
+Finding fields:
+  criterionId, conclusion, value, unit, interpretation
+Conclusion: SUPPORTS, CONTRADICTS, INCONCLUSIVE, NOT_EVALUATED
+A NOT_EVALUATED finding must have empty value and unit. Other findings require a value.
+Every hypothesis criterion needs exactly one finding. The Attempt must be ACCEPTED or
+DEDUPLICATED, have a resulting state/product and match the hypothesis and parent state.
+The runId provides the host/run namespace for run-local Phase 1 IDs.
+
+Decision fields:
+  knowledge: Reference, hypothesis: Reference, parent: existing DesignState,
+  code: DecisionCode, reason, proposal: nullable existing AuthorizedEdit
+DecisionCode:
+  PROPOSED, UNRESOLVED_HYPOTHESIS, MISSING_EVIDENCE, INSUFFICIENT_EVIDENCE,
+  CONFLICTING_EVIDENCE, NOT_APPLICABLE, UNRESOLVED_SITE, AMBIGUOUS_SITE,
+  PROTECTED_ANCHOR, INELIGIBLE_TRANSFORMATION
+A proposal exists if and only if code is PROPOSED.
+
+APIs added:
+  DesignKnowledge.hypothesis/rule/evidence/evaluation(Reference): exact-version lookup
+  DesignKnowledge.withEvaluation(snapshotReference, Evaluation): new immutable snapshot
+  DesignKnowledge.revise(snapshotReference, previousReference, newVersion,
+      observationReference, revisedClaim, revisedConsequence, revisedPrediction, limitations)
+  HypothesisDirectedPlanner(knowledge, requestedHypotheses, permittedEvidenceKinds, DecisionSink)
+  HypothesisDirectedPlanner.editsFor(DesignState): existing extension point
+  DecisionSink.record(Decision) throws IOException
+  DesignGrammarJsonCodec.readKnowledge(Path) / writeKnowledge(Path, DesignKnowledge)
+  MolecularDesignTree.Journal.knowledge(DesignKnowledge) / planningDecision(Decision)
+
+writeKnowledge uses CREATE_NEW and checked I/O exceptions. The existing journal writes and
+forces each event before returning. New "knowledge" and "planning-decision" events are
+additive to athena-design-journal/1; existing execution event shapes are unchanged. Consumers
+assuming a closed event-name set must accept these additive events before using this path.
+
+EXACT PLANNER ALGORITHM
+
+1. Require 1..64 unique explicitly requested hypothesis versions. Sort by ID/version.
+   This is a bounded request list, not a transformation-library search.
+2. Resolve each exact hypothesis version; decline if absent.
+3. Require nonempty supporting evidence and resolve each reference. Prior evidence must
+   be REVIEWED, in the exact declared context, and of an explicitly permitted kind.
+   SYNTHETIC_TEST must be explicitly permitted by the host; it is never relabeled as real SAR.
+   Referenced evaluation support must resolve to the same hypothesis family/context,
+   be reviewed, use a permitted kind and support every criterion.
+4. Resolve conflicting evidence. Applicable conflicts always block automatic replanning.
+5. Require exact equality with applicableParent, including graph IDs/order/coordinates,
+   parent provenance and design state. No canonical-identity-only applicability shortcut.
+6. Resolve explicit candidate site IDs. Zero/missing bindings decline; multiple bindings
+   decline as ambiguous. Do not choose a first match or symmetry representative.
+7. Resolve retained anchor atom/bond IDs. Decline if missing or if the substituted atom is
+   protected. No graph mutation occurs during this check.
+8. Resolve the exact eligible rule, require enabled=true and its mechanical preconditions.
+9. Construct one existing GraphEdit(ATOM_SUBSTITUTION), its existing Authorization and
+   Provenance(hypothesis, evidence, anchors, rule, snapshot resource, intended consequence,
+   geometry constraints). Operation IDs use length-prefixed hypothesis ID/version.
+10. Persist the decision before releasing proposals. On sink I/O failure, throw with the
+    underlying reason. generateTraced records its existing planner-failure receipt; no edits
+    from that planner invocation are released. If receipt storage also fails, I/O propagates.
+11. The existing generator applies its budgets, transaction, anchor checks, OCL validation,
+    identity/correspondence, deduplication, DesignState/Attempt creation and durable journal.
+    Missing requested geometry evaluation still fails through Phase 1 GEOMETRY_FAILURE.
+
+INDEPENDENT EVALUATION AND REVISION
+
+Execution success never constructs Evaluation or Evidence. Prediction remains a separate
+type. A caller explicitly supplies a reviewed evaluation with values/method/limitations and
+the original receipt. The knowledge constructor verifies criterion coverage and parent links.
+
+withEvaluation returns a new snapshot. revise requires a reviewed observation of the exact
+prior hypothesis version. Any contradicting finding adds that observation to conflicting
+references; otherwise all findings must support the criteria to add it as support. Partial,
+inconclusive or unevaluated findings cannot justify an automatic revision in this slice.
+The scientist supplies the revised claim/consequence; the old hypothesis and receipts remain.
+The new version retains original evidence and bindings. Conflict blocks further proposals.
+Historical versions remain explicitly addressable for reproducible replay.
+
+COMPLETE SYNTHETIC EXAMPLE
+
+Fixture: athena-openchemlib/src/test/resources/reasoning/local-replacement.json
+No target, campaign or pyrazolone structure is used.
+
+Synthetic prior/design brief "prior@1"
+ -> hypothesis "h@1": test lower molecular weight while independently testing property Y
+ -> exact a(C)-b(C)-c(S) parent and unique terminal c binding
+ -> retain atoms a/b and bond ab; reference mechanical rule terminal-rule@1
+ -> neutral terminal S -> O atom substitution, NOT a metabolic/SAR rule
+ -> existing AuthorizedEdit / generateTraced / OCL
+ -> resulting C-C-O graph, complete delta and receipt, real OCL canonical identity
+ -> separate OCL descriptor evaluation shows molecular-weight decrease
+ -> Y remains NOT_EVALUATED; acceptance does not claim biological retention
+ -> explicit SYNTHETIC_TEST observation contradicts Y retention
+ -> h@2 records that conflict without changing h@1, prior evidence or the candidate receipt
+ -> replanning h@2 declines with CONFLICTING_EVIDENCE.
+A second test uses a supporting synthetic observation to create a new supported version.
+Another test reaches the same chemistry from two hypotheses and verifies distinct states,
+OCL correspondence and deterministic replay/journal output within the test runtime.
+
+PHASE 1 COMPONENTS REUSED UNCHANGED
+
+MolecularGraph and Delta; GraphEdit and GraphEditTransactionEngine; StateAwarePlanner;
+AuthorizedEdit; generateTraced; canonical identity and correspondence; OCL sanitization,
+stereo interpretation and descriptors; retained anchors; all Attempt/DesignState contracts;
+search bounds and typed failures. Topology execution remains untouched and its existing
+acceptance coverage runs; this slice needs only the atom-substitution graph operation.
+Journal and codec receive additive methods only. No new dependency or Maven module.
+
+ACCEPTANCE COVERAGE
+
+Athena HypothesisDirectedPlannerTest: 16 tests.
+OCL HypothesisDirectedReplacementAcceptanceTest: 9 tests.
+All 15 requested guarantees are covered: justified proposal; missing/insufficient evidence;
+unresolved/ambiguous binding; protected anchors at planning and execution; ineligible rule;
+Phase 1 provenance; real generateTraced/OCL path; durable execution and declines;
+non-observation of predictions/success; supportive and contradictory immutable revision;
+distinct derivations of identical chemistry; deterministic decisions and replay.
+Additional checks cover schema/version uniqueness, explicit synthetic-evidence opt-in,
+unsupported atom-state annotations, missing geometry, and durable planner-storage failure.
+
+FINAL VALIDATION (repository root; Java 21)
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest'
+Result: BUILD SUCCESS; 678 tests, 0 failures, 0 errors, 0 skipped.
+Includes existing Phase 1 DesignProvenanceAcceptanceTest and architecture coverage.
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test
+Result: BUILD SUCCESS; 27 tests, 0 failures, 0 errors, 0 skipped.
+Includes all 18 existing OCL tests plus 9 new acceptance tests.
+
+Earlier bounded Athena sandbox run: 676 tests, 1 failure in the existing
+OpenMmProcessExecutorTest because sysctl was not permitted. Rerun with subprocess permissions
+passed; no unrelated code was changed. An added OCL acceptance check subsequently found
+that a planner storage-failure wrapper omitted its underlying I/O message from the receipt.
+The wrapper was corrected and both final suites above were rerun successfully.
+Machine-readable results, final test names and preservation hashes: phase2_1-validation.json.
+
+EXCLUSIONS / PRESERVATION
+
+No scientific campaigns, athena regression package, or *IntegrationTest suite executed.
+No METTL7 campaign, Hephaestus consolidation, WELD migration or Python runtime integration.
+No chemistry algorithms, package names, POMs, backend identities or historical reports changed.
+The three preexisting scientific tracked modifications and source PDF match the pre-work
+SHA256 values recorded in phase2_1-validation.json. Preserved untracked artifacts were not
+staged, normalized, relocated or deleted. A global diff --check reports preexisting CRLF
+whitespace in the scientific CSV; the scoped software diff check passes. Do not fix that CSV.
+
+KNOWN LIMITATIONS / PHASE 2.2 RECOMMENDATION
+
+- Human-authored reviewed evidence and its context are trusted inputs, not independently
+  verified scientific truth. No causal inference, automatic hypothesis invention or ML.
+- Exact state snapshots and explicit stable-ID binding only. Reordered/equivalent parents
+  require an explicitly reviewed rebind; no SMARTS, symmetry-site selection or fragment search.
+- One terminal atom replacement only; isotope, charge, explicit-H and defined stereo at the
+  edited site are conservatively declined. Existing OCL limitations remain unchanged.
+- Coordinates are inherited; no conformer placement/minimization or geometry benefit is
+  implied. Requested geometry must be independently evaluated through the existing hook.
+- Evaluation payloads record externally supplied assessment. No assay ingestion, statistical
+  comparability model or calibration is implemented. Synthetic results remain labeled synthetic.
+- Snapshot updates are immutable and file writes refuse overwrite, but there is no global
+  cross-file registry enforcing that independently authored files never reuse an ID/version.
+  Journaling full snapshots preserves the actual inputs used; raw source authentication is absent.
+- Hosts must persist the knowledge before planning and use a durable DecisionSink and existing
+  execution sink. The integration test demonstrates this wiring; no new workflow/CLI is added.
+- JSON semantic replay is tested; no cross-JVM canonical-byte serialization contract is added.
+- No broad resource-provider or medicinal-chemistry rule catalog is introduced.
+
+Recommended Phase 2.2, after review: strengthen evidence applicability/comparability and
+reviewed site-rebinding/evaluation adapters against existing Athena contracts, before expanding
+transformation breadth. Hephaestus consolidation is a separately authorized checkpoint with
+characterization tests. Neither work unit starts automatically.

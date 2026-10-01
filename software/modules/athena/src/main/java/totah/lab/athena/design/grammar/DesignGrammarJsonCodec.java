@@ -22,6 +22,20 @@ public final class DesignGrammarJsonCodec {
         return mapper.readValue(path.toFile(), DesignGrammar.class);
     }
 
+    public totah.lab.athena.design.reasoning.DesignKnowledge readKnowledge(Path path) throws IOException {
+        try (var input = java.nio.file.Files.newInputStream(path)) {
+            return mapper.readValue(input, totah.lab.athena.design.reasoning.DesignKnowledge.class);
+        }
+    }
+
+    /** A new immutable snapshot must never overwrite an earlier scientific input. */
+    public void writeKnowledge(Path path, totah.lab.athena.design.reasoning.DesignKnowledge knowledge) throws IOException {
+        try (var output = java.nio.file.Files.newOutputStream(path, java.nio.file.StandardOpenOption.CREATE_NEW,
+                java.nio.file.StandardOpenOption.WRITE)) {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(output, knowledge);
+        }
+    }
+
     public PredockCandidateEvidence[] readCandidates(Path path) throws IOException {
         return mapper.readValue(path.toFile(), PredockCandidateEvidence[].class);
     }

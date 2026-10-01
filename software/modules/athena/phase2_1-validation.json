@@ -1,0 +1,1975 @@
+{
+  "schema": "athena-phase2.1-validation/1",
+  "parent_commit": "3b6f3aea392eeab2b547f47cf4d74436290bb3ca",
+  "branch": "codex/athena-phase2-resources",
+  "java_home": "/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home",
+  "working_directory": "/Users/yazan/totah-lab",
+  "runs": [
+    {
+      "module": "athena",
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest'",
+      "result": "BUILD SUCCESS",
+      "tests": 678,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "f94df29f2a27493161ce2c48bed15c33f38f81db7cb0a46d10acb454f26863c5",
+      "suites": [
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAlignmentEvidenceFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "losingHypothesisIsRetainedWithItsRealMetrics",
+            "unavailableSeedHypothesisIsReportedAsUnavailable"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalSiteGrammarFactoryTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "insufficientStructuralEvidenceCarriesNoInventedValue",
+            "keepsIdentityBlosumChemistryAndContactDimensionsIndependent"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.grammar.ExperimentalStructuralVariabilityCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "removesRigidTranslationBeforeCalculatingDispersion",
+            "leavesSingleObservationExplicitlyUnavailable"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.EvidenceChannelTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsNullEvaluatedValuesAndBlankFailureMetadata",
+            "evaluatedEmptyRetainsOriginAndMethodWithoutInventingAValue",
+            "snapshotsEvaluatedCollections",
+            "distinguishesEvaluatedEmptyFromEveryUnavailableState"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketResidueEvidenceFactoryTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "conservativePairIsDistinctFromIdentityAndChemistry",
+            "incompatiblePairIsASpatialReplacement",
+            "identicalPairReportsIdentityChemistryAndSubstitution",
+            "sequenceAlignedPairsAreFlaggedAndCounted",
+            "absentSequenceAlignmentYieldsZeroSequenceConsistency",
+            "chemistryCompatiblePairCanHavePoorSubstitution",
+            "contactFlagsComeFromTheContactLabelSets",
+            "unmatchedResiduesLowerCoverageWithoutTouchingMatchScores",
+            "keyResidueFlagFollowsTheConfiguredSet"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.Mettl7PocketComparisonEvidenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "mettl7aVsMettl7bAssemblesConsistentEvidence"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentRulesTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "everyVerdictCarriesANonBlankReason",
+            "geometricMatchOnlyWhenResidueAgreementIsPoor",
+            "insufficientEvidenceWhenTooFewCorrespondences",
+            "rejectedWhenGeometryAndResidueEvidenceAreBothPoor",
+            "versionedAssessmentPreservesExistingVerdictAndReason",
+            "conflictingWhenGeometryIsPoorButChemistryIsHigh",
+            "probableWhenOneDimensionIsOnlyModerate",
+            "strongWhenEveryPresentDimensionIsHigh",
+            "probableWhenChemistryIsModerate",
+            "conflictingWhenGeometryIsStrongButChemistryIsPoor",
+            "strongRequiresContactConservationWhenLigandEvidenceExists"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketAssessmentTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "carriesVerdictReasonsAndRulesetWithoutAScore",
+            "rejectsReasonlessOrUnversionedJudgments"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketEvidenceModelTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "predictedStructureCannotCarryExperimentalResolution",
+            "keepsIdealCoordinatesDistinctAndValidatesCcdTopology",
+            "ligandOccurrenceIdentityKeepsInsertionAndAlternateLocationSeparate",
+            "experimentalResolutionAndPredictedConfidenceCannotBeConfused",
+            "buildsEvidenceWithoutAssessmentOrMasterScore",
+            "rejectsIncorrectOriginsForReportedAndDerivedChannels"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.LigandContactTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "availableContactCarriesAllDimensions",
+            "notAvailableIsAnExplicitMarkerWithoutMeasuredValues",
+            "availableContactRequiresResidueAndContactType",
+            "availableContactAllowsAMissingDistance",
+            "rejectsNegativeOrNonFiniteDistances",
+            "notAvailableAllowsAnUnknownLigand"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.evidence.PocketFunctionalEvidenceFactoryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "freeFormCcdCodeSelectsTheAnnotationSets",
+            "noAnnotationYieldsZeroedEvidence",
+            "ligandChoiceSelectsTheAnnotationSet",
+            "contactConservationCoversAllAnnotationCombinations",
+            "keyResiduesSummarizeTheConfiguredSet"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchSignatureFactoryTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "selfPointPairsAreExcludedAndPairsAreCountedOnce",
+            "distanceListsAreSortedAscending",
+            "sideChainCentroidAveragesSideChainHeavyAtomsOnly",
+            "skipsUnresolvableAndUnclassifiableResiduesWithDiagnostics",
+            "signatureIsBuiltFromResidueAtomsNotAlphaSpheres",
+            "missingBetaCarbonFallsBackToAlphaCarbon",
+            "glycineFallsBackToAlphaCarbonForBetaAndCentroid",
+            "caDistancesMatchKnownGeometry",
+            "residueWithoutSideChainHeavyAtomsFallsBackToAlphaCarbon",
+            "everyAdditionalResidueAddsExactlyOnePairPerExistingPoint"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.DefaultPocketMatchComparatorTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "identicalSignatureScoresOneInEveryMeasure",
+            "largerToleranceMatchesMoreDistances",
+            "scoresStayWithinUnitInterval",
+            "randomizingChemistryAtFixedCoordinatesDecreasesTheScore",
+            "twoPointerMatchingAdvancesPastUnmatchableElements",
+            "symmetricScoreIsSymmetricAndCoveragesSwapDirections",
+            "twoPointerMatchingConsumesEachElementAtMostOnce",
+            "scoresAreInvariantUnderRigidRotationAndTranslation",
+            "directionalCoverageExposesSubsetContainment",
+            "emptySignaturesCompareSafelyToZero",
+            "comparisonEchoesTheConfiguredTolerance",
+            "smallCoordinateNoiseDecreasesTheScoreGradually"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchCategoriesTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "generatesSixUnorderedPointTypePairs",
+            "generatesNinetyTotalCategoriesWithoutGaps",
+            "canonicalizesUnorderedCategoryKeys",
+            "generatesFifteenUnorderedGroupPairs",
+            "unorderedPairIndexIsOrderIndependentAndDistinct"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "comparesTwoPocketsEndToEnd"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.pocketmatch.PocketMatchResidueGroupTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "classifiesCaseInsensitively",
+            "definesExactlyFiveGroups",
+            "coversNineteenResiduesAndLeavesMethionineUnclassified",
+            "groupsHistidineWithThePositiveResidues",
+            "mapsEveryGroupedResidueToItsPublishedGroup",
+            "rejectsUnknownResidueNames"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketShapeDistanceTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "zeroVersusPositiveScaleValueMaxesOut",
+            "identicalDescriptorsHaveZeroDistance",
+            "uniformScalingUsesLogRatioDistance",
+            "rejectsOutOfRangeShapeRatios",
+            "rejectsInvalidHistograms",
+            "rejectsNegativeScaleValues",
+            "rejectsNonFiniteScaleValues",
+            "zeroVersusZeroScaleValuesAreIdentical",
+            "distanceIsClampedToUnitInterval",
+            "distanceIsSymmetric",
+            "histogramDistanceDominatesShapeChange"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.similar.PocketRetrievalDistanceTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "nonPositiveSizesFallBackToMaximumLogRatio",
+            "identicalDescriptorsHaveZeroDistance",
+            "histogramDistanceIsHalfTheL1Distance",
+            "histogramOnlyDifferenceIsBounded",
+            "unequalHistogramLengthsAreRejected",
+            "retrievalNeverExceedsTheScaleAwareDistance",
+            "uniformScalingOnlyPenalizesTheScaleAwareForm"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ExperimentalBindingSiteGrouperTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "collapsesOverlappingCavitiesAroundTheSameLigandAtoms",
+            "preservesDistinctTargetLocalizedSites",
+            "nearOnlyEvidenceCreatesOneWeakSiteWithoutMergingIncidentalPockets",
+            "elongatedLigandAnchorsSeparatedContactsOnOneTargetAsOneSite",
+            "joinsAdjacentComplementarySubpocketsInTheSameTargetContext"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.component.ComponentPocketGeometryAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "classifiesOccupancyByHeavyAtomFractionInsideSphereCloud",
+            "rejectsInvalidThresholdOrdering",
+            "hydrogenDoesNotDiluteHeavyAtomFractions",
+            "distinguishesContactNearAndNotAssociated"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureFrameConsistencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "consistentPairProducesNoWarning",
+            "wallUsesBackboneFrameAndFlagsInconsistentSpheres"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.Mettl7PocketArchitectureRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "mettl7ComparisonRunsEndToEndWithFiniteMetrics"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PocketArchitectureTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "computesHandVerifiableArchitecture"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandSpaceComparatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "occupancyDefaultsToAtomInsideSphere",
+            "posesInDifferentComponentsYieldDifferentCompartment",
+            "posesAtDifferentDepthsYieldDifferentDepth",
+            "lateralDisplacementYieldsLateralShift"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LoopRegionAnalyzerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "burialAndCavityMetricsAreDeterministic",
+            "poseShiftedTowardLoopIsDetected",
+            "poseShiftedAwayFromLoopIsDetected",
+            "identicalReceptorsAndPosesGiveZeroAndOrthogonalVerdict",
+            "contactsAndWallMembershipAreReportedPerResidue",
+            "pocketWithoutNearbySpheresHasNoCavityDisplacement",
+            "orthogonalDisplacementIsNegligibleVerdict"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.EscapeRouteAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "openPocketEscapesWithKnownBottleneckWidth",
+            "originInOccupiedVoxelIsClassifiedOccupied",
+            "rejectsInvalidInputs",
+            "fullyEnclosedPocketHasNoEscapeAndTwoComponents",
+            "rejectsInvalidOptions",
+            "resultsAreDeterministic"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.BackboneArchitectureAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rigidlyTransformedReceptorHasZeroDisplacement",
+            "shiftedResidueTopsTheDisplacementProfile",
+            "identicalReceptorsHaveZeroDisplacement"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.WallGeometryAnalyzerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "shiftedSideChainIsFlaggedWithItsResidue",
+            "identicalReceptorsHaveZeroWallDisplacement"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.SameSitePoseComparatorTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "unverifiedCorrespondenceNullsRmsdButKeepsCentroids",
+            "permutedLigandIsMappedAndGivesZeroRmsd",
+            "rotatedLigandRecoversTheRotationAngle",
+            "ligandLongAxisOrientationIsMeasuredPerAxis",
+            "translationIsDecomposedAlongThePocketAxes"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.PrincipalComponentsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "projectionsAreRelativeToTheCentroid",
+            "axisAlignedEllipsoidRecoversAxesAndEigenvalues",
+            "offsetIsTheDisplacementDotNormalizedPocketAxis"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.LigandAtomCorrespondenceTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "differentHeavyAtomCountsAreNotAvailable",
+            "permutedOrderIsMappedByNameAndElement",
+            "identicalOrderIsIndexCorrespondence",
+            "unmappableNamesAreNotAvailable"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.architecture.AlphaSphereArchitectureAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "identicalPocketHasZeroDeltas",
+            "unionFindComponentsRespectTheSurfaceGapThreshold",
+            "rigidlyTransformedPocketHasNearZeroDeltasAfterAlignment",
+            "extraSphereClusterIsDetectedAsExtraComponent"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KabschRigidPointAlignerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "identityInputProducesIdentityMapping",
+            "recoversRotationAndTranslation"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.CompositePocketAlignerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "returnedTransformReproducesAlignedCandidate"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryClassifierTest",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[1]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[2]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[3]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[4]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[5]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[6]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[7]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[8]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[9]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[10]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[11]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[12]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[13]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[14]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[15]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[16]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[17]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[18]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[19]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[20]",
+            "preservesAthenaClassificationWhileUsingGaiaCategories(String, ResidueChemistry)[21]"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueCorrespondenceCalculatorTest",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "treatsGlycineAsMatchableOnlyWithItself",
+            "preservesInputOrderInUnmatchedLists",
+            "rejectsInvalidRecordComponents",
+            "assignsCandidateToClosestQueryOnly",
+            "classifiesIdenticalResidues",
+            "rejectsNonPositiveMaximumDistance",
+            "classifiesChemistryCompatibleResidues",
+            "handlesEmptyInputs",
+            "breaksDistanceTiesDeterministicallyByQueryReference",
+            "classifiesConservativeSubstitutions",
+            "computesExactSummaryStatistics",
+            "assignsQueryToClosestCandidateOnly",
+            "treatsCysteineAsMatchableOnlyWithItself",
+            "classifiesDifferentResidues",
+            "respectsMaximumDistanceCutoff"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.AlignedResidueCorrespondenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "recoversIdenticalCorrespondenceAfterAlignment"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueMatchTypeOfTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "cysteineAndGlycineAreNeverCompatibleWithOthers",
+            "identicalNamesAreIdentical",
+            "conservativeSetsAreConservative",
+            "unrelatedChemistriesAreDifferent",
+            "sameBroadChemistryIsChemistryCompatible"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.PocketResiduePointTransformerTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "returnsImmutableList",
+            "appliesTransformToPositionsOnly"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueChemistryScorerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsOutOfRangeAssessmentValues",
+            "blendsFinalSimilarityFromItsComponents",
+            "classifiesOnFinalSimilarityThresholds",
+            "handlesEmptyCorrespondenceEntirely",
+            "keySimilarityIsZeroWithoutMatchingKeyResidues",
+            "scoresKeyResiduesOnTheQuerySubsetOnly",
+            "exposesCanonicalPerPairChemistryWeights",
+            "handlesEmptyMatches",
+            "appliesGateThresholdsInclusively",
+            "scoresTheRegressionFixtureExactly"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.residue.ResidueSubstitutionScorerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsOutOfRangeAssessmentValues",
+            "normalizesNamesCaseInsensitively",
+            "returnsZeroForUnknownResidueNames",
+            "scoresKnownBlosum62Pairs",
+            "isSymmetric",
+            "handlesEmptyCorrespondence",
+            "doesNotForceIdentityToOne",
+            "assessesAHandComputedCorrespondence",
+            "rejectsNullResidueNames"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.MultiHypothesisPocketAlignerTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "geometricallyPoorSeedIsRejected",
+            "tiedGeometryAndSequenceConsistencyPrefersHigherChemistry",
+            "collinearSeedIsDegenerateAndFallsBackToPca",
+            "strictlyImprovingIcpRefinementIsRetained",
+            "equalGeometryPrefersHigherSequenceConsistency",
+            "mettl7aPocket32VsMettl7bPocket3SelectsTheSequenceSeed",
+            "unrelatedProteinsFallBackToPca",
+            "perfectTieKeepsPca",
+            "fewerThanThreeSeedPairsFallsBackToPca"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.compare.KnownTransformAlignmentTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "scoresClearlyUnrelatedCloudLow",
+            "producesDeterministicResults",
+            "alignsRigidlyTransformedCopy",
+            "alignsRotatedCopy",
+            "outliersReduceSimilarityRatherThanCorruptRanking",
+            "alignsTranslatedCopy",
+            "handlesUnequalPointCounts"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.selection.PocketResidueSelectionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "duplicatePocketResidueIdsResolveOnlyOnce",
+            "liningCutoffUsesResolvedPocketResidueHeavyAtoms",
+            "reportsMissingIdsWithoutHidingResolvedResidues"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketShapeStatisticsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "computesStatisticsForTwoPoints",
+            "rejectsEmptyPositions",
+            "computesStatisticsForAsymmetricPoints"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "overlapRejectsMixedGeometryBases",
+            "preservesIntersectionAndIouBehavior",
+            "overlapBetweenSameBasisIsUnchanged",
+            "preservesAlphaSphereCentroidAndBoundsBehavior",
+            "centerDistanceUsesAlphaSphereCentroids"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.pocket.geometry.PocketGeometryStrategyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "fpocketGeometryIsExplicitlyAlphaSphereBased",
+            "p2rankGeometryUsesResolvedHeavyAtomsAndReportsMissingIds",
+            "centerOnlyPocketFallsBackToReportedCenterGeometry",
+            "unresolvableResidueIdsAlsoFallBackToReportedCenter",
+            "duplicateResidueIdsDoNotSkewResolvedHeavyAtomCentroid"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.ExecutableScaffoldGrammarValidatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "protectedBondRequiresMatchingOrderAromaticityAndStereo"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.grammar.PredockGrammarEngineTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "executesTwoUnrelatedGrammarsWithoutSourceChangesAndPreservesDimensions",
+            "genericGrammarRoundTripsWithoutTargetAdapter(Path)",
+            "alignsConfiguredFeatureTemplatesWithoutTargetKnowledge"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.CanonicalCorrespondenceTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "excessiveSymmetryIsExplicitlyTruncatedAndDeterministic",
+            "compositionRefusesIncompleteIntermediateMapping",
+            "relativeStereoCannotBeProvedByPlainLabelEquality"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.MolecularGraphDeltaTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "coordinatesAreSeparateFromChemicalGraphChanges",
+            "bondDeletionIsExplicit",
+            "inPlaceAtomAndBondEditsHaveCompleteDeltasAndPreserveChargeStereoAndHydrogens",
+            "completeBeforeAfterReplayIncludesEveryChemicalDimensionAndDeletion"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.TopologyEditTransactionEngineTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "lineageRejectsMissingSourceMissingTargetAndDuplicateTarget",
+            "indexedReplacementPreservesUnaffectedAromaticStereoAndCharge",
+            "lineageRejectsPreservedConflictAndOutOfDomainMappings",
+            "rejectsUnmappedReplacementNonRingOpeningAndOutOfBoundsClosure",
+            "replacementAndReplayPreserveProtectedStereoAndCharge",
+            "validLineageIsImmutableAndDeterministic",
+            "linkerClosureOpeningAndScaffoldReplacementAreBounded"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.GraphEditTransactionEngineTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "attachmentAndPruningHaveExactLineage",
+            "atomSubstitutionIsDeterministicAndKeepsLineage",
+            "substitutionRejectsHydrogenWithMultipleBonds",
+            "attachmentAnchorMustExistBePermittedAndNotProtected",
+            "substitutionOnlyRemovesTerminalHydrogensOnTheSubstitutedAtomDeterministically",
+            "authorizedBondModificationAndSubstituentReplacementAreBounded",
+            "pruneAndAttachmentCannotBypassAnchorAuthorization",
+            "protectedAtomsFailClosed"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.reasoning.HypothesisDirectedPlannerTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "justifiedLocalReplacementIsProposedWithoutEditingParent",
+            "duplicateVersionsCannotOverwriteKnowledge",
+            "terminalRuleDoesNotSilentlyInterpretChargeIsotopeHydrogensOrStereo",
+            "unresolvedHypothesisAndBoundedRequests",
+            "unsupportedSchemaAndUnresolvedRevisionAreRejectedOnLoad",
+            "exactParentIncludesDesignContextAndCoordinates",
+            "decisionReplayIsIdenticalAndPredictionsAreNotObservations",
+            "emptySupportCannotAuthorizeAnEdit",
+            "knowledgeRoundTripAndDurableDeclineUseExistingInfrastructure",
+            "wrongDisabledOrUnresolvedRuleCannotBeProposed",
+            "syntheticEvidenceRequiresExplicitOptIn",
+            "protectedOrMissingAnchorCannotBeProposed",
+            "sameEnumerableEditWithoutEvidenceIsDeclined",
+            "decisionSinkFailureCannotReleaseAnEdit",
+            "unresolvedAndAmbiguousSitesHaveExplicitDeclines",
+            "unreviewedWithdrawnAndWrongContextEvidenceAreInsufficient"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.feature.LineageAwareFeatureMapperTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsCoincidentInvariantCorrespondencesAsRankDeficient",
+            "alignsAnUnrelatedToyConfigurationWithoutTargetKnowledge",
+            "rejectsCollinearInvariantCorrespondencesAsRankDeficient",
+            "inheritsOnlyChemicallyCompatibleSurvivingFeatureAndReturnsNovelAmbiguity"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.feature.CounterRecognitionEnsembleEvaluatorTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "evaluatesEveryTemplateAndRetainsAmbiguousCompatibleFeatures"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.generation.MolecularDesignGraphGeneratorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "heteroatomSubstitutionCanRemoveAnExplicitAuthorizedHydrogen",
+            "enumerativeAndPrioritizedStrategiesAreExplicitAndDeduplicateBeforeExpansion",
+            "disconnectedProductsFailUnlessExplicitlyAllowed"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.generation.GrammarDrivenCandidateGeneratorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "failsClosedOnNarrativeInvariantAndPlaceholderSubstituent",
+            "generatesWithArbitraryConfigurationAndBackend"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.generation.IndexedGraphDryRunTransformerTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "constructsThreeGraphOnlyDryRuns"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.generation.DesignProvenanceAcceptanceTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "multipleHypothesesRetainStatesAndSymmetricLineage",
+            "retainedAnchorRejectsChemicalChangeAndIncidentDeletionEvenWhenAdditionsAllowed",
+            "coordinateOnlyBackendChangesRemainDistinctAndReachGeometryEvaluation",
+            "rejectedAuthorizationHasAnOperationAndParentReceipt",
+            "malformedTopologyIsRejectedEvenWhenDisconnectedGraphsAllowed",
+            "parentAtomOrderingDoesNotInventLineage",
+            "depthAndNodeLimitsProduceReceipts",
+            "durableJournalRoundTripsCompleteReceiptsAndRefusesOverwrite(Path)",
+            "sameOperationIdCanCarryDistinctHypotheses",
+            "persistenceCallbacksCaptureRootStatesAttemptsAndTerminationAndIoErrorsPropagate",
+            "durableJournalRetainsRejectedAndBudgetBlockedOperations(Path)",
+            "topologyReplacementUsesSamePathAndComposesRenamedAtomsAndBonds",
+            "invalidChemistryBackendFailureAndUnexpectedFailureAreDifferent",
+            "backendCannotSilentlyChangeChargeEvenWhenItClaimsValid",
+            "missingGeometryEvaluationFailsExplicitly",
+            "canonicalCollisionWithoutGraphProofIsRejected",
+            "plannerAndMissingBackendEvidenceFailuresProduceReceipts",
+            "disconnectedProductHasExplicitTopologyReceipt",
+            "enumerationIsDeterministicAndEveryKnownBudgetBlockedOperationIsReceipted"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.energy.EnergyFoundationTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "energyRequiresTotalAndCannotMasqueradeAsFreeEnergy",
+            "deterministicGridIsStableAndContainsTheUnperturbedState"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmResponseValidatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsWrongPlatformNonfiniteEnergyAndMissingGroup",
+            "rejectsMalformedMinimizedCoordinatesAndWrongOperationFlag"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmProcessExecutorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "terminatesStalledProcessAtDeadline",
+            "rejectsNonPositiveDeadline"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmSystemManifestLoaderTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsTamperedArtifactAndIncompleteProvenance",
+            "resolvesRelativeArtifactsAndVerifiesEveryHash"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.energy.openmm.OpenMmEnergyEvaluatorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsNonfiniteEnergyAndMissingHashes",
+            "rejectsMissingGroupsAndNoncanonicalCpuSettings",
+            "preservesComponentsAndCompleteDeterministicProvenance",
+            "requiresSamHashExactlyWhenCofactorIsPresent"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfoniumStereochemistryAssessmentTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "preservesResolvedSulfoniumHandednessAcrossRoundTrip",
+            "rejectsPlanarOrUnresolvedSulfoniumGeometry",
+            "rejectsSulfoniumInversion"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.TorsionProfileAssessmentTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "acceptsOnlyAProfileWithinBothErrorLimits",
+            "missingReferenceDataIsUnevaluatedAndCannotPass",
+            "rejectsMismatchedAngleAndEnergyGrids",
+            "rejectsAConvergedButEnergeticallyWrongProfile"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.SulfurStateTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "protonationStatesAreDistinctChemicalStates"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.SamStereochemistryRegressionTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "failsWhenRoundTripSerializationInvertsSulfur",
+            "requiresConfiguredSulfurToSurviveEveryPipelineStage",
+            "failsClosedWhenAnyStageIsMissing"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.ParameterizationProvenanceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "preservesSeparateChemicalStateAndParameterEvidence",
+            "rejectsUnverifiableChecksum"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.NearAttackAssessorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "geometryAloneCannotBecomeChemicallyCompatible",
+            "clashFailureIsClearlyNonproductive",
+            "computesLinearBacksideAttackUsingGaiaCoordinates",
+            "criteriaRequireThresholdProvenance"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.tmt.EnsembleNacAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reportsReplicaPopulationTransitionsAndVariabilitySeparately",
+            "oneReplicaCannotProduceBetweenReplicaEvidence",
+            "noFramesRemainUnevaluated"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffCompatibleReferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reproducesOriginalSurfDiffIntermediateAndFinalValues"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceAnalyzerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "neighborhoodMembershipUsesAlphaCarbonRatherThanMinimumAtomDistance",
+            "appliesStrictSurfaceThresholdBeforeNeighborhoodConstruction",
+            "unmatchedQueryResidueHasUnitRup",
+            "subjectOnlyNeighborContributesAsMaximumDifference",
+            "neighborhoodsRetainDeterministicResidueOrder"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffSubjectAggregatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "takesIndependentColumnWiseMinima",
+            "duplicateQueryResidueScoresAreRejectedAtMapBoundary",
+            "computesRdsFromCohortMinima"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.DifferentialSurfaceEvidenceWriterTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "traceUsesCanonicalMinimumOfDirectionalDistances"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffPhysicochemicalDifferenceTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reproducesFrozenMatrixCasesAndMissingResidue"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.surface.differential.SurfDiffWeightsTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reproducesRdsClipping",
+            "reproducesExposureCutoffAndHillFunction",
+            "reproducesDistanceBoundariesAndClipping"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.thermo.ThermodynamicCoreTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "zwanzigEffectiveSampleSizeUsesExponentialImportanceWeights",
+            "tiRejectsDuplicateLambdaAndEnergyTaxonomyContainsSeparatedTerms",
+            "tiAndLieKeepMethodIdentityExplicit",
+            "kdRoundTripRetainsExplicitStandardState",
+            "zwanzigZeroPerturbationIsZeroAndRejectsUnnormalizedWeights",
+            "partitionFunctionRequiresPositiveMeasuresAndProvenance",
+            "freezesBMinusASignForTenHundredAndThousandFoldRatios"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.architecture.AthenaDependencyTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "productionSourcesDependOnlyOnGaiaAndJava",
+            "genericDesignCannotImportLegacyTargetPolicyOrEmbedKnownTargetConcepts"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.relaxation.ProteinDefinedMaskTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "residueIdentityAndSidechainSizeDoNotChangePositionalRules",
+            "apoHasNoLigandParticlesAndCorrectMask",
+            "missingAndOverlappingRulesFailClosed",
+            "ruleOrderDoesNotChangeReceiptAndMaskIsImmutable",
+            "backboneCannotBecomeMobileAndLegacyStillRequiresLigand",
+            "exactProteinAssignmentsAndSemanticHashAreLigandIndependent",
+            "atomSpecificRuleOnlyMovesRequestedAtom"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.relaxation.LocalRelaxationProtocolContractTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "mappingHashIsStableAcrossInputOrderButChangesWithProvenance",
+            "forceConstantsRejectInvalidValuesAndUnitsAndConvertExplicitly",
+            "rejectsMissingRequiredBackboneAndSideChainConstants",
+            "classifiesEveryRoleWithReasonAndReplaysIdentically",
+            "mappingRejectsIncompleteDuplicateAndTamperedIdentity",
+            "identicalPolicyOnEquivalentTopologyHasComparableSelectionSemantics"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.relaxation.DisplacementCalculatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reportsFixedFrameRmsdAndBothMaximumDisplacements",
+            "rejectsNonbijectiveAndUnresolvedMappings"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.relaxation.PhysicalValidityEvaluatorTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reportsAllIndependentFailuresWithoutDiscardingEvidence",
+            "exactBoundaryIsAcceptedBecausePoliciesUseStrictExceedance"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.fragment.FragmentRegionFitTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "preservesIndependentSpatialEvidenceDimensions",
+            "rejectsInvalidOccupancyFractions"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentInterfaceTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "evidenceCannotBeAppliedToAnotherGeometry",
+            "secondShellDoesNotAutomaticallyEnterPairCalculations",
+            "explicitChargedAmmoniumIsSupportedWithoutRoundingPartialCharges",
+            "waterSelectionPreservesSourceIdentityAndExplicitChemistry",
+            "missingFormalChargeNeverUsesPartialChargeOrZero",
+            "inconsistentValenceAndUnprovenTopologyFailClosed",
+            "mixedLabelsCannotUpgradeSulfurAromaticOrPiPi",
+            "cappingIsIndependentGeometricConstructionWithCorrectValence"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.fragment.quantum.QuantumFragmentMultipleUnitsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "emptyDuplicateAndUnknownSelectionsStillFailClosed",
+            "arbitraryDisconnectedUnitsKeepIndependentCapsAndSourceOrder"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.clash.StericClashAnalysisTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "distanceExactlyAtThresholdIsNotAClash",
+            "clearOverlapReportsClashWithCorrectPairAndAmount",
+            "atomsFarApartYieldNoClashes",
+            "atomsWithoutElementAreExcluded",
+            "sameResiduePairsAreExcluded",
+            "resultsAreDeterministicAcrossRuns",
+            "distanceJustBelowThresholdClashesAndJustAboveDoesNot",
+            "clashRecordCanonicalizesAtomOrder",
+            "bondedPairsAreExcluded",
+            "unknownElementUsesDefaultUnknownRadius",
+            "hydrogenAtomsAreExcluded"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.recognition.InteractionStableFeatureAssignerTest",
+          "tests": 19,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "acceptor",
+            "nonEquivalentAmbiguity",
+            "nonHalogenDonorAtomIsRejectedForHalogenAssignment",
+            "halogenBondUsesDonorHalogenRatherThanItsBondedCarbon",
+            "halogenAssignmentHashIsDeterministic",
+            "hydrogenBondDirectionDisambiguatesDualRoleAtom",
+            "aromaticPi",
+            "hydrophobic",
+            "halogenBondWithoutMappedDonorHalogenFailsClosed",
+            "halogenSymmetryEquivalentFeaturesRemainEquivalent",
+            "symmetryEquivalent",
+            "donor",
+            "deterministicHash",
+            "degradedPreserved",
+            "halogenNonEquivalentFeaturesRemainAmbiguous",
+            "noCompatible",
+            "halogenFeatureTypeMismatchIsRejected",
+            "chargedGroup",
+            "bromineAndIodineUseExistingHalogenFeatures"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.recognition.RecognitionBasinModelTest",
+          "tests": 16,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "fixedFrameGeometryIsDeterministicOrderInvariantAndUnavailableOnMappingFailure",
+            "targetCompetitionLoserIsReconsideredForSecondChoice",
+            "targetCompetitionUsesBestGeometryRatherThanSourceIterationOrder",
+            "noMatchedEdgesReportsGeometryUnavailableRatherThanZero",
+            "stableFeatureIdentityUsesCanonicalOrbitsNotSourceAtomNames",
+            "recurrenceUsesMembersSeedsAndRunsButNotFamilies",
+            "equalSourceCompetitionRetainsBothSourcesInAuditEvidence",
+            "definingRequiresPersistentEdgeAndAdequateAlternativeEvidence",
+            "semanticAdmissionComponentsControlMembershipAndRetainReasons",
+            "directionalDistancesRequireAnExplicitSymmetryRule",
+            "topologyComponentsRemainSeparateAndScalarNeedsExplicitWeights",
+            "missingPairEvidenceIsReportedAndCannotCreateRecurrence",
+            "equallyPlausibleTargetsRemainExplicitlyAmbiguous",
+            "incompleteAtomIdentityIsRejectedRatherThanGuessed",
+            "oneToOneAssignmentDoesNotReuseTargetEdge",
+            "basinMembershipRequiresBothGeometryAndTopologyAndRetainsSingletons"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.recognition.DifferentialRecognitionComparatorTest",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "samNodeExistsOnlyForExistingCofactorInteraction",
+            "exposesBackgroundRerouteGroupsAndOnlyCanonicalDefiningFraction",
+            "substitutedConstraintRequiresSubstituteAndUnavailableStatesAgree",
+            "comparisonIsDirectionalWhileTypedJaccardIsSymmetricForMappedGraphs",
+            "graphCreationDoesNotMutateProfileAndRenderingIsDeterministic",
+            "definingAbsentEdgeIsLostButUnresolvedAbsentEdgeIsUnobserved",
+            "surfaceAnnotationRemainsSeparateAndMarksChangedEdgeIntersection",
+            "exactMappedEdgeIsPreservedAndMetricsAreTransparent",
+            "sameFeatureAtDifferentEnvironmentIsRerouted",
+            "missingResidueCorrespondenceIsUnavailable",
+            "explicitIncompatibilityTakesPrecedenceOverObservedExactEdge",
+            "explicitConstraintViolationIsIncompatible",
+            "degradedSourceOrTargetPropagatesUnavailable",
+            "differentTypeAtMappedEnvironmentIsSubstituted"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.landscape.CoordinateRealizerTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rigidRotationAndInverseRoundTripAreCorrect",
+            "multipleTorsionsUseCanonicalIdentifierOrderRegardlessOfMapOrder",
+            "zeroAndTranslationPreserveOrderAndAreDeterministic",
+            "rejectsInvalidCorrespondenceAxisAndRotatingSet",
+            "torsionRotatesOnlyDeclaredDownstreamAtoms",
+            "recordsExactRotationCenterAndRejectsBlankTorsionIdentifier",
+            "sameDescriptorGivesIdenticalGeometryForMatchedFrames"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.geometry.GridVolumeTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsEmptyAtomSets",
+            "rejectsNonFiniteOrNonPositiveParameters",
+            "rejectsBlankProvenance",
+            "knownEnvelopesGiveExactOverlapOnCoarseGrid",
+            "resultsAreDeterministic",
+            "singleBlockingAtomRemovesExpectedVoxels",
+            "rejectsNonPositiveSpacing",
+            "disjointEnvelopesHaveZeroOverlap",
+            "ligandAtomsAreHonoredAsOccupied",
+            "emptyEnvironmentGivesAnalyticFreeVolume"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.sasa.ShrakeRupleySasaTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "distantAtomsShouldEachBeFullyAccessible",
+            "singleIsolatedAtomShouldHaveFullSphereArea",
+            "areaOfUnknownAtomShouldBeRejected",
+            "higherSampleDensityShouldStayCloseToExactArea",
+            "resultsShouldBeDeterministic",
+            "invalidParametersShouldBeRejected",
+            "buriedAtomShouldHaveSignificantlyReducedArea"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.sequence.NeedlemanWunschSequenceAlignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "terminalGapsDoNotProducePairs",
+            "candidateDeletionGapsTheCandidate",
+            "identityIsTheFractionOfIdenticalPairs",
+            "candidateInsertionGapsTheQuery",
+            "residueNamesAreComparedCaseInsensitively",
+            "gapBeatsMismatchWhenMismatchIsTooCostly",
+            "blankResidueNamesAreRejected",
+            "emptySequenceProducesAnEmptyAlignment",
+            "mismatchRunAlignsWithoutGaps",
+            "identicalSequencesAlignEveryResidue"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.contact.DefaultContactAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "skipsHydrogensOnBothSides",
+            "classifiesDirectAndShellContactsByDistance",
+            "rejectsInvalidCutoffs"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketScorerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "weightsMustSumToOne",
+            "appliesDefaultWeights",
+            "customWeightsReplaceDefaults",
+            "weightsMustBeUnitInterval",
+            "zeroEvidenceScoresZero"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandPocketOccupancyAnalyzerTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "ambiguousAssignmentsCountTowardBestPocket",
+            "rejectsSizeMismatch",
+            "summarizesCountsFractionsAffinitiesAndScores",
+            "emptyInputYieldsEmptyReport"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultCrossProteinPoseComparatorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "ambiguousAssignmentYieldsAmbiguousRelationship",
+            "scenarioG_transformedPoseInCorrespondingPocketIsSameSite",
+            "scenarioI_knownRigidTransformYieldsZeroDistanceAndRmsd",
+            "unequalHeavyAtomCountsNullTheRmsd",
+            "scenarioH_dissimilarPocketsAreDifferentSiteDespiteSameNumber",
+            "homologousPocketsWithDisplacedPoseIsDifferentPose",
+            "notAssignedPoseYieldsAmbiguousRelationship"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.DefaultPosePocketAssignerTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "scenarioF_contactCoverageRaisesPocketWithWeakSpheres",
+            "scenarioB_ligandInsidePocketBIsAssignedToB",
+            "scenarioC_overlappingPocketsYieldAmbiguousAssignment",
+            "scenarioE_atomOccupancyBeatsCentroidProximity",
+            "scenarioD_ligandOutsideAllPocketsIsNotAssigned",
+            "overloadComputesContactsInternally",
+            "fallsBackToPocketBoundsWhenNoSpheres",
+            "emptyCandidateListIsNotAssigned",
+            "fallsBackToResidueAtomsWhenNoSpheresAndNoBounds",
+            "scenarioA_ligandInsidePocketAIsAssignedToA"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.LigandGeometryTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "computesHeavyAtomOnlyShape",
+            "radiusReachesFurthestHeavyAtom",
+            "throwsOnZeroHeavyAtoms"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.pose.AlphaSphereMetricsTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "occupiedFractionRespectsTolerance",
+            "atomInsideSphereHasZeroSurfaceDistance",
+            "aggregatesFractionsMeanAndMaxAcrossAtoms",
+            "atomOutsideSphereHasSurfaceGap",
+            "takesMinimumOverSpheres",
+            "pocketWithoutSpheresReportsNoBasis",
+            "throwsOnZeroHeavyAtoms"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultMutationPoseComparatorTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "ninetyDegreeRotationIsRecovered",
+            "pureTranslationGivesExpectedShiftAndRmsdWithoutRotation",
+            "identicalPosesHaveZeroShiftRmsdAndFullOverlap",
+            "unequalHeavyAtomCountsNullRmsdAndRotation",
+            "gainedLostAndRetainedContactsAreSetDifferences",
+            "collinearLigandHasNoRobustRotation"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.DefaultLigandContactAlignmentAnalyzerTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "correspondenceFollowsTheAlignmentNotResidueNumbers",
+            "pocketMembershipAndStructuralEquivalenceUseThePockets",
+            "conservedContactWhenIdenticalResidueContactsOnBothSides",
+            "aOnlyContactWhenOnlySideAContacts",
+            "bOnlyContactWhenOnlySideBContacts",
+            "contactBothDifferentResidueReportsChemistryDelta",
+            "nonContactDifferenceWhenResiduesDifferWithoutContacts",
+            "unmappedContactResidueGetsAnUnmappedRow"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.Mettl7ContactAlignmentRegressionTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "reproducesTheVerified36To43MappingAndCandidates"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.MutationCandidateRankerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "proposesBothDirectionsPerDifferentialContactPosition",
+            "skipsIdenticalAndNonContactPositions",
+            "ranksByInterpretableTiers"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.ContactStringRendererTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "oneLetterCodesCoverTheStandardResidues",
+            "rendersContactStringsNumbersAndDiffExactly"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.selectivity.PoseReferenceSimilarityAnalyzerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "tiesOnBothMetricsAreAmbiguous",
+            "bothShiftsBeyondLargePoseChangeIsDifferentFromBoth",
+            "closerToBOnBothMetricsIsMoreBLike",
+            "disagreementBetweenMetricsIsIntermediate",
+            "tieOnlyOnOneMetricIsAlsoIntermediate",
+            "closerToAOnBothMetricsIsMoreALike"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.interaction.DefaultLigandInteractionAnalyzerTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "detectsHydrogenBondFromPreparedAd4TypesAndGeometry",
+            "detectsSaltBridgeFromOppositePreparedChargeSums",
+            "rejectsHydrogenBondWithBadDonorHydrogenAcceptorAngle"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.ScreeningGatesTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "canonicalGateReportsIndependentGeometryFailures",
+            "ruleOfFiveAndExplicitRuleOfThreeRemainAdvisoryEvidence",
+            "unresolvedTmt1aIsOnlyProvisionalEvidence",
+            "isolatedPoseFailsDedicatedReproducibilityGate"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.LigandDiversitySelectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "lockedPolicyUsesGlobalPointThreeFiveCoverage",
+            "deduplicatesExactStructuresAndAuditsGlobalRepresentation",
+            "keepsCohortsIndependentAndPreservesRareScaffolds",
+            "protectsLowFsp3PolarHeteroaromaticFragmentInCommonFamily"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.CandidateFilterTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "unresolvedTmt1aProducesProvisionalNotPredictedDisposition",
+            "assignsPredictedLabelOnlyForResolvedStrongTslPattern",
+            "preservesEveryMachineReadableLiability",
+            "dockingScoreDifferenceCannotSupplySelectivityByItself",
+            "retainsDcmbNeighborhoodAsControl",
+            "computesCheapEvidenceEvenWhenLibraryRequirementFails",
+            "incomingFilterSelectsForDockingWithoutStructuralEvidence"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.ligand.screening.Mettl7bEnrichmentGateTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "drugLikePolicyUsesFrozenStage2Thresholds",
+            "balancedFragmentPreservesPolarSingleRingHeteroaromaticWithLowFsp3",
+            "balancedFragmentRejectsMultipleAromaticRingsButNotForFsp3"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.HalogenBondDetectorTest",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "etherOxygenWithTwoHeavyNeighborsIsNotAnAcceptor",
+            "acceptorAngleBoundsAreInclusive",
+            "degradedConnectivityYieldsNoHalogenBonds",
+            "detectsExactAngleHalogenBond",
+            "fluorineQualifiesAsDonor",
+            "distanceMaxBoundIsInclusive",
+            "halogenWithTwoBondsIsNotADonor",
+            "donorAngleBoundsAreInclusive"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.ContactMatrixTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rowOrderFollowsFirstAppearance",
+            "countsAndMinDistancesPerCell",
+            "rendersCountsAsDeterministicCsv"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrophobicContactDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "minBoundIsExclusive",
+            "maxBoundIsInclusive",
+            "foreignProteinAtomRejected",
+            "detectsContactWithinBoundsAndResolvesProteinResidue"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionThresholdsTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "nonPositiveCutoffRejected",
+            "plipReferenceCarriesPlipHbValuesWithUngatedAcceptorDistance",
+            "blankProvenanceRejected",
+            "athenaDefaultsCarryLegacyHbAndPlipLiteratureValues"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionProfilerTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "degradedPerceptionIsSurfaced",
+            "separateCofactorIsProfiledAsEnvironmentNeverAsLigand",
+            "bindingSitePreselectionDropsFarResidues",
+            "mergedComplexWithLigandSelectorYieldsSameInteractions",
+            "profilesAllSixInteractionTypesWithRefinementApplied"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.SaltBridgeDetectorTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "maxBoundIsInclusiveAndMinBoundExclusive",
+            "bothDirectionsProduceOneRecordPerGroupPair",
+            "detectsOppositeSignPairAcrossBoundary",
+            "sameSignPairsAreIgnored"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiCationDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "ligandAmineFacingProteinRingPassesTertamineGuard",
+            "ligandAmineWithPerpendicularAmineNormalIsRejected",
+            "negativeGroupsAreIgnored",
+            "nonAmineGroupsSkipTheTertamineGuard",
+            "proteinPositiveGroupFacingLigandRing",
+            "allChargeGroupsAreEvaluatedPerRing",
+            "distanceBoundIsInclusiveAndOffsetOutRejects"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.PiStackingDetectorTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "distanceBoundsAreMinExclusiveMaxInclusive",
+            "parallelDeviationBoundIsInclusive",
+            "perpendicularWithoutOffsetIsTShaped",
+            "degradedRingsAreSkipped",
+            "perfectParallelStackIsAccepted",
+            "perpendicularBeyondOffsetIsRejected",
+            "fortyFiveDegreesYieldsNothing",
+            "parallelStackBeyondOffsetIsRejected",
+            "parallelStackWithSmallOffsetIsAccepted"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionRefinementsTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "patchClusteringKeepsClosestPerClusterAndDropsIsolatedAtomsLikePlip",
+            "refineAllAppliesThePlipPrecedenceOrder",
+            "perLigandAtomResidueDedupKeepsClosestAndIncludesChain",
+            "saltBridgeSuppressesHydrogenBondBetweenItsAtomSets",
+            "hisPiCationIsSuppressedWhenTheSameRingPairStacks",
+            "degradedLigandConnectivitySkipsClustering",
+            "oneHydrogenBondPerDonorHeavyAtomKeepsLargestAngle",
+            "hydrophobicContactsInsideStackedRingsAreExcluded",
+            "hisPiCationWithoutMatchingStackIsKept"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.HydrogenBondDetectorTest",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "detectsProteinDonorHydrogenBond",
+            "angleGateDiffersBetweenThresholdSets",
+            "donorHydrogenBeyondDonorBondCutoffYieldsNoDonorSite",
+            "nonAcceptorAd4TypesAreIgnored",
+            "detectsLigandDonorHydrogenBond",
+            "thresholdInjectionFlipsBoundaryVerdict",
+            "athenaDefaultsMatchLegacyAnalyzerVerdicts"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.InteractionFingerprintTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "typedJaccardComparesResidueTypePairs",
+            "buildsTypedMapAndKeepsRecordsAccessible",
+            "jaccardIsSymmetricAndEmptyFingerprintsAreIdentical"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.HydrophobicAtomPerceptionTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "degradesToAd4TypesWhenConnectivityAbsent",
+            "emptyStructureYieldsNoHydrophobicAtoms",
+            "perceivesCarbonsWithOnlyCarbonOrHydrogenNeighbors",
+            "degradesToAd4TypesWhenConnectivityPartial",
+            "rejectsCarbonBondedToHeteroatomAndNonCarbonAtoms"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.AromaticRingPerceptionTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "perceivesLigandRingFromAromaticBonds",
+            "fewerThanThreeAd4AromaticAtomsYieldNoFallbackRing",
+            "skipsIncompleteProteinTemplate",
+            "fusedNaphthaleneYieldsTwoRingsAndNoPerimeterRing",
+            "degradesToAd4PseudoRingWhenConnectivityAbsent",
+            "kekuleBondsUseAd4TypedCandidatesOverBondGraph",
+            "emptyStructureYieldsNoRings",
+            "perceivesPheRingFromProteinTemplate",
+            "nonAromaticResidueYieldsNoRings",
+            "perceivesBothTrpRings"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.interaction.perception.ChargedGroupPerceptionTest",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "perceivesSulfoniumFromBondGraph",
+            "emptyStructureYieldsNoChargedGroups",
+            "perceivesQuaternaryAmineFromBondDegreeFour",
+            "nearNeutralChargeSumYieldsNoFallbackGroup",
+            "perceivesLigandCarboxylateFromBondGraph",
+            "neutralFunctionalGroupsYieldNoChargedGroup",
+            "perceivesLysineAndHistidineAsPositive",
+            "skipsResidueWithIncompleteTemplate",
+            "explicitFormalChargesDistinguishNeutralEsterFromCarboxylate",
+            "perceivesAspartateAndGlutamateAsNegative",
+            "degradesToChargeSumWhenConnectivityAbsent",
+            "perceivesArginineGuanidiniumFromTemplate",
+            "perceivesLigandGuanidiniumFromBondGraph"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "athena-openchemlib",
+      "command": "JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test",
+      "result": "BUILD SUCCESS",
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log_sha256": "b759a941c0e9425b666a566cf5622cf0caa27a30c3c56f40d50a99e0053cea8b",
+      "suites": [
+        {
+          "name": "totah.lab.athena.design.backend.ocl.HypothesisDirectedReplacementAcceptanceTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "evaluationCannotAttachToAnotherHypothesisOrUseMissingCriteria",
+            "protectedAnchorAlsoFailsIfCallerBypassesPlanner",
+            "completeReasoningReachesOclAttemptDeltaAndDurableJournal",
+            "oclRemainsAuthoritativeForInvalidProducts",
+            "missingRequestedGeometryStillProducesPhaseOneRejection",
+            "independentEvaluationAndContradictoryObservationCreateImmutableRevision",
+            "distinctHypothesesDeduplicateChemistryButKeepDerivationsAndCorrespondence",
+            "supportingObservationAlsoCreatesANewVersion",
+            "plannerPersistenceFailureIsAnExplicitFailureNotAnUnrecordedProposal"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclStableAtomOrbitServiceTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "explicitEquivalentHydrogensUseTheirParentOrbit",
+            "namesAndInputOrderDoNotChangeChemistryCanonicalOrbitPartition"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMolecularBackendAcceptanceTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "unsupportedStereoDescriptorFailsExplicitly",
+            "correspondenceRepairsStableIdsAcrossDifferentAtomOrders",
+            "unsupportedHydrogenCountsAndBondStereoFailClosed",
+            "positiveHydrogenCountsMustMatchInferredHydrogensAndArePreserved",
+            "symmetryAndTetrahedralParityAreProvedByTheBackend",
+            "canonicalIdentityAndSanitizationAreStableForAromaticAndChargedGraphs",
+            "chargedProductsRetainMultipleReceiptedDerivationsThroughOcl",
+            "mmffMinimizationIsBoundedAndReportsBackend",
+            "existingNetChargeValidationLimitationIsExplicit",
+            "smartsReturnsStableProjectAtomIds",
+            "explicitParitySurvivesSanitizationRoundTrip",
+            "fixedSeedConformersAreReproducible"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclMmff94sStrainCalculatorTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "rejectsNonConvergedReferenceInsteadOfPublishingStrain",
+            "minimizesReferenceWithFrozenProtocol",
+            "rejectsChangedAtomIdentity"
+          ]
+        },
+        {
+          "name": "totah.lab.athena.design.backend.ocl.OclLigandFeaturePerceiverTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "test_methods": [
+            "perceivesChemistryWithoutTargetOrResidueIdentifiers"
+          ]
+        }
+      ]
+    }
+  ],
+  "acceptance_tests_added": 25,
+  "preservation": [
+    {
+      "path": "ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv",
+      "before_sha256": "6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d",
+      "after_sha256": "6b0d53bc92b6361ce31ce4acc4dcf768e86b652b347bd275b2f55fc1ed2cc53d",
+      "unchanged": true
+    },
+    {
+      "path": "analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh",
+      "before_sha256": "b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9",
+      "after_sha256": "b0cfe4982ef5a9daac0f0569627b85409d919971b7550d695abc9490345440e9",
+      "unchanged": true
+    },
+    {
+      "path": "analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv",
+      "before_sha256": "dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f",
+      "after_sha256": "dc3c94a10c88710c7a1d8375c50c8eedd987059ab7bf4e87fc363d914dc53c0f",
+      "unchanged": true
+    },
+    {
+      "path": "CMDC-21-e70466.pdf",
+      "before_sha256": "a31c7e38c8199d9c9190a203c46d5311acc345022dec6eb36e97b2ac270c7990",
+      "after_sha256": "a31c7e38c8199d9c9190a203c46d5311acc345022dec6eb36e97b2ac270c7990",
+      "unchanged": true
+    }
+  ],
+  "excluded": [
+    "athena totah.lab.athena.regression",
+    "*IntegrationTest",
+    "scientific campaigns",
+    "METTL7 campaigns",
+    "Hephaestus consolidation",
+    "WELD migration"
+  ],
+  "intermediate_failures": [
+    {
+      "tests": 676,
+      "failures": 1,
+      "cause": "Existing process-timeout test: sandbox sysctl denied",
+      "resolution": "Same bounded suite passed with subprocess permission"
+    },
+    {
+      "tests": 27,
+      "failures": 1,
+      "cause": "New planner-storage acceptance test: I/O cause message missing from durable receipt",
+      "resolution": "Preserved underlying I/O message in exception wrapper; both final suites rerun and passed"
+    }
+  ]
+}
