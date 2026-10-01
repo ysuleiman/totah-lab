@@ -1,0 +1,230 @@
+ATHENA PHASE 2.2 CHECKPOINT — EVIDENCE QUALIFICATION, BINDING AND EVALUATION
+
+Parent (accepted Phase 2.1): eb413a97f6aee3c01e69c15c4d094a5d12078cc7
+Branch: codex/athena-phase2-resources
+The commit containing this report is the separate Phase 2.2 checkpoint.
+Java 21. No dependency/POM/module/package changes. Transformation breadth is unchanged.
+
+FILES CHANGED (relative to software/modules/)
+
+athena/src/main/java/totah/lab/athena/design/reasoning/DesignKnowledge.java
+athena/src/main/java/totah/lab/athena/design/reasoning/HypothesisDirectedPlanner.java
+athena/src/main/java/totah/lab/athena/design/reasoning/ReviewedEvidenceAdapters.java
+athena/src/test/java/totah/lab/athena/design/reasoning/ReviewedEvidenceAdaptersTest.java
+athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/QualifiedReasoningAcceptanceTest.java
+athena-openchemlib/src/test/resources/reasoning/qualified-local-replacement.json
+athena/PHASE2_2_CHECKPOINT.txt
+athena/phase2_2-validation.json
+
+EXISTING MODEL AUDIT / OWNERSHIP
+
+Inspected source, not just module documentation:
+- Athena pocket.evidence.EvidenceMethod: versioned method plus parameter map. Reused directly.
+- Athena pocket.evidence.EvidenceProvenance: source provider/identifier/version, extraction
+  method/time and attributes. Designed for pocket acquisition; retained in that pipeline.
+  DesignKnowledge already has source Reference and full snapshot journaling, so no second
+  provenance aggregate was added. Qualification adds explicit review attribution and subject.
+- Athena recognition.EvidenceQuality: ADEQUATE/DEGRADED/UNAVAILABLE recognition adequacy,
+  not an assay comparability schema or universal confidence. Not repurposed as such.
+- Athena InteractionObservation: geometry/contact observations with method attribution;
+  neither experimental interaction proof nor a potency endpoint. Not automatically ingested.
+- Aether provenance.ScientificStatus: validated/screening/unavailable/nonconverged/numerical/
+  unsupported statuses. Reused as an independent source-status dimension, not a scalar score.
+- Aether matrix.FragmentInteractionCalculator.Result: separate CP/D3 components, receipt hashes,
+  component convergence/cache provenance, failures and fixed SCREENING_ONLY status. Adapted
+  only as the fixed PBE-D3 CP electronic fragment-energy endpoint, without running calculations.
+- METTL7 triage.EvidenceObservation and ExperimentalFeatures: target-specific evidence/timing/
+  confidence and feature interpretations. They remain downstream; no generic Athena imports.
+- METTL7 evidence.Mettl7CompoundEvidence: source/canonical identity, separate experimental A/B,
+  computed and mutation evidence/classification/run references. No automatic report ingestion.
+- METTL7 landscape.Mettl7EnergyComparability: explicit method/preparation/state assumptions and
+  component separation. The general principle informs exact comparability; target policy stays
+  downstream. No target constants or policies were copied into Athena.
+
+Existing Reference, DesignState, Provenance, RetainedAnchor and DesignGrammar.EditableVector
+already own identities, state, lineage and region data. New nested qualification/value/requirement
+records extend DesignKnowledge rather than replace those authorities. Neither pocket evidence
+nor Aether status alone owns hypothesis-specific relevance, acceptance criteria or revisions.
+One new production class, ReviewedEvidenceAdapters, separates concrete source-result interpretation
+from immutable knowledge records and the planner. No existing adapter performs this association.
+There is no second generator, matcher, graph, sanitizer or canonical identity implementation.
+
+PUBLIC CONTRACT / COMPATIBILITY
+
+DesignKnowledge supports athena-design-knowledge/2 for qualified planning/evaluation.
+The existing SCHEMA constant remains athena-design-knowledge/1 for historical replay;
+QUALIFIED_SCHEMA explicitly opts into the stricter path. Production callers seeking these
+new guarantees must supply schema 2. Legacy unqualified data is never silently upgraded.
+Existing constructor signatures for Evidence, Criterion, Hypothesis, Finding and Decision
+remain as overloads. Legacy fixtures and tests pass unchanged; missing new JSON fields default
+to null/empty. Record components and serialized shape are additive changes; record-pattern or
+strict external JSON consumers need review/recompilation. New enum values are additive.
+No scientific backend identifier, frozen Phase 2.1 fixture or historical report was renamed.
+
+Evidence adds Qualification and Value. Qualification contains method/endpoint/system/conditions/
+unit/value-kind semantics, ScientificStatus, exact subject DesignState, reviewer reference and
+an explicit uncertainty description. Source and version remain the existing Reference.
+Value is either finite ordered inclusive numeric bounds or a qualitative category, never both.
+Requirements specify accepted evidence kinds/statuses and exact semantics, independently.
+Hypotheses add explicit evidence requirements, optional ReviewedBinding and unresolved observations.
+Criteria add a requirement, accepted interval/category, versioned policy and policy-source references.
+Findings retain the raw evidence reference. withEvidence appends immutable observations;
+evaluate derives dimension-wise findings; withEvaluation validates them again on snapshot creation.
+
+COMPARABILITY / CLAIM BOUNDARIES
+
+Exact method name/version/parameters, endpoint ID/version, system ID/version, condition map,
+unit and quantitative/qualitative kind must agree. No implicit unit conversion, method aliases,
+endpoint substitution, potency inference or global evidence-quality score is implemented.
+Evidence must be reviewed, in the hypothesis context, of an explicitly permitted class/status,
+and applicable to the original exact design state. A reviewed transfer is separately required
+for a reordered/renamed parent. Unbound requirements cannot be silently ignored.
+SCREENING_ONLY can satisfy only a policy explicitly accepting that status. It cannot satisfy
+VALIDATED_REFERENCE by conversion or ranking. Source type restrictions also apply to raw
+observations behind a supporting evaluation, preventing type laundering through the evaluator.
+A source-kind/status whitelist is scientist-authored policy, not evidence that a claim is true.
+
+REVIEWED ADAPTERS
+
+1. MolecularSanitizer.Result -> toolkit-chemical-validation@1, qualitative.
+   Checks exact graph attribution; preserves backend name/version/operation, lineage, normalization
+   changes and messages. Validity yields category 'valid', status SCREENING_ONLY. Invalidity or
+   unauthorized meaningful normalization yields UNAVAILABLE with no usable value. Source validity
+   remains explicit in limitations. No geometry, retained function or biological success is inferred.
+2. FragmentInteractionCalculator.Result -> electronic-fragment-interaction-energy@1, hartree.
+   Fixed Aether PBE-D3 counterpoise method/protocol; original receipt and component/cache/convergence
+   details preserved. Requires the six distinct RHF/PBE CP roles, finite available energies, three
+   dispersion receipts and no failures. Otherwise returns UNAVAILABLE/no value. SCREENING_ONLY
+   survives; this is not free energy, affinity or potency. The point estimate has no uncertainty
+   estimate: equal bounds do NOT assert zero physical uncertainty.
+
+Both adapters require explicit review, subject/system/context association. They do not discover
+or ingest arbitrary historical outputs. The Aether result does not itself encode the full ligand
+DesignState: that association remains a reviewer responsibility, prominently recorded in limits.
+Receipt hashes are source identifiers, not cryptographically authenticated by these adapters.
+Per-run receipt details are provenance, not method parameters, so different receipts do not become
+incomparable merely because they have different hashes. Underlying source algorithms are unchanged.
+
+REVIEWED REGION BINDING
+
+Exact parent + stable atom IDs remains available without a backend lookup. Rebinding requires
+schema 2, one explicit ReviewedBinding, reviewer and grammar references, and the exact target state.
+The reused EditableVector must identify the existing unique source site and ATOM_SUBSTITUTION.
+Protected neighborhood atoms and retained atom/bond anchors are mapped, not guessed.
+Unsupported hard/geometric/substituent-class restrictions decline instead of being ignored.
+
+The injected existing CanonicalIdentityService supplies both identities and complete correspondence.
+Backend/version and canonical keys must agree. Exactly one exhaustive mapping is required. Multiple
+symmetry alternatives produce AMBIGUOUS_SITE; absent/truncated/incomplete mapping or missing backend
+produces UNSUPPORTED_LINEAGE. Canonical identity by itself is insufficient. Mapping IDs must cover
+both graphs bijectively; coordinates and metadata must remain unchanged under that mapping.
+The backend owns chemical/stereo equivalence; the planner only checks applicability and state data.
+Full proof and alternatives remain in the durable Decision, including declined correspondence.
+Successful provenance includes knowledge snapshot, binding, grammar and reviewer references.
+
+StableAtomOrbitService was considered but orbits deliberately group symmetry equivalents and cannot
+prove unique lineage. Feature perception/attachment concepts were inspected but are not used to
+select new sites. This slice transfers a reviewed existing region only; it does not search for motifs,
+select among symmetric atoms, infer feature equivalence or transfer geometry between coordinate frames.
+Real OCL rebinding is tested through the existing generator, transaction, validator and journal.
+
+EVALUATION / REVISION
+
+Schema-2 findings are recomputed against hypothesis-owned criteria on insertion/loading; a manually
+strengthened conclusion cannot be inserted. Unknown criterion or observation references throw.
+Absent criterion observations are NOT_MEASURED, not an invented measurement.
+Wrong context/method/endpoint/system/conditions/unit/kind/state or unmet status qualification is
+UNRESOLVED. Applicable failed/unavailable evaluations produce FAILED_INVALID, not contradiction.
+For comparable usable numeric observations: an interval wholly within the accepted range SUPPORTS;
+an interval disjoint from it CONTRADICTS; an overlapping boundary is UNRESOLVED. Qualitative equality
+supports the specified category; a different comparable category contradicts it. Policies and their
+sources are versioned in the snapshot; no hidden scientific thresholds are introduced.
+
+Evaluation is a computational rule assessment; findings retain original source kinds and references.
+Successful molecule construction and validation alone never create biological findings.
+Evidence must match the attempted resulting derivation's graph, state ID, parent and provenance.
+Representative storage-node ID is not the scientific applicability key; deduplicated derivations
+retain their own graph/provenance under Phase 1. No cross-run global identity registry is introduced.
+
+revise still requires an explicit reviewed observation and scientist-written new claim/consequence.
+It preserves old hypotheses/evidence/receipts. Contradictions enter conflict references, all-support
+observations enter support, otherwise unresolved observations are retained. Conflicts and unresolved
+observations block automatic replanning. Reusing support also requires matching original criteria,
+parent applicability and allowed raw evidence classes. No automatic promotion to truth occurs.
+
+COMPLETE TARGET-INDEPENDENT EXAMPLE
+
+qualified-local-replacement.json extends the frozen Phase 2.1 synthetic C-C-S fixture:
+reviewed synthetic design brief + explicit method/endpoint/system/conditions/category/status
+ -> h@1 requests lower mass while separately testing Y; versioned synthetic criteria
+ -> exact terminal S site, retained C-C anchor, existing enabled S->O mechanical rule
+ -> existing authorized edit, generator, OCL validation, identity, delta and durable receipt
+ -> separately supplied synthetic mass interval [-17,-15] g/mol satisfies [-20,-10]
+ -> Y omitted => NOT_MEASURED, so an explicit revision records unresolved observations and blocks
+    replanning; missing Y is not inferred from graph retention
+ -> alternatively, synthetic Y='retained' supports both criteria, or Y='lost' contradicts retention
+ -> explicit h@2 preserves h@1 and the original candidate receipt; contradiction blocks planning.
+Additional fixtures cover a disjoint mass interval, overlapping uncertainty bounds, evaluator failure,
+wrong observation semantics/state, and attempted forged support. These are test data, not real science.
+JSON round trips preserve snapshots/decisions; real OCL unique binding and ambiguous proof replay.
+
+REUSED EXECUTION / ARCHITECTURE
+
+GraphEditTransactionEngine, TopologyEditTransactionEngine (unchanged), MolecularDesignGraphGenerator,
+CanonicalIdentityService and OCL correspondence, MolecularGraph/Delta, DesignState/Attempt,
+retained anchors, bounded enumeration, sanitizer, existing journal and knowledge JSON codec.
+No chemistry widening, new toolkit, WELD migration, Hephaestus move, ML, docking optimizer,
+METTL7 production design, Aether scientific computation or orchestration restructuring.
+
+FINAL VALIDATION (repository root; exact commands)
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena/pom.xml install '-Dtest=*,!**/regression/**,!*IntegrationTest'
+BUILD SUCCESS: 684 tests; 0 failures, 0 errors, 0 skipped.
+Includes Phase 1 DesignProvenanceAcceptanceTest (19), Phase 2.1 HypothesisDirectedPlannerTest (16),
+new ReviewedEvidenceAdaptersTest (6), AthenaDependencyTest (2), graph/topology/delta/correspondence tests.
+
+JAVA_HOME=$(/usr/libexec/java_home -v 21) mvn -o -B -f software/modules/athena-openchemlib/pom.xml test
+BUILD SUCCESS: 39 tests; 0 failures, 0 errors, 0 skipped.
+Includes Phase 2.1 HypothesisDirectedReplacementAcceptanceTest (9), existing OCL backend acceptance
+and other backend tests (18), new QualifiedReasoningAcceptanceTest (12).
+
+18 new tests total. All intermediate runs passed. Final runs follow the last source/test changes.
+Exact per-class results and logs' SHA256 are recorded in phase2_2-validation.json.
+No downstream production source/API was changed; adapter tests compile and exercise the existing
+Aether result contract, and OCL acceptance tests exercise concrete backend compatibility. No METTL7
+campaign or downstream scientific evaluator was rerun. Full Aether physics tests were unnecessary
+because its algorithms are unchanged and adapters use deterministic receipt fixtures.
+
+PRESERVATION / EXCLUSIONS
+
+Excluded Athena regression and *IntegrationTest tests that can execute broader/scientific workflows.
+Scientific artifacts were not edited, regenerated, normalized, moved, staged or deleted.
+The four pre-work sentinel hashes match exactly (see validation JSON): root regression CSV,
+Stage A supervisor script, torsion consistency CSV and CMDC PDF. All 114871 previously preserved
+untracked paths remain present. This is a path inventory plus four content checks, not a claim of
+rehashing every historical output. The three preexisting tracked modifications remain untouched.
+No repository cleanup was performed; git status remains non-clean due to this preserved prior work.
+Only the eight listed Phase 2.2 files belong in this commit. Frozen earlier reports remain unchanged.
+
+KNOWN LIMITATIONS / RECOMMENDED PHASE 2.3 (NOT STARTED)
+
+- Qualification and reviewer/source attribution are explicit trusted inputs, not authenticated truth.
+- Strict exact comparability; no conversions, assay ontology, effect-size statistics, confidence
+  calibration, cross-system causal transfer or general biological-evidence importer.
+- Legacy schema 1 intentionally retains Phase 2.1 semantics for replay, not Phase 2.2 guarantees.
+- Region transfer is limited to unique backend-proven identity correspondence with unchanged
+  coordinates/metadata. No ambiguity resolution, motif binding, conformer transfer or new placement.
+- Human policy must interpret numeric intervals and uncertainty descriptions appropriately; the
+  engine only implements explicit interval/category predicates, not statistical significance.
+- Adapter audit details are preserved in method/source/limitations, not a new normalized archive of
+  all source receipts. Raw receipt storage/authentication remains a host responsibility.
+- Hosts must journal knowledge before planning and use durable decision/execution sinks. No new
+  workflow/CLI is introduced. Semantic replay is tested, not canonical byte ordering across JVMs.
+- Version uniqueness is snapshot-local. Cross-file ID reuse and independent review governance
+  need a separate persisted registry/protocol before broader external evidence ingestion.
+
+Recommend a narrowly reviewed evidence-ingestion checkpoint next: choose one real, target-independent
+source/endpoint; define its review and attribution contract, unit/uncertainty policy and immutable
+receipt storage; add end-to-end fixtures without widening transformation chemistry. Broader region
+binding should wait for explicit ambiguity/coordinate-transfer requirements. WELD resources and
+Hephaestus consolidation remain separate approvals. STOP here after the Phase 2.2 commit.
