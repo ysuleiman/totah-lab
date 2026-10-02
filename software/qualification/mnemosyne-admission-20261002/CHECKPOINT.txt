@@ -1,0 +1,63 @@
+MNEMOSYNE PHASE 3 — BOUNDED SNAPSHOT ADMISSION CHECKPOINT
+Date: 2026-10-02
+Base HEAD: 13ce65d0588934b13699ba51b319cc518f61984b
+Branch: codex/mmp-chemistry-roundtrip
+Status: implemented and bounded tests passing; not yet committed.
+
+Approved deliverable: a read-only successor-admission contract, with explicit
+ADMISSIBLE / REPLAY / CONFLICT outcomes, pinned parent/incoming identities and
+canonical exchange digests, immutable inputs and no implicit branch merge.
+
+Added EvidenceAdmission with nested immutable Pin, Expectation, Finding and
+Result records; typed Status and Reason enums. check(parent,incoming,expectation)
+validates both complete snapshots using EvidenceExchange.encode, compares
+caller-supplied pins, checks exact replay or a distinct successor, expected
+parent, nondecreasing snapshot creation time and unchanged inherited membership.
+Findings contain explicit reasons and affected references in deterministic order.
+The result retains expected pins and method mnemosyne-snapshot-admission/1.
+Existing public signatures and exchange schema remain unchanged.
+
+Digest semantics: SHA256(EvidenceExchange.encode(snapshot)), not raw input file
+bytes or an authenticity signature. Malformed caller arguments throw argument/
+null errors; internally invalid snapshots return conflict findings. No new I/O
+is performed; checked encoding failures are translated to invalid-input reasons.
+The existing 16 MiB exchange encoding limit applies to each snapshot.
+
+Branches are checked independently against their declared parent. Differing
+same-ID content on sibling branches remains separate; one sibling cannot be
+admitted as the other's successor without satisfying the parent/content guards.
+This class does not maintain a global catalog, select a branch, merge histories,
+reconcile missing ancestors, or authenticate authorities. REPLAY is exact equality
+with the supplied parent, not a persistent deduplication registry.
+Distinct-ID contradictory assessments remain attributed records. Admission is
+structural consistency, not scientific truth, endorsement or current usability.
+Equal snapshot timestamps are allowed; earlier successors conflict. Existing
+record-level temporal and reference rules remain owned by EvidenceHistory and
+EvidenceExchange. No new backdating policy is inferred.
+
+Validation: fresh Java 21 compilation of all eight Mnemosyne production sources
+and all five test classes, cached Jackson/JUnit dependencies only, heap 256 MiB.
+36 tests started/passed; zero failures/skips/aborts; six containers passed.
+10 new EvidenceAdmissionAcceptanceTest cases; all 26 existing tests pass.
+Coverage: successors, exact replay, expected references/digests, wrong/missing
+parent, earlier chronology, reused snapshot identity, omitted/changed inherited
+records, invalid manifest/body on either side, branches, preserved SUPPORTS and
+CONTRADICTS assessments, insertion-order determinism, byte-identical inputs,
+immutable results and malformed expectations. Existing exchange golden encoding,
+history, resolver and architecture tests ran unchanged.
+
+commands.json contains exact argument arrays. Recreate its temporary output
+directory and save BoundedTests.java.txt there as BoundedTests.java to rerun.
+Existing architecture tests read cached target/classes as well; a supplemental
+scan of freshly compiled production bytecode found no checked domain/toolkit
+references. Test class bytecode is excluded because architecture tests contain
+forbidden names as test data. Initial compilation failed on ambiguous wildcard
+imports in the new test, corrected by qualifying the method constant; original
+compiler log preserved. No production behavior weakened to satisfy tests.
+
+Preservation: all 80 prior checkpoint hashes unchanged. Only two new Java files
+and this qualification directory added. Existing scientific tracked changes and
+prior checkpoints were not modified. No full untracked inventory performed.
+No broad Maven/reactor build, downloads, scientific runs, cleanup, reset or moves.
+No persistence, application wiring, chemistry changes or planner activation.
+Stop at this separate checkpoint. No commit or push performed.
