@@ -45,6 +45,177 @@ class GovernedDesignWorkflowTest {
         h.putArray("requirements").add(JSON.valueToTree(new EvidenceRequirement(ref("prior"),new Requirement(decision.evidence().qualification().semantics(),Set.of(EvidenceKind.COMPUTATIONAL),Set.of(ScientificStatus.SCREENING_ONLY)))));
         return JSON.treeToValue(n,DesignKnowledge.class);
     }
+
+    /** Reuse the frozen toy brief; this interpretation is explicitly test-authored. */
+    private static DesignKnowledge syntheticKnowledge(GovernedDesignWorkflow run, boolean duplicate) throws Exception {
+        ObjectNode document = JSON.valueToTree(fixture());
+        String raw = "{\"origin\":\"frozen synthetic local replacement brief\"}";
+        String hash = ContentHash.sha256(raw);
+        ((ObjectNode) document.path("evidence").get(0).path("source")).put("version", hash);
+        if (duplicate) {
+            ObjectNode second = ((ObjectNode) document.path("hypotheses").get(0)).deepCopy();
+            ((ObjectNode) second.path("reference")).put("id", "h-other");
+            second.put("claim", "Independent synthetic rationale for the same toy edit");
+            document.withArray("hypotheses").add(second);
+        }
+        var knowledge = JSON.treeToValue(document, DesignKnowledge.class);
+        var evidence = knowledge.evidence().getFirst();
+        var qualification = evidence.qualification();
+        var review = new SourceReview(qualification.review(), ref("test-reviewer"), ref("test-process"),
+                TIME.toString(), true, "synthetic acceptance fixture only", "frozen toy brief",
+                qualification.subject(), qualification.semantics(), qualification.status(),
+                UncertaintyKind.POINT_UNKNOWN, qualification.uncertainty(), evidence.claim(), evidence.limitations());
+        run.registerInterpretation(new Interpretation(review, ref("test-policy"), "synthetic-test-fixture",
+                raw, hash, evidence.claim(), evidence));
+        return knowledge;
+    }
+
+    private MolecularDesignTree execute(DesignState parent,
+            List<MolecularDesignGraphGenerator.AuthorizedEdit> operations, Path path) throws Exception {
+        try (var journal = new Journal(path)) {
+            return new MolecularDesignGraphGenerator(new GraphEditTransactionEngine(), backend, backend).generateTraced(
+                    parent.graph(), parent.provenance(), new MolecularDesignGraphGenerator.Configuration(
+                            GenerationStrategy.ENUMERATIVE, 8, 1, 8, false,
+                            new MolecularSanitizer.SanitizationPolicy(Set.of(), true)),
+                    state -> state.depth() == 0 ? operations : List.of(), journal,
+                    (state, operation, graph) -> new MolecularDesignGraphGenerator.GeometryResult(true, List.of(), Set.of()));
+        }
+    }
+
+    private static <T> List<T> events(Path path, String event, Class<T> type) throws Exception {
+        var result = new ArrayList<T>();
+        long sequence = 0;
+        for (String line : Files.readAllLines(path)) {
+            var entry = JSON.readTree(line);
+            assertEquals(Journal.SCHEMA, entry.path("schema").asText());
+            assertEquals(sequence++, entry.path("sequence").asLong());
+            if (event.equals(entry.path("event").asText())) result.add(JSON.treeToValue(entry.path("data"), type));
+        }
+        return result;
+    }
+
+    @Test void governedHandoffDurablyPreservesDistinctDerivationsAndDeterministicReplay() throws Exception {
+        var factory = new PipelineFactory(temporary);
+        Path snapshot, firstExecution, firstReasoning, evaluated;
+        MolecularDesignTree first;
+        DesignKnowledge knowledge;
+        try (var run = factory.openDesignReasoningRun(backend)) {
+            knowledge = syntheticKnowledge(run, true);
+            var parent = knowledge.hypotheses().getFirst().applicableParent();
+            snapshot = run.saveKnowledge("knowledge.json", knowledge);
+            var proposals = run.plan(snapshot, List.of(ref("h-other"), ref("h")), Set.of(EvidenceKind.SYNTHETIC_TEST), parent);
+            assertEquals(2, proposals.size());
+            firstReasoning = run.runDirectory().resolve("reasoning.jsonl");
+            // Planning is already durable before execution starts; the host owns the separate execution journal.
+            assertEquals(proposals, events(firstReasoning, "planning-decision", HypothesisDirectedPlanner.Decision.class)
+                    .stream().map(HypothesisDirectedPlanner.Decision::proposal).toList());
+            firstExecution = run.runDirectory().resolve("execution.jsonl");
+            first = execute(parent, proposals, firstExecution);
+            assertEquals(List.of(Outcome.ACCEPTED, Outcome.DEDUPLICATED), first.attempts().stream().map(Attempt::outcome).toList());
+            assertEquals(2, first.nodes().size());
+            assertEquals(3, first.states().size());
+            var receipts = events(firstExecution, "receipt", Attempt.class);
+            assertEquals(first.attempts(), receipts);
+            assertEquals(first.states(), events(firstExecution, "state", DesignState.class));
+            assertEquals(List.of(first.termination()), events(firstExecution, "terminated", Termination.class));
+            for (int i = 0; i < receipts.size(); i++) {
+                var receipt = receipts.get(i);
+                var hypothesis = knowledge.hypotheses().get(i);
+                var provenance = receipt.operation().provenance();
+                assertEquals(proposals.get(i), receipt.operation());
+                assertEquals(parent, receipt.parentDesignState());
+                assertEquals(hypothesis.reference(), provenance.hypothesis());
+                assertEquals(hypothesis.supportingEvidence(), provenance.evidence());
+                assertEquals(hypothesis.eligibleRule(), provenance.rule());
+                assertEquals(hypothesis.retainedAnchors(), provenance.retainedAnchors());
+                assertEquals(List.of(knowledge.reference()), provenance.resources());
+                assertEquals(receipt.attemptedProduct(), receipt.graphReceipt().delta().replay(parent.graph()));
+                assertEquals(receipt.resultingProduct(), receipt.finalDelta().replay(parent.graph()));
+                assertEquals(List.of("a", "b", "c"), receipt.resultingProduct().atoms().stream().map(MolecularGraph.Atom::id).toList());
+                assertFalse(receipt.backendEvidence().isEmpty());
+                assertTrue(receipt.backendEvidence().stream().allMatch(e -> OclMolecularBackend.BACKEND.equals(e.backend())
+                        && OclMolecularBackend.VERSION.equals(e.version())));
+            }
+            var duplicate = receipts.get(1);
+            assertNotEquals(receipts.getFirst().resultingStateId(), duplicate.resultingStateId());
+            assertEquals(first.states().get(1).representativeNodeId(), first.states().get(2).representativeNodeId());
+            assertTrue(duplicate.representativeMapping().exhaustive());
+            assertEquals(Map.of("a", "a", "b", "b", "c", "c"), duplicate.parentToRepresentativeAtoms());
+            assertEquals(Map.of("ab", "ab", "bc", "bc"), duplicate.parentToRepresentativeBonds());
+            evaluated = run.evaluate(snapshot, "evaluated.json", new Reference(knowledge.reference().id(), "evaluated"), ref("evaluation"), ref("h-other"),
+                    "synthetic-handoff-run", duplicate, ref("test-evaluator"), Map.of());
+        }
+        try (var replay = factory.openDesignReasoningRun(backend)) {
+            assertEquals(knowledge, replay.load(snapshot));
+            var evaluation = replay.load(evaluated).evaluations().getFirst();
+            assertEquals(first.attempts().get(1), evaluation.attempt());
+            assertEquals(Set.of("mass", "Y"), evaluation.findings().stream().map(Finding::criterionId).collect(java.util.stream.Collectors.toSet()));
+            assertTrue(evaluation.findings().stream().allMatch(f -> f.conclusion() == Conclusion.NOT_MEASURED));
+            var parent = knowledge.hypotheses().getFirst().applicableParent();
+            var proposals = replay.plan(snapshot, List.of(ref("h"), ref("h-other")), Set.of(EvidenceKind.SYNTHETIC_TEST), parent);
+            var secondExecution = replay.runDirectory().resolve("execution.jsonl");
+            assertEquals(first, execute(parent, proposals.reversed(), secondExecution));
+            assertEquals(events(firstExecution, "receipt", Attempt.class), events(secondExecution, "receipt", Attempt.class));
+            assertEquals(events(firstReasoning, "planning-decision", HypothesisDirectedPlanner.Decision.class),
+                    events(replay.runDirectory().resolve("reasoning.jsonl"), "planning-decision", HypothesisDirectedPlanner.Decision.class));
+        }
+    }
+
+    @Test void governedProposalWithDeniedAuthorizationLeavesDurableRejection() throws Exception {
+        try (var run = new PipelineFactory(temporary).openDesignReasoningRun(backend)) {
+            var knowledge = syntheticKnowledge(run, false);
+            var parent = knowledge.hypotheses().getFirst().applicableParent();
+            var snapshot = run.saveKnowledge("knowledge.json", knowledge);
+            var proposal = run.plan(snapshot, List.of(ref("h")), Set.of(EvidenceKind.SYNTHETIC_TEST), parent).getFirst();
+            // Deliberate host-boundary fault injection: execution must recheck authorization.
+            var denied = new MolecularDesignGraphGenerator.AuthorizedEdit(proposal.edit(),
+                    new GraphEditTransactionEngine.Authorization("wrong-vector", Set.of(), Set.of(), Set.of(), Set.of()),
+                    proposal.priority(), proposal.provenance());
+            var path = run.runDirectory().resolve("execution.jsonl");
+            var tree = execute(parent, List.of(denied), path);
+            var receipts = events(path, "receipt", Attempt.class);
+            assertEquals(tree.attempts(), receipts);
+            assertEquals(1, receipts.size());
+            var rejected = receipts.getFirst();
+            assertEquals(Outcome.AUTHORIZATION_REJECTED, rejected.outcome());
+            assertFalse(rejected.reason().isBlank());
+            assertEquals(denied, rejected.operation());
+            assertEquals(parent, rejected.parentDesignState());
+            assertNull(rejected.resultingStateId());
+            assertNull(rejected.resultingProduct());
+            assertEquals(List.of(parent), tree.states());
+            assertEquals(List.of(tree.termination()), events(path, "terminated", Termination.class));
+        }
+    }
+
+    @Test void governedUnsupportedOrInapplicableEvidenceDeclinesWithoutExecution() throws Exception {
+        try (var run = new PipelineFactory(temporary).openDesignReasoningRun(backend)) {
+            var knowledge = syntheticKnowledge(run, false);
+            var parent = knowledge.hypotheses().getFirst().applicableParent();
+            var snapshot = run.saveKnowledge("knowledge.json", knowledge);
+            var otherState = new DesignState("unreviewed-state", parent.representativeNodeId(), parent.parentStateId(),
+                    parent.graph(), parent.provenance(), parent.depth());
+            var unsupported = run.plan(snapshot, List.of(ref("h")), Set.of(EvidenceKind.EXPERIMENTAL), parent);
+            var inapplicable = run.plan(snapshot, List.of(ref("h")), Set.of(EvidenceKind.SYNTHETIC_TEST), otherState);
+            assertTrue(unsupported.isEmpty());
+            assertTrue(inapplicable.isEmpty());
+            var decisions = events(run.runDirectory().resolve("reasoning.jsonl"), "planning-decision", HypothesisDirectedPlanner.Decision.class);
+            assertEquals(List.of(HypothesisDirectedPlanner.DecisionCode.INSUFFICIENT_EVIDENCE,
+                    HypothesisDirectedPlanner.DecisionCode.NOT_APPLICABLE), decisions.stream().map(HypothesisDirectedPlanner.Decision::code).toList());
+            for (var decision : decisions) {
+                assertNull(decision.proposal());
+                assertFalse(decision.reason().isBlank());
+                assertEquals(knowledge.reference(), decision.knowledge());
+                assertEquals(ref("h"), decision.hypothesis());
+            }
+            var path = run.runDirectory().resolve("execution.jsonl");
+            var tree = execute(parent, unsupported, path);
+            assertTrue(tree.attempts().isEmpty());
+            assertTrue(events(path, "receipt", Attempt.class).isEmpty());
+            assertEquals(List.of(parent), tree.states());
+            assertEquals(TerminationReason.EXHAUSTED, tree.termination().reason());
+        }
+    }
     @Test void factoryBindsSharedRegistryAndJournalsVerifiedLineageBeforePlanning()throws Exception {
         var factory=new PipelineFactory(temporary);Path snapshot,journal;SourceDecision first;
         try(var run=factory.openDesignReasoningRun(backend)) {
