@@ -1,0 +1,51 @@
+MNEMOSYNE PHASE 7 — THIN READ-ONLY QUERY FACADE
+Date: 2026-10-02
+Branch: codex/mmp-chemistry-roundtrip
+Phase 6 commit / Phase 7 base: 44fbdeeefccb7df56d48429c7aa672131ff40209
+Phase 6 parent: 1465e37f73f804447b611aaa3314076d2d2c095f
+Phase 6 committed exactly as qualified: eleven files, unchanged manifest contents.
+No push requested or performed.
+
+Phase 7 adds EvidenceQueries.java (two delegating read operations),
+EvidenceQueriesAcceptanceTest.java and this separate checkpoint only. Existing
+catalog, admission, lineage, branch-view, history and exchange APIs/schemas/tests
+remain unchanged. Evidence snapshot selection is always explicit. No write API,
+branch preference/current state, scientific ranking/resolution, chemistry-specific
+behavior, planner activation, UI or application wiring. Contract: QUERIES_V1.txt.
+
+VALIDATION
+Fresh Java 21 compile of all twelve Mnemosyne production sources and nine test
+classes against cached Jackson/JUnit dependencies; temporary output, heap 256 MiB.
+Compile exit 0; JUnit exit 0. 85 tests started/passed, zero failed/skipped/aborted;
+ten containers passed. Eight new facade tests; all 77 existing tests retained
+unchanged and passing. No failed development compile/test run occurred.
+Exact command arrays/raw logs and explicit-class launcher retained. Reproduce by
+copying BoundedTests.java.txt to the recorded temporary directory as BoundedTests.java
+and executing commands.json arrays. No broad build or downloads.
+
+NEW COVERAGE
+Public facade exposes only lineage() and evidence(reference), no default snapshot
+or catalog handle; direct delegation equality for metadata and every evidence-view
+field; all lineage operations through returned views; branch-local same-ID
+contradictory assessments and isolated withdrawals; earlier root state retained;
+exact snapshot pins, path, source and first-inclusion provenance; determinism across
+instances and branch insertion order; immutable collections/captured views; fresh
+queries after explicit appends; missing/wrong/null snapshot arguments; absent
+catalog open never creates storage; empty valid catalog remains distinct from
+invalid requests; corruption after an earlier success is not hidden by caching;
+orphan, cycle and invalid inheritance propagate checked failure; contents and
+mtimes remain unchanged through successful/failed read requests.
+
+Existing architecture tests ran unchanged, including cached target/classes checks.
+Supplemental scan of freshly compiled production classes found no checked domain/
+toolkit dependencies. New-source whitespace checks pass. No scientific regression,
+frozen prediction, benchmark or campaign rerun. Existing filesystem/concurrent-load
+limitations remain as documented in prior phases; no expanded durability claim.
+
+PRESERVATION / STOP
+80 prior checkpoint hashes verified unchanged, including the three tracked
+scientific sentinels. Full Phase 3/4/5/6 manifests reverified unchanged. Only new
+Phase 7 source/test and this directory written. No unrelated artifact writes,
+cleanup, reset or moves. No full untracked inventory performed.
+Phase 7 remains uncommitted at this separately qualified checkpoint. Stop before
+actual application wiring. No further milestone started.

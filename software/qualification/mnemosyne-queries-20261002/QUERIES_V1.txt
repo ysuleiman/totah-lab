@@ -1,0 +1,31 @@
+MNEMOSYNE READ-ONLY QUERY FACADE / 1
+
+Java 21 application-facing entry point, not application wiring:
+    new EvidenceQueries(existingCatalogDirectory)
+    queries.lineage()
+    queries.evidence(explicitSnapshotReference)
+
+Construction delegates to EvidenceSnapshotCatalog's existing non-creating open.
+lineage() delegates to EvidenceLineage.load and returns the existing immutable
+query view: roots, parent, children, ancestry, descendants, tips, strict ancestor
+tests. It does not select a snapshot, branch, preferred root or head.
+evidence(reference) delegates to EvidenceBranchView.load. The snapshot reference
+is required, validated and passed unchanged. No no-argument overload, latest/current
+state, fallback selection, framework annotation, transport DTO or UI is added.
+
+Both calls freshly validate through the existing layers. The facade neither
+caches nor catches/converts integrity errors. Checked IOException failures and
+argument errors retain their existing meanings. No default empty successful view
+is manufactured on corrupt/orphaned/cyclic/invalid lineage. Returned views retain
+their existing captured-view semantics; fresh calls are required for later changes.
+
+Only the two read methods are public. The catalog handle is private/final and
+never returned, so no seed/append/write route is exposed through this facade.
+All existing snapshot pins, branch-local first-inclusion provenance, original
+records, withdrawals, review admissibility, immutable collections and deterministic
+ordering are returned directly without remapping or reinterpreting them.
+No new ranking, scientific resolution, chemistry, planner behavior or temporal
+policy. The existing layers' documented consistency/authenticity limits remain:
+no filesystem transaction, live monitoring of an already-returned view, distributed
+consistency or proof of scientific truth. No HTTP/API serialization contract is
+introduced; this is a Java library facade for later separately reviewed wiring.
