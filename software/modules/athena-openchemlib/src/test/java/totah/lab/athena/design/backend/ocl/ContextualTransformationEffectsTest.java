@@ -100,4 +100,82 @@ class ContextualTransformationEffectsTest {
         assertEquals(3,s.studyCount());assertEquals(0.1/3,s.mean().orElseThrow(),1e-10);assertTrue(s.studyStandardDeviation().isPresent());
         assertTrue(service.summarize(r.effects(),p.transformation(),context,Optional.of("unseen context")).mean().isEmpty());
     }
+    @Test void retainedStereoExtractionPreservesEvidenceEligibilityUnderPermutation() throws Exception {
+        var backend = new OclMolecularBackend();
+        var extractor = new OclMatchedPairExtractor();
+        // Synthetic numbers test plumbing only; no assay or target interpretation.
+        for (String prefix : List.of("CC[C@H](F)C", "C[C@H](F)C")) {
+            var a = new Source("a", "synthetic-integration/v1", backend.decodeStructure("SMILES", prefix + "O"), List.of("oa"));
+            var b = new Source("b", "synthetic-integration/v1", backend.decodeStructure("SMILES", prefix + "N"), List.of("ob"));
+            var baseline = extractor.extract(List.of(a, b), 1);
+            assertEquals(1, baseline.pairs().size(), baseline.issues().toString());
+            var pair = baseline.pairs().getFirst();
+            var observations = List.of(
+                    m(pair.left().observationReferences().getFirst(), pair.leftIdentity(), context, "synthetic-study", 5, 5, "="),
+                    m(pair.right().observationReferences().getFirst(), pair.rightIdentity(), context, "synthetic-study", 6, 6, "="));
+            var expected = service.analyze(baseline.pairs(), observations, 0.3);
+            assertEquals(1, expected.effects().size());
+            assertTrue(expected.rejections().isEmpty());
+            for (var original : List.of(a, b)) for (int i = 1; i < original.graph().atoms().size(); i++) {
+                var mapper = new OclGraphMapper();
+                var mapping = mapper.toOcl(original.graph());
+                mapping.molecule().ensureHelperArrays(com.actelion.research.chem.Molecule.cHelperCIP);
+                mapping.molecule().swapAtoms(0, i);
+                mapping.molecule().ensureHelperArrays(com.actelion.research.chem.Molecule.cHelperCIP);
+                var graph = mapper.fromOcl(mapping, mapping.molecule());
+                assertEquals(backend.identify(original.graph()), backend.identify(graph));
+                var reordered = new Source(original.id(), original.dataset(), graph, original.observationReferences());
+                var extraction = extractor.extract(original == a ? List.of(b, reordered) : List.of(reordered, a), 1);
+                assertEquals(baseline.issues(), extraction.issues());
+                assertEquals(1, extraction.pairs().size());
+                var actualPair = extraction.pairs().getFirst();
+                assertEquals(pair.algorithm(), actualPair.algorithm());
+                assertEquals(pair.coreCorrespondence(), actualPair.coreCorrespondence());
+                var actual = service.analyze(List.of(actualPair, actualPair), observations.reversed(), 0.3);
+                assertEquals(expected.rejections(), actual.rejections());
+                assertEquals(1, actual.effects().size(), "duplicate extraction paths must not inflate support");
+                var effect = actual.effects().getFirst();
+                assertEquals(expected.effects().getFirst().left(), effect.left());
+                assertEquals(expected.effects().getFirst().right(), effect.right());
+                assertEquals(Direction.INCREASE, effect.direction());
+                assertEquals(1, effect.lower());
+                assertEquals(1, effect.upper());
+                var summary = service.summarize(actual.effects(), pair.transformation(), context,
+                        Optional.of(pair.leftFragment().chemicalContext()));
+                assertEquals(1, summary.pairCount());
+                assertEquals(1, summary.studyCount());
+                assertEquals(1, summary.mean().orElseThrow());
+                assertTrue(summary.studyStandardDeviation().isEmpty());
+                assertEquals(actual, service.analyze(List.of(actualPair, actualPair), observations, 0.3));
+            }
+        }
+    }
+
+    @Test void extractedStereoPairsAbstainForMissingUnboundAndIncomparableEvidence() throws Exception {
+        var backend = new OclMolecularBackend();
+        var extraction = new OclMatchedPairExtractor().extract(List.of(
+                new Source("a", "synthetic-integration/v1", backend.decodeStructure("SMILES", "C[C@H](F)CO"), List.of("oa")),
+                new Source("b", "synthetic-integration/v1", backend.decodeStructure("SMILES", "C[C@H](F)CN"), List.of("ob"))), 1);
+        assertEquals(1, extraction.pairs().size(), extraction.issues().toString());
+        var pair = extraction.pairs().getFirst();
+        var left = m(pair.left().observationReferences().getFirst(), pair.leftIdentity(), context, "synthetic-study", 5, 5, "=");
+        var otherContext = new Context("other-synthetic-target", "IC50", "binding", "assay", "protocol-v1", "dimensionless", "pIC50", "review-1");
+        var scenarios = List.of(List.of(left),
+                List.of(left, m("unbound", pair.rightIdentity(), context, "synthetic-study", 6, 6, "=")),
+                List.of(left, m(pair.right().observationReferences().getFirst(), pair.rightIdentity(), otherContext, "synthetic-study", 6, 6, "=")));
+        var reasons = List.of("MISSING_MEASUREMENT", "OBSERVATION_NOT_BOUND_TO_SOURCE", "INCOMPARABLE_CONTEXT_OR_STUDY");
+        for (int i = 0; i < scenarios.size(); i++) {
+            var result = service.analyze(extraction.pairs(), scenarios.get(i), 0.3);
+            assertTrue(result.effects().isEmpty());
+            assertEquals(List.of(reasons.get(i)), result.rejections().stream().map(Rejection::reason).toList());
+            assertEquals(result, service.analyze(extraction.pairs(), scenarios.get(i).reversed(), 0.3));
+            var summary = service.summarize(result.effects(), pair.transformation(), context,
+                    Optional.of(pair.leftFragment().chemicalContext()));
+            assertEquals(0, summary.pairCount());
+            assertEquals(0, summary.studyCount());
+            assertTrue(summary.mean().isEmpty());
+            assertTrue(summary.studyStandardDeviation().isEmpty());
+        }
+    }
+
 }
