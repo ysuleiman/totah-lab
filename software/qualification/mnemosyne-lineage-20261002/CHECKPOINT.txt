@@ -1,0 +1,49 @@
+MNEMOSYNE PHASE 5 — READ-ONLY DETERMINISTIC LINEAGE
+Date: 2026-10-02
+Branch: codex/mmp-chemistry-roundtrip
+Phase 4 commit / Phase 5 base: ccdaa3b2d2958cad7d40968530fc58a76d1b532b
+Phase 4 parent: a31e206f7b40a3272b2d70a42a71a9c994e5af8c
+Phase 4 committed exactly as qualified: eleven files, no prior artifact edits.
+No push requested or performed.
+
+Phase 5 adds EvidenceLineage.java, EvidenceLineageAcceptanceTest.java and this
+checkpoint only. Existing admission/catalog/history/exchange classes and tests
+remain unchanged. Uses existing catalog pinned reads and EvidenceAdmission for
+complete validation before publishing an immutable read-only query view.
+Roots, parent, children, ancestry, descendants, tips and strict ancestor tests
+are implemented with explicit deterministic ordering. See LINEAGE_V1.txt for
+semantics and temporal/consistency limitations.
+
+VALIDATION
+Fresh Java 21 compile of all ten Mnemosyne production sources and seven test
+classes, cached Jackson/JUnit dependencies, temporary output, heap 256 MiB.
+Compile exit 0; JUnit exit 0: 64 tests started/passed, zero failed/skipped/aborted;
+eight containers passed. Twelve new lineage tests, all 52 prior tests pass.
+Exact command argument arrays and raw logs included. Launcher source is
+BoundedTests.java.txt; copy it as BoundedTests.java to the recorded temporary
+classes directory to reproduce. No failed development test run occurred.
+
+New coverage: all requested query types, strict self/unknown-reference behavior,
+multiple roots, sibling branches, deterministic output across insertion order
+and reopening, immutable outputs and explicit reload for appends; orphan/cycle
+in a disconnected component blocks the whole view; malformed content, changed
+inherited records and backward chronology fail closed; sibling disagreement
+records remain separately pinned/readable; catalog bytes and mtimes unchanged
+by queries and failed loads; 128-link chain with iterative traversal.
+Existing Phase 4 tests also verify persisted SUPPORTS/CONTRADICTS assessments,
+review withdrawal/historical views, concurrent catalog writers and no overwrite.
+No new scientific policy, chemistry, branch preference, merge or application wiring.
+
+Existing architecture tests ran unchanged and include cached target/classes
+checks. Supplemental scan of all freshly compiled production bytecode found no
+checked domain/toolkit dependencies. New-source whitespace checks pass.
+No broad build, dependency download, scientific regression, benchmark or campaign
+rerun. No filesystem power-loss or concurrent lineage-load injection qualification.
+
+PRESERVATION / STOP
+All 80 prior checkpoint hashes verified unchanged, including tracked scientific
+sentinels. Phase 3 and Phase 4 full manifests reverified unchanged. Only new Phase 5
+source/test and this qualification directory written. No cleanup/reset/move or
+unrelated artifact modification. No full untracked content inventory performed.
+Phase 5 is uncommitted at this separate qualified checkpoint. Stop before
+application wiring; no later milestone started.

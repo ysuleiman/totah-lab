@@ -1,0 +1,45 @@
+MNEMOSYNE LINEAGE / 1
+
+Read-only Java 21 contract: EvidenceLineage.load(EvidenceSnapshotCatalog).
+A successful load returns an immutable metadata view of the validated inventory.
+No snapshot or catalog method/signature/schema was changed. No persistent index,
+head, branch preference, merge or scientific-resolution operation is introduced.
+
+load validates the whole enumerated catalog before exposing results:
+1. Catalog inventory validates canonical exchange bytes and path/identity binding.
+2. Check for duplicate identities and missing referenced parents in every component.
+3. Detect cycles iteratively, including disconnected components.
+4. Reread each snapshot by its captured pin. Check each parent-child pair using
+   existing EvidenceAdmission. Roots use self-admission as at catalog seeding.
+   Changed/missing inherited records and backward timestamps therefore fail closed.
+5. Compare a fresh catalog inventory with the initial captured inventory. Observed
+   changes or disappearing files cause IOException; no partial view is returned.
+
+Query meanings:
+- roots(): all parentless entries, sorted by reference namespace/id/version.
+- parent(reference): the single immediate parent, or empty only for a known root.
+- children(reference): every direct child, sorted by reference.
+- ancestry(reference): strict ancestors, nearest parent first, root last.
+- descendants(reference): all strict descendants, sorted by reference, not recency.
+- tips(): all leaves, including isolated roots; no preferred tip is selected.
+- isAncestor(a,b): strict relation, so self is false. Both references must exist.
+All results carry original catalog entries (snapshot pins and parent references),
+are immutable, and include sibling branches without comparing their assessments.
+Unknown references or non-snapshot kinds raise argument errors, not empty/false
+answers. Empty catalogs legitimately have empty roots and tips.
+
+Queries do no I/O after loading and return a captured view; later appends require
+an explicit reload. The view does not monitor later corruption or claim live
+catalog status. The two inventory passes detect observed changes, not a linearizable
+filesystem transaction or lock against concurrent writers. A racing append may
+require retry, or be outside the captured view; no silent partial result is
+returned for detected inconsistency. Concurrent load fault injection was not run.
+Inherited catalog limitations apply: trusted local filesystem, checksums not
+signatures, no protection from a fully self-consistent external rewrite without
+trusted external pins. No branch selection or recovery from corrupt/orphaned
+catalog contents. Only loading a valid catalog yields query access.
+
+Metadata traversal is iterative; loading keeps reference metadata and rereads
+bounded exchange snapshots, not a resident collection of all histories. Inventory
+is scanned/validated twice. No large-catalog performance or distributed consistency
+claim. Existing exchange per-snapshot byte limits remain enforced.
