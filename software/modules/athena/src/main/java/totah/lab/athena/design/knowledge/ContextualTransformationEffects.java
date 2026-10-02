@@ -4,7 +4,7 @@ import java.util.*;
 
 /** Exact-context paired differences. No universal confidence, benefit claim or planner authorization. */
 public final class ContextualTransformationEffects {
-    public static final String METHOD = "paired-interval-difference/exact-context/study-balanced/v1";
+    public static final String METHOD = "paired-interval-difference/exact-context/study-balanced/v2";
     /** Conditions must be an explicit reviewed protocol/conditions reference, never an unknown placeholder. */
     public record Context(String target, String endpoint, String method, String assay, String conditions,
                           String units, String scale, String qualification) {
@@ -56,6 +56,8 @@ public final class ContextualTransformationEffects {
         }
         var effects = new ArrayList<Effect>(); var rejected = new ArrayList<Rejection>();
         var seen = new HashSet<String>();
+        var provenance = new HashMap<String, List<String>>();
+        var conflicts = new HashSet<String>();
         for (var pair : pairs) {
             var left = byIdentity.getOrDefault(pair.leftIdentity(), List.of());
             var right = byIdentity.getOrDefault(pair.rightIdentity(), List.of());
@@ -71,7 +73,12 @@ public final class ContextualTransformationEffects {
                 if (reason != null) { rejected.add(new Rejection(a.reference(), b.reference(), reason)); continue; }
                 // Multiple symmetry-related cut paths must not multiply one empirical comparison.
                 String key = a.reference() + "\n" + b.reference() + "\n" + pair.transformation() + "\n" + pair.leftFragment().chemicalContext();
-                if (!seen.add(key)) continue;
+                var version = List.of(pair.algorithm(), pair.left().dataset(), pair.right().dataset());
+                var previous = provenance.putIfAbsent(key, version);
+                if (previous != null && !previous.equals(version)) {
+                    if (conflicts.add(key)) rejected.add(new Rejection(a.reference(), b.reference(), "CONFLICTING_PROVENANCE"));
+                }
+                if (conflicts.contains(key) || !seen.add(key)) continue;
                 double lo = b.lower() - a.upper(), hi = b.upper() - a.lower();
                 if (a.relation().equals("=") && b.relation().equals("=") && (!Double.isFinite(lo) || !Double.isFinite(hi))) {
                     rejected.add(new Rejection(a.reference(), b.reference(), "DELTA_OVERFLOW")); continue;
@@ -81,6 +88,10 @@ public final class ContextualTransformationEffects {
                 effects.add(new Effect(pair, a, b, lo, hi, direction));
             }
         }
+        // A later conflicting duplicate invalidates an earlier effect too. Never let
+        // encounter order select a resource version or leave partial support behind.
+        effects.removeIf(e -> conflicts.contains(e.left().reference() + "\n" + e.right().reference()
+                + "\n" + e.pair().transformation() + "\n" + e.pair().leftFragment().chemicalContext()));
         effects.sort(Comparator.comparing((Effect e) -> e.left().reference()).thenComparing(e -> e.right().reference())
                 .thenComparing(e -> e.pair().transformation()).thenComparing(e -> e.pair().leftFragment().chemicalContext()));
         rejected.sort(Comparator.comparing(Rejection::leftObservation).thenComparing(Rejection::rightObservation).thenComparing(Rejection::reason));

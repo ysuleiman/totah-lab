@@ -1,0 +1,34 @@
+Provenance conflict repair — 2026-10-02
+Base: 9c331abe121e744d87b55787106cdd5ce1ca8fa0
+Branch: codex/mmp-chemistry-roundtrip
+
+Approved scope: abstain on duplicate empirical comparisons carrying conflicting
+algorithm or left/right dataset provenance, with an explicit receipt.
+ContextualTransformationEffects.analyze now tracks those three labels per existing
+empirical comparison key after eligibility checks. A conflict emits exactly one
+CONFLICTING_PROVENANCE receipt per group and removes any already-created effect.
+Later duplicates cannot reintroduce it. No arbitrary version is selected.
+Identical provenance still deduplicates normally; unrelated evidence survives.
+The method provenance advances to paired-interval-difference/exact-context/study-balanced/v2.
+No public API signature, dependency, module, or scientific interpretation changes.
+
+Validation: Java 21 compilation exit 0; bounded JUnit exit 0.
+42 tests started/passed, 0 failed/skipped/aborted; 11 containers passed.
+Coverage includes algorithm, both dataset labels, each side independently,
+reversed order, repeated conflicting duplicates, absent summary support,
+identical-provenance deduplication, independent evidence retention, and prior
+stereo/context integration tests. Commands and logs retained alongside.
+Cached dependencies reused. No broad build, downloads or scientific reruns.
+Scoped source diff whitespace check passed.
+
+Preservation: 80 previous checkpoint hashes unchanged, including tracked
+scientific sentinel files. Prior audit artifacts unchanged. No unrelated writes,
+cleanup/reset/moves. No full untracked inventory performed.
+Only production edit: ContextualTransformationEffects.java; tests in
+ContextualProvenanceAuditTest.java; this checkpoint is separate from the audit.
+No commit made. Stop at this reviewable repair checkpoint.
+
+Limitations: conflict policy is confined to eligible duplicate comparisons in
+analyze. This does not certify compatibility of distinct resource versions across
+different empirical comparisons, or add provenance arbitration to direct calls
+to summarize with externally constructed Effects. No persistence/planner wiring.

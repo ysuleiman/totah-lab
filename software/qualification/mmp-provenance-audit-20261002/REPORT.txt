@@ -1,0 +1,33 @@
+MMP resource/version provenance audit — 2026-10-02
+Base HEAD: 9c331abe121e744d87b55787106cdd5ce1ca8fa0
+Branch: codex/mmp-chemistry-roundtrip
+Scope: existing extractor -> contextual effects -> summary; synthetic fixtures.
+
+Confirmed defect (P2): ContextualTransformationEffects.analyze deduplication key
+(lines 73-74) omits pair.algorithm and source.dataset. Equivalent pairs carrying
+different algorithm or dataset revisions silently collapse to the first input.
+Reversing input order changes the retained Effect.pair provenance with no receipt.
+Two parameterized regression cases fail on this behavior. This demonstrates
+order-dependent lineage, not a measured numerical or scientific error.
+There is no explicit resource-version compatibility enforcement here; labels
+are retained on the winning pair, not adjudicated. Different versions are not
+necessarily incompatible. Do not invent compatibility rules from these tests.
+A bounded repair should reject/abstain on conflicting provenance or explicitly
+preserve it under an approved policy, rather than choose a version arbitrarily.
+
+Passing coverage: single-version source, algorithm/toolkit version, observation,
+context and method provenance survive effects and summary. Qualification version
+mismatch produces INCOMPARABLE_CONTEXT_OR_STUDY, stable receipt replay and no mean.
+No direct MatchedPairExtractor/ContextualTransformationEffects references found
+in inspected Mnemosyne/Daedalus main sources. This is not persistence or complete
+workflow coverage; no new integration or ownership reassignment was attempted.
+
+Validation: Java 21 compile exit 0; bounded JUnit exit 1.
+38 started: 36 passed, 2 failed, 0 skipped/aborted; 11 containers passed.
+All prior 34 tests pass. Exact commands and logs recorded. Cached dependencies
+reused; no broad build, downloads, scientific regression or prediction reruns.
+
+Preservation: 80 prior checkpoint content hashes verified unchanged. Only new
+ContextualProvenanceAuditTest.java and this audit directory were written.
+No production edits or commit. Original tracked scientific changes remain.
+No full untracked inventory performed. Stop for repair-policy approval.
