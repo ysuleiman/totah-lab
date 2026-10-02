@@ -1,0 +1,35 @@
+Direct summary provenance repair — 2026-10-02
+Base: b927851a6afb96d2dfc8b5902aaca284a210ffd5
+Branch: codex/mmp-chemistry-roundtrip
+Approved scope: explicit exception for conflicting summary duplicate provenance,
+without changing the public API signature.
+
+summarize now checks algorithm and both source dataset labels while deduplicating
+selected observation-reference pairs. Conflicts throw IllegalArgumentException:
+CONFLICTING_PROVENANCE: duplicate summary observations
+No partial summary or numerical support is returned. Context filtering precedes
+this check, so irrelevant evidence outside the requested scope does not block it.
+Identical-provenance empirical duplicates retain existing support counting.
+Method provenance advanced to paired-interval-difference/exact-context/study-balanced/v3.
+No public signature, module, dependency or scientific interpretation changes.
+The previous audit tests' empty-summary expectations were replaced with the
+explicit exception behavior approved by the user; no tests disabled or removed.
+
+Validation: Java 21 compile exit 0; bounded JUnit exit 0.
+47 tests started/passed, 0 failed/skipped/aborted; 12 containers passed.
+Four conflict cases cover algorithm, both datasets, left dataset, right dataset;
+each exercises both input orders, conditional/unconditional filters, repeated
+duplicates and out-of-scope filtering. Identical-version summary control passes.
+All previous tests pass. Exact commands/raw logs recorded alongside.
+Scoped source diff --check passed; cached dependencies reused. No broad build,
+scientific regression outputs, frozen predictions or benchmarks rerun.
+
+Preservation: 80 prior checkpoint hashes unchanged. Prior audit records were not
+rewritten. No unrelated tracked/untracked writes, clean, reset, move or regeneration.
+No full untracked inventory performed. Changes uncommitted; no push performed.
+
+Limits: this is duplicate algorithm/dataset conflict validation only, not general
+validation of arbitrary externally constructed Effect records or a declaration
+of resource compatibility. Callers merging conflicting batches must handle the
+explicit exception. Existing inspected benchmark/frozen callers use one analysis
+batch; their artifacts were not changed. Stop at this separate repair checkpoint.

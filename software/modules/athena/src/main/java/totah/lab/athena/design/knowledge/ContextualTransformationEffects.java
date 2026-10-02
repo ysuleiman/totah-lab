@@ -4,7 +4,7 @@ import java.util.*;
 
 /** Exact-context paired differences. No universal confidence, benefit claim or planner authorization. */
 public final class ContextualTransformationEffects {
-    public static final String METHOD = "paired-interval-difference/exact-context/study-balanced/v2";
+    public static final String METHOD = "paired-interval-difference/exact-context/study-balanced/v3";
     /** Conditions must be an explicit reviewed protocol/conditions reference, never an unknown placeholder. */
     public record Context(String target, String endpoint, String method, String assay, String conditions,
                           String units, String scale, String qualification) {
@@ -100,14 +100,24 @@ public final class ContextualTransformationEffects {
     private static long count(List<Measurement> values, Measurement value) {
         return values.stream().filter(m -> m.context().equals(value.context()) && m.study().equals(value.study())).count();
     }
-    /** Unconditional means chemical context omitted ONLY; scientific contexts never pool. */
+    /**
+     * Unconditional means chemical context omitted ONLY; scientific contexts never pool.
+     * @throws IllegalArgumentException if selected duplicate observations carry conflicting
+     * algorithm or dataset provenance; no partial summary is returned.
+     */
     public Summary summarize(List<Effect> input, String transformation, Context context, Optional<String> chemicalContext) {
         var selected = input.stream().filter(e -> e.pair().transformation().equals(transformation)
                 && e.left().context().equals(context) && (chemicalContext.isEmpty()
                 || chemicalContext.get().equals(e.pair().leftFragment().chemicalContext()))).toList();
         var byStudy = new TreeMap<String, List<Double>>(); var studies = new TreeSet<String>();
         var empirical = new LinkedHashMap<String, Effect>();
-        for (var e : selected) empirical.putIfAbsent(e.left().reference()+"\n"+e.right().reference(), e);
+        for (var e : selected) {
+            var previous = empirical.putIfAbsent(e.left().reference()+"\n"+e.right().reference(), e);
+            if (previous != null && (!previous.pair().algorithm().equals(e.pair().algorithm())
+                    || !previous.pair().left().dataset().equals(e.pair().left().dataset())
+                    || !previous.pair().right().dataset().equals(e.pair().right().dataset())))
+                throw new IllegalArgumentException("CONFLICTING_PROVENANCE: duplicate summary observations");
+        }
         for (var e : empirical.values()) {
             if (!e.left().study().startsWith("UNRESOLVED:")) studies.add(e.left().study());
             if (e.lower() == e.upper() && Double.isFinite(e.lower()))

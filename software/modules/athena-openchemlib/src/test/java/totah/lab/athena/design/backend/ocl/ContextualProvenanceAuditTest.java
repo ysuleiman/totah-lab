@@ -75,6 +75,49 @@ class ContextualProvenanceAuditTest {
         assertEquals(forward, reversed, "versioned lineage must be invariant under replay ordering");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"algorithm", "dataset", "left-dataset", "right-dataset"})
+    void directSummaryOfSeparateBatchesMustNotRestoreConflictingSupport(String changed) throws Exception {
+        var p = pair();
+        var revised = new Pair((changed.equals("dataset") || changed.equals("left-dataset")) ? revision(p.left()) : p.left(),
+                (changed.equals("dataset") || changed.equals("right-dataset")) ? revision(p.right()) : p.right(),
+                p.leftIdentity(), p.rightIdentity(), p.leftFragment(), p.rightFragment(), p.coreCorrespondence(),
+                changed.equals("algorithm") ? "synthetic-unqualified-extractor/vNext" : p.algorithm());
+        // Each batch is individually eligible; merging their real analysis outputs must
+        // not bypass the abstention applied when those same pairs are analyzed together.
+        var first = service.analyze(List.of(p), measurements(p), 0.3);
+        var second = service.analyze(List.of(revised), measurements(p), 0.3);
+        assertEquals(1, first.effects().size());
+        assertEquals(1, second.effects().size());
+        var together = service.analyze(List.of(p, revised), measurements(p), 0.3);
+        assertTrue(together.effects().isEmpty());
+        assertEquals("CONFLICTING_PROVENANCE", together.rejections().getFirst().reason());
+        var merged = List.of(first.effects().getFirst(), second.effects().getFirst());
+        for (var filter : List.of(Optional.<String>empty(), Optional.of(p.leftFragment().chemicalContext()))) {
+            for (var effects : List.of(merged, merged.reversed())) {
+                var error = assertThrows(IllegalArgumentException.class,
+                        () -> service.summarize(effects, p.transformation(), context, filter));
+                assertEquals("CONFLICTING_PROVENANCE: duplicate summary observations", error.getMessage());
+            }
+        }
+        assertThrows(IllegalArgumentException.class, () -> service.summarize(
+                List.of(merged.getFirst(), merged.getFirst(), merged.getLast()), p.transformation(), context, Optional.empty()));
+        var outsideSelection = service.summarize(merged, p.transformation(), context, Optional.of("unseen-context"));
+        assertEquals(0, outsideSelection.pairCount());
+        assertTrue(outsideSelection.mean().isEmpty());
+    }
+
+    @Test void directSummaryOfIdenticalBatchesRetainsOneEmpiricalComparison() throws Exception {
+        var p = pair();
+        var effect = service.analyze(List.of(p), measurements(p), 0.3).effects().getFirst();
+        var summary = service.summarize(List.of(effect, effect), p.transformation(), context, Optional.empty());
+        assertEquals(1, summary.pairCount());
+        assertEquals(1, summary.studyCount());
+        assertEquals(1, summary.exactStudyCount());
+        assertEquals(1, summary.mean().orElseThrow());
+        assertTrue(summary.studyStandardDeviation().isEmpty());
+    }
+
     @Test void identicalProvenanceStillDeduplicatesWithoutAbstaining() throws Exception {
         var p = pair();
         var single = service.analyze(List.of(p), measurements(p), 0.3);

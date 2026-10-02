@@ -1,0 +1,40 @@
+Direct summary provenance audit — 2026-10-02
+Base HEAD: b927851a6afb96d2dfc8b5902aaca284a210ffd5
+Branch: codex/mmp-chemistry-roundtrip
+Scope: caller inspection and tests only; production behavior unchanged.
+
+P2: summarize bypasses analyze's duplicate-provenance conflict guard.
+ContextualTransformationEffects.java:105-124 filters effects, then uses
+putIfAbsent on observation references without checking algorithm/dataset labels.
+Two separately analyzed, individually eligible synthetic batches with conflicting
+provenance yield effects. Summarizing their merged effects returns mean 1,
+pairCount 1, studyCount 1 and exactStudyCount 1; jointly analyzing the same pairs
+correctly returns CONFLICTING_PROVENANCE with no effect. No malformed or manually
+constructed Effect is needed to demonstrate the gap. The numerical value 1 is
+synthetic; no scientific conclusion is drawn.
+Four parameter cases reproduce algorithm, both dataset labels, left dataset,
+and right dataset conflicts. The first unconditional forward-order assertion
+fails in each case; subsequent loop assertions await a repair. One passing
+control confirms identical batches still count as one empirical comparison.
+
+Caller inspection: ContextualMmpBenchmarkTest and the preserved qualification
+FrozenPrediction.java use subsets of one analyze result for summary. No existing
+cross-batch aggregation found in those callers; no claim of historical result
+corruption. Other callers found in module tests. No production module caller
+found in the inspected Java sources. Frozen code was read, not executed/modified.
+
+Validation: Java 21 compile exit 0; JUnit exit 1.
+47 started: 43 passed, 4 failed, 0 skipped/aborted; 12 containers passed.
+All prior 42 tests pass. Added five cases to ContextualProvenanceAuditTest.
+Exact commands/raw logs accompany this report. Cached dependencies reused.
+No broad builds, downloads, benchmarks or scientific regression reruns.
+80 previous checkpoint hashes verified unchanged. No unrelated artifact writes.
+No full untracked inventory performed. No commit or push made.
+
+Recommended bounded repair: guard duplicate provenance in summarize before
+computing support/statistics, retaining normal identical-version deduplication.
+An explicit conflict outcome must be chosen: Summary has no rejection-receipt
+field today. A checked design decision is needed before changing its public API;
+an explicit exception is a possible signature-preserving alternative. Do not
+silently return an empty estimate without a reason or infer compatibility rules.
+Stop for repair approval; no production changes in this audit.
