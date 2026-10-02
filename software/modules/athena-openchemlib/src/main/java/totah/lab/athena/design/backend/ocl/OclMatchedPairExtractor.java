@@ -3,6 +3,7 @@ package totah.lab.athena.design.backend.ocl;
 import com.actelion.research.chem.Molecule;
 import com.actelion.research.chem.StereoMolecule;
 import com.actelion.research.chem.Canonizer;
+import com.actelion.research.chem.IDCodeParser;
 import com.actelion.research.chem.mmp.MMPEnumerator;
 import com.actelion.research.chem.mmp.MMPFragmenter;
 import totah.lab.athena.design.backend.*;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 /** Bounded adapter of OCL extraction/enumeration, not a second fragmenter or molecular editor. */
 public final class OclMatchedPairExtractor implements MatchedPairExtractor {
     public static final String ALGORITHM = "OCL/" + OclMolecularBackend.VERSION
-            + "/MMPFragmenter(false)+MMPEnumerator(1.1)/single-cut/source-map-v1";
+            + "/MMPFragmenter(false)+MMPEnumerator(1.1)/single-cut/source-map-v2";
     private final OclMolecularBackend backend = new OclMolecularBackend();
     private record Occurrence(Source source, String identity, Fragment fragment, int size) { }
 
@@ -37,7 +38,7 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
                 String identity = backend.identify(source.graph()).canonicalKey();
                 var mapper = new OclGraphMapper(); var mapping = mapper.toOcl(source.graph());
                 mapper.validateHydrogenCounts(mapping);
-                var molecule = mapping.molecule(); molecule.ensureHelperArrays(Molecule.cHelperCIP);
+                var molecule = fragmentationMolecule(mapping);
                 // OCL removes explicit H in its constructor. Input graph is immutable; map numbers survive helper reordering.
                 var fragmenter = new MMPFragmenter(molecule);
                 boolean doubleCut = false, sizeExcluded = false;
@@ -123,20 +124,62 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
         issues.sort(Comparator.comparing(Issue::source).thenComparing(Issue::reason));
         return new Extraction(new ArrayList<>(pairs.values()), issues, ALGORITHM);
     }
+    /** A toolkit-local representation, never a replacement for the ordered source graph. */
+    private static StereoMolecule fragmentationMolecule(OclGraphMapper.Mapping mapping) {
+        var source = mapping.molecule();
+        source.ensureHelperArrays(Molecule.cHelperCIP);
+        var canonicalizer = new Canonizer(source);
+        String identity = canonicalizer.getIDCode();
+        var indexes = canonicalizer.getGraphIndexes();
+        var molecule = new IDCodeParser().getCompactMolecule(identity);
+        if (molecule.getAllAtoms() != source.getAllAtoms() || indexes.length != source.getAllAtoms()
+                || !identity.equals(new Canonizer(molecule).getIDCode()))
+            throw new IllegalArgumentException("FRAGMENTATION_REPRESENTATION_UNPROVEN");
+        var seen = new HashSet<Integer>();
+        for (int i = 0; i < indexes.length; i++) {
+            if (indexes[i] < 0 || indexes[i] >= indexes.length || !seen.add(indexes[i]))
+                throw new IllegalArgumentException("FRAGMENTATION_SOURCE_MAPPING_UNPROVEN");
+            molecule.setAtomMapNo(indexes[i], source.getAtomMapNo(i), false);
+        }
+        // MMP's cut representation depends on index-relative stereo and its 2D drawing.
+        // Decode the same canonical identity for every input ordering, then restore source
+        // map numbers through OCL's own canonical permutation. No source atoms are reordered.
+        molecule.ensureHelperArrays(Molecule.cHelperCIP);
+        return molecule;
+    }
     private static String attachedIdentity(StereoMolecule source, Map<Integer,String> ids,
                                            Set<String> atoms, String anchor) {
+        source.ensureHelperArrays(Molecule.cHelperParities);
         boolean[] include = new boolean[source.getAllAtoms()];
         int anchorIndex = -1;
-        for (int i=0;i<include.length;i++) {
+        for (int i=0;i<source.getAllAtoms();i++) {
             String id = ids.get(source.getAtomMapNo(i)); include[i] = atoms.contains(id);
             if (anchor.equals(id)) anchorIndex=i;
         }
+        if (anchorIndex < 0 || !include[anchorIndex]) throw new IllegalArgumentException("fragment anchor missing");
+        int boundaryBond = -1, outsideEnd = -1;
+        for (int bond = 0; bond < source.getAllBonds(); bond++) {
+            int a = source.getBondAtom(0, bond), b = source.getBondAtom(1, bond);
+            if (include[a] == include[b]) continue;
+            if (boundaryBond >= 0 || (include[a] ? a : b) != anchorIndex)
+                throw new IllegalArgumentException("fragment requires one cut at its anchor");
+            boundaryBond = bond; outsideEnd = include[a] ? 1 : 0;
+        }
+        if (boundaryBond < 0) throw new IllegalArgumentException("fragment cut missing");
         var fragment = new StereoMolecule(); int[] map = new int[include.length];
         source.copyMoleculeByAtoms(fragment, include, true, map);
-        int dummy=fragment.addAtom(MMPFragmenter.FRAGMENT_ATOMIC_NO);
+        int dummy = fragment.addAtom(MMPFragmenter.FRAGMENT_ATOMIC_NO);
         fragment.setAtomCustomLabel(dummy, MMPFragmenter.FRAGMENT_DELIMITER);
-        fragment.addBond(map[anchorIndex],dummy,Molecule.cBondTypeSingle);
+        fragment.addBond(map[anchorIndex], dummy, Molecule.cBondTypeSingle);
         fragment.setFragment(false); // OCL MMP getFragments() returns concrete capped fragments.
+        // The cap takes the removed neighbor's place in the parity permutation. Ask OCL
+        // to translate source parity, not copy index-relative numbers or trust a lost wedge.
+        map[source.getBondAtom(outsideEnd, boundaryBond)] = dummy;
+        for (int i = 0; i < include.length; i++) if (include[i]) {
+            fragment.setAtomParity(map[i], source.translateTHParity(i, map), false);
+        }
+        fragment.setParitiesValid(0);
+        fragment.setStereoBondsFromParity();
         return new Canonizer(fragment,Canonizer.ENCODE_ATOM_CUSTOM_LABELS).getIDCode();
     }
     private static boolean endpoints(MolecularGraph.Bond bond, String a, String b) {

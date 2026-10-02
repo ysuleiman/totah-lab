@@ -3,6 +3,8 @@ package totah.lab.athena.design.backend.ocl;
 import com.actelion.research.chem.*;
 import com.actelion.research.chem.mmp.MMPFragmenter;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import totah.lab.athena.design.backend.*;
 import totah.lab.athena.design.knowledge.MatchedPairExtractor.*;
 import java.util.*;
@@ -13,6 +15,87 @@ class OclMatchedPairExtractorTest {
     private final OclMatchedPairExtractor extractor = new OclMatchedPairExtractor();
     private Source source(String id, String smiles) throws Exception {
         return new Source(id, "fixture/v1", backend.decodeStructure("SMILES", smiles), List.of("observation:"+id));
+    }
+    private MolecularGraph permuted(MolecularGraph graph, int first, int second) throws Exception {
+        var mapper = new OclGraphMapper();
+        var mapping = mapper.toOcl(graph);
+        var molecule = mapping.molecule();
+        molecule.ensureHelperArrays(Molecule.cHelperCIP);
+        molecule.swapAtoms(first, second);
+        molecule.ensureHelperArrays(Molecule.cHelperCIP);
+        var result = mapper.fromOcl(mapping, molecule);
+        return new MolecularGraph(result.atoms(), result.bonds().reversed(), result.properties());
+    }
+    private static void assertSameMappings(Extraction expected, Extraction actual) {
+        assertEquals(expected.issues(), actual.issues());
+        assertEquals(expected.pairs().stream().map(Pair::transformation).toList(), actual.pairs().stream().map(Pair::transformation).toList());
+        assertEquals(expected.pairs().stream().map(Pair::leftFragment).toList(), actual.pairs().stream().map(Pair::leftFragment).toList());
+        assertEquals(expected.pairs().stream().map(Pair::rightFragment).toList(), actual.pairs().stream().map(Pair::rightFragment).toList());
+        assertEquals(expected.pairs().stream().map(Pair::coreCorrespondence).toList(), actual.pairs().stream().map(Pair::coreCorrespondence).toList());
+    }
+    @ParameterizedTest
+    @ValueSource(strings = {"N[C@@H](C)c1ccccc1", "N[C@H](C)c1ccccc1"})
+    void stereoAtCutRetainsExactToolkitMembership(String smiles) throws Exception {
+        var input = source("stereo", smiles);
+        var before = input.graph();
+        var identity = backend.identify(before).canonicalKey();
+        // A single source still proves every eligible cap against OCL, even without a pairing partner.
+        var result = extractor.extract(List.of(input), 8);
+        assertTrue(result.issues().stream().noneMatch(i -> i.reason().startsWith("SOURCE_REJECTED:")), result.issues().toString());
+        assertTrue(result.issues().stream().noneMatch(i -> i.reason().equals("NO_ELIGIBLE_SINGLE_CUT")));
+        assertEquals(before, input.graph());
+        assertEquals(identity, backend.identify(input.graph()).canonicalKey());
+
+        var other = source("opposite", smiles.contains("@@") ? "N[C@H](C)c1ccccc1" : "N[C@@H](C)c1ccccc1");
+        assertNotEquals(identity, backend.identify(other.graph()).canonicalKey());
+        var paired = extractor.extract(List.of(input, other), 8);
+        assertFalse(paired.pairs().isEmpty(), paired.issues().toString());
+        assertTrue(paired.issues().stream().noneMatch(i -> i.reason().startsWith("SOURCE_REJECTED:")), paired.issues().toString());
+        for (var pair : paired.pairs()) {
+            assertNotEquals(pair.leftIdentity(), pair.rightIdentity());
+            assertNotEquals(pair.leftFragment().variable(), pair.rightFragment().variable());
+            assertTrue(pair.coreCorrespondence().exhaustive());
+        }
+        // Let OCL remap index-relative stereo while permuting atoms, rather than relabeling parity by hand.
+        for (int i = 1; i < before.atoms().size(); i++) {
+            var graph = permuted(before, 0, i);
+            assertNotEquals(before.atoms().stream().map(MolecularGraph.Atom::id).toList(),
+                    graph.atoms().stream().map(MolecularGraph.Atom::id).toList());
+            var reordered = new Source(input.id(), input.dataset(), graph, input.observationReferences());
+            assertEquals(identity, backend.identify(graph).canonicalKey());
+            assertSameMappings(paired, extractor.extract(List.of(other, reordered), 8));
+        }
+    }
+    @ParameterizedTest
+    @ValueSource(strings = {"CHEMBL4062830", "CHEMBL4074601", "CHEMBL4103893"})
+    void preservedStereoCutInputsRetainOtherExclusions(String id) throws Exception {
+        try (var stream = getClass().getResourceAsStream("/mmp/stereo-cut-regression.json")) {
+            assertNotNull(stream);
+            var rows = new com.fasterxml.jackson.databind.ObjectMapper().readTree(stream);
+            var row = java.util.stream.StreamSupport.stream(rows.spliterator(), false)
+                    .filter(r -> r.path("id").asText().equals(id)).findFirst().orElseThrow();
+            var graph = backend.decodeStructure("SMILES", row.path("smiles").asText());
+            var references = new ArrayList<String>();
+            row.path("references").forEach(r -> references.add(r.asText()));
+            var input = new Source(id, "ChEMBL32/CHEMBL4038017", graph, references);
+            var before = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(input);
+            var result = extractor.extract(List.of(input), 8);
+            assertEquals(List.of("DOUBLE_CUT_AVAILABLE_BUT_MAPPING_NOT_QUALIFIED", "VARIABLE_SIZE_EXCLUDED"),
+                    result.issues().stream().map(Issue::reason).toList());
+            assertEquals(before, new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(input));
+            assertTrue(result.pairs().isEmpty(), "one source is not an empirical molecular pair");
+            assertEquals(OclMatchedPairExtractor.ALGORITHM, result.algorithm());
+            assertTrue(result.algorithm().endsWith("source-map-v2"));
+            var all = new ArrayList<Source>();
+            for (var record : rows) all.add(source(record.path("id").asText(), record.path("smiles").asText()));
+            var baseline = extractor.extract(all, 8);
+            assertFalse(baseline.pairs().isEmpty());
+            var changed = permuted(graph, 0, graph.atoms().size() - 1);
+            assertEquals(backend.identify(graph).canonicalKey(), backend.identify(changed).canonicalKey());
+            var reordered = all.stream().map(s -> s.id().equals(id)
+                    ? new Source(s.id(), s.dataset(), changed, s.observationReferences()) : s).toList().reversed();
+            assertSameMappings(baseline, extractor.extract(reordered, 8));
+        }
     }
     @Test void singleCutPairsPreservePartitionsAnchorsAndEveryCoreMapping() throws Exception {
         var result = extractor.extract(List.of(source("a", "Oc1ccccc1"), source("b", "Nc1ccccc1")), 8);

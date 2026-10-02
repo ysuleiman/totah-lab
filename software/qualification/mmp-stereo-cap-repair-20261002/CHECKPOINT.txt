@@ -1,0 +1,90 @@
+BOUNDED MMP STEREO CAP REPAIR — 2026-10-02
+Parent: 02eb9eaa87be3db616d0df5cd958bb230660826c
+Branch: codex/mmp-chemistry-roundtrip
+The commit containing this report closes the approved cap/permutation repair.
+
+RESULT
+The three preserved fragment-membership exclusions and the subsequently found
+atom-permutation blocker are fixed within OclMatchedPairExtractor. Five new
+parameterized cases plus existing safeguards pass. No planner connection,
+fragment placement, ligand design, new scientific interpretation or benchmark
+prediction was executed. The previously blocked checkpoint remains preserved.
+
+TWO REPRESENTATION DEFECTS
+The old cap reconstruction discarded a stereo-bearing cut bond and appended a
+plain bond, leaving unknown stereo. Merely reconnecting the wedge/dash fixed
+those inputs but failed when atom indices and bond order changed: equivalent
+parent graphs yielded different toolkit fragment stereo identities. That
+candidate was withdrawn, with its 8-pass/2-fail result retained here.
+Direct raw-SMILES controls did not establish a universal OCL fragmenter defect.
+The problem is representation-sensitive cutting at the existing adapter boundary;
+2D depiction alone did not resolve the tested permutation. The final repair
+neither weakens canonical membership nor assumes equal parent keys prove lineage.
+
+FINAL IMPLEMENTATION / OWNERSHIP
+1. Reuse OCL Canonizer/IDCodeParser to obtain the same internal fragmentation
+   representation for equivalent inputs. Verify exact parent canonical identity,
+   atom count, and a complete bijective toolkit canonical-index permutation.
+   Restore the original map numbers through that permutation. The ordered source
+   MolecularGraph, IDs, coordinates, metadata and observation references stay intact.
+   Internal 2D toolkit decoding is not 3D fragment placement or candidate generation.
+2. Reconstruct each capped side using the existing graph cut. Require exactly one
+   boundary at the declared anchor. Map the removed neighbor to the dummy and use
+   OCL translateTHParity for source-to-fragment indices; mark parities valid and
+   rebuild stereo bonds with OCL. Do not manually copy relative parity numbers.
+3. Continue requiring exact agreement with OCL fragment identities before accepting
+   either partition. Original whole-source rejection, core correspondence checks,
+   size/budget limits, explicit-H, charge and unsupported stereo safeguards remain.
+4. Bump the extraction provenance tag from source-map-v1 to source-map-v2 because
+   supported output and fragment identities can change. Historical v1 receipts and
+   frozen benchmarks are unchanged; they must not be relabeled as v2.
+No new public signature, dependency, module, chemistry algorithm or graph type.
+
+REGRESSION COVERAGE
+Existing synthetic N[C@@H](C)c1ccccc1 plus its enantiomer: source membership,
+retained stereo distinction, source immutability, explicit complete mappings,
+16 atom swaps (atom zero with every other position in each enantiomer), reversed
+bond order and reversed input order. Parent canonical identity is checked before
+comparing fragment identities, source partitions, contexts and core mappings.
+Three copied frozen structures: CHEMBL4062830, CHEMBL4074601, CHEMBL4103893.
+Fixture preserves SMILES and activity references, carries source/fixture hashes
+and ChEMBL attribution. No activity values were added or interpreted.
+All three are accepted for their eligible single cuts; double-cut and variable-size
+exclusions remain explicit. Their three-source structural extraction is compared
+under one atom swap/bond reversal per source, including pair mapping equality.
+No contextual-effect prediction or full frozen dataset extraction was rerun.
+
+VALIDATION
+Final: 25 tests, 0 failures/errors/skips/aborts.
+OclMatchedPairExtractorTest 10 (five new parameterized cases),
+OclBenchmarkChemistryRegressionTest 3, ContextualTransformationEffectsTest 7,
+SourceAssociationAcceptanceTest 5. Includes prior aromatic/isotope/stereo guards,
+reference pair parity, context comparability and source-association rejection.
+Initial old-code run: 5 pass / 2 fail, demonstrating the original defect.
+The first partial candidate's final run: 8 pass / 2 fail, demonstrating why its
+wedge-only repair was not accepted. Both logs are retained, not concealed.
+Final source diff whitespace checks pass; raw JUnit logs retain trailing blank
+lines rather than altering recorded bytes.
+
+BUILD / REPRODUCTION / LIMITS
+Java 21 direct compilation of the modified extractor and four selected test
+classes, cached dependency classes/jars, JUnit Platform Launcher 1.11.4, -Xmx256m.
+Exact subprocess argument arrays: commands.json; classpath and launcher source
+included. Recreate the recorded temporary output directory, compile the included
+BoundedTests.java.txt as BoundedTests.java against the classpath, then run the
+saved compile/test arrays. New test resources are first on the classpath.
+No Maven reactor build/download, fresh dependency rebuild, full toolkit suite,
+new chemistry qualification, or power-loss test is claimed. This fixes the bounded
+supported cases and their tested permutations, not every conceivable stereo input.
+Any future source that cannot prove exact capped identity still rejects explicitly.
+No general E/Z, double-cut, allene/atropisomer support expansion is asserted.
+
+PRESERVATION / STOP
+All 80 pre-work hashes for scientific sentinels, frozen EGFR qualification and
+prediction artifacts and previous MMP fixtures match before-hashes.json. The
+three pre-existing tracked scientific modifications retain their original binary
+diff. Previously untracked work, including the blocked candidate checkpoint, is
+excluded from this commit. A separate inventory of 114993 unrelated untracked
+paths records mode/size/mtime for post-commit preservation checking; it is not a
+content rehash of every scientific file. No cleanup, reset or scientific rewrite.
+STOP after this bounded software checkpoint. No next milestone started.
