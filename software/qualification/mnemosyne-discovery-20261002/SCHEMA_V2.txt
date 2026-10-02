@@ -1,0 +1,103 @@
+MNEMOSYNE PHASE 8 — DISCOVERY DESCRIPTION / EXCHANGE V2
+
+Purpose
+Discovery is a read-side query over one explicit, validated snapshot. It returns
+attributed records and provenance, not a scientific conclusion. The approved
+requirements remain verbatim in ../mnemosyne-discovery-design-20261002/DESIGN.txt.
+
+Records
+DiscoveryDescription has its own DISCOVERY_DESCRIPTION reference and binds to
+an OBSERVATION reference plus the SHA-256 of that observation's canonical v1
+record bytes. Participants contain SUBJECT identities, opaque versioned role
+terms, and explicit exact labels. An opaque versioned relationship term applies
+to the participants in that one description. Modality is explicitly EXPERIMENTAL,
+COMPUTATIONAL, INFERRED, SYNTHETIC or UNKNOWN. Agent, recordedAt and the existing
+Observation.Provenance value shape attribute the whole description, including
+its labels, roles, relationship and modality. This provenance shape is reused;
+Observation itself is not modified. Attribution is not authentication or truth.
+If claims have different provenance, use separate attributed descriptions.
+Participants sort by full entity reference then full role; labels sort exactly.
+Duplicate entity/role pairs and duplicate labels are rejected. No normalization,
+identity union, relationship inference, registry or domain-specific vocabulary.
+
+Lifecycle
+Descriptions append immutably; exact identity/content replay returns the same
+history, changed content under the same identity is rejected. Observation binding
+is checked on append and exchange restore. A separate append-only Withdrawal
+lifecycle receipt uses DISCOVERY_WITHDRAWAL identity, references its description,
+optional explicit replacement, agent, provenance, reason and recordedAt. Only the
+same attributed agent can withdraw its description; this is identity consistency,
+not an authentication mechanism. One withdrawal per description, no backdating
+before that description. A replacement must already be present, be strictly later,
+and describe the same observation by the same agent. An attributed disagreement
+from another agent is an independent description, never an overwrite. Withdrawal
+is known at recordedAt; it has no separate retrospective effective-time model.
+Every description and withdrawal must be recorded by snapshot creation time.
+History, withdrawn metadata and replacement records all remain visible. Queries
+never follow replacement pointers to select a preferred description.
+
+Wire versioning and compatibility
+SCHEMA and RECORD_SCHEMA remain mnemosyne-exchange/1 and mnemosyne-record/1.
+New constants DISCOVERY_SCHEMA and DISCOVERY_RECORD_SCHEMA designate /2.
+Legacy record types retain their exact /1 wrappers and bytes, even in a /2
+snapshot. New description/withdrawal types and standalone references of their
+new kinds require /2 record wrappers. Snapshot construction uses /2 when it
+contains descriptions; withdrawals require an existing description. V1 manifests
+cannot contain discovery records. Exchange and manifest versions must agree.
+Unknown schemas/types/fields, malformed attribution/bindings, missing membership,
+duplicate identity, time mismatches and integrity failures are rejected. Old v1
+readers reject v2 snapshots; no claim of forward compatibility is made. New readers
+accept old snapshots byte-for-byte. No historical exchange/pin migration occurs.
+Admission, catalog and lineage need no new write path: new records participate
+in the existing manifest hashes, immutable inheritance and EvidenceAdmission gate.
+
+Read path
+EvidenceDiscovery(EvidenceQueries).find(explicitSnapshot, Query) freshly invokes
+EvidenceQueries.evidence(snapshot), preserving the complete lineage validation.
+Existing EvidenceQueries public surface remains unchanged. EvidenceBranchView
+adds immutable sorted description states and withdrawal lists, with the existing
+provenance collection carrying all record hashes and first inclusion pins.
+No captured-view overload or application wiring is included in this checkpoint.
+
+A Query requires participant constraints, each either an exact SUBJECT identity
+or an exact recorded label, plus optional role. Relationship, modality and endpoint
+are optional filters. No label case folding, alias inference or scientific ranking.
+Label resolution is local to all historical descriptions in the selected branch,
+optionally restricted by the requested role. More than one entity is explicit
+AMBIGUOUS_NAME with all identity/description candidates and zero selected matches.
+An unresolved label produces NO_MATCH_IN_SELECTED_SNAPSHOT. Ambiguity is not
+silently resolved using endpoint/modality/relationship filters. Explicit identities
+remain usable for disambiguation. All constraints must occur in one matching
+description: no joins across observations or competing descriptions. A label
+constraint must be explicitly supported in that matching description as well.
+Results sort observations and descriptions by full qualified identity. Query
+constraint/name-resolution order is the caller's explicit order. Repeated identical
+queries give deterministic value fields; no wall clock is consulted. The branch
+view is a captured immutable object, not a live cache or a value-equality DTO.
+
+Result semantics and limits
+MATCHES means matching attributed descriptions exist, not accepted science.
+Withdrawn descriptions and observations with withdrawn reviews stay visible and
+annotated. Different observations, same-value runs, contradictory assessments and
+competing modality descriptions are not collapsed. Matching original observations
+and descriptions are accompanied by the complete immutable branch evidence view:
+reviews, assessments, withdrawals, source/artifact/receipt/locator, path pins,
+record digests and first inclusion. No source files are read by this query.
+Coverage lists observations with no description and descriptions with UNKNOWN
+modality. Partial coverage and unknown modality are explicit limitations; zero
+matches never means no experiment exists. Coverage is historical metadata coverage,
+not a completeness guarantee or an active/current-evidence measure.
+SOURCE_AVAILABILITY_NOT_CHECKED, ASSAY_DETAILS_NOT_MODELED and
+EXPERIMENT_EVENT_TIME_NOT_MODELED are explicit on every result. Source locations
+are returned as recorded, not verified as available/authoritative bytes. Assay
+conditions/concentrations/replicates and 'latest' event-date selection are outside
+scope. Failed catalog admissions are not discoverable because they were not
+persisted; observation availability FAILED_INVALID remains a different axis.
+
+Bounds
+No persistent secondary index. Matching traverses the bounded immutable branch
+view in memory; the existing 16 MiB per-exchange limit still applies. Catalog-wide
+lineage validation and prior concurrent-load/durability limitations remain intact.
+This phase makes no performance/transactional/authentication claim beyond that
+existing contract. No real scientific ingestion, external lookup, chemistry
+behavior, ranking, preferred branch/current truth, planning or UI is included.

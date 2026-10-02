@@ -1,5 +1,6 @@
 package totah.lab.mnemosyne;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,25 +20,30 @@ public final class EvidenceHistory {
     private final Map<ScientificReference, Assessment> assessments;
     private final Map<ScientificReference, ReviewChange> changes;
 
-    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of()); }
+    private final Map<ScientificReference, DiscoveryDescription> descriptions;
+    private final Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals;
+
+    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
     private EvidenceHistory(Map<ScientificReference, Observation> observations, Map<ScientificReference, Review> reviews,
-                            Map<ScientificReference, Assessment> assessments, Map<ScientificReference, ReviewChange> changes) {
+                            Map<ScientificReference, Assessment> assessments, Map<ScientificReference, ReviewChange> changes,
+                            Map<ScientificReference, DiscoveryDescription> descriptions,
+                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals) {
         this.observations = Map.copyOf(observations); this.reviews = Map.copyOf(reviews);
         this.assessments = Map.copyOf(assessments); this.changes = Map.copyOf(changes);
+        this.descriptions = Map.copyOf(descriptions); this.withdrawals = Map.copyOf(withdrawals);
     }
     public Map<ScientificReference, Observation> observations() { return observations; }
     public Map<ScientificReference, Review> reviews() { return reviews; }
     public Map<ScientificReference, Assessment> assessments() { return assessments; }
     public Map<ScientificReference, ReviewChange> changes() { return changes; }
-
     public EvidenceHistory append(Observation observation) {
         var next = add(observations, observation.reference(), observation);
-        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes);
+        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals);
     }
     public EvidenceHistory append(Review review) {
         require(observations, review.observation());
         var next = add(reviews, review.reference(), review);
-        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes);
+        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals);
     }
     public EvidenceHistory append(Assessment assessment) {
         if (assessments.containsKey(assessment.reference())) {
@@ -56,7 +62,7 @@ public final class EvidenceHistory {
                     || !admissible(review.reference(), assessment.recordedAt(), assessment.recordedAt())))
                 throw new IllegalArgumentException("finding requires an admissible present observation");
         }
-        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes);
+        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals);
     }
 
     /** Historical records are never removed. Retraction/supersession only changes scoped admissibility. */
@@ -87,7 +93,34 @@ public final class EvidenceHistory {
                     || !replacement.reviewedAt().isAfter(old.reviewedAt()))
                 throw new IllegalArgumentException("replacement must be a later review of the same scoped observation by the same reviewer");
         });
-        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change));
+        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals);
+    }
+
+    public Map<ScientificReference, DiscoveryDescription> descriptions() { return descriptions; }
+    public Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals() { return withdrawals; }
+
+    public EvidenceHistory append(DiscoveryDescription description) throws IOException {
+        var observation = require(observations, description.observation());
+        if (!new EvidenceExchange().contentDigest(observation).equals(description.observationSha256()))
+            throw new IllegalArgumentException("discovery observation digest mismatch");
+        var next = add(descriptions, description.reference(), description);
+        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals);
+    }
+    public EvidenceHistory append(DiscoveryDescription.Withdrawal withdrawal) {
+        if (withdrawals.containsKey(withdrawal.reference())) { add(withdrawals, withdrawal.reference(), withdrawal); return this; }
+        var old = require(descriptions, withdrawal.description());
+        if (!old.agent().equals(withdrawal.agent()) || old.recordedAt().isAfter(withdrawal.recordedAt()))
+            throw new IllegalArgumentException("withdrawal attribution/time mismatch");
+        if (withdrawals.values().stream().anyMatch(w -> w.description().equals(old.reference())))
+            throw new IllegalArgumentException("description already withdrawn");
+        withdrawal.replacement().ifPresent(id -> {
+            var replacement = require(descriptions, id);
+            if (!replacement.observation().equals(old.observation()) || !replacement.agent().equals(old.agent())
+                    || !replacement.recordedAt().isAfter(old.recordedAt()) || replacement.recordedAt().isAfter(withdrawal.recordedAt()))
+                throw new IllegalArgumentException("replacement must be a later description of the same observation by the same agent");
+        });
+        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions,
+                add(withdrawals, withdrawal.reference(), withdrawal));
     }
 
     public boolean admissible(ScientificReference reviewId, Instant knownAt, Instant effectiveAt) {

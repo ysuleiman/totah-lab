@@ -1,0 +1,19 @@
+import totah.lab.mnemosyne.*;
+import java.nio.file.*;
+import java.time.*;
+import java.util.*;
+import static totah.lab.mnemosyne.ScientificReference.Kind.*;
+public class LegacyFixture {
+ static ScientificReference r(ScientificReference.Kind k,String id) {return new ScientificReference(k,"synthetic-legacy",id,"1");}
+ public static void main(String[] args) throws Exception {
+  var t=Instant.parse("2026-01-01T00:00:00Z");
+  var o=new Observation(r(OBSERVATION,"o"),r(SUBJECT,"s"),r(ENDPOINT,"e"),r(METHOD,"m"),r(CONTEXT,"c"),r(ACTIVITY,"a"),new Observation.Provenance(r(SOURCE,"source"),r(ARTIFACT,"artifact"),r(RECEIPT,"receipt"),r(METHOD,"projection"),"synthetic row 1",List.of()),Observation.Availability.PRESENT,Optional.of(new Observation.Scalar("1.00","unit")),new Observation.Unknown("not reported"),List.of("synthetic fixture"));
+  var review=new Review(r(REVIEW,"review"),o.reference(),r(AGENT,"agent"),r(METHOD,"review"),r(POLICY,"policy"),r(CONTEXT,"c"),Review.Decision.ACCEPTED,List.of("fixture"),t,t,List.of(),List.of());
+  var assessment=new Assessment(r(ASSESSMENT,"assessment"),Optional.of(o.reference()),Optional.of(review.reference()),r(PROPOSITION,"p"),r(CRITERION,"criterion"),r(POLICY,"policy"),r(CONTEXT,"c"),Assessment.Outcome.SUPPORTS,List.of("fixture"),t);
+  var withdrawal=new EvidenceHistory.ReviewChange(r(REVIEW_CHANGE,"withdrawal"),review.reference(),Optional.empty(),r(AGENT,"agent"),"fixture withdrawal",t.plusSeconds(1),t.plusSeconds(1));
+  var h=new EvidenceHistory().append(o).append(review).append(assessment).append(withdrawal);
+  var e=new EvidenceExchange();
+  Files.write(Path.of(args[0],"snapshot.json"),e.encode(e.snapshot(r(SNAPSHOT,"root"),r(ACTIVITY,"capture"),t.plusSeconds(2),Optional.empty(),h)));
+  Files.write(Path.of(args[0],"observation.json"),e.encodeRecord(o));
+ }
+}

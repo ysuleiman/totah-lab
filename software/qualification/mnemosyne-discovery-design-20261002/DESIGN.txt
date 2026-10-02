@@ -1,0 +1,157 @@
+MNEMOSYNE PHASE 8 — SCIENTIFIC DISCOVERY DESIGN CHECKPOINT (NO IMPLEMENTATION)
+Date: 2026-10-02
+Base HEAD: 44fbdeeefccb7df56d48429c7aa672131ff40209
+Branch: codex/mmp-chemistry-roundtrip
+
+PHASE 7 COMMIT STATUS
+Verified the Phase 7 complete SHA256 manifest and 80 preservation hashes before
+attempting unchanged staging. Both narrowly scoped git add attempts failed:
+".git/index.lock write error. Out of diskspace". No files were staged; no commit
+or push occurred. No lock remained after failure. Filesystem reported about
+118-119 MiB available; that did not suffice for Git's operation. No cleanup,
+reset, artifact moves or deletion attempted. Phase 7 remains exactly qualified
+but uncommitted. This operational block is separate from the schema design gate.
+
+OBJECTIVE
+Given an explicit snapshot, discover evidence involving named/canonical entities
+and relationships without needing observation IDs, source paths, or repository
+scans. Return records and provenance, not conclusions or a preferred observation.
+Reuse the Phase 7 -> branch-view -> lineage -> catalog path. No parallel inventory.
+
+INSPECTED CONTRACTS / FINDINGS
+Observation.java: one SUBJECT reference, ENDPOINT/METHOD/CONTEXT/ACTIVITY refs,
+a scalar, availability, uncertainty, and source/artifact/receipt/locator provenance.
+ScientificReference.java: opaque kind/namespace/id/version; no label/alias registry,
+participant roles, compound-target tuple or relation membership schema.
+Review/Assessment/ReviewChange: attributed history and scoped admissibility;
+these are not entity participation or experimental/computational modality fields.
+EvidenceHistory and EvidenceExchange: closed typed immutable record membership,
+strict codec schemas, per-record hashes and relationship validation. A new metadata
+record cannot simply be slipped into v1 JSON or an existing limitations field.
+ReferenceResolver: authoritative lookup by already-known reference. Existing Athena
+and Prometheus implementations resolve pinned source-review/computation records;
+neither exposes a general entity-to-observation discovery contract.
+Athena ScientificObservationAdapter: current source projection is specifically
+PubChem molecular weight. Method/context semantics partly remain hashed external
+references. That is not a generic assay/compound-target membership projection.
+Earlier universal architecture audit already distinguishes modality from literature
+medium and warns against identity union based only on names.
+
+READ-SIDE-ONLY OPTION: USEFUL BUT INSUFFICIENT
+Exact filtering of known subject/endpoint/method/context references could be added
+without changing the schema. It cannot discover both participants of an opaque
+assay subject, resolve supplied names/aliases, or classify experimental evidence
+from current generic fields. Parsing namespace strings, limitations or filenames
+would invent semantics. A derived index cannot manufacture absent source facts.
+No existing reverse-discovery authority was found that supplies these missing
+facts under a versioned contract. An injected projector would itself require that
+contract and provenance; calling it an index would not remove the schema need.
+
+SMALLEST PROPOSED EXTENSION (CONCEPTUAL; NOT AN APPROVED JAVA/WIRE API)
+Add one immutable, attributed, versioned observation discovery-description record,
+with its own identity and a binding to an exact observation reference/content digest.
+Keep the existing observation unchanged. Minimal descriptive content:
+1. Participants: canonical SUBJECT/entity references with explicitly declared roles.
+2. A declared relationship/predicate, using versioned general vocabulary terms.
+3. Attributed evidence modality (experimental, computational, inferred, synthetic,
+   or explicitly unknown), separate from source medium and review/admission status.
+4. Recorded labels/aliases if name-based lookup is offered, bound to participant
+   identity and explicit source/curator provenance. No automatic synonym discovery,
+   biological identity normalization, case-based identity union or global alias truth.
+5. Description source/artifact/receipt/locator, attribution and method/version so
+   each searchable fact can be traced to an authoritative projection/review.
+
+The description must participate in snapshot membership, canonical digests,
+inheritance/admission, immutable history and branch-local reconstruction. It is
+scientific metadata, not an unversioned cache entry or free-text project summary.
+This necessarily needs a separately reviewed schema evolution: record kind/type,
+codec versioning, history validation, lifecycle/withdrawal semantics for descriptions,
+and view exposure. Do not modify old exchange bytes, pins or accepted snapshots.
+One record type is the starting proposal; do not build a general knowledge-graph
+framework, separate entity repository or new database to implement it.
+
+Names remain a discovery aid, not proof of equivalence. Queries may accept canonical
+entity references, or resolve recorded labels within the selected snapshot first.
+An ambiguous name returns candidates/explicit ambiguity, never a guessed entity.
+No hard-coded netarsudil/METTL7/TMT synonym table. An assay/co-occurrence relation
+must not imply inhibition, binding, effectiveness or any new scientific claim.
+
+READ MODEL ONCE THE DESCRIPTION CONTRACT IS APPROVED
+Conceptual operation: findEvidence(explicitSnapshot, participantConstraints,
+optionalRelationship, optionalModality, optionalEndpoint).
+All participants in a query must match the same declared relationship description;
+no Cartesian join of unrelated observations. Matching uses exact qualified refs
+or explicitly resolved aliases. Unknown modality never matches experimental.
+Build a disposable in-memory lookup from the selected EvidenceBranchView records;
+no repository scan, independently maintained index, mutable global cache or writes.
+No initial persisted secondary index; performance work is separately justified.
+
+Result: all distinct matching observations with their matching descriptions,
+original values/units/uncertainty/availability, reviews/assessments/changes,
+selected/path pins, record digests and first inclusion, original source/artifact/
+receipt/locator, and explicit metadata coverage/ambiguity limitations. Sort by
+stable identity, not effect magnitude, recency, confidence or scientific importance.
+Different observations stay distinct even when values are equal. Multiple competing
+descriptions for one observation remain visible with attribution; do not arbitrarily
+pick one. Superseded/withdrawn evidence stays visible and annotated by existing
+review history, not silently filtered. No cross-branch matches.
+
+EMPTY / PARTIAL / INVALID
+Invalid lineage/integrity still raises the existing checked failures. Missing
+participant/modality descriptions must be reported as insufficient discovery
+coverage, not a claim that an experiment does not exist. Zero matches means no
+match in the explicitly selected, indexed snapshot, never no experiment anywhere.
+Legacy observations without descriptions remain intact and visible in the regular
+view. Do not backfill missing metadata from guesses or automatically classify them.
+
+FAST-ANSWER BOUNDARIES
+- Source artifact identity and locator already exist; actual availability/bytes
+  require the existing authoritative resolver. A locator is not proof a file is
+  present or authentic. No source filesystem crawl or new artifact registry.
+- Concentrations, replicates and assay conditions are not generically structured
+  here. Return their existing context/activity/payload references and explicit
+  missing-detail status. Typed authoritative assay-detail projections may be a
+  later reviewed extension; do not claim this first discovery step answers every
+  assay-detail question or embed an assay object model into generic Mnemosyne.
+- Experimental/computational/inferred are modality assertions. Review rejection,
+  withdrawal and supersession are separate history axes. Availability FAILED_INVALID
+  is not the same thing as a failed catalog admission.
+- Failed admissions never enter the append-only catalog, by design. This read path
+  cannot discover absent failed attempts. Existing external receipts may be linked
+  when explicitly represented; a rejection registry is not part of Phase 8.
+- There is no generic experimental event date today. Snapshot creation, activity ID
+  and review time must not be substituted for assay date. A future request for
+  'latest IC50' must specify date semantics and still expose historical matches;
+  Phase 8 will not choose the newest number as current truth.
+
+EVENTUAL ACCEPTANCE (FUTURE, SYNTHETIC/EXPLICITLY REVIEWED FIXTURES)
+1. Arbitrary entity pairs and declared roles/relationship find only their own
+   observations in an explicit selected snapshot, without observation IDs or paths.
+2. Attributed alias fixtures allow the requested compound/target names when those
+   identities and aliases are explicitly represented; ambiguous names do not merge.
+3. Experimental filter excludes computational/inferred/synthetic/unknown metadata.
+4. Distinct old/new or contradictory observations both return; same-value runs
+   are not collapsed; differing sibling descriptions/evidence never leak.
+5. Withdrawn/superseded history and exact source locations/digests survive queries.
+6. Missing descriptions, absent source availability, unsupported detail and unknown
+   event times are explicit; no fabricated concentrations, counts or conclusions.
+7. Invalid lineage, orphan/cycle, tampering and invalid description binding fail
+   closed; results are immutable/deterministic; no catalog writes.
+8. Old snapshots/encodings/tests remain unchanged; backward compatibility and new
+   description lifecycle/version conflicts are qualified before accepting a schema.
+
+USER-REPORTED NEW FIGURE
+The user reported a new wet-lab figure dated 2026-10-02 with a newer TMT1B IC50
+and multi-concentration AR-13503 tests. It has NOT been inspected, verified,
+ingested, encoded as a test result, or used to alter any scientific record here.
+Its role is requirements context: distinguish entities, targets, modality,
+concentration-series details, historical observations and source provenance.
+No scientific values from the report are inserted into repository evidence.
+
+STOP
+Schema extension is required for the requested general discovery acceptance.
+No Phase 8 production/test implementation, new index, scientific ingestion,
+application wiring, migration or external lookup was performed. No tests rerun:
+this phase is inspection/design only; Phase 7's recorded 85-test qualification
+remains unchanged. Stop for review of this schema-level proposal. Git commit is
+separately blocked by disk space; do not delete scientific artifacts to resolve it.

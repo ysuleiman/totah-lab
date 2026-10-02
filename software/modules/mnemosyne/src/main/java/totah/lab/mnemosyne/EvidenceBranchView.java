@@ -24,6 +24,12 @@ public final class EvidenceBranchView {
     public record RecordProvenance(EvidenceExchange.RecordDigest record, EvidenceAdmission.Pin firstIncludedIn) {
         public RecordProvenance { Objects.requireNonNull(record); Objects.requireNonNull(firstIncludedIn); }
     }
+    /** Withdrawal annotates historical metadata, without preferring a replacement or hiding a disagreement. */
+    public record DescriptionState(DiscoveryDescription record, Optional<DiscoveryDescription.Withdrawal> withdrawal) {
+        public DescriptionState { Objects.requireNonNull(record); withdrawal = Objects.requireNonNull(withdrawal); }
+    }
+    private final List<DescriptionState> descriptions;
+    private final List<DiscoveryDescription.Withdrawal> withdrawals;
     private final EvidenceAdmission.Pin selected;
     private final Instant asOf;
     private final List<EvidenceAdmission.Pin> path;
@@ -40,6 +46,12 @@ public final class EvidenceBranchView {
         this.path = List.copyOf(path);
         this.provenance = List.copyOf(provenance);
         var history = snapshot.history();
+        withdrawals = history.withdrawals().values().stream()
+                .sorted(Comparator.comparing(DiscoveryDescription.Withdrawal::reference, REFERENCES)).toList();
+        var withdrawalByDescription = new HashMap<ScientificReference, DiscoveryDescription.Withdrawal>();
+        withdrawals.forEach(w -> withdrawalByDescription.put(w.description(), w));
+        descriptions = history.descriptions().values().stream().sorted(Comparator.comparing(DiscoveryDescription::reference, REFERENCES))
+                .map(d -> new DescriptionState(d, Optional.ofNullable(withdrawalByDescription.get(d.reference())))).toList();
         observations = history.observations().values().stream().sorted(Comparator.comparing(Observation::reference, REFERENCES)).toList();
         changes = history.changes().values().stream().sorted(Comparator.comparing(EvidenceHistory.ReviewChange::reference, REFERENCES)).toList();
         var changeByReview = new HashMap<ScientificReference, EvidenceHistory.ReviewChange>();
@@ -85,6 +97,8 @@ public final class EvidenceBranchView {
         return new EvidenceBranchView(target.pin(), Objects.requireNonNull(last), path,
                 firstInclusion.values().stream().sorted(Comparator.comparing(p -> p.record().reference(), REFERENCES)).toList());
     }
+    public List<DescriptionState> descriptions() { return descriptions; }
+    public List<DiscoveryDescription.Withdrawal> withdrawals() { return withdrawals; }
     public EvidenceAdmission.Pin selected() { return selected; }
     /** Both known-time and effective-time for review admissibility; no wall clock is consulted. */
     public Instant asOf() { return asOf; }

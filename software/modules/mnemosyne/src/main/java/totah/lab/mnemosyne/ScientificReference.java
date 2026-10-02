@@ -6,7 +6,7 @@ import java.util.Objects;
 public record ScientificReference(Kind kind, String namespace, String id, String version) {
     public enum Kind {
         ARTIFACT, SOURCE, SUBJECT, ENDPOINT, METHOD, CONTEXT, ACTIVITY, OBSERVATION,
-        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT
+        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT, DISCOVERY_DESCRIPTION, DISCOVERY_WITHDRAWAL
     }
 
     public ScientificReference {
