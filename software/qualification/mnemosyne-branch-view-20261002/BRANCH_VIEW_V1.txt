@@ -1,0 +1,52 @@
+MNEMOSYNE BRANCH EVIDENCE VIEW / 1
+
+Java 21 contract:
+EvidenceBranchView.load(EvidenceSnapshotCatalog catalog, ScientificReference selected)
+The snapshot reference is mandatory. No default snapshot, preferred branch or
+implicit latest/head selection exists. Unknown/non-snapshot selections are caller
+errors; invalid catalog lineage is a checked IOException and yields no view.
+
+Construction first uses EvidenceLineage.load to validate the catalog under Phase 5
+rules. An orphan, cycle, invalid snapshot or inheritance link anywhere blocks load.
+After validation, reconstruction reads the pinned path from the selected root to
+the selected snapshot, inclusive. Sibling records are never included in state or
+provenance even though global lineage integrity validation reads their snapshots.
+The path is returned in root-to-selected order, with full snapshot references and
+canonical exchange SHA256 pins. Each read verifies its captured pin; disappearing
+or changed path content fails closed.
+
+Snapshots are already full immutable histories under the admission contract.
+Consequently reconstruction retains the selected snapshot's complete history,
+verifies inherited membership/hashes along its path, and computes first inclusion
+without replaying records in a new time order. It does not merge separate histories.
+
+Outputs:
+- selected(): the explicit snapshot pin.
+- asOf(): its manifest creation time, used for BOTH known-time and effective-time.
+- path(): immutable root-to-selected pins, including both endpoints.
+- observations(): original observations, including source/receipt/method provenance,
+  original scalar spelling, availability, uncertainty and limitations.
+- reviews(): original reviews plus EvidenceHistory.admissible(review, asOf, asOf)
+  and the original withdrawal/supersession record, if present in this snapshot.
+- assessments(): every original attributed assessment, unchanged and unfiltered.
+- changes(): all original review changes, retaining both time axes and replacements.
+- provenance(): per-record manifest identity/type/digest and the FIRST snapshot on
+  this path including it. This is catalog inclusion, not scientific origin/date.
+All record lists are sorted by reference kind/namespace/id/version. Output lists
+and nested existing records are immutable; path ordering is ancestry, not ranking.
+
+Effective state is scoped review admissibility only, delegated to EvidenceHistory.
+A withdrawal/supersession can make an old review inadmissible, but it never removes
+an observation, rewrites an assessment outcome, or transfers an assessment to a
+replacement review. SUPPORTS and CONTRADICTS remain attributed interpretations.
+Rejected reviews and NOT_MEASURED coverage stay explicit. Observation presence is
+not scientific validity, and admissibility is not a truth verdict.
+Later recorded withdrawals do not retroactively appear in an earlier selected
+snapshot. No arbitrary historical-time query API or new temporal policy is added.
+
+The view is a captured read-only result; later appends/withdrawals need an explicit
+new load and snapshot selection. Existing lineage/catalog limitations apply:
+no filesystem transaction, live mutation monitoring, authentication, fully
+self-consistent tamper detection without external trusted pins, or distributed
+consistency claim. No application wiring, evidence ranking, branch merge,
+scientific resolution or domain-specific behavior. No persistence writes occur.

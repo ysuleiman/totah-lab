@@ -1,0 +1,55 @@
+MNEMOSYNE PHASE 6 — READ-ONLY BRANCH-LOCAL EVIDENCE VIEW
+Date: 2026-10-02
+Branch: codex/mmp-chemistry-roundtrip
+Phase 5 commit / Phase 6 base: 1465e37f73f804447b611aaa3314076d2d2c095f
+Phase 5 parent: ccdaa3b2d2958cad7d40968530fc58a76d1b532b
+Phase 5 committed exactly as qualified: ten files, unchanged recorded contents.
+No push requested or performed.
+
+Phase 6 adds EvidenceBranchView.java, EvidenceBranchViewAcceptanceTest.java,
+and this separate checkpoint. Existing APIs/schemas and all earlier tests remain
+unchanged. Branch selection is always explicit. EvidenceLineage validates before
+path reconstruction; EvidenceSnapshotCatalog supplies pinned reads; EvidenceHistory
+owns effective review admissibility. Original observations, assessments, reviews,
+withdrawals/supersessions and source provenance are retained. Added first-inclusion
+provenance is branch-local and includes record type/digest and snapshot pin.
+No merge, preference, ranking, scientific resolution, chemistry or application wiring.
+Detailed contract and limits: BRANCH_VIEW_V1.txt.
+
+VALIDATION
+Fresh Java 21 compilation of all eleven Mnemosyne production sources and eight
+test classes against cached Jackson/JUnit dependencies; temporary output, heap
+256 MiB. Compile exit 0; JUnit exit 0. 77 tests started/passed; zero failed,
+skipped or aborted; nine containers passed. Thirteen new view tests; all prior
+64 tests pass. Initial 75-test pass retained; two added tests qualify delayed
+withdrawals and record insertion order. No failed development test run occurred.
+Exact commands, raw logs and explicit-class JUnit launcher retained. Save
+BoundedTests.java.txt as BoundedTests.java in the recorded temporary directory
+to reproduce the command arrays. No broad build or downloads.
+
+COVERAGE
+Explicit root/non-tip/descendant selection; selected-time review admissibility;
+complete historical assessments including SUPPORTS/CONTRADICTS; same-ID differing
+sibling assessments and withdrawal isolation; no later-record leakage into earlier
+snapshots; exact source provenance/scalar preservation; first inclusion of all
+record types with hashes and root-to-selected pins; supersession followed by
+replacement-review withdrawal; rejected reviews and NOT_MEASURED without invented
+support; late-recorded withdrawals with original effective/recorded times;
+determinism across branch and record insertion orders and reopening; immutable
+collections; unknown/wrong-kind/null references and empty root; catalog-wide
+orphan/cycle fail-closed; corrupted ancestors and missing inherited content fail
+without partial output or writes; catalog contents and mtimes unchanged.
+
+Existing architecture tests run unchanged, including their cached target/classes
+inspection. Supplemental checks scan fresh production bytecode for domain/toolkit
+dependencies. New-source whitespace checks pass. No scientific regressions,
+frozen predictions or campaign data were regenerated. No concurrent branch-view
+load fault-injection or large-catalog performance qualification is claimed.
+
+PRESERVATION / STOP
+80 prior checkpoint hashes unchanged, including tracked scientific sentinels.
+Full Phase 3, 4 and 5 manifests reverified unchanged. Only new Phase 6 Java sources
+and this qualification directory written. No cleanup, reset, move or unrelated
+artifact writes. No full untracked inventory performed.
+Phase 6 remains uncommitted at this separately qualified checkpoint. Stop before
+application wiring; no subsequent milestone started.
