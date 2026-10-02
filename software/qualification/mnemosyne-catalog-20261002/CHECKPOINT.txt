@@ -1,0 +1,56 @@
+MNEMOSYNE PHASE 4 — APPEND-ONLY SNAPSHOT CATALOG
+Date: 2026-10-02
+Branch: codex/mmp-chemistry-roundtrip
+Phase 3 commit / Phase 4 base: a31e206f7b40a3272b2d70a42a71a9c994e5af8c
+Phase 3 parent: 13ce65d0588934b13699ba51b319cc518f61984b
+Phase 3 was committed exactly as previously qualified: ten files, no edits to
+its recorded implementation, tests or artifacts. No push requested/performed.
+
+Phase 4 adds exactly EvidenceSnapshotCatalog.java and
+EvidenceSnapshotCatalogAcceptanceTest.java, plus this separate qualification
+record. Existing EvidenceAdmission/Exchange/History and their contracts are
+unchanged. Catalog behavior and filesystem failure boundaries: CATALOG_V1.txt.
+Every published root/successor passes EvidenceAdmission. No caller-provided
+admission result can bypass the private publication path. A stored parent must
+be found and verified for successors. Immutable snapshot identity is enforced
+again against existing catalog entries, including concurrent publication races.
+No merge, branch preference, current head, chemistry or scientific semantics.
+No application wiring, new dependencies or module restructuring.
+
+VALIDATION
+Fresh Java 21 compile of all nine Mnemosyne production sources and six test
+classes against cached Jackson/JUnit dependencies, temporary output, 256 MiB heap.
+Compile exit 0; JUnit exit 0. 52 tests started/passed, zero failed/skipped/aborted;
+seven containers passed. 16 new catalog tests plus all 36 previous tests.
+The initial 49-test pass is retained; added persistence/disagreement/corruption
+coverage brings the final total to 52. No failed compilation/test run in Phase 4.
+commands.json contains exact process argument arrays; BoundedTests.java.txt is
+the explicit-class JUnit launcher (copy to the temp directory as BoundedTests.java).
+No broad build, download, scientific regression or campaign rerun occurred.
+
+COVERAGE
+Root seeding and successor storage; reopen with a fresh catalog instance; exact
+canonical bytes; persisted parent references; replay with unchanged bytes/mtimes;
+wrong pins, absent/wrong parent, missing/changed inherited records, invalid
+snapshots; immutable identity collision even when parent admission passes;
+sibling branches including different same-ID record content; no implicit merge;
+malformed/misplaced/noncanonical/symlink stored entries fail closed; checked I/O;
+path-safe reference encoding; missing reads create no files; independent roots
+and insertion-independent inventory; concurrent identical writers, conflicting
+writers, and siblings; manually orphaned staging does not become a catalog entry;
+SUPPORTS/CONTRADICTS assessments and later review withdrawal survive restart with
+unchanged historical admissibility. Concurrent tests use separate catalog objects
+and threads, not a multi-process/power-loss fault-injection campaign.
+
+Existing architecture tests ran unchanged; they read cached target/classes as
+well. A supplemental scan checks freshly compiled production bytecode for domain/
+toolkit dependencies. All sources use only allowed JDK imports. New-source
+whitespace checks pass; no modifications to prior tracked software files.
+
+PRESERVATION / STOP
+80 earlier checkpoint content hashes verified unchanged, including all three
+pre-existing tracked scientific files. All Phase 3 manifest hashes reverified
+unchanged after Phase 4. No unrelated tracked/untracked artifacts written, moved,
+reset, cleaned or regenerated. No full untracked content inventory performed.
+Phase 4 remains uncommitted for review at this separately qualified checkpoint.
+Stop here before application wiring. No subsequent milestone started.

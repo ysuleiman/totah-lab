@@ -1,0 +1,63 @@
+MNEMOSYNE LOCAL SNAPSHOT CATALOG / 1
+
+API: EvidenceSnapshotCatalog(Path existingDedicatedDirectory), seed(root, pin),
+append(incoming, expectation), read(pin), entries(). All filesystem operations
+report checked IOException. No existing public method or exchange schema changes.
+The caller explicitly supplies a dedicated directory. Opening never creates it.
+
+Each committed entry is a canonical EvidenceExchange.encode(snapshot) file:
+SHA256(EvidenceExchange.encodeRecord(snapshot.manifest().reference())) +
+".snapshot.json". Digesting the whole structured reference avoids delimiter and
+path traversal aliases. Catalog read verifies exchange membership/content,
+canonical bytes and path/reference agreement; pinned read additionally verifies
+the expected whole-exchange SHA256. No mutable index, pointer or head file exists.
+The catalog format version is EvidenceSnapshotCatalog.FORMAT; payloads retain
+the existing exchange schema. Unknown files without the catalog suffix are not
+entries. Catalog files with invalid bytes/names/types fail reads/inventory closed.
+
+seed explicitly accepts only a parentless snapshot and calls EvidenceAdmission
+with the snapshot as both inputs and the expected pin on both sides. This proves
+integrity/replay consistency, not source authenticity. Multiple explicitly seeded
+roots are allowed; none becomes a preferred root or head.
+append resolves the expected parent in this catalog, then calls EvidenceAdmission
+with the stored parent, incoming snapshot, and caller expectations. Missing parent
+is a conflict. An admission conflict never reaches publication. An existing target
+identity with identical canonical content is REPLAY; changed content is CONFLICT.
+Replays still validate the supplied parent/pins. Siblings preserve independent
+full snapshots and may disagree without cross-branch record merging.
+
+Results report STORED, REPLAY or CONFLICT, a typed reason, the caller expectations,
+and the exact admission result when admission was reached. Results/receipts are
+returned in memory, not separately persisted; snapshot bytes contain their parent
+reference and record digests. A durable conflict log would violate this phase's
+no-write-on-conflict contract and is not added. No authenticity or scientific
+judgment is attached to successful storage.
+
+Publication: encode/validate first, write an exclusive private staging file beside
+(not inside) the catalog, force its bytes to storage, then publish by hard link.
+The hard-link create atomically fails if an identity file already exists. There
+is no overwrite fallback. A losing writer reads/validates the winner and returns
+REPLAY or CONFLICT. Finally it removes only its own private staging pathname.
+Only the winner creates a catalog entry. Sequential conflicts and replays create
+no staging file and leave catalog contents/mtimes unchanged. A racing loser may
+have made a private staging file; it removes that file and never replaces the
+winning entry. It cannot prevent the concurrent winner's legitimate append.
+
+Platform boundary: a trusted local filesystem with hard-link support, writable
+catalog and parent directory on the same filesystem. No advisory locks or process-
+local mutexes are relied on for no-replace publication. Tests use independent
+instances with concurrent threads on the local filesystem; separate processes,
+network filesystems and alternate OS/filesystems were not qualified.
+Symlink final directory/entries are rejected, but this is not a defense against
+hostile administrators, ancestor replacement, or arbitrary external mutation.
+
+Failure boundary: data bytes are forced before publication. No directory fsync or
+power-loss durability guarantee is claimed. A crash before publication can leave
+an unlisted private staging file; a crash after publication leaves a whole entry
+visible. Cleanup failures after publication can report IOException despite a
+committed entry: callers must use pinned read/retry to resolve the outcome. Never
+roll back/delete the immutable entry. No automated sweeping or repair is provided.
+Corrupt entries raise IOException; they are never normalized, repaired or replaced.
+Inventory is a sorted scan, not a transactionally consistent view under concurrent
+appends and not a catalog-wide scientific or ancestry validation operation.
+Per-snapshot EvidenceExchange.MAX_BYTES applies (16 MiB); no scalability claim.
