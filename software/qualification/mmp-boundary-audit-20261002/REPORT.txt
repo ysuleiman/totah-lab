@@ -1,0 +1,56 @@
+MMP mapping boundary audit — 2026-10-02
+
+Base: 931586740cacf52ca9ef8b3fb10329138afa12b0
+Branch: codex/mmp-chemistry-roundtrip
+Status: audit and regression tests only; NOT a passing repair checkpoint.
+No production edits, new algorithms, public API changes or scientific conclusions.
+
+Finding 1 (P2): retained context depends on input atom ordering.
+OclMatchedPairExtractor.java:205-215 includes raw index-relative tetrahedral parity
+in chemicalContext. Synthetic CC[C@H](F)CO / CC[C@H](F)CN at variable limit 1
+produces one pair. Swapping source a atoms 0 and 3 through OCL preserves canonical
+identity, transformation and correspondence alternatives, but changes context
+PARITY_2 to PARITY_1. ContextualTransformationEffects.java:69 compares these
+strings for eligibility, and lines 73/96 use them for grouping/filtering. Thus
+representation alone can cause a context mismatch. No experimental effect tested.
+Regression: retainedStereoContextIsIndependentOfAtomOrdering (FAIL).
+
+Finding 2 (P2): uncapped core loses attachment-distinguished stereochemistry.
+OclMatchedPairExtractor.java:107-109/200-202 filters the source graph to an uncapped
+core while retaining its stereo descriptor. For synthetic C[C@H](F)CO / C[C@H](F)CN,
+limit 1, the terminal O/N single cut is individually accepted. Removing that
+attachment converts the retained CH2 branch to methyl, making two branches
+identical. Correspondence throws unresolved tetrahedral stereo; the dataset-level
+catch at lines 120-122 returns EXTRACTION_FAILED and clears pairs. Expected one
+attachment-proven pair, actual zero. This is an explicit failure/abstention, not
+an unsafe recommendation. A future repair must prove attachment-aware mappings;
+it must not suppress the exception or delete stereo merely to pass.
+Regression: attachmentDistinguishedStereoCoreRemainsProvable (FAIL).
+
+New passing coverage: three parameterized identity/stable-atom correspondence
+checks covering tetrahedral stereo, isotope and charge; one rejected-source
+receipt, source/reference preservation, algorithm provenance and replay check.
+All fixtures are synthetic software inputs, not proposed ligands or chemistry rules.
+
+Validation: Java 21 javac exit 0; JUnit launcher exit 1.
+31 tests started: 29 passed, 2 failed, 0 skipped/aborted; 9 containers passed.
+All 25 existing tests passed; 6 new cases comprise 4 passes and 2 regressions.
+Selected classes: OclMappingBoundaryAuditTest, OclMatchedPairExtractorTest,
+OclBenchmarkChemistryRegressionTest, ContextualTransformationEffectsTest,
+SourceAssociationAcceptanceTest. Freshly compiled the three audited production
+classes and these five test classes; cached dependency classes/jars were reused.
+No reactor build, downloads, historical scientific regressions, conformer/ligand
+generation or benchmark prediction rerun. This is not a whole-repository audit.
+Exact invocation arrays are in commands.json; test output is in tests.log.
+
+Preservation: original tracked diff byte-for-byte unchanged; three starting
+scientific sentinel hashes unchanged; 80 hashes from the previous checkpoint
+verified unchanged (see preservation.json). No existing untracked artifacts were
+written. No full untracked content audit performed. Global git diff --check
+reports pre-existing CRLF/trailing whitespace in TORSION_SURFACE_CONSISTENCY.csv;
+that file was not changed. New test source has no trailing whitespace.
+
+Only additions: OclMappingBoundaryAuditTest.java and this audit directory.
+HEAD/index unchanged, no commit created. Two tests deliberately express the
+required invariants and fail on current production code; neither disabled nor
+weakened. Stop for separately scoped repair approval.

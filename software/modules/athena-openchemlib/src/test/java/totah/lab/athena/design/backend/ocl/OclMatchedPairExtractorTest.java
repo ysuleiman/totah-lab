@@ -85,7 +85,7 @@ class OclMatchedPairExtractorTest {
             assertEquals(before, new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(input));
             assertTrue(result.pairs().isEmpty(), "one source is not an empirical molecular pair");
             assertEquals(OclMatchedPairExtractor.ALGORITHM, result.algorithm());
-            assertTrue(result.algorithm().endsWith("source-map-v2"));
+            assertTrue(result.algorithm().endsWith("source-map-v3"));
             var all = new ArrayList<Source>();
             for (var record : rows) all.add(source(record.path("id").asText(), record.path("smiles").asText()));
             var baseline = extractor.extract(all, 8);

@@ -1,0 +1,33 @@
+MMP mapping boundary repair — 2026-10-02
+Base HEAD: 931586740cacf52ca9ef8b3fb10329138afa12b0
+Branch: codex/mmp-chemistry-roundtrip
+Scope: repair only the two demonstrated mapping boundary defects.
+
+Retained context now uses the existing backend absolute-stereo normalization.
+Core correspondence retains the exact OCL-proven attachment cap and translated
+parities, normalizes its stereo with the same backend helper, and reuses the
+existing bounded attributed-graph correspondence search. Only after that proof
+are temporary cap atoms/bonds excluded from returned lineage. Source atoms,
+bonds, observations, provenance and graph ordering are not rewritten.
+Identity, exhaustive correspondence, anchor and partition guards remain active.
+No public API signature, dependency, module or scientific-rule changes.
+
+Provenance versions: source-map-v3 and retained-shell1/v2. Old context strings
+must not be treated as interchangeable with v2; no stored artifacts migrated.
+The earlier failed audit checkpoint remains unchanged as historical evidence.
+
+Validation: javac Java 21 exit 0; bounded JUnit launcher exit 0.
+32 tests found/started/passed; 0 failures, skipped, aborted; 9 containers passed.
+The original 25 tests pass. Seven audit/repair cases pass, including both formerly
+failing regressions, isotope/charge/stereo permutation checks, source/reference
+and rejection-receipt replay checks, all first-atom transpositions of both sources
+for the attachment-sensitive core, and rejection of opposite retained stereo.
+Exact command arrays and logs accompany this report. Three production classes
+and five test classes freshly compiled against cached dependencies. No broad
+build, downloads, scientific regression outputs or frozen predictions rerun.
+Scoped git diff --check passed. This is not whole-repository qualification.
+
+Preservation: 80 previous checkpoint hashes verified unchanged; original tracked
+scientific diff byte-identical. No unrelated tracked/untracked artifacts written.
+No full untracked content inventory performed. No clean/reset/move operations.
+No commit made; repair and tests are left for review at this separate checkpoint.

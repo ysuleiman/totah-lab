@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 /** Bounded adapter of OCL extraction/enumeration, not a second fragmenter or molecular editor. */
 public final class OclMatchedPairExtractor implements MatchedPairExtractor {
     public static final String ALGORITHM = "OCL/" + OclMolecularBackend.VERSION
-            + "/MMPFragmenter(false)+MMPEnumerator(1.1)/single-cut/source-map-v2";
+            + "/MMPFragmenter(false)+MMPEnumerator(1.1)/single-cut/source-map-v3";
     private final OclMolecularBackend backend = new OclMolecularBackend();
     private record Occurrence(Source source, String identity, Fragment fragment, int size) { }
 
@@ -39,6 +39,7 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
                 var mapper = new OclGraphMapper(); var mapping = mapper.toOcl(source.graph());
                 mapper.validateHydrogenCounts(mapping);
                 var molecule = fragmentationMolecule(mapping);
+                var contextGraph = backend.absoluteStereo(source.graph());
                 // OCL removes explicit H in its constructor. Input graph is immutable; map numbers survive helper reordering.
                 var fragmenter = new MMPFragmenter(molecule);
                 boolean doubleCut = false, sizeExcluded = false;
@@ -66,7 +67,7 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
                     var constantAtoms = source.graph().atoms().stream().map(MolecularGraph.Atom::id)
                             .filter(x -> !variableAtoms.contains(x)).collect(Collectors.toCollection(TreeSet::new));
                     var fragment = new Fragment(cut.getKeysID()[0], cut.getValueID(), bond.id(), anchor, variableAnchor,
-                            constantAtoms, variableAtoms, context(source.graph(), anchor, bond.id()));
+                            constantAtoms, variableAtoms, context(contextGraph, anchor, bond.id()));
                     local.add(new Occurrence(source, identity, fragment, cut.getValueIDAtoms()));
                 }
                 if (doubleCut) issues.add(new Issue(source.id(), "DOUBLE_CUT_AVAILABLE_BUT_MAPPING_NOT_QUALIFIED"));
@@ -104,11 +105,17 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
                     }
                     String key = left.source().id()+"\n"+right.source().id()+"\n"+left.fragment().cutBond()+"\n"+right.fragment().cutBond()+"\n"+left.fragment().constant();
                     if (pairs.containsKey(key)) continue;
-                    var lc = subgraph(left.source().graph(), left.fragment().constantAtoms());
-                    var rc = subgraph(right.source().graph(), right.fragment().constantAtoms());
-                    var proof = backend.correspondence(lc, rc);
+                    var lc = attachedCore(left.source(), left.fragment());
+                    var rc = attachedCore(right.source(), right.fragment());
+                    // Identity was proved against the exact toolkit cap; match its absolute stereo
+                    // through the existing bounded attributed-graph search, without removing the cap.
+                    CanonicalIdentityService matcher = backend::identify;
+                    var proof = matcher.correspondence(lc, rc);
                     final String la = left.fragment().constantAnchor(), ra = right.fragment().constantAnchor();
-                    var alternatives = proof.alternatives().stream().filter(m -> ra.equals(m.atoms().get(la))).toList();
+                    var leftAtoms = left.fragment().constantAtoms();
+                    var rightAtoms = right.fragment().constantAtoms();
+                    var alternatives = proof.alternatives().stream().filter(m -> ra.equals(m.atoms().get(la)))
+                            .map(m -> retainedMapping(m, lc, leftAtoms, rightAtoms)).distinct().toList();
                     if (!proof.exhaustive() || alternatives.isEmpty()) {
                         issues.add(new Issue(left.source().id()+"/"+right.source().id(), "CORE_CORRESPONDENCE_UNPROVEN")); continue;
                     }
@@ -149,6 +156,10 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
     }
     private static String attachedIdentity(StereoMolecule source, Map<Integer,String> ids,
                                            Set<String> atoms, String anchor) {
+        return new Canonizer(attachedMolecule(source, ids, atoms, anchor), Canonizer.ENCODE_ATOM_CUSTOM_LABELS).getIDCode();
+    }
+    private static StereoMolecule attachedMolecule(StereoMolecule source, Map<Integer,String> ids,
+                                                  Set<String> atoms, String anchor) {
         source.ensureHelperArrays(Molecule.cHelperParities);
         boolean[] include = new boolean[source.getAllAtoms()];
         int anchorIndex = -1;
@@ -180,7 +191,7 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
         }
         fragment.setParitiesValid(0);
         fragment.setStereoBondsFromParity();
-        return new Canonizer(fragment,Canonizer.ENCODE_ATOM_CUSTOM_LABELS).getIDCode();
+        return fragment;
     }
     private static boolean endpoints(MolecularGraph.Bond bond, String a, String b) {
         return bond.firstAtomId().equals(a) && bond.secondAtomId().equals(b)
@@ -197,9 +208,34 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
         }
         return seen;
     }
-    private static MolecularGraph subgraph(MolecularGraph graph, Set<String> atoms) {
-        return new MolecularGraph(graph.atoms().stream().filter(a -> atoms.contains(a.id())).toList(),
-                graph.bonds().stream().filter(b -> atoms.contains(b.firstAtomId()) && atoms.contains(b.secondAtomId())).toList(), Map.of());
+    private MolecularGraph attachedCore(Source source, Fragment occurrence) throws MolecularBackendException {
+        var mapper = new OclGraphMapper();
+        var mapping = mapper.toOcl(source.graph());
+        var molecule = attachedMolecule(fragmentationMolecule(mapping), mapping.idByMapNumber(),
+                occurrence.constantAtoms(), occurrence.constantAnchor());
+        if (!new Canonizer(molecule, Canonizer.ENCODE_ATOM_CUSTOM_LABELS).getIDCode().equals(occurrence.constant()))
+            throw new MolecularBackendException("CORE_ATTACHMENT_IDENTITY_UNPROVEN");
+        // Give the temporary cap a collision-free local ID; it never enters returned lineage.
+        String cap = "attachment-cap";
+        while (source.graph().atom(cap).isPresent()) cap += ":";
+        var ids = new HashMap<>(mapping.idByMapNumber());
+        int capMap = source.graph().atoms().size() + 1;
+        ids.put(capMap, cap);
+        molecule.setAtomMapNo(molecule.getAllAtoms() - 1, capMap, false);
+        molecule.ensureHelperArrays(Molecule.cHelperCIP);
+        var graph = mapper.fromOcl(new OclGraphMapper.Mapping(molecule, source.graph(), ids), molecule);
+        return backend.absoluteStereo(graph, new OclGraphMapper.Mapping(molecule, graph, ids));
+    }
+    private static CanonicalIdentityService.Mapping retainedMapping(CanonicalIdentityService.Mapping mapping,
+            MolecularGraph capped, Set<String> left, Set<String> right) {
+        var atoms = new TreeMap<String, String>();
+        mapping.atoms().forEach((a, b) -> { if (left.contains(a)) atoms.put(a, b); });
+        if (!atoms.keySet().equals(left) || !new HashSet<>(atoms.values()).equals(right))
+            throw new IllegalArgumentException("CORE_ATTACHMENT_MAPPING_UNPROVEN");
+        var bonds = new TreeMap<String, String>();
+        capped.bonds().stream().filter(b -> left.contains(b.firstAtomId()) && left.contains(b.secondAtomId()))
+                .forEach(b -> bonds.put(b.id(), mapping.bonds().get(b.id())));
+        return new CanonicalIdentityService.Mapping(atoms, bonds);
     }
     /** Deliberately narrow radius-one retained-side signature, NOT mmpdb/Morgan environment equivalence. */
     private static String context(MolecularGraph graph, String anchor, String cut) {
@@ -209,7 +245,7 @@ public final class OclMatchedPairExtractor implements MatchedPairExtractor {
             neighbors.add(b.order()+":"+b.aromatic()+":"+label(graph.atom(other).orElseThrow()));
         }
         Collections.sort(neighbors);
-        return "retained-shell1/v1:"+label(graph.atom(anchor).orElseThrow())+neighbors;
+        return "retained-shell1/v2:"+label(graph.atom(anchor).orElseThrow())+neighbors;
     }
     private static String label(MolecularGraph.Atom a) {
         return a.element()+":"+a.isotope()+":"+a.formalCharge()+":"+a.explicitHydrogens()+":"+a.aromatic()+":"+a.stereochemistry();

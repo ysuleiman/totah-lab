@@ -119,8 +119,11 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
         return CanonicalIdentityService.super.correspondence(absoluteStereo(attempted), absoluteStereo(representative));
     }
 
-    private MolecularGraph absoluteStereo(MolecularGraph graph) throws MolecularBackendException {
-        var mapping = mapper.toOcl(graph);
+    MolecularGraph absoluteStereo(MolecularGraph graph) throws MolecularBackendException {
+        return absoluteStereo(graph, mapper.toOcl(graph));
+    }
+
+    MolecularGraph absoluteStereo(MolecularGraph graph, OclGraphMapper.Mapping mapping) throws MolecularBackendException {
         var molecule = mapping.molecule();
         molecule.ensureHelperArrays(Molecule.cHelperCIP);
         var stereo = new java.util.HashMap<String, String>();
