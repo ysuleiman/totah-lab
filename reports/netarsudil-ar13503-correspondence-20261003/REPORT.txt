@@ -1,0 +1,131 @@
+NETARSUDIL / AR-13503 — BOUNDED ATOM / FEATURE CORRESPONDENCE CHECKPOINT
+2026-10-03
+Base commit fb4fdb43e890f26d037449cd2826ef8fbedf1326
+Branch codex/mmp-chemistry-roundtrip
+
+OUTCOME
+Neutral reference correspondence is certified with two explicit symmetry-equivalent
+heavy-atom alternatives. The frozen SDF bridge has an explicit stereo policy;
+unconditional absolute identity from the SDF files alone is NOT certified.
+No physical atom lineage, isotope tracing, AR pose/contact retention, binding mode,
+B2/B3 preference, inhibition mechanism or A sparing is established by this work.
+
+IDENTITY AND REPRESENTATION
+Both cached PubChem response hashes match their original retrieval receipts:
+netarsudil CID 66599893 / OURRXQUGYQRVML-AREMUKBSSA-N;
+AR-13503 CID 134128281 / LTXBFJFJUIJOQE-GOSISDBHSA-N.
+Full connectivity, atom charges, isotope/stereo identity were compared with OCL
+canonical identities, not inferred from names or SMILES character order.
+The cached ChEMBL CHEMBL4753043 canonical SMILES agrees with the AR reference.
+The two recovered prepared AR SDF artifacts represent the same neutral reference
+under the explicit stereo bridge policy below. The output enumerates these forms.
+This is not an exhaustive external salt/tautomer inventory, nor identification of
+the actual assay lot or its protonation distribution. No files were regenerated.
+
+IMPORTANT STEREO CAVEAT
+Prepared parent and AR SDFs have unset V2000 chiral flags. OCL default parsing
+assigns relative/racemic ESR groups, unlike absolute stereo in the source SMILES.
+Their coordinate handedness is S at parent C14 and AR C7. The bridge explicitly
+uses MolfileParser.setAssumeChiralTrue(true) in memory, then requires equality to
+the pinned absolute reference identity. Raw/default-parsed SDF identity equality
+fails, and the negative acceptance test preserves that failure. The source SDFs
+are unchanged. A caller must retain this policy and limitation, not report that
+the SDF independently proves absolute stereochemistry or assay-lot stereopurity.
+
+EXACT ACCOUNTING
+Parent atom names are element plus 1-based record ordinal in the pinned parent
+SDF, verified against Hermes names. AR IDs use its own SDF ordinals, not parent
+numbers. All alternatives are present in CORRESPONDENCE.json.
+- Parent: 34 heavy atoms + 27 explicit H = 61 atom records.
+- AR: 24 heavy atoms + 19 explicit H = 43 atom records.
+- Retained: all 24 AR heavy atoms; no added heavy atoms.
+- Removed parent heavy atoms: C1,C2,C3,C4,C5,C6,O7,C32,C33,C34.
+- Removed explicit parent H: H35,H36,H37,H38,H39,H58,H59,H60,H61.
+- Added explicit AR H: H25, on O1. This is formal chemical correspondence,
+  not a claim about which physical hydrogen moved in an experiment.
+- Retained heavy bonds: 26; no chemical bond-order changes between retained
+  heavy atoms. Aromatic equivalence is validated without assigning significance
+  to alternate Kekule spellings. Deleted bonds are individually listed.
+- Two mappings differ only among symmetry-equivalent central-ring atoms
+  C11/C12/C30/C31. Both preserve the same feature atom sets. No preferred
+  atom-level alternative is selected. Equivalent H atoms are reported as
+  neighbor-based candidate orbits, not falsely unique physical assignments.
+
+KEY CORRESPONDENCES
+Parent N25 -> AR N18: isoquinoline N retained.
+Parent N16 -> AR N9: free amine retained in these neutral reference forms.
+Parent C14 -> AR C7: S stereocenter retained under the explicit stereo policy.
+Parent O8 -> AR O1: alkoxy oxygen retained and gains H; ester becomes alcohol.
+Parent C9 -> AR C2: benzyl linker retained.
+Parent C6 and O7 removed with distal aromatic cap and both methyl substituents.
+Thus the transformation is not deletion of all atoms labeled ESTER. It removes
+the distal acyl/cap region while chemically changing the surviving oxygen.
+
+FEATURE RESULT
+ISOQUINOLINE_RING, ISOQUINOLINE_N, FREE_AMINE, AMINOMETHYL, AMIDE,
+CENTRAL_AROMATIC, BENZYL_LINKER, BRANCH_STEREOCENTER:
+  preserved atom sets; AR geometry/contact retention unknown.
+ESTER (parent C6/O7/O8):
+  partially retained and chemically changed; only O8 survives as AR O1.
+DISTAL_AROMATIC, ORTHO_METHYL, PARA_METHYL:
+  removed.
+All entries include exact parent and AR atom sets. Preserved neutral chemistry
+is not proof of identical assay protonation, conformational populations or contacts.
+
+FROZEN EVIDENCE BRIDGE
+Verified source SDF row ordering, element and coordinates under OCL parser
+conventions (float precision; reversed Y/Z, a proper coordinate rotation).
+No OCL coordinates are used to replace frozen geometry. Hermes parent heavy-atom
+names match all 34 named source atoms. Re-read all 100 A + 100 B AD4 models and
+checked model numbers, complete heavy-name sets, uniqueness and matching elements.
+The previous raw DLG coordinate audit is retained, not recomputed as a new geometry
+campaign. All 50 earlier frozen input dependency hashes and 65 current input pins
+match. B2/B3 feature names and medoid/pose references bridge to the same certified
+feature sets. B2 medoid AD4_B_052 and B3 medoid AD4_B_020 remain parent poses only.
+Basin occupancy for AR is NOT inferred. This does not discriminate B2 from B3.
+
+METHOD / BOUNDS
+Reused OCL 2026.7.2 SSSearcher rigorous full-AR embedding enumeration, followed
+by exact induced retained-graph canonical identity, per-mapped-atom charge,
+isotope, CIP/ESR and bond checks. Because all AR heavy atoms are accounted for,
+these are maximal-cardinality heavy correspondences for this pair. Source size
+bounds are <=40 parent/<=30 AR heavy atoms; >256 matches fail rather than selecting.
+No generic MMP algorithm was modified, no new chemical search algorithm written,
+no production API changed and no model ligand/pose or conformer emitted. The
+retained-graph copy exists only in memory for identity checking. Existing
+LineageAwareFeatureMapper was inspected but not forced to label partly retained
+ESTER as inherited or to infer an AR geometry. This is a task-local certification
+artifact, not a new application-facing abstraction or a completed crossed report.
+
+VALIDATION
+Fresh Java 21 task-local compile exit 0; test compile exit 0.
+10 JUnit 5 tests started/passed; 0 failures, skipped or aborted.
+Tests cover raw-SDF stereo rejection / explicit bridge equivalence, all-24 mapping
+with both alternatives, internal atom permutation, inverted absolute stereo,
+charge change, carbonyl bond change, isotope change, missing topology, partial
+ester classification, complete H accounting and all 200 frozen pose names.
+Independent JVM replay returned byte-identical CORRESPONDENCE.json:
+a9a8997f1dded919f70361baa0b3271de16ccaed57c5c1496225bc814a843d5a
+First certificate attempt failed its row-coordinate check because OCL reverses
+Y/Z and reads coordinates as floats. Corrected only the reader-convention check;
+all source coordinates stayed unchanged. Failure log retained. Initial probe
+found the stereo mismatch; it was not bypassed silently. No JUnit test failed.
+Exact compile/run/test commands, logs, runtime class hashes and input pins saved.
+Used existing cached Hermes/Gaia/OCL/Jackson/JUnit runtime; no broad Maven build,
+download, scientific regression, docking, QM, D3, MD, SAM or analog calculation.
+
+PRESERVATION / CLEANUP
+Before validation, removed only the 27 Git-reported temporary garbage files
+explicitly approved by the user: 51,209,307,206 logical bytes (~47.69 GiB).
+No open handles were reported immediately before deletion. Git afterwards reports
+zero garbage, eight valid packs unchanged at 66.78 GiB, and ~48 GiB free.
+No Git history rewrite/repack/prune was performed. All 80 scientific preservation
+hashes still match; the three pre-existing tracked scientific changes remain.
+Task artifacts are uncommitted. No push performed.
+
+STOP / NEXT DECISION
+The approved atom/feature correspondence task is complete at this conditional,
+separately qualified checkpoint. The full parent-AR crossed experimental
+hypothesis analysis has NOT been run. It may reuse these feature correspondences
+only with symmetry, stereo-policy, assay-comparability and geometry caveats intact.
+No new campaign or software phase started.
