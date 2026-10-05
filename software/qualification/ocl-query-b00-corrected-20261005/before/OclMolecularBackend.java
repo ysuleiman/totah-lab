@@ -211,7 +211,26 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     @Override
     public SubstructureMatcher.Result match(String query, MolecularGraph graph)
             throws MolecularBackendException {
-        return OclOccurrenceMatcher.match(query, mapper.toOcl(graph));
+        var mapping = mapper.toOcl(graph);
+        try {
+            var parser = new SmilesParser(SmilesParser.SMARTS_MODE_IS_SMARTS);
+            var fragment = parser.parseMolecule(query);
+            var searcher = new SSSearcher(); searcher.setMol(fragment, mapping.molecule());
+            searcher.findFragmentInMolecule(SSSearcher.cCountModeUnique, SSSearcher.cDefaultMatchMode);
+            var results = new ArrayList<Map<String, String>>();
+            for (int[] match : searcher.getMatchList()) {
+                var result = new LinkedHashMap<String, String>();
+                for (int queryIndex = 0; queryIndex < match.length; queryIndex++) {
+                    int targetMap = mapping.molecule().getAtomMapNo(match[queryIndex]);
+                    result.put("query:" + queryIndex, mapping.idByMapNumber().get(targetMap));
+                }
+                results.add(result);
+            }
+            return new SubstructureMatcher.Result(results,
+                    evidence("substructure-match", mapping, List.of(), List.of("query=" + query)));
+        } catch (Exception exception) {
+            throw new MolecularBackendException("OCL SMARTS/substructure match failed", exception);
+        }
     }
 
     private static BackendEvidence evidence(String operation, OclGraphMapper.Mapping mapping,

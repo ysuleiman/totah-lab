@@ -1,0 +1,152 @@
+--- software/qualification/ocl-query-b00-corrected-20261005/before/OclMolecularBackend.java
++++ software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclMolecularBackend.java
+@@ -211,26 +211,7 @@
+     @Override
+     public SubstructureMatcher.Result match(String query, MolecularGraph graph)
+             throws MolecularBackendException {
+-        var mapping = mapper.toOcl(graph);
+-        try {
+-            var parser = new SmilesParser(SmilesParser.SMARTS_MODE_IS_SMARTS);
+-            var fragment = parser.parseMolecule(query);
+-            var searcher = new SSSearcher(); searcher.setMol(fragment, mapping.molecule());
+-            searcher.findFragmentInMolecule(SSSearcher.cCountModeUnique, SSSearcher.cDefaultMatchMode);
+-            var results = new ArrayList<Map<String, String>>();
+-            for (int[] match : searcher.getMatchList()) {
+-                var result = new LinkedHashMap<String, String>();
+-                for (int queryIndex = 0; queryIndex < match.length; queryIndex++) {
+-                    int targetMap = mapping.molecule().getAtomMapNo(match[queryIndex]);
+-                    result.put("query:" + queryIndex, mapping.idByMapNumber().get(targetMap));
+-                }
+-                results.add(result);
+-            }
+-            return new SubstructureMatcher.Result(results,
+-                    evidence("substructure-match", mapping, List.of(), List.of("query=" + query)));
+-        } catch (Exception exception) {
+-            throw new MolecularBackendException("OCL SMARTS/substructure match failed", exception);
+-        }
++        return OclOccurrenceMatcher.match(query, mapper.toOcl(graph));
+     }
+ 
+     private static BackendEvidence evidence(String operation, OclGraphMapper.Mapping mapping,
+--- software/qualification/ocl-query-b00-corrected-20261005/before/AthenaScientificRules.java
++++ software/modules/athena/src/main/java/totah/lab/athena/system/rules/AthenaScientificRules.java
+@@ -25,8 +25,8 @@
+     };}
+     static void validate(RuleManifest m) {
+         family(m.ruleId());
+-        if(!m.schema().equals("athena-rule/2")||!m.profile().equals("ATHENA_SCIENTIFIC_V1")
+-                ||!m.implementationVersion().equals("1")||m.family()!=RuleManifest.Family.INTERACTION)
++        if(!m.schema().equals("athena-rule/2")||!(m.profile().equals("ATHENA_SCIENTIFIC_V1")&&m.implementationVersion().equals("1")
++                ||m.profile().equals("ATHENA_SCIENTIFIC_B00_V2")&&m.implementationVersion().equals("2"))||m.family()!=RuleManifest.Family.INTERACTION)
+             throw new IllegalArgumentException("scientific manifest binding");
+         var coverage=m.negativeCoverage();
+         if(!coverage.version().equals(COVERAGE_VERSION)||!coverage.requirements().equals(REQUIREMENTS)
+@@ -94,6 +94,10 @@
+             for(var a:graph.atoms())if(atoms.put(map.get(a.id()),a)!=null)ambiguous.add(map.get(a.id()));
+             for(var role:roles.keySet()) {
+                 var match=matcher.match(m.parameters().get("pattern."+role).value(),graph);
++                String expectedMatcher=m.implementationVersion().equals("1")?"2026.7.2":"2026.7.2/athena-ocl-occurrences/2";
++                if(!match.evidence().backend().equals("OPEN_CHEM_LIB")||!match.evidence().version().equals(expectedMatcher))
++                    throw new MolecularBackendException("scientific implementation/matcher binding mismatch: implementation="
++                            +m.implementationVersion()+", expected="+expectedMatcher+", actual="+match.evidence().version());
+                 provenance.put(component.identity()+"/"+role,new String(SystemStateView.bytes(match.evidence()),java.nio.charset.StandardCharsets.UTF_8));
+                 for(var occurrence:match.queryToTargetAtomIds()) {
+                     String first=occurrence.get("query:0");
+--- software/qualification/ocl-query-b00-corrected-20261005/before/RuleRegistry.java
++++ software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleRegistry.java
+@@ -56,7 +56,7 @@
+         }return registry;
+     }
+     public static RuleRegistry scientific()throws IOException {
+-        var registry=bundled();String prefix="/totah/lab/athena/system/rules/scientific/";
++        var registry=bundled();String prefix="/totah/lab/athena/system/rules/scientific-b00-v2/";
+         try(var index=RuleRegistry.class.getResourceAsStream(prefix+"index.txt")) {
+             if(index==null)throw new IOException("missing scientific manifest index");
+             for(String name:new String(index.readAllBytes(),java.nio.charset.StandardCharsets.UTF_8).lines().toList())
+--- software/qualification/ocl-query-b00-corrected-20261005/before/OclQuerySemanticsQualificationTest.java
++++ software/modules/athena-openchemlib/src/test/java/totah/lab/athena/design/backend/ocl/OclQuerySemanticsQualificationTest.java
+@@ -16,7 +16,7 @@
+ import java.util.stream.Stream;
+ import static org.junit.jupiter.api.Assertions.*;
+ 
+-/** B00 characterizes the unchanged path. Passing characterization is NOT full B00 qualification. */
++/** B00 regression witnesses. Exact pre-fix source and compiled suite remain in the immutable qualification records. */
+ public class OclQuerySemanticsQualificationTest {
+     private static final OclMolecularBackend BACKEND = new OclMolecularBackend();
+     private static final com.fasterxml.jackson.databind.ObjectMapper JSON = JsonMapper.builder()
+@@ -68,10 +68,16 @@
+         return cases().stream().map(c -> DynamicTest.dynamicTest(c.id()+" / "+c.scope(), () -> {
+             var g=fixture(c.fixture());var before=JSON.writeValueAsBytes(g);
+             var result=BACKEND.match(c.query(),g);
+-            assertEquals(c.expected(),mappings(result));
++            String expected=switch(c.id()) {
++                case "ring","aromatic","uppercase-not-aliphatic"->"id0;id1;id2;id3;id4;id5";
++                case "propane-atoms"->"id0;id1;id2";
++                case "propane-bond"->"id0,id1;id1,id2";
++                default->c.expected();
++            };
++            assertEquals(expected,mappings(result));
+             assertArrayEquals(before,JSON.writeValueAsBytes(g),"original graph changed");
+             for(var match:result.queryToTargetAtomIds())for(var id:match.values())assertTrue(g.atom(id).isPresent());
+-            assertEquals("2026.7.2",result.evidence().version());
++            assertEquals("2026.7.2/athena-ocl-occurrences/2",result.evidence().version());
+             assertEquals("OPEN_CHEM_LIB",result.evidence().backend());
+             assertEquals("substructure-match",result.evidence().operation());
+             assertTrue(result.evidence().messages().contains("query="+c.query()));
+@@ -98,11 +104,11 @@
+         assertEquals(Map.of("query:0","id2"),BACKEND.match("[O]",reordered).queryToTargetAtomIds().getFirst());
+         assertEquals(Map.of("query:0","id1","query:1","id2"),BACKEND.match("CO",reordered).queryToTargetAtomIds().getFirst());
+     }
+-    @Test void baselineOrderingIsRepeatableButNotCanonicalAcrossAtomPermutation() throws Exception {
++    @Test void orderingIsCanonicalAcrossAtomPermutation() throws Exception {
+         var g=fixture("ethanol");var atoms=new ArrayList<>(g.atoms());Collections.reverse(atoms);
+         var other=new MolecularGraph(atoms,g.bonds(),g.properties());
+         var a=BACKEND.match("C",g).queryToTargetAtomIds();var b=BACKEND.match("C",other).queryToTargetAtomIds();
+-        assertEquals(new HashSet<>(a),new HashSet<>(b));assertNotEquals(a,b);
++        assertEquals(new HashSet<>(a),new HashSet<>(b));assertEquals(a,b);
+     }
+     @Test void nestedMatchesDoNotConsumeOrPruneOtherQueries() throws Exception {
+         var g=fixture("ethanol");var oxygen=BACKEND.match("O",g);
+@@ -120,24 +126,23 @@
+         var a=new MolecularGraph.Atom("s","C",null,0,0,false,"R",null,Map.of());
+         assertThrows(MolecularBackendException.class,()->BACKEND.match("C",new MolecularGraph(List.of(a),List.of(),Map.of())));
+     }
+-    @Test void baselineBlockerUniqueModeOmitsDistinctSymmetricTargetAtoms() throws Exception {
++    @Test void distinctSymmetricTargetAtomsAreNotOmitted() throws Exception {
+         var g=fixture("benzene");var r=BACKEND.match("[c]",g);
+-        assertEquals(1,r.queryToTargetAtomIds().size());
+-        assertNotEquals(g.atoms().size(),r.queryToTargetAtomIds().size(),"This is a blocker, not all-target qualification");
++        assertEquals(6,r.queryToTargetAtomIds().size());
++        assertEquals(g.atoms().size(),r.queryToTargetAtomIds().size());
+     }
+-    @Test void baselineBlockerPositiveHydrogenAnnotationIsNotValidatedByMatch() throws Exception {
++    @Test void positiveHydrogenAnnotationIsValidatedByMatch() throws Exception {
+         var a=new MolecularGraph.Atom("c","C",null,0,1,false,"UNSPECIFIED",null,Map.of());
+         var g=new MolecularGraph(List.of(a),List.of(),Map.of());
+-        assertEquals("c",mappings(BACKEND.match("[CH4]",g)));
++        assertThrows(MolecularBackendException.class,()->BACKEND.match("[CH4]",g));
+         assertThrows(MolecularBackendException.class,()->new OclGraphMapper().validateHydrogenCounts(new OclGraphMapper().toOcl(g)));
+     }
+-    @Test void baselineBlockerInvalidQueriesBecomeEmptyResults() throws Exception {
++    @Test void invalidQueriesCannotBecomeEmptyResults() throws Exception {
+         for(String q:List.of("[z2]","[C;Q]","[A]",""))
+-            assertTrue(BACKEND.match(q,fixture("ethanol")).queryToTargetAtomIds().isEmpty(),"Known failure swallowed by parseMolecule");
++            assertThrows(MolecularBackendException.class,()->BACKEND.match(q,fixture("ethanol")));
+     }
+-    @Test void baselineBlockerUnbalancedBranchCanBeAccepted() throws Exception {
+-        assertEquals(BACKEND.match("C",fixture("ethanol")).queryToTargetAtomIds(),
+-                BACKEND.match("C(",fixture("ethanol")).queryToTargetAtomIds());
++    @Test void unbalancedBranchCannotBeAccepted() throws Exception {
++        assertThrows(MolecularBackendException.class,()->BACKEND.match("C(",fixture("ethanol")));
+     }
+     static String digest(byte[] bytes) throws Exception {
+         return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
+@@ -149,7 +154,7 @@
+             var g=fixture(c.fixture());var result=BACKEND.match(c.query(),g);
+             receipts.add(Map.of("case",c.id(),"query",c.query(),"querySha256",digest(c.query().getBytes(StandardCharsets.UTF_8)),
+                     "sourceState",g,"sourceStateSha256",digest(JSON.writeValueAsBytes(g)),"result",result,
+-                    "adapterCountMode","cCountModeUnique","scope",c.scope()));
++                    "adapterCountMode","Rigorous; canonical distinct target sets","scope",c.scope()));
+         }
+         Files.write(Path.of(args[0]),JSON.writeValueAsBytes(receipts));
+     }

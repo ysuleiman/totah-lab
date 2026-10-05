@@ -1,0 +1,71 @@
+B00 CORRECTED OCL OCCURRENCE CONTRACT /2
+Execution substrate: OpenChemLib 2026.7.2; runtime JAR SHA-256
+2e1642f29f09c1def25dc405a77973c28bae02355a6807320e42f1dc4cd157c9.
+A different/unreadable runtime artifact fails closed. No replacement matcher.
+
+Occurrence and correspondence
+A returned occurrence is a distinct SET of stable source target atom IDs. Distinct
+symmetric atoms/bonds/ester occurrences survive. Query automorphisms do not create
+additional group identities. Rigorous OCL embeddings are first enumerated; occurrence
+keys sort target IDs lexicographically; their representatives are lexicographically
+smallest stable-target-ID vectors in compiled query-index order. Every alternative
+embedding is preserved in immutable BackendEvidence.messages as occurrenceEmbeddings
+JSON, including cases where alternative role assignments should not be presumed to
+be chemically equivalent. Group rules must consult these alternatives if role identity
+matters: B00 does not assign scientific functional-group identity.
+
+Result query:N keys identify compiled OCL query atom indices, not SMARTS :N labels.
+Positive recursive query compilation can expand those indices; the raw query and
+all expanded correspondences remain attributed. Disconnected queries impose no
+requirement that matched atoms belong to separate target components. Overlapping and
+nested occurrences are independent; no greedy consumption. List order is independent
+of source atom/bond list order. Source-state digest intentionally still distinguishes
+those different serialized input states. Result maps themselves are immutable; callers
+must not rely on Map iteration order. Canonical serialization sorts map keys.
+
+Compiler boundary
+SmilesParser.parse(StereoMolecule,String) is the throwing OCL entry point.
+SMARTS_MODE_IS_SMARTS plus MODE_CREATE_SMARTS_WARNING; any unresolved feature warning
+is an explicit checked failure. Empty compiled queries and excluded query atoms fail
+before matching, even if the target would give zero matches.
+OCL does not expose a reliable consumed-position result and deliberately terminates
+at whitespace. Its loop also accepts some unclosed branch syntax. The small adapter
+athena-query-envelope/1 therefore rejects whitespace/names/extensions, non-ASCII,
+unbalanced or empty delimiters, empty components, unfinished suffixes/branches, and
+repeated/compound simple bond operators outside brackets. OCL remains responsible for
+chemical/query parsing, atom perception, ring closure and syntax inside atoms.
+This is a bounded input envelope plus the pinned OCL dialect, NOT unrestricted SMARTS
+validation or an independent SMARTS parser. Entire-input handling is demonstrated for
+the reviewed corpus and explicit partial-parse witnesses; arbitrary dialect extensions
+or malformed forms outside that corpus are not certified by extrapolation.
+
+Demonstrated domain
+Synthetic element and negation/list queries; single/double/triple/any bonds; aromatic
+and explicit nonaromatic predicates; exposed ring predicates; degree; formal charge;
+OCL H predicates; atom labels; positive recursive expansion; connected/disconnected
+queries/targets; overlap/nesting; symmetry and stable correspondence. The four existing
+Athena perception patterns are also exercised across all five scientific consumers.
+See unchanged historical query-cases.tsv plus current JUnit fixtures and source pins.
+No RDKit parity, broad SMARTS equivalence, group truth, stereospecific query parity or
+unbounded-size performance claim. Unsupported stereo graph descriptors remain checked
+failures. Existing aromatic/parity/charge graph consumer regressions remain included.
+
+Hydrogen scope
+Reuse OclGraphMapper.validateHydrogenCounts exactly: source zero is UNSPECIFIED;
+positive source annotation must agree with OCL inferred implicit H; negative or
+contradictory annotation fails. Explicit H vertices remain separate original graph
+state, not interchangeable metadata. OCL query H semantics remain OCL-specific:
+[H] does not expose a normal explicit H endpoint in the characterized path, and
+[NH3] matched the ammonium alternate in the qualified corpus. Neither supports a
+claim of generic exact hydrogen-count/protonation semantics. Uppercase [C] likewise
+is not a general aliphatic-only predicate; explicit [C;!a] is tested separately.
+An empty match means zero occurrences under this qualified query/model/state scope,
+not absence of an atom/group/property under every chemical model.
+
+Evidence
+Backend version: 2026.7.2/athena-ocl-occurrences/2. Existing Result and BackendEvidence
+APIs are unchanged. Messages preserve literal query, canonical-JSON query SHA-256,
+source graph-state SHA-256, compiler mode/envelope, runtime artifact pin, occurrence
+policy, all correspondence alternatives and explicit source-H policy. Source graph
+is immutable and graphChanges is empty. No source observation is rewritten.
+Bounded corpus and independent-JVM replay qualify implementation conformance only.
