@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `2daccf091647262ae7f9d800126b6613eff99506d40419bc42a3b7d4e67b4021`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `45ecba635f2a3c4e83465a1cc04e694108744eaf0af31fee03b428cc4ae8d2b9`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -33,7 +33,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I16 | Van der Waals contact/gap | P1 | IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
 | I17 | Steric overlaps/clashes | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | I18 | Pi-hydrogen / X-H-pi geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt), [b05-mixed-geometry-v3-20261005](../../../software/qualification/b05-mixed-geometry-v3-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
-| I19 | Disulfide bond versus S-S proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| I19 | Disulfide bond versus S-S proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE | [b06-connectivity-coverage-characterization-20261005](../../../software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt) |
 | I20 | Unpaired donor/acceptor/halogen features | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I21 | Interaction overlap/refinement and pruning | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N01 | Directional roles and atom/group attribution | P0 | BOUNDED_ATTRIBUTION_IMPLEMENTATION_QUALIFIED_REMAINDER_PENDING | [n01-role-geometry-attribution-20261005](../../../software/qualification/n01-role-geometry-attribution-20261005/CHECKPOINT.txt) |

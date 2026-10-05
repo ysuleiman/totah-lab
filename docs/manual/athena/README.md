@@ -70,3 +70,5 @@ Complete-membership aromatic-carbocycle predicate: [P05 scientific support and c
 Independent centroid and plane geometry: [P06 V2 definition, partial coverage and historical preservation](supporting-material/CENTROID_PLANE.md).
 
 Mixed atom/group-centroid geometry: [V3 definition, mathematical support and partial truth](supporting-material/POINT_PAIR_GROUP.md).
+
+Source S–S negative coverage: [historical limitation and correction review](supporting-material/SS_CONNECTIVITY_COVERAGE.md).

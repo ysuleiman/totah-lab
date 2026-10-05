@@ -1,0 +1,69 @@
+B06 — SOURCE S-S NEGATIVE COVERAGE: QUALIFIED-CONSUMER SEMANTIC REVIEW
+2026-10-05; base 6744fb515. No production sulfur change implemented.
+
+VERIFIED HISTORICAL BEHAVIOR
+Native SULF.SS.001 / ATHENA_SOURCE_MEASUREMENTS / 1.0.0 is historically QUALIFIED.
+RuleAnalyzers.sulfur sets bondState=ABSENT whenever graph connectivity provenance is
+EXPLICIT and no listed bond connects the selected sulfur atoms. The evaluator returns
+ABSENT_FALSE. No pair/component exhaustive-connectivity assertion is required.
+
+REPRODUCIBLE WITNESS
+ConnectivityCoverageCharacterizationTest supplies two sulfur subjects at identical
+coordinates across both cases and an unrelated explicit C-H edge. Source diagnostics
+explicitly disclaim exhaustive sulfur connectivity. Existing outputs:
+  EXPLICIT -> bondState ABSENT -> ABSENT_FALSE
+  PARTIAL  -> bondState UNKNOWN -> UNKNOWN_INCONCLUSIVE
+One characterization test passes: it preserves observed behavior, not its validity.
+run/observed.json stores exact manifest, source state and raw result.
+No distance change, redocking, scientific input or METTL7 interpretation is involved.
+
+WHY EXPLICIT IS INSUFFICIENT
+Gaia Structure describes EXPLICIT as fully-mapped explicit connectivity. It does not
+assert exhaustive bond assessment. Hermes PdbReader.importPdbConect marks EXPLICIT
+when records map successfully (and earlier import was not partial); it does not prove
+all covalent connections were supplied. importConnectivity likewise distinguishes
+mapping success from unmapped source edges. ConnectivityMetadata has provenance and
+diagnostics, not an independent completeness field. This is source-code inspection,
+not a new PDB import experiment or claim that a particular real artifact is affected.
+Existing group-source-coverage/1 does have state-bound component completeGraph coverage.
+
+PROPOSED BOUNDED CORRECTION FOR REVIEW
+Keep the legacy rule, source bytes, certificates, evaluator and historical replay
+unchanged. Introduce a separately versioned opt-in source-connectivity implementation
+under an explicitly named source S-S-connectivity rule, not a favorable disulfide rule.
+Reuse SystemStateView, existing component molecular graphs/correspondence, generic
+RuleRequest/RuleManifest/EvidenceEnvelope and athena-group-source-coverage/1.
+No new public API/schema is proposed at this gate. If implementation establishes an
+unavoidable schema gap, present it before implementing that addition.
+
+Exact corrected proposition: authoritative supplied graph lists a covalent connection
+between the two explicitly selected distinct sulfur atoms in the declared scope.
+Preserve source bond identity/order and provenance; unknown order must remain unknown.
+Do not infer oxidation, redox, Cys identity, stability or biological disulfide function.
+A listed positive may be retained without claiming exhaustive negative coverage.
+An absence requires verified completeGraph=SUPPORTED_PRESENT for the applicable
+same-component source graph, state/component binding, complete unambiguous subject
+mapping, evaluable source topology and no conflicting source assertion.
+No listed edge plus EXPLICIT alone -> UNKNOWN_INCONCLUSIVE, never ABSENT_FALSE.
+Cross-component missing edges have no complete intercomponent assertion in that payload:
+retain them as inconclusive; do not reinterpret separate component completeness as
+complete intercomponent connectivity. Conflicting structural/chemical assertions coexist
+and prevent a resolved negative; preserve both, do not select a source silently.
+Malformed inputs remain failures; unsupported or missing coverage remains non-negative.
+
+EXPECTED DELTA AND ACCEPTANCE
+The characterized EXPLICIT-without-coverage negative becomes UNKNOWN_INCONCLUSIVE
+only on the new opt-in path. Source edge presence and independently established
+complete absence must remain distinguishable. Preserve positive and negative source
+assertions separately from distances. Tests: same-distance listed edge / complete
+no-edge / unknown; partial import; unrelated CONECT coverage; binding/mapping tamper;
+cross-component unknown; conflicting assertions; deterministic replay and source
+immutability; complete legacy registry and historical scientific consumer comparison.
+Any additional scientific-semantic delta requires review. No distance-based inference,
+new sulfur interaction classifier, graph repair, source normalization or schema work.
+
+STOP
+Program REQUEST.txt section14 requires review before scientific-semantic migration of
+an already-qualified consumer. This witness shows an exact changed negative result.
+Approve the bounded separately versioned coverage correction before implementation.
+Historical checkpoint remains immutable; this record is not a retroactive rewrite.
