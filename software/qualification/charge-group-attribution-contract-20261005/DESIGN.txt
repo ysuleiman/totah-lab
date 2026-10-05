@@ -1,0 +1,106 @@
+P04 — PROSPECTIVE CHARGED-GROUP ATTRIBUTION CONTRACT
+2026-10-05. REVIEW REQUIRED; NO IMPLEMENTATION.
+Base: 89642d6c5, bounded aromatic attribution implementation qualified.
+
+EXISTING REPRESENTATIONS / PRECISE GAP
+- athena-group-identities/1 and /2 preserve constitutional/state-specific occurrence
+  membership, context, role alternatives and source graph. Do not modify their bytes.
+- Existing FORMAL_CHARGE.PLUS_ONE/MINUS_ONE report atomic formal state, not group state.
+- Existing MolecularValidationService records total charge of the supplied component,
+  not a chemical group's charge. Its neutrality policy is independent.
+- ChargedGroup/ChargedGroupPerception is a legacy interaction-oriented representation:
+  sign, group type, coordinate-bearing atoms and centroid/representative. It lacks exact
+  source occurrence, atom-level formal-charge evidence, independent negative coverage
+  and source role alternatives. Do not turn it into the authoritative chemical state.
+- Concrete distinction: reviewed CARBOXYLATE membership is acylC+carbonylO+anionicO;
+  existing formal-charge interaction perception uses the two oxygen atoms as its
+  representative. This is not a license to replace one membership with the other.
+
+SCIENTIFIC DEFINITION PROPOSED FOR BOUNDED QUALIFICATION
+Describe the explicitly supplied formal charge of an already-qualified source group.
+Initial domain only:
+  ATHENA.GROUP.CARBOXYLATE and CARBOXYLATE.FORMYL (/1 definitions)
+  ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND, SECONDARY_CARBON_BOUND,
+  TERTIARY_CARBON_BOUND, QUATERNARY_CARBON_BOUND (/2 definitions).
+Reuse exact existing queries/state domains; do not copy them into new patterns.
+For every verified source occurrence, sum authoritative integer formal charges over
+its exact memberAtomIds, once per distinct member, using overflow-checked arithmetic.
+Carboxylate's C/O/O membership remains distinct from any future oxygen-only geometric
+representative. Ammonium's source member is N, with C/H context retained in source.
+The sum describes the declared group boundary, not charge localization/delocalization,
+partial charge, pKa, protonation inference, physiological ionization, salt policy,
+whole-component net charge, interaction center, electrostatic energy or affinity.
+Nitro is not promoted from its internally charged atoms to either supported group.
+Other charged motifs, arbitrary charge magnitudes and resonance encodings remain
+outside this initial group domain. Neutral acid/amine controls are not assertions of
+nonionizability. Contradictory source states coexist in separate state-bound reports.
+
+EXACT PROPOSED DURABLE PAYLOAD — athena-charge-groups/1
+ schema: literal "athena-charge-groups/1"
+ stateBinding: existing SystemStateView.Binding
+ definitionReference: ScientificReference (reviewed model digest)
+ sourceReports: array of {reference: ScientificReference, payloadSha256: SHA256}
+ groups: array of {
+   groupId: SHA256(canonical state/component/source-membership/definition/mapping),
+   componentReference: ScientificReference,
+   sourceOccurrences: array of {reportReference: ScientificReference, occurrenceId: string},
+   correspondenceAlternatives: array of {
+     members: array of {
+       chemicalAtomId: source MolecularGraph atom ID,
+       atomReference: existing AtomReference,
+       formalCharge: integer
+     },
+     totalFormalCharge: integer
+   }
+ }
+ coverage: {
+   assessment: existing EvidenceInterpretation.Status,
+   completeEligibleGroupEnumeration: boolean,
+   scope: literal "SUPPLIED_COMPONENT_REVIEWED_CARBOXYLATE_AMMONIUM",
+   reasons: string array
+ }
+ limitations: string array
+
+Ordering/hashes: existing canonical serialization; sort by stable source IDs, never
+by discovery order. Verify every payload hash, state, component, exact pinned source
+definition and source report through the existing generic group evaluator.
+All correspondence alternatives remain attributable through source occurrence links.
+No mixed per-atom mapping products. Upstream incomplete correspondence cannot become
+positive by merely summing known formal charges. Missing group reports, incomplete
+charge/source-state coverage or incomplete search prevent absence. ABSENT_FALSE only
+for exhaustive verified enumeration of all six source predicates in the stated scope.
+Partial verified positives may coexist with incomplete coverage. Invalid/conflicting
+reports fail closed after their envelopes have been preserved, not discarded.
+No weighted/equal-weight center or default coordinate representative in this payload.
+No typed public Java API, alternate molecule/evidence representation, new matcher,
+new schema for existing group reports, normalization or existing-consumer migration.
+Use existing RuleRegistry/RuleAnalyzers/EvidenceEnvelope transport and evaluator path,
+following the aromatic attribution composition pattern. No legacy salt/pi rule change.
+
+ACCEPTANCE / QUALIFICATION
+- acetate and formate; swapped explicitly drawn carboxylate O charges/bond orders:
+  preserve each supplied depiction, member set and role alternatives, total -1;
+- primary/secondary/tertiary/quaternary carbon-bound ammonium: source N total +1;
+- acid/ester/amide/neutral amine/nitro controls: no supported charged-group identity;
+- zwitterionic supplied graph: separate positive and negative groups survive despite
+  component net zero; neutrality policy never suppresses them;
+- unknown/contradictory H/charge, missing report, incomplete/ambiguous mapping:
+  no invented neutral state and no absence without exhaustive qualified coverage;
+- explicit H, symmetry, multiple/overlapping occurrences, source-order permutations;
+- source/definition/hash tampering, evaluator failure, immutable input preservation;
+- EvidenceExchange roundtrip, independent-JVM replay and historical five-family replay;
+- existing group/charge/dimensional-validator consumer regressions.
+No broad Maven build or new research. Pin source materials and update the permanent
+reference/catalog with implementation qualification, keeping Research Gate distinct.
+
+SUPPORTING MATERIAL ALREADY PRESENT
+rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.FORMAL_CHARGE.json
+rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.IONIZABLE_MOTIF.json
+charge-nonpolar-perception-20261005/CHECKPOINT.txt
+Existing six source manifests listed above (exact pins in SOURCE_SHA256SUMS).
+Existing legacy ChargedGroupPerception and AthenaScientificRules source paths pinned
+for comparison only; their geometry/heuristics are not production scientific authority.
+
+STOP: approve this bounded definition and new payload before implementation.
+Reason: current user-required prospective public payload/schema review boundary.
+This does not declare other foundation capabilities completed or globally blocked.
