@@ -1,0 +1,214 @@
+CONTINUOUS GEOMETRY — PROSPECTIVE CONTRACT / REVIEW REQUIRED
+2026-10-05. Proposal only. Do not implement until approved.
+
+Purpose
+Expose continuous, reproducible geometry over the existing complete SystemStateView,
+without a contact cutoff deciding what evidence may exist. This continues the approved
+foundation program; it is not a new graph, a docking campaign or an interaction rule.
+
+Verified reuse
+- Gaia Point3D.distance/vectorTo and Vector3D.angle/dot/cross: distance/angle/vectors.
+- Gaia Dihedral.measureRadians/measureDegrees: ordered torsion, defined failure for
+  coincident/collinear cases; preserve its signed convention.
+- Gaia Plane3D.fit: existing deterministic Jacobi least-squares fit and canonical
+  normal sign. Existing public result exposes centroid/normal but not eigenvalues
+  or conditioning. Reuse its solver; do not write another plane/eigenvalue solver.
+- SystemStateView.atoms, binding, components, graph, neighborhood; ResidueGraph
+  remains authoritative. Pocket never selects allowed evidence.
+- Existing MolecularGraph/component correspondences and source Structure bonds;
+  no topology inference from distance.
+- Existing SystemGraphAnalyzer, RuleAnalyzers, RuleRegistry, RuleRequest,
+  RuleExecutionPipeline and EvidenceEnvelope/Exchange/catalog transport.
+- Element.getVanDerWaalsRadius exists, but carries no per-assignment model/source
+  evidence. StericClashAnalysis filters scaled overlaps and cannot supply complete
+  continuous pair evidence. Keep it and all legacy behavior unchanged.
+- Existing GEO.PROX.001 measures one pair; GEO.SHELL/PATH preserve neighborhoods;
+  these are historical profiles, not a substitute for complete pair/group metrics.
+
+ONE additive Java API requested (Gaia geometry, no molecule representation)
+Plane3D:
+  public static FitDiagnostics fitWithDiagnostics(List<Point3D> points)
+  public record FitDiagnostics(
+      Plane3D plane,
+      List<Double> covarianceEigenvalues,
+      double rmsDistance,
+      double maximumAbsoluteDistance)
+Eigenvalues: three ascending, unnormalized covariance eigenvalues, squared input
+length units. Immutable defensive list; finite numbers. Preserve tiny signed
+roundoff eigenvalues rather than rewriting source coordinates. RMS/max residuals
+are measured from original points against the reported fitted plane.
+Reuse the existing Jacobi implementation, eigenvalues and canonical-sign policy.
+Existing fit(List<Point3D>) signature/result/error behavior must remain unchanged;
+qualification must compare its old/new output before accepting the refactor.
+No new scientific planarity cutoff or normal-uniqueness claim is added by this API.
+The adapter's separately versioned numerical conditioning policy is explicit:
+  planeNormalRelativeGapTolerance = 1e-10 (dimensionless manifest parameter).
+  ratio = (middleEigenvalue-smallestEigenvalue)/largestEigenvalue.
+A unique normal under this numerical policy requires a finite positive largest
+value and ratio strictly above the declared tolerance, in addition to existing
+Plane3D degeneracy checks. Otherwise keep the algorithmNormal as raw evidence but
+mark directional plane quantities UNKNOWN_INCONCLUSIVE. This is a proposed
+numerical stability guard for qualification, not an empirical aromaticity/planarity
+criterion. The parameter and rationale must be visible in the manifest; it does not
+change legacy fit or detector thresholds. Approval includes testing this guard;
+no universal error-bound or physical significance is claimed.
+
+THREE opt-in payload schemas requested; no EvidenceExchange or typed rule API change
+All top-level/exact variant fields below are required unless explicitly optional.
+Unknown fields, duplicate JSON keys, invalid references, malformed/nonfinite numbers
+and binding mismatches fail explicitly AFTER preserving original envelopes.
+Numbers used as measurements/parameters are finite Double.toString decimal strings;
+counts/limits are nonnegative integer JSON values. References use the existing
+ScientificReference and AtomReference structures; no new identity system.
+
+1. athena-continuous-geometry-plan/1
+  schema
+  stateBinding: exact existing SystemStateView.Binding
+  coordinateUnit: ANGSTROM
+  coordinateSourceReferences: nonempty ScientificReference[]
+  groups: [{id, atoms, sourceReferences}]
+    id unique nonblank; atoms sorted unique explicit AtomReference[] (nonempty);
+    sources nonempty. Group labels do not assert chemical/aromatic identity.
+    An upstream identity report may be a source; it is not rewritten.
+  operations: discriminated union below; unique nonblank id per operation
+  radiusAssignmentReference: null OR {reference, payloadSha256}
+  sourceReferences: nonempty ScientificReference[]
+  limitations: string[]
+Every selected atom must exist in the selected state and belong to RuleRequest.atoms.
+RuleRequest.atoms is exactly the sorted union of explicitly selected group/tuple atoms;
+first/second residue selections remain empty in this adapter. Source snapshots still
+preserve the COMPLETE protein/cofactor/ligand frame, not just selected atoms.
+No inferred all-state/pocket/current selection. Callers can explicitly list all atoms.
+
+Operation variants (exact fields)
+  {id, kind:DISTANCE, atoms:[A,B]}
+  {id, kind:ANGLE, atoms:[A,B,C]}                 vertex B; degrees [0,180]
+  {id, kind:DIHEDRAL, atoms:[A,B,C,D]}            Gaia signed convention
+  {id, kind:VECTOR, atoms:[A,B]}                 A->B vector; length/unit vector
+  {id, kind:PLANE, groupId}
+  {id, kind:POINT_PLANE, atom, planeGroupId}
+  {id, kind:PLANE_PAIR, firstGroupId, secondGroupId}
+  {id, kind:PAIR_MATRIX, firstGroupId, secondGroupId,
+       hydrogenScope:ALL_EXPLICIT|HEAVY_ONLY,
+       topologyPolicy:RETAIN_ALL|FLAG_BONDED|FLAG_BONDED_AND_1_3}
+  {id, kind:GROUP_MINIMUM, firstGroupId, secondGroupId,
+       hydrogenScope:ALL_EXPLICIT|HEAVY_ONLY}
+Tuple order is scientific measurement order, not sorted. Groups are canonical sets.
+Unknown operation kinds are retained and assessed UNSUPPORTED, not silently ignored.
+
+Pair matrices retain distances for every distinct pair in the declared product,
+including noncontacts, bonded atoms and pairs excluded from a later nonbonded
+assessment. Each topology exclusion is a flag/reason, never loss of the distance.
+Overlapping-group self-pairs are explicitly accounted for as excluded self identities;
+other duplicate unordered pairs are emitted once with both group memberships retained.
+Topology flags use only authoritative source connectivity; unknown connectivity is
+UNKNOWN, never assumed nonbonded. Heavy-only omissions are counted explicitly.
+GROUP_MINIMUM preserves all equal-minimum pair identities. A budget-truncated scan
+may report observedMinimum, but never completeMinimum or exhaustive absence.
+Request maximumCandidates/maximumNodes are operational budgets, not scientific cutoffs.
+No RuleRequest.radiusAngstrom filtering for these continuous operations.
+Existing shell/path operations remain separate and unchanged in this milestone.
+
+2. athena-radius-assignments/1
+  schema
+  stateBinding
+  unit: ANGSTROM
+  model: {id, version, sourceReferences}
+  assignments: [{atom, status, radius, sourceReferences, reasons}]
+  sourceReferences
+  limitations
+status uses existing EvidenceInterpretation.Status values. radius is a positive finite
+decimal string only for SUPPORTED_PRESENT; otherwise null. Atoms are unique/sorted;
+unknown/missing assignments are retained/accounted for, not filled by a default.
+Source references are mandatory per supplied assignment/model. This is attributed
+reference data, not proof of scientific correctness merely because it parses.
+No silent mixture of element, covalent, vdW or force-field radii. No pKa/H inference.
+An explicit adapter may attribute the historical Gaia Element table by exact source
+hash, but cannot label it Probe/Amber/chemically typed radii or silently choose it.
+Current-policy eligibility must cover the radius model actually claimed.
+
+3. athena-continuous-geometry/1
+  schema
+  stateBinding
+  planReference: {reference, payloadSha256}
+  plan: exact parsed plan (original bytes remain in its immutable envelope)
+  radiusAssignmentReference: null OR {reference, payloadSha256}
+  implementation: {id, version, sourceReferences}
+  operations: [{id, kind, subjects, quantities, coverage, reasons}]
+  sourceReferences
+  limitations
+subjects: ordered exact atoms and/or declared group IDs with original membership.
+quantities: deterministic name -> {status, unit, value, reasons, sourceReferences}
+value: null when unavailable; otherwise decimal string, ordered decimal-string vector,
+  or the explicit structured rows below. No NaN/sentinel distance substitutes.
+status uses existing six states. A supported number is NOT favorable chemistry.
+No ABSENT_FALSE merely because a continuous quantity or radius was unavailable.
+An empty declared pair scope is accounted for by coverage, not a scientific negative.
+
+Measurements by operation
+DISTANCE: distanceAngstrom.
+ANGLE/DIHEDRAL: angleDegrees/torsionDegrees, exact ordered atom provenance.
+VECTOR: displacementAngstrom[3], lengthAngstrom, unitVector[3]; zero vector keeps
+  zero length/displacement but direction is UNKNOWN_INCONCLUSIVE.
+PLANE: centroidAngstrom[3], algorithmNormal[3], covarianceEigenvaluesAngstrom2[3],
+  rmsDistanceAngstrom, maximumAbsoluteDistanceAngstrom, smallestEigenvalueGapRatio.
+  Algorithm normal is the pinned fit result, not automatically a unique physical
+  plane. Degenerate fit failures are explicit; tied eigenvalues cannot certify a
+  unique directional normal. No empirical planarity classifier or arbitrary
+  small-residual PASS is introduced. Preserve diagnostics for later policy.
+POINT_PLANE: perpendicularDistanceAngstrom and inPlaneOffsetAngstrom relative to
+  the fitted centroid. Signed projection refers only to canonical algorithm normal.
+PLANE_PAIR: centroidDistanceAngstrom, unsignedNormalAngleDegrees, and BOTH projected
+  offsets (second centroid onto first plane, first centroid onto second plane).
+  Ambiguous normals remain inconclusive; measured centroids/residuals survive.
+PAIR_MATRIX rows: {firstAtom, secondAtom, distanceAngstrom,
+  firstRadius, secondRadius, gapAngstrom, overlapAngstrom,
+  radiusStatus, topologyStatus, topologyReasons, groupMemberships}
+  gap=d-ri-rj; overlap=ri+rj-d (signed, not clamped).
+  Missing radii leave both radius-dependent quantities null; distance survives.
+GROUP_MINIMUM: completeMinimum or observedMinimum, tiedPairs; completeMinimum is null
+  unless all requested pairs have been covered. Distances may be recovered from the
+  same collected pair data; do not compute a second inconsistent contact engine.
+coverage exact fields per operation:
+  requestedSubjects, evaluatedSubjects, requestedPairs, evaluatedPairs,
+  omittedSelfPairs, omittedHydrogenPairs, completeEnumeration,
+  frameQualified, finiteCoordinates, radiusCoverage, topologyCoverage,
+  budgetExceeded, normalUniquenessStatus
+requestedSubjects/evaluatedSubjects/requestedPairs/evaluatedPairs/omittedSelfPairs/
+omittedHydrogenPairs are integer counts. Unused counts=0; unused coverage dimensions
+are NOT_EVALUATED rather than false.
+Coverage dimensions requiring statuses use existing six-state vocabulary; boolean
+fields are only completeEnumeration/frameQualified/finiteCoordinates/budgetExceeded.
+Missing state/unsupported evaluator retains all input evidence and available numbers.
+
+Execution/ownership
+Internal package-private continuous-geometry adapter in Athena rules; Gaia supplies
+math; Daedalus uses existing orchestration; Mnemosyne stores immutable envelopes.
+Register an explicit athena.geometry/1 implementation for existing rule manifests
+(internal registry extension only). New definition/measurement versions never fall
+back to old detectors. Current-policy qualification still requires research gate.
+Collect and preserve raw evidence before eligibility/evaluation; no new write API.
+Evaluation checks exact plan/state/model binding and measurement consistency.
+No candidate ranking, aggregate molecular score, binding-mode choice, force-field
+assignment, contact-favorability classifier, mutation or scientific interpretation.
+
+Mandatory bounded acceptance
+- Hand-computable distances, 0/positive/negative vdW gaps, all noncontact pairs retained.
+- Complete graph includes SAM/protein and environment beyond 4.5 A without a residue
+  name special case; synthetic fixtures first, no METTL7 scientific conclusion.
+- Known/unknown radii, H scope, bonded/1-3/self/overlapping groups accounted separately.
+- Tied minima, truncated budget non-negativity, explicit tuple order and units.
+- Known angles/signed torsions; zero vectors and collinear/coincident cases fail closed.
+- Plane residuals/eigenvalues, planar and nonplanar sets, isotropic/tied-eigenvalue
+  ambiguity. No qualified unique direction from an arbitrary tied-eigenvector choice.
+- Translation/rotation covariance where mathematically defined, atom-order permutation,
+  canonical plane-sign handling and numeric tolerances pinned in tests.
+- Unknown operation/input evidence survives journal; evaluator failure never deletes it.
+- Historical Plane3D.fit results and existing five-family/B00/B01 checkpoints unchanged.
+- Independent-JVM replay, evidence roundtrip, source/coordinate-frame immutability.
+
+Boundary
+Approval covers this raw-geometry contract and additive diagnostics API only.
+No serious-clash empirical cutoff, structural-validation distribution, advanced
+interaction classification, occupancy redesign, fragment growing or METTL7 science.
+After qualification, continue the existing program dependencies under its stop policy.

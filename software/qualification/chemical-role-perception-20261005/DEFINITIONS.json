@@ -1,0 +1,1900 @@
+[
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 2,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0
+        ],
+        "nitrogen": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H1;+0](-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2
+        ],
+        "nitrogen": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json",
+          "version": "ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H3;+1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 3,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0
+        ],
+        "nitrogen": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "18b93e43a86b148624b1a029c0f7f4f7881be77d01762438a3ebec3539fe6d5e"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H2;+1](-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 2,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2
+        ],
+        "nitrogen": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND.rule.json",
+          "version": "da5fa44323f50ea036e58d20200f8645687a695cf71b29235bef21d2d199cb96"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H1;+1](-[#6])(-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 3
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2,
+          3
+        ],
+        "nitrogen": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND.rule.json",
+          "version": "0df9c2ac65b42b061f56ee0edad4fe59ea743728bb279a9f9ed44052bdaac3eb"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMIDE_NH2",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMIDE_NH2.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMIDE_NH2",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMIDE_NH2/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMIDE_NH2/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 2,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "nitrogen": [
+          2
+        ],
+        "oxygen": [
+          1
+        ],
+        "donor": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMIDE.NH2.rule.json",
+          "version": "26aa235e17125190d73e7986c0f16f00089fc49c77df880f669b32704b78e1fc"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.AMIDE_NH1",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.AMIDE_NH1.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.AMIDE_NH1",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.AMIDE_NH1/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.DONOR.AMIDE_NH1/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "nitrogen": [
+          2
+        ],
+        "oxygen": [
+          1
+        ],
+        "donor": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMIDE.NH1.rule.json",
+          "version": "e76ca9dd8d66b6be62e4795877cbe5ba87c35bf01432beed8550dcab375f233d"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.ALCOHOL",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.ALCOHOL.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.ALCOHOL",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.ALCOHOL/negative/1",
+      "patternId": "ATHENA.PERCEPTION.DONOR.ALCOHOL/pattern",
+      "patternVersion": "1",
+      "query": "[C;X4]-[O;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "O"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "hydroxylO"
+          }
+        ],
+        "roleHeavyDegree": {
+          "hydroxylO": 1
+        }
+      },
+      "roles": {
+        "carbonAttachment": [
+          0
+        ],
+        "hydroxylO": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.ALCOHOL.rule.json",
+          "version": "f42a8f87adfc272050e5c98c70d01525597a0a4f1bc46379052b272321fdfd10"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.PHENOL",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.PHENOL.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.PHENOL",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.PHENOL/negative/1",
+      "patternId": "ATHENA.PERCEPTION.DONOR.PHENOL/pattern",
+      "patternVersion": "1",
+      "query": "[c]-[O;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": true,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "O"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "hydroxylO"
+          }
+        ],
+        "roleHeavyDegree": {
+          "hydroxylO": 1
+        }
+      },
+      "roles": {
+        "arylAttachment": [
+          0
+        ],
+        "hydroxylO": [
+          1
+        ],
+        "donor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.PHENOL.rule.json",
+          "version": "f5bd2cae825c65f8d3f8f5428972ac7b931e66b28475012b6bcd89a4cf8a9d53"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 2,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0
+        ],
+        "nitrogen": [
+          1
+        ],
+        "acceptor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H1;+0](-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2
+        ],
+        "nitrogen": [
+          1
+        ],
+        "acceptor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json",
+          "version": "ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY/negative/1",
+      "occurrenceExclusions": [
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H0;+0](-[#6])(-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 0,
+            "role": "nitrogen"
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 3
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2,
+          3
+        ],
+        "nitrogen": [
+          1
+        ],
+        "acceptor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND.rule.json",
+          "version": "486c2b1049f56222702302eb611fbf2e5f694723bbc31476c2955aaa13ec762e"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O/negative/1",
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O/pattern",
+      "patternVersion": "1",
+      "query": "[C;X3;+0]=[O;X1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenElements": [
+          "O"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "carbonylOxygen",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "carbonylOxygen": 1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "carbonylOxygen": [
+          1
+        ],
+        "acceptor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.CARBONYL.rule.json",
+          "version": "f33abc13c262e46a9ba8ade910076613192e40f2318e43dbb47dac9786b75c88"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": [
+          {
+            "query": "[C+]-[O-]",
+            "reason": "charge-separated carbonyl resonance is outside literal neutral C=O domain"
+          },
+          {
+            "query": "[C+]=O",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "[C-]=O",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "C=[O+]",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "C=[O-]",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          }
+        ]
+      },
+      "occurrenceExclusions": []
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.ETHER_O.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O/negative/1",
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[O;!a;X2;H0;+0]-[#6]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "O"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 0,
+            "role": "etherO"
+          }
+        ],
+        "roleHeavyDegree": {
+          "etherO": 2
+        }
+      },
+      "roles": {
+        "carbonAttachments": [
+          0,
+          2
+        ],
+        "etherO": [
+          1
+        ],
+        "acceptor": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.ETHER.rule.json",
+          "version": "400acb9b02eb4778f49be7507ff52e4e110bfc5494c5639e7c18a6cc1962dd85"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_oxygen",
+          "patternId": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O/acyl",
+          "patternVersion": "1",
+          "query": "[O]-[C](=[O])",
+          "anchors": {
+            "etherO": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Keep ether and acyl-oxygen role domains separate.",
+          "sourceReferences": [
+            {
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ETHER.json",
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "version": "8c5f9b0cffa82555ebefb57c293cb5496f82838744bcc4a34e0d155c578d9888"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.PYRROLIC_NH",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.PYRROLIC_NH.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.PYRROLIC_NH",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.PYRROLIC_NH/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.DONOR.PYRROLIC_NH/pattern",
+      "patternVersion": "1",
+      "query": "[n;X3;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": true,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          0
+        ],
+        "donor": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH/pattern",
+      "patternVersion": "1",
+      "query": "[n;H1;+1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": true,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          0
+        ],
+        "donor": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "version": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N/pattern",
+      "patternVersion": "1",
+      "query": "[n;X2;H0;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": true,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        },
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          0
+        ],
+        "acceptor": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "version": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  }
+]
