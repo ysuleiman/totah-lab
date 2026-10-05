@@ -49,3 +49,13 @@ sign invariance, collinear/coincident/nonunique planes, zero vectors, incomplete
 budget/frame failure, tampering and unknown/versioned operations. Independent JVM,
 V1/V2, legacy solver and scientific-consumer replays are preserved. Broader B05 chemical
 composition, methyl-environment channels and interaction calibration remain separate.
+
+## Bounded chemical attribution acceptance
+
+[The subsequent integration checkpoint](../../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt)
+connects existing METHYL and RING6 reports to V3 through stable source atom mapping.
+Both methyl occurrences and all six explicit bonded hydrogens survive; implicit H
+counts never produce coordinates. Complete source identity reports survive exchange
+alongside their references in the plan. This is explicit fixture composition, not an
+automatic adapter or a favorable-interaction assertion. Candidate ring evaluation stays
+NOT_EVALUATED; raw positive identity coverage does not forge a qualification receipt.

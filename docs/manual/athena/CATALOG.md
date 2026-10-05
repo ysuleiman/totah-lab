@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `207701c0dff0fc2c647b4a17001a0a55d08b6e03be05451d378fc9f4a248b346`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `2daccf091647262ae7f9d800126b6613eff99506d40419bc42a3b7d4e67b4021`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -32,7 +32,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I15 | Metal coordination geometry/complex | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I16 | Van der Waals contact/gap | P1 | IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
 | I17 | Steric overlaps/clashes | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
-| I18 | Pi-hydrogen / X-H-pi geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt), [b05-mixed-geometry-v3-20261005](../../../software/qualification/b05-mixed-geometry-v3-20261005/CHECKPOINT.txt) |
+| I18 | Pi-hydrogen / X-H-pi geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt), [b05-mixed-geometry-v3-20261005](../../../software/qualification/b05-mixed-geometry-v3-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
 | I19 | Disulfide bond versus S-S proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I20 | Unpaired donor/acceptor/halogen features | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I21 | Interaction overlap/refinement and pruning | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
@@ -75,7 +75,7 @@ Disposition is copied without upgrading partial capability coverage.
 | A07 | Chemical alerts and substructure filter catalogs | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| G01 | Methyl environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
+| G01 | Methyl environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
 | G02 | Vicinal-disulfide-compatible geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G03 | Sulfur-pi and chalcogen-O | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G04 | Cysteine environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
