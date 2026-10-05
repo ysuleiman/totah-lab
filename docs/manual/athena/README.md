@@ -68,3 +68,5 @@ Supplied group formal-charge attribution: [P04 scientific support and domain lim
 Complete-membership aromatic-carbocycle predicate: [P05 scientific support and coverage](supporting-material/ALL_MEMBERS_NONPOLAR.md).
 
 Independent centroid and plane geometry: [P06 V2 definition, partial coverage and historical preservation](supporting-material/CENTROID_PLANE.md).
+
+Mixed atom/group-centroid geometry: [V3 definition, mathematical support and partial truth](supporting-material/POINT_PAIR_GROUP.md).

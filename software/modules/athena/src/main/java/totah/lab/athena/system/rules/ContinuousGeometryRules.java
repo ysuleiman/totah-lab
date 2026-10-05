@@ -28,7 +28,8 @@ final class ContinuousGeometryRules {
     static void validate(RuleManifest m) {
         if (!Set.of("athena-rule/2", "athena-rule/3").contains(m.schema())
                 || !(m.implementationVersion().equals("1") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V1")
-                    || m.implementationVersion().equals("2") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V2"))
+                    || m.implementationVersion().equals("2") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V2")
+                    || m.implementationVersion().equals("3") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V3"))
                 || m.family() != RuleManifest.Family.ENVIRONMENT
                 || !m.parameters().keySet().equals(Set.of("planeNormalRelativeGapTolerance")))
             throw new IllegalArgumentException("continuous geometry manifest contract");
@@ -99,6 +100,15 @@ final class ContinuousGeometryRules {
                     int size = kind.equals("ANGLE") ? 3 : kind.equals("DIHEDRAL") ? 4 : 2;
                     if (a.size() != size) throw new IllegalArgumentException("ordered tuple arity"); selected.addAll(a);
                 }
+                case "POINT_PAIR_GROUP" -> {
+                    if (m.implementationVersion().equals("3")) {
+                        fields(op, "id", "kind", "atoms", "groupId");
+                        var tuple = atoms(op.get("atoms"));
+                        if (tuple.size() != 2 || tuple.get(0).equals(tuple.get(1)))
+                            throw new IllegalArgumentException("distinct ordered pair required");
+                        selected.addAll(tuple); group(groups, op, "groupId");
+                    }
+                }
                 case "PLANE" -> { fields(op, "id", "kind", "groupId"); group(groups, op, "groupId"); }
                 case "POINT_PLANE" -> { fields(op, "id", "kind", "atom", "planeGroupId"); selected.add(atom(op.get("atom"))); group(groups, op, "planeGroupId"); }
                 case "PLANE_PAIR", "PAIR_MATRIX", "GROUP_MINIMUM" -> {
@@ -158,7 +168,8 @@ final class ContinuousGeometryRules {
         for (String n : List.of("requestedSubjects", "evaluatedSubjects", "requestedPairs", "evaluatedPairs", "omittedSelfPairs", "omittedHydrogenPairs")) c.put(n, 0);
         c.put("completeEnumeration", true); c.put("frameQualified", s.frameQualified()); c.put("finiteCoordinates", true); c.put("budgetExceeded", false);
         for (String n : List.of("radiusCoverage", "topologyCoverage", "normalUniquenessStatus")) c.put(n, NOT_EVALUATED.name());
-        if (!Set.of("DISTANCE", "ANGLE", "DIHEDRAL", "VECTOR", "PLANE", "POINT_PLANE", "PLANE_PAIR", "PAIR_MATRIX", "GROUP_MINIMUM").contains(kind)) {
+        if (!(Set.of("DISTANCE", "ANGLE", "DIHEDRAL", "VECTOR", "PLANE", "POINT_PLANE", "PLANE_PAIR", "PAIR_MATRIX", "GROUP_MINIMUM").contains(kind)
+                || kind.equals("POINT_PAIR_GROUP") && m.implementationVersion().equals("3"))) {
             c.put("completeEnumeration", false);
             quantity(q, "measurement", null, "NONE", UNSUPPORTED, sources, "unknown operation kind; original plan preserved");
             return result;
@@ -187,7 +198,7 @@ final class ContinuousGeometryRules {
                 }
                 case "PLANE" -> {
                     var selection = group(groups, op, "groupId");
-                    if (m.implementationVersion().equals("2")) {
+                    if (!m.implementationVersion().equals("1")) {
                         // Resolve the entire requested selection before publishing any centroid.
                         var points = selection.stream().map(a -> point(s, a)).toList();
                         var centroid = Plane3D.centroidOf(points);
@@ -198,6 +209,32 @@ final class ContinuousGeometryRules {
                     }
                     var fit = fit(s, selection); planeQuantities(q, fit, sources);
                     c.put("normalUniquenessStatus", unique(fit, m) ? SUPPORTED_PRESENT.name() : UNKNOWN_INCONCLUSIVE.name());
+                }
+                case "POINT_PAIR_GROUP" -> {
+                    var points = group(groups, op, "groupId").stream().map(a -> point(s, a)).toList();
+                    var p = point(s, tuple.get(0)); var second = point(s, tuple.get(1));
+                    var centroid = Plane3D.centroidOf(points);
+                    quantity(q, "centroidAngstrom", List.of(finite(centroid.x()), finite(centroid.y()), finite(centroid.z())), "ANGSTROM", SUPPORTED_PRESENT, sources, "");
+                    quantity(q, "firstCentroidDistanceAngstrom", p.distance(centroid), "ANGSTROM", SUPPORTED_PRESENT, sources, "");
+                    quantity(q, "secondCentroidDistanceAngstrom", second.distance(centroid), "ANGSTROM", SUPPORTED_PRESENT, sources, "");
+                    try {
+                        quantity(q, "firstSecondCentroidAngleDegrees", Math.toDegrees(second.vectorTo(p).angle(second.vectorTo(centroid))), "DEGREE", SUPPORTED_PRESENT, sources, "");
+                    } catch (IllegalArgumentException | IllegalStateException e) {
+                        c.put("completeEnumeration", false);
+                        quantity(q, "firstSecondCentroidAngleDegrees", null, "DEGREE", UNKNOWN_INCONCLUSIVE, sources, "undefined tuple angle: " + e.getMessage());
+                    }
+                    c.put("normalUniquenessStatus", UNKNOWN_INCONCLUSIVE.name());
+                    try {
+                        var fit = Plane3D.fitWithDiagnostics(points);
+                        if (!unique(fit, m)) throw new IllegalArgumentException("nonunique plane normal");
+                        c.put("normalUniquenessStatus", s.frameQualified() ? SUPPORTED_PRESENT.name() : UNKNOWN_INCONCLUSIVE.name());
+                        var direction = centroid.vectorTo(second).normalize();
+                        double cosine = Math.abs(fit.plane().normal().dot(direction));
+                        quantity(q, "secondCentroidNormalAngleDegrees", Math.toDegrees(Math.acos(Math.min(1.0, Math.max(0.0, cosine)))), "DEGREE", SUPPORTED_PRESENT, sources, "");
+                    } catch (IllegalArgumentException | IllegalStateException e) {
+                        c.put("completeEnumeration", false);
+                        quantity(q, "secondCentroidNormalAngleDegrees", null, "DEGREE", UNKNOWN_INCONCLUSIVE, sources, "undefined normal angle: " + e.getMessage());
+                    }
                 }
                 case "POINT_PLANE" -> {
                     var fit = fit(s, group(groups, op, "planeGroupId")); boolean unique = unique(fit, m);
