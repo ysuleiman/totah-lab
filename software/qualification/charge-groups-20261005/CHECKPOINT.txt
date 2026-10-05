@@ -1,0 +1,46 @@
+P04 BOUNDED CHEMICAL-GROUP FORMAL-CHARGE ATTRIBUTION — 2026-10-05
+Base c844e0c78. Exact contract at charge-group-attribution-contract-20261005 approved
+by the user, including hard checked-sum acceptance condition.
+Status: IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING, initial six-source domain only.
+
+Package-private ChargeGroupRules reuses existing group evaluator/B00 receipts via
+RuleAnalyzers and RuleRegistry. No new chemical query, matcher, public Java API,
+normalization, coordinate representative or legacy consumer migration.
+athena-charge-groups/1 contains supplied state/member charges and checked group totals.
+The six existing definitions remain exact and immutable. C/O/O carboxylate identity
+is not replaced by the legacy O/O interaction representation. Opposite groups in a
+net-zero supplied component coexist. Nitro is not promoted to a supported ion group.
+Every total recomputed with Math.addExact over exact distinct source member IDs.
+Never read an asserted total or legacy ChargedGroup; evaluator rejects tampering.
+
+VALIDATION
+final-run: 659/659 JUnit 5 tests passed, zero failed/skipped/aborted.
+70 P04 tests include overflow/underflow, distinct membership, source H/charge coverage,
+neutrality isolation, exact-state depiction, mapping, tamper, permutation and replay.
+Existing B00/B01, vocabulary, atomic-charge/nonpolar, aromatic attribution, dimensional
+validation, disconnected topology, registry, continuous geometry and five scientific
+interaction family regressions passed. No scientific consumer result changed.
+Independent JVM replay-one.json == replay-two.json.
+Five-family historical scientific replay byte-identical to frozen B00 checkpoint.
+Initial 68-test characterization had 4 formate completeness expectation failures:
+source general CARBOXYLATE explicitly excludes FORMYL. Specialized positive total -1
+is valid, but composite completeness remains false. Test expectation corrected;
+source definitions and production behavior were not loosened. run-1 passed 657;
+final-run adds explicit neutrality/permutation acceptance (659).
+
+PRESERVATION / LIMITS
+PRESERVATION.json records 25 unrelated tracked-change pins and historical checkpoint
+verification. No scientific artifacts moved, cleaned, regenerated or overwritten.
+Source raw group reports retain all role alternatives; incomplete/ambiguous structural
+mapping stays inconclusive under upstream semantics. No positive ambiguous mapping
+claim. Absence requires all six source predicates exhaustive and supported.
+Domain remains carboxylate/formyl + four carbon-bound ammonium classes only.
+No pKa, ionization, charge delocalization, partial charge, interaction center, salt
+bridge, electrostatic energy, affinity or METTL7 interpretation.
+NOT_EVALUATED production candidate is not self-activated or current-policy qualified.
+Compilation is bounded against prior qualified cached dependencies; full clean-checkout
+Maven qualification remains pending at program level. No broad build/download.
+
+Permanent documentation: docs/manual/athena/supporting-material/CHARGE_GROUPS.md.
+Exact sources and reviewed contract: manifest and SOURCE_SHA256SUMS.
+Continue foundation dependency order; broader P04 remains partial.

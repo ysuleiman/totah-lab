@@ -3497,6 +3497,128 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.PERCEPTION.CHARGED_GROUP — 1.0.0 (charge-groups-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/charge-groups-v1/ATHENA.PERCEPTION.CHARGED_GROUP.rule.json) · SHA256 `ae779045dda3b869082f46d64874a45a7f5492f81a96c283c5504f0197ffe3f2`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_CHARGE_GROUPS_V1"
+```
+
+**implementationId**
+
+```json
+"athena.charge-groups"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "charge-groups": "athena-charge-groups/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.PERCEPTION.CHARGED_GROUP/negative/1",
+  "supportedDomain": "Exact existing six reviewed carboxylate/ammonium predicates in supplied component.",
+  "requirements": [
+    "VERIFIED_SOURCE_REPORTS",
+    "COMPLETE_SIX_GROUP_ENUMERATION",
+    "COMPLETE_SOURCE_CORRESPONDENCE",
+    "WITHIN_REQUEST_BUDGET"
+  ],
+  "scope": "SUPPLIED_COMPONENT_REVIEWED_CARBOXYLATE_AMMONIUM",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied carboxylate and four carbon-bound ammonium group domains only.",
+  "Atomic formal charges, group totals and later geometric representatives are distinct. No center, electrostatic, ionization, partial-charge or affinity claim.",
+  "No normalization or legacy consumer migration; unknown source state remains non-negative.",
+  "Implementation qualification is separate from current-policy Research Gate eligibility."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/charge-group-attribution-contract-20261005/DESIGN.txt",
+    "sha256": "606ef20951e1f1077fd3ff1ce6af0f241bf5e609ab4f8c400a55aed82dada1bc",
+    "citation": "Exact user-approved P04 definition and payload, with recomputed overflow-checked total invariant."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GEOMETRY.CONTINUOUS — 1 (geometry-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/geometry-foundation-v1/ATHENA.GEOMETRY.CONTINUOUS.rule.json) · SHA256 `f9e4971bf8d025957f9dac0819535916375fb0935dba6181f7ce16ad5fc4e249`

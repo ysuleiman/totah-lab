@@ -82,6 +82,7 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.charge-groups")){ChargeGroupRules.validate(m);return;}
         if(m.implementationId().equals("athena.aromatic-systems")){AromaticSystemRules.validate(m);return;}
         if(m.implementationId().equals("athena.geometry")){ContinuousGeometryRules.validate(m);return;}
         if(m.schema().equals("athena-rule/3")) {

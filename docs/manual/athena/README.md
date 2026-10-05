@@ -62,3 +62,5 @@ use `--check` to verify no stale generated pages. Documentation rendering is not
 execution, research review, or a scientific qualification test.
 
 Bounded aromatic cycle/fused-system attribution: [definition rationale, source limitations and qualification](supporting-material/AROMATIC_SYSTEMS.md).
+
+Supplied group formal-charge attribution: [P04 scientific support and domain limits](supporting-material/CHARGE_GROUPS.md).
