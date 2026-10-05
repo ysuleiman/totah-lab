@@ -1,0 +1,65 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.CARBOXYLATE",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_B01_V1",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.CARBOXYLATE\",\"limitations\":[\"Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.\",\"Candidate definition under qualification; current-policy research approval is not conferred.\",\"Original source charges, H state, stereo and correspondence alternatives are preserved.\",\"This profile is the carbon-substituted subtype; the FORMYL sibling covers formic acid/formate.\"],\"memberQueryIndices\":[1,2,3],\"negativeCoverageVersion\":\"ATHENA.GROUP.CARBOXYLATE/negative/1\",\"patternId\":\"ATHENA.GROUP.CARBOXYLATE/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[C;X3;+0](=[O;X1;+0])-[O;X1;-1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\"},\"hydrogenElements\":[\"O\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"carbonylO\"},{\"count\":0,\"role\":\"anionicO\"}],\"roleHeavyDegree\":{\"anionicO\":1}},\"roles\":{\"acylC\":[1],\"anionicO\":[3],\"carbonAttachment\":[0],\"carbonylO\":[2]},\"schema\":\"athena-group-definition/1\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBOXYLATE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"120a1f195039521a18e292001b45d0be993291edace2cb4d96a50e07bf160a0d\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[{\"query\":\"[C;X3;H1;+0](=[O;X1;+0])-[O;X1;-1]\",\"reason\":\"Formyl acid/anion is a separately qualified subclass with authoritative carbon-H coverage; not a negative of the whole acid family.\"}]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBOXYLATE.json",
+      "sha256": "120a1f195039521a18e292001b45d0be993291edace2cb4d96a50e07bf160a0d",
+      "citation": "Existing pinned functional-group blueprint dossier; candidate literal query requires qualification."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+    "This profile is the carbon-substituted subtype; the FORMYL sibling covers formic acid/formate."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.CARBOXYLATE/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

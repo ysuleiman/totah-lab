@@ -1,0 +1,64 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.HALOGENATED",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_B01_V1",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.HALOGENATED\",\"limitations\":[\"Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.\",\"Candidate definition under qualification; current-policy research approval is not conferred.\",\"Original source charges, H state, stereo and correspondence alternatives are preserved.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.GROUP.HALOGENATED/negative/1\",\"patternId\":\"ATHENA.GROUP.HALOGENATED/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[F,Cl,Br,I]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenElements\":[],\"hydrogenRoles\":[],\"roleHeavyDegree\":{\"halogen\":1}},\"roles\":{\"carbonAttachment\":[0],\"halogen\":[1]},\"schema\":\"athena-group-definition/1\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"27c940e949327cf2f5c38b4a2a7ec856c1a5588b5175b6922bc313a090fca0ae\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json",
+      "sha256": "27c940e949327cf2f5c38b4a2a7ec856c1a5588b5175b6922bc313a090fca0ae",
+      "citation": "Existing pinned functional-group blueprint dossier; candidate literal query requires qualification."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.HALOGENATED/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

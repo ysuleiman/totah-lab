@@ -1,0 +1,39 @@
+FOUNDATION GROUP BATCH — BOUNDED IMPLEMENTATION QUALIFICATION
+2026-10-05. Reuses the approved B01 declarative interpreter and B00 only.
+13 opt-in definitions: alcohol, phenol, nonaromatic ether oxygen, carbon-substituted
+carboxylic acid/carboxylate, separate formyl acid/anion subtypes, thioether, literal
+neutral S=O sulfoxide, C-F/Cl/Br/I identity, primary/secondary/tertiary aliphatic amines.
+DEFINITIONS.json gives exact queries, roles, domain requirements and dossier pins.
+
+qualified-tests.log: 107/107 passed, zero failures/skips/aborts. Every positive,
+explicit-H, duplicate-occurrence, atom-order permutation, unknown-charge/unknown-H
+case round-trips through EvidenceExchange and the existing generic evaluator.
+Additional cases cover negative constitution, source sulfur parity preservation,
+unknown aromatic model, ester/ether overlap, thiophene, epoxide/anisole/furan,
+charge-separated sulfoxide (unsupported), all four halogens/CF3-like distinct sites,
+carbonic acid/bicarbonate exclusions and the occurrence-context limitation witness.
+qualified-one.json and qualified-two.json: identical independent-JVM replay.
+scientific-replay: five scientific profiles exactly unchanged (scientific-diff empty).
+The shared synthetic structure helper now uses Element.fromSymbol to support Cl/Br;
+its exact previous source is preserved in before/. No production element mapper changed.
+
+Corrections preserved in initial-tests.log, acid-witness.log and ether-witness.log:
+OCL uppercase heteroatoms do not exclude aromaticity. Explicit !a was required to
+avoid thioether/thiophene and ether/furan false positives. The unrestricted acid
+pattern also recognized carbonic acid; carbon-bound and authoritative formyl subtypes
+now separate the intended identities. None of these candidate queries was previously
+production-qualified or applied to scientific data.
+
+Manifest qualification remains NOT_EVALUATED. Qualification tests enable a copied
+fixture manifest solely to test implementation semantics. Production current-policy
+execution requires reviewed /3 research/implementation bindings; none is fabricated.
+Program disposition: IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING (dossier/review
+eligibility pending, not a claim that the gate implementation is missing).
+
+Known scope: aliphatic amines do not cover anilines/enamines/guanidines; hetero/fused
+aromatic and broader sulfur classes remain elsewhere in the program. Acyl ether
+context and nested identities survive. Literal S=O and charge-separated sulfur are
+not normalized. No donor/acceptor role, ionization, pKa, interaction or potency follows.
+Whole-component unsupported-query scope cannot safely replace occurrence-local
+exclusion; the mixed amine/amide witness is retained. The proposed /2 contract for
+that separate extension is awaiting explicit schema approval. /1 is unchanged.
