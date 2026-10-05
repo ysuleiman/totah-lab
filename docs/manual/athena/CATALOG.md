@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `efa142deed95dd95831ac93a35cc8dbd9d71077f377501125c48818286a399c9`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `e96162a1c0553d3e307e8a5f1e1596b288326a47aabded2a6031d2e7f02152b4`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -32,7 +32,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I15 | Metal coordination geometry/complex | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I16 | Van der Waals contact/gap | P1 | IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
 | I17 | Steric overlaps/clashes | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
-| I18 | Pi-hydrogen / X-H-pi geometry | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| I18 | Pi-hydrogen / X-H-pi geometry | P1 | PENDING_RECONCILIATION_NOT_COMPLETE | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt) |
 | I19 | Disulfide bond versus S-S proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I20 | Unpaired donor/acceptor/halogen features | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I21 | Interaction overlap/refinement and pruning | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |

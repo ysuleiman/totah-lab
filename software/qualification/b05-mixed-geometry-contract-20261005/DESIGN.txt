@@ -1,0 +1,82 @@
+B05 PREREQUISITE — MIXED ATOM / GROUP-CENTROID GEOMETRY
+2026-10-05; prospective public payload-contract review; NOT IMPLEMENTED.
+Base P06 commit 92d7c316da1ebdb17f1ac68234e909fc1794cc16.
+
+WHY NEXT
+Accepted BACKLOG.txt/DEPENDENCIES.mmd place B05 after B01/B03/B04. Its existing
+ATHENA.INT.CH_PI.GEOMETRY dossier requests C-centroid/H-centroid distances,
+C-H-centroid angle and H/centroid-normal angle. Reviewed geometry, not a favorable
+interaction classifier, is the bounded prerequisite. No new literature search.
+
+EXISTING REUSE / GAP
+ContinuousGeometryRules supports DISTANCE/ANGLE/DIHEDRAL/VECTOR over source atoms,
+PLANE over a complete explicit group, POINT_PLANE, PLANE_PAIR and pair distances.
+P06 now independently preserves a group centroid. POINT_PLANE already provides
+perpendicular distance and projected offset. Existing role-attribution tests show
+source pins can accompany explicit plans without another adapter or graph.
+But ANGLE accepts only source AtomReferences, not a group's computed centroid.
+PLANE_PAIR cannot substitute a one-atom group: a one-atom plane is undefined.
+No fake source atom or graph mutation will be used to represent a centroid.
+Generic EvidenceEnvelope can store data, but does not define the missing executable
+measurement semantics. This is a prospective extension of the public plan vocabulary.
+
+MINIMAL PROPOSAL FOR REVIEW
+No Java signature, molecular representation or evidence schema is added.
+Add one tagged operation within the existing extensible athena-continuous-geometry-plan/1:
+  {"id": <unique string>, "kind": "POINT_PAIR_GROUP",
+   "atoms": [<first AtomReference>, <second AtomReference>], "groupId": <group ID>}
+Exact fields; ordered atom tuple length2, distinct references; canonical existing group.
+Use opt-in athena.geometry implementation "3" / ATHENA_CONTINUOUS_GEOMETRY_V3.
+V1/V2 remain byte-identical and continue reporting this unknown tag UNSUPPORTED.
+All existing operations under V3 have V2 semantics; no implicit consumer migration.
+Results use athena-continuous-geometry/1, existing quantity/status/source structure.
+No new status token, automatic source chemistry claim or Research Gate qualification.
+
+DEFINITION
+Let P,Q be the ordered supplied points; G is the independently computed equal-weight
+centroid of the complete supplied group. Preserve the explicit tuple/group/source pins.
+Proposed quantity keys:
+- centroidAngstrom: G (ANGSTROM; 3-vector).
+- firstCentroidDistanceAngstrom: |P-G| (ANGSTROM).
+- secondCentroidDistanceAngstrom: |Q-G| (ANGSTROM).
+- firstSecondCentroidAngleDegrees: angle(P-Q, G-Q) (DEGREE; [0,180]).
+- secondCentroidNormalAngleDegrees: acos(|n dot (Q-G)| / |Q-G|)
+  in degrees [0,90], for a normalized, qualified unique group-plane normal n only.
+Clamp floating-point cosine to its mathematical domain; reuse Gaia vector/plane math.
+Existing POINT_PLANE supplies height/offset; existing pair matrix supplies closest atoms.
+Do not duplicate those outputs or add a new coordinate/frame authority.
+These labels describe geometry only; P/Q are not inherently C/H or a chemical donor.
+
+COVERAGE / PARTIAL RESULTS
+Validate full requested atom/group/frame/budget scope first; never emit subset centroid.
+Missing/invalid state fails closed. Unqualified frame retains numbers inconclusively.
+Distances/centroid survive a degenerate plane. Each undefined angle is inconclusive
+with null value and reason. Coincident coordinate vectors never fabricate an angle.
+A nonunique/failed plane supplies no normal-derived angle. Plane failure must not erase
+independent distances or angle(P-Q,G-Q). Centroid availability cannot qualify a plane.
+CompleteEnumeration is false for any requested undefined measurement; per-quantity
+status remains authoritative. No ABSENT_FALSE from unavailable geometry.
+
+B05 SCIENTIFIC BOUNDARY
+This prerequisite does not establish CH-pi chemistry or a favorable interaction.
+Later composition must verify source C-H connectivity/H orientation and reviewed ring
+identity/correspondence. Do not infer explicit H coordinates from H counts, infer
+hybridization from geometry, select a symmetry mapping, broaden hetero/fused domains,
+or invent CH-pi cutoffs. Domain-specific interaction calibration remains separately
+blocked by the empirical requirements already recorded in the dossier.
+Methyl environment channels likewise remain independent; no score or potency claim.
+
+ACCEPTANCE BEFORE CLOSURE
+Analytic point/triangle or hexagon fixtures for both distances and angle conventions;
+face-directed vs tangential tuples with equal carbon-centroid distance; reversed tuple;
+plane-normal sign invariance; explicit hydrogen rotation changes; arbitrary group names;
+centroid-only collinear/coincident groups; P=Q and Q=G; incomplete selection, unknown tag,
+budget/frame failure; deterministic order/translation/rotation; source preservation;
+exchange/evaluator tamper rejection; independent JVM replay; unchanged V1/V2 and solver
+replay and scientific consumers. No chemistry graph or source coordinate modification.
+Permanent support/documentation and focused local commit required.
+
+STOP: exact new executable operation/public payload semantics need prospective approval
+under REQUEST.txt section14. No V3 production change has been made. P06 is independently
+qualified/committed. Approving this proposal would authorize only this raw measurement
+prerequisite, not CH-pi thresholds or an interaction classifier.
