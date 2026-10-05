@@ -1,0 +1,46 @@
+V01/V02/V05 — LEGACY VALIDATION SEMANTICS REVIEW GATE
+2026-10-05. Characterization only; no production fix or qualification claim.
+
+Observed exact path:
+OclMolecularBackend.sanitize -> StereoMolecule.validate -> unbalanced atom charge.
+OclMolecularBackend.validate (StereochemistryService) -> same OCL validation/error.
+SystemGraphValidation.validate catches failure and sets chemistryValid=false;
+GRAPH_TRANSFORMATIONS, INTERACTION_TYPING, HBOND_ANALYSIS become FAILED.
+
+Synthetic inputs from existing ChemicalRoleAcceptanceTest:
+methylamine, acetamide, pyridine: sanitize and stereo PASS, three capabilities QUALIFIED.
+methylammonium, pyridinium: both calls fail with unbalanced atom charge;
+three capabilities FAILED. Source state bytes remain unchanged in all five cases.
+P03 already recognizes the corresponding supplied ammonium/pyridinium donor states.
+These results concern validation domain coupling, not evidence of biological activity.
+
+Proposed bounded correction for review:
+1. Keep legacy combined validation and historical certificates/replay unchanged.
+2. Introduce explicitly versioned chemical-state validation semantics separating
+   nonempty topology/valence, supplied-H consistency and stereo validity from the
+   independently requested net-neutrality/salt criterion. Net charge alone must not
+   establish invalid valence or invalid stereo.
+3. Reuse OCL's available validation facilities; inspect them before implementing.
+   Do not neutralize, add counterions, normalize tautomers or alter source graphs.
+4. Preserve checked failures and backend causes; unknown/unsupported valence/stereo
+   remains non-negative. Do not turn charged states automatically into a global PASS.
+5. Before any public API addition, present exact signatures if separate policy
+   selection cannot be expressed safely through existing interfaces. No API change
+   is approved by this characterization.
+6. Test neutral/charged pairs, true bad valence, H contradiction, stereo, empty graphs,
+   source preservation and deterministic replay; compare all affected sanitizer,
+   stereo and system-validation consumers listed in CONSUMER_LOCATIONS.txt.
+
+Expected behavioral delta (proposed, not implemented/tested): charge-only failure
+no longer suppresses separately valid valence/stereo under the new policy; neutral
+and other existing validation behavior stays pinned; explicit neutrality check
+continues reporting the actual net charge. No new interaction-rule definition.
+
+Reason for stop: the standing instruction requires review before changing already
+qualified scientific-consumer semantics. SystemGraphValidation was preserved in
+system-graph-20261004; the shared sanitizer/stereo services have additional design/
+fragment consumers. No migration has been accepted or silently applied.
+
+This is not missing literature or documentation backfill. It is a reproduced
+cross-capability semantics issue. Independent work can resume after the migration
+scope is reviewed; no broad audit or new architecture is requested.

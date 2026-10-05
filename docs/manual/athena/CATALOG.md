@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `acd35a4e782070dc84aebc9136dd4774145f22bb112d419eb0de6a6840c85cf2`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `de772d177789cc70d90637b1fb405859e0bcc3cbc8fed7280bb26f49db0916c9`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -44,11 +44,11 @@ Disposition is copied without upgrading partial capability coverage.
 | N06 | Network degree/paths/second shell | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N07 | RMSD-based ensemble clustering | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N08 | 2D/3D pharmacophore fingerprints and matching | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| V01 | Valence/sanitization and nonempty graph validation | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| V02 | Fragment/salt/solvent and neutral-charge checks | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| V01 | Valence/sanitization and nonempty graph validation | P0 | CHARACTERIZED_SEMANTIC_MIGRATION_REVIEW_REQUIRED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt) |
+| V02 | Fragment/salt/solvent and neutral-charge checks | P0 | CHARACTERIZED_SEMANTIC_MIGRATION_REVIEW_REQUIRED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt) |
 | V03 | Isotopes, allowed/disallowed elements and radicals | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | V04 | Representation/query/dummy/enhanced-stereo validation | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| V05 | Stereo syntax and authoritative stereo validation | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| V05 | Stereo syntax and authoritative stereo validation | P0 | CHARACTERIZED_SEMANTIC_MIGRATION_REVIEW_REQUIRED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt) |
 | V06 | 2D layout/dimensionality checks | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | V07 | Bond-length and bond-angle validation | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | V08 | Chirality/planarity validation in coordinates | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
