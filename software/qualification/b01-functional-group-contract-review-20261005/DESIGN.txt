@@ -1,0 +1,166 @@
+B01 FUNCTIONAL-GROUP IDENTITY — PROPOSED CONTRACT, NOT IMPLEMENTED OR QUALIFIED
+2026-10-05; base 23da6b8723eff29f4bb1a174b6ea7e5c5f42496c.
+
+Review gate
+The user requires review if B01 needs a public API/schema change. The existing generic
+interfaces can transport B01 without Java signature changes, but they do not define
+its new durable definition/coverage/result payloads. The proposal below is a PAYLOAD
+SCHEMA ADDITION, not an EvidenceExchange /1,/2,/3 migration or Research Gate /3.
+It is not claimed technically impossible to transport the data today: arbitrary
+strings/opaque bytes already work. Their B01 meaning still needs an explicit,
+versioned contract rather than hidden conventions. Alternative typed public Java
+records would also constitute an API addition. Stop here for the requested review.
+No production code, existing manifests, APIs, evidence schemas or tests were changed.
+
+Existing representation audit
+- MolecularGraph: authoritative immutable source atoms, bonds, orders, formal-charge
+  integers, H annotations, aromatic flags, stereo, coordinates, properties. No second
+  molecule representation is needed. H annotation zero means unspecified, not known zero.
+  A zero formal-charge integer alone does not prove source charge-completeness.
+- SubstructureMatcher.Result/BackendEvidence: qualified B00 stable occurrences,
+  correspondence alternatives, query/compiler/runtime/source hashes and checked failure.
+  No group role/domain/negative-coverage semantics should be added to this substrate.
+- LigandFeature/Result: feature types and arbitrary evidence strings, but no typed group
+  definition/coverage contract. CUSTOM could transport strings but would not solve it.
+- OclLigandFeaturePerceiver: direct OCL atom/ring feature perception includes donor,
+  acceptor and hydrophobic roles. Do NOT use it as B01: it bypasses B00 and adds meanings
+  outside group identity. Keep its current consumers and behavior untouched.
+- SystemStateView: component graph/source correspondence, formal-charge assignments,
+  global protonation/frame qualification. Reuse source bindings and references, but do
+  not treat a global flag or partial contact map as per-atom complete H-state evidence.
+- RuleManifest /2: existing metadata/parameters/negativeCoverage suffice as outer rule
+  manifest. RuleRegistry can load/register explicit bundles; no default scientific
+  registry activation is necessary. RuleAnalyzers/SystemGraphAnalyzer already separate
+  measurement and evaluation; their generic payload transport can host B01 internally.
+- EvidenceEnvelope/Interpretation: preserve source and measurements before assessment,
+  all six existing statuses. No new status, repository, molecular class or DB schema.
+
+Recommended integration (subject to this contract review)
+One package-private declarative group evaluator in athena.system.rules, using the
+existing collector/evaluator interfaces. Definitions live in athena resources under
+system/rules/groups-b01. Query execution is injected SubstructureMatcher and must
+return the exact B00 /2 implementation/artifact identity. No direct SSSearcher access
+and no seven per-group detector classes. No dependency from athena to OCL module.
+Load the B01 bundle explicitly through existing RuleRegistry.load/register; do not add
+it to RuleRegistry.scientific or connect it to existing five interaction collectors.
+External Java signatures remain unchanged. Internal records may validate/encode the
+following public payload contracts; no corresponding domain classes in Mnemosyne.
+
+PROPOSED PAYLOAD A — athena-group-definition/1
+Required fields:
+ schema, groupId, definitionVersion, patternId, patternVersion, query,
+ memberQueryIndices (sorted distinct integer list),
+ roles (role name -> sorted compiled-query-index list),
+ contextPolicy="ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+ requiredState (graphCompleteness, formalCharge, hydrogens, aromaticity),
+ supportedDomain, negativeCoverageVersion, limitations,
+ sourceReferences (existing ScientificReference values),
+ requiredMatcher="2026.7.2/athena-ocl-occurrences/2".
+Definition digest is SHA-256 of existing canonical SystemStateView.bytes encoding;
+not a self-containing field. Exact pattern digest uses that pattern's canonical
+identity/version/query object. Definition bytes and digest both accompany the result.
+No arbitrary executable expressions or alternate query language. Pattern does graph
+selection; role declarations only attribute its already-matched indices. A further
+reviewed fixture-only definition must execute through this same mechanism unchanged.
+
+PROPOSED PAYLOAD B — athena-group-source-coverage/1
+Required fields:
+ schema, stateBinding (existing SystemStateView.Binding), componentReference,
+ completeGraph (existing assessment status plus evidence references),
+ atomState (stable atom ID -> chargeStatus, hydrogenMode, aromaticityStatus,
+            explicitHydrogenAtomIds, optional authoritative implicit-H count,
+            optional aromaticity model/version, evidenceReferences),
+ sourceReferences, limitations.
+Hydrogen modes: EXPLICIT_GRAPH, AUTHORITATIVE_IMPLICIT, UNKNOWN.
+Counts are source/qualified-state assertions, not fabricated by the group evaluator.
+Missing entries remain unknown. Existing global flags alone cannot invent atom counts.
+Explicit H vertices remain in the original graph. A supplied positive H annotation is
+also checked by B00. Zero annotation never establishes zero H by itself. A declared
+implicit-H zero must have an independent attributed complete-state assertion; otherwise
+thiolate/methyl negatives are inconclusive. Never infer thiolate from missing H.
+Validate state digest, referenced atom IDs, explicit bond membership and provenance
+before treating a completeness assertion as usable. Invalid coverage is non-negative.
+This payload adds coverage evidence about the existing graph; it does not replace it.
+
+PROPOSED PAYLOAD C — athena-group-identities/1
+Required fields:
+ schema, sourceStateBinding, componentReference, definitionBytes/digest,
+ patternBytes/digest, sourceCoverageBytes/digest, b00Result (existing Result),
+ occurrences (immutable canonical list), negativeCoverage, assessment, reasons,
+ sourceReferences, limitations.
+Each occurrence:
+ occurrenceId, memberAtomIds, roleCorrespondenceAlternatives,
+ contextAtomIds, sourceBondIds, explicitHydrogenAtomIds, sourceStateReferences.
+Use references into the preserved MolecularGraph, retaining its original Atom/Bond
+records so charge/H/stereo/aromatic flags/order are recoverable without reconstruction.
+Role maps must preserve ALL relevant B00 alternative embeddings. Do not select a
+chemical role merely because an arbitrary representative was lexicographically first.
+Occurrence identity: canonical hash of state binding + definition digest + sorted
+member IDs. Distinct group definitions on overlapping atoms coexist. Multiple query
+context embeddings of the same member set coalesce into one occurrence while retaining
+all context/role alternatives. Distinct target member sets always survive.
+Ordering: groupId/definitionVersion, then sorted stable member IDs, then canonical
+role alternatives. Input atom-list permutations may change the exact source digest,
+but must not change the group memberships/role alternatives after ID normalization.
+Assessments reuse SUPPORTED_PRESENT, ABSENT_FALSE, NOT_EVALUATED, UNSUPPORTED,
+UNKNOWN_INCONCLUSIVE, FAILED. A valid positive can coexist with incomplete wider
+coverage; the incomplete enumeration cannot establish whole-scope absence.
+
+Proposed initial scientific boundaries / queries (NOT yet execution-qualified)
+Patterns below are review candidates; role index maps must be verified against B00's
+compiled query indexing. No digest here is an assertion of research eligibility.
+CARBONYL: [C;X3;+0]=[O;X1;+0]. Members C,O. Literal neutral C=O graph identity;
+  a carboxylate drawing may contain such a bond but must retain charged context and
+  its exact O assignment. A charge-separated resonance drawing is not normalized
+  into this identity. Unsupported representation != general absence of carbonyl.
+ESTER: [#6]-[C;X3;+0](=[O;X1;+0])-[O;X2;+0]-[#6]. Members acyl C/two O;
+  both carbon substituents are role/context IDs. Initial carbon-substituted acyl
+  domain excludes acid/carbonate/carbamate; formate scope needs explicit review.
+  Carbonyl overlap persists. Ring/aryl attachments preserve actual source bonds.
+AMIDE: [#6]-[C;X3;+0](=[O;X1;+0])-[N;+0]. Members acyl C/O/N; carbon attachment
+  context. Neutral carbon-substituted acyl-N domain initially; formamide/urea/carbamate
+  and charge-separated resonance representations need explicit scope decisions,
+  not accidental omission. No donor/acceptor inference about N or O.
+AROMATIC: c1ccccc1. Initially isolated six-carbon aromatic cycle under pinned B00/OCL
+  model with complete source aromaticity/state. Heteroaromatic/fused/other cycles
+  remain unsupported in B01 pending B02 expansion. Coordinates/planarity are not
+  membership criteria; planar cyclohexane is a constitutional negative fixture.
+METHYL: [C;H3;+0]-[*]. Member carbon, attachment context. Authoritative three H and
+  exactly one non-H single-bond neighbor required in the reviewed graph domain.
+  Carbon-bound, methoxy and sulfonium-bound methyl identities can all exist, but their
+  attachments/charge context remain distinct; none implies hydrophobic benefit.
+  Bare OCL H3 is insufficient alone, given B00's documented H-query limitations.
+THIOL: [#6]-[S;H1;+0]. Member S; carbon and explicit/implicit H attribution retained.
+  Authoritative C-S-H state; disulfide sulfur/thiolate are separate states.
+THIOLATE: [#6]-[S;H0;-1]. Member S; carbon attachment; actual source -1 charge and
+  authoritative zero-H state required. Missing H knowledge is not a positive thiolate.
+For all seven: unsupported valence/state/context is non-negative. Exact query matching
+must demonstrate intended connectivity within the declared domain; no separate
+post-hoc chemistry detector may compensate for an inadequate query.
+
+Negative coverage, versioned per definition
+Valid reviewed definition/query; complete supported graph/partner component; complete
+required bond/charge/H/aromaticity provenance; no unsupported relevant representation;
+verified B00 implementation; exhaustive occurrence and role/context enumeration;
+unchanged source. All must hold for ABSENT_FALSE. Query/compiler failure -> FAILED or
+UNSUPPORTED with original evidence retained. Incomplete state -> UNKNOWN_INCONCLUSIVE.
+Never translate an empty list alone into absence. No group-to-biological claim.
+
+Acceptance / bounded scope after approval
+Each group: positive, near miss, charge/resonance alternate, explicit/implicit/unknown
+H as applicable, symmetry, genuinely distinct occurrences, overlap, unsupported state,
+atom/bond-order permutations and independent-JVM replay. Permanently retain ester plus
+carbonyl and amide plus carbonyl overlaps; acid/carbonate/carbamate contrasts; methyl
+attachments; C-S-H vs C-S- vs S-S vs unknown H; aromatic vs planar nonaromatic.
+A fixture-only additional declarative motif demonstrates extension without Java changes;
+do not register it as another qualified production group.
+Evidence write/read must preserve roles/context/alternatives and failed/unknown results.
+Rerun corrected B00, relevant OCL/graph/design regressions, all five scientific suites,
+full consumer comparison and historical replay/pins. Compile only affected Java/test
+sources with cached dependencies. No broad builds, docking or calculations.
+If a pre-existing scientific consumer changes, stop with exact old/new input/output.
+
+Decision requested
+Approve these payload-only schema additions and bounded domains, or request a typed
+public Java API instead. This design does not implement either option. On approval,
+implement only B01 and stop at qualification. No research-gate /3 or B02 activation.

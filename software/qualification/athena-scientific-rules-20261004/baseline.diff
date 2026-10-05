@@ -1,0 +1,1123 @@
+diff --git a/.gitignore b/.gitignore
+index d68c5b2b3..102b0dc95 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -71,3 +71,7 @@ workspace/output/
+ /analysis/mettl7-phase2/execution-unit-05O/model-class-benchmark/.venv/
+ /analysis/mettl7-phase2/execution-unit-05O/aws-vdw/terraform/.terraform/
+ /analysis/track2g-ncats-panel-2026-09-12/node_modules/
++
++# Local authoritative ChEMBL copies: preserve on disk, exclude from Git snapshots.
++/workspace/preservation/chembl32-official/chembl_32.db
++/workspace/preservation/chembl32-official/verified-chembl_32_sqlite.tar.gz
+diff --git a/AGENTS.md b/AGENTS.md
+index e3583d7fe..a7879cec8 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,5 +1,29 @@
+ # Project Instructions
+ 
++## Mandatory METTL7 cumulative scientific workflow
++- Before interpreting any new METTL7 experiment, calculation, compound or paper,
++  read `knowledge/mettl7/CURRENT_STATE.md` and the single authoritative living
++  argument in `reports/mettl7-netarsudil-evidence-discovery-20261002/CUMULATIVE_MECHANISTIC_STATE.txt`.
++- Identify the existing hypotheses affected and the exact unresolved question;
++  retrieve only their necessary primary artifacts. Do not repeat completed checks
++  or restart the mechanism from the latest result alone.
++- State what is strengthened, weakened, falsified, newly introduced or unchanged,
++  then update that same mechanistic state with provenance and a dated delta.
++  Preserve its prior version. Do not create a competing scientific-state inventory.
++- Keep lab assays, published assays, mutation assays, literature interpretation,
++  structural/docking evidence, local refinement, electronic physics and SAR distinct.
++  Shared poses or source experiments are not independent corroboration.
++- Preserve contradictory evidence, supersession and retired interpretations.
++  Keep user scientific acceptance separate from formal numerical qualification,
++  including the user-retained near-threshold residue-203 evidence. Never invent
++  its unresolved historical cutoff or upgrade it to PASS/discard it as negative.
++- Assay records must retain compound, paralog, mutations, concentrations, conditions,
++  result, replicates/statistics, source and interpretation when available; missing
++  fields stay missing. Planned assays are not results; no detectable inhibition
++  is not an invented IC50 bound. Do not silently mix lab and literature provenance.
++- This workflow does not authorize new calculations, assays, database/schema work
++  or scientific campaigns. Follow the current task's scope and stop boundary.
++
+ ## General
+ - Java 21
+ - Maven project
+@@ -49,4 +73,4 @@
+ ## Don't
+ - Don't rewrite unrelated code.
+ - Don't reformat the whole project.
+-- Don't remove comments unless incorrect.
+\ No newline at end of file
++- Don't remove comments unless incorrect.
+diff --git a/ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv b/ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+index 3820347a4..1e1dac4c2 100644
+--- a/ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
++++ b/ATHENA_INTERACTION_V2_REGRESSION_RESULTS.csv
+@@ -548,7 +548,9 @@ stage12j_tyr47_pi,7B_R2_SER47_min_heavy_distance_A,4.304475229339809,4.304475229
+ stage12j_tyr47_pi,7B_R2_TYR47_interaction_types,CLOSE_GEOMETRIC_CONTACT,NONE,,historical HYDROPHOBIC at <= 4.5 A (residue-set+element); ours PLIP-style at <= 4.0 A: Tyr47 min distances 4.13-4.47 A fall in the gap,DELTA_DOCUMENTED
+ stage12j_tyr47_pi,7B_R3_SER47_min_heavy_distance_A,4.332281038898562,4.332281038898562,0.0,run_stage12j.py: min heavy-atom pair distance to residue 47,REPRODUCED
+ stage12j_tyr47_pi,7B_R3_TYR47_interaction_types,CLOSE_GEOMETRIC_CONTACT,NONE,,historical HYDROPHOBIC at <= 4.5 A (residue-set+element); ours PLIP-style at <= 4.0 A: Tyr47 min distances 4.13-4.47 A fall in the gap,DELTA_DOCUMENTED
+-stage12j_tyr47_pi,7B_R4_TRP195_pi_type,EDGE_FACE_PI,NONE,,"our pi gates not met (offset 2.0 A min-of-both vs historical 2.5 A ligand-plane, parallel only; edge-face historically ungated)",DELTA_DOCUMENTED
++stage12j_tyr47_pi,7B_R4_TRP195_pi_type,EDGE_FACE_PI,EDGE_FACE_PI,,pi class gates differ (see aggregate rows),REPRODUCED
++stage12j_tyr47_pi,7B_R4_TRP195_pi_centroid_A,5.151673875463762,4.885819017546823,-0.2658548579169384,ring centroid to ring centroid,DELTA_DOCUMENTED
++stage12j_tyr47_pi,7B_R4_TRP195_pi_normal_deg,60.42001372667586,61.42289533622017,1.0028816095443105,folded ring-normal angle,DELTA_DOCUMENTED
+ stage12j_tyr47_pi,7B_S4_TRP195_pi_type,PARALLEL_PI,NONE,,"our pi gates not met (offset 2.0 A min-of-both vs historical 2.5 A ligand-plane, parallel only; edge-face historically ungated)",DELTA_DOCUMENTED
+ stage12j_tyr47_pi,7B_S5_SER149_hbond_distance_A,3.057,3.05738057820743,3.8057820743020443E-4,heavy D...A distance; historical rounded to 3 decimals,REPRODUCED
+ stage12j_tyr47_pi,7B_S5_SER149_hbond_angle_deg,168.6,168.56092986655955,-0.03907013344044685,D-H...A angle; historical rounded to 1 decimal,REPRODUCED
+@@ -561,16 +563,16 @@ stage12j_tyr47_pi,7B_S8_SER47_min_heavy_distance_A,4.334821910990115,4.334821910
+ stage12j_tyr47_pi,7B_S8_TYR47_interaction_types,CLOSE_GEOMETRIC_CONTACT,NONE,,historical HYDROPHOBIC at <= 4.5 A (residue-set+element); ours PLIP-style at <= 4.0 A: Tyr47 min distances 4.13-4.47 A fall in the gap,DELTA_DOCUMENTED
+ stage12j_tyr47_pi,7B_S9_GLY199_hbond_distance_A,2.883,2.88305705805487,5.705805486977411E-5,heavy D...A distance; historical rounded to 3 decimals,REPRODUCED
+ stage12j_tyr47_pi,7B_S9_GLY199_hbond_angle_deg,150.9,150.85629082080067,-0.04370917919933959,D-H...A angle; historical rounded to 1 decimal,REPRODUCED
+-stage12j_tyr47_pi,perception_degraded_all_30_families,TRUE,TRUE,,"PDBQT inputs carry no bond graph: protein rings via PROTEIN_TEMPLATE, ligand ring via AD4 fallback, halogens empty; InteractionProfile.anyPerceptionDegraded()",REPRODUCED
+-stage12j_tyr47_pi,pi_stack_parallel_total,1.0,0.0,-1.0,"PDBQT input: the AD4-fallback ligand ring is marked degraded and InteractionGeometry.ringPlane refuses degraded rings, so no pi-stack can fire at all; additionally our offset gate (2.0 A, min of both mutual projections, both classes) is stricter than the historical one (2.5 A ligand-plane, parallel only)",DELTA_DOCUMENTED
+-stage12j_tyr47_pi,pi_stack_edge_face_total,11.0,0.0,-11.0,"as above: degraded ligand ring skipped; historical EDGE_FACE had no offset gate, ours T_SHAPED requires offset <= 2.0 A",DELTA_DOCUMENTED
++stage12j_tyr47_pi,ligand_topology_complete_all_30_families,NOT_PREVIOUSLY_EVALUATED,TRUE,,"Hermes reconstructs the ligand graph from preserved Meeko SMILES, SMILES IDX, and H PARENT records",REGENERATED_JAVA
++stage12j_tyr47_pi,pi_stack_parallel_total,1.0,0.0,-1.0,"Meeko topology supplies a non-degraded ligand ring; the canonical offset gate (2.0 A, min of both mutual projections, both classes) is stricter than the historical one (2.5 A ligand-plane, parallel only)",DELTA_DOCUMENTED
++stage12j_tyr47_pi,pi_stack_edge_face_total,11.0,1.0,-10.0,historical EDGE_FACE had no offset gate; ours T_SHAPED requires offset <= 2.0 A,DELTA_DOCUMENTED
+ stage12j_tyr47_pi,hydrogen_bonds_raw_total,8.0,8.0,0.0,"detector-level parity: identical HB convention (HD donor pairing 1.35 A, H...A <= 2.5, D...A <= 3.5, D-H-A >= 120, acceptors NA/OA/SA) in both",REPRODUCED
+ stage12j_tyr47_pi,hydrogen_bonds_refined_total,8.0,7.0,-1.0,our PLIP precedence refinement dedups the 7B_S5 SER149 and ASP200 H-bonds sharing the ligand primary-amine donor; the historical script kept both,DELTA_DOCUMENTED
+-stage12j_tyr47_pi,hydrophobic_contact_records_total,1049,282,-767.0,"historical hydrophobic: residue-set + element (C,S)x(C,CL) at <= 4.5 A; ours: PLIP-style perceived hydrophobic atoms at <= 4.0 A with refinements",DELTA_DOCUMENTED
++stage12j_tyr47_pi,hydrophobic_contact_records_total,1049,148,-901.0,"historical hydrophobic: residue-set + element (C,S)x(C,CL) at <= 4.5 A; ours: PLIP-style perceived hydrophobic atoms at <= 4.0 A with refinements",DELTA_DOCUMENTED
+ stage12j_tyr47_pi,pi_cation_total,NOT_IN_HISTORICAL_SCHEMA,0,,stage12j had no pi-cation channel,DELTA_DOCUMENTED
+ stage12j_tyr47_pi,salt_bridges_total,0.0,0.0,0.0,neutral prepared DCMB: no salt bridges expected,REPRODUCED
+-stage12j_tyr47_pi,halogen_bonds_total,NOT_EVALUATED,0,,stage12j froze halogen_bonds=NOT_EVALUATED (no canonical implementation); our detector needs a bond graph (degraded PDBQT input),DELTA_DOCUMENTED
+-stage12j_tyr47_pi,fingerprint_rows,353.0,168.0,-185.0,historical row granularity includes untyped CLOSE_GEOMETRIC_CONTACT rows and hydrophobic 4.5 A pairs; ours counts residues with at least one typed refined interaction,DELTA_DOCUMENTED
++stage12j_tyr47_pi,halogen_bonds_total,NOT_EVALUATED,0,,stage12j froze halogen_bonds=NOT_EVALUATED (no canonical implementation); canonical Java now has the bonded halogen topology and finds no passing geometry,DELTA_DOCUMENTED
++stage12j_tyr47_pi,fingerprint_rows,353.0,141.0,-212.0,historical row granularity includes untyped CLOSE_GEOMETRIC_CONTACT rows and hydrophobic 4.5 A pairs; ours counts residues with at least one typed refined interaction,DELTA_DOCUMENTED
+ netarsudil_nac_and_c202_c203,7B_ACCEPTED_7B_FAMILY5_N5_distance_A,16.8565,16.856528735181513,2.8735181512473673E-5,run_analysis.py:108-113: ligand N to SAM CE distance and N-CE-SD angle via tmt.NearAttackGeometry; SAM CE/SD from analysis/dcmb/sam_state/validated PDB; historical values rounded to 4/3 decimals,REPRODUCED
+ netarsudil_nac_and_c202_c203,7B_ACCEPTED_7B_FAMILY5_N5_angle_deg,98.454,98.45375151935072,-2.484806492759617E-4,run_analysis.py:108-113: ligand N to SAM CE distance and N-CE-SD angle via tmt.NearAttackGeometry; SAM CE/SD from analysis/dcmb/sam_state/validated PDB; historical values rounded to 4/3 decimals,REPRODUCED
+ netarsudil_nac_and_c202_c203,7B_ACCEPTED_7B_FAMILY5_N5_in_pose_near_attack,FALSE,FALSE,,in-pose near-attack gate 2.8-3.2 A and >= 150 deg,REPRODUCED
+diff --git a/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh b/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+index 5f68e71ec..ce035b210 100755
+--- a/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
++++ b/analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/run_stage_a_supervisor.sh
+@@ -11,6 +11,7 @@ REMOTE_BASE=${REMOTE_BASE:-/workspace/tsl-stage-a}
+ RATE=${RATE:-1.59}
+ TIMEOUT=${TIMEOUT:-1200}
+ MAX_COST=${MAX_COST:-35}
++COST_OFFSET=${COST_OFFSET:-0}
+ CANARY_MODE=${CANARY_MODE:-false}
+ POD_ID=${POD_ID:-hn837ck13cwsjs}
+ HOST=${HOST:-185.216.23.121}
+@@ -68,11 +69,11 @@ recreate_pod() {
+   printf '%s pod=%s host=%s port=%s\n' "$(date -u +%FT%TZ)" "$POD_ID" "$HOST" "$PORT" >> "$LOCAL_ROOT/RECREATIONS.log"
+ }
+ 
+-attempt=0
++attempt=${ATTEMPT_OFFSET:-0}
+ while :; do
+   now=$(date +%s)
+   elapsed=$((now-STAGE_START))
+-  cost=$(awk -v s="$elapsed" -v r="$RATE" 'BEGIN{printf "%.8f",s/3600*r}')
++  cost=$(awk -v s="$elapsed" -v r="$RATE" -v o="$COST_OFFSET" 'BEGIN{printf "%.8f",o+s/3600*r}')
+   if awk -v c="$cost" -v m="$MAX_COST" 'BEGIN{exit !(c>=m)}'; then
+     sync_results || true
+     api DELETE "https://rest.runpod.io/v1/pods/$POD_ID" >/dev/null || true
+diff --git a/analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv b/analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+index f15c88895..a796118cd 100644
+--- a/analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
++++ b/analysis/mettl7-phase2/tsl-rsh-torsiondrive-campaign/TORSION_SURFACE_CONSISTENCY.csv
+@@ -1,4 +1,4 @@
+-torsion,definition_zero_based,grid,candidate_count,successful_candidates,failed_candidates,rounds,grid_cells,converged,energy_range_hartree,minimum_grid_degrees,minimum_energy_hartree,archive,sha256,verification
+-CHI,55-25-9-8,-180:15:165,225,225,0,10,24,true,0.00606047228120588,45,-1477.94378525919,TSL_RSH_TORSIONDRIVE_BACKUP-20260825T144336Z-1-001.zip,6cc680aec6a161147d45564755276b22b9b46f46a7fb502fdb77f9d349f96fa3,PASS
+-PHI,25-9-8-7,-180:15:165,37,37,0,6,18,true,0.0631487911077784,-75,-1477.94370179682,TSL_RSH_PHI_RUNPOD_RESULTS.tar.gz,22d7e15d275611c909fd96d7f3597f30acb153b2e0090df38793ce627835f65e,PASS
+-PSI,9-8-7-1,-180:15:165,47,47,0,7,14,true,0.0586123162436252,-60,-1477.94321192772,TSL_RSH_PSI_RUNPOD_RESULTS.tar.gz,1e339fc04bf495521095f8f6e6ff93286b0da7f2252fc27b0a90c450ddd55818,PASS
++torsion,definition_zero_based,grid,candidate_count,successful_candidates,failed_candidates,rounds,grid_cells,converged,energy_range_hartree,minimum_grid_degrees,minimum_energy_hartree,archive,sha256,verification
++CHI,55-25-9-8,-180:15:165,225,225,0,10,24,true,0.00606047228120588,45,-1477.94378525919,TSL_RSH_TORSIONDRIVE_BACKUP-20260825T144336Z-1-001.zip,6cc680aec6a161147d45564755276b22b9b46f46a7fb502fdb77f9d349f96fa3,PASS
++PHI,25-9-8-7,-180:15:165,37,37,0,6,18,true,0.0631487911077784,-75,-1477.94370179682,TSL_RSH_PHI_RUNPOD_RESULTS.tar.gz,22d7e15d275611c909fd96d7f3597f30acb153b2e0090df38793ce627835f65e,PASS
++PSI,9-8-7-1,-180:15:165,47,47,0,7,14,true,0.0586123162436252,-60,-1477.94321192772,TSL_RSH_PSI_RUNPOD_RESULTS.tar.gz,1e339fc04bf495521095f8f6e6ff93286b0da7f2252fc27b0a90c450ddd55818,PASS
+diff --git a/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceRunner.java b/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceRunner.java
+index 151827cc4..346ff151b 100644
+--- a/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceRunner.java
++++ b/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceRunner.java
+@@ -33,8 +33,8 @@ import java.util.Optional;
+  * <p>Gated one-shot runner, launched with
+  * {@code --spring.main.web-application-type=none
+  * --totah.docking.enabled=true} plus the {@code totah.docking.*}
+- * properties below. Dry run (default) executes vina and computes
+- * everything but performs no database writes. A run is an event: every
++ * properties below. Dry run (default) validates configuration but does not
++ * execute vina or produce unregistered scientific output. A run is an event: every
+  * invocation inserts a new docking_run row; there is no dedupe. All
+  * writes happen in a single transaction after vina and parsing
+  * succeeded, so relaunching after a failure is always safe.</p>
+@@ -152,6 +152,12 @@ public class DockingPersistenceRunner implements CommandLineRunner {
+                     options.sizeZ(), exhaustiveness, seed);
+         }
+ 
++        if (dryRun) {
++            LOG.info("DRY RUN: configuration validated; docking not executed."
++                    + " Set --totah.docking.dry-run=false for execution with mandatory persistence.");
++            return;
++        }
++
+         Path runDirectory = Files.createDirectories(runsRoot.resolve(
+                 "run-" + RUN_ID_FORMAT.format(
+                         java.time.LocalDateTime.now())));
+@@ -226,12 +232,6 @@ public class DockingPersistenceRunner implements CommandLineRunner {
+                 result.bestPose().orElseThrow().affinityKcalPerMol(),
+                 totalContacts);
+ 
+-        if (dryRun) {
+-            LOG.info("DRY RUN: nothing written; rerun with"
+-                    + " --totah.docking.dry-run=false to persist");
+-            return;
+-        }
+-
+         DockingPersistenceService.PersistResult persisted =
+                 persistenceService.persist(
+                         new DockingPersistenceService.PersistRequest(
+diff --git a/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceService.java b/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceService.java
+index 0a79d7ded..f4555c830 100644
+--- a/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceService.java
++++ b/software/apps/web-api/src/main/java/totah/lab/web/docking/DockingPersistenceService.java
+@@ -1,6 +1,8 @@
+ package totah.lab.web.docking;
+ 
+ import org.springframework.stereotype.Service;
++import jakarta.persistence.EntityManager;
++import jakarta.persistence.PersistenceContext;
+ import org.springframework.transaction.annotation.Transactional;
+ import totah.lab.daedalus.docking.PocketGridBox;
+ import totah.lab.daedalus.docking.VinaDockingOptions;
+@@ -79,6 +81,9 @@ public class DockingPersistenceService {
+     ) {
+     }
+ 
++    @PersistenceContext
++    private EntityManager entityManager;
++
+     private final StructureRepository structureRepository;
+     private final PocketRepository pocketRepository;
+     private final ArtifactRepository artifactRepository;
+@@ -197,6 +202,7 @@ public class DockingPersistenceService {
+                         request.sourceSystem()));
+ 
+         int contactCount = 0;
++        List<DockingPoseEntity> writtenPoses = new ArrayList<>();
+         for (int index = 0; index < request.poses().size(); index++) {
+             VinaPose pose = request.poses().get(index);
+             DockingPoseEntity poseEntity =
+@@ -208,7 +214,9 @@ public class DockingPersistenceService {
+                                     structure.getReceptor().getUniProtId(),
+                                     run,
+                                     request.sourceSystem(),
+-                                    request.ligandLabel()));
++                                    "m" + (index + 1) + " " + Objects.toString(
++                                            request.ligandLabel(), request.ligandId())));
++            writtenPoses.add(poseEntity);
+             for (ResidueContact contact :
+                     request.contactsPerPose().get(index)) {
+                 contactRepository.save(new PoseResidueContactEntity(
+@@ -220,6 +228,37 @@ public class DockingPersistenceService {
+             }
+         }
+ 
++        // Flush and discard the persistence context: verification must read the
++        // database, not the objects just passed to save(). A mismatch aborts the
++        // transaction; the runner cannot log completion before commit succeeds.
++        entityManager.flush();
++        entityManager.clear();
++        for (DockingPoseEntity expected : writtenPoses) {
++            DockingPoseEntity actual = entityManager.find(
++                    DockingPoseEntity.class, expected.getId());
++            if (actual == null
++                    || !actual.getRun().getId().equals(run.getId())
++                    || !actual.getLigandId().equals(expected.getLigandId())
++                    || !actual.getPoseFile().equals(expected.getPoseFile())
++                    || !Objects.equals(actual.getLigandLabel(), expected.getLigandLabel())
++                    || Double.compare(actual.getVinaScore(), expected.getVinaScore()) != 0) {
++                throw new IllegalStateException("Docking pose read-back failed");
++            }
++        }
++        long savedContacts = entityManager.createQuery(
++                "select count(c) from PoseResidueContactEntity c where c.poseId in :ids",
++                Long.class).setParameter("ids", writtenPoses.stream()
++                        .map(DockingPoseEntity::getId).toList()).getSingleResult();
++        if (savedContacts != contactCount) {
++            throw new IllegalStateException("Docking contact read-back failed");
++        }
++        ArtifactEntity savedArtifact = entityManager.find(ArtifactEntity.class,
++                posesArtifact.getId());
++        if (savedArtifact == null || !poseFile.toString().equals(
++                savedArtifact.getStorageLocation())) {
++            throw new IllegalStateException("Docking artifact read-back failed");
++        }
++
+         return new PersistResult(run.getId(), posesArtifact.getId(),
+                 request.poses().size(), contactCount);
+     }
+diff --git a/software/apps/web-api/src/main/java/totah/lab/web/poseanalysis/PoseAnalysisService.java b/software/apps/web-api/src/main/java/totah/lab/web/poseanalysis/PoseAnalysisService.java
+index 3ea46e15d..8470d2848 100644
+--- a/software/apps/web-api/src/main/java/totah/lab/web/poseanalysis/PoseAnalysisService.java
++++ b/software/apps/web-api/src/main/java/totah/lab/web/poseanalysis/PoseAnalysisService.java
+@@ -368,7 +368,23 @@ public class PoseAnalysisService {
+                         HttpStatus.NOT_FOUND,
+                         "No docking pose " + poseId
+                 ));
+-        return Files.readString(Path.of(pose.getPoseFile()));
++        String content = Files.readString(Path.of(pose.getPoseFile()));
++        var matcher = java.util.regex.Pattern.compile(
++                "(?ms)^MODEL[^\\r\\n]*\\R.*?^ENDMDL[^\\r\\n]*(?:\\R|$)")
++                .matcher(content);
++        List<String> blocks = new ArrayList<>();
++        while (matcher.find()) blocks.add(matcher.group());
++        long declaredModels = content.lines().filter(line -> line.startsWith("MODEL ")).count();
++        if (declaredModels != blocks.size()) {
++            throw new IOException("Incomplete multi-model pose file");
++        }
++        if (blocks.size() <= 1) return content;
++        Integer mode = pose.getLigandLabel() == null ? null
++                : PoseLabel.parse(pose.getLigandLabel()).mode();
++        if (mode == null || mode < 1 || mode > blocks.size()) {
++            throw new IOException("Multi-model pose file requires an explicit valid mode");
++        }
++        return blocks.get(mode - 1);
+     }
+ 
+     /**
+diff --git a/software/apps/web-api/src/main/java/totah/lab/web/service/StructureService.java b/software/apps/web-api/src/main/java/totah/lab/web/service/StructureService.java
+index 33b21b1c9..ace84814c 100644
+--- a/software/apps/web-api/src/main/java/totah/lab/web/service/StructureService.java
++++ b/software/apps/web-api/src/main/java/totah/lab/web/service/StructureService.java
+@@ -339,6 +339,24 @@ public class StructureService {
+                         NOT_FOUND,
+                         "Structure not found: " + structureId
+                 ));
++        // Uploaded Chai/Boltz complexes have their own coordinate frame. Never overlay
++        // the historical reference SAM onto these independently predicted models.
++        if (structure.getSourceAccession() != null
++                && (structure.getSourceAccession().startsWith("chai-mettl7b-sam-")
++                || structure.getSourceAccession().startsWith("boltz-mettl7b-sam-"))) {
++            String complex = structureArtifactService.readText(
++                    structure.getArtifactStorageLocation());
++            String sam = complex.lines()
++                    .filter(line -> (line.startsWith("HETATM") || line.startsWith("ATOM  "))
++                            && line.length() >= 22
++                            && "SAM".equals(line.substring(17, 20).trim())
++                            && line.charAt(21) == 'B')
++                    .collect(Collectors.joining("\n"));
++            if (sam.isBlank()) {
++                throw new IOException("Predicted complex contains no model-local SAM");
++            }
++            return sam + "\nEND\n";
++        }
+         String accession = structure.getUniProtId();
+         if (accession == null || accession.isBlank()) {
+             throw new IOException("Structure has no UniProt accession");
+diff --git a/software/apps/web-api/src/test/java/totah/lab/web/service/DockingPersistenceIntegrationTest.java b/software/apps/web-api/src/test/java/totah/lab/web/service/DockingPersistenceIntegrationTest.java
+index 1d742c3fd..afd236593 100644
+--- a/software/apps/web-api/src/test/java/totah/lab/web/service/DockingPersistenceIntegrationTest.java
++++ b/software/apps/web-api/src/test/java/totah/lab/web/service/DockingPersistenceIntegrationTest.java
+@@ -182,6 +182,8 @@ class DockingPersistenceIntegrationTest extends DockingTestSchemaSupport {
+         assertEquals(-6.1, poses.get(1).getVinaScore(), 1.0e-9);
+         assertEquals("ligand", poses.get(0).getLigandId());
+         assertEquals("Q6UX53", poses.get(0).getReceptorId());
++        assertTrue(poses.get(0).getLigandLabel().startsWith("m1 "));
++        assertTrue(poses.get(1).getLigandLabel().startsWith("m2 "));
+         String poseFile = poses.get(0).getPoseFile();
+         assertTrue(poseFile.endsWith("ligand_out.pdbqt"), poseFile);
+         assertTrue(Path.of(poseFile).isAbsolute(), poseFile);
+@@ -217,9 +219,33 @@ class DockingPersistenceIntegrationTest extends DockingTestSchemaSupport {
+                 posesArtifact.getPipelineRun().getId());
+     }
+ 
++    @Test
++    void readBackMismatchRollsBackInsteadOfReportingCompletion() {
++        jdbc.execute("""
++                CREATE FUNCTION docking_test.corrupt_pose_for_test()
++                RETURNS trigger LANGUAGE plpgsql AS $$
++                BEGIN NEW.vina_score := NEW.vina_score + 1; RETURN NEW; END $$
++                """);
++        jdbc.execute("""
++                CREATE TRIGGER corrupt_pose_for_test BEFORE INSERT
++                ON docking_test.docking_pose FOR EACH ROW
++                EXECUTE FUNCTION docking_test.corrupt_pose_for_test()
++                """);
++        try {
++            assertThrows(IllegalStateException.class, () -> runner(false).run());
++            assertEquals(0, dockingRunRepository.count());
++            assertEquals(0, dockingPoseRepository.count());
++            assertEquals(0, contactRepository.count());
++        } finally {
++            jdbc.execute("DROP TRIGGER corrupt_pose_for_test ON docking_test.docking_pose");
++            jdbc.execute("DROP FUNCTION docking_test.corrupt_pose_for_test()");
++        }
++    }
++
+     @Test
+     void dryRunWritesNothing() throws Exception {
+-        runner(true).run();
++        runner(fakeVina(3), true).run();
++        assertTrue(Files.notExists(temporaryDirectory.resolve("runs")));
+ 
+         assertEquals(0, dockingRunRepository.count());
+         assertEquals(0, dockingPoseRepository.count());
+diff --git a/software/apps/web-api/src/test/java/totah/lab/web/service/StructureServiceTest.java b/software/apps/web-api/src/test/java/totah/lab/web/service/StructureServiceTest.java
+index 5b36daeb4..ebaa220ab 100644
+--- a/software/apps/web-api/src/test/java/totah/lab/web/service/StructureServiceTest.java
++++ b/software/apps/web-api/src/test/java/totah/lab/web/service/StructureServiceTest.java
+@@ -20,6 +20,27 @@ class StructureServiceTest {
+     @TempDir
+     Path artifactRoot;
+ 
++    @org.junit.jupiter.params.ParameterizedTest
++    @org.junit.jupiter.params.provider.ValueSource(strings = {"chai", "boltz"})
++    void predictedSamUsesItsOwnFrameAndNeverFallsBackWhenMissing(String engine) throws Exception {
++        String sam = "HETATM    1  C1  SAM B   1      99.000  88.000  77.000  1.00 90.00           C";
++        Path file = artifactRoot.resolve("chai.pdb");
++        Files.writeString(file, sam + "\nEND\n");
++        StructureDetailsProjection structure = proxy(StructureDetailsProjection.class,
++                java.util.Map.of("getSourceAccession", engine + "-mettl7b-sam-parent-20261004-model1",
++                        "getUniProtId", "Q6UX53", "getArtifactStorageLocation", "chai.pdb"));
++        StructureRepository repository = proxy(StructureRepository.class,
++                java.util.Map.of("findStructureDetails", Optional.of(structure)));
++        StructureService service = new StructureService(repository,
++                new StructureArtifactService(artifactRoot.toString()));
++        assertThat(service.getValidatedSamFileContent(123L)).isEqualTo(sam + "\nEND\n");
++        Files.writeString(file, "END\n");
++        org.assertj.core.api.Assertions.assertThatThrownBy(
++                () -> service.getValidatedSamFileContent(123L))
++                .isInstanceOf(java.io.IOException.class)
++                .hasMessageContaining("model-local SAM");
++    }
++
+     @Test
+     void findsAllSpatialNeighborsWithoutChangingResidueIdentityOrOrder()
+             throws Exception {
+diff --git a/software/apps/web-ui/src/app/AppShell.tsx b/software/apps/web-ui/src/app/AppShell.tsx
+index fc0e63480..23177d608 100644
+--- a/software/apps/web-ui/src/app/AppShell.tsx
++++ b/software/apps/web-ui/src/app/AppShell.tsx
+@@ -35,8 +35,8 @@ const NAVIGATION: NavigationItem[] = [
+     active: (pathname) => pathname === '/reports/dcmb',
+   },
+   {
+-    label: 'RNA evidence',
+-    description: 'Papers & activator audit',
++    label: 'METTL7 evidence',
++    description: 'Saved runs, sources & RNA audit',
+     path: '/reports/mettl7-evidence',
+     active: (pathname) => pathname === '/reports/mettl7-evidence',
+   },
+diff --git a/software/apps/web-ui/src/features/report/Mettl7EvidenceReportPage.tsx b/software/apps/web-ui/src/features/report/Mettl7EvidenceReportPage.tsx
+index d24d3a2ee..76282e60d 100644
+--- a/software/apps/web-ui/src/features/report/Mettl7EvidenceReportPage.tsx
++++ b/software/apps/web-ui/src/features/report/Mettl7EvidenceReportPage.tsx
+@@ -1,11 +1,25 @@
++import { useState } from 'react'
+ import { useApiQuery } from '../../api/hooks'
+ 
+ interface Report { generatedAt: string; sources: Record<string, unknown>[]; evidence: Record<string, unknown>[]; implicatedFeatures: Record<string, unknown>[]; computationalRuns: Record<string, unknown>[]; focusClashSummary: Record<string, unknown>[]; focusClashes: Record<string, unknown>[]; flexibleRnaSummary: Record<string, unknown>[]; rnaSelectivityContrasts: Record<string, unknown>[]; rnaSelectivityResidues: Record<string, unknown>[]; longRnaFragments: Record<string, unknown>[]; longRnaSummary: Record<string, unknown>[]; klf4FinalValidation: Record<string, unknown>[]; reproducibilityArtifacts: Record<string, unknown>[]; unansweredQuestions: string[] }
+ const text = (value: unknown) => value == null ? '—' : String(value)
+ const label = (value: unknown) => text(value).replaceAll('_', ' ')
+ const verdictClass = (value: unknown) => text(value).includes('DIRECT') ? 'direct' : text(value).includes('INDIRECT') ? 'indirect' : 'context'
++function savedModels(value: unknown): { model: number; structure_id: number }[] {
++  if (!value || typeof value !== 'object') return []
++  const wrapped = value as { type?: string; value?: string; models?: unknown[] }
++  if (wrapped.type === 'jsonb' && typeof wrapped.value === 'string') {
++    try { return savedModels(JSON.parse(wrapped.value)) } catch { return [] }
++  }
++  return Array.isArray(wrapped.models) ? wrapped.models.filter((model): model is { model: number; structure_id: number } => {
++    if (!model || typeof model !== 'object') return false
++    const entry = model as { model?: number; structure_id?: number }
++    return Number.isSafeInteger(entry.model) && Number.isSafeInteger(entry.structure_id) && (entry.structure_id ?? 0) > 0
++  }) : []
++}
+ 
+ export function Mettl7EvidenceReportPage() {
++  const [search, setSearch] = useState('')
+   const { data, loading, error } = useApiQuery<Report>('/api/reports/mettl7-rna-activator')
+   if (loading) return <article className="dcmb-report"><p>Loading evidence audit…</p></article>
+   if (error || !data) return <article className="dcmb-report"><h1>METTL7 evidence audit</h1><p role="alert">{error instanceof Error ? error.message : 'Report unavailable.'}</p></article>
+@@ -14,8 +28,46 @@ export function Mettl7EvidenceReportPage() {
+   const focusPositions = [...new Set(data.focusClashSummary.map((row) => Number(row.residue_number)))].sort((a, b) => a - b)
+   const clashAt = (enzyme: string, position: number) => data.focusClashSummary.find((row) => row.enzyme === enzyme && Number(row.residue_number) === position)
+ 
++  const query = search.trim().toLowerCase()
++  const runs = data.computationalRuns.filter((row) =>
++    JSON.stringify(row).toLowerCase().includes(query))
++
+   return <article className="dcmb-report mettl7-evidence-report">
+-    <header className="dcmb-report-hero mettl7-hero"><div><p className="dcmb-kicker">Saved primary-evidence audit · live PostgreSQL record</p><h1>METTL7 RNA mechanism</h1><p className="dcmb-lede">What is directly established for METTL7A and METTL7B, where the m7G–m6A conflict remains open, and what netarsudil actually does.</p></div><div className="dcmb-gate-stack"><span className="dcmb-gate mettl7-direct">7A m7G · DIRECT</span><span className="dcmb-gate mettl7-class">7B m6A · SUBSTRATE CLASS</span><span className="dcmb-gate insufficient">Netarsudil activation · UNPROVEN</span></div></header>
++    <header className="dcmb-report-hero mettl7-hero"><div><p className="dcmb-kicker">Saved primary-evidence audit · live PostgreSQL record</p><h1>METTL7 evidence and saved runs</h1><p className="dcmb-lede">What is directly established for METTL7A and METTL7B, where the m7G–m6A conflict remains open, and what netarsudil actually does.</p></div><div className="dcmb-gate-stack"><span className="dcmb-gate mettl7-direct">7A m7G · DIRECT</span><span className="dcmb-gate mettl7-class">7B m6A · SUBSTRATE CLASS</span><span className="dcmb-gate insufficient">Netarsudil activation · UNPROVEN</span></div></header>
++
++    <section className="dcmb-section" aria-labelledby="saved-runs-heading">
++      <div className="dcmb-section-heading"><p>Saved PostgreSQL records</p><h2 id="saved-runs-heading">Computational runs and source artifacts</h2></div>
++      <p>These are historical run records, including their original classifications and conclusions. Registration does not establish experimental validity or incorporate later assessments. This list covers the METTL7 run registry; it is not a complete inventory of repository results or individual docking poses.</p>
++      <label htmlFor="mettl7-run-search">Search saved runs</label>{' '}
++      <input id="mettl7-run-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Compound, method, run key or source path" />
++      <p role="status">{runs.length} of {data.computationalRuns.length} saved runs</p>
++      {runs.length === 0 && <p>No matching registered run. This does not establish that an experiment or source artifact does not exist.</p>}
++      <div className="mettl7-evidence-grid">{runs.map((row) => {
++        const artifacts = data.reproducibilityArtifacts.filter((artifact) => artifact.run_key === row.run_key)
++        const models = savedModels(row.protocol)
++        return <article className="mettl7-evidence-card" key={text(row.run_key)}>
++          <h3>{text(row.title)}</h3><code>{text(row.run_key)}</code>
++          <dl>
++            <div><dt>Completed on (recorded)</dt><dd>{text(row.completed_on)}</dd></div>
++            <div><dt>Method / version</dt><dd>{text(row.method)} / {text(row.method_version)}</dd></div>
++            <div><dt>Historical classification</dt><dd>{text(row.classification)}</dd></div>
++            <div><dt>Report path</dt><dd><code>{text(row.report_path)}</code></dd></div>
++            <div><dt>Input path</dt><dd><code>{text(row.input_path)}</code></dd></div>
++          </dl>
++          <p><strong>Recorded conclusion: </strong>{text(row.conclusion)}</p>
++          {models.length > 0 && <nav aria-label={`${text(row.title)} models`}>
++            <p>Open saved complexes (protein + SAM + ligand):</p>
++            <ul>{models.map((model) => <li key={model.structure_id}>
++              <a href={`/structures/${model.structure_id}`}>Model {model.model} · structure {model.structure_id}</a>
++            </li>)}</ul>
++          </nav>}
++          <details><summary>Recorded protocol</summary><pre>{JSON.stringify(row.protocol ?? null, null, 2)}</pre></details>
++          {artifacts.length === 0 ? <p>No downloadable artifact registered for this run.</p> : <ul>{artifacts.map((artifact) => <li key={text(artifact.artifact_key)}>
++            <a href={`/api/reports/mettl7-rna-activator/artifacts/${encodeURIComponent(text(artifact.artifact_key))}`} target="_blank" rel="noreferrer">{text(artifact.artifact_key)}</a>{' '}<code>{text(artifact.repository_path)}</code>
++          </li>)}</ul>}
++        </article>
++      })}</div>
++    </section>
+ 
+     <section className="dcmb-callout"><strong>Hard conclusion</strong><p>Purified METTL7A transfers d3-methyl to defined KLF4 and NFKBIA RNA as internal m7G. Purified METTL7B generates m6A on heterogeneous poly(A) RNA. BMP2 and FILIP1L are strong cellular assignments, but neither is yet a purified, site-defined reaction.</p></section>
+ 
+diff --git a/software/apps/web-ui/src/features/structure/components/MolstarViewer.tsx b/software/apps/web-ui/src/features/structure/components/MolstarViewer.tsx
+index fe95ad9f9..886f46a1c 100644
+--- a/software/apps/web-ui/src/features/structure/components/MolstarViewer.tsx
++++ b/software/apps/web-ui/src/features/structure/components/MolstarViewer.tsx
+@@ -1073,6 +1073,18 @@ async function applyRepresentation(
+     structures[0].cell,
+     PRESETS[representation],
+   )
++  // The polymer-only cartoon preset otherwise hides co-predicted ligands
++  // and cofactors, even though they are present in the saved complex.
++  if (representation === 'cartoon') {
++    const ligands = await viewer.plugin.builders.structure.tryCreateComponentStatic(
++      structures[0].cell, 'ligand', { label: 'Saved ligands and cofactors' },
++    )
++    if (ligands) {
++      await viewer.plugin.builders.structure.representation.addRepresentation(
++        ligands, { type: 'ball-and-stick', color: 'element-symbol' },
++      )
++    }
++  }
+   if (pocket && showPocket) {
+     const component = await viewer.plugin.builders.structure
+       .tryCreateComponentFromExpression(
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/clash/StericClashAnalysis.java b/software/modules/athena/src/main/java/totah/lab/athena/clash/StericClashAnalysis.java
+index 5706eeeb2..db5e510b8 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/clash/StericClashAnalysis.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/clash/StericClashAnalysis.java
+@@ -228,15 +228,27 @@ public final class StericClashAnalysis {
+ 
+         List<Clash> clashes = new ArrayList<>();
+ 
++        // A full receptor frame may be large while the scoped ligand is small.
++        // Visit exactly the same pairs in the same order without an environment/environment
++        // quadratic scan. Unscoped callers retain the original all-pairs traversal.
++        List<Integer> scopedIndices = new ArrayList<>();
++        if (scope != null) {
++            for (int i = 0; i < heavyAtoms.size(); i++) {
++                if (scope.contains(heavyAtoms.get(i).reference())) scopedIndices.add(i);
++            }
++        }
++
+         for (int firstIndex = 0;
+              firstIndex < heavyAtoms.size();
+              firstIndex++) {
+ 
+             HeavyAtom first = heavyAtoms.get(firstIndex);
+ 
+-            for (int secondIndex = firstIndex + 1;
+-                 secondIndex < heavyAtoms.size();
+-                 secondIndex++) {
++            boolean firstScoped = scope == null || scope.contains(first.reference());
++            int end = firstScoped ? heavyAtoms.size() : scopedIndices.size();
++            for (int cursor = firstScoped ? firstIndex + 1 : 0; cursor < end; cursor++) {
++                int secondIndex = firstScoped ? cursor : scopedIndices.get(cursor);
++                if (secondIndex <= firstIndex) continue;
+ 
+                 HeavyAtom second = heavyAtoms.get(secondIndex);
+ 
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrogenBondDetector.java b/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrogenBondDetector.java
+index d1e4e69d4..c0f269b34 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrogenBondDetector.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrogenBondDetector.java
+@@ -56,6 +56,13 @@ public final class HydrogenBondDetector {
+             Structure receptor,
+             Structure ligand,
+             InteractionThresholds thresholds) {
++        return detect(receptor, ligand, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            Structure receptor,
++            Structure ligand,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(receptor, "receptor");
+         Objects.requireNonNull(ligand, "ligand");
+@@ -74,10 +81,10 @@ public final class HydrogenBondDetector {
+                 List<Atom> receptorAtoms = residue.getAtoms();
+                 hydrogenBonds(bonds, residueId,
+                         donorSites(receptorAtoms, thresholds),
+-                        ligandAcceptors, true, thresholds);
++                        ligandAcceptors, true, thresholds, observer);
+                 hydrogenBonds(bonds, residueId,
+                         ligandDonors, acceptors(receptorAtoms),
+-                        false, thresholds);
++                        false, thresholds, observer);
+             }
+         }
+         return List.copyOf(bonds);
+@@ -89,7 +96,7 @@ public final class HydrogenBondDetector {
+             List<DonorSite> donors,
+             List<Atom> acceptors,
+             boolean proteinDonor,
+-            InteractionThresholds thresholds) {
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         for (DonorSite donor : donors) {
+             for (Atom acceptor : acceptors) {
+@@ -99,12 +106,10 @@ public final class HydrogenBondDetector {
+                         .distance(acceptor.getPosition());
+                 double angle = angleDegrees(
+                         donor.heavyAtom(), donor.hydrogen(), acceptor);
+-                if (hydrogenDistance > thresholds.hydrogenAcceptorCutoff()
+-                        || heavyDistance <= thresholds.minDist()
+-                        || heavyDistance > thresholds.donorAcceptorCutoff()
+-                        || angle < thresholds.minDonorAngleDegrees()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", heavyDistance, "hydrogenDistance", hydrogenDistance, "angle", angle);
++                observer.accept("HBOND", proteinDonor ? List.of(donor.heavyAtom(), donor.hydrogen()) : List.of(acceptor),
++                        proteinDonor ? List.of(acceptor) : List.of(donor.heavyAtom(), donor.hydrogen()), measurements);
++                if (InteractionMeasurements.classify("HBOND", measurements, thresholds) == null) continue;
+                 bonds.add(new Interaction(
+                         InteractionType.HYDROGEN_BOND,
+                         residue,
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrophobicContactDetector.java b/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrophobicContactDetector.java
+index d5c4afcea..2de415fce 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrophobicContactDetector.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrophobicContactDetector.java
+@@ -47,6 +47,14 @@ public final class HydrophobicContactDetector {
+             HydrophobicAtoms proteinHydrophobic,
+             HydrophobicAtoms ligandHydrophobic,
+             InteractionThresholds thresholds) {
++        return detect(protein, proteinHydrophobic, ligandHydrophobic, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            Structure protein,
++            HydrophobicAtoms proteinHydrophobic,
++            HydrophobicAtoms ligandHydrophobic,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(protein, "protein");
+         Objects.requireNonNull(proteinHydrophobic, "proteinHydrophobic");
+@@ -64,10 +72,9 @@ public final class HydrophobicContactDetector {
+             for (Atom ligandAtom : ligandHydrophobic.atoms()) {
+                 double distance = proteinAtom.getPosition()
+                         .distance(ligandAtom.getPosition());
+-                if (distance <= thresholds.minDist()
+-                        || distance > thresholds.hydrophobicDistMax()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", distance);
++                observer.accept("HYDROPHOBIC", List.of(proteinAtom), List.of(ligandAtom), measurements);
++                if (InteractionMeasurements.classify("HYDROPHOBIC", measurements, thresholds) == null) continue;
+                 contacts.add(new Interaction(
+                         InteractionType.HYDROPHOBIC_CONTACT,
+                         residue,
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiCationDetector.java b/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiCationDetector.java
+index 8ed656ff7..14bb6b8fd 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiCationDetector.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiCationDetector.java
+@@ -66,6 +66,15 @@ public final class PiCationDetector {
+             List<ChargedGroup> ligandGroups,
+             List<AromaticRing> ligandRings,
+             InteractionThresholds thresholds) {
++        return detect(proteinGroups, proteinRings, ligandGroups, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<ChargedGroup> proteinGroups,
++            List<AromaticRing> proteinRings,
++            List<ChargedGroup> ligandGroups,
++            List<AromaticRing> ligandRings,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinGroups, "proteinGroups");
+         Objects.requireNonNull(proteinRings, "proteinRings");
+@@ -79,7 +88,7 @@ public final class PiCationDetector {
+                 continue;
+             }
+             for (AromaticRing ring : ligandRings) {
+-                evaluate(group, ring, true, thresholds, interactions);
++                evaluate(group, ring, true, thresholds, interactions, observer);
+             }
+         }
+         for (ChargedGroup group : ligandGroups) {
+@@ -87,7 +96,7 @@ public final class PiCationDetector {
+                 continue;
+             }
+             for (AromaticRing ring : proteinRings) {
+-                evaluate(group, ring, false, thresholds, interactions);
++                evaluate(group, ring, false, thresholds, interactions, observer);
+             }
+         }
+         return List.copyOf(interactions);
+@@ -98,33 +107,23 @@ public final class PiCationDetector {
+             AromaticRing ring,
+             boolean proteinGroup,
+             InteractionThresholds thresholds,
+-            List<Interaction> interactions) {
++            List<Interaction> interactions, InteractionMeasurements.Observer observer) {
+ 
+         Optional<Plane3D> plane = InteractionGeometry.ringPlane(ring);
+         if (plane.isEmpty()) {
+             return;
+         }
+         double distance = ring.centroid().distance(group.chargeCenter());
+-        if (distance <= thresholds.minDist()
+-                || distance > thresholds.piCationDistMax()) {
+-            return;
+-        }
+-        double offset = plane.get().centroid()
+-                .distance(plane.get().project(group.chargeCenter()));
+-        if (offset > thresholds.piCationOffsetMax()) {
+-            return;
+-        }
+-        Double tertamineAngle = null;
+-        if (group.type() == ChargedGroupType.AMINE) {
+-            tertamineAngle = tertamineAngle(group, plane.get());
+-            if (tertamineAngle == null) {
+-                // Guard not evaluable (too few neighbor atoms): the
+-                // distance/offset gates alone decide.
+-            } else if (tertamineAngle
+-                    > thresholds.piCationTertamineAngleMax()) {
+-                return;
+-            }
+-        }
++        double offset = plane.get().centroid().distance(plane.get().project(group.chargeCenter()));
++        Double tertamineAngle = group.type() == ChargedGroupType.AMINE ? tertamineAngle(group, plane.get()) : null;
++        var measurements = new java.util.TreeMap<String,Double>();
++        measurements.put("distance", distance); measurements.put("offset", offset);
++        measurements.put("amineGuardRequired", group.type() == ChargedGroupType.AMINE ? 1.0 : 0.0);
++        if (tertamineAngle != null) measurements.put("angle", tertamineAngle);
++        observer.accept("PI_CATION", proteinGroup ? group.atoms() : ring.atoms(),
++                proteinGroup ? ring.atoms() : group.atoms(), measurements);
++        // Preserve native behavior: an unevaluable amine guard is skipped. Registry coverage marks this conditional.
++        if (InteractionMeasurements.classify("PI_CATION", measurements, thresholds) == null) return;
+         interactions.add(new Interaction(
+                 InteractionType.PI_CATION,
+                 proteinGroup ? group.owner() : ring.owner(),
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiStackingDetector.java b/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiStackingDetector.java
+index 5d71261af..5d05fa16b 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiStackingDetector.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/interaction/PiStackingDetector.java
+@@ -54,6 +54,13 @@ public final class PiStackingDetector {
+             List<AromaticRing> proteinRings,
+             List<AromaticRing> ligandRings,
+             InteractionThresholds thresholds) {
++        return detect(proteinRings, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<AromaticRing> proteinRings,
++            List<AromaticRing> ligandRings,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinRings, "proteinRings");
+         Objects.requireNonNull(ligandRings, "ligandRings");
+@@ -75,16 +82,14 @@ public final class PiStackingDetector {
+                 if (ligandPlane.isEmpty()) {
+                     continue;
+                 }
+-                InteractionType type = classify(
+-                        proteinRing, proteinPlane.get(),
+-                        ligandRing, ligandPlane.get(), thresholds);
+-                if (type == null) {
+-                    continue;
+-                }
+-                double distance = proteinRing.centroid()
+-                        .distance(ligandRing.centroid());
+-                double angle = proteinPlane.get()
+-                        .angleToDegrees(ligandPlane.get());
++                double distance = proteinRing.centroid().distance(ligandRing.centroid());
++                double angle = proteinPlane.get().angleToDegrees(ligandPlane.get());
++                double offset = Math.min(inPlaneOffset(proteinPlane.get(), ligandRing.centroid()),
++                        inPlaneOffset(ligandPlane.get(), proteinRing.centroid()));
++                var measurements = Map.of("distance", distance, "angle", angle, "offset", offset);
++                observer.accept("PI_STACKING", proteinRing.atoms(), ligandRing.atoms(), measurements);
++                InteractionType type = InteractionMeasurements.classify("PI_STACKING", measurements, thresholds);
++                if (type == null) continue;
+                 stacks.add(new Interaction(
+                         type,
+                         proteinRing.owner(),
+@@ -101,35 +106,6 @@ public final class PiStackingDetector {
+         return List.copyOf(stacks);
+     }
+ 
+-    private static InteractionType classify(
+-            AromaticRing proteinRing,
+-            Plane3D proteinPlane,
+-            AromaticRing ligandRing,
+-            Plane3D ligandPlane,
+-            InteractionThresholds thresholds) {
+-
+-        double distance = proteinRing.centroid()
+-                .distance(ligandRing.centroid());
+-        if (distance <= thresholds.minDist()
+-                || distance > thresholds.piStackDistMax()) {
+-            return null;
+-        }
+-        double offset = Math.min(
+-                inPlaneOffset(proteinPlane, ligandRing.centroid()),
+-                inPlaneOffset(ligandPlane, proteinRing.centroid()));
+-        if (offset > thresholds.piStackOffsetMax()) {
+-            return null;
+-        }
+-        double angle = proteinPlane.angleToDegrees(ligandPlane);
+-        if (angle <= thresholds.piStackParallelAngleDev()) {
+-            return InteractionType.PI_STACK_PARALLEL;
+-        }
+-        if (Math.abs(90.0 - angle) <= thresholds.piStackTShapeAngleDev()) {
+-            return InteractionType.PI_STACK_T_SHAPED;
+-        }
+-        return null;
+-    }
+-
+     /** In-plane distance of {@code center} projected into {@code plane}. */
+     private static double inPlaneOffset(Plane3D plane, Point3D center) {
+         return plane.centroid().distance(plane.project(center));
+diff --git a/software/modules/athena/src/main/java/totah/lab/athena/interaction/SaltBridgeDetector.java b/software/modules/athena/src/main/java/totah/lab/athena/interaction/SaltBridgeDetector.java
+index 791a42e7f..d4b254a89 100644
+--- a/software/modules/athena/src/main/java/totah/lab/athena/interaction/SaltBridgeDetector.java
++++ b/software/modules/athena/src/main/java/totah/lab/athena/interaction/SaltBridgeDetector.java
+@@ -37,6 +37,13 @@ public final class SaltBridgeDetector {
+             List<ChargedGroup> proteinGroups,
+             List<ChargedGroup> ligandGroups,
+             InteractionThresholds thresholds) {
++        return detect(proteinGroups, ligandGroups, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<ChargedGroup> proteinGroups,
++            List<ChargedGroup> ligandGroups,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinGroups, "proteinGroups");
+         Objects.requireNonNull(ligandGroups, "ligandGroups");
+@@ -50,10 +57,9 @@ public final class SaltBridgeDetector {
+                 }
+                 double distance = proteinGroup.chargeCenter()
+                         .distance(ligandGroup.chargeCenter());
+-                if (distance <= thresholds.minDist()
+-                        || distance > thresholds.saltBridgeDistMax()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", distance);
++                observer.accept("SALT_BRIDGE", proteinGroup.atoms(), ligandGroup.atoms(), measurements);
++                if (InteractionMeasurements.classify("SALT_BRIDGE", measurements, thresholds) == null) continue;
+                 bridges.add(new Interaction(
+                         InteractionType.SALT_BRIDGE,
+                         proteinGroup.owner(),
+diff --git a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceBranchView.java b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceBranchView.java
+index e60ff6f5c..deedb32d5 100644
+--- a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceBranchView.java
++++ b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceBranchView.java
+@@ -28,6 +28,8 @@ public final class EvidenceBranchView {
+     public record DescriptionState(DiscoveryDescription record, Optional<DiscoveryDescription.Withdrawal> withdrawal) {
+         public DescriptionState { Objects.requireNonNull(record); withdrawal = Objects.requireNonNull(withdrawal); }
+     }
++    private final List<EvidenceEnvelope> envelopes;
++    private final List<EvidenceInterpretation> interpretations;
+     private final List<DescriptionState> descriptions;
+     private final List<DiscoveryDescription.Withdrawal> withdrawals;
+     private final EvidenceAdmission.Pin selected;
+@@ -46,6 +48,8 @@ public final class EvidenceBranchView {
+         this.path = List.copyOf(path);
+         this.provenance = List.copyOf(provenance);
+         var history = snapshot.history();
++        envelopes = history.envelopes().values().stream().sorted(Comparator.comparing(EvidenceEnvelope::reference, REFERENCES)).toList();
++        interpretations = history.interpretations().values().stream().sorted(Comparator.comparing(EvidenceInterpretation::reference, REFERENCES)).toList();
+         withdrawals = history.withdrawals().values().stream()
+                 .sorted(Comparator.comparing(DiscoveryDescription.Withdrawal::reference, REFERENCES)).toList();
+         var withdrawalByDescription = new HashMap<ScientificReference, DiscoveryDescription.Withdrawal>();
+@@ -97,6 +101,8 @@ public final class EvidenceBranchView {
+         return new EvidenceBranchView(target.pin(), Objects.requireNonNull(last), path,
+                 firstInclusion.values().stream().sorted(Comparator.comparing(p -> p.record().reference(), REFERENCES)).toList());
+     }
++    public List<EvidenceEnvelope> envelopes() { return envelopes; }
++    public List<EvidenceInterpretation> interpretations() { return interpretations; }
+     public List<DescriptionState> descriptions() { return descriptions; }
+     public List<DiscoveryDescription.Withdrawal> withdrawals() { return withdrawals; }
+     public EvidenceAdmission.Pin selected() { return selected; }
+diff --git a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java
+index 7209a97b0..db69f5322 100644
+--- a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java
++++ b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java
+@@ -31,6 +31,8 @@ public final class EvidenceExchange {
+     public static final String RECORD_SCHEMA = "mnemosyne-record/1";
+     public static final String DISCOVERY_SCHEMA = "mnemosyne-exchange/2";
+     public static final String DISCOVERY_RECORD_SCHEMA = "mnemosyne-record/2";
++    public static final String EVIDENCE_SCHEMA = "mnemosyne-exchange/3";
++    public static final String EVIDENCE_RECORD_SCHEMA = "mnemosyne-record/3";
+     public static final int MAX_BYTES = 16 * 1024 * 1024;
+     private static final Comparator<ScientificReference> REFERENCES = Comparator
+             .comparing((ScientificReference r) -> r.kind().name()).thenComparing(ScientificReference::namespace)
+@@ -59,7 +61,8 @@ public final class EvidenceExchange {
+     public enum RecordType {
+         REFERENCE(ScientificReference.class), OBSERVATION(Observation.class), REVIEW(Review.class),
+         ASSESSMENT(Assessment.class), REVIEW_CHANGE(EvidenceHistory.ReviewChange.class),
+-        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class);
++        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class),
++        ENVELOPE(EvidenceEnvelope.class), INTERPRETATION(EvidenceInterpretation.class);
+         private final Class<?> javaType;
+         RecordType(Class<?> javaType) { this.javaType = javaType; }
+         static RecordType of(Object value) {
+@@ -74,7 +77,7 @@ public final class EvidenceExchange {
+     public record Manifest(String schema, ScientificReference reference, ScientificReference creationActivity,
+                            Instant createdAt, Optional<ScientificReference> parent, List<RecordDigest> records) {
+         public Manifest {
+-            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
++            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema) && !EVIDENCE_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
+             reference.require(SNAPSHOT); creationActivity.require(ACTIVITY); Objects.requireNonNull(createdAt);
+             parent = Objects.requireNonNull(parent); parent.ifPresent(p -> p.require(SNAPSHOT));
+             if (parent.filter(reference::equals).isPresent()) throw new IllegalArgumentException("self-parent snapshot");
+@@ -89,10 +92,11 @@ public final class EvidenceExchange {
+             return other instanceof Snapshot s && manifest.equals(s.manifest)
+                     && history.observations().equals(s.history.observations()) && history.reviews().equals(s.history.reviews())
+                     && history.assessments().equals(s.history.assessments()) && history.changes().equals(s.history.changes())
+-                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals());
++                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals())
++                    && history.envelopes().equals(s.history.envelopes()) && history.interpretations().equals(s.history.interpretations());
+         }
+         @Override public int hashCode() {
+-            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals());
++            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals(), history.envelopes(), history.interpretations());
+         }
+     }
+ 
+@@ -101,7 +105,7 @@ public final class EvidenceExchange {
+         var records = records(history);
+         var entries = new ArrayList<RecordDigest>();
+         for (var record : records) entries.add(new RecordDigest(reference(record), RecordType.of(record), sha256(encodeRecord(record))));
+-        var snapshot = new Snapshot(new Manifest(history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
++        var snapshot = new Snapshot(new Manifest(!history.envelopes().isEmpty() || !history.interpretations().isEmpty() ? EVIDENCE_SCHEMA : history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
+         verify(snapshot);
+         return snapshot;
+     }
+@@ -138,7 +142,7 @@ public final class EvidenceExchange {
+     public Snapshot decode(byte[] bytes) throws IOException {
+         try {
+             var root = parse(bytes); fields(root, "schema", "manifest", "manifestSha256", "records");
+-            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
++            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema")) && !EVIDENCE_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
+             if (!sha256(canonical(root.get("manifest"))).equals(text(root, "manifestSha256")))
+                 throw new IOException("manifest digest mismatch");
+             text(root.get("manifest"), "createdAt");
+@@ -165,8 +169,14 @@ public final class EvidenceExchange {
+ 
+     private void verify(Snapshot snapshot) throws IOException {
+         var records = records(snapshot.history());
+-        if (!snapshot.history().descriptions().isEmpty() && !DISCOVERY_SCHEMA.equals(snapshot.manifest().schema()))
++        if (!snapshot.history().descriptions().isEmpty() && SCHEMA.equals(snapshot.manifest().schema()))
+             throw new IOException("description requires exchange v2");
++        if ((!snapshot.history().envelopes().isEmpty() || !snapshot.history().interpretations().isEmpty()) && !EVIDENCE_SCHEMA.equals(snapshot.manifest().schema()))
++            throw new IOException("opaque evidence requires exchange v3");
++        for (var envelope : snapshot.history().envelopes().values())
++            if (envelope.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates evidence");
++        for (var interpretation : snapshot.history().interpretations().values())
++            if (interpretation.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates interpretation");
+         var actual = new ArrayList<RecordDigest>();
+         for (var record : records) actual.add(new RecordDigest(reference(record), RecordType.of(record), contentDigest(record)));
+         if (!snapshot.manifest().records().equals(actual)) throw new IOException("manifest membership/content mismatch");
+@@ -184,6 +194,8 @@ public final class EvidenceExchange {
+             if (change.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates contained change");
+     }
+     private static String recordSchema(Object record) {
++        if (record instanceof EvidenceEnvelope || record instanceof EvidenceInterpretation
++                || record instanceof ScientificReference r && (r.kind() == EVIDENCE_ENVELOPE || r.kind() == EVIDENCE_INTERPRETATION)) return EVIDENCE_RECORD_SCHEMA;
+         if (record instanceof DiscoveryDescription || record instanceof DiscoveryDescription.Withdrawal
+                 || record instanceof ScientificReference r && (r.kind() == DISCOVERY_DESCRIPTION || r.kind() == DISCOVERY_WITHDRAWAL))
+             return DISCOVERY_RECORD_SCHEMA;
+@@ -201,13 +213,23 @@ public final class EvidenceExchange {
+             for (var r : records) if (r instanceof Assessment assessment) history = history.append(assessment);
+             for (var r : records) if (r instanceof DiscoveryDescription description) history = history.append(description);
+             for (var r : records) if (r instanceof DiscoveryDescription.Withdrawal withdrawal) history = history.append(withdrawal);
++            for (var r : records) if (r instanceof EvidenceEnvelope e) history = history.append(e);
++            var pending = new ArrayList<EvidenceInterpretation>();
++            for (var r : records) if (r instanceof EvidenceInterpretation i) pending.add(i);
++            while (!pending.isEmpty()) {
++                int before = pending.size();
++                for (var i : List.copyOf(pending)) if (i.supersedes().isEmpty() || history.interpretations().containsKey(i.supersedes().orElseThrow())) {
++                    history = history.append(i); pending.remove(i);
++                }
++                if (pending.size() == before) throw new IllegalArgumentException("unresolved/cyclic interpretation ancestry");
++            }
+             return history;
+         } catch (IllegalArgumentException | NullPointerException error) { throw new IOException("inconsistent self-contained history", error); }
+     }
+     private Object readRecord(JsonNode wrapper) throws IOException {
+         fields(wrapper, "schema", "type", "data");
+         String schema = text(wrapper, "schema");
+-        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
++        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema) && !EVIDENCE_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
+         if (!wrapper.get("data").isObject()) throw new IOException("record data object required");
+         try {
+             var type = RecordType.valueOf(text(wrapper, "type"));
+@@ -216,6 +238,7 @@ public final class EvidenceExchange {
+             if (type == RecordType.ASSESSMENT) text(data, "recordedAt");
+             if (type == RecordType.REVIEW_CHANGE) { text(data, "effectiveAt"); text(data, "recordedAt"); }
+             if (type == RecordType.DISCOVERY_DESCRIPTION || type == RecordType.DISCOVERY_WITHDRAWAL) text(data, "recordedAt");
++            if (type == RecordType.ENVELOPE || type == RecordType.INTERPRETATION) text(data, "recordedAt");
+             Object record = json.treeToValue(data, type.javaType);
+             if (!recordSchema(record).equals(text(wrapper, "schema"))) throw new IOException("record type/schema mismatch");
+             return record;
+@@ -226,6 +249,7 @@ public final class EvidenceExchange {
+         var result = new ArrayList<Object>(); result.addAll(history.observations().values()); result.addAll(history.reviews().values());
+         result.addAll(history.assessments().values()); result.addAll(history.changes().values());
+         result.addAll(history.descriptions().values()); result.addAll(history.withdrawals().values());
++        result.addAll(history.envelopes().values()); result.addAll(history.interpretations().values());
+         result.sort(Comparator.comparing(EvidenceExchange::reference, REFERENCES)); return List.copyOf(result);
+     }
+     private static ScientificReference reference(Object record) {
+@@ -233,6 +257,7 @@ public final class EvidenceExchange {
+             case Observation o -> o.reference(); case Review r -> r.reference(); case Assessment a -> a.reference();
+             case EvidenceHistory.ReviewChange c -> c.reference();
+             case DiscoveryDescription d -> d.reference(); case DiscoveryDescription.Withdrawal w -> w.reference();
++            case EvidenceEnvelope e -> e.reference(); case EvidenceInterpretation i -> i.reference();
+             default -> throw new IllegalArgumentException("only history records may be contained in snapshots");
+         };
+     }
+diff --git a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java
+index 2e517ef6e..dcb778ed4 100644
+--- a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java
++++ b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java
+@@ -23,14 +23,17 @@ public final class EvidenceHistory {
+     private final Map<ScientificReference, DiscoveryDescription> descriptions;
+     private final Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals;
+ 
+-    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
++    private final Map<ScientificReference, EvidenceEnvelope> envelopes;
++    private final Map<ScientificReference, EvidenceInterpretation> interpretations;
++    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
+     private EvidenceHistory(Map<ScientificReference, Observation> observations, Map<ScientificReference, Review> reviews,
+                             Map<ScientificReference, Assessment> assessments, Map<ScientificReference, ReviewChange> changes,
+                             Map<ScientificReference, DiscoveryDescription> descriptions,
+-                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals) {
++                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals, Map<ScientificReference, EvidenceEnvelope> envelopes, Map<ScientificReference, EvidenceInterpretation> interpretations) {
+         this.observations = Map.copyOf(observations); this.reviews = Map.copyOf(reviews);
+         this.assessments = Map.copyOf(assessments); this.changes = Map.copyOf(changes);
+         this.descriptions = Map.copyOf(descriptions); this.withdrawals = Map.copyOf(withdrawals);
++        this.envelopes = Map.copyOf(envelopes); this.interpretations = Map.copyOf(interpretations);
+     }
+     public Map<ScientificReference, Observation> observations() { return observations; }
+     public Map<ScientificReference, Review> reviews() { return reviews; }
+@@ -38,12 +41,12 @@ public final class EvidenceHistory {
+     public Map<ScientificReference, ReviewChange> changes() { return changes; }
+     public EvidenceHistory append(Observation observation) {
+         var next = add(observations, observation.reference(), observation);
+-        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals);
++        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(Review review) {
+         require(observations, review.observation());
+         var next = add(reviews, review.reference(), review);
+-        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals);
++        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(Assessment assessment) {
+         if (assessments.containsKey(assessment.reference())) {
+@@ -62,7 +65,7 @@ public final class EvidenceHistory {
+                     || !admissible(review.reference(), assessment.recordedAt(), assessment.recordedAt())))
+                 throw new IllegalArgumentException("finding requires an admissible present observation");
+         }
+-        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals);
++        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+ 
+     /** Historical records are never removed. Retraction/supersession only changes scoped admissibility. */
+@@ -93,7 +96,7 @@ public final class EvidenceHistory {
+                     || !replacement.reviewedAt().isAfter(old.reviewedAt()))
+                 throw new IllegalArgumentException("replacement must be a later review of the same scoped observation by the same reviewer");
+         });
+-        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals);
++        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals, envelopes, interpretations);
+     }
+ 
+     public Map<ScientificReference, DiscoveryDescription> descriptions() { return descriptions; }
+@@ -104,7 +107,7 @@ public final class EvidenceHistory {
+         if (!new EvidenceExchange().contentDigest(observation).equals(description.observationSha256()))
+             throw new IllegalArgumentException("discovery observation digest mismatch");
+         var next = add(descriptions, description.reference(), description);
+-        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals);
++        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(DiscoveryDescription.Withdrawal withdrawal) {
+         if (withdrawals.containsKey(withdrawal.reference())) { add(withdrawals, withdrawal.reference(), withdrawal); return this; }
+@@ -120,7 +123,29 @@ public final class EvidenceHistory {
+                 throw new IllegalArgumentException("replacement must be a later description of the same observation by the same agent");
+         });
+         return new EvidenceHistory(observations, reviews, assessments, changes, descriptions,
+-                add(withdrawals, withdrawal.reference(), withdrawal));
++                add(withdrawals, withdrawal.reference(), withdrawal), envelopes, interpretations);
++    }
++
++    public Map<ScientificReference, EvidenceEnvelope> envelopes() { return envelopes; }
++    public Map<ScientificReference, EvidenceInterpretation> interpretations() { return interpretations; }
++    public EvidenceHistory append(EvidenceEnvelope envelope) {
++        var next = add(envelopes, envelope.reference(), envelope);
++        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, next, interpretations);
++    }
++    public EvidenceHistory append(EvidenceInterpretation interpretation) {
++        for (var input : interpretation.inputs()) {
++            var source = require(envelopes, input.reference());
++            try {
++                if (!new EvidenceExchange().contentDigest(source).equals(input.sha256())) throw new IllegalArgumentException("input evidence digest mismatch");
++            } catch (IOException error) { throw new IllegalArgumentException("unencodable input", error); }
++            if (source.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("interpretation predates evidence");
++        }
++        interpretation.supersedes().ifPresent(id -> {
++            var prior = require(interpretations, id);
++            if (prior.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("supersession predates prior interpretation");
++        });
++        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, envelopes,
++                add(interpretations, interpretation.reference(), interpretation));
+     }
+ 
+     public boolean admissible(ScientificReference reviewId, Instant knownAt, Instant effectiveAt) {
+diff --git a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceSnapshotCatalog.java b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceSnapshotCatalog.java
+index 2f5cbb364..06485fa73 100644
+--- a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceSnapshotCatalog.java
++++ b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceSnapshotCatalog.java
+@@ -76,6 +76,7 @@ public final class EvidenceSnapshotCatalog {
+         var found = find(expected.reference());
+         if (found.isPresent() && !pin(found.orElseThrow()).equals(expected))
+             throw new IOException("catalog snapshot digest mismatch");
++        if (found.isPresent()) for (var envelope : found.orElseThrow().history().envelopes().values()) envelope.verifyArtifact();
+         return found;
+     }
+ 
+@@ -97,6 +98,7 @@ public final class EvidenceSnapshotCatalog {
+     private Result publish(EvidenceExchange.Snapshot incoming, EvidenceAdmission.Expectation expected,
+                            EvidenceAdmission.Result decision) throws IOException {
+         requireDirectory();
++        for (var envelope : incoming.history().envelopes().values()) envelope.verifyArtifact();
+         byte[] bytes = exchange.encode(incoming);
+         var destination = path(incoming.manifest().reference());
+         var existing = find(incoming.manifest().reference());
+diff --git a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
+index 9f39d3c4f..9ea1928b1 100644
+--- a/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
++++ b/software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
+@@ -6,7 +6,7 @@ import java.util.Objects;
+ public record ScientificReference(Kind kind, String namespace, String id, String version) {
+     public enum Kind {
+         ARTIFACT, SOURCE, SUBJECT, ENDPOINT, METHOD, CONTEXT, ACTIVITY, OBSERVATION,
+-        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT, DISCOVERY_DESCRIPTION, DISCOVERY_WITHDRAWAL
++        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT, DISCOVERY_DESCRIPTION, DISCOVERY_WITHDRAWAL, EVIDENCE_ENVELOPE, EVIDENCE_INTERPRETATION
+     }
+ 
+     public ScientificReference {

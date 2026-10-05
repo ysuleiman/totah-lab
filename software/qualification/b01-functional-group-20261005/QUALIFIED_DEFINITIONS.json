@@ -1,0 +1,688 @@
+[
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AMIDE.rule.json",
+    "fileSha256": "116207ed69b6e98d88db3c784dad5909b8b049ccac90e239841aa0515c9a5523",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMIDE",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        1,
+        2,
+        3
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMIDE/negative/1",
+      "patternId": "ATHENA.GROUP.AMIDE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[C;X3;+0](=[O;X1;+0])-[N;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": []
+      },
+      "roles": {
+        "acylSubstituent": [
+          0
+        ],
+        "amideNitrogen": [
+          3
+        ],
+        "carbonylCarbon": [
+          1
+        ],
+        "carbonylOxygen": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": [
+          {
+            "query": "[CH1](=O)N",
+            "reason": "formamide outside initial carbon-substituted acyl domain"
+          },
+          {
+            "query": "C(=O)[N+]",
+            "reason": "charged amide outside neutral amide domain"
+          },
+          {
+            "query": "[C+]-[O-]",
+            "reason": "charge-separated resonance unsupported"
+          },
+          {
+            "query": "[C+]=O",
+            "reason": "charged core outside reviewed neutral amide representation"
+          },
+          {
+            "query": "[C-]=O",
+            "reason": "charged core outside reviewed neutral amide representation"
+          },
+          {
+            "query": "C=[O+]",
+            "reason": "charged core outside reviewed neutral amide representation"
+          },
+          {
+            "query": "C=[O-]",
+            "reason": "charged core outside reviewed neutral amide representation"
+          },
+          {
+            "query": "C(=O)[N-]",
+            "reason": "charged core outside reviewed neutral amide representation"
+          }
+        ]
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.AMIDE/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AROMATIC.rule.json",
+    "fileSha256": "218b65a203fc08fc56646f40291da1afc6ae5b4e1262b2f90dd6d8c45865bf78",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AROMATIC",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AROMATIC/negative/1",
+      "patternId": "ATHENA.GROUP.AROMATIC/pattern",
+      "patternVersion": "1",
+      "query": "c1ccccc1",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": true,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleCharges": {
+          "ringMembers": 0
+        }
+      },
+      "roles": {
+        "ringMembers": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "[c]",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": [
+          {
+            "query": "[n]",
+            "reason": "heteroaromatic domain deferred"
+          },
+          {
+            "query": "[o]",
+            "reason": "heteroaromatic domain deferred"
+          },
+          {
+            "query": "[s]",
+            "reason": "heteroaromatic domain deferred"
+          },
+          {
+            "query": "[p]",
+            "reason": "heteroaromatic domain deferred"
+          }
+        ]
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.AROMATIC/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.CARBONYL.rule.json",
+    "fileSha256": "f33abc13c262e46a9ba8ade910076613192e40f2318e43dbb47dac9786b75c88",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.CARBONYL",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        0,
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.CARBONYL/negative/1",
+      "patternId": "ATHENA.GROUP.CARBONYL/pattern",
+      "patternVersion": "1",
+      "query": "[C;X3;+0]=[O;X1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": []
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "carbonylOxygen": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": [
+          {
+            "query": "[C+]-[O-]",
+            "reason": "charge-separated carbonyl resonance is outside literal neutral C=O domain"
+          },
+          {
+            "query": "[C+]=O",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "[C-]=O",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "C=[O+]",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          },
+          {
+            "query": "C=[O-]",
+            "reason": "charged core outside reviewed neutral carbonyl representation"
+          }
+        ]
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.CARBONYL/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.ESTER.rule.json",
+    "fileSha256": "89f2add5a718d24cbf41ec41357ea61bc7d019ab5e7f652da355605bdd57c354",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.ESTER",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        1,
+        2,
+        3
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.ESTER/negative/1",
+      "patternId": "ATHENA.GROUP.ESTER/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[C;X3;+0](=[O;X1;+0])-[O;X2;+0]-[#6]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": []
+      },
+      "roles": {
+        "acylSubstituent": [
+          0
+        ],
+        "alkoxySubstituent": [
+          4
+        ],
+        "carbonylCarbon": [
+          1
+        ],
+        "carbonylOxygen": [
+          2
+        ],
+        "esterOxygen": [
+          3
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": [
+          {
+            "query": "[CH1](=O)O",
+            "reason": "formate outside initial carbon-substituted acyl domain"
+          },
+          {
+            "query": "[C+]-[O-]",
+            "reason": "charge-separated resonance unsupported"
+          },
+          {
+            "query": "[C+]=O",
+            "reason": "charged core outside reviewed neutral ester representation"
+          },
+          {
+            "query": "[C-]=O",
+            "reason": "charged core outside reviewed neutral ester representation"
+          },
+          {
+            "query": "C=[O+]",
+            "reason": "charged core outside reviewed neutral ester representation"
+          },
+          {
+            "query": "C=[O-]",
+            "reason": "charged core outside reviewed neutral ester representation"
+          },
+          {
+            "query": "C(=O)[O+]",
+            "reason": "charged core outside reviewed neutral ester representation"
+          },
+          {
+            "query": "C(=O)[O-]",
+            "reason": "charged core outside reviewed neutral ester representation"
+          }
+        ]
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.ESTER/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+    "fileSha256": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.METHYL",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.METHYL/negative/1",
+      "patternId": "ATHENA.GROUP.METHYL/pattern",
+      "patternVersion": "1",
+      "query": "[C;H3;+0]-[*]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 3,
+            "role": "methylCarbon"
+          }
+        ],
+        "roleHeavyDegree": {
+          "methylCarbon": 1
+        }
+      },
+      "roles": {
+        "attachment": [
+          1
+        ],
+        "methylCarbon": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": []
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.METHYL/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.THIOL.rule.json",
+    "fileSha256": "eb8185eab385fb34bc7cafb541673fd94e77b2eddf7cef6585e5ce6d5448ef6c",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.THIOL",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.THIOL/negative/1",
+      "patternId": "ATHENA.GROUP.THIOL/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[S;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "S"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 1,
+            "role": "sulfur"
+          }
+        ],
+        "roleHeavyDegree": {
+          "sulfur": 1
+        }
+      },
+      "roles": {
+        "carbonAttachment": [
+          0
+        ],
+        "sulfur": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": []
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.THIOL/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  },
+  {
+    "manifestPath": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.THIOLATE.rule.json",
+    "fileSha256": "c2b040fb95174352d45b7d85dfb41d0f7e2e3d59ec53ee79d30dded29874e833",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.THIOLATE",
+      "limitations": [
+        "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+        "Initial bounded domains only; no resonance/protonation normalization.",
+        "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.THIOLATE/negative/1",
+      "patternId": "ATHENA.GROUP.THIOLATE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[S;H0;-1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "aromaticity": false,
+        "formalCharge": true,
+        "graphCompleteness": true,
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]"
+        },
+        "hydrogenElements": [
+          "S"
+        ],
+        "hydrogenRoles": [
+          {
+            "count": 0,
+            "role": "sulfur"
+          }
+        ],
+        "roleHeavyDegree": {
+          "sulfur": 1
+        }
+      },
+      "roles": {
+        "carbonAttachment": [
+          0
+        ],
+        "sulfur": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/1",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.b01",
+          "version": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S"
+        ],
+        "unsupportedQueries": []
+      }
+    },
+    "negativeCoverage": {
+      "version": "ATHENA.GROUP.THIOLATE/negative/1",
+      "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+      "requirements": [
+        "VALID_DEFINITION",
+        "COMPLETE_GRAPH",
+        "COMPLETE_CHARGE_STATE",
+        "REQUIRED_H_STATE",
+        "AROMATICITY_MODEL",
+        "SUPPORTED_DOMAIN",
+        "EXHAUSTIVE_B00"
+      ],
+      "scope": "EXPLICIT_COMPONENT_ONLY",
+      "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+    }
+  }
+]

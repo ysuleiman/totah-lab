@@ -1,0 +1,64 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.THIOLATE",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_B01_V1",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "1",
+  "qualification": "QUALIFIED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.THIOLATE\",\"limitations\":[\"Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.\",\"Initial bounded domains only; no resonance/protonation normalization.\",\"Implementation qualification does not confer Scientific Rule Research Gate eligibility.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.GROUP.THIOLATE/negative/1\",\"patternId\":\"ATHENA.GROUP.THIOLATE/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[S;H0;-1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\"},\"hydrogenElements\":[\"S\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"sulfur\"}],\"roleHeavyDegree\":{\"sulfur\":1}},\"roles\":{\"carbonAttachment\":[0],\"sulfur\":[1]},\"schema\":\"athena-group-definition/1\",\"sourceReferences\":[{\"id\":\"software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.b01\",\"version\":\"b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/b01-functional-group-contract-review-20261005/DESIGN.txt",
+      "sha256": "b293f434afe486d30641b3bddcd51bd5da44b4ccfa06b3f36e10d15a9d908813",
+      "citation": "User-approved B01 payload contract and bounded group definitions; literal patterns require qualification."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+    "Initial bounded domains only; no resonance/protonation normalization.",
+    "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.THIOLATE/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

@@ -1,0 +1,208 @@
+--- software/qualification/athena-scientific-rules-20261004/before/RuleAnalyzers.java
++++ software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java
+@@ -18,6 +18,11 @@
+ public final class RuleAnalyzers {
+     private RuleAnalyzers() { }
+     private static final ObjectMapper JSON=new ObjectMapper().registerModule(new Jdk8Module());
++    private static final ObjectMapper SCIENTIFIC_JSON=com.fasterxml.jackson.databind.json.JsonMapper.builder()
++            .addModule(new Jdk8Module()).enable(com.fasterxml.jackson.core.JsonParser.Feature.STRICT_DUPLICATE_DETECTION)
++            .disable(MapperFeature.ALLOW_COERCION_OF_SCALARS).enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
++            .enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
++            .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES).build();
+     public static String nativeFamily(String id){return switch(id){
+         case "INT.HBOND.001"->"HBOND";case "INT.HYDRO.001"->"HYDROPHOBIC";case "INT.SALT.001"->"SALT_BRIDGE";
+         case "INT.PIPI.001"->"PI_STACKING";case "INT.CATPI.001"->"PI_CATION";
+@@ -27,7 +32,8 @@
+         fields.put("radius",r.radiusAngstrom());fields.put("hops",r.maximumHops());fields.put("nodes",r.maximumNodes());fields.put("candidates",r.maximumCandidates());
+         fields.put("rule",m.ruleId());fields.put("implementation",m.implementationId()+"/"+m.implementationVersion());
+         // Preparation affects which donors can be measured. Classification cutoffs do not.
+-        if(m.implementationId().equals("native.interaction"))fields.put("donorBondCutoff",m.parameters().get("donorBondCutoff"));
++        if(m.implementationId().equals("athena.scientific"))fields.put("perceptionPatterns",m.parameters().entrySet().stream().filter(e->e.getKey().startsWith("pattern.")).toList());
++        if(m.implementationId().equals("native.interaction")||m.implementationId().equals("athena.scientific"))fields.put("donorBondCutoff",m.parameters().get("donorBondCutoff"));
+         if(m.implementationId().equals("native.clash"))fields.put("clashProtocol",m.parameters());
+         return SystemStateView.digest(fields);
+     }
+@@ -46,13 +52,18 @@
+         void bound(SystemStateView s){if(!s.binding().equals(request.state())||!manifest.key().equals(request.manifestKey())||!RuleRegistry.digest(manifest).equals(request.manifestSha256()))throw new IllegalArgumentException("rule/state/request binding mismatch");}
+         Finding finding(SystemStateView s,EvidenceInterpretation.Status status,Map<String,String> values,String reason){return new Finding(stage,List.of(subjects(s,request)),status,values,List.of(reason),manifest.limitations());}
+     }
+-    public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r){return new Adapter(m,r,"measure") {
++    public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r){return collector(m,r,null);}
++    public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r,totah.lab.athena.design.backend.SubstructureMatcher matcher){return new Adapter(m,r,"measure") {
+         public Set<SystemGraphCertificate.Capability> requires(){return Set.of(DISTANCE_QUERIES);}
+         public Set<String> evidenceTypes(){return Set.of("athena:system-state","athena:rule-request","athena:rule-manifest");}
+         public List<Finding> analyze(SystemStateView s,List<EvidenceEnvelope> inputs,Map<String,String> config)throws Exception {
+             bound(s);var payload=new TreeMap<String,Object>();payload.put("collectionKey",collectionKey(m,r));payload.put("state",s.binding());payload.put("collectorVersion","1");
+             boolean complete=true;
+-            if(m.implementationId().equals("external.plip")||m.ruleId().equals("SULF.PI.001")) {
++            if(m.implementationId().equals("athena.scientific")) {
++                var measurements=AthenaScientificRules.collect(s,m,r,matcher);
++                payload.put("scientific",measurements);
++                complete=measurements.negativeCoverage().values().stream().allMatch(Boolean::booleanValue);
++            } else if(m.implementationId().equals("external.plip")||m.ruleId().equals("SULF.PI.001")) {
+                 payload.put("unsupported",true);payload.put("subjects",r.atoms());payload.put("missing",m.requiredChemistry());
+             } else if(m.implementationId().equals("native.interaction")) {
+                 if(r.first().isEmpty()||r.second().isEmpty())throw new IllegalArgumentException("explicit nonempty partners required");
+@@ -85,7 +96,7 @@
+             if(m.retired())return List.of(finding(s,NOT_EVALUATED,Map.of(),"rule version retired; measurements preserved"));
+             var measurements=inputs.stream().filter(e->e.evidenceType().equals("athena:rule-measurements")).toList();
+             if(measurements.size()!=1)throw new IllegalArgumentException("one exact measurement envelope required");
+-            var root=JSON.readTree(measurements.getFirst().readPayload());
++            var root=(m.implementationId().equals("athena.scientific")?SCIENTIFIC_JSON:JSON).readTree(measurements.getFirst().readPayload());
+             if(root==null||!root.isObject()||!root.path("complete").isBoolean()
+                     ||!root.path("collectorVersion").asText().equals("1")
+                     ||!root.path("state").equals(JSON.valueToTree(s.binding())))throw new IllegalArgumentException("invalid measurement envelope structure/state");
+@@ -93,6 +104,26 @@
+             if(m.implementationId().equals("external.plip")||m.ruleId().equals("SULF.PI.001")||m.ruleId().equals("SULF.VICINAL.001"))
+                 return List.of(finding(s,UNSUPPORTED,Map.of("measurementDigest",measurements.getFirst().payloadSha256()),"classification implementation/prerequisites unqualified; all measurements retained"));
+             if(m.qualification()!=SystemGraphCertificate.Status.QUALIFIED)return List.of(finding(s,NOT_EVALUATED,Map.of(),"manifest is not qualified for execution"));
++            if(m.implementationId().equals("athena.scientific")) {
++                var measured=SCIENTIFIC_JSON.treeToValue(root.get("scientific"),AthenaScientificRules.Measurements.class);
++                if(!measured.coverageVersion().equals(m.negativeCoverage().version())
++                        ||!measured.negativeCoverage().keySet().equals(new HashSet<>(m.negativeCoverage().requirements())))
++                    throw new IllegalArgumentException("negative coverage proof schema/version mismatch");
++                var selected=new ArrayList<Integer>();
++                for(int i=0;i<measured.raw().candidates().size();i++) {
++                    var candidate=measured.raw().candidates().get(i);
++                    if(!candidate.family().equals(AthenaScientificRules.family(m.ruleId())))throw new IllegalArgumentException("scientific family mismatch");
++                    if(measured.candidateSupported().get(i)&&AthenaScientificRules.qualifies(candidate,m))selected.add(i);
++                }
++                boolean negative=measured.negativeCoverage().values().stream().allMatch(Boolean::booleanValue);
++                if(root.path("complete").asBoolean()!=negative)throw new IllegalArgumentException("conflicting aggregate negative coverage");
++                var status=!selected.isEmpty()?SUPPORTED_PRESENT:negative?ABSENT_FALSE:UNKNOWN_INCONCLUSIVE;
++                return List.of(finding(s,status,Map.of("measurementDigest",measurements.getFirst().payloadSha256(),
++                        "manifestDigest",RuleRegistry.digest(m),"negativeCoverage",text(measured.negativeCoverage()),
++                        "coverageVersion",measured.coverageVersion(),"qualifyingCandidateIndices",text(selected)),
++                        !selected.isEmpty()?"supported local candidate; complete absence coverage not implied":
++                                negative?"no qualifying candidate in demonstrably complete supported partner scope":"insufficient negative coverage; absence not established"));
++            }
+             if(!root.path("complete").asBoolean())return List.of(finding(s,UNKNOWN_INCONCLUSIVE,Map.of("measurementDigest",measurements.getFirst().payloadSha256()),"chemistry/geometry coverage incomplete; no absence claim"));
+             boolean present=true;var details=new TreeMap<String,String>();details.put("measurementDigest",measurements.getFirst().payloadSha256());details.put("manifestDigest",RuleRegistry.digest(m));
+             if(m.implementationId().equals("native.interaction")) {
+--- software/qualification/athena-scientific-rules-20261004/before/RuleManifest.java
++++ software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleManifest.java
+@@ -12,7 +12,29 @@
+                            List<String> requiredChemistry, List<String> requiredGeometry,
+                            Map<String,String> measurementsProduced, List<EvidenceInterpretation.Status> classificationStates,
+                            Map<String,Parameter> parameters, List<Source> scientificSources,
+-                           List<Source> referenceArtifacts, List<String> limitations) {
++                           List<Source> referenceArtifacts, List<String> limitations,
++                           @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
++                           NegativeCoverage negativeCoverage) {
++    /** Versioned necessary conditions for a negative, not an assertion that the input satisfies them. */
++    public record NegativeCoverage(String version, String supportedDomain,
++                                   List<String> requirements, String scope, String incompleteStatus) {
++        public NegativeCoverage {
++            text(version);text(supportedDomain);text(scope);
++            requirements=List.copyOf(requirements);requirements.forEach(RuleManifest::text);
++            if(requirements.isEmpty()||new HashSet<>(requirements).size()!=requirements.size()
++                    ||!incompleteStatus.equals("UNKNOWN_INCONCLUSIVE"))throw new IllegalArgumentException("invalid negative coverage policy");
++        }
++    }
++    /** Preserve source compatibility and canonical /1 bytes; /1 never implicitly acquires a /2 policy. */
++    public RuleManifest(String schema,String ruleId,String version,String profile,Family family,String tier,
++                        String implementationId,String implementationVersion,SystemGraphCertificate.Status qualification,
++                        boolean retired,List<SystemGraphCertificate.Capability> requiredCapabilities,List<String> requiredChemistry,
++                        List<String> requiredGeometry,Map<String,String> measurementsProduced,List<EvidenceInterpretation.Status> classificationStates,
++                        Map<String,Parameter> parameters,List<Source> scientificSources,List<Source> referenceArtifacts,List<String> limitations) {
++        this(schema,ruleId,version,profile,family,tier,implementationId,implementationVersion,qualification,retired,
++                requiredCapabilities,requiredChemistry,requiredGeometry,measurementsProduced,classificationStates,parameters,
++                scientificSources,referenceArtifacts,limitations,null);
++    }
+     public enum Family { VALIDATOR, INTERACTION, MOTIF, ENVIRONMENT }
+     public record Parameter(String value, String unit, String definition) {
+         public Parameter {
+@@ -25,7 +47,9 @@
+         public Source {text(locator);text(citation);if(!sha256.matches("[0-9a-f]{64}"))throw new IllegalArgumentException("source digest required");}
+     }
+     public RuleManifest {
+-        if(!"athena-rule/1".equals(schema))throw new IllegalArgumentException("unknown rule schema");
++        if(!Set.of("athena-rule/1","athena-rule/2").contains(schema))throw new IllegalArgumentException("unknown rule schema");
++        if(schema.equals("athena-rule/2")&&negativeCoverage==null)throw new IllegalArgumentException("versioned negative coverage required");
++        if(schema.equals("athena-rule/1")&&negativeCoverage!=null)throw new IllegalArgumentException("legacy schema cannot acquire a new coverage policy");
+         for(var s:List.of(ruleId,version,profile,tier,implementationId,implementationVersion))text(s);
+         Objects.requireNonNull(family);Objects.requireNonNull(qualification);
+         requiredCapabilities=List.copyOf(requiredCapabilities);requiredChemistry=List.copyOf(requiredChemistry);requiredGeometry=List.copyOf(requiredGeometry);
+--- software/qualification/athena-scientific-rules-20261004/before/RuleRegistry.java
++++ software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleRegistry.java
+@@ -12,7 +12,7 @@
+ public final class RuleRegistry {
+     private static final ObjectMapper JSON=new ObjectMapper().enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION)
+             .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES)
+-            .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES).disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
++            .disable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES).disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
+             .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
+     private final Map<String,RuleManifest> manifests;
+     public RuleRegistry(){this(Map.of());}
+@@ -21,7 +21,16 @@
+     public static String digest(RuleManifest manifest){return SystemStateView.digest(manifest);}
+     public static RuleManifest decode(byte[] bytes)throws IOException {
+         if(bytes.length>1024*1024)throw new IOException("manifest exceeds bounded metadata size");
+-        try {var m=JSON.readValue(bytes,RuleManifest.class);validate(m);return m;}
++        try {
++            var root=JSON.readTree(bytes);
++            if(root==null||!root.isObject())throw new IllegalArgumentException("manifest object required");
++            for(var value:root)if(value.isNull())throw new IllegalArgumentException("null manifest field");
++            if(root.path("schema").asText().equals("athena-rule/1")) {
++                if(root.has("negativeCoverage"))throw new IllegalArgumentException("legacy coverage field forbidden");
++                ((com.fasterxml.jackson.databind.node.ObjectNode)root).putNull("negativeCoverage");
++            }
++            var m=JSON.treeToValue(root,RuleManifest.class);validate(m);return m;
++        }
+         catch(IllegalArgumentException e){throw new IOException("invalid rule manifest",e);}
+     }
+     public RuleRegistry register(RuleManifest m) {
+@@ -46,7 +55,22 @@
+                 }
+         }return registry;
+     }
++    public static RuleRegistry scientific()throws IOException {
++        var registry=bundled();String prefix="/totah/lab/athena/system/rules/scientific/";
++        try(var index=RuleRegistry.class.getResourceAsStream(prefix+"index.txt")) {
++            if(index==null)throw new IOException("missing scientific manifest index");
++            for(String name:new String(index.readAllBytes(),java.nio.charset.StandardCharsets.UTF_8).lines().toList())
++                try(var input=RuleRegistry.class.getResourceAsStream(prefix+name)) {
++                    if(input==null)throw new IOException("missing scientific manifest: "+name);
++                    registry=registry.register(decode(input.readAllBytes()));
++                }
++        }return registry;
++    }
+     private static void validate(RuleManifest m) {
++        if(m.implementationId().equals("athena.scientific")) {
++            AthenaScientificRules.validate(m);return;
++        }
++        if(m.negativeCoverage()!=null)throw new IllegalArgumentException("/2 requires its qualified coverage implementation");
+         if(!Set.of("native.interaction","native.geometry","native.clash","native.sulfur","external.plip").contains(m.implementationId())||!m.implementationVersion().equals("1"))throw new IllegalArgumentException("implementation not registered");
+         if(m.implementationId().equals("external.plip")&&m.qualification()==totah.lab.athena.system.SystemGraphCertificate.Status.QUALIFIED)throw new IllegalArgumentException("PLIP execution parity not qualified");
+         if(m.implementationId().equals("external.plip")) {
+@@ -85,7 +109,7 @@
+     }
+     public static InteractionThresholds thresholds(RuleManifest m) {
+         var keys=List.of("minDist","hydrophobicDistMax","saltBridgeDistMax","piStackDistMax","piStackParallelAngleDev","piStackTShapeAngleDev","piStackOffsetMax","piCationDistMax","piCationOffsetMax","piCationTertamineAngleMax","halogenDistMax","halogenAcceptorAngle","halogenDonorAngle","halogenAngleDev","hydrogenAcceptorCutoff","donorAcceptorCutoff","minDonorAngleDegrees","donorBondCutoff");
+-        if(!m.parameters().keySet().equals(new HashSet<>(keys)))throw new IllegalArgumentException("exact native threshold fields required");
++        if(!m.parameters().keySet().stream().filter(k->!m.schema().equals("athena-rule/2")||!k.startsWith("pattern.")).collect(java.util.stream.Collectors.toSet()).equals(new HashSet<>(keys)))throw new IllegalArgumentException("exact native threshold fields required");
+         double[] v=new double[keys.size()];for(int i=0;i<v.length;i++){
+             var p=m.parameters().get(keys.get(i));String expected=(keys.get(i).contains("Angle")?"degree":"angstrom");
+             if(!p.unit().equals(expected))throw new IllegalArgumentException("threshold unit mismatch");
+--- software/qualification/athena-scientific-rules-20261004/before/RuleExecutionPipeline.java
++++ software/modules/daedalus/src/main/java/totah/lab/daedalus/system/RuleExecutionPipeline.java
+@@ -11,7 +11,9 @@
+ /** Evidence-first composition of the existing qualification pipeline, not a new journal. */
+ public final class RuleExecutionPipeline {
+     private final SystemQualificationPipeline pipeline;
+-    public RuleExecutionPipeline(SystemQualificationPipeline pipeline){this.pipeline=Objects.requireNonNull(pipeline);}
++    private final totah.lab.athena.design.backend.SubstructureMatcher matcher;
++    public RuleExecutionPipeline(SystemQualificationPipeline pipeline){this(pipeline,null);}
++    public RuleExecutionPipeline(SystemQualificationPipeline pipeline,totah.lab.athena.design.backend.SubstructureMatcher matcher){this.pipeline=Objects.requireNonNull(pipeline);this.matcher=matcher;}
+     public record Result(SystemQualificationPipeline.Published published,Optional<EvidenceEnvelope> measurements) { }
+     public Result run(EvidenceSnapshotCatalog catalog,SystemQualificationPipeline.Published foundation,
+                       Map<String,String> foundationConfiguration,RuleRegistry registry,byte[] manifestBytes,RuleRequest request,
+@@ -37,7 +39,7 @@
+         var parent=admitted;
+         if(reuseMeasurements.isPresent())measurements=reuseMeasurements.orElseThrow();
+         else {
+-            var collector=RuleAnalyzers.collector(manifest,request);
++            var collector=RuleAnalyzers.collector(manifest,request,matcher);
+             parent=pipeline.run(catalog,Optional.of(admitted.catalogSnapshot()),state,List.of(manifestEnvelope,requestEnvelope),Map.of(),List.of(collector),phase(run,"collection"),at);
+             if(!successful(catalog,parent,collector.method()))return new Result(parent,Optional.empty());
+             var finding=catalog.read(parent.catalogSnapshot()).orElseThrow().history().interpretations().values().stream()

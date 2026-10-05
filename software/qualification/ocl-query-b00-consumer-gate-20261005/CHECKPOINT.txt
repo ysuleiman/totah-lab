@@ -1,0 +1,76 @@
+B00 CONSUMER IMPACT GATE — STOPPED FOR SCIENTIFIC-SEMANTIC MIGRATION REVIEW
+2026-10-05
+
+Status: NOT QUALIFIED. No production implementation, public API, manifest, schema,
+scientific artifact or historical qualification was modified. This checkpoint
+contains a test-only copy of OclMolecularBackend with exactly one change:
+cCountModeUnique -> cCountModeOverlapping. It is an impact experiment, NOT the
+proposed complete B00 implementation and NOT a production alternative matcher.
+The candidate lacks canonical ordering, compiler fixes, H validation and new
+implementation provenance. It must not be activated or treated as qualified.
+
+Consumer trace
+CONSUMERS.txt records source references. AthenaScientificRules.chemistry is the
+only direct production SubstructureMatcher.match caller found under software/modules.
+Its results flow through RuleAnalyzers.collector and Daedalus RuleExecutionPipeline.
+All five ATHENA_SCIENTIFIC_V1 families use this chemistry collection. Hydrogen-bond
+eligibility uses alcohol/carbonyl roles; salt and pi-cation use charged groups.
+Existing fragment/design consumers use the backend's other interfaces; the bounded
+regression run includes replacement and graph/topology edit tests.
+
+Exact migration witness
+Rule: ATHENA.HBOND.DIRECTIONAL; profile ATHENA_SCIENTIFIC_V1; implementation 1.
+Input: synthetic explicit-H methanol plus connected neutral glyoxal (O1=C1-C2=O2).
+See ConsumerImpactProbe.java for the complete immutable graphs and coordinates.
+These deliberately synthetic coordinates are an engineering witness, not a modeled
+binding geometry, optimized chemical conformer or scientific conclusion.
+Pattern: [O;X1;+0]=[C;+0]. Query:0 is the carbonyl role anchor.
+Old: maps O1/C1 only. Candidate: maps both O1/C1 and O2/C2.
+Raw geometry is identical: donor O/H to O1 is 12 A / 11 A, angle 180 degrees;
+to O2 is 2.8 A / 1.8 A, angle 180 degrees.
+Candidate-supported flags: [true,false] -> [true,true].
+SUPPORTED_CHEMICAL_DOMAIN: false -> true.
+Actual governed pipeline verdict (journaled and read back):
+UNKNOWN_INCONCLUSIVE -> SUPPORTED_PRESENT.
+See old.txt, candidate.txt, old-journal and candidate-journal.
+This is a demonstrated verdict change, not just a count or provenance change.
+Historical outputs are not retroactively rewritten or requalified.
+
+Symmetry distinction resolved
+Six direct-OCL/gate JUnit tests pass:
+- benzene+[c]: Unique 1, Overlapping 6 distinct atoms;
+- propane+C: Unique 2, Overlapping 3 distinct atoms;
+- propane+CC: Unique 1, Overlapping 2 bonds, Rigorous 4 embeddings;
+- ethane+CC: Rigorous 2 embeddings, Overlapping 1 occurrence;
+- symmetric diester+C(=O)O: Unique 1, Overlapping 2 distinct occurrences;
+- governed HBOND verdict change with unchanged raw candidates.
+Thus this is loss of genuinely distinct occurrences, not merely automorphism dedup.
+Overlapping alone is NOT qualified as canonical ordering or role-preserving policy.
+
+Validation
+ConsumerGateTest: 6/6 passed (tests.log; junit/).
+Unchanged frozen baseline classes: 115/115 passed (baseline-tests.log; junit-baseline/):
+B00 characterization, AthenaScientificRulesAcceptanceTest, PocketFragmentReplacement,
+GraphEditTransactionEngine and TopologyEditTransactionEngine.
+Parser stack traces in baseline log are preserved pre-fix characterization behavior.
+These runs do NOT establish corrected B00 qualification.
+Independent-JVM corrected replay and remaining correction/regression runs are NOT
+performed: no corrected production implementation was accepted at this gate.
+
+Preservation
+708 existing manifest entries verified without mismatch, including all 52 failed
+B00 pins and all 656 earlier preservation entries. See PRESERVATION.json.
+No unrelated files cleaned, reset, staged or committed.
+
+Required review decision
+Authorize a separately identified/requalified scientific consumer binding to the
+corrected matcher, retaining historical implementation/artifacts for historical
+replay, or specify another reviewed compatibility boundary. Simply changing the
+matcher globally would silently migrate the existing version-1 scientific rule.
+Do not manufacture a new public API or alternate matcher to avoid this gate.
+
+Outstanding B00 work
+Canonical distinct-occurrence/embedding policy, fail-closed compilation and partial
+parse rejection, authoritative source-H validation, corrected implementation identity,
+complete normative/consumer tests and independent-JVM replay remain pending.
+No B01, rule activation, research-gate /3, fragment work or METTL7 interpretation.

@@ -67,6 +67,7 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.group")){FunctionalGroupRules.validate(m);return;}
         if(m.implementationId().equals("athena.scientific")) {
             AthenaScientificRules.validate(m);return;
         }

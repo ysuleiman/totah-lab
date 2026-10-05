@@ -1,0 +1,77 @@
+RULE-BY-RULE STATUS — all profiles ATHENA_SCIENTIFIC_V1 / version1.0.0
+All are QUALIFIED ONLY for their bounded operational supported domain below.
+Scientific energy/affinity/causality validation remains outside scope.
+
+ATHENA.HYDROPHOBIC.CONTACT
+Domain: mapped source-validated neutral carbon sites whose complete source neighbors
+are C/H. Reuse native hydrophobic candidate enumeration, corroborated against full source
+connectivity so a sliced partner cannot hide a bonded heteroatom.
+Geometry: native0.5<d<=4.0 A. No new numerical criterion.
+Negative proof: all selected atoms mapped and chemically validated, neutral carbon
+eligibility fully known, full context bonds/formal charges, all cross-partner candidate
+pairs evaluated without budget exhaustion. Domain-relevant charged carbon remains unknown.
+Legacy disagreement: typed/fallback or unmapped geometry can remain a historical contact
+but cannot alone support this scientific positive or a complete negative.
+Limit: nonpolar-carbon proximity only; not solvent exclusion or hydrophobic binding energy.
+
+ATHENA.HBOND.DIRECTIONAL
+Domain: neutral aliphatic alcohol donors/acceptors and carbonyl O acceptors. Explicit
+source single D-H bond, prepared HD/OA typing and qualified protonation. Existing OCL
+SMARTS roles plus existing native geometry; no new donor engine or added H atoms.
+Geometry: native D-A<=3.5 A, H-A<=2.5 A, D-H-A>=120 degrees, noncoincident lower bound.
+Negative proof: neutral C/H/O supported domain, all O roles recognized, all alcohol H
+atoms explicit/typed, every source donor/acceptor pairing represented by native enumeration,
+correct atom mapping/bond orders/charge/state and exhaustive search.
+Legacy disagreement: nearest-heavy assignment can give a legacy positive with the wrong
+covalent donor; new profile rejects that candidate and reports incomplete enumeration,
+not ABSENT_FALSE. Unknown N/S/ether/other chemistry also blocks a complete negative.
+Limit: does not qualify all donor/acceptor classes, acceptor lone-pair geometry or energetics.
+
+ATHENA.PI_STACKING.GEOMETRY
+Domain: isolated six-member neutral carbon aromatic rings with exact source chemical
+aromaticity/bonding corroboration and evaluable native fitted plane. Existing perception.
+Geometry: center<=5.5 A, minimum projected offset<=2.0 A, parallel folded angle<=30 or
+edge-on within30 degrees of90; all bounds inherited inclusively except global lower bound.
+Negative proof: every selected aromatic atom belongs to a supported complete ring;
+no fused/shared-atom, heteroaromatic, omitted or degraded ring can disappear into FALSE;
+all eligible cross-partner ring pairs evaluated with valid planes and complete mappings.
+Legacy disagreement: templates/AD4 geometry without chemical corroboration, or rings
+outside this bounded domain, are unqualified here even if historically detected.
+Limit: no energetic claim; only existing minimum offset is measured, not fabricated extras.
+
+ATHENA.PI_CATION.GEOMETRY
+Domain: supported tetra-coordinate ammonium group (native AMINE, OCL matched) and
+isolated six-carbon neutral aromatic ring; formal group charge corroborated, state known.
+Geometry: center<=6.0 A, projected offset<=2.0 A. No universal amine-plane angle gate.
+Raw native amine angle/guard information is preserved, so legacy interpretation is reproducible.
+Negative proof: all selected charged sites and aromatic sites accounted for in the supported
+domains, authoritative charge/protonation/mapping, all eligible cross-partner groups/rings
+searched and planes evaluable. Unrecognized cation type cannot count as no cation contact.
+Legacy disagreement: the legacy <=30-degree AMINE guard can reject geometry the new
+scientific profile accepts. Dedicated test retains and demonstrates both interpretations.
+Limit: no group-specific energetic/angular model; other cations/protein templates unsupported.
+
+ATHENA.SALT_BRIDGE.PROXIMITY
+Domain: source-mapped tetra-coordinate ammonium and carboxylate groups, native AMINE/
+CARBOXYLATE types corroborated by OCL patterns and explicit group formal charges/state.
+Geometry: native opposite group-center0.5<d<=5.5 A, explicitly a broad proximity window.
+Negative proof: every selected nonzero formal-charge site represented in a supported
+qualified group, no degraded partial-charge/template fallback, complete candidate enumeration,
+qualified source state and exact chemical/coordinate mapping for all selected atoms.
+Legacy disagreement: uncorroborated fallback/template/other ionic groups do not support
+scientific presence or absence. Complete charge map alone is not complete group perception.
+Limit: not a universally calibrated salt-bridge distance and not electrostatic strength;
+new atom-pair/solvation-dependent definitions would require additional measured evidence.
+
+ALL FIVE
+Every negative requires the explicit8-obligation manifest contract; failure reasons and
+candidate eligibility travel with immutable measurement evidence. Local supported positives
+are retained even when unrelated selected atoms lack chemistry or search is unfinished.
+Schema /2 and coverage policy /1 are required. Missing/unknown/weakened obligation schema
+is rejected, not defaulted. Retirement preserves measurements. New numeric versions can
+reinterpret identical collection scope/patterns; new perception or scope requires separately
+attributed collection. Existing /1 evidence remains unchanged and is not upgraded by inference.
+
+Degenerate/excluded-minimum-distance candidate geometry is not a scientific negative:
+FINITE_GEOMETRY fails its necessary proof, yielding UNKNOWN_INCONCLUSIVE if no other
+supported positive exists. This uses the existing lower bound, not a new clash criterion.

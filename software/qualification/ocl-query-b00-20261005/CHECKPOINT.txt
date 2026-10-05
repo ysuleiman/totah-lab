@@ -1,0 +1,94 @@
+B00 OCL QUERY SEMANTICS — QUALIFICATION ATTEMPT / NOT QUALIFIED
+2026-10-05. No production behavior, API, schema or scientific rule changed.
+
+OUTCOME
+The unchanged SubstructureMatcher/OclMolecularBackend path does NOT satisfy the
+requested reusable all-match/fail-closed B00 contract. Four normative JUnit checks
+fail. Passing characterization tests are not being called successful qualification.
+An approval question is pending about bounded internal corrections versus preserving
+current behavior. No corrective implementation or B01 work has been started.
+
+EXACT VALIDATION
+run.sh:53/53 passed (50 B00 characterization/round-trip checks and3 selected existing
+backend acceptance tests). No conformer generation/minimization tests selected.
+run-required-contract.sh:0/4 passed,4 failed; JUnit exit1.
+Two independent JVM replay artifacts are byte-identical, preserving exact original
+synthetic graph, query text/hash, source-state hash, result mappings and BackendEvidence.
+This demonstrates deterministic replay for identical ordered inputs, not complete
+matching, general dialect equivalence or deterministic representative choice across
+all equivalent graph orderings.
+Bounded build:Java21 javac,6 current production source files compiled unchanged,
+2 module test classes and1 checkpoint-only normative probe, existing cached dependencies,
+256MiB heap. No broad Maven build, scientific artifact generation or external engine.
+
+FOUR REPRODUCIBLE BLOCKERS
+1. All distinct target mappings are not returned.
+   Existing adapter uses SSSearcher.cCountModeUnique, which intentionally accounts for
+   target/query symmetry. Benzene+[c] returns1 target atom instead of all6 distinct
+   stable target atoms; propane+C returns2 instead of3. Propane+CC returns1 instead
+   of both overlapping target bonds. This is NOT just eliminating duplicate maps
+   of the same target set. It cannot support complete ATHENA.GROUP enumeration.
+2. Invalid/unsupported query becomes an empty negative.
+   SmilesParser.parseMolecule catches parser exceptions, prints to stderr and returns
+   null. The search path then returns an empty list, rather than the adapter's checked
+   MolecularBackendException. [z2], [C;Q], [A] and empty text reproduce this.
+3. Source hydrogen-count constraint is ignored by match().
+   A carbon annotated with1 implicit H (positive explicitHydrogens field is a constraint
+   in this graph model) matches[CH4]. OclGraphMapper.validateHydrogenCounts rejects the
+   same source, but match() never calls it. Original bytes survive; modeled matching
+   chemistry nevertheless fails to honor that supplied constraint.
+4. Malformed branch may become a partial valid query.
+   C( produces the same matches as C. A null check alone would not repair this case.
+
+SEMANTICS ESTABLISHED FOR THE TESTED INPUTS
+- Engine:OCL2026.7.2, SMARTS_MODE_IS_SMARTS, cDefaultMatchMode, cCountModeUnique.
+  Source/tag snapshots and installed JAR hashes are preserved in provenance.
+- Element/negation/atom-list, single/double/triple/any bonds, degree and tested R/r
+  queries behave as recorded in query-cases.tsv. This is a bounded dialect corpus,
+  not unrestricted SMARTS certification. No RDKit execution/parity claimed.
+- Lowercase c imposes aromaticity in tested cases. Uppercase C also matches benzene
+  under this OCL path; use explicit nonaromatic constraint for the tested distinction.
+  [C;!a] rejects benzene. Generic[a]/[A] syntax is not assumed supported.
+- Formal charge:explicit[N+] and[N+0] discriminate; bare[N] is unconstrained and
+  matches the positive state. No protonation inference or partial-charge substitution.
+- H counts:OH1/HO explicit-atom fixtures match as recorded; zero in source annotations
+  means historical unspecified. [H] does not expose the explicit H target endpoint in
+  the tested path. [NH3] also matches isolated positive N with inferred4H: do not claim
+  general exact SMARTS H-count equivalence or complete explicit-H mapping.
+- Query dot separates query components; it does not require separate target molecules.
+  C.O matches connected ethanol and separated C/O. CO rejects separated C/O.
+- Query keys are compiled OCL fragment indices, not user map labels or SMARTS text
+  offsets. [C:17] returns query:0; positive recursive[$(C-O)] expands to2 mapped atoms.
+  Recursive flattening must not be represented as a one-token logical-atom map.
+- Asymmetric overlapping CC matches in propanol survive; independently requested
+  nested O and CO matches coexist. Symmetric completeness remains failed.
+- Mapped stable IDs survive tested input permutations and target indices never escape.
+  Match LIST order is repeatable for the exact ordered graph, not canonical under
+  atom permutation. Map iteration order itself has no guarantee (Map.copyOf).
+- Original graph, coordinates/properties and returned collections remain immutable;
+  checked failures for invalid topology and unsupported source stereo are preserved.
+- BackendEvidence contains literal query, backend/version and identity lineage.
+  It does NOT itself contain source-state/query digests. The qualification replay
+  receipt binds them explicitly; this is a TEST artifact, not new production storage
+  or proof that every application caller already persists those bindings.
+
+TRUTHFUL INTERPRETATION TODAY
+The result can mean a returned representative mapping for the compiled query under
+this pinned OCL projection and count mode. It cannot currently mean an exhaustive
+list of every matching source atom set, nor can an empty result generally mean a
+valid query found no match. Source H constraints also require a validated precondition.
+No match implies favorable biology, reactivity, protonation or protein interaction.
+
+NEXT CORRECTION SCOPE REQUIRING THE PENDING DECISION
+Use existing OCL parser/searcher only. Select and document complete match semantics
+(distinct target sets versus every query automorphism), preserve exact correspondences,
+propagate parse/unsupported errors, reject partial malformed queries, validate source
+H constraints and bind compiler/query/state provenance. Recheck bounded legacy callers
+before changing behavior; no B01 classifier or research-gate /3 implementation.
+No second matcher or SMARTS engine is proposed. No fixes have been applied here.
+
+PRESERVATION
+Existing source/checkpoint hashes are checked read-only in PRESERVATION.json. New
+module files are the single JUnit test and synthetic fixture table. New checkpoint
+contains pinned references, reports, replay and probes. No old checkpoints overwritten,
+scientific artifacts changed, git commit/push, docking or energy calculation.

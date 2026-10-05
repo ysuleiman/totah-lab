@@ -1,0 +1,112 @@
+ATHENA SCIENTIFIC RULES — BOUNDED QUALIFICATION CHECKPOINT
+2026-10-04. Stop boundary reached; no commit/push requested or performed.
+Base branch codex/mmp-chemistry-roundtrip; HEAD 9212150b7d32af7ed173ac6697897b4a5661c053.
+Scientific basis: ../athena-rule-definitions-review-20261004/DESIGN.txt, approved by user.
+Additional requirement: explicit versioned sufficient-negative-coverage contract.
+
+OUTCOME
+Five opt-in ATHENA.* scientific profiles, schema athena-rule/2, implementation
+athena.scientific/1. Each manifest contains negativeCoverage: version, supportedDomain,
+requirements, scope, incompleteStatus. All eight requirements are mandatory before
+ABSENT_FALSE. They are actual recorded evaluation inputs, not prose-only suggestions.
+A supported candidate can yield SUPPORTED_PRESENT even with incomplete coverage elsewhere;
+its positive statement is about those identified candidates, not whole-scope completeness.
+
+Qualification means conformance to the approved operational definition within the bounded
+supported chemical domain. It does not mean empirical affinity calibration, exhaustive
+chemistry coverage or validated binding energetics. The operational numeric windows were
+not silently changed. The chemical eligibility and negative-proof requirements are new
+separate profiles. See RULE_STATUS.json and DEFINITIONS_AND_COVERAGE.txt.
+
+ALL EIGHT NECESSARY NEGATIVE OBLIGATIONS, version athena-negative-coverage/1
+EXPLICIT_PARTNER_SCOPE: explicit nonempty disjoint, existing partner selections.
+EXPLICIT_CONNECTIVITY: source declares explicit complete connectivity.
+UNAMBIGUOUS_CHEMICAL_MAPPING: selected atoms have unambiguous validated component mappings;
+  element, formal charge, available coordinates and source bond sets agree. A truncated
+  chemical component with an omitted cross-boundary bond is not complete context.
+SUPPORTED_CHEMICAL_DOMAIN: every relevant site is accounted for in this rule's domain.
+FORMAL_STATE_COVERAGE: complete selected formal charges and required protonation state.
+PERCEPTION_ENUMERATION_COMPLETE: relevant native/OCL role enumeration is complete;
+  no degraded rings/groups, omitted donor identity or unknown required orientation.
+SEARCH_ENUMERATION_COMPLETE: all candidate pairs in selected partners enumerated; no
+  budget exhaustion. No implicit binding-site/distance prefilter narrows the scope.
+FINITE_GEOMETRY: certified finite common frame, evaluable required candidate geometry;
+  candidates at/below the existing minimum-distance exclusion cannot establish a negative.
+No passing candidates + all true -> ABSENT_FALSE within EXPLICIT_PARTNERS_ONLY.
+No passing candidates + any false -> UNKNOWN_INCONCLUSIVE with missing-proof reasons.
+Exception -> FAILED, preserving previously admitted input evidence.
+A supported positive still requires its own source chemical context, charge/state and
+geometry; this is not permission to classify a chemically untyped distance as an interaction.
+
+QUALIFICATION
+377/377 JUnit tests passed: 374 targeted +3 isolated foundation architecture tests;
+0 failed, skipped or aborted. Includes all343 prior tests plus34 new acceptance cases.
+Five families each have supported positive, complete negative and incomplete-scope
+positive/negative controls, and operational boundary checks. Further controls cover
+/1 compatibility, /2 tampering, missing topology/protonation/backend, explicit donor
+identity, unsupported heteroaromatic domains, candidate budgets, matcher failure,
+threshold versioning, retirement, immutable raw evidence and corrupted coverage proof.
+Exact outputs: validation.log, junit/, junit-foundation/.
+Independent JVM replay covers all five scientific profiles; full catalogs/certificates
+are byte-identical. All70 preserved legacy detector/profile/boundary outputs match.
+Final receipt: REPLAY.txt; final replay directories: qualified-checkpoint/.
+Earlier replay directories are pre-final qualification runs, not the final receipt.
+Synthetic chemistry/coordinates only. No frozen METTL7 pose rerun or scientific interpretation.
+The betaine fixture tests existing charged-group machinery using a neutral connected
+zwitterion; synthetic coordinates are not relaxed structures or evidence of physical stability.
+
+REUSE / COMPATIBILITY
+Existing InteractionMeasurements and five detector files unchanged in this milestone.
+Scientific chemistry uses existing SubstructureMatcher/MolecularSanitizer interfaces with
+injected OclMolecularBackend; no athena->athena-openchemlib dependency or new SMARTS engine.
+Existing component MolecularGraphs, Gaia structures, charge assignments and mappings reused.
+No new graph, chemistry representation, evidence store, exchange schema or force field.
+Old19-argument RuleManifest constructor retained; /1 canonical serialization omits the
+new field, decoder compatibility tested. Existing26 resource manifests/index/schema untouched.
+RuleRegistry.bundled() retains the historical26. RuleRegistry.scientific() explicitly
+adds5 scientific profiles (31 total), preserving all historical references and pins.
+No implicit default selection, replacement or migration of old certificates.
+
+Methodological material: all pinned PLIP/OpenFF/Probe audit artifacts preserved. PLIP
+parity is not a qualification gate. Existing water and metal reference registrations
+remain UNSUPPORTED; no new executable water/metal rules. Halogen remains separately gated.
+No sulfur classifier activated or changed.
+
+LIMITATIONS
+- Qualified source MolecularGraph correspondence and chemistry are required on both
+  candidate sides; coordinate-only protein/SAM inputs do not automatically meet this.
+- Domain excludes hetero/fused/other aromatic rings and unqualified ionic motifs.
+- The existing OCL sanitizer can reject net-ion components. Its behavior is not changed
+  or bypassed: failed component qualification is recorded; those atoms cannot support a
+  scientific positive or a complete negative. A supported candidate in another valid
+  component may still be assessed. General net-ion support is not claimed.
+- Legacy protein charge templates are not sufficient by themselves. This version's
+  supported native charged-group types are AMINE and CARBOXYLATE, corroborated by OCL
+  patterns, exact mapping and formal charges. Other types, including unmatched protein
+  template groups, remain outside the qualified domain.
+- HBOND domain is deliberately alcohol/carbonyl C/H/O chemistry, not all N/S donors or
+  acceptors. Source covalent D-H must agree with the existing enumerator; a missed or
+  differently paired donor blocks a negative instead of silently losing it.
+- Ring collector retains existing native geometry; newly requested measurements (e.g.
+  both directional offsets) are not invented from historical payloads.
+- Complete absence concerns the two explicit partner selections, never the full unqueried
+  system. Unrecognized chemistry or insufficient historical fields are not evidence of absence.
+
+PRESERVATION / STOP
+Prior registry checkpoint artifacts/classes/runtime jars remain hash-identical. Exactly
+four pre-existing registry/orchestration sources changed; their originals are in before/.
+No legacy detector, scientific artifact, reference snapshot or historical manifest changed.
+Unrelated tracked diff unchanged; detailed receipts in PRESERVATION.json and source hashes.
+No clean/reset, scientific artifact regeneration, database/UI wiring, fragment growth,
+candidate generation, docking, energy calculation or METTL7 interpretation.
+Stop at this separate checkpoint.
+
+All26 historical manifest digests and the full accepted /1 synthetic pipeline catalog/
+certificate were independently compared against pre-change outputs and match exactly.
+Legacy /1 negative assessments remain historical method outputs: they do not implicitly
+acquire /2 sufficient-negative-coverage proof. No retrospective upgrading of evidence.
+
+Scientific measurement decoding rejects missing obligations, scalar coercion, duplicate
+JSON keys and contradictory aggregate coverage. Corrupt input remains retained with FAILED.
+Replay reproduction: pass a fresh output directory as the first argument to replay.sh;
+qualified output paths are CREATE_NEW and are never silently overwritten.
