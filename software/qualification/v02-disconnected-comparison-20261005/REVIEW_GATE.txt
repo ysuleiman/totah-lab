@@ -1,0 +1,33 @@
+NON-CHARGE CONSUMER REGRESSION — STOP BEFORE ACCEPTING MIGRATION
+2026-10-05; discovered while continuing V02 after bounded checkpoint 73672f080.
+
+Exact supplied synthetic graph: disconnected Na(+1) and Cl(-1), net charge 0,
+coordinates (0,0,0) and (5,0,0), no bonds. No counterion was generated or added to
+another source graph; these two atoms are the complete immutable fixture input.
+Legacy OclMolecularBackend.sanitize(Set.of(), true): valid=true, original graph returned.
+Opt-in corrected sanitizer: throws because TOPOLOGY_VALENCE=FAILED: disconnected graph.
+
+Cause: new OclValidationDimensions.assess calls graph.validateTopology(true).
+Legacy OclGraphMapper.toOcl calls graph.validateTopology(false).
+This is CONNECTIVITY_POLICY_CHANGE, NOT CHARGE_ONLY_CORRECTION.
+The 179 passing checkpoint tests did not exercise this disconnected-source case.
+The earlier immutable checkpoint stays preserved, but it must not be interpreted
+as complete qualification for unrestricted migration. Current program status blocks
+that migration pending this review. Existing no-arg/default production behavior unchanged.
+
+Proposed bounded repair for review (no new Java signatures):
+- Preserve the legacy backend's valid disconnected-topology scope using
+  validateTopology(false), with malformed endpoints/duplicates/self-bonds still failing.
+- Retain explicit nonempty policy separately; do not hide it in connectivity.
+- Evaluate all supplied atoms for valence/H/stereo/coordinates without constructing
+  a new molecule, adding ions or neutralizing anything.
+- Continue recording charge for the supplied graph/component only; no inferred
+  salt parent, no automatic component split or per-fragment neutrality claim.
+- Keep historical SystemGraphValidation's explicit connected-component requirement
+  unchanged. Any new selection of connectedness is a distinct scope, not neutrality.
+- Add the neutral supplied salt and disconnected neutral fragments to old/new
+  consumer comparisons; verify every remaining delta is charge-only or separately
+  identified before qualification. Preserve this failed characterization permanently.
+
+User instruction requires a stop if changed downstream behavior is not attributable
+specifically to the approved charge-only correction. No follow-up fix implemented.

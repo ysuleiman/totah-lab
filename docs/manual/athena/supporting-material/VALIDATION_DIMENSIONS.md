@@ -1,3 +1,7 @@
+> Current limitation: subsequent disconnected-source characterization found an
+> unapproved connectivity restriction. See [review gate](../../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt).
+> The 179-test checkpoint is preserved but does not qualify unrestricted migration.
+
 # Dimensional chemical-state validation (V01 / V02 / V05)
 
 The user-reviewed [API and semantics contract](../../../../software/qualification/validation-dimensions-contract-20261005/DESIGN.txt)
