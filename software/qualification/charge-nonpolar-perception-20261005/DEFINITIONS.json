@@ -1,0 +1,848 @@
+[
+  {
+    "rule": "ATHENA.PERCEPTION.FORMAL_CHARGE.PLUS_ONE",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.FORMAL_CHARGE.PLUS_ONE.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.FORMAL_CHARGE.PLUS_ONE",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.FORMAL_CHARGE.PLUS_ONE/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.FORMAL_CHARGE.PLUS_ONE/pattern",
+      "patternVersion": "1",
+      "query": "[*;+1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "roleCharges": {
+          "feature": 1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.FORMAL_CHARGE.json",
+          "version": "8b21fd289cd9f462be66fe4c1b71d402e50bd606a44b15bd705e93837fac51c8"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE/negative/1",
+      "occurrenceExclusions": [],
+      "patternId": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE/pattern",
+      "patternVersion": "1",
+      "query": "[*;-1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "roleCharges": {
+          "feature": -1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.FORMAL_CHARGE.json",
+          "version": "8b21fd289cd9f462be66fe4c1b71d402e50bd606a44b15bd705e93837fac51c8"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H0/pattern",
+      "patternVersion": "1",
+      "query": "[C;X4;H0;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 4
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H1/pattern",
+      "patternVersion": "1",
+      "query": "[C;X4;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 3
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H2/pattern",
+      "patternVersion": "1",
+      "query": "[C;X4;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 2
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 2
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.SATURATED_C_H3/pattern",
+      "patternVersion": "1",
+      "query": "[C;X4;H3;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 3
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 1
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H0/pattern",
+      "patternVersion": "1",
+      "query": "[c;H0;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 3
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  },
+  {
+    "rule": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1",
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-state-v1/ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1.rule.json",
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1",
+      "limitations": [
+        "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+        "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+        "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+        "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+        "Implementation qualification is not current-policy scientific eligibility."
+      ],
+      "memberQueryIndices": [
+        0
+      ],
+      "negativeCoverageVersion": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1/negative/1",
+      "occurrenceExclusions": [
+        {
+          "id": "heteroatom_neighbor",
+          "patternId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1/heteroatom_neighbor",
+          "patternVersion": "1",
+          "query": "[#6]~[!#6;!#1]",
+          "anchors": {
+            "feature": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Only explicit C/H neighborhoods in this initial subdomain; heteroatom-adjacent carbon is not silently equated.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+              "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+            },
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+              "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+            }
+          ]
+        }
+      ],
+      "patternId": "ATHENA.PERCEPTION.NONPOLAR.AROMATIC_C_H1/pattern",
+      "patternVersion": "1",
+      "query": "[c;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "feature",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "feature": 2
+        },
+        "roleCharges": {
+          "feature": 0
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "feature": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "version": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json",
+          "version": "da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      }
+    }
+  }
+]

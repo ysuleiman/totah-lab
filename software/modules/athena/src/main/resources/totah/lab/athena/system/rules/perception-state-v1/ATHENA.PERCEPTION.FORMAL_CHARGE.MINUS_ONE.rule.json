@@ -1,0 +1,71 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B03",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "state-features": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE\",\"limitations\":[\"Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.\",\"Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.\",\"Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.\",\"Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.\",\"Implementation qualification is not current-policy scientific eligibility.\"],\"memberQueryIndices\":[0],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE/pattern\",\"patternVersion\":\"1\",\"query\":\"[*;-1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[],\"hydrogenRoles\":[],\"roleCharges\":{\"feature\":-1},\"roleHeavyDegree\":{}},\"roles\":{\"feature\":[0]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.FORMAL_CHARGE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"8b21fd289cd9f462be66fe4c1b71d402e50bd606a44b15bd705e93837fac51c8\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+      "sha256": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852",
+      "citation": "Pinned reviewed blueprint and existing local-context substrate"
+    },
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.FORMAL_CHARGE.json",
+      "sha256": "8b21fd289cd9f462be66fe4c1b71d402e50bd606a44b15bd705e93837fac51c8",
+      "citation": "Pinned reviewed blueprint and existing local-context substrate"
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Source-state feature only; no pKa, partial-charge substitution, favorable contact, hydrophobic free energy or biological inference.",
+    "Atomic +/-1 features do not assert a net charged group: nitro/zwitterionic internal charges remain separately attributed.",
+    "Nonpolar candidates here mean only the declared neutral saturated/aromatic C/H neighborhood with authoritative H; other carbon/halogen/sulfur contexts are outside this candidate definition.",
+    "Zero match is only absence of this exact feature in complete reviewed scope; unknown state remains non-negative.",
+    "Implementation qualification is not current-policy scientific eligibility."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.PERCEPTION.FORMAL_CHARGE.MINUS_ONE/negative/1",
+    "supportedDomain": "Complete explicit component, exact charge/H/context subdomain; no universal nonpolar or net-group-charge claim.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}
