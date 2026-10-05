@@ -1,0 +1,263 @@
+PROSPECTIVE RESEARCH-GATE API / SCHEMA CONTRACT — REVIEW REQUIRED
+No production API, schema or behavior is changed by this document.
+This is the exact proposed extension, not an implementation approval.
+
+A. OWNERSHIP AND COMPATIBILITY
+Athena: immutable research metadata and validation beside existing system.rules.
+Daedalus: evidence-first admission and qualified-execution orchestration.
+Mnemosyne: existing EvidenceEnvelope, EvidenceInterpretation and catalog. Unknown
+payloads already survive. No new Observation class or EvidenceExchange revision is
+needed. Proposed typed payload schemas below are opaque evidence types within the
+existing exchange. Do not alter /1,/2,/3 historical EvidenceExchange bytes.
+Gaia/OCL chemistry and system views remain authoritative; no new graph.
+
+RuleManifest /1 and /2 constructors, fields, canonical bytes, digests, loading and
+historical replay stay exactly as now. The five-family checkpoint retains its old
+qualification policy and source/detector behavior. It is NOT current-policy eligible.
+No field is retroactively added to old serialized manifests.
+
+B. MANIFEST /3
+Exact schema identifier: athena-rule/3.
+Append one nullable field to RuleManifest, omitted on serialization for /1 and /2:
+  ResearchBinding research
+Retain BOTH existing constructor signatures (19 and20 fields), forwarding research
+=null. New canonical record constructor has21 fields. This proposed public API
+change requires approval before code edits.
+
+ResearchBinding (all fields required):
+  String schema = "athena-rule-research-binding/1"
+  RuleManifest.Source dossier
+  RuleManifest.Source reviewPolicy
+  RuleManifest.Source domain
+  String definitionSha256
+  String projectionVersion = "athena-rule-definition-projection/1"
+All Source references are immutable SHA-256 pins, not mutable URLs alone.
+For /3 negativeCoverage and research are mandatory. qualification must be
+NOT_EVALUATED: static metadata cannot self-certify current qualification. retired
+continues to be an administrative lifecycle flag. Real current qualification is a
+separate checked receipt. /3 constructor/decode rejects an embedded QUALIFIED claim.
+/1,/2 reject the new research field. Existing decode semantics remain schema-specific.
+
+DEFINITION PROJECTION v1 — EXACT HASH INPUT
+Object containing exactly these existing manifest fields:
+ schema, ruleId, version, profile, family, tier, implementationId,
+ implementationVersion, requiredCapabilities, requiredChemistry, requiredGeometry,
+ measurementsProduced, classificationStates, parameters, scientificSources,
+ referenceArtifacts, limitations, negativeCoverage
+plus:
+ domainSha256 = research.domain.sha256
+Exclude research itself, qualification and retired. The domain digest avoids a
+prose subset test. All scientific criteria, negative requirements, implementation
+version and scientific/source references ARE bound by the definition digest.
+Dossier/policy/certificate references must not also be smuggled into referenceArtifacts
+or scientificSources; this would create a cycle and is rejected during validation.
+Manifest digest binds everything including the eventual dossier/policy pins; dossier
+binds definition projection, never manifest digest. Receipt binds final manifest.
+
+CANONICAL JSON v1 (new artifacts ONLY)
+UTF-8 without BOM/trailing newline. Object keys sorted by Unicode scalar value;
+no whitespace. Arrays preserve their specified order. Strings use JSON escapes for
+quote, backslash and control characters; non-control Unicode emitted directly;
+no normalization; reject unpaired surrogates. Null is forbidden except where schema
+explicitly marks it. No duplicate/unknown properties, scalar coercion or trailing
+JSON. Numeric scientific parameters remain canonical decimal STRINGS (existing
+Parameter); no nonfinite numbers. Booleans true/false. Set-like arrays must be sorted
+and unique by declared identity; ordered scientific arrays remain ordered. SHA-256
+is over these bytes. Artifact source hashes are over ORIGINAL bytes, not canonical
+re-encoding. Existing SystemStateView.bytes and historical digest logic unchanged.
+Implementation should reuse existing JSON facilities, with explicit golden vectors
+for this new codec rather than relying on incidental ObjectMapper defaults.
+
+C. IMMUTABLE SCHEMAS (all objects closed; fields required unless stated)
+1. athena-rule-domain/1:
+   id:string, version:string, entityKinds:[string], chemistryClauses:[string],
+   coordinateClauses:[string], exclusions:[string], perceptionPins:[Source],
+   measurementPins:[Source], negativeCoverageVersion:string
+   These are reviewed clauses with exact identity, not executable logic or a new
+   chemistry language. No dynamic domain inference/subtyping. Current manifest
+   must bind precisely this domain; a changed domain requires a new dossier.
+
+2. athena-rule-research-dossier/1:
+   schema, id, version, ruleKey, definitionSha256, projectionVersion,
+   domain:Source, sources:[Source], implementationAudits:[Audit],
+   literatureAudits:[Audit], datasetAudits:[DatasetAudit], decisions:[Decision],
+   unresolvedRequirements:[string], review:Review
+   Audit = {system, version, applicability, inspectedArtifacts:[Source],
+     entryPoints:[string], perception, measurements, classification,
+     exclusions:[string], limitations:[string]}
+   applicability is APPLICABLE / NOT_APPLICABLE / NO_RULE_IN_INSPECTED_SCOPE /
+     UNINSPECTED. The last cannot satisfy a mandatory applicable audit.
+   DatasetAudit = {id, applicability, sourcePins:[Source], population,
+     releaseOrQuery, inclusionExclusion, redundancyPolicy, preparation,
+     analysisStatus, limitations:[string]}
+   analysisStatus = NOT_ACQUIRED / ACQUIRED_NOT_ANALYZED / ANALYZED;
+     an applicable calibration requirement cannot be satisfied by NOT_ACQUIRED.
+   Decision = {id, criterion, domainSha256, disposition, rationale,
+     sourcePins:[Source], resultingDefinition}
+   disposition = ADOPT / MODIFY / REJECT / UNSUPPORTED.
+   Review = {reviewer:ScientificReference, decisionSource:Source,
+     reviewedAt:UTC-Instant, validUntil:UTC-Instant, policy:Source,
+     approvedDefinitionSha256, approvedDomainSha256}
+   Reviewer identity and authority must be explicitly accepted by the policy; do
+   not fabricate a user's review. Immutable review source is preserved. Current
+   drafts use a DIFFERENT draft schema and cannot deserialize as this final schema.
+
+3. athena-rule-review-policy/1:
+   schema,id,version,applicableRulePrefixes:[string],
+   requiredSystems:[string],requiredAuditCategories:[string],
+   authorizedReviewers:[ScientificReference],
+   authorizedContextIssuers:[ScientificReference],
+   freshnessMode:"EXPLICIT_EXPIRY",requireExpiryAfterReview:true,
+   invalidatingChangeKinds:[string],requiredQualificationChecks:[string],
+   canonicalizationVersion:string
+   Proposed required systems: RDKit/FDef, OpenFF/SMIRNOFF, PLIP, ProLIF,
+   MolProbity/Probe/wwPDB, RING, Athena/OCL; additional applicable systems referenced
+   in the dossier. NOT_APPLICABLE needs sourced rationale, not a missing row.
+   Mandatory changes: domain, perception, measurement, references/distributions,
+   classification/thresholds, negative coverage, implementation version.
+   No arbitrary review age is silently chosen. Each authorized review explicitly
+   sets validUntil; a missing expiry fails closed. All durations/expiry choices
+   remain review decisions, not scientific constants.
+
+4. athena-rule-policy-context/1:
+   schema, policy:Source, invalidations:[Invalidation],
+   asOf:UTC-Instant, issuer:ScientificReference, contextSource:Source
+   Invalidation = {targetSha256, effectiveAt:UTC-Instant, reason, source:Source}
+   Explicit immutable snapshot of known invalidations, not a web lookup. Current
+   request must pin it. CURRENT requires asOf==evaluatedAt and an authorized
+   issuer with attributable contextSource. Historical mode uses its original
+   context/time. Cannot pretend absence of unknown future invalidations is
+   omniscience. Its provenance/time belong to the receipt.
+
+5. athena-rule-research-eligibility/1:
+   schema,manifestSha256,dossierSha256,domainSha256,policySha256,
+   contextSha256,evaluatedAt:UTC-Instant,mode:CURRENT|HISTORICAL_REPLAY,
+   eligible:boolean,reasons:[string],checkedArtifactDigests:[string]
+   Reasons are stable code strings plus attributed explanation in interpretation.
+   Eligibility is an administrative gate result, NOT a new scientific assessment
+   state and NOT QUALIFIED. Reasons sorted; original artifacts remain readable.
+
+6. athena-rule-implementation-qualification/1:
+   schema,ruleKey,definitionSha256,domainSha256,implementationPins:[Source],
+   fixturePins:[Source],checkResults:[Check],reviewer:ScientificReference,
+   reviewSource:Source,completedAt:UTC-Instant
+   Check = {id,passed:boolean,resultArtifact:Source,declaredScope:string}
+   All policy-required check IDs must pass with pinned outputs; missing checks or
+   a caller-supplied unsupported pass claim cannot certify the rule. A report is
+   attributable evidence, not a trusted boolean parameter. No tests run by the gate.
+
+7. athena-rule-qualification-receipt/1:
+   schema,ruleKey,manifestSha256,eligibility:Source,implementationReport:Source,
+   foundationCertificate:Source,stateBinding:Source,request:Source,
+   qualification:existing SystemGraphCertificate.Status,mode,evaluatedAt,
+   reasons:[string]
+   Bound to the concrete request/state/capabilities AND exact rule/domain/method.
+   An eligible dossier with a failed implementation report cannot be QUALIFIED.
+   General INTERACTION_TYPING capability is necessary where requested but does not
+   certify a particular rule/domain. Both certificates must be checked.
+
+8. athena-reference-capability-inventory/1:
+   inventory_id,version,parent_snapshot(optional),source_map,entries[],scope,
+   dispositions,status. Each entry preserves capability/source/version/perception/
+   measurement/classification/Athena-equivalent/status/disposition/rationale/priority/
+   immutable source pins. It is immutable content-addressed discovery metadata.
+   DEFER and ALREADY_COVERED belong here, not to scientific assessment states.
+   Inventory completeness does not make a dossier eligible; no gate needs a global
+   inventory ranking or a current/preferred inventory.
+
+D. PROPOSED PUBLIC JAVA API (signatures; no implementation)
+Package: totah.lab.athena.system.rules.research
+
+public interface ResearchArtifactReader {
+    byte[] read(RuleManifest.Source source) throws java.io.IOException;
+}
+The adapter resolves ONLY supplied admitted artifact pins in an explicit catalog
+snapshot. No filesystem scan or network. Hash verification is mandatory; returned
+bytes are defensively copied. Unknown bytes can be stored even if decoding fails.
+
+public final class ScientificRuleResearchGate {
+    public ResearchEligibility evaluate(
+        RuleManifest manifest, RuleReviewPolicy policy, RulePolicyContext context,
+        ResearchArtifactReader artifacts, java.time.Instant evaluatedAt,
+        QualificationMode mode) throws java.io.IOException;
+}
+Typed records correspond exactly to schemas above; immutable collections/byte
+copies. QualificationMode has CURRENT and HISTORICAL_REPLAY only. An unreadable
+artifact fails the operation with checked I/O; Daedalus appends FAILED and preserves
+already admitted bytes. Missing/invalid/stale inputs yield eligible=false reasons
+when the envelope can be evaluated. Never translate denial to interaction ABSENT_FALSE.
+
+public final class RuleQualification {
+    public static RuleQualificationReceipt qualify(
+        RuleManifest manifest, ResearchEligibility eligibility,
+        RuleImplementationQualification implementation,
+        SystemGraphCertificate foundation, SystemStateView state,
+        RuleRequest request, RulePolicyContext context,
+        ResearchArtifactReader artifacts, java.time.Instant evaluatedAt)
+        throws java.io.IOException;
+}
+Must revalidate eligibility pins/context/time and report authority/checks; never
+trust a public record's fields alone. Cannot accept only an eligible boolean.
+
+RuleRegistry additions:
+  public VerifiedScientificRule requireCurrent(String key, String digest,
+      RuleQualificationReceipt receipt, RulePolicyContext context,
+      ResearchArtifactReader artifacts, java.time.Instant at) throws IOException;
+VerifiedScientificRule is an immutable validated handle with no public constructor;
+contains the existing RuleManifest and checked receipt, not another rule model.
+Existing require/register/load/scientific/bundled remain for definitions/historical
+policy. Their legacy QUALIFIED fields MUST NOT be exposed as current-policy claims.
+
+RuleExecutionPipeline addition:
+  public Result runCurrent(EvidenceSnapshotCatalog catalog,
+      SystemQualificationPipeline.Published foundation,
+      Map<String,String> foundationConfiguration, RuleRegistry registry,
+      byte[] manifestBytes, RuleRequest request,
+      Optional<EvidenceEnvelope> reuseMeasurements,
+      ResearchExecutionInputs research, ScientificReference run, Instant at)
+      throws IOException;
+Exact record addition in Daedalus:
+  public record ResearchExecutionInputs(List<EvidenceEnvelope> artifacts,
+      RuleManifest.Source policyContext, RuleManifest.Source implementationReport) {}
+The immutable artifacts list contains dossier/policy/domain/context/implementation
+envelopes and review/source evidence needed by their pins. Dossier/domain/policy
+selectors come from manifest.research; no implicit latest lookup. Duplicate identity
+with different bytes is a conflict. Envelopes use existing payload/source semantics;
+no new store. Admit all supplied bytes first,
+collect/preserve permitted raw measurements, evaluate gate, issue bound receipt only
+on success, then run qualified classification. On ineligibility preserve measurements
+and append the reason, never fall back to legacy rules. Existing run remains explicit
+historical-policy behavior; /3 rejected there so it cannot bypass runCurrent.
+
+E. ISSUANCE BOUNDARY / REPLAY / TRUST
+Audit all public RuleAnalyzers/RuleRegistry/SystemQualificationPipeline entry points.
+Low-level measurement or legacy analysis may still run, but cannot mint a CURRENT
+rule-qualification claim. Current claim consumers must require the validated handle
+and matching receipt; a raw status enum never suffices. Add adversarial tests for
+forged receipts/manifests, direct evaluator calls and mismatched policy scope.
+Historical receipts replay at original time/policy/context with HISTORICAL_REPLAY;
+replaying them cannot obtain current qualification. Current evaluation uses the
+explicit trusted orchestration time; reject a context not valid as of that time,
+review in future, or evaluatedAt>=validUntil. validUntil is exclusive. Current date
+cannot be overridden by a caller's historical time while still labeled CURRENT;
+the application's time-authority adapter must validate the request. Replay remains
+deterministic because that input and its provenance are explicit, not ambient clock.
+A policy invalidation changes current eligibility but never rewrites old evidence.
+
+F. MANDATORY ACCEPTANCE BEFORE IMPLEMENTATION QUALIFICATION
+- /1 and /2 byte/digest golden fixtures and all existing acceptance tests unchanged.
+- /3 mandatory research/negative coverage; rejects static QUALIFIED and wrong fields.
+- Canonicalization Unicode/order/duplicate-field/boundary golden vectors; no cycles.
+- Missing dossier, bad digest, bad source, unauthorized review, unknown policy,
+  future review, expiry equality, stale context and effective invalidation fail closed.
+- Narrow dossier cannot qualify wider/different chemistry, measurement or negative scope.
+- Fresh complete dossier alone gives eligibility only; failed/missing implementation
+  checks or system capabilities cannot qualify; forged record cannot bypass.
+- Unknown/invalid dossier and measurements survive admission/write/read unchanged.
+- Contradictory/rejected alternatives coexist; new review appends without mutation.
+- All eight source systems have applicability decisions; absence is scoped, not error.
+- Raw measurements remain independent; no implicit legacy fallback on gate failure.
+- Deterministic exact replay; historical mode cannot generate a current handle.
+- Spatial traversal and system qualification cannot imply chemical coupling.
+
+STOP: Review this prospective contract and dossier gaps before ANY production edits.

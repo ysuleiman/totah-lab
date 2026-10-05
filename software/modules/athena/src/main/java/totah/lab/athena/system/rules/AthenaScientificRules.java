@@ -25,7 +25,7 @@ public final class AthenaScientificRules {
     };}
     static void validate(RuleManifest m) {
         family(m.ruleId());
-        if(!m.schema().equals("athena-rule/2")||!(m.profile().equals("ATHENA_SCIENTIFIC_V1")&&m.implementationVersion().equals("1")
+        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!(m.profile().equals("ATHENA_SCIENTIFIC_V1")&&m.implementationVersion().equals("1")
                 ||m.profile().equals("ATHENA_SCIENTIFIC_B00_V2")&&m.implementationVersion().equals("2"))||m.family()!=RuleManifest.Family.INTERACTION)
             throw new IllegalArgumentException("scientific manifest binding");
         var coverage=m.negativeCoverage();

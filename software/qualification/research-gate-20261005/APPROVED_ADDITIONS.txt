@@ -1,0 +1,11 @@
+Explicit user approval in this task: "Approve all three bounded additions".
+Additional entry points:
+ResearchDocuments.encode(Object): byte[]
+ResearchDocuments.decode(byte[], Class<T>): T throws IOException
+RuleQualification.verify(RuleManifest, RuleQualificationReceipt, RulePolicyContext, ResearchArtifactReader, Instant): void throws IOException
+ResearchTimeAuthority.verifyCurrent(RulePolicyContext, Instant): void throws IOException
+RuleExecutionPipeline(SystemQualificationPipeline, SubstructureMatcher, ResearchTimeAuthority)
+No default time authority. The caller's injected authority must authenticate the
+policy context and evaluation time; equality of two untrusted timestamps is not proof.
+Existing constructors retain historical behavior and fail closed for CURRENT without
+an authority. No additional chemical inference or evidence representation is authorized.

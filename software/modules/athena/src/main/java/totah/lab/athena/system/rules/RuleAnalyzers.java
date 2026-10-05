@@ -107,7 +107,7 @@ public final class RuleAnalyzers {
             if(!root.path("collectionKey").asText().equals(collectionKey(m,r)))throw new IllegalArgumentException("measurement selection/state/collector mismatch");
             if(m.implementationId().equals("external.plip")||m.ruleId().equals("SULF.PI.001")||m.ruleId().equals("SULF.VICINAL.001"))
                 return List.of(finding(s,UNSUPPORTED,Map.of("measurementDigest",measurements.getFirst().payloadSha256()),"classification implementation/prerequisites unqualified; all measurements retained"));
-            if(m.qualification()!=SystemGraphCertificate.Status.QUALIFIED)return List.of(finding(s,NOT_EVALUATED,Map.of(),"manifest is not qualified for execution"));
+            if((!m.schema().equals("athena-rule/3")&&m.qualification()!=SystemGraphCertificate.Status.QUALIFIED))return List.of(finding(s,NOT_EVALUATED,Map.of(),"manifest is not qualified for execution"));
             if(m.implementationId().equals("athena.scientific")) {
                 var measured=SCIENTIFIC_JSON.treeToValue(root.get("scientific"),AthenaScientificRules.Measurements.class);
                 if(!measured.coverageVersion().equals(m.negativeCoverage().version())

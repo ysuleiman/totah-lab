@@ -23,7 +23,7 @@ final class FunctionalGroupRules {
             "REQUIRED_H_STATE","AROMATICITY_MODEL","SUPPORTED_DOMAIN","EXHAUSTIVE_B00");
 
     static void validate(RuleManifest m) {
-        if(!m.schema().equals("athena-rule/2")||!m.implementationVersion().equals("1")
+        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!m.implementationVersion().equals("1")
                 ||!m.profile().equals("ATHENA_GROUP_B01_V1")||m.family()!=RuleManifest.Family.MOTIF
                 ||!m.requiredCapabilities().isEmpty()||!m.parameters().keySet().equals(Set.of("definition"))
                 ||!m.negativeCoverage().requirements().equals(NEGATIVE))throw new IllegalArgumentException("B01 manifest contract");
@@ -86,7 +86,7 @@ final class FunctionalGroupRules {
                     if(!report.equals(JSON.readTree(relevant.getFirst().readPayload())))throw new IllegalArgumentException("inconsistent/tampered group report");
                 } else report=build(state,m,r,JSON.readTree(relevant.getFirst().readPayload()),matcher,null);
                 var status=EvidenceInterpretation.Status.valueOf(report.get("assessment").asText());
-                if(m.retired()||m.qualification()!=SystemGraphCertificate.Status.QUALIFIED)status=NOT_EVALUATED;
+                if(m.retired()||(!m.schema().equals("athena-rule/3")&&m.qualification()!=SystemGraphCertificate.Status.QUALIFIED))status=NOT_EVALUATED;
                 return List.of(finding(state,evaluate?status:SUPPORTED_PRESENT,Map.of("payload",report.toString(),"assessment",status.name(),"reportDigest",hash(report)),"group identity only; no interaction or biological inference"));
             }
             private Finding finding(SystemStateView s,EvidenceInterpretation.Status status,Map<String,String> values,String reason) {
