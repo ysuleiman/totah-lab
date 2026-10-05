@@ -1,0 +1,2648 @@
+[
+  {
+    "rule": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X3;H2;+0]",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Carbon-bound neutral nonaromatic N only; acyl/amidino/thioacyl/sulfonyl contexts excluded. Enamines/anilines are constitutional amines here, without acceptor/pKa inference."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 2
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X3;H1;+0](-[#6])",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Carbon-bound neutral nonaromatic N only; acyl/amidino/thioacyl/sulfonyl contexts excluded. Enamines/anilines are constitutional amines here, without acceptor/pKa inference."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H1;+0](-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X3;H0;+0](-[#6])(-[#6])",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2,
+        3
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Carbon-bound neutral nonaromatic N only; acyl/amidino/thioacyl/sulfonyl contexts excluded. Enamines/anilines are constitutional amines here, without acceptor/pKa inference."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;H0;+0](-[#6])(-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 3
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2,
+          3
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X4;H3;+1]",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Exact source +1 N state only; no prediction of protonation or ionizability."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H3;+1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 3
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.PRIMARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X4;H2;+1](-[#6])",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Exact source +1 N state only; no prediction of protonation or ionizability."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H2;+1](-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 2
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.SECONDARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X4;H1;+1](-[#6])(-[#6])",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2,
+        3
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Exact source +1 N state only; no prediction of protonation or ionizability."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H1;+1](-[#6])(-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 3
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2,
+          3
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.TERTIARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND",
+    "query": "[#6]-[N;!a;X4;H0;+1](-[#6])(-[#6])(-[#6])",
+    "members": [
+      1
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2,
+        3,
+        4
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Exact source +1 N state only; no prediction of protonation or ionizability."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X4;H0;+1](-[#6])(-[#6])(-[#6])",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 4
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2,
+          3,
+          4
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+          "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "acyl_or_amidino",
+          "patternId": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND/acyl_or_amidino",
+          "patternVersion": "1",
+          "query": "[N]-[C](=[O,N,S])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        },
+        {
+          "id": "sulfonyl",
+          "patternId": "ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND/sulfonyl",
+          "patternVersion": "1",
+          "query": "[N]-[S](=[O])",
+          "anchors": {
+            "nitrogen": [
+              0
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+              "version": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMMONIUM.QUATERNARY_CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMIDE.NH2",
+    "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H2;+0]",
+    "members": [
+      0,
+      1,
+      2
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        0
+      ],
+      "oxygen": [
+        1
+      ],
+      "nitrogen": [
+        2
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMIDE.NH2",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "N-H-count subclass of literal neutral amide C(=O)-N, retaining urea/carbamate and carbonyl overlap."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMIDE.NH2/negative/1",
+      "patternId": "ATHENA.GROUP.AMIDE.NH2/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H2;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 2
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 1
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "oxygen": [
+          1
+        ],
+        "nitrogen": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMIDE.json",
+          "version": "047c3049e8037c894797c17b6e617e5ecfc1ef50b6d416fa527cf7e83790205b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMIDE.NH2.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMIDE.NH1",
+    "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H1;+0]",
+    "members": [
+      0,
+      1,
+      2
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        0
+      ],
+      "oxygen": [
+        1
+      ],
+      "nitrogen": [
+        2
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMIDE.NH1",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "N-H-count subclass of literal neutral amide C(=O)-N, retaining urea/carbamate and carbonyl overlap."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMIDE.NH1/negative/1",
+      "patternId": "ATHENA.GROUP.AMIDE.NH1/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 2
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "oxygen": [
+          1
+        ],
+        "nitrogen": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMIDE.json",
+          "version": "047c3049e8037c894797c17b6e617e5ecfc1ef50b6d416fa527cf7e83790205b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMIDE.NH1.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AMIDE.NH0",
+    "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H0;+0]",
+    "members": [
+      0,
+      1,
+      2
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        0
+      ],
+      "oxygen": [
+        1
+      ],
+      "nitrogen": [
+        2
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AMIDE.NH0",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "N-H-count subclass of literal neutral amide C(=O)-N, retaining urea/carbamate and carbonyl overlap."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AMIDE.NH0/negative/1",
+      "patternId": "ATHENA.GROUP.AMIDE.NH0/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;H0;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "N"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "nitrogen",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "nitrogen": 3
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "oxygen": [
+          1
+        ],
+        "nitrogen": [
+          2
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMIDE.json",
+          "version": "047c3049e8037c894797c17b6e617e5ecfc1ef50b6d416fa527cf7e83790205b"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMIDE.NH0.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED",
+    "query": "[#6]-[C;!a;X3;H1;+0]=[O;X1;+0]",
+    "members": [
+      1,
+      2
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        1
+      ],
+      "oxygen": [
+        2
+      ],
+      "carbonAttachment": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved."
+      ],
+      "memberQueryIndices": [
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED/negative/1",
+      "patternId": "ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[C;!a;X3;H1;+0]=[O;X1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "carbonylCarbon",
+            "count": 1
+          }
+        ],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          1
+        ],
+        "oxygen": [
+          2
+        ],
+        "carbonAttachment": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBONYL.json",
+          "version": "37d81bf5565fae5d543126d8459abb27de4de5c1427eb0065e66b7484d0a8ec1"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE",
+    "query": "[C;!a;X3;H2;+0]=[O;X1;+0]",
+    "members": [
+      0,
+      1
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        0
+      ],
+      "oxygen": [
+        1
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved."
+      ],
+      "memberQueryIndices": [
+        0,
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE/negative/1",
+      "patternId": "ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;X3;H2;+0]=[O;X1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "C"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "carbonylCarbon",
+            "count": 2
+          }
+        ],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          0
+        ],
+        "oxygen": [
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBONYL.json",
+          "version": "37d81bf5565fae5d543126d8459abb27de4de5c1427eb0065e66b7484d0a8ec1"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.KETONE",
+    "query": "[#6]-[C;!a;X3;+0](=[O;X1;+0])-[#6]",
+    "members": [
+      1,
+      2
+    ],
+    "roles": {
+      "carbonylCarbon": [
+        1
+      ],
+      "oxygen": [
+        2
+      ],
+      "carbonAttachments": [
+        0,
+        3
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.KETONE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved."
+      ],
+      "memberQueryIndices": [
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.KETONE/negative/1",
+      "patternId": "ATHENA.GROUP.KETONE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[C;!a;X3;+0](=[O;X1;+0])-[#6]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbonylCarbon": [
+          1
+        ],
+        "oxygen": [
+          2
+        ],
+        "carbonAttachments": [
+          0,
+          3
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBONYL.json",
+          "version": "37d81bf5565fae5d543126d8459abb27de4de5c1427eb0065e66b7484d0a8ec1"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.KETONE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.NITRILE",
+    "query": "[#6]-[C;!a;X2;+0]#[N;X1;+0]",
+    "members": [
+      1,
+      2
+    ],
+    "roles": {
+      "carbon": [
+        1
+      ],
+      "nitrogen": [
+        2
+      ],
+      "attachment": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.NITRILE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved."
+      ],
+      "memberQueryIndices": [
+        1,
+        2
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.NITRILE/negative/1",
+      "patternId": "ATHENA.GROUP.NITRILE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[C;!a;X2;+0]#[N;X1;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbon": [
+          1
+        ],
+        "nitrogen": [
+          2
+        ],
+        "attachment": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.NITRILE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED",
+    "query": "[#6]-[N;!a;X3;+1](=[O;X1;+0])-[O;X1;-1]",
+    "members": [
+      1,
+      2,
+      3
+    ],
+    "roles": {
+      "nitrogen": [
+        1
+      ],
+      "doubleO": [
+        2
+      ],
+      "anionicO": [
+        3
+      ],
+      "attachment": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "One literal charge-separated resonance drawing; alternative O assignment is not overwritten or normalized."
+      ],
+      "memberQueryIndices": [
+        1,
+        2,
+        3
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED/negative/1",
+      "patternId": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[N;!a;X3;+1](=[O;X1;+0])-[O;X1;-1]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "nitrogen": [
+          1
+        ],
+        "doubleO": [
+          2
+        ],
+        "anionicO": [
+          3
+        ],
+        "attachment": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.NITRO.CHARGE_SEPARATED.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.ALKENE",
+    "query": "[C;!a;+0]=[C;!a;+0]",
+    "members": [
+      0,
+      1
+    ],
+    "roles": {
+      "carbons": [
+        0,
+        1
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.ALKENE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Exact neutral nonaromatic C=C bond identity; unconstrained E/Z is preserved, not assigned."
+      ],
+      "memberQueryIndices": [
+        0,
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.ALKENE/negative/1",
+      "patternId": "ATHENA.GROUP.ALKENE/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;+0]=[C;!a;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbons": [
+          0,
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.ALKENE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.ALKYNE",
+    "query": "[C;!a;+0]#[C;!a;+0]",
+    "members": [
+      0,
+      1
+    ],
+    "roles": {
+      "carbons": [
+        0,
+        1
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.ALKYNE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved."
+      ],
+      "memberQueryIndices": [
+        0,
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.ALKYNE/negative/1",
+      "patternId": "ATHENA.GROUP.ALKYNE/pattern",
+      "patternVersion": "1",
+      "query": "[C;!a;+0]#[C;!a;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "carbons": [
+          0,
+          1
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.ALKYNE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.SULFONE",
+    "query": "[#6]-[S;!a;X4;+0](=[O;X1;+0])(=[O;X1;+0])-[#6]",
+    "members": [
+      1,
+      2,
+      3
+    ],
+    "roles": {
+      "sulfur": [
+        1
+      ],
+      "oxygens": [
+        2,
+        3
+      ],
+      "carbonAttachments": [
+        0,
+        4
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.SULFONE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Literal neutral S(=O)2 representation only; charge-separated sulfur remains outside the reviewed domain."
+      ],
+      "memberQueryIndices": [
+        1,
+        2,
+        3
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.SULFONE/negative/1",
+      "patternId": "ATHENA.GROUP.SULFONE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[S;!a;X4;+0](=[O;X1;+0])(=[O;X1;+0])-[#6]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "S"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "sulfur",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "sulfur": 4
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "sulfur": [
+          1
+        ],
+        "oxygens": [
+          2,
+          3
+        ],
+        "carbonAttachments": [
+          0,
+          4
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.SULFONE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.SULFONAMIDE",
+    "query": "[#6]-[S;!a;X4;+0](=[O;X1;+0])(=[O;X1;+0])-[N;!a;X3;+0]",
+    "members": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "roles": {
+      "sulfur": [
+        1
+      ],
+      "oxygens": [
+        2,
+        3
+      ],
+      "nitrogen": [
+        4
+      ],
+      "carbonAttachment": [
+        0
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.SULFONAMIDE",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Literal neutral S(=O)2-N constitution, no donor/acceptor claim."
+      ],
+      "memberQueryIndices": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.SULFONAMIDE/negative/1",
+      "patternId": "ATHENA.GROUP.SULFONAMIDE/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[S;!a;X4;+0](=[O;X1;+0])(=[O;X1;+0])-[N;!a;X3;+0]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "S"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "sulfur",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "sulfur": 4
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "sulfur": [
+          1
+        ],
+        "oxygens": [
+          2,
+          3
+        ],
+        "nitrogen": [
+          4
+        ],
+        "carbonAttachment": [
+          0
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+          "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.SULFONAMIDE.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.SULFONIUM.CARBON_BOUND",
+    "query": "[#6]-[S;!a;X3;+1](-[#6])-[#6]",
+    "members": [
+      1
+    ],
+    "roles": {
+      "sulfur": [
+        1
+      ],
+      "carbonAttachments": [
+        0,
+        2,
+        3
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.SULFONIUM.CARBON_BOUND",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Constitutional sulfonium only; does not assert SAM identity or sulfonium-pi interaction."
+      ],
+      "memberQueryIndices": [
+        1
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.SULFONIUM.CARBON_BOUND/negative/1",
+      "patternId": "ATHENA.GROUP.SULFONIUM.CARBON_BOUND/pattern",
+      "patternVersion": "1",
+      "query": "[#6]-[S;!a;X3;+1](-[#6])-[#6]",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": false,
+        "hydrogenElements": [
+          "S"
+        ],
+        "hydrogenRoles": [
+          {
+            "role": "sulfur",
+            "count": 0
+          }
+        ],
+        "roleHeavyDegree": {
+          "sulfur": 3
+        },
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "sulfur": [
+          1
+        ],
+        "carbonAttachments": [
+          0,
+          2,
+          3
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.SULFONIUM_PI.json",
+          "version": "7f0bc680c90c2dff8b3bafa73a7b4d5453b47ae09696d495c8dbf5d59d4fa9a6"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.SULFONIUM.CARBON_BOUND.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AROMATIC.RING5",
+    "query": "[*;a]1[*;a][*;a][*;a][*;a]1",
+    "members": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "roles": {
+      "ringAtoms": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AROMATIC.RING5",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Every B00 aromatic cycle of exactly this size; overlapping fused cycles coexist; no planarity or unique cycle-basis claim."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AROMATIC.RING5/negative/1",
+      "patternId": "ATHENA.GROUP.AROMATIC.RING5/pattern",
+      "patternVersion": "1",
+      "query": "[*;a]1[*;a][*;a][*;a][*;a]1",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "ringAtoms": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AROMATIC.json",
+          "version": "423614c70fe4e5c9b5947b1074a71ba316e63b9c622cd632776929c2788df192"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AROMATIC.RING5.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.HETEROAROMATIC.RING5",
+    "query": "[*;a]1[*;a][*;a][*;a][*;a]1",
+    "members": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "roles": {
+      "ringAtoms": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.HETEROAROMATIC.RING5",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "At least one non-carbon atom in this exact aromatic cycle; no pyridine/pyrrole role or tautomer inference."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.HETEROAROMATIC.RING5/negative/1",
+      "patternId": "ATHENA.GROUP.HETEROAROMATIC.RING5/pattern",
+      "patternVersion": "1",
+      "query": "[*;a]1[*;a][*;a][*;a][*;a]1",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "ringAtoms": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HETEROAROMATIC.json",
+          "version": "7f0b888233e03de41632181792ed2f3816d125d924c3f1f50ade1ae1700de5dd"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "all_carbon_ring",
+          "patternId": "ATHENA.GROUP.HETEROAROMATIC.RING5/all_carbon_ring",
+          "patternVersion": "1",
+          "query": "[c]1[c][c][c][c]1",
+          "anchors": {
+            "ringAtoms": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HETEROAROMATIC.json",
+              "version": "7f0b888233e03de41632181792ed2f3816d125d924c3f1f50ade1ae1700de5dd"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.HETEROAROMATIC.RING5.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.AROMATIC.RING6",
+    "query": "[*;a]1[*;a][*;a][*;a][*;a][*;a]1",
+    "members": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "roles": {
+      "ringAtoms": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.AROMATIC.RING6",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "Every B00 aromatic cycle of exactly this size; overlapping fused cycles coexist; no planarity or unique cycle-basis claim."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.AROMATIC.RING6/negative/1",
+      "patternId": "ATHENA.GROUP.AROMATIC.RING6/pattern",
+      "patternVersion": "1",
+      "query": "[*;a]1[*;a][*;a][*;a][*;a][*;a]1",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "ringAtoms": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AROMATIC.json",
+          "version": "423614c70fe4e5c9b5947b1074a71ba316e63b9c622cd632776929c2788df192"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": []
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AROMATIC.RING6.rule.json"
+  },
+  {
+    "rule": "ATHENA.GROUP.HETEROAROMATIC.RING6",
+    "query": "[*;a]1[*;a][*;a][*;a][*;a][*;a]1",
+    "members": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "roles": {
+      "ringAtoms": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "definition": {
+      "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+      "definitionVersion": "1.0.0",
+      "groupId": "ATHENA.GROUP.HETEROAROMATIC.RING6",
+      "limitations": [
+        "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+        "Candidate definition under qualification; current-policy research approval is not conferred.",
+        "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+        "At least one non-carbon atom in this exact aromatic cycle; no pyridine/pyrrole role or tautomer inference."
+      ],
+      "memberQueryIndices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "negativeCoverageVersion": "ATHENA.GROUP.HETEROAROMATIC.RING6/negative/1",
+      "patternId": "ATHENA.GROUP.HETEROAROMATIC.RING6/pattern",
+      "patternVersion": "1",
+      "query": "[*;a]1[*;a][*;a][*;a][*;a][*;a]1",
+      "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+      "requiredState": {
+        "graphCompleteness": true,
+        "formalCharge": true,
+        "aromaticity": true,
+        "hydrogenElements": [],
+        "hydrogenRoles": [],
+        "roleHeavyDegree": {},
+        "hydrogenConsistencyQueries": {
+          "0": "[*;H0]",
+          "1": "[*;H1]",
+          "2": "[*;H2]",
+          "3": "[*;H3]",
+          "4": "[*;H4]"
+        }
+      },
+      "roles": {
+        "ringAtoms": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "schema": "athena-group-definition/2",
+      "sourceReferences": [
+        {
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HETEROAROMATIC.json",
+          "version": "7f0b888233e03de41632181792ed2f3816d125d924c3f1f50ade1ae1700de5dd"
+        }
+      ],
+      "supportedDomain": {
+        "coveredAtomQuery": "",
+        "elements": [
+          "H",
+          "C",
+          "N",
+          "O",
+          "S",
+          "F",
+          "Cl",
+          "Br",
+          "I"
+        ],
+        "unsupportedQueries": []
+      },
+      "occurrenceExclusions": [
+        {
+          "id": "all_carbon_ring",
+          "patternId": "ATHENA.GROUP.HETEROAROMATIC.RING6/all_carbon_ring",
+          "patternVersion": "1",
+          "query": "[c]1[c][c][c][c][c]1",
+          "anchors": {
+            "ringAtoms": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          "hydrogenRoles": [],
+          "rationale": "Exclude this exact anchored constitutional context without suppressing unrelated occurrences.",
+          "sourceReferences": [
+            {
+              "kind": "SOURCE",
+              "namespace": "athena.foundation",
+              "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HETEROAROMATIC.json",
+              "version": "7f0b888233e03de41632181792ed2f3816d125d924c3f1f50ade1ae1700de5dd"
+            }
+          ]
+        }
+      ]
+    },
+    "manifest": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.HETEROAROMATIC.RING6.rule.json"
+  }
+]

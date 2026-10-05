@@ -1,0 +1,65 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.NITRO.CHARGE_SEPARATED\",\"limitations\":[\"Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.\",\"Candidate definition under qualification; current-policy research approval is not conferred.\",\"Original source charges, H state, stereo and correspondence alternatives are preserved.\",\"One literal charge-separated resonance drawing; alternative O assignment is not overwritten or normalized.\"],\"memberQueryIndices\":[1,2,3],\"negativeCoverageVersion\":\"ATHENA.GROUP.NITRO.CHARGE_SEPARATED/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.NITRO.CHARGE_SEPARATED/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;+1](=[O;X1;+0])-[O;X1;-1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[],\"hydrogenRoles\":[],\"roleHeavyDegree\":{}},\"roles\":{\"anionicO\":[3],\"attachment\":[0],\"doubleO\":[2],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+      "sha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
+      "citation": "Existing pinned blueprint/reference inventory; exact literal/state fixtures qualify this bounded identity, not external-engine parity."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+    "One literal charge-separated resonance drawing; alternative O assignment is not overwritten or normalized."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.NITRO.CHARGE_SEPARATED/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

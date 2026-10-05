@@ -1,0 +1,65 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND\",\"limitations\":[\"Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.\",\"Candidate definition under qualification; current-policy research approval is not conferred.\",\"Original source charges, H state, stereo and correspondence alternatives are preserved.\",\"Carbon-bound neutral nonaromatic N only; acyl/amidino/thioacyl/sulfonyl contexts excluded. Enamines/anilines are constitutional amines here, without acceptor/pKa inference.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H2;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":2,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":1}},\"roles\":{\"carbonAttachments\":[0],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json",
+      "sha256": "4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b",
+      "citation": "Existing pinned blueprint/reference inventory; exact literal/state fixtures qualify this bounded identity, not external-engine parity."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved.",
+    "Carbon-bound neutral nonaromatic N only; acyl/amidino/thioacyl/sulfonyl contexts excluded. Enamines/anilines are constitutional amines here, without acceptor/pKa inference."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}
