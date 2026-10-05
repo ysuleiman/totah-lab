@@ -1,0 +1,92 @@
+FOUNDATION INTEGRATION — PROSPECTIVE GOVERNED DIRECT-ASSESSMENT ENTRY POINT
+2026-10-05; base 5125c1490. PUBLIC API REVIEW; NOT IMPLEMENTED.
+
+VERIFIED EXISTING CAPABILITY AND GAP
+SystemQualificationPipeline already durably admits explicit inputs before evaluation
+and persists generic Findings as immutable EvidenceInterpretations. B06 uses it and
+is qualified independently. No replacement pipeline or result representation is needed.
+RuleExecutionPipeline.run intentionally passes only manifest/request (and later raw
+measurements); inherited coverage is NOT selected implicitly. The current-mode runner
+can receive explicit source envelopes in ResearchExecutionInputs.artifacts, but its
+execution path still requires a collector payload followed by an evaluator.
+Direct-assessment rules (e.g. the complete-membership predicate and new S-S predicate)
+produce attributed Findings rather than a new scientific raw-payload schema.
+They should not fabricate a measurement payload solely to satisfy orchestration.
+
+PRESERVED CHARACTERIZATION
+The same source S-S graph and complete coverage yields raw assessment ABSENT_FALSE
+when explicitly supplied to the generic direct evaluator. The legacy runner preserves
+that coverage in history but does not forward it, yielding raw UNKNOWN_INCONCLUSIVE
+and no measurement envelope. Both candidate execution statuses remain NOT_EVALUATED.
+One passing witness records this boundary; it does NOT endorse activating candidates
+or treating inherited history as a current input. run/observed.json + catalog preserve
+exact source and interpretations. No production behavior was changed.
+CurrentRuleExecution.run inspection separately verifies its payload requirement.
+
+PROPOSED ADDITIVE PUBLIC API (EXACT SIGNATURE)
+In existing totah.lab.daedalus.system.RuleExecutionPipeline:
+
+public SystemQualificationPipeline.Published evaluateCurrent(
+    EvidenceSnapshotCatalog catalog,
+    SystemQualificationPipeline.Published foundation,
+    Map<String,String> foundationConfiguration,
+    RuleRegistry registry,
+    byte[] manifestBytes,
+    RuleRequest request,
+    ResearchExecutionInputs research,
+    ScientificReference run,
+    Instant at) throws IOException;
+
+Reuse the existing nested ResearchExecutionInputs. Its artifacts list explicitly
+selects source evidence as well as research artifacts. No additional evidence DTO,
+measurement schema, opaque pseudo-measurement, graph or implicit current selection.
+Returning existing Published represents direct persisted interpretations without
+misusing Result.measurements empty/present as a success indicator.
+Keep run, runCurrent, all constructors, signatures and historical behavior unchanged.
+
+CURRENT-POLICY SEMANTICS
+1. Preserve/read back every explicitly supplied artifact, original manifest/request,
+   foundation certificate and state binding BEFORE parsing, callbacks or assessment.
+2. Require existing /3 binding, registered exact manifest/request/state and matching
+   foundation configuration. Do not accept /2 as current or silently upgrade it.
+3. Reuse ResearchDocuments, ScientificRuleResearchGate, RuleQualification.qualify,
+   receipt verification, registry.requireCurrent and existing time authority. Eligibility
+   alone never authorizes assessment and never confers qualification.
+4. Persist eligibility/implementation-qualification/receipt results as currently done.
+   Missing/stale/invalid artifacts, time failure, foundation mismatch or invalid receipt
+   prevents evaluator execution, retains input evidence and yields attributed failure.
+5. Immediately before evaluating recheck time/receipt via the existing guarded path.
+   Invoke the registered evaluator once with the explicitly selected applicable inputs.
+   Preserve every Finding/status, including independent contradictory assertions.
+6. Use existing SystemQualificationPipeline persistence/certification; grant no new
+   SystemGraphCertificate capability merely because a rule emits a positive finding.
+
+INITIAL BOUNDED ADAPTER SCOPE
+Allow an explicit /3 binding for the new source S-S implementation after the existing
+review/qualification machinery verifies it. Its source-connectivity definition is
+unchanged; /2 candidate status behavior remains unchanged. Do not migrate the historical
+SULF.SS.001, activate other direct predicates, create review expiry dates, or manufacture
+real qualification receipts. Synthetic dossiers/policies in acceptance tests are
+engineering fixtures only. Actual current-policy activation remains separately gated.
+No rule IDs are inferred from payload appearance; unsupported execution paths fail closed.
+
+REUSE / IMPLEMENTATION BOUNDARY
+Reuse/refactor existing CurrentRuleExecution gate steps internally to avoid duplicate
+admission, clock, receipt or artifact-reader logic. Keep all two-stage paths byte-stable.
+The public method is the only proposed API addition. Existing /3 schema fields are
+sufficient; any discovered schema requirement triggers a new prospective gate.
+This is a bounded orchestration integration, not application/UI/planner activation.
+
+ACCEPTANCE
+Explicit complete/no-completeness source selection; inherited-only evidence stays
+unselected; valid engineering receipt invokes evaluator exactly once; missing/stale
+research, invalid implementation report/receipt, time failure and state/config/hash
+mismatch invoke it zero times. Inputs survive every failure. Conflicting source
+assertions persist independently. No fabricated payload required. Deterministic journal
+and independent JVM replay; all prior run/runCurrent/gate/registry/consumer replays
+unchanged; no legacy or candidate activation. Update permanent docs in the same commit.
+
+STOP
+The foundation REQUEST.txt section14 and AGENTS.md public API boundary require approval
+before adding this method. B06 correction is already committed and usable through the
+existing generic pipeline. Approve this exact additive integration before implementation.
