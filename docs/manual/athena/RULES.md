@@ -3741,6 +3741,350 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.GROUP.CYSTEINE_BACKBONE — 1 (cysteine-backbone-b06)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.GROUP.CYSTEINE_BACKBONE.rule.json) · SHA256 `d08408a452ab88dd97521d049a2baa90c7fe2d63b6de2ab997bacde91ea2dfd6`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_MAPPING_V3"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"3"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Graph-backed backbone only; source CYS label is independent evidence.",
+  "No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.",
+  "CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt",
+    "sha256": "eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e",
+    "citation": "User-approved B06 graph-backed cysteine backbone attribution; literal query subject to qualification."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1",
+  "groupId": "ATHENA.GROUP.CYSTEINE_BACKBONE",
+  "limitations": [
+    "Graph-backed backbone only; source CYS label is independent evidence.",
+    "No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.",
+    "CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.CYSTEINE_BACKBONE/pattern",
+  "patternVersion": "1",
+  "query": "[#7]-[C](-[C]-[#16])-[#6]=[#8]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]"
+    },
+    "hydrogenElements": [],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "CA"
+      },
+      {
+        "count": 2,
+        "role": "CB"
+      }
+    ],
+    "roleCharges": {
+      "CA": 0,
+      "CB": 0
+    },
+    "roleHeavyDegree": {
+      "CA": 3,
+      "CB": 2
+    }
+  },
+  "roles": {
+    "C": [
+      4
+    ],
+    "CA": [
+      1
+    ],
+    "CB": [
+      2
+    ],
+    "N": [
+      0
+    ],
+    "O": [
+      5
+    ],
+    "SG": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.b06",
+      "version": "eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION — 1 (cysteine-backbone-b06)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION.rule.json) · SHA256 `ccf55d6bb85df5469528cf4bdb7bf6a11108510990b370d4fb65aac4305e861a`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_CYSTEINE_ATTRIBUTION_V1"
+```
+
+**implementationId**
+
+```json
+"athena.cysteine-attribution"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "attribution": "Existing attributed Findings with original identity report and athena-continuous-geometry/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.CYSTEINE_ATTRIBUTION/negative/1",
+  "supportedDomain": "Explicit ordered sulfur pair, verified backbone identities and complete single source component",
+  "requirements": [
+    "VERIFIED_BACKBONE_ROLES",
+    "COMPLETE_SOURCE_GRAPH_MAPPING",
+    "EXPLICIT_ORDERED_PAIR",
+    "WITHIN_REQUEST_BUDGET"
+  ],
+  "scope": "EXPLICIT_PAIR",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Graph-backed backbone only; source CYS label is independent evidence.",
+  "No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.",
+  "CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt",
+    "sha256": "eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e",
+    "citation": "User-approved B06 graph-backed cysteine backbone attribution; literal query subject to qualification."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GEOMETRY.CONTINUOUS — 1 (geometry-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/geometry-foundation-v1/ATHENA.GEOMETRY.CONTINUOUS.rule.json) · SHA256 `f9e4971bf8d025957f9dac0819535916375fb0935dba6181f7ce16ad5fc4e249`

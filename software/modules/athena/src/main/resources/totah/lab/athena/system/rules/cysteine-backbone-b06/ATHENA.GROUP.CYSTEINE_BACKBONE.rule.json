@@ -1,0 +1,64 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.CYSTEINE_BACKBONE",
+  "version": "1",
+  "profile": "ATHENA_GROUP_MAPPING_V3",
+  "family": "MOTIF",
+  "tier": "B06",
+  "implementationId": "athena.group",
+  "implementationVersion": "3",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1\",\"groupId\":\"ATHENA.GROUP.CYSTEINE_BACKBONE\",\"limitations\":[\"Graph-backed backbone only; source CYS label is independent evidence.\",\"No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.\",\"CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate.\"],\"memberQueryIndices\":[0,1,2,3,4,5],\"negativeCoverageVersion\":\"ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.CYSTEINE_BACKBONE/pattern\",\"patternVersion\":\"1\",\"query\":\"[#7]-[C](-[C]-[#16])-[#6]=[#8]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\"},\"hydrogenElements\":[],\"hydrogenRoles\":[{\"count\":1,\"role\":\"CA\"},{\"count\":2,\"role\":\"CB\"}],\"roleCharges\":{\"CA\":0,\"CB\":0},\"roleHeavyDegree\":{\"CA\":3,\"CB\":2}},\"roles\":{\"C\":[4],\"CA\":[1],\"CB\":[2],\"N\":[0],\"O\":[5],\"SG\":[3]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.b06\",\"version\":\"eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt",
+      "sha256": "eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e",
+      "citation": "User-approved B06 graph-backed cysteine backbone attribution; literal query subject to qualification."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Graph-backed backbone only; source CYS label is independent evidence.",
+    "No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.",
+    "CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

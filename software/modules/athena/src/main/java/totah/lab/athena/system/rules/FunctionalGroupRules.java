@@ -23,8 +23,8 @@ final class FunctionalGroupRules {
             "REQUIRED_H_STATE","AROMATICITY_MODEL","SUPPORTED_DOMAIN","EXHAUSTIVE_B00");
 
     static void validate(RuleManifest m) {
-        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!Set.of("1","2").contains(m.implementationVersion())
-                ||!m.profile().equals(m.implementationVersion().equals("2")?"ATHENA_GROUP_CONTEXT_V2":"ATHENA_GROUP_B01_V1")||m.family()!=RuleManifest.Family.MOTIF
+        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!Set.of("1","2","3").contains(m.implementationVersion())
+                ||!m.profile().equals(m.implementationVersion().equals("3")?"ATHENA_GROUP_MAPPING_V3":m.implementationVersion().equals("2")?"ATHENA_GROUP_CONTEXT_V2":"ATHENA_GROUP_B01_V1")||m.family()!=RuleManifest.Family.MOTIF
                 ||!m.requiredCapabilities().isEmpty()||!m.parameters().keySet().equals(Set.of("definition"))
                 ||!m.negativeCoverage().requirements().equals(NEGATIVE))throw new IllegalArgumentException("B01 manifest contract");
         try {definition(m);}catch(Exception e){throw new IllegalArgumentException("invalid group definition",e);}
@@ -33,7 +33,7 @@ final class FunctionalGroupRules {
         var d=JSON.readTree(m.parameters().get("definition").value());
         var expectedFields=new HashSet<>(Set.of("schema","groupId","definitionVersion","patternId","patternVersion","query","memberQueryIndices","roles",
                 "contextPolicy","requiredState","supportedDomain","negativeCoverageVersion","limitations","sourceReferences","requiredMatcher"));
-        boolean local=m.implementationVersion().equals("2");
+        boolean local=!m.implementationVersion().equals("1");
         if(local)expectedFields.add("occurrenceExclusions");
         fields(d,expectedFields);
         equal(d,"schema",local?"athena-group-definition/2":"athena-group-definition/1");equal(d,"groupId",m.ruleId());equal(d,"definitionVersion",m.version());equal(d,"requiredMatcher",MATCHER);
@@ -83,7 +83,7 @@ final class FunctionalGroupRules {
                     var expectedMethod=new ScientificReference(ScientificReference.Kind.METHOD,"athena.groups",m.key()+"/collect",RuleRegistry.digest(m));
                     if(!relevant.getFirst().method().equals(expectedMethod))throw new IllegalArgumentException("group report collector provenance mismatch");
                     report=JSON.readTree(relevant.getFirst().readPayload());
-                    equal(report,"schema",m.implementationVersion().equals("2")?"athena-group-identities/2":"athena-group-identities/1");
+                    equal(report,"schema",!m.implementationVersion().equals("1")?"athena-group-identities/2":"athena-group-identities/1");
                     if(!report.path("sourceStateBinding").equals(node(state.binding()))||!report.path("definitionDigest").asText().equals(hash(definition(m))))throw new IllegalArgumentException("report binding mismatch");
                     // Recompute all identities and assessments from preserved query results and source coverage.
                     report=build(state,m,r,report.get("sourceCoverage"),null,report.get("b00Results"));
@@ -160,7 +160,12 @@ final class FunctionalGroupRules {
             var actual=new HashSet<totah.lab.gaia.structure.Bond>();
             state.graph().structure().bonds().stream().filter(b->map.containsValue(b.atom1())||map.containsValue(b.atom2())).forEach(actual::add);
             var mapped=new HashSet<totah.lab.gaia.structure.Bond>();
-            graph.bonds().forEach(b->mapped.add(new totah.lab.gaia.structure.Bond(map.get(b.firstAtomId()),map.get(b.secondAtomId()),totah.lab.gaia.chemistry.BondOrder.valueOf(b.order().name()))));
+            // V3 preserves incomplete mapping as missing coverage. V1/V2 replay keeps its historical behavior.
+            boolean constructMappedBonds=!manifest.implementationVersion().equals("3")
+                    ||graph.bonds().stream().allMatch(b->map.get(b.firstAtomId())!=null&&map.get(b.secondAtomId())!=null
+                        &&!map.get(b.firstAtomId()).equals(map.get(b.secondAtomId())));
+            if(constructMappedBonds)graph.bonds().forEach(b->mapped.add(new totah.lab.gaia.structure.Bond(map.get(b.firstAtomId()),map.get(b.secondAtomId()),totah.lab.gaia.chemistry.BondOrder.valueOf(b.order().name()))));
+            else proof.put("COMPLETE_GRAPH",false);
             if(!actual.equals(mapped))proof.put("COMPLETE_GRAPH",false);
         }
         var results=JSON.createObjectNode();
@@ -175,7 +180,7 @@ final class FunctionalGroupRules {
             if(!hConsistency.containsKey(count))hConsistency.put(count,query(constraint.asText(),graph,matcher,replay,results).queryToTargetAtomIds().stream().flatMap(x->x.values().stream()).collect(java.util.stream.Collectors.toSet()));
             if(!hConsistency.get(count).contains(atom.id()))sourceContradiction=true;
         }
-        if(manifest.implementationVersion().equals("2")&&sourceContradiction) {
+        if(!manifest.implementationVersion().equals("1")&&sourceContradiction) {
             proof.put("REQUIRED_H_STATE",false);proof.put("COMPLETE_CHARGE_STATE",false);
         }
         var members=new TreeMap<List<String>,SortedSet<String>>(ATOM_ORDER);
@@ -261,15 +266,15 @@ final class FunctionalGroupRules {
             occurrence.set("explicitHydrogenAtomIds",node(all.stream().filter(a->graph.atom(a).orElseThrow().element().equals("H")).toList()));
             occurrence.set("sourceStateReferences",node(List.of(component.identity())));occurrences.add(occurrence);
         }
-        if(unknownContext||(manifest.implementationVersion().equals("2")&&localStateMissing)){proof.put("REQUIRED_H_STATE",false);reasons.add("occurrence exclusion context is incomplete; no negative inference");}
+        if(unknownContext||(!manifest.implementationVersion().equals("1")&&localStateMissing)){proof.put("REQUIRED_H_STATE",false);reasons.add("occurrence exclusion context is incomplete; no negative inference");}
         boolean complete=proof.values().stream().allMatch(Boolean::booleanValue);
         var status=!proof.get("SUPPORTED_DOMAIN")?UNSUPPORTED:!occurrences.isEmpty()?SUPPORTED_PRESENT:complete?ABSENT_FALSE:UNKNOWN_INCONCLUSIVE;
         proof.forEach((k,v)->{if(!v)reasons.add("negative coverage missing: "+k);});
-        var report=JSON.createObjectNode();report.put("schema",manifest.implementationVersion().equals("2")?"athena-group-identities/2":"athena-group-identities/1");report.set("sourceStateBinding",node(state.binding()));report.set("componentReference",node(component.identity()));
+        var report=JSON.createObjectNode();report.put("schema",!manifest.implementationVersion().equals("1")?"athena-group-identities/2":"athena-group-identities/1");report.set("sourceStateBinding",node(state.binding()));report.set("componentReference",node(component.identity()));
         report.set("sourceGraph",node(graph));report.set("definition",d);report.put("definitionDigest",hash(d));
         var pattern=Map.of("id",text(d,"patternId"),"version",text(d,"patternVersion"),"query",text(d,"query"));report.set("pattern",node(pattern));report.put("patternDigest",SystemStateView.digest(pattern));
         report.set("sourceCoverage",coverage);report.put("sourceCoverageDigest",hash(coverage));report.set("b00Results",results);
-        if(manifest.implementationVersion().equals("2")) {
+        if(!manifest.implementationVersion().equals("1")) {
             contextAssessments.sort((a,b)->{
                 int c=ATOM_ORDER.compare(strings(a.get("memberAtomIds")),strings(b.get("memberAtomIds")));
                 if(c==0)c=a.get("roleCorrespondence").toString().compareTo(b.get("roleCorrespondence").toString());

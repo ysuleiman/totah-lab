@@ -80,3 +80,5 @@ without a measurement payload. `run` remains historical and `runCurrent` retains
 measurement path. All share existing evidence/qualification machinery. Admission preserves
 all explicit artifacts; only verified, applicable selected evidence reaches the direct
 evaluator. History is never an implicit input. See [supporting rationale and boundaries](supporting-material/DIRECT_ASSESSMENT_EXECUTION.md).
+
+Bounded sulfur/backbone attribution: [support and limitations](supporting-material/CYSTEINE_BACKBONE.md).

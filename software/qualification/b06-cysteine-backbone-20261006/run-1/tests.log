@@ -1,0 +1,84 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+╷
+├─ JUnit Platform Suite ✔
+├─ JUnit Jupiter ✔
+│  └─ CysteineBackboneAcceptanceTest ✔
+│     ├─ explicitHydrogensAndDistinctOccurrencesSurvive() ✔
+│     ├─ graphOrderingDoesNotChangeRoles() ✔
+│     ├─ labelAloneCannotEstablishBackbone() ✔
+│     ├─ backboneDoesNotResolveIndependentLabelsOrStates(String) ✔
+│     │  ├─ [1] plain ✔
+│     │  ├─ [2] R ✘ unsupported project-neutral stereo descriptor: R
+│     │  ├─ [3] S ✘ unsupported project-neutral stereo descriptor: S
+│     │  ├─ [4] thiolate ✔
+│     │  ├─ [5] ammonium ✔
+│     │  ├─ [6] modified ✔
+│     │  └─ [7] wrong-label ✔
+│     ├─ incompleteSourceCannotEstablishAbsence(String) ✔
+│     │  ├─ [1] unknownH ✔
+│     │  ├─ [2] contradictoryH ✔
+│     │  ├─ [3] partial ✔
+│     │  └─ [4] unknownCharge ✔
+│     └─ missingCorrespondenceIsInconclusiveWithoutInventingMapping() ✘ atom2
+└─ JUnit Vintage ✔
+
+Failures (3):
+  JUnit Jupiter:CysteineBackboneAcceptanceTest:backboneDoesNotResolveIndependentLabelsOrStates(String):[2] R
+    MethodSource [className = 'totah.lab.daedalus.system.CysteineBackboneAcceptanceTest', methodName = 'backboneDoesNotResolveIndependentLabelsOrStates', methodParameterTypes = 'java.lang.String']
+    => totah.lab.athena.design.backend.MolecularBackendException: unsupported project-neutral stereo descriptor: R
+       totah.lab.athena.design.backend.ocl.OclGraphMapper.applyParity(OclGraphMapper.java:135)
+       totah.lab.athena.design.backend.ocl.OclGraphMapper.toOcl(OclGraphMapper.java:49)
+       totah.lab.athena.design.backend.ocl.OclMolecularBackend.match(OclMolecularBackend.java:254)
+       totah.lab.athena.system.rules.FunctionalGroupRules.query(FunctionalGroupRules.java:358)
+       totah.lab.athena.system.rules.FunctionalGroupRules.build(FunctionalGroupRules.java:167)
+       totah.lab.athena.system.rules.FunctionalGroupRules$1.analyze(FunctionalGroupRules.java:91)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.collect(CysteineBackboneAcceptanceTest.java:37)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.collect(CysteineBackboneAcceptanceTest.java:45)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.backboneDoesNotResolveIndependentLabelsOrStates(CysteineBackboneAcceptanceTest.java:48)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       [...]
+  JUnit Jupiter:CysteineBackboneAcceptanceTest:backboneDoesNotResolveIndependentLabelsOrStates(String):[3] S
+    MethodSource [className = 'totah.lab.daedalus.system.CysteineBackboneAcceptanceTest', methodName = 'backboneDoesNotResolveIndependentLabelsOrStates', methodParameterTypes = 'java.lang.String']
+    => totah.lab.athena.design.backend.MolecularBackendException: unsupported project-neutral stereo descriptor: S
+       totah.lab.athena.design.backend.ocl.OclGraphMapper.applyParity(OclGraphMapper.java:135)
+       totah.lab.athena.design.backend.ocl.OclGraphMapper.toOcl(OclGraphMapper.java:49)
+       totah.lab.athena.design.backend.ocl.OclMolecularBackend.match(OclMolecularBackend.java:254)
+       totah.lab.athena.system.rules.FunctionalGroupRules.query(FunctionalGroupRules.java:358)
+       totah.lab.athena.system.rules.FunctionalGroupRules.build(FunctionalGroupRules.java:167)
+       totah.lab.athena.system.rules.FunctionalGroupRules$1.analyze(FunctionalGroupRules.java:91)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.collect(CysteineBackboneAcceptanceTest.java:37)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.collect(CysteineBackboneAcceptanceTest.java:45)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.backboneDoesNotResolveIndependentLabelsOrStates(CysteineBackboneAcceptanceTest.java:48)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       [...]
+  JUnit Jupiter:CysteineBackboneAcceptanceTest:missingCorrespondenceIsInconclusiveWithoutInventingMapping()
+    MethodSource [className = 'totah.lab.daedalus.system.CysteineBackboneAcceptanceTest', methodName = 'missingCorrespondenceIsInconclusiveWithoutInventingMapping', methodParameterTypes = '']
+    => java.lang.NullPointerException: atom2
+       java.base/java.util.Objects.requireNonNull(Objects.java:259)
+       totah.lab.gaia.structure.Bond.<init>(Bond.java:12)
+       totah.lab.athena.system.rules.FunctionalGroupRules.lambda$build$9(FunctionalGroupRules.java:163)
+       java.base/java.lang.Iterable.forEach(Iterable.java:75)
+       totah.lab.athena.system.rules.FunctionalGroupRules.build(FunctionalGroupRules.java:163)
+       totah.lab.athena.system.rules.FunctionalGroupRules$1.analyze(FunctionalGroupRules.java:91)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.collect(CysteineBackboneAcceptanceTest.java:37)
+       totah.lab.daedalus.system.CysteineBackboneAcceptanceTest.missingCorrespondenceIsInconclusiveWithoutInventingMapping(CysteineBackboneAcceptanceTest.java:69)
+       java.base/java.lang.reflect.Method.invoke(Method.java:580)
+       java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+       [...]
+
+Test run finished after 729 ms
+[         6 containers found      ]
+[         0 containers skipped    ]
+[         6 containers started    ]
+[         0 containers aborted    ]
+[         6 containers successful ]
+[         0 containers failed     ]
+[        15 tests found           ]
+[         0 tests skipped         ]
+[        15 tests started         ]
+[         0 tests aborted         ]
+[        12 tests successful      ]
+[         3 tests failed          ]
+

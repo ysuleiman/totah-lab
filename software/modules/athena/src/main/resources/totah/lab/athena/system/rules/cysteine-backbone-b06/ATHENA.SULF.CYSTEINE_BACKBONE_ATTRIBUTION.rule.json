@@ -1,0 +1,66 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION",
+  "version": "1",
+  "profile": "ATHENA_CYSTEINE_ATTRIBUTION_V1",
+  "family": "MOTIF",
+  "tier": "B06",
+  "implementationId": "athena.cysteine-attribution",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "attribution": "Existing attributed Findings with original identity report and athena-continuous-geometry/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "sourceManifest": {
+      "value": "{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"MOTIF\",\"implementationId\":\"athena.group\",\"implementationVersion\":\"3\",\"limitations\":[\"Graph-backed backbone only; source CYS label is independent evidence.\",\"No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.\",\"CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate.\"],\"measurementsProduced\":{\"group-identities\":\"athena-group-identities/2\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"VALID_DEFINITION\",\"COMPLETE_GRAPH\",\"COMPLETE_CHARGE_STATE\",\"REQUIRED_H_STATE\",\"AROMATICITY_MODEL\",\"SUPPORTED_DOMAIN\",\"EXHAUSTIVE_B00\"],\"scope\":\"EXPLICIT_COMPONENT_ONLY\",\"supportedDomain\":\"Explicit complete source component under this declarative definition; see definition payload.\",\"version\":\"ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1\"},\"parameters\":{\"definition\":{\"definition\":\"Immutable declarative group identity and source-state requirements.\",\"unit\":\"policy\",\"value\":\"{\\\"contextPolicy\\\":\\\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\\\",\\\"definitionVersion\\\":\\\"1\\\",\\\"groupId\\\":\\\"ATHENA.GROUP.CYSTEINE_BACKBONE\\\",\\\"limitations\\\":[\\\"Graph-backed backbone only; source CYS label is independent evidence.\\\",\\\"No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.\\\",\\\"CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate.\\\"],\\\"memberQueryIndices\\\":[0,1,2,3,4,5],\\\"negativeCoverageVersion\\\":\\\"ATHENA.GROUP.CYSTEINE_BACKBONE/negative/1\\\",\\\"occurrenceExclusions\\\":[],\\\"patternId\\\":\\\"ATHENA.GROUP.CYSTEINE_BACKBONE/pattern\\\",\\\"patternVersion\\\":\\\"1\\\",\\\"query\\\":\\\"[#7]-[C](-[C]-[#16])-[#6]=[#8]\\\",\\\"requiredMatcher\\\":\\\"2026.7.2/athena-ocl-occurrences/2\\\",\\\"requiredState\\\":{\\\"aromaticity\\\":true,\\\"formalCharge\\\":true,\\\"graphCompleteness\\\":true,\\\"hydrogenConsistencyQueries\\\":{\\\"0\\\":\\\"[*;H0]\\\",\\\"1\\\":\\\"[*;H1]\\\",\\\"2\\\":\\\"[*;H2]\\\",\\\"3\\\":\\\"[*;H3]\\\"},\\\"hydrogenElements\\\":[],\\\"hydrogenRoles\\\":[{\\\"count\\\":1,\\\"role\\\":\\\"CA\\\"},{\\\"count\\\":2,\\\"role\\\":\\\"CB\\\"}],\\\"roleCharges\\\":{\\\"CA\\\":0,\\\"CB\\\":0},\\\"roleHeavyDegree\\\":{\\\"CA\\\":3,\\\"CB\\\":2}},\\\"roles\\\":{\\\"C\\\":[4],\\\"CA\\\":[1],\\\"CB\\\":[2],\\\"N\\\":[0],\\\"O\\\":[5],\\\"SG\\\":[3]},\\\"schema\\\":\\\"athena-group-definition/2\\\",\\\"sourceReferences\\\":[{\\\"id\\\":\\\"software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.b06\\\",\\\"version\\\":\\\"eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e\\\"}],\\\"supportedDomain\\\":{\\\"coveredAtomQuery\\\":\\\"\\\",\\\"elements\\\":[\\\"H\\\",\\\"C\\\",\\\"N\\\",\\\"O\\\",\\\"S\\\"],\\\"unsupportedQueries\\\":[]}}\"}},\"profile\":\"ATHENA_GROUP_MAPPING_V3\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[],\"requiredCapabilities\":[],\"requiredChemistry\":[\"B00 qualified matching\",\"attributed complete chemical state\"],\"requiredGeometry\":[],\"retired\":false,\"ruleId\":\"ATHENA.GROUP.CYSTEINE_BACKBONE\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"User-approved B06 graph-backed cysteine backbone attribution; literal query subject to qualification.\",\"locator\":\"software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt\",\"sha256\":\"eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e\"}],\"tier\":\"B06\",\"version\":\"1\"}",
+      "unit": "policy",
+      "definition": "Pinned existing implementation used for attribution"
+    },
+    "geometryManifest": {
+      "value": "{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"ENVIRONMENT\",\"implementationId\":\"athena.geometry\",\"implementationVersion\":\"3\",\"limitations\":[\"raw measurements only; no interaction, energy or potency assertion\"],\"measurementsProduced\":{\"geometry\":\"athena-continuous-geometry/1\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"COMPLETE_EXPLICIT_SCOPE\",\"QUALIFIED_FRAME\",\"FINITE_COORDINATES\"],\"scope\":\"No continuous quantity establishes ABSENT_FALSE\",\"supportedDomain\":\"raw explicit geometry\",\"version\":\"1\"},\"parameters\":{\"planeNormalRelativeGapTolerance\":{\"definition\":\"Numerical eigengap guard; not empirical planarity\",\"unit\":\"dimensionless\",\"value\":\"1.0E-10\"}},\"profile\":\"ATHENA_CONTINUOUS_GEOMETRY_V3\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/p06-centroid-characterization-20261005/REVIEW_GATE.txt\",\"sha256\":\"ec889f0b9a9eb7c591a955e9a97342c931ba61fe19bec7b1a0aa659625a21a85\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"d48eaf31e98c114f8a03a33f63885c9963821c7565bc0388020c8e2abfe2723a\"}],\"requiredCapabilities\":[],\"requiredChemistry\":[\"explicit atoms; attributed radii only\"],\"requiredGeometry\":[\"explicit complete source frame\"],\"retired\":false,\"ruleId\":\"ATHENA.GEOMETRY.CONTINUOUS\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"}],\"tier\":\"GEOMETRY\",\"version\":\"3\"}",
+      "unit": "policy",
+      "definition": "Pinned existing implementation used for attribution"
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt",
+      "sha256": "eeada3e9fc731469671c1aaafb8b4c15c44ef83c39a7ecbf5aa10be4ff6a1c9e",
+      "citation": "User-approved B06 graph-backed cysteine backbone attribution; literal query subject to qualification."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Graph-backed backbone only; source CYS label is independent evidence.",
+    "No sulfur oxidation, thiol/thiolate, disulfide, N protonation, biological residue identity or L/D inference.",
+    "CHNOS component domain; exact source state, no normalization; current-policy Research Gate remains separate."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.CYSTEINE_ATTRIBUTION/negative/1",
+    "supportedDomain": "Explicit ordered sulfur pair, verified backbone identities and complete single source component",
+    "requirements": [
+      "VERIFIED_BACKBONE_ROLES",
+      "COMPLETE_SOURCE_GRAPH_MAPPING",
+      "EXPLICIT_ORDERED_PAIR",
+      "WITHIN_REQUEST_BUDGET"
+    ],
+    "scope": "EXPLICIT_PAIR",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}
