@@ -3370,6 +3370,128 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.PERCEPTION.AROMATIC_CARBOCYCLE.ALL_MEMBERS_NONPOLAR — 1.0.0 (all-members-nonpolar-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/all-members-nonpolar-v1/ATHENA.PERCEPTION.AROMATIC_CARBOCYCLE.ALL_MEMBERS_NONPOLAR.rule.json) · SHA256 `743194973ec54443b1f720f20314c71c5e5ba895a2d7e9940e561be7ddb3ee8f`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_ALL_MEMBERS_NONPOLAR_V1"
+```
+
+**implementationId**
+
+```json
+"athena.all-members-nonpolar"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "assessment": "existing EvidenceInterpretation per source cycle occurrence"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.PERCEPTION.AROMATIC_CARBOCYCLE.ALL_MEMBERS_NONPOLAR/negative/1",
+  "supportedDomain": "Exact complete aromatic carbocycle under the pinned cycle and aromatic C/H-only atom predicates.",
+  "requirements": [
+    "VERIFIED_SOURCE_REPORTS",
+    "COMPLETE_CYCLE_AND_ATOM_ENUMERATION",
+    "COMPLETE_SOURCE_CORRESPONDENCE",
+    "WITHIN_REQUEST_BUDGET"
+  ],
+  "scope": "EXISTING_AROMATIC_CARBOCYCLE_OCCURRENCE",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Complete existing aromatic-carbocycle membership only; no partial fragment or fused-cycle merger.",
+  "Operational all-members predicate, not universal hydrophobicity, burial, favorable contact or affinity.",
+  "No centroid, interaction representative or legacy interaction migration.",
+  "Preserved source reports retain every atom identity and correspondence alternative; current-policy Research Gate qualification remains separate."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/p05-group-definition-review-20261005/DESIGN.txt",
+    "sha256": "96ae7c97d36a8d7a4ee7972aced3e3a5e1798d8ccefd12c280995a922b6cd1ee",
+    "citation": "Explicit user-approved complete-membership predicate; no empirical threshold."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.PERCEPTION.AROMATIC.SYSTEM — 1.0.0 (aromatic-systems-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/aromatic-systems-v1/ATHENA.PERCEPTION.AROMATIC.SYSTEM.rule.json) · SHA256 `c9670ff9fd63871ce70f4e126cb8b1e3cf10397a9994e0dd8fef6fbafaaf3b1f`

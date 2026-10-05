@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `cee99241bd9963b235476ad2a5790bb503256fc57b87b9012395fe54a4d3dd26`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `5e06bc2b228d7d38fc0b52ea01403a143b1dc695e3016cd5de7c6d26d0592d5c`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -10,7 +10,7 @@ Disposition is copied without upgrading partial capability coverage.
 | P02 | Valence/aromaticity/conjugation/hybridization/ring perception | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [aromatic-systems-20261005](../../../software/qualification/aromatic-systems-20261005/CHECKPOINT.txt) |
 | P03 | Donor and acceptor features | P0 | BOUNDED_COMPOSITION_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [chemical-role-perception-20261005](../../../software/qualification/chemical-role-perception-20261005/CHECKPOINT.txt), [p03-role-closure-20261005](../../../software/qualification/p03-role-closure-20261005/CHECKPOINT.txt) |
 | P04 | Positive/negative ionizable features versus formal charge | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt), [charge-groups-20261005](../../../software/qualification/charge-groups-20261005/CHECKPOINT.txt) |
-| P05 | Hydrophobe and lumped hydrophobe features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt) |
+| P05 | Hydrophobe and lumped hydrophobe features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt), [all-members-nonpolar-20261005](../../../software/qualification/all-members-nonpolar-20261005/CHECKPOINT.txt) |
 | P06 | Aromatic pharmacophore/centroid features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [aromatic-systems-20261005](../../../software/qualification/aromatic-systems-20261005/CHECKPOINT.txt) |
 | P07 | Zinc-binding pharmacophore motifs | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | P08 | Functional-group hierarchy and fragment features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
