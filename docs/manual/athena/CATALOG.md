@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `9e39aa40805a84f073703153bfb40415ed414ede5ac6972e78a2dafccdaa033e`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `1f74220e46d93a44440eb819b9337c32ef6f297ad25514c5f655d0e3a198949a`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -66,7 +66,7 @@ Disposition is copied without upgrading partial capability coverage.
 | V20 | X-ray local map/model fit | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | V21 | NMR ensemble/shift/constraint validation | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | V22 | EM map validation and map-model fit | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| A01 | SMIRNOFF hierarchical parameter precedence and typed serialization | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| A01 | SMIRNOFF hierarchical parameter precedence and typed serialization | P0 | CLOSED_ARCHITECTURAL_DISPOSITION_NO_FORCEFIELD_ASSIGNMENT | [a01-disposition-20261005](../../../software/qualification/a01-disposition-20261005/CHECKPOINT.txt) |
 | A02 | Constraints and bond/angle/proper/improper torsion parameter families | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | A03 | vdW and electrostatics parameter families | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | A04 | Library/AM1-BCC/charge-increment/NAGL charge assignment | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |

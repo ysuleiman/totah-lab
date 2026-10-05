@@ -1,0 +1,91 @@
+P02/P06 — PROSPECTIVE AROMATIC SYSTEM ATTRIBUTION CONTRACT
+Public payload/schema gate. No implementation or new scientific classification yet.
+
+EXISTING QUALIFIED SUBSTRATE
+B00 supplies complete bounded target occurrences/correspondence. Existing group /2
+AROMATIC.RING5/RING6 and HETEROAROMATIC.RING5/RING6 preserve exact 5/6-vertex
+cycles with aromatic vertices under pinned OCL, including overlapping fused cycles.
+Their authoritative limitations explicitly reject a unique cycle-basis or energy claim.
+Continuous geometry already accepts explicit groups and source references.
+
+EXACT GAP
+athena-group-identities/2 records independent occurrences and context; it has no
+fused-system identity or explicit relation between occurrences from different reports.
+Do not add undeclared fields to /2 or replace the source molecular graph. The accepted
+ATHENA.PERCEPTION.AROMATIC dossier calls for simple rings and system identity separately.
+Existing OclLigandFeaturePerceiver uses OCL RingCollection directly; adopting its ring
+representatives silently would bypass the reviewed B00 cycle definition.
+
+PROPOSED DEFINITION FOR REVIEW
+An attributed aromatic cycle remains exactly an existing qualified 5/6-cycle occurrence.
+Merge duplicate chemical cycle identities across general/hetero labels by the same
+state, component and source bond set, retaining every source occurrence and mapping.
+Do not merge distinct correspondence alternatives. Do not choose a cycle basis.
+A fused system is a maximal connected collection of these cycle identities joined
+by sharing at least one covalent source bond. Sharing only an atom is recorded as a
+shared-atom relation, not fusion. No sigma/pi energy, planarity, aromatic stabilization,
+interaction or biological claim follows. This is a stated structural grouping model.
+All atom sets remain references to the existing authoritative state.
+Larger cycles/systems not exhaustively represented by these predicates remain outside
+complete-domain claims. No assertion of exhaustive arbitrary aromatic-system perception.
+
+EXACT PROPOSED PAYLOAD — athena-aromatic-systems/1
+Top-level required fields:
+ schema: literal "athena-aromatic-systems/1"
+ stateBinding: existing SystemStateView.Binding
+ definitionReference: existing ScientificReference (immutable reviewed model digest)
+ sourceReports: array of {reference: ScientificReference, payloadSha256: hex SHA256}
+ cycles: array of {
+   cycleId: SHA256 of canonical state/component/bond-set/mapping identity,
+   componentReference: ScientificReference,
+   sourceOccurrences: array of {reportReference: ScientificReference, occurrenceId: string},
+   correspondenceAlternatives: array of {
+     memberAtoms: sorted existing AtomReference array,
+     sourceBondIds: sorted source MolecularGraph bond-ID array
+   }
+ }
+ relations: array of {
+   firstCycleId: string, secondCycleId: string,
+   correspondenceAlternativeIndices: two nonnegative integers,
+   kind: "SHARED_BOND" or "SHARED_ATOM_ONLY",
+   sharedAtoms: sorted AtomReference array,
+   sharedSourceBondIds: sorted string array
+ }
+ systems: array of {
+   systemId: SHA256 of canonical state/component/cycle-membership/alternative identity,
+   cycleIds: sorted string array,
+   memberAtoms: sorted AtomReference array,
+   relationIndices: sorted nonnegative integer array
+ }
+ coverage: {
+   assessment: existing EvidenceInterpretation.Status,
+   completeEligibleCycleEnumeration: boolean,
+   scope: literal "SUPPLIED_COMPONENT_B00_AROMATIC_5_6_CYCLES",
+   reasons: string array
+ }
+ limitations: string array
+
+Canonical ordering by stable source identity; hashes use existing canonical bytes.
+Alternative mappings must yield separate attributed alternatives/system identities;
+no Cartesian product may silently fabricate jointly consistent source correspondence.
+Source reports must agree on exact state/component/definition and verified payload
+hashes; conflicting or unverifiable reports remain preserved and evaluation fails closed.
+Positive partial systems may be retained with incomplete coverage. ABSENT_FALSE only
+within stated supported scope after exhaustive source-cycle queries and correspondence
+coverage. Missing/unsupported source state or incomplete enumeration is non-negative.
+
+Existing EvidenceEnvelope/Exchange transport and generic evaluator interfaces suffice;
+no typed public Java API, new graph representation, external library or registry overhaul.
+No modification of historical group /2 payloads. Generic persistence preserves unknown
+payloads before interpretation. Geometry plans may cite this report, but group membership
+never implies favorable geometry; no interaction detector activation.
+
+ACCEPTANCE
+Benzene/pyridine/pyrrole; naphthalene/indole fused overlaps; general+hetero duplicate
+labels; shared-atom-only counterexample; disconnected rings; missing/ambiguous source
+correspondence; incomplete/unknown coverage; false hash/state reference; atom-order
+permutations; no source mutation; evidence round-trip and independent-JVM replay.
+Use existing synthetic fixtures/hand-specified graph memberships as oracle. No new
+literature acquisition, docking, energies or METTL7 interpretation.
+
+STOP: obtain approval for this exact grouping definition and payload before implementation.
