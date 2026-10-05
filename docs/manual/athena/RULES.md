@@ -21654,3 +21654,124 @@ Current-policy gate status must be established by a valid receipt, not the histo
   }
 ]
 ```
+
+## ATHENA.SULF.SS_CONNECTIVITY — 1.0.0 (ss-connectivity-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/ss-connectivity-v1/ATHENA.SULF.SS_CONNECTIVITY.rule.json) · SHA256 `ef6cfd10234d65c434cb05b8d6aaf472be292816fc73a5d70ea47e8485c9e137`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_SOURCE_SS_CONNECTIVITY_V1"
+```
+
+**implementationId**
+
+```json
+"athena.ss-connectivity"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "authoritative source sulfur identities and connectivity scope"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "assessment": "existing generic attributed EvidenceInterpretation; no new payload schema"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.SULF.SS_CONNECTIVITY/negative/1",
+  "supportedDomain": "Explicit selected distinct source sulfur pair; complete same-component covalent graph for absence.",
+  "requirements": [
+    "COMPLETE_APPLICABLE_COMPONENT_GRAPH",
+    "COMPLETE_UNAMBIGUOUS_MAPPING",
+    "VALID_TOPOLOGY_STATE_BINDING",
+    "NO_CONFLICTING_ASSERTION",
+    "WITHIN_SCOPE_BUDGET"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "scope": "EXPLICIT_SOURCE_SULFUR_PAIR"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source covalent connectivity only; no geometry, oxidation, disulfide chemistry, biological function or favorable interaction.",
+  "No intercomponent absence inference; explicit imported connectivity is not exhaustive coverage.",
+  "Candidate implementation; current-policy Research Gate qualification remains separate."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt",
+    "sha256": "f3e60886f2decc4aa4bc83088beffef3bab004ee40ccdae04615f1ae7caa07be",
+    "citation": "User-approved source-connectivity proposition and negative-coverage correction."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```

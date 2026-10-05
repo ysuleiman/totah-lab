@@ -82,6 +82,7 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.ss-connectivity")){SourceSulfurConnectivityRules.validate(m);return;}
         if(m.implementationId().equals("athena.all-members-nonpolar")){AllMembersNonpolarRules.validate(m);return;}
         if(m.implementationId().equals("athena.charge-groups")){ChargeGroupRules.validate(m);return;}
         if(m.implementationId().equals("athena.aromatic-systems")){AromaticSystemRules.validate(m);return;}

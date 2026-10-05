@@ -1,0 +1,61 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.SULF.SS_CONNECTIVITY",
+  "version": "1.0.0",
+  "profile": "ATHENA_SOURCE_SS_CONNECTIVITY_V1",
+  "family": "MOTIF",
+  "tier": "B06",
+  "implementationId": "athena.ss-connectivity",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "authoritative source sulfur identities and connectivity scope"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "assessment": "existing generic attributed EvidenceInterpretation; no new payload schema"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definitionReference": {
+      "value": "{\"id\":\"software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"f3e60886f2decc4aa4bc83088beffef3bab004ee40ccdae04615f1ae7caa07be\"}",
+      "unit": "policy",
+      "definition": "Approved separately versioned source S-S connectivity coverage correction."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt",
+      "sha256": "f3e60886f2decc4aa4bc83088beffef3bab004ee40ccdae04615f1ae7caa07be",
+      "citation": "User-approved source-connectivity proposition and negative-coverage correction."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Source covalent connectivity only; no geometry, oxidation, disulfide chemistry, biological function or favorable interaction.",
+    "No intercomponent absence inference; explicit imported connectivity is not exhaustive coverage.",
+    "Candidate implementation; current-policy Research Gate qualification remains separate."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.SULF.SS_CONNECTIVITY/negative/1",
+    "supportedDomain": "Explicit selected distinct source sulfur pair; complete same-component covalent graph for absence.",
+    "requirements": [
+      "COMPLETE_APPLICABLE_COMPONENT_GRAPH",
+      "COMPLETE_UNAMBIGUOUS_MAPPING",
+      "VALID_TOPOLOGY_STATE_BINDING",
+      "NO_CONFLICTING_ASSERTION",
+      "WITHIN_SCOPE_BUDGET"
+    ],
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+    "scope": "EXPLICIT_SOURCE_SULFUR_PAIR"
+  }
+}
