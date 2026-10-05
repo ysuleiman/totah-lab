@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `6111632b1e8aae0255235f5dd4d7f59a13cabc5ad2144bcd6216ad22ab6e2093`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `acd35a4e782070dc84aebc9136dd4774145f22bb112d419eb0de6a6840c85cf2`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -36,7 +36,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I19 | Disulfide bond versus S-S proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I20 | Unpaired donor/acceptor/halogen features | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I21 | Interaction overlap/refinement and pruning | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| N01 | Directional roles and atom/group attribution | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| N01 | Directional roles and atom/group attribution | P0 | BOUNDED_ATTRIBUTION_IMPLEMENTATION_QUALIFIED_REMAINDER_PENDING | [n01-role-geometry-attribution-20261005](../../../software/qualification/n01-role-geometry-attribution-20261005/CHECKPOINT.txt) |
 | N02 | Binary/count interaction fingerprints | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N03 | Ensemble contact frequencies/probabilistic networks | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N04 | Contact correlations and co-occurrence networks | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
