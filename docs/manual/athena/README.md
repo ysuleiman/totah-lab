@@ -72,3 +72,11 @@ Independent centroid and plane geometry: [P06 V2 definition, partial coverage an
 Mixed atom/group-centroid geometry: [V3 definition, mathematical support and partial truth](supporting-material/POINT_PAIR_GROUP.md).
 
 Source S–S negative coverage: [historical limitation and correction review](supporting-material/SS_CONNECTIVITY_COVERAGE.md).
+
+## Direct assessment execution
+
+`RuleExecutionPipeline.evaluateCurrent` is the current-policy path for attributed Findings
+without a measurement payload. `run` remains historical and `runCurrent` retains its two-stage
+measurement path. All share existing evidence/qualification machinery. Admission preserves
+all explicit artifacts; only verified, applicable selected evidence reaches the direct
+evaluator. History is never an implicit input. See [supporting rationale and boundaries](supporting-material/DIRECT_ASSESSMENT_EXECUTION.md).

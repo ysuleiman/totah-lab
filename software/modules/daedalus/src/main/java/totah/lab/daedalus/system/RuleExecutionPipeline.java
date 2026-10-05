@@ -25,6 +25,14 @@ public final class RuleExecutionPipeline {
             Optional<EvidenceEnvelope> reuseMeasurements,ResearchExecutionInputs research,ScientificReference run,Instant at)throws IOException {
         return new CurrentRuleExecution(pipeline,matcher,timeAuthority).run(catalog,foundation,foundationConfiguration,registry,manifestBytes,request,reuseMeasurements,research,run,at);
     }
+    /** Direct Findings under current policy; only explicitly selected applicable evidence is evaluated. */
+    public SystemQualificationPipeline.Published evaluateCurrent(EvidenceSnapshotCatalog catalog,
+            SystemQualificationPipeline.Published foundation,Map<String,String> foundationConfiguration,
+            RuleRegistry registry,byte[] manifestBytes,RuleRequest request,ResearchExecutionInputs research,
+            ScientificReference run,Instant at)throws IOException {
+        return new CurrentRuleExecution(pipeline,matcher,timeAuthority).evaluate(catalog,foundation,
+                foundationConfiguration,registry,manifestBytes,request,research,run,at);
+    }
     public record Result(SystemQualificationPipeline.Published published,Optional<EvidenceEnvelope> measurements) { }
     public Result run(EvidenceSnapshotCatalog catalog,SystemQualificationPipeline.Published foundation,
                       Map<String,String> foundationConfiguration,RuleRegistry registry,byte[] manifestBytes,RuleRequest request,

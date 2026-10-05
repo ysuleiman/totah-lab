@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `413c36a398f8f4fe6a5192a6feff4d922be0fcf681a8f13edb383b1b624c21ee`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `9047d8f3c9e39c8a1a1d5fe9cc4f3bf11a1b96904cce13706863f722e3fbaee0`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -33,7 +33,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I16 | Van der Waals contact/gap | P1 | IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
 | I17 | Steric overlaps/clashes | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | I18 | Pi-hydrogen / X-H-pi geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt), [b05-mixed-geometry-v3-20261005](../../../software/qualification/b05-mixed-geometry-v3-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
-| I19 | Disulfide bond versus S-S proximity | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b06-connectivity-coverage-characterization-20261005](../../../software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt), [b06-source-connectivity-20261005](../../../software/qualification/b06-source-connectivity-20261005/CHECKPOINT.txt), [direct-assessment-execution-contract-20261005](../../../software/qualification/direct-assessment-execution-contract-20261005/DESIGN.txt) |
+| I19 | Disulfide bond versus S-S proximity | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b06-connectivity-coverage-characterization-20261005](../../../software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt), [b06-source-connectivity-20261005](../../../software/qualification/b06-source-connectivity-20261005/CHECKPOINT.txt), [direct-assessment-execution-contract-20261005](../../../software/qualification/direct-assessment-execution-contract-20261005/DESIGN.txt), [direct-assessment-current-20261005](../../../software/qualification/direct-assessment-current-20261005/CHECKPOINT.txt) |
 | I20 | Unpaired donor/acceptor/halogen features | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I21 | Interaction overlap/refinement and pruning | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | N01 | Directional roles and atom/group attribution | P0 | BOUNDED_ATTRIBUTION_IMPLEMENTATION_QUALIFIED_REMAINDER_PENDING | [n01-role-geometry-attribution-20261005](../../../software/qualification/n01-role-geometry-attribution-20261005/CHECKPOINT.txt) |

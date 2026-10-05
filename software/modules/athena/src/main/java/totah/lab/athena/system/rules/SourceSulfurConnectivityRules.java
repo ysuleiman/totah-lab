@@ -19,7 +19,7 @@ final class SourceSulfurConnectivityRules {
             "COMPLETE_UNAMBIGUOUS_MAPPING", "VALID_TOPOLOGY_STATE_BINDING", "NO_CONFLICTING_ASSERTION", "WITHIN_SCOPE_BUDGET");
 
     static void validate(RuleManifest m) {
-        if (!m.schema().equals("athena-rule/2") || !m.ruleId().equals("ATHENA.SULF.SS_CONNECTIVITY")
+        if (!Set.of("athena-rule/2","athena-rule/3").contains(m.schema()) || !m.ruleId().equals("ATHENA.SULF.SS_CONNECTIVITY")
                 || !m.implementationVersion().equals("1") || !m.profile().equals("ATHENA_SOURCE_SS_CONNECTIVITY_V1")
                 || m.family()!=RuleManifest.Family.MOTIF || !m.requiredCapabilities().isEmpty()
                 || !m.parameters().keySet().equals(Set.of("definitionReference"))
@@ -150,7 +150,7 @@ final class SourceSulfurConnectivityRules {
             }
         };
     }
-    private static EvidenceInterpretation.Status status(RuleManifest m,EvidenceInterpretation.Status value){return m.retired()||m.qualification()!=SystemGraphCertificate.Status.QUALIFIED?NOT_EVALUATED:value;}
+    private static EvidenceInterpretation.Status status(RuleManifest m,EvidenceInterpretation.Status value){return m.retired()||(!m.schema().equals("athena-rule/3")&&m.qualification()!=SystemGraphCertificate.Status.QUALIFIED)?NOT_EVALUATED:value;}
     private static void fields(JsonNode n,Set<String> expected){if(n==null||!n.isObject())throw new IllegalArgumentException("coverage object required");var actual=new HashSet<String>();n.fieldNames().forEachRemaining(actual::add);if(!actual.equals(expected))throw new IllegalArgumentException("coverage fields");}
     private static void references(JsonNode n)throws Exception {if(n==null||!n.isArray()||n.isEmpty())throw new IllegalArgumentException("coverage source references required");for(var v:n)JSON.treeToValue(v,ScientificReference.class);}
     private static JsonNode node(Object value){return JSON.valueToTree(value);}
