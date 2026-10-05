@@ -14,6 +14,7 @@ import totah.lab.athena.design.backend.ConformerMinimizer;
 import totah.lab.athena.design.backend.MolecularBackendException;
 import totah.lab.athena.design.backend.MolecularGraph;
 import totah.lab.athena.design.backend.MolecularSanitizer;
+import totah.lab.athena.design.backend.MolecularValidationService;
 import totah.lab.athena.design.backend.StereochemistryService;
 import totah.lab.athena.design.backend.SubstructureMatcher;
 
@@ -24,10 +25,30 @@ import java.util.Map;
 
 /** Minimal replaceable OpenChemLib kernel. It performs no edit selection or target logic. */
 public final class OclMolecularBackend implements MolecularSanitizer, CanonicalIdentityService,
-        StereochemistryService, ConformerGenerator3d, ConformerMinimizer, SubstructureMatcher {
+        MolecularValidationService, StereochemistryService, ConformerGenerator3d, ConformerMinimizer, SubstructureMatcher {
     public static final String BACKEND = "OPEN_CHEM_LIB";
     public static final String VERSION = "2026.7.2";
     private final OclGraphMapper mapper = new OclGraphMapper();
+
+    private final boolean dimensionalValidation;
+    public OclMolecularBackend() { this(false); }
+    private OclMolecularBackend(boolean dimensionalValidation) { this.dimensionalValidation=dimensionalValidation; }
+    public static OclMolecularBackend forChemicalStateValidation() { return new OclMolecularBackend(true); }
+    @Override
+    public MolecularValidationService.Result validateDimensions(MolecularGraph graph, MolecularValidationService.NeutralityPolicy policy) throws MolecularBackendException {
+        return OclValidationDimensions.assess(graph,policy);
+    }
+    private MolecularValidationService.Result checkedDimensions(MolecularGraph graph, boolean checkSuppliedH) throws MolecularBackendException {
+        var result=validateDimensions(graph,MolecularValidationService.NeutralityPolicy.OBSERVE_ONLY);
+        for(var entry:result.dimensions().entrySet())if(entry.getKey()!=MolecularValidationService.Dimension.NET_NEUTRALITY
+            &&(checkSuppliedH||entry.getKey()!=MolecularValidationService.Dimension.SUPPLIED_H_STATE)
+            &&!(entry.getKey()==MolecularValidationService.Dimension.OCL_COORDINATE_COMPATIBILITY
+                &&entry.getValue().status()==totah.lab.mnemosyne.EvidenceInterpretation.Status.UNKNOWN_INCONCLUSIVE
+                &&result.evidence().messages().contains("legacyCombined=PASS"))
+            &&entry.getValue().status()!=totah.lab.mnemosyne.EvidenceInterpretation.Status.SUPPORTED_PRESENT)
+            throw new MolecularBackendException("dimensional validation not established: "+entry.getKey()+": "+entry.getValue()+"; "+result.evidence().messages());
+        return result;
+    }
 
     @Override
     public MolecularGraph decodeStructure(String format, String text) throws MolecularBackendException {
@@ -66,9 +87,24 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
         catch (Exception error) { throw new MolecularBackendException("source structure decoding failed", error); }
     }
 
+    private MolecularSanitizer.Result sanitizeDimensional(MolecularGraph graph,SanitizationPolicy policy) throws MolecularBackendException {
+        var checked=checkedDimensions(graph,true);
+        var mapping=mapper.toOcl(graph);
+        if(graph.atoms().stream().allMatch(a->a.stereochemistry().equals("UNSPECIFIED")||a.stereochemistry().equals("NONE")))mapping.molecule().stripStereoInformation();
+        mapping.molecule().ensureHelperArrays(Molecule.cHelperCIP);
+        var after=mapper.fromOcl(mapping,mapping.molecule());
+        var changes=meaningfulChanges(graph,after);
+        boolean unauthorized=changes.stream().anyMatch(change->change.disposition()==BackendEvidence.Disposition.UNAUTHORIZED_MEANINGFUL_CHANGE
+            ||(change.disposition()==BackendEvidence.Disposition.BENIGN_NORMALIZATION&&!policy.allowedBenignNormalizations().contains(normalizationId(change))));
+        if(unauthorized&&policy.failOnMeaningfulChange())throw new MolecularBackendException("OCL sanitization changed chemically meaningful graph dimensions");
+        var evidence=new BackendEvidence(BACKEND,OclValidationDimensions.VERSION,"sanitize",checked.evidence().atomLineage(),changes,checked.evidence().messages());
+        return new MolecularSanitizer.Result(unauthorized?after:graph,!unauthorized,evidence);
+    }
+
     @Override
     public MolecularSanitizer.Result sanitize(MolecularGraph graph, SanitizationPolicy policy)
             throws MolecularBackendException {
+        if(dimensionalValidation) return sanitizeDimensional(graph,policy);
         try {
             var mapping = mapper.toOcl(graph);
             mapper.validateHydrogenCounts(mapping);
@@ -147,6 +183,10 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
 
     @Override
     public StereochemistryService.Result validate(MolecularGraph graph) throws MolecularBackendException {
+        if(dimensionalValidation) {
+            var result=checkedDimensions(graph,false);var converted=mapper.toOcl(graph);converted.molecule().ensureHelperArrays(Molecule.cHelperCIP);
+            return new StereochemistryService.Result(true,converted.molecule().getStereoCenterCount(),result.evidence());
+        }
         var mapping = mapper.toOcl(graph);
         try {
             mapping.molecule().ensureHelperArrays(Molecule.cHelperCIP);
