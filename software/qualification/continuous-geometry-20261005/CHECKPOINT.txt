@@ -1,0 +1,63 @@
+CONTINUOUS GEOMETRY — IMPLEMENTATION QUALIFICATION CHECKPOINT
+2026-10-05. User approved the three payload contracts and additive diagnostics API.
+Contract/approval: ../continuous-geometry-contract-20261005/DESIGN.txt; APPROVAL.txt.
+Base: cbf76a0db11cc556efc732e2bd5feec3f28fa57a.
+
+Implemented
+- Gaia Plane3D.fitWithDiagnostics shares the unchanged Jacobi calculation with fit.
+  Ascending unnormalized covariance eigenvalues, RMS/max residuals, immutable result.
+- Opt-in internal athena.geometry/1 adapter behind existing RuleRegistry/RuleAnalyzers.
+  No new molecular graph, matcher, evidence-store API or scientific classifier.
+- Explicit bound plans, attributed radius assignments and deterministic geometry payloads.
+- Ordered distances/vectors/angles/torsions; planes with conditioning diagnostics;
+  point-plane and plane-pair offsets; complete explicit pair matrices and group minima.
+- Full state remains authoritative, including protein/cofactor/environment beyond 4.5 A.
+  Test residue labels (including synthetic CYS203) have no production special cases.
+- Signed surface gap/overlap only with supplied attributed radii. No default radius.
+- Bond/1-3 flags retain underlying distances. Unknown connectivity is not nonbonded.
+- Overlapping scopes deduplicate unordered pairs, retain membership directions and
+  count self/H omissions. Pair rows are allocated only up to the per-operation budget;
+  full requested cardinality is calculated independently. Truncation cannot yield a
+  complete minimum. Unknown elements cannot certify exhaustive heavy-atom coverage.
+- Unknown operation content remains in the immutable plan and is UNSUPPORTED.
+  Malformed plans/pins fail explicitly. Journal preservation precedes evaluation.
+- Evaluator verifies source method and exact recomputation from selected preserved
+  plan/radius/state inputs. No implicit latest evidence or default selections.
+
+Qualification
+final-run/tests.log: 770 tests started, 770 successful, zero failed/skipped/aborted.
+Includes geometry + existing Gaia plane/torsion, corrected B00, B01/local context,
+vocabulary/roles, five scientific families and Research Gate acceptance.
+Geometry report and journal: independent JVM replay byte-identical.
+B00 replay and five-family scientific artifacts: byte-identical to historical pins.
+PlaneReplay: 132 old/new solver cases exact hexadecimal outputs/errors, including
+128 fixed-seed nonplanar sets, isotropic set, collinear/coincident and too-small sets.
+ManifestCheck: production candidate decodes/registers as NOT_EVALUATED.
+Preservation.json records all 25 unrelated tracked hashes and prior checkpoint pins.
+Reproduce using validate.sh with a NEW output directory and existing cached classpath.
+
+Qualification scope/limitations
+IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING: no current-policy scientific receipt
+was manufactured. Candidate manifest is NOT_EVALUATED and is not bundled/activated.
+Finite explicit ANGSTROM coordinates; per-operation node/pair budgets; selected groups
+are caller declarations, not inferred chemical identities. Source frame qualification
+is retained separately. Unqualified-frame numbers remain non-negative/inconclusive.
+Normal uniqueness uses the reviewed numerical 1e-10 eigengap policy, not an empirical
+planarity threshold or a universal numerical error bound. Raw algorithm normal survives
+isotropic ambiguity; directional plane quantities then remain inconclusive.
+Radii are attributed inputs, not scientifically validated merely by parsing. No
+serious-clash, favorable-interaction, energetic, binding-mode or potency classification.
+Existing neighborhood/traversal and legacy detectors are unchanged. This checkpoint
+is not qualification of occupancy/SASA or the whole chemistry/geometry foundation.
+Bounded build uses existing cached foundational dependencies; clean-checkout whole-
+project compilation remains an explicit program-level validation obligation.
+
+Characterization/repair history retained
+run-2: 48/52 initially passed; four evaluator comparisons exposed JSON long/int node
+identity differences. Comparison now reparses canonical JSON, without changing counts.
+run-3: 624/624; run-5: 627/627. These overlap the final suite and must not be summed.
+qualified-run: 770/770; initial replay launcher omitted creation of catalog directories.
+The launcher was corrected and replay completed. final-run reran all 770 plus complete
+replay from a fresh directory. Early compiler attempts were development, not qualified.
+
+No docking, fragment generation, new scientific interpretation, cleanup or push.

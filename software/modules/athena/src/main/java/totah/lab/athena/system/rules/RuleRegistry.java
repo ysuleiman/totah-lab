@@ -82,6 +82,7 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.geometry")){ContinuousGeometryRules.validate(m);return;}
         if(m.schema().equals("athena-rule/3")) {
             if(!Set.of("athena.group","athena.scientific").contains(m.implementationId()))
                 throw new IllegalArgumentException("/3 implementation not registered");

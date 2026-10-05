@@ -1,0 +1,65 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GEOMETRY.CONTINUOUS",
+  "version": "1",
+  "profile": "ATHENA_CONTINUOUS_GEOMETRY_V1",
+  "family": "ENVIRONMENT",
+  "tier": "GEOMETRY",
+  "implementationId": "athena.geometry",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "explicit atoms; attributed radii only"
+  ],
+  "requiredGeometry": [
+    "explicit complete source frame"
+  ],
+  "measurementsProduced": {
+    "geometry": "athena-continuous-geometry/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "planeNormalRelativeGapTolerance": {
+      "value": "1.0E-10",
+      "unit": "dimensionless",
+      "definition": "Numerical eigengap guard; not empirical planarity"
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/continuous-geometry-contract-20261005/DESIGN.txt",
+      "sha256": "7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1",
+      "citation": "Approved continuous geometry contract"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/qualification/continuous-geometry-contract-20261005/DESIGN.txt",
+      "sha256": "7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1",
+      "citation": "Approved continuous geometry contract"
+    }
+  ],
+  "limitations": [
+    "raw measurements only; no interaction, energy or potency assertion"
+  ],
+  "negativeCoverage": {
+    "version": "1",
+    "supportedDomain": "raw explicit geometry",
+    "requirements": [
+      "COMPLETE_EXPLICIT_SCOPE",
+      "QUALIFIED_FRAME",
+      "FINITE_COORDINATES"
+    ],
+    "scope": "No continuous quantity establishes ABSENT_FALSE",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

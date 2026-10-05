@@ -76,6 +76,43 @@ public final class Plane3D {
      *                                  so that no unique plane exists
      */
     public static Plane3D fit(List<Point3D> points) {
+        return solve(points).plane();
+    }
+
+    /** Raw least-squares diagnostics; a returned normal is not a uniqueness certificate. */
+    public static FitDiagnostics fitWithDiagnostics(List<Point3D> points) {
+        var solution = solve(points);
+        double squared = 0.0;
+        double maximum = 0.0;
+        for (var point : points) {
+            double residual = solution.plane().absoluteDistanceTo(point);
+            squared += residual * residual;
+            maximum = Math.max(maximum, residual);
+        }
+        return new FitDiagnostics(solution.plane(), solution.eigenvalues(),
+                Math.sqrt(squared / points.size()), maximum);
+    }
+
+    /** Eigenvalues are ascending, unnormalized covariance values in squared input units. */
+    public record FitDiagnostics(Plane3D plane, List<Double> covarianceEigenvalues,
+                                 double rmsDistance, double maximumAbsoluteDistance) {
+        public FitDiagnostics {
+            Objects.requireNonNull(plane, "plane");
+            covarianceEigenvalues = List.copyOf(covarianceEigenvalues);
+            if (covarianceEigenvalues.size() != 3
+                    || covarianceEigenvalues.stream().anyMatch(v -> !Double.isFinite(v))
+                    || covarianceEigenvalues.get(0) > covarianceEigenvalues.get(1)
+                    || covarianceEigenvalues.get(1) > covarianceEigenvalues.get(2)
+                    || !Double.isFinite(rmsDistance) || rmsDistance < 0
+                    || !Double.isFinite(maximumAbsoluteDistance) || maximumAbsoluteDistance < 0) {
+                throw new IllegalArgumentException("invalid plane diagnostics");
+            }
+        }
+    }
+
+    private record Solution(Plane3D plane, List<Double> eigenvalues) { }
+
+    private static Solution solve(List<Point3D> points) {
         Objects.requireNonNull(points, "points");
 
         if (points.size() < MIN_POINTS) {
@@ -140,7 +177,9 @@ public final class Plane3D {
                 eigenvectors[1][smallestIndex],
                 eigenvectors[2][smallestIndex]).normalize());
 
-        return new Plane3D(centroid, normal);
+        return new Solution(new Plane3D(centroid, normal),
+                java.util.stream.DoubleStream.of(covariance[0][0], covariance[1][1], covariance[2][2])
+                        .sorted().boxed().toList());
     }
 
     /**
