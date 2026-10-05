@@ -1,0 +1,46 @@
+
+Thanks for using JUnit! Support its development at https://junit.org/sponsoring
+
+
+Failures (1):
+  JUnit Jupiter:GroupContextAcceptanceTest:malformedPayloadIsRejected()
+    MethodSource [className = 'totah.lab.daedalus.system.GroupContextAcceptanceTest', methodName = 'malformedPayloadIsRejected', methodParameterTypes = '']
+    => org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <java.lang.IllegalArgumentException> but was: <java.io.IOException>
+       org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+       org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:67)
+       org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+       org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3128)
+       totah.lab.daedalus.system.GroupContextAcceptanceTest.malformedPayloadIsRejected(GroupContextAcceptanceTest.java:126)
+       [...]
+     Caused by: java.io.IOException: invalid rule manifest
+       totah.lab.athena.system.rules.RuleRegistry.decode(RuleRegistry.java:40)
+       totah.lab.daedalus.system.GroupContextAcceptanceTest.local(GroupContextAcceptanceTest.java:28)
+       totah.lab.daedalus.system.GroupContextAcceptanceTest.lambda$malformedPayloadIsRejected$17(GroupContextAcceptanceTest.java:126)
+       org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+       [...]
+     Caused by: java.lang.IllegalArgumentException: invalid group definition
+       totah.lab.athena.system.rules.FunctionalGroupRules.validate(FunctionalGroupRules.java:30)
+       totah.lab.athena.system.rules.RuleRegistry.validate(RuleRegistry.java:90)
+       totah.lab.athena.system.rules.RuleRegistry.decode(RuleRegistry.java:38)
+       [...]
+     Caused by: java.lang.IllegalArgumentException: exclusion anchor role/arity mismatch
+       totah.lab.athena.system.rules.FunctionalGroupRules.lambda$validateExclusions$24(FunctionalGroupRules.java:290)
+       java.base/java.util.Iterator.forEachRemaining(Iterator.java:133)
+       totah.lab.athena.system.rules.FunctionalGroupRules.validateExclusions(FunctionalGroupRules.java:288)
+       totah.lab.athena.system.rules.FunctionalGroupRules.definition(FunctionalGroupRules.java:60)
+       [...]
+
+Test run finished after 966 ms
+[         6 containers found      ]
+[         0 containers skipped    ]
+[         6 containers started    ]
+[         0 containers aborted    ]
+[         6 containers successful ]
+[         0 containers failed     ]
+[        21 tests found           ]
+[         0 tests skipped         ]
+[        21 tests started         ]
+[         0 tests aborted         ]
+[        20 tests successful      ]
+[         1 tests failed          ]
+

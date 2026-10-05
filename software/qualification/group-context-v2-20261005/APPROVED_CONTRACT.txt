@@ -1,0 +1,81 @@
+FOUNDATION PERCEPTION CONTINUATION — EXACT PAYLOAD REVIEW GATE
+2026-10-05. Proposal only. No production /2 group payload is implemented.
+
+Problem
+B00 deliberately rejects excluded query atoms/negative recursive groups because
+those atoms cannot supply the complete stable correspondence required by its contract.
+B01 /1 has one positive query, member/role mapping and whole-component unsupported
+queries. A component-wide exclusion is not an occurrence-local chemical exclusion:
+using it to exclude amide N would also suppress a valid amine elsewhere in the same
+molecule. Enumerating a few positive aliphatic subtypes is useful but does not solve
+this general context requirement. Do not silently weaken B00 or broaden /1 semantics.
+
+Proposed exact new payloads; existing generic Java interfaces remain unchanged
+athena-group-definition/2:
+All /1 fields unchanged, plus required occurrenceExclusions array (may be empty).
+Each exclusion is an object with exactly:
+  id: nonblank stable string unique within definition
+  patternId: nonblank stable string
+  patternVersion: nonblank stable string
+  query: literal B00-supported query
+  anchors: object mapping existing definition role name to nonempty unique ordered
+    compiled-query indices in this exclusion query
+  hydrogenRoles: array of {queryIndex: nonnegative integer, count: nonnegative integer}
+  rationale: nonblank string
+  sourceReferences: nonempty existing ScientificReference array
+The source graph is never changed. Query compilation and exhaustive matching use B00
+only; no negative SMARTS engine or hand-written molecular search is introduced.
+Anchors compare exact stable atom IDs. An anchored list is compared in its declared
+order; all original positive and exclusion correspondence alternatives are searched.
+
+Per-alternative evaluation
+For each original positive-query embedding, test all exclusions. An exclusion only
+applies when every anchored role maps to the same target atoms in a B00 exclusion
+embedding. Required source H assertions must be supplied and consistent; inferred
+OCL H never substitutes. Any satisfied exclusion marks that positive role alternative
+EXCLUDED_BY_CONTEXT. A missing required source H assertion marks the applicable
+alternative UNKNOWN_CONTEXT; invalid/unsupported condition query fails explicitly.
+Complete absence of anchored exclusion matches is NOT_EXCLUDED only within complete
+source/query scope. Original B00 occurrences and every correspondence survive.
+
+athena-group-identities/2:
+All /1 report fields unchanged, plus required contextAssessments array sorted by
+memberAtomIds, canonical positive role mapping, then exclusion ID.
+Each entry is exactly:
+  memberAtomIds: sorted unique stable IDs
+  roleCorrespondence: original positive-role mapping
+  exclusionId: stable exclusion ID
+  status: EXCLUDED_BY_CONTEXT | NOT_EXCLUDED | UNKNOWN_CONTEXT
+  matchedExclusionCorrespondences: all applicable original exclusion query vectors,
+    sorted and deduplicated by exact stable-ID vector
+  sourceStateReferences: existing ScientificReference array
+  reasons: ordered nonblank strings
+All exclusion B00 receipts join the existing b00Results map under query digests.
+These are local derivation dispositions, not new EvidenceInterpretation.Status values.
+
+An identity is supported by at least one fully covered nonexcluded role alternative;
+its output retains all original alternative receipts and marks excluded/unknown roles
+explicitly rather than selecting an arbitrary symmetric representative. Exhaustive
+absence requires no surviving supported occurrence AND no unknown alternatives AND
+all existing versioned negative coverage conditions. Unknown never becomes false.
+Two valid occurrences remain distinct even when one different site is excluded.
+
+Compatibility
+/1 definitions, /1 reports and source-coverage/1 stay byte/behavior identical.
+/2 is opt-in, separately versioned and never inferred when reading /1.
+New profiles cannot silently change any old five-family scientific result.
+No EvidenceExchange change, public typed group API, new matcher, graph or store.
+No donor/acceptor activation follows merely from approval of this contract.
+
+Acceptance
+Mixed molecule with one ordinary amine and one amide: keep the amine, exclude only
+amide N. Sulfonamide and aromatic-N distinctions use their reviewed local predicates.
+Keep original roles, source graph, excluded matches and decision provenance. Test
+multiple occurrences, symmetry alternatives, nested identity, explicit/unknown H,
+unknown/invalid exclusion queries, charge alternates, atom-order permutation,
+independent-JVM replay, journal roundtrip and unchanged /1/five-family replay.
+
+Scope
+This is the smallest proposed data-contract extension for local chemical context.
+It does not authorize general reaction/ionization prediction, pKa, favorable contacts,
+energies or new scientific rules merely because patterns can now be expressed.
