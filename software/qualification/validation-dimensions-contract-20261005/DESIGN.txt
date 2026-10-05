@@ -1,0 +1,115 @@
+PROSPECTIVE CONTRACT — V01/V02/V05 DIMENSIONAL VALIDATION
+Public API review required. No production Java or schema changes implemented.
+
+WHY EXISTING INTERFACES ARE INSUFFICIENT
+MolecularSanitizer.SanitizationPolicy only permits benign normalization names and
+failOnMeaningfulChange. A neutrality policy is not a normalization and cannot safely
+be smuggled into that set. StereochemistryService.validate has no policy argument.
+Both result records have one valid boolean. Existing BackendEvidence can retain
+causes but cannot select different validation semantics. OclMolecularBackend is final
+and has only the implicit no-argument constructor. SystemGraphValidation has a static
+VERSION, and SystemQualificationPipeline writes that constant into all certificates.
+Changing any of these defaults would silently migrate historical consumers.
+
+OCL FACILITIES
+Pinned 2026.7.2 bytecode excerpts and jar hash accompany this contract.
+ExtendedMolecule.validate first checks close coordinates, then valence and total
+charge; StereoMolecule.validate invokes it before performing stereo checks.
+There is no charge-policy validate overload. Catching charge failure cannot prove
+stereo validity. No source-charge override, neutralization, counterion, H edit or
+coordinate repair is permitted, even on a temporary copy to trick the validator.
+Use OCL perception/predicates for an attributed adapter. Any OCL check not faithfully
+reproduced remains UNKNOWN_INCONCLUSIVE/UNSUPPORTED, not PASS. Preserve combined
+OCL exception causes as diagnostic evidence. The close-coordinate condition stays
+separate and cannot disappear merely because charge is nonzero.
+
+EXACT PROPOSED ADDITIVE JAVA API
+Package totah.lab.athena.design.backend:
+
+public interface MolecularValidationService {
+    enum Dimension {
+        TOPOLOGY_VALENCE, SUPPLIED_H_STATE, STEREOCHEMISTRY,
+        NET_NEUTRALITY, OCL_COORDINATE_COMPATIBILITY
+    }
+    enum NeutralityPolicy { OBSERVE_ONLY, REQUIRE_COMPONENT_NEUTRAL }
+    record Assessment(
+        totah.lab.mnemosyne.EvidenceInterpretation.Status status,
+        java.util.List<String> reasons) { }
+    record Result(
+        java.util.Map<Dimension, Assessment> dimensions,
+        int netFormalCharge,
+        BackendEvidence evidence) { }
+    Result validateDimensions(MolecularGraph graph, NeutralityPolicy neutrality)
+        throws MolecularBackendException;
+}
+
+All dimensions required, immutable canonical enum-keyed map, immutable reasons.
+netFormalCharge is a scoped component sum, not a protonation prediction. Integer
+overflow is a checked failure. Missing chemistry/state cannot be certified.
+OBSERVE_ONLY records charge with NET_NEUTRALITY=NOT_EVALUATED (no neutrality request).
+REQUIRE_COMPONENT_NEUTRAL reports SUPPORTED_PRESENT if zero, ABSENT_FALSE otherwise;
+this result cannot poison valence/stereo/H statuses. No salt recognition is claimed.
+Original backend causes remain in BackendEvidence.messages; no exception-text-only
+success shortcut. UNKNOWN/UNSUPPORTED/FAILED remain non-negative. Zero source H
+annotation retains its existing unspecified meaning, not authoritative zero H.
+
+Package totah.lab.athena.design.backend.ocl:
+
+// OclMolecularBackend additionally implements MolecularValidationService.
+public static OclMolecularBackend forChemicalStateValidation();
+public MolecularValidationService.Result validateDimensions(
+    MolecularGraph graph, MolecularValidationService.NeutralityPolicy neutrality)
+    throws MolecularBackendException;
+
+The existing public no-arg construction remains legacy byte-for-byte in output.
+The factory is explicitly opt-in, with implementation identity
+2026.7.2/athena-validation-dimensions/1 in corrected validation BackendEvidence.
+Other operations (matching, identity, generation, energies) keep existing behavior
+and identities. No caller is automatically changed. Corrected sanitizer returns the
+original graph and fails closed on non-charge errors; corrected stereo never passes
+because a combined validator stopped at charge. Dimensional results are the authority
+for decomposition; boolean adapters cannot represent conditional validity as true.
+
+Package totah.lab.athena.system, additions to SystemGraphValidation:
+
+public SystemGraphValidation(
+    MolecularValidationService validation,
+    CanonicalIdentityService identity,
+    MolecularValidationService.NeutralityPolicy neutrality);
+public totah.lab.mnemosyne.ScientificReference methodReference();
+
+Existing three-service constructor and public VERSION constant retain legacy behavior.
+New constructor uses independent checks and version system-graph-validation/2.
+methodReference() on legacy instances returns EXACTLY the currently constructed
+(kind METHOD, namespace athena.system, id system-graph-validation/1, version 1).
+New instances identify version /2 and explicitly encode neutrality policy in method
+identity/version so a receipt cannot replay under a different requested policy.
+Pipeline replaces its hardcoded legacy reference with validation.methodReference().
+Existing certificate/EvidenceExchange schemas and capability enums stay unchanged.
+Use existing Check records for attributed dimensional outcomes. Bind component/state,
+policy and backend version through checks and method identity, not mutable globals.
+
+CAPABILITY CAUSALITY
+Only net-charge rejection is removed from unrelated capabilities. Coordinate,
+correspondence, source H, valence and stereo deficiencies retain their appropriate
+independent consequences. Explicit nonneutrality is visible as its own check;
+no universal graph rejection. Existing typed/H/frame prerequisites are not widened.
+No interaction definition/threshold changes and no implicit role activation.
+
+ACCEPTANCE BEFORE QUALIFICATION
+- Existing five neutral/charged witnesses; exact original causes retained.
+- Genuine over-valence, inconsistent supplied H, empty/malformed graph, unsupported
+  stereo and non-charge OCL failures. Charged invalid cases must not pass.
+- Explicit component-neutrality request versus observe-only; no salt assumption.
+- All source graph/charge/H/stereo/coordinates immutable.
+- Separate sanitizer/stereo/SystemGraphValidation/capability result comparisons;
+  every delta attributed CHARGE_ONLY_CORRECTION or blocked for review.
+- All listed consumers traced; legacy constructors unchanged. Corrected opt-in
+  fragment/design acceptance fixtures only; no new generation campaign.
+- Independent JVM replay; historical certificates and five scientific replay exact.
+- Checkpoint/source pins and permanent supporting documentation in focused commit.
+
+No production implementation until this additive API contract is approved.
+This is a validation adapter, not an alternate molecular model or chemistry engine.
+If public OCL predicates cannot faithfully support a claimed check, stop or explicitly
+narrow the supported domain rather than inventing chemistry or accepting a hidden error.

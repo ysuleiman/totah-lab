@@ -1,0 +1,122 @@
+  public void validate() throws java.lang.Exception;
+    Code:
+       0: aload_0
+       1: invokevirtual #201                // Method getAverageBondLength:()D
+       4: dstore_1
+       5: dload_1
+       6: dload_1
+       7: dmul
+       8: ldc2_w        #202                // double 16.0d
+      11: ddiv
+      12: dstore_3
+      13: iconst_1
+      14: istore        5
+      16: iload         5
+      18: aload_0
+      19: getfield      #16                 // Field mAllAtoms:I
+      22: if_icmpge     148
+      25: iconst_0
+      26: istore        6
+      28: iload         6
+      30: iload         5
+      32: if_icmpge     142
+      35: aload_0
+      36: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      39: iload         6
+      41: aaload
+      42: getfield      #205                // Field com/actelion/research/chem/Coordinates.x:D
+      45: aload_0
+      46: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      49: iload         5
+      51: aaload
+      52: getfield      #205                // Field com/actelion/research/chem/Coordinates.x:D
+      55: dsub
+      56: dstore        7
+      58: aload_0
+      59: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      62: iload         6
+      64: aaload
+      65: getfield      #206                // Field com/actelion/research/chem/Coordinates.y:D
+      68: aload_0
+      69: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      72: iload         5
+      74: aaload
+      75: getfield      #206                // Field com/actelion/research/chem/Coordinates.y:D
+      78: dsub
+      79: dstore        9
+      81: aload_0
+      82: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      85: iload         6
+      87: aaload
+      88: getfield      #207                // Field com/actelion/research/chem/Coordinates.z:D
+      91: aload_0
+      92: getfield      #204                // Field mCoordinates:[Lcom/actelion/research/chem/Coordinates;
+      95: iload         5
+      97: aaload
+      98: getfield      #207                // Field com/actelion/research/chem/Coordinates.z:D
+     101: dsub
+     102: dstore        11
+     104: dload         7
+     106: dload         7
+     108: dmul
+     109: dload         9
+     111: dload         9
+     113: dmul
+     114: dadd
+     115: dload         11
+     117: dload         11
+     119: dmul
+     120: dadd
+     121: dload_3
+     122: dcmpg
+     123: ifge          136
+     126: new           #87                 // class java/lang/Exception
+     129: dup
+     130: ldc           #208                // String The distance between two atoms is too close.
+     132: invokespecial #209                // Method java/lang/Exception."<init>":(Ljava/lang/String;)V
+     135: athrow
+     136: iinc          6, 1
+     139: goto          28
+     142: iinc          5, 1
+     145: goto          16
+     148: aload_0
+     149: iconst_1
+     150: invokevirtual #11                 // Method ensureHelperArrays:(I)V
+     153: iconst_0
+     154: istore        5
+     156: iconst_0
+     157: istore        6
+     159: iload         6
+     161: aload_0
+     162: getfield      #54                 // Field mAtoms:I
+     165: if_icmpge     211
+     168: aload_0
+     169: iload         6
+     171: invokevirtual #19                 // Method getOccupiedValence:(I)I
+     174: aload_0
+     175: iload         6
+     177: invokevirtual #72                 // Method getMaxValence:(I)I
+     180: if_icmple     193
+     183: new           #87                 // class java/lang/Exception
+     186: dup
+     187: ldc           #210                // String atom valence exceeded
+     189: invokespecial #209                // Method java/lang/Exception."<init>":(Ljava/lang/String;)V
+     192: athrow
+     193: iload         5
+     195: aload_0
+     196: getfield      #27                 // Field mAtomCharge:[I
+     199: iload         6
+     201: iaload
+     202: iadd
+     203: istore        5
+     205: iinc          6, 1
+     208: goto          159
+     211: iload         5
+     213: ifeq          226
+     216: new           #87                 // class java/lang/Exception
+     219: dup
+     220: ldc           #211                // String unbalanced atom charge
+     222: invokespecial #209                // Method java/lang/Exception."<init>":(Ljava/lang/String;)V
+     225: athrow
+     226: return
+
