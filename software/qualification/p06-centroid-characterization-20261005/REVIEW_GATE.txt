@@ -1,0 +1,54 @@
+P06 CONTINUOUS CENTROID / PLANE SEPARATION — PROSPECTIVE REVIEW
+2026-10-05. Base 41c1d1252; P05 qualified and committed.
+No production geometry change implemented.
+
+REPRODUCED EXISTING BEHAVIOR
+Explicit source points (0,0,0), (2,0,0), (4,0,0), existing PLANE operation:
+athena.geometry/1 returns UNKNOWN_INCONCLUSIVE measurement, no centroidAngstrom.
+Arithmetic centroid is well defined at (2,0,0); plane normal is not uniquely defined.
+CentroidCharacterizationTest (1/1 pass) preserves this observed limitation, not approval
+of it. run/observed-v1.json retains exact source frame, plan and actual output.
+
+EXISTING CAUSE AND REUSE
+ContinuousGeometryRules.PLANE invokes fitWithDiagnostics before planeQuantities emits
+any centroid. The exception path marks geometry inconclusive without retaining centroid.
+Gaia Plane3D already implements private static Point3D centroidOf(List<Point3D> points).
+ResidueGeometry.centroid requires a Residue plus AtomSelection; manufacturing a residue
+for a cross-residue explicit group would be inappropriate.
+
+PROPOSED BOUNDED PUBLIC API FOR REVIEW
+Expose the existing Gaia helper (same class, no new graph or numerical engine):
+  public static Point3D Plane3D.centroidOf(List<Point3D> points)
+Contract: equal-weight arithmetic centroid of a nonempty finite supplied point list;
+null list/member rejected, empty/nonfinite input rejected; no mutation or plane fitting;
+no normal, planarity, aromaticity, interaction or physical weighting is implied.
+Reuse the existing arithmetic/order. Preserve valid legacy Plane3D.fit behavior/replay.
+This is an additive public API and therefore requires approval under AGENTS.md.
+
+PROPOSED VERSIONED GEOMETRY CORRECTION FOR REVIEW
+Add opt-in athena.geometry implementation version 2 / ATHENA_CONTINUOUS_GEOMETRY_V2.
+Keep version 1 behavior and historical bytes unchanged. No automatic consumer migration.
+Reuse current plan/result fields, operation kinds and EvidenceExchange transport;
+no new payload schema or CENTROID operation is proposed.
+For PLANE in v2, after full requested coordinate/frame/budget checks:
+- independently record centroidAngstrom for complete finite selected points;
+- attempt the existing plane/diagnostic solver;
+- if plane is degenerate, keep centroid and an explicit inconclusive plane diagnostic;
+- do not manufacture a normal, residual/offset or complete plane-geometry coverage;
+- missing coordinates or incomplete traversal do not yield a partial-scope centroid;
+- an unqualified frame retains numbers with inconclusive qualification as before.
+Implementation provenance must correctly state version 2. v1 replay must stay exact.
+No new cutoffs, radii, chemistry, interaction behavior or coordinate repair.
+
+ACCEPTANCE
+Existing collinear witness: v1 unchanged; v2 centroid (2,0,0), plane inconclusive.
+Coincident points and small nonempty explicit groups: centroid independent of normal.
+Ordinary nondegenerate geometry: centroid and plane measurements unchanged numerically.
+Missing/nonfinite points, empty list, node budget, unqualified frame, order/translation
+checks, source immutability, independent JVM replay and complete v1 historical replay.
+Aromatic identity remains source-graph based; degeneracy cannot erase chemical evidence.
+Permanent supporting record must explain the separation and preserve this failed/limited
+v1 characterization. Qualify the correction separately before any consumer migration.
+
+STOP: approve the additive helper API and opt-in versioned geometry correction.
+Do not silently rewrite v1 as though it already preserved the centroid.
