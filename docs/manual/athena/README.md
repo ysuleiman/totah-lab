@@ -66,3 +66,5 @@ Bounded aromatic cycle/fused-system attribution: [definition rationale, source l
 Supplied group formal-charge attribution: [P04 scientific support and domain limits](supporting-material/CHARGE_GROUPS.md).
 
 Complete-membership aromatic-carbocycle predicate: [P05 scientific support and coverage](supporting-material/ALL_MEMBERS_NONPOLAR.md).
+
+Independent centroid and plane geometry: [P06 V2 definition, partial coverage and historical preservation](supporting-material/CENTROID_PLANE.md).

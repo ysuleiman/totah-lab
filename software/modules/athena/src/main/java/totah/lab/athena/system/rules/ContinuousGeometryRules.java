@@ -27,7 +27,8 @@ final class ContinuousGeometryRules {
 
     static void validate(RuleManifest m) {
         if (!Set.of("athena-rule/2", "athena-rule/3").contains(m.schema())
-                || !m.implementationVersion().equals("1") || !m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V1")
+                || !(m.implementationVersion().equals("1") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V1")
+                    || m.implementationVersion().equals("2") && m.profile().equals("ATHENA_CONTINUOUS_GEOMETRY_V2"))
                 || m.family() != RuleManifest.Family.ENVIRONMENT
                 || !m.parameters().keySet().equals(Set.of("planeNormalRelativeGapTolerance")))
             throw new IllegalArgumentException("continuous geometry manifest contract");
@@ -120,7 +121,7 @@ final class ContinuousGeometryRules {
         var report = JSON.createObjectNode(); report.put("schema", "athena-continuous-geometry/1");
         report.set("stateBinding", node(s.binding())); report.set("planReference", pin(pe)); report.set("plan", plan);
         report.set("radiusAssignmentReference", plan.get("radiusAssignmentReference"));
-        report.set("implementation", node(Map.of("id", "athena.geometry", "version", "1", "sourceReferences", List.of(methodReference(m, false)))));
+        report.set("implementation", node(Map.of("id", "athena.geometry", "version", m.implementationVersion(), "sourceReferences", List.of(methodReference(m, false)))));
         var out = report.putArray("operations");
         for (var op : plan.get("operations")) out.add(measure(s, m, r, op, groups, radii, plan.get("coordinateSourceReferences")));
         report.set("sourceReferences", plan.get("sourceReferences")); report.set("limitations", plan.get("limitations"));
@@ -185,7 +186,17 @@ final class ContinuousGeometryRules {
                     else quantity(q, "unitVector", vector(v.normalize()), "DIMENSIONLESS", SUPPORTED_PRESENT, sources, "");
                 }
                 case "PLANE" -> {
-                    var fit = fit(s, group(groups, op, "groupId")); planeQuantities(q, fit, sources);
+                    var selection = group(groups, op, "groupId");
+                    if (m.implementationVersion().equals("2")) {
+                        // Resolve the entire requested selection before publishing any centroid.
+                        var points = selection.stream().map(a -> point(s, a)).toList();
+                        var centroid = Plane3D.centroidOf(points);
+                        quantity(q, "centroidAngstrom", List.of(finite(centroid.x()), finite(centroid.y()), finite(centroid.z())),
+                                "ANGSTROM", SUPPORTED_PRESENT, sources, "");
+                        // Centroid availability cannot establish a plane or unique normal.
+                        c.put("normalUniquenessStatus", UNKNOWN_INCONCLUSIVE.name());
+                    }
+                    var fit = fit(s, selection); planeQuantities(q, fit, sources);
                     c.put("normalUniquenessStatus", unique(fit, m) ? SUPPORTED_PRESENT.name() : UNKNOWN_INCONCLUSIVE.name());
                 }
                 case "POINT_PLANE" -> {

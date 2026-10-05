@@ -249,7 +249,18 @@ public final class Plane3D {
                 normal);
     }
 
-    private static Point3D centroidOf(List<Point3D> points) {
+    /**
+     * Equal-weight arithmetic centroid of a complete, nonempty selection.
+     * This calculation makes no assertion about a plane or its uniqueness.
+     * Point3D enforces finite inputs; nonfinite accumulation is rejected as well.
+     * Summation follows supplied order, as in the historical plane fitter.
+     *
+     * @throws NullPointerException if the list or a member is null
+     * @throws IllegalArgumentException if empty or the arithmetic result is nonfinite
+     */
+    public static Point3D centroidOf(List<Point3D> points) {
+        Objects.requireNonNull(points, "points");
+        if (points.isEmpty()) throw new IllegalArgumentException("centroid requires nonempty points");
         double sumX = 0.0;
         double sumY = 0.0;
         double sumZ = 0.0;
