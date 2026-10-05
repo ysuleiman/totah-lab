@@ -3370,6 +3370,133 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.PERCEPTION.AROMATIC.SYSTEM — 1.0.0 (aromatic-systems-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/aromatic-systems-v1/ATHENA.PERCEPTION.AROMATIC.SYSTEM.rule.json) · SHA256 `c9670ff9fd63871ce70f4e126cb8b1e3cf10397a9994e0dd8fef6fbafaaf3b1f`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_AROMATIC_SYSTEMS_V1"
+```
+
+**implementationId**
+
+```json
+"athena.aromatic-systems"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "aromatic-systems": "athena-aromatic-systems/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.PERCEPTION.AROMATIC.SYSTEM/negative/1",
+  "supportedDomain": "Reviewed existing general aromatic 5/6-cycle source reports in one supplied component.",
+  "requirements": [
+    "VERIFIED_SOURCE_REPORTS",
+    "COMPLETE_GENERAL_5_6_ENUMERATION",
+    "COMPLETE_SOURCE_CORRESPONDENCE",
+    "WITHIN_REQUEST_BUDGET"
+  ],
+  "scope": "SUPPLIED_COMPONENT_B00_AROMATIC_5_6_CYCLES",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact existing B00 aromatic-vertex 5/6-cycle attribution only; no arbitrary-cycle completeness, unique cycle basis, planarity, energy or interaction claim.",
+  "Shared bond establishes fusion under this reviewed grouping model; shared atom alone does not.",
+  "Source reports and role alternatives remain immutable and linked; incomplete/ambiguous source correspondence remains inconclusive.",
+  "Implementation qualification does not confer current-policy Research Gate qualification or activate interaction consumers."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AROMATIC.json",
+    "sha256": "423614c70fe4e5c9b5947b1074a71ba316e63b9c622cd632776929c2788df192",
+    "citation": "Existing pinned blueprint/reference inventory; exact literal/state fixtures qualify this bounded identity, not external-engine parity."
+  },
+  {
+    "locator": "software/qualification/aromatic-system-contract-20261005/DESIGN.txt",
+    "sha256": "291db22dbe397908cb2c01528ca5c4d9cea7df63601cdcabfeef3eb9c1199deb",
+    "citation": "User-approved P02/P06 structural grouping contract; approval 2026-10-05."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GEOMETRY.CONTINUOUS — 1 (geometry-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/geometry-foundation-v1/ATHENA.GEOMETRY.CONTINUOUS.rule.json) · SHA256 `f9e4971bf8d025957f9dac0819535916375fb0935dba6181f7ce16ad5fc4e249`

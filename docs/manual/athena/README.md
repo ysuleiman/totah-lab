@@ -60,3 +60,5 @@ metadata/digests and retrieval provenance when redistribution is inappropriate.
 Run `python3 docs/manual/athena/render_reference.py` to render from repository artifacts;
 use `--check` to verify no stale generated pages. Documentation rendering is not chemistry
 execution, research review, or a scientific qualification test.
+
+Bounded aromatic cycle/fused-system attribution: [definition rationale, source limitations and qualification](supporting-material/AROMATIC_SYSTEMS.md).
