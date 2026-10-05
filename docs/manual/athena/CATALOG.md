@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `9047d8f3c9e39c8a1a1d5fe9cc4f3bf11a1b96904cce13706863f722e3fbaee0`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `af7b8ef1f527da6cb1eae2fbd60753bcc77ea0f28b332495ef401b96490d9088`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -76,9 +76,9 @@ Disposition is copied without upgrading partial capability coverage.
 | A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | G01 | Methyl environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
-| G02 | Vicinal-disulfide-compatible geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
+| G02 | Vicinal-disulfide-compatible geometry | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt) |
 | G03 | Sulfur-pi and chalcogen-O | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
-| G04 | Cysteine environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
+| G04 | Cysteine environment | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt) |
 | G05 | SAM sulfonium/methyl/aromatic environment | P2 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G06 | SAM methyl-transfer geometry | P2 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G07 | n-to-pi-star motif | P3 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |

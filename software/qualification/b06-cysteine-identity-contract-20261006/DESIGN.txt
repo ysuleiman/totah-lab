@@ -1,0 +1,92 @@
+B06 — PROSPECTIVE CYSTEINE ROLE ATTRIBUTION SCIENTIFIC-DEFINITION REVIEW
+2026-10-06; committed execution base c32409a38. NOT IMPLEMENTED.
+
+WHY THIS IS THE NEXT DEPENDENCY
+The accepted BACKLOG.txt B06 requires source S-S connectivity followed by
+vicinal/state-resolved geometry. Source connectivity and its current-policy direct
+execution are implemented. The VICINAL dossier requires explicit consecutive
+peptide-linked cysteines, actual peptide connectivity, and named sidechain/backbone
+roles. The CYS_ENVIRONMENT dossier separately requires sourced chemical-state identity.
+Neither draft fixes an executable cysteine identity domain (labels versus graph,
+modified sulfur, stereochemical scope and incomplete H state).
+
+Exact existing sources:
+software/qualification/rule-qualification-blueprint-20261005/BACKLOG.txt, B06
+software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.VICINAL.json
+software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.CYS_ENVIRONMENT.json
+software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java, sulfur()/named()
+software/modules/athena/src/main/java/totah/lab/athena/system/rules/SourceSulfurConnectivityRules.java
+software/modules/athena/src/main/java/totah/lab/athena/system/rules/ContinuousGeometryRules.java
+
+VERIFIED DISTINCTIONS
+The historical sulfur collector finds N/CA/CB by source atom name and adjacent
+residues by chain order. It explicitly labels its backbone torsions chain-order,
+not proof of peptide continuity. Preserve its results and implementation unchanged.
+Corrected B06 establishes an explicit S-S graph edge only; it intentionally does
+NOT establish Cys identity. Reusing that positive as a disulfide/Cys assertion would
+widen its approved scientific proposition.
+Existing continuous geometry can already measure supplied tuples and planes without
+naming them chemically. No new calculator, geometry schema or coordinate authority
+is needed just to record those raw quantities. That raw ability does not resolve
+chemical role assignment, peptide linkage or absolute stereochemistry.
+
+SCIENTIFIC DECISION REQUESTED
+Approve a bounded graph-backed CYSTEINE_BACKBONE attribution, distinct from source
+residue annotation and from sulfur state. Do not treat a CYS label alone as a
+chemically verified identity; preserve the label as source evidence.
+
+PROPOSED FIRST DOMAIN (CANDIDATE DEFINITION FOR QUALIFICATION)
+1. Reuse B00 exclusively for an explicitly ordered role mapping of the supplied
+   N-CA-C(=O) backbone with CA-CB-SG side chain. Require the listed single bonds
+   N-CA, CA-C, CA-CB, CB-SG and listed carbonyl C=O; retain exact source bond IDs/order.
+2. CA and CB are neutral, nonaromatic carbon with authoritative one-H and two-H
+   states respectively; their complete non-H attachment sets are {N,C,CB} and
+   {CA,SG}. Use existing source coverage, not inferred OCL H counts.
+3. Preserve N, carbonyl and sulfur charge/state as supplied. The backbone label
+   alone does not classify N protonation, SG oxidation, thiol/thiolate, disulfide,
+   donor/acceptor chemistry or biological residue identity. Sulfur-state assessments
+   require their own already-qualified applicable group/source evidence. Modified
+   sulfur may retain this backbone; do not label it unmodified cysteine.
+4. Include supplied L, D and unspecified stereo as separately preserved source
+   states. The backbone identity itself makes no L/D or R/S assertion. Do not
+   normalize, repair or infer stereochemistry from names or coordinates.
+5. Retain every correspondence alternative and overlapping group identity. Do not
+   select one symmetric/permuted mapping as chemical truth.
+6. A fully supported source-label/graph disagreement remains two observations.
+   Missing graph, H-state or mapping stays inconclusive for chemical attribution;
+   a source name cannot fill the gap. Negative claims require exhaustive reviewed
+   graph/state/mapping coverage. Unsupported substitutions stay outside this domain.
+7. A vicinal pair additionally requires an explicitly listed source C(first)-N(second)
+   covalent edge with exact atom/state binding. Number adjacency, chain order,
+   proximity or a source sequence edge are insufficient. This defines peptide
+   connectivity only, not a peptide conformation or disulfide bond.
+8. After identity/linkage attribution, reuse existing geometry plans to preserve
+   all requested distances/torsions/planes with exact ordered atom tuples and source
+   evidence. A missing role or external neighbor yields unavailable affected geometry;
+   do not silently substitute chain neighbors or shrink the scope.
+
+REUSE AND BOUNDARIES
+Existing B00, B01 group definitions/source coverage, MolecularGraph/SystemStateView,
+EvidenceEnvelope/Findings and continuous geometry. No alternate graph, matcher, new
+Java public API or payload schema is proposed by this document. If qualification
+reveals a durable transport requirement, present it before implementing it.
+No other direct predicate is activated by the c32409a38 execution checkpoint.
+No empirical vicinal C+/C-/Tx/Tz classification: its calibration remains a separate
+local blocker; it must not suppress source geometry or other independent capabilities.
+No redox, reactivity, favorable interaction, potency, chemistry repair or METTL7 use.
+
+QUALIFICATION REQUIRED AFTER SCIENTIFIC REVIEW
+Matched backbone with unrelated source label; CYS label on wrong connectivity;
+L/D/unspecified stereo; thiol/thiolate/explicit S-S/modified sulfur kept separate;
+unknown/contradictory CA/CB H; wrong attachment; incomplete mapping; all distinct
+occurrences and correspondence permutations; actual peptide edge versus adjacent
+numbering without edge; missing neighbor/atom; immutable source, conflict preservation,
+independent replay and unchanged historical sulfur/current execution consumers.
+Literal OCL query remains to be qualified, not presumed correct by design approval.
+
+REVIEW STOP
+The dossier's current phrase "explicit cysteine/modified-Cys identity" does not resolve
+this source-label versus graph/state domain decision. This is the scientific-definition
+gate under foundation REQUEST.txt section14(4), not a missing-dataset program stop.
+Approve this bounded backbone/source-label separation before implementing chemical
+role attribution. No new scientific classifier, definition or criterion was installed.
