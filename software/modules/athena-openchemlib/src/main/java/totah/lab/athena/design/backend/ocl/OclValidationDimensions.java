@@ -8,7 +8,7 @@ import static totah.lab.mnemosyne.EvidenceInterpretation.Status.*;
 
 /** Adapter over pinned OCL 2026.7.2 predicates; never edits the supplied chemical state. */
 final class OclValidationDimensions {
-    static final String VERSION="2026.7.2/athena-validation-dimensions/1";
+    static final String VERSION="2026.7.2/athena-validation-dimensions/2";
     private OclValidationDimensions() { }
     static Assessment assessment(totah.lab.mnemosyne.EvidenceInterpretation.Status s,String reason) {return new Assessment(s,List.of(reason));}
     static Result assess(MolecularGraph graph,NeutralityPolicy policy)throws MolecularBackendException {
@@ -23,7 +23,7 @@ final class OclValidationDimensions {
         var diagnostics=new ArrayList<String>();var lineage=new TreeMap<String,String>();graph.atoms().forEach(a->lineage.put(a.id(),a.id()));
         OclGraphMapper.Mapping mapping=null;
         boolean topology=true;
-        try {graph.validateTopology(true);}
+        try {graph.validateTopology(false);if(graph.atoms().isEmpty())throw new IllegalArgumentException("empty supplied graph outside nonempty validation scope");}
         catch(Exception e){topology=false;diagnostics.add("topology: "+e);values.put(Dimension.TOPOLOGY_VALENCE,assessment(FAILED,e.toString()));}
         if(topology)try {mapping=new OclGraphMapper().toOcl(graph);}
         catch(Exception e){

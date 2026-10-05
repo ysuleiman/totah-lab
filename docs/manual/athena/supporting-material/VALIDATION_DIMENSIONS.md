@@ -1,7 +1,3 @@
-> Current limitation: subsequent disconnected-source characterization found an
-> unapproved connectivity restriction. See [review gate](../../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt).
-> The 179-test checkpoint is preserved but does not qualify unrestricted migration.
-
 # Dimensional chemical-state validation (V01 / V02 / V05)
 
 The user-reviewed [API and semantics contract](../../../../software/qualification/validation-dimensions-contract-20261005/DESIGN.txt)
@@ -64,7 +60,7 @@ retaining UNKNOWN coordinate coverage. It does not certify the missing geometry.
 - `athena/design/backend/MolecularValidationService`: additive public dimensional result.
 - `athena-openchemlib/.../OclValidationDimensions`: package-private OCL adapter.
 - `OclMolecularBackend.forChemicalStateValidation()`: opt-in sanitizer/stereo path,
-  identity `2026.7.2/athena-validation-dimensions/1`.
+  identity `2026.7.2/athena-validation-dimensions/2`.
 - `SystemGraphValidation` opt-in constructor: dimensional checks and
   `system-graph-validation/2`, with policy-bound method reference.
 - `SystemQualificationPipeline`: takes that instance reference; legacy reference bytes unchanged.
@@ -80,3 +76,24 @@ include consumer comparisons, source pins, synthetic charged-invalid witnesses,
 independent replay and immutable historical source copies. This is bounded implementation
 qualification; no current-policy scientific Research Gate receipt or validity date is
 fabricated. Broader salt, stereo and chemistry domains remain open in the catalog.
+
+## Disconnected-topology correction (2026-10-05)
+
+Generic molecular structural validity does not imply connectedness; connectedness
+is an explicit consumer/system-scope requirement. The initial dimensional adapter
+incorrectly used `validateTopology(true)`. The [failed characterization](../../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt)
+remains immutable, together with commit 73672f080 and follow-up 07b2862f4.
+
+Version `/2` restores `validateTopology(false)` and keeps nonempty input as an
+explicit validation-scope precondition. Bad endpoints, self/duplicate bonds still
+fail. No graph is split or interpreted as a salt; no counterion or H is added.
+`REQUIRE_COMPONENT_NEUTRAL` concerns the complete supplied graph/component scope,
+including all disconnected fragments together. It does not assert that each
+fragment is neutral. OBSERVE_ONLY does not evaluate that proposition at all.
+The historical SystemGraphValidation connected-component check remains unchanged.
+
+[Repair checkpoint](../../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt)
+records neutral/charged disconnected fixtures, malformed topology and direct
+system-scope comparison. Source bytes and historical replay remain preserved.
+This is the explicitly reviewed CONNECTIVITY_SCOPE_RESTORATION; legacy-versus-final
+valid input differences are charge-only. No new scientific interaction rule is added.
