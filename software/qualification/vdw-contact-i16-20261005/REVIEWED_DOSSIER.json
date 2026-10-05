@@ -1,0 +1,84 @@
+{
+  "rule_id": "ATHENA.VAL.VDW_CONTACT",
+  "version_proposal": "1.0.0-blueprint-draft",
+  "baseline_concepts": [
+    "I16",
+    "I17"
+  ],
+  "supported_domain": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.",
+  "perception_requirements": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.; existing OCL graph matching only, after dialect qualification.",
+  "raw_measurements": "Distance d, ri,rj, signed gap=d-ri-rj, overlap=ri+rj-d, radius units/model, topology exclusions, state IDs, coverage and unknown radii.",
+  "classification_semantics": "Continuous descriptor. No small/serious clash, favorable contact or Probe parity by default. Keep values for nonclashing pairs.",
+  "sufficient_negative_coverage": "All pairs within declared complete search, assigned radii and H/altloc/topology policy; absence only relative to explicit query predicate, not absence of a continuous quantity.",
+  "qualification_fixtures": [
+    "positive/zero/negative gap",
+    "unknown radius",
+    "bonded/same-residue pair",
+    "H vs heavy-only scope",
+    "pair omitted by scaled clash filter"
+  ],
+  "empirical_data_requirements": "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.",
+  "historical_measurement_sufficiency": "Full source graph/state can support recollection; prior contact lists or generic feature labels alone cannot. Append new attributed evidence, never backfill old records.",
+  "limitations": "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.",
+  "backlog_item": "B04",
+  "priority": "P0",
+  "definition": {
+    "rule_id": "ATHENA.VAL.VDW_CONTACT",
+    "version_proposal": "1.0.0-blueprint-draft",
+    "supported_domain": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.",
+    "perception_requirements": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.; existing OCL graph matching only, after dialect qualification.",
+    "raw_measurements": "Distance d, ri,rj, signed gap=d-ri-rj, overlap=ri+rj-d, radius units/model, topology exclusions, state IDs, coverage and unknown radii.",
+    "classification_semantics": "Continuous descriptor. No small/serious clash, favorable contact or Probe parity by default. Keep values for nonclashing pairs.",
+    "sufficient_negative_coverage": "All pairs within declared complete search, assigned radii and H/altloc/topology policy; absence only relative to explicit query predicate, not absence of a continuous quantity.",
+    "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+    "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+    "negative_coverage_version": "ATHENA.VAL.VDW_CONTACT/blueprint-negative/1"
+  },
+  "proposed_definition_sha256": "24de869c2b0acf00fb9fe45a502b8247ed3d41c6d6662a04560ccb924337b2e0",
+  "reviewed_definition_sha256": "24de869c2b0acf00fb9fe45a502b8247ed3d41c6d6662a04560ccb924337b2e0",
+  "review_status": "USER_REVIEWED_SCIENTIFIC_INTENT_CURRENT_POLICY_PENDING",
+  "common_requirements": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/COMMON_REQUIREMENTS.json",
+    "sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061"
+  },
+  "source_map": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+    "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+  },
+  "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+  "freshness_policy": "Research draft only; final authorized review must name exact definition digest and validUntil. No reviewer/approval invented. Re-review on chemistry/query/dialect/aromaticity/H/charge/stereo/measurement/domain/reference/threshold/negative-coverage change or source invalidation. No current-policy eligibility from these drafts.",
+  "negative_coverage_version": "ATHENA.VAL.VDW_CONTACT/blueprint-negative/1",
+  "decisions": [
+    {
+      "decision": "ADOPT",
+      "criterion": "Preserve explicit chemistry/state and raw measurements",
+      "rationale": "Distance d, ri,rj, signed gap=d-ri-rj, overlap=ri+rj-d, radius units/model, topology exclusions, state IDs, coverage and unknown radii."
+    },
+    {
+      "decision": "MODIFY",
+      "criterion": "External feature/detector behavior as Athena definition",
+      "rationale": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared."
+    },
+    {
+      "decision": "REJECT",
+      "criterion": "Automatic equivalence, truth, potency or favorable energy from feature/contact label",
+      "rationale": "Outside declared chemistry/structural claim."
+    },
+    {
+      "decision": "UNSUPPORTED",
+      "criterion": "Immediate current-policy qualification",
+      "rationale": "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted."
+    }
+  ],
+  "attributed_review": {
+    "reviewer": "user",
+    "source": "User message authorizing I16 only in this conversation",
+    "reviewed_definition_sha256": "24de869c2b0acf00fb9fe45a502b8247ed3d41c6d6662a04560ccb924337b2e0",
+    "original_dossier": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.VDW_CONTACT.json",
+    "original_dossier_sha256": "3b9b8361b5f088c2538742b85d1bd8ec046e625a301a3a462aa86335ce8fd9cb",
+    "scope": "I16 continuous pairwise surface gap/overlap only; not I17, clash, energy or binding interpretation",
+    "semantic_comparison": "Identical scientific intent within the existing explicit finite coordinate/radius domain and pinned common requirements. No definition field changed.",
+    "validUntil": null,
+    "eligibility": "No current-policy eligibility or receipt asserted; explicit freshness-policy binding is not supplied by this review."
+  }
+}
