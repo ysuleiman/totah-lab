@@ -1,0 +1,62 @@
+# Athena Scientific Rule Reference
+
+This living reference is the user/developer entry point. [The capability catalog](CATALOG.md)
+is rendered from the accepted program ledger, not a second roadmap. [Rule records](RULES.md)
+link exact authoritative manifests; definitions must be changed there, never edited in
+generated documentation. Historical qualification records remain immutable.
+
+## Architecture
+
+Authoritative molecular graph and coordinate/state identity → direct chemical perception
+(B00/OCL) → independent group/role identities (B01 /1, /2) → continuous measurements
+→ versioned scientific classifiers → immutable evidence → qualification/certification.
+
+Graph connectivity, charge, supplied H state and geometry retain separate provenance.
+Athena's foundation does not use universal atom types, destructive last-match-wins
+identity classification, or contact cutoffs as substitutes for raw geometry. Overlapping
+identities and contradictory observations coexist. Unsupported or failed evaluation
+never deletes evidence. Spatial proximity alone establishes no favorable interaction.
+Historical native detectors have their own bounded chemistry and are not silently widened
+by newer roles. See [Mobley supporting analysis](supporting-material/MOBLEY_2018.md).
+
+Implementation qualification, research eligibility and current-policy qualification are
+separate. A historical manifest marked QUALIFIED does not establish current-policy
+eligibility. Consult the ledger and exact checkpoint; do not infer activation from counts.
+
+## Supporting material and completeness
+
+Every rule needs both scientific supporting material and execution qualification.
+[The blueprint source map](../../../software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json)
+and [dossier index](../../../software/qualification/rule-qualification-blueprint-20261005/DOSSIER_INDEX.json)
+retain existing pinned research. Follow the dossier's source locators and digests; citation
+strings alone are insufficient. Missing full text, empirical data, exact locators or
+review decisions remain explicit gaps, not reconstructed facts. Mobley is a shared
+architectural record, not a substitute for each chemical definition's supporting evidence.
+
+A complete provenance package records bibliography/version/DOI/commit and exact locators;
+what the primary source establishes; external behavior; datasets and exclusions;
+methodology and hashed calibration outputs; alternatives and ADOPT/MODIFY/REJECT/
+UNSUPPORTED rationale; disagreement, assumptions, failures, uncertainty, and motivated
+fixtures. Link existing immutable material instead of copying publications. Retain lawful
+metadata/digests and retrieval provenance when redistribution is inappropriate.
+
+## Adding or closing a rule
+
+1. Locate its accepted ledger capability and existing dossier; reuse authoritative graph,
+   matcher, measurements and generic evaluator. Do not add an alternative molecular model.
+2. Review the exact domain, state prerequisites and scientific support. Research eligibility
+   makes a rule testable; it does not qualify implementation. Missing support is a local gap.
+3. Version declarative definitions and negative-coverage requirements. ABSENT_FALSE requires
+   exhaustive evaluable chemistry/search coverage; UNKNOWN, UNSUPPORTED, FAILED and
+   NOT_EVALUATED are not negatives. Keep measurements independent of thresholds.
+4. Exercise positive, near-miss, unknown-state, invalid, symmetry/overlap, preservation,
+   evidence round-trip, deterministic replay and relevant consumer regressions.
+5. Stop for review before public API/schema changes or migration of qualified consumers.
+6. Preserve old definitions/evidence/checkpoints. Record exact implementation, source and
+   fixture hashes, qualifications and limitations. Never fabricate review validity dates.
+7. Update the ledger, permanent catalog/reference and supporting-material links in the same
+   focused commit as implementation/qualification. A capability is not closed without them.
+
+Run `python3 docs/manual/athena/render_reference.py` to render from repository artifacts;
+use `--check` to verify no stale generated pages. Documentation rendering is not chemistry
+execution, research review, or a scientific qualification test.

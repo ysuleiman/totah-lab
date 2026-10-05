@@ -138,3 +138,7 @@ example, and the endpoints (`/evidence`, `/evidence/report.md`).
 - web-ui: `npm run lint && npm test && npm run build` in
   `software/apps/web-ui`.
 - Coding conventions: see the root `AGENTS.md`.
+
+## Athena scientific rules
+
+[Living scientific rule reference](athena/README.md): capability catalog, exact manifest definitions, supporting material, architecture and developer closure requirements.
