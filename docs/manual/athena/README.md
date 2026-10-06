@@ -90,3 +90,5 @@ V03 opt-in representation and operation matrix: [supporting material](supporting
 Review authority and per-rule validity: [approved semantics and prospective implementation](supporting-material/RESEARCH_AUTHORITY_SEPARATION.md).
 
 Opt-in research separation `/2`: [authority, projection, implementation binding and historical compatibility](supporting-material/RESEARCH_SEPARATION_V2.md). This mechanism does not activate real policies or issue production scientific receipts.
+
+Real-policy preparation and local caller trust boundary: [supporting record](supporting-material/REAL_POLICY_PACKAGE.md).
