@@ -84,3 +84,5 @@ evaluator. History is never an implicit input. See [supporting rationale and bou
 Bounded sulfur/backbone attribution: [support and limitations](supporting-material/CYSTEINE_BACKBONE.md).
 
 Source representation boundary: [V03 evidence and pending contract](supporting-material/V03_REPRESENTATION.md).
+
+V03 opt-in representation and operation matrix: [supporting material](supporting-material/EXPLICIT_RADICAL_STATE.md).

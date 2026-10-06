@@ -28,14 +28,25 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
         MolecularValidationService, StereochemistryService, ConformerGenerator3d, ConformerMinimizer, SubstructureMatcher {
     public static final String BACKEND = "OPEN_CHEM_LIB";
     public static final String VERSION = "2026.7.2";
-    private final OclGraphMapper mapper = new OclGraphMapper();
+    private final OclGraphMapper mapper;
+    private final boolean explicitRadical;
 
     private final boolean dimensionalValidation;
     public OclMolecularBackend() { this(false); }
-    private OclMolecularBackend(boolean dimensionalValidation) { this.dimensionalValidation=dimensionalValidation; }
+    private OclMolecularBackend(boolean dimensionalValidation) { this(dimensionalValidation,false); }
+    private OclMolecularBackend(boolean dimensionalValidation,boolean explicitRadical) {
+        this.dimensionalValidation=dimensionalValidation;this.explicitRadical=explicitRadical;
+        this.mapper=new OclGraphMapper(explicitRadical);
+    }
+    /** Representation-only opt-in; unqualified scientific operations fail explicitly. */
+    public static OclMolecularBackend forExplicitRadicalState() { return new OclMolecularBackend(false,true); }
+    private void rejectRadicalOperation(String operation) throws MolecularBackendException {
+        if(explicitRadical)throw new MolecularBackendException("unsupported under explicit-radical representation/1: "+operation);
+    }
     public static OclMolecularBackend forChemicalStateValidation() { return new OclMolecularBackend(true); }
     @Override
     public MolecularValidationService.Result validateDimensions(MolecularGraph graph, MolecularValidationService.NeutralityPolicy policy) throws MolecularBackendException {
+        rejectRadicalOperation("validateDimensions");
         return OclValidationDimensions.assess(graph,policy);
     }
     private MolecularValidationService.Result checkedDimensions(MolecularGraph graph, boolean checkSuppliedH) throws MolecularBackendException {
@@ -104,6 +115,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     @Override
     public MolecularSanitizer.Result sanitize(MolecularGraph graph, SanitizationPolicy policy)
             throws MolecularBackendException {
+        rejectRadicalOperation("sanitize");
         if(dimensionalValidation) return sanitizeDimensional(graph,policy);
         try {
             var mapping = mapper.toOcl(graph);
@@ -150,16 +162,19 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     @Override
     public CanonicalIdentityService.Correspondence correspondence(MolecularGraph attempted, MolecularGraph representative)
             throws MolecularBackendException {
+        rejectRadicalOperation("correspondence/associate");
         if (!identify(attempted).canonicalKey().equals(identify(representative).canonicalKey()))
             return new CanonicalIdentityService.Correspondence(List.of(), true, 0);
         return CanonicalIdentityService.super.correspondence(absoluteStereo(attempted), absoluteStereo(representative));
     }
 
     MolecularGraph absoluteStereo(MolecularGraph graph) throws MolecularBackendException {
+        rejectRadicalOperation("absoluteStereo");
         return absoluteStereo(graph, mapper.toOcl(graph));
     }
 
     MolecularGraph absoluteStereo(MolecularGraph graph, OclGraphMapper.Mapping mapping) throws MolecularBackendException {
+        rejectRadicalOperation("absoluteStereo");
         var molecule = mapping.molecule();
         molecule.ensureHelperArrays(Molecule.cHelperCIP);
         var stereo = new java.util.HashMap<String, String>();
@@ -183,6 +198,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
 
     @Override
     public StereochemistryService.Result validate(MolecularGraph graph) throws MolecularBackendException {
+        rejectRadicalOperation("stereo-validation");
         if(dimensionalValidation) {
             var result=checkedDimensions(graph,false);var converted=mapper.toOcl(graph);converted.molecule().ensureHelperArrays(Molecule.cHelperCIP);
             return new StereochemistryService.Result(true,converted.molecule().getStereoCenterCount(),result.evidence());
@@ -202,6 +218,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     public ConformerGenerator3d.Result generate(MolecularGraph graph,
                                                 ConformerGenerator3d.Configuration configuration)
             throws MolecularBackendException {
+        rejectRadicalOperation("generate");
         var mapping = mapper.toOcl(graph);
         try {
             var generator = new ConformerGenerator(configuration.seed(), configuration.optimizeRigidFragments());
@@ -231,6 +248,7 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     public ConformerMinimizer.Result minimize(MolecularGraph graph,
                                               ConformerMinimizer.Configuration configuration)
             throws MolecularBackendException {
+        rejectRadicalOperation("minimize");
         var mapping = mapper.toOcl(graph);
         try {
             String forceField = OclMmff94Support.resolve(configuration.forceField());
@@ -251,14 +269,15 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
     @Override
     public SubstructureMatcher.Result match(String query, MolecularGraph graph)
             throws MolecularBackendException {
+        rejectRadicalOperation("match");
         return OclOccurrenceMatcher.match(query, mapper.toOcl(graph));
     }
 
-    private static BackendEvidence evidence(String operation, OclGraphMapper.Mapping mapping,
+    private BackendEvidence evidence(String operation, OclGraphMapper.Mapping mapping,
                                             List<BackendEvidence.GraphChange> changes, List<String> messages) {
         var lineage = new LinkedHashMap<String, String>();
         mapping.source().atoms().forEach(atom -> lineage.put(atom.id(), atom.id()));
-        return new BackendEvidence(BACKEND, VERSION, operation, lineage, changes, messages);
+        return new BackendEvidence(BACKEND, explicitRadical ? VERSION+"/explicit-radical-representation/1" : VERSION, operation, lineage, changes, messages);
     }
 
     private static List<BackendEvidence.GraphChange> meaningfulChanges(MolecularGraph before, MolecularGraph after) {

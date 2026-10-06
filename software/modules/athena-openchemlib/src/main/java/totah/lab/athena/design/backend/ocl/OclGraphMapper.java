@@ -14,6 +14,39 @@ import java.util.Map;
 
 /** Package-private mapping boundary. OCL indices never escape this package. */
 final class OclGraphMapper {
+    static final String RADICAL = "athena.ocl.atomRadicalState/1";
+    private final boolean explicitRadical;
+    OclGraphMapper() { this(false); }
+    OclGraphMapper(boolean explicitRadical) { this.explicitRadical=explicitRadical; }
+    private static int radical(String value) throws MolecularBackendException {
+        return switch(value) {
+            case "NONE" -> Molecule.cAtomRadicalStateNone;
+            case "S" -> Molecule.cAtomRadicalStateS;
+            case "D" -> Molecule.cAtomRadicalStateD;
+            case "T" -> Molecule.cAtomRadicalStateT;
+            default -> throw new MolecularBackendException("unsupported explicit atom radical state: "+value);
+        };
+    }
+    private static String radical(int value) throws MolecularBackendException {
+        return switch(value) {
+            case Molecule.cAtomRadicalStateNone -> "NONE";
+            case Molecule.cAtomRadicalStateS -> "S";
+            case Molecule.cAtomRadicalStateD -> "D";
+            case Molecule.cAtomRadicalStateT -> "T";
+            default -> throw new MolecularBackendException("unsupported OCL atom radical state: "+value);
+        };
+    }
+    private Map<String,String> radicalProperties(MolecularGraph.Atom original, int state) throws MolecularBackendException {
+        String observed=radical(state);
+        // Default OCL zero is not an explicit source assertion of NONE.
+        if(original==null) return state==Molecule.cAtomRadicalStateNone ? Map.of("origin","backend-added") : Map.of("origin","backend-added",RADICAL,observed);
+        String supplied=original.properties().get(RADICAL);
+        if(supplied!=null && radical(supplied)!=state)
+            throw new MolecularBackendException("contradictory radical source state: "+original.id());
+        if(supplied==null && state!=Molecule.cAtomRadicalStateNone)
+            throw new MolecularBackendException("unsupplied radical state cannot be inferred: "+original.id());
+        return original.properties();
+    }
     Mapping toOcl(MolecularGraph graph) throws MolecularBackendException {
         try {
             graph.validateTopology(false);
@@ -25,6 +58,8 @@ final class OclGraphMapper {
                 int index = molecule.addAtom(atom.element());
                 molecule.setAtomMapNo(index, mapNumber, false);
                 molecule.setAtomCharge(index, atom.formalCharge());
+                if(explicitRadical && atom.properties().containsKey(RADICAL))
+                    molecule.setAtomRadical(index,radical(atom.properties().get(RADICAL)));
                 if (atom.isotope() != null) molecule.setAtomMass(index, atom.isotope());
                 if (atom.coordinates() != null) {
                     molecule.setAtomX(index, atom.coordinates().x());
@@ -90,10 +125,10 @@ final class OclGraphMapper {
             atoms.add(new MolecularGraph.Atom(id, molecule.getAtomLabel(index),
                     molecule.getAtomMass(index) == 0 ? null : molecule.getAtomMass(index),
                     molecule.getAtomCharge(index), original == null ? 0 : original.explicitHydrogens(),
-                    molecule.isAromaticAtom(index), parity(molecule.getAtomParity(index)),
-                    molecule.is3D() ? new MolecularGraph.Coordinates(
+                    molecule.isAromaticAtom(index), explicitRadical && original!=null ? original.stereochemistry() : parity(molecule.getAtomParity(index)),
+                    explicitRadical && original!=null ? original.coordinates() : molecule.is3D() ? new MolecularGraph.Coordinates(
                             molecule.getAtomX(index), molecule.getAtomY(index), molecule.getAtomZ(index)) : null,
-                    original == null ? Map.of("origin", "backend-added") : original.properties()));
+                    explicitRadical ? radicalProperties(original,molecule.getAtomRadical(index)) : original == null ? Map.of("origin", "backend-added") : original.properties()));
         }
         var originalBonds = new HashMap<String, MolecularGraph.Bond>();
         for (var bond : mapping.source().bonds()) originalBonds.put(pair(bond.firstAtomId(), bond.secondAtomId()), bond);
@@ -107,6 +142,27 @@ final class OclGraphMapper {
             bonds.add(new MolecularGraph.Bond(id, first, second, order,
                     order == MolecularGraph.BondOrder.AROMATIC, "UNSPECIFIED",
                     original == null ? Map.of("origin", "backend-added") : original.properties()));
+        }
+        if(explicitRadical && !mapping.source().atoms().isEmpty()) {
+            var byId=new HashMap<String,MolecularGraph.Atom>();atoms.forEach(a->byId.put(a.id(),a));
+            if(byId.size()!=mapping.source().atoms().size() || !byId.keySet().equals(originalAtoms.keySet()))
+                throw new MolecularBackendException("explicit radical representation changed atom membership");
+            var ordered=new ArrayList<MolecularGraph.Atom>();
+            for(var a:mapping.source().atoms()) {
+                var rebuilt=byId.get(a.id());
+                if(!a.equals(rebuilt))throw new MolecularBackendException("explicit radical representation changed source atom: "+a.id());
+                ordered.add(rebuilt);
+            }
+            atoms=ordered;
+            var byBond=new HashMap<String,MolecularGraph.Bond>();bonds.forEach(b->byBond.put(b.id(),b));
+            if(byBond.size()!=mapping.source().bonds().size())throw new MolecularBackendException("bond membership changed");
+            for(var b:mapping.source().bonds()) {
+                var rebuilt=byBond.get(b.id());
+                if(rebuilt==null || !pair(b.firstAtomId(),b.secondAtomId()).equals(pair(rebuilt.firstAtomId(),rebuilt.secondAtomId()))
+                        || b.order()!=rebuilt.order() || b.aromatic()!=rebuilt.aromatic())
+                    throw new MolecularBackendException("source bond changed: "+b.id());
+            }
+            bonds=new ArrayList<>(mapping.source().bonds());
         }
         return new MolecularGraph(atoms, bonds, mapping.source().properties());
     }
