@@ -1,0 +1,103 @@
+{
+  "purpose": "Consolidated scientific review; no new inventory authority, rule or implementation",
+  "family": "SOURCE_CHEMISTRY",
+  "entries": [
+    {
+      "capabilityId": "F08",
+      "capability": "Functional group: Azo/hydrazine/diazo/azide",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+      "decisionRequired": "Review azo/hydrazine/diazo/azide graph and resonance/state domains separately.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "F15",
+      "capability": "Functional group: Boron motifs",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+      "decisionRequired": "Review boron coordination/charge/valence and exact bounded motif queries.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "F19",
+      "capability": "Functional group: Branched alkyl/cyclopropyl",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+      "decisionRequired": "Review exact branched-alkyl/cyclopropyl occurrence boundaries; no maximal-fragment inference.",
+      "knownSpecificRequirements": [
+        "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine."
+      ],
+      "supportingReference": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+          "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+          "definition": {
+            "rule_id": "ATHENA.GROUP.ALKYL",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Connected saturated carbon subgraph; methyl/branched/cyclic attachment context labeled, no blanket nonpolarity.",
+            "perception_requirements": "Connected saturated carbon subgraph; methyl/branched/cyclic attachment context labeled, no blanket nonpolarity.; existing OCL graph matching only, after dialect qualification.",
+            "raw_measurements": "Exact matched and attachment atoms; all internal/attachment bonds and orders, H/charge/stereo, pattern/dialect/backend/source pins.",
+            "classification_semantics": "Chemical group membership only; preserve overlaps with carbonyl/amide/ester and alternative state descriptions.",
+            "sufficient_negative_coverage": "Complete relevant graph and all-match enumeration; unsupported pattern/state cannot produce absence.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.GROUP.ALKYL/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "limitations": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "V04",
+      "capability": "Representation/query/dummy/enhanced-stereo validation",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Graph mapper and sanitizer; unresolved mapping retained",
+      "decisionRequired": "Review query/dummy/enhanced-stereo representability and validation scope separately from molecular truth.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RDKit FeaturesValidation; OclGraphMapper",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "A07",
+      "capability": "Chemical alerts and substructure filter catalogs",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Existing matcher; no qualification of these catalogs",
+      "decisionRequired": "Review specific alert catalog/version/domain and advisory semantics; never automatic evidence rejection.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RDKit FilterCatalog.h",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "A08",
+      "capability": "Tautomers, normalization, fragment parents and stereochemical identity",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "MolecularGraph; CanonicalIdentityService; transformation lineage",
+      "decisionRequired": "Review optional derived normalization/tautomer identities without mutation of source evidence.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RDKit book; OCL backend; Athena graph machinery",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    }
+  ]
+}

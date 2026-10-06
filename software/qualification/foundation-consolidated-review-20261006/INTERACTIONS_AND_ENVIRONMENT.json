@@ -1,0 +1,259 @@
+{
+  "purpose": "Consolidated scientific review; no new inventory authority, rule or implementation",
+  "family": "INTERACTIONS_AND_ENVIRONMENT",
+  "entries": [
+    {
+      "capabilityId": "P07",
+      "capability": "Zinc-binding pharmacophore motifs",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "OCL matcher can express motifs; no qualified classifier",
+      "decisionRequired": "Define metal identity/oxidation, donor state and coordination context; zinc-binding motif is not established coordination.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "BaseFeatures ZnBinder1..6",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I03",
+      "capability": "Implicit-H hydrogen-bond approximation",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "No qualified equivalent",
+      "decisionRequired": "Choose an attributed implicit-H approximation and validate H/state/preparation domain; cannot call it observed D-H-A.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "ProLIF ImplicitHBAcceptor implementation",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I04",
+      "capability": "Weak C-H donor perception",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "No qualified weak-H-bond rule",
+      "decisionRequired": "Define weak C-H donor classes, attachment/acidity scope and independent geometric controls.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "PLIP find_hbd and PLInteraction constructor",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I10",
+      "capability": "Halogen bond to atom acceptor",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "HalogenBondDetector; INT.HALOGEN.001",
+      "decisionRequired": "Review separate Cl/Br/I donor environments and carbonyl-acceptor directional criteria; survey radii are not automatic cutoffs.",
+      "knownSpecificRequirements": [
+        "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+        "Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1."
+      ],
+      "supportingReference": "ProLIF XBAcceptor/XBDonor; PLIP halogen",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json",
+          "sha256": "27c940e949327cf2f5c38b4a2a7ec856c1a5588b5175b6922bc313a090fca0ae",
+          "definition": {
+            "rule_id": "ATHENA.GROUP.HALOGENATED",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "C-F/Cl/Br/I context with exact element and carbon environment; no halogen-bond claim.",
+            "perception_requirements": "C-F/Cl/Br/I context with exact element and carbon environment; no halogen-bond claim.; existing OCL graph matching only, after dialect qualification.",
+            "raw_measurements": "Exact matched and attachment atoms; all internal/attachment bonds and orders, H/charge/stereo, pattern/dialect/backend/source pins.",
+            "classification_semantics": "Chemical group membership only; preserve overlaps with carbonyl/amide/ester and alternative state descriptions.",
+            "sufficient_negative_coverage": "Complete relevant graph and all-match enumeration; unsupported pattern/state cannot produce absence.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.GROUP.HALOGENATED/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "limitations": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.HALOGEN_BOND.DIRECTIONAL.json",
+          "sha256": "c992114e366e8ade1eca44434144bec0415bc4ac7a6377e3a7c6b2dedffbb6d6",
+          "definition": {
+            "rule_id": "ATHENA.HALOGEN_BOND.DIRECTIONAL",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Proposed Cl/Br/I separately, carbon-bound donors; initial carbonyl O acceptors. F/At, other donor elements and broad acceptor classes not included automatically.",
+            "perception_requirements": "Authoritative C-X bonding, carbon environment/aromaticity, halogen identity and carbonyl O parent geometry.",
+            "raw_measurements": "X...O; radius-normalized d/(rX+rO) with exact radius set; C-X...O angle; X...O=C angle; all roles and state.",
+            "classification_semantics": "Research directional geometry windows per domain; legacy detector remains separate. No universal4A or favorable energy.",
+            "sufficient_negative_coverage": "Every supported donor/acceptor orientation and pair; excluded halogens/acceptors disclosed, never silently negative.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.HALOGEN_BOND.DIRECTIONAL/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I11",
+      "capability": "Halogen bond to pi system",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "No qualified equivalent",
+      "decisionRequired": "Define aromatic-face acceptance, halogen axis and element-specific geometry separately from atom-acceptor rules.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RING4 primary paper non-covalent bond section",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I12",
+      "capability": "Single-water H-bond bridge",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Reference registration only",
+      "decisionRequired": "Define water identity/orientation and two compatible directional legs with complete water/H coverage.",
+      "knownSpecificRequirements": [
+        "PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported."
+      ],
+      "supportingReference": "PLIP water_bridges; ProLIF WaterBridge",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.WATER_BRIDGE.PATH.json",
+          "sha256": "bd504e9bd3ece084ed54b8bb1f97c491070fc85a1f5a14d9d2f44a3d263ed21b",
+          "definition": {
+            "rule_id": "ATHENA.WATER_BRIDGE.PATH",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Same identified water, compatible hydrogen orientation/model, two chemically typed partners.",
+            "perception_requirements": "Explicit water identity and H orientation provenance; donor/acceptor roles and each leg domain.",
+            "raw_measurements": "Each leg D-H-A/H-A/D-A geometry and certificate; water/partner atom refs; water orientation consistency.",
+            "classification_semantics": "Path supported only if both legs jointly hold in the same compatible orientation. O-only proximity remains measured with unresolved directionality.",
+            "sufficient_negative_coverage": "Complete water/partner enumeration, water H state and both qualified leg searches; absent solvent inventory is not no bridge.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.WATER_BRIDGE.PATH/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I13",
+      "capability": "Multi-water bridge paths",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "SystemStateView traversal primitive only",
+      "decisionRequired": "Define same-state multiwater path validity, orientation consistency, search bounds and negative coverage.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "ProLIF water_bridge.py",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I14",
+      "capability": "Metal-ligand pair proximity",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Reference registration only",
+      "decisionRequired": "Select element/oxidation/donor pair domains and justified proximity references without implying coordination.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "ProLIF MetalDonor/MetalAcceptor; RING4",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I15",
+      "capability": "Metal coordination geometry/complex",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Reference registration only",
+      "decisionRequired": "Specify coordination number/geometry, ligand typing, waters and complete candidate sphere.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "PLIP metal_complexation and find_metal_binding",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I17",
+      "capability": "Steric overlaps/clashes",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "StericClashAnalysis; VAL.CLASH.001",
+      "decisionRequired": "Select radii/H/bond/altloc/water protocol and justified overlap classes; I16 gap alone is not a clash criterion.",
+      "knownSpecificRequirements": [
+        "Probe2 source and reference practice pinned; no new benchmark run. Serious-overlap reference0.4A is protocol-specific. No Probe parity effort; select Athena radius/H protocol and qualify categories against curated fixtures before new profile.",
+        "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted."
+      ],
+      "supportingReference": "Probe source; MolProbity clashes; wwPDB guide",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.CLASH.json",
+          "sha256": "843ecafe29a2dfb8ed34aef9bec617f688e91a940ca05b19a22c7bcca81ae055",
+          "definition": {
+            "rule_id": "ATHENA.VAL.CLASH",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Explicit prepared atom model with radius/perception/bond exclusion/altloc/water policy pinned.",
+            "perception_requirements": "Element and chemical radius assignment; authoritative topology; explicit H preparation and ionic/H-bond roles.",
+            "raw_measurements": "Pair distance, both radii, signed gap and overlap; excluded pairs/reasons; Probe-style occlusion dots only under a separately implemented protocol.",
+            "classification_semantics": "Preserve current qualified Athena clash profile. Probe2 dot contacts and serious clashscore are not interchangeable with all-pairs radius overlap. No0.05A warning adopted.",
+            "sufficient_negative_coverage": "All applicable atoms/radii/exclusions and complete neighborhood; missing H/radius prevents all-atom absence.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.VAL.CLASH/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Probe2 source and reference practice pinned; no new benchmark run. Serious-overlap reference0.4A is protocol-specific. No Probe parity effort; select Athena radius/H protocol and qualify categories against curated fixtures before new profile.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. No Probe parity effort; select Athena radius/H protocol and qualify categories against curated fixtures before new profile.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.VDW_CONTACT.json",
+          "sha256": "3b9b8361b5f088c2538742b85d1bd8ec046e625a301a3a462aa86335ce8fd9cb",
+          "definition": {
+            "rule_id": "ATHENA.VAL.VDW_CONTACT",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.",
+            "perception_requirements": "Atom pairs in an explicit search scope with pinned element/chemical radii and H preparation; pair exclusions separately declared.; existing OCL graph matching only, after dialect qualification.",
+            "raw_measurements": "Distance d, ri,rj, signed gap=d-ri-rj, overlap=ri+rj-d, radius units/model, topology exclusions, state IDs, coverage and unknown radii.",
+            "classification_semantics": "Continuous descriptor. No small/serious clash, favorable contact or Probe parity by default. Keep values for nonclashing pairs.",
+            "sufficient_negative_coverage": "All pairs within declared complete search, assigned radii and H/altloc/topology policy; absence only relative to explicit query predicate, not absence of a continuous quantity.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.VAL.VDW_CONTACT/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.",
+          "limitations": "Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "I20",
+      "capability": "Unpaired donor/acceptor/halogen features",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "No qualified unpaired-site assessment",
+      "decisionRequired": "Define profile-relative pairing and exhaustive role/search coverage; unsearched is not unsatisfied.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "PLIP find_unpaired_ligand",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `8489f3d3f2876080c70598905d7088d217b7f0b9b6f58f7acd8cfeb7df01808d`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `e42bd2de865a7d5916486088da821051928f1d90d046e724f7c123dc40a61bd5`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -89,7 +89,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F05 | Functional group: Acid/sulfonyl chlorides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F07 | Functional group: Imines/oximes/nitroso | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt) |
+| F07 | Functional group: Imines/oximes/nitroso | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt), [f07-source-identity-20261006](../../../software/qualification/f07-source-identity-20261006/CHECKPOINT.txt) |
 | F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F09 | Functional group: Nitriles | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F10 | Functional group: Nitro groups | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
@@ -1150,15 +1150,15 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### F07 — Functional group: Imines/oximes/nitroso
 
-Review imine/oxime/nitroso definitions separately, including H, charge and bond depiction.
+Nine exact source identities; acyclic/exocyclic/endocyclic neutral imines included. Existing aromatic identities reused. No universal imine/charged-resonance or current-policy receipt claim.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 33 F07 focused checks, 982 combined checks; independent replay and historical preservation; fresh committed-source confirmation follows in a separately pinned checkpoint.
 
-**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+**Existing implementation:** FunctionalGroupRules athena.group/2; B00 matcher; nine opt-in groups-f07-v1 manifests; existing heteroaromatic identities.
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
-**Remaining scientific requirement:** Approve the exact four proposed bounded source-identity domains; the source motif labels alone do not authorize production chemistry.
+**Remaining scientific requirement:** Charged iminium/resonance, heteroatom-substituted carbon and additional N-hetero identities need separate exact membership/state definitions; existing aromatic cycle-domain boundaries remain explicit.
 
 ### F08 — Functional group: Azo/hydrazine/diazo/azide
 

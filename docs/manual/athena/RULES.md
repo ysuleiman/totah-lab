@@ -6796,6 +6796,2328 @@ Current-policy gate status must be established by a valid receipt, not the histo
 }
 ```
 
+## ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND.rule.json) · SHA256 `6f30202f3c72a712c2483491c70cafa0ed05ee20c389fba4767adb6947f83955`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 2,
+        "role": "imineCarbon"
+      }
+    ],
+    "roleHeavyDegree": {
+      "imineCarbon": 1,
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC.rule.json) · SHA256 `a8c767b3f125bef594b6e11a2f188202562ea53a4e1bb7f8bf3b596c2a14d517`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;R0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC.rule.json) · SHA256 `4ac8e05bc99464c2f61ad0b9b6da3d9f15fde57392756b060d394004ce150c9e`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC.rule.json) · SHA256 `214406cc69cb410e010310e4f82da7a49553dfd731fac2d30116bb167cc9821e`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_H.ACYCLIC_C — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_H.ACYCLIC_C.rule.json) · SHA256 `14326f0a266e298c01523e5a4e72501017cc2cafb3b1914ca16622fe11821c97`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]=[C;!a;+0;R0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      1
+    ],
+    "nitrogen": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_H.CYCLIC_C — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_H.CYCLIC_C.rule.json) · SHA256 `0edbe8fc21ed9e183c4ead38e43ceb550ef7bd5a59bf2aa32c3a431f254ce560`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      1
+    ],
+    "nitrogen": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND.rule.json) · SHA256 `dddf32bf7372301801a4043fdbbb1ab7a47eddf45b375fd7bbf740e38e89ef38`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[C;H3;+0]-[N;!a;+0;R0]=[C;!a;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 3,
+        "role": "methylCarbon"
+      },
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "methylCarbon": 1,
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "attachment": [
+      1
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "methylCarbon": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.NITROSO.CARBON_BOUND — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.NITROSO.CARBON_BOUND.rule.json) · SHA256 `aa37fbc4e284f16da569cc305033f330a4de5454d080023099769169fb6bb77c`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.NITROSO.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.NITROSO.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.NITROSO.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.NITROSO.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0]=[O;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 0,
+        "role": "oxygen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2,
+      "oxygen": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ],
+    "oxygen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[#6]-[N;+1]~[O]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[#6]-[N;-1]~[O]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;+1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;-1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND — 1.0.0 (groups-f07-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND.rule.json) · SHA256 `208802420c31f42b50f5920cc75e39910038a2ca8a02b61322919301b880d1fe`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0]=[N;!a;+0]-[O;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 1,
+        "role": "oxygen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2,
+      "oxygen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ],
+    "oxygen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;+1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;-1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
 ## ATHENA.GROUP.ALCOHOL — 1.0.0 (groups-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.ALCOHOL.rule.json) · SHA256 `f42a8f87adfc272050e5c98c70d01525597a0a4f1bc46379052b272321fdfd10`

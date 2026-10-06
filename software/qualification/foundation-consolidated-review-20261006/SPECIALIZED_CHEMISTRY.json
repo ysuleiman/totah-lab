@@ -1,0 +1,246 @@
+{
+  "purpose": "Consolidated scientific review; no new inventory authority, rule or implementation",
+  "family": "SPECIALIZED_CHEMISTRY",
+  "entries": [
+    {
+      "capabilityId": "G03",
+      "capability": "Sulfur-pi and chalcogen-O",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "ATHENA.SULF.PI / ATHENA.SULF.CHALCOGEN_O",
+      "decisionRequired": "Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi/O partner domains independently.",
+      "knownSpecificRequirements": [
+        "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+        "L07 structural/QM state comparison; L21 alternative n-pi sulfur chemistry has different donor/acceptor roles and must not be conflated. Sulfur perception and independent reference distributions; no Cys classifier currently.",
+        "Methionine-aromatic structural survey supports thioether domain; not a cysteine classifier training set. State-specific domain and empirical geometry distributions."
+      ],
+      "supportingReference": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.THIOETHER.json",
+          "sha256": "ee158666e9f07c58ac5b01b4233a542f1f7ee8a86ba96dba327836caf434d7c3",
+          "definition": {
+            "rule_id": "ATHENA.GROUP.THIOETHER",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Neutral divalent C-S-C; aromatic S, sulfoxide and sulfonium separate.",
+            "perception_requirements": "Neutral divalent C-S-C; aromatic S, sulfoxide and sulfonium separate.; existing OCL graph matching only, after dialect qualification.",
+            "raw_measurements": "Exact matched and attachment atoms; all internal/attachment bonds and orders, H/charge/stereo, pattern/dialect/backend/source pins.",
+            "classification_semantics": "Chemical group membership only; preserve overlaps with carbonyl/amide/ester and alternative state descriptions.",
+            "sufficient_negative_coverage": "Complete relevant graph and all-match enumeration; unsupported pattern/state cannot produce absence.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.GROUP.THIOETHER/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "limitations": "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.CHALCOGEN_O.json",
+          "sha256": "3bd607ef5c36530d1025e4324ada5e6bafc1b5270c6d75d9347802528bca8376",
+          "definition": {
+            "rule_id": "ATHENA.SULF.CHALCOGEN_O",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "State-resolved sulfur/O pairs; initial candidate neutral divalent S, carbonyl O; thiol/disulfide domains unresolved.",
+            "perception_requirements": "Explicit S substituents, charge, oxidation/protonation and O acceptor/substituent context.",
+            "raw_measurements": "S...O; normalized distance with pinned radii; each R-S...O angle and acceptor orientation; competing S-H...O geometry when H exists.",
+            "classification_semantics": "Directional geometry only after domain review; short S...O alone cannot separate chalcogen bonding from H bonding.",
+            "sufficient_negative_coverage": "Every supported substituent direction/O pair plus competing H-bond state and full search.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SULF.CHALCOGEN_O/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "L07 structural/QM state comparison; L21 alternative n-pi sulfur chemistry has different donor/acceptor roles and must not be conflated. Sulfur perception and independent reference distributions; no Cys classifier currently.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Sulfur perception and independent reference distributions; no Cys classifier currently.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.PI.json",
+          "sha256": "dde09e189408db17c7954c0b99a5e4f092f5c53514f806930b24d33371f099e6",
+          "definition": {
+            "rule_id": "ATHENA.SULF.PI",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Begin neutral divalent thioether as separate reviewed domain; thiol/thiolate/disulfide/sulfonium not pooled.",
+            "perception_requirements": "S bonded neighbors, formal charge/H state and chemically perceived ring.",
+            "raw_measurements": "S-centroid/closest ring distance; height/offset; each C-S-centroid angle; ring plane quality; S chemical state.",
+            "classification_semantics": "State-labeled sulfur-pi geometry candidate; no attractive sulfur-pi energy assertion.",
+            "sufficient_negative_coverage": "All supported sulfur/ring pairs enumerated; an unsupported sulfur state prevents whole-system negative.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SULF.PI/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Methionine-aromatic structural survey supports thioether domain; not a cysteine classifier training set. State-specific domain and empirical geometry distributions.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. State-specific domain and empirical geometry distributions.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "G05",
+      "capability": "SAM sulfonium/methyl/aromatic environment",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "ATHENA.SAM.*",
+      "decisionRequired": "Review SAM/SAH identity and sulfonium/methyl/aromatic domains; no ammonium-pi parameter transplant.",
+      "knownSpecificRequirements": [
+        "No single universal SAM-aromatic structural class assumed. Dependency qualifications and cofactor identity.",
+        "SAM orientation studies and tetrel examples constrain what geometry cannot prove. Explicit-H treatment and methyl vs sulfur motif domain review.",
+        "Published sulfonium structural/QM studies; local environments and compound classes not universal energy calibration. SAM graph identity and state-specific angular domain review."
+      ],
+      "supportingReference": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.AROMATIC_ENVIRONMENT.json",
+          "sha256": "898a9256b760ffdb08bd604d80a6e0a29355647c388a801866f08045043ae233",
+          "definition": {
+            "rule_id": "ATHENA.SAM.AROMATIC_ENVIRONMENT",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Authenticated SAM and rings within declared collection scope.",
+            "perception_requirements": "SAM atom roles including sulfonium/methyl/adenine, ring memberships and component states.",
+            "raw_measurements": "All distinct S/methyl/ring-ring raw geometries and atom IDs; neighborhood coverage.",
+            "classification_semantics": "Composition of separately qualified observations; no summed interaction strength or cofactor effect.",
+            "sufficient_negative_coverage": "Complete ring enumeration and all requested subchannels; unsupported subchannels retained explicitly.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SAM.AROMATIC_ENVIRONMENT/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "No single universal SAM-aromatic structural class assumed. Dependency qualifications and cofactor identity.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Dependency qualifications and cofactor identity.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.METHYL_PI.json",
+          "sha256": "37b774e64835664a189b06ec2547c2396679b1be21ff73f00b1e3ef93354b58c",
+          "definition": {
+            "rule_id": "ATHENA.SAM.METHYL_PI",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Authenticated S-bound SAM methyl with explicit H for CH geometry.",
+            "perception_requirements": "Methyl atom mapping and S-C connectivity; ring and H provenance.",
+            "raw_measurements": "Methyl C-centroid and H-centroid; S-C-centroid angle; H face offsets/orientations; S-centroid separately.",
+            "classification_semantics": "Measured methyl/ring arrangement; no catalytic/favorable-energy label.",
+            "sufficient_negative_coverage": "All methyl H orientations and rings for claimed explicit-H domain.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SAM.METHYL_PI/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "SAM orientation studies and tetrel examples constrain what geometry cannot prove. Explicit-H treatment and methyl vs sulfur motif domain review.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Explicit-H treatment and methyl vs sulfur motif domain review.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.SULFONIUM_PI.json",
+          "sha256": "7f0bc680c90c2dff8b3bafa73a7b4d5453b47ae09696d495c8dbf5d59d4fa9a6",
+          "definition": {
+            "rule_id": "ATHENA.SAM.SULFONIUM_PI",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Explicit SAM cofactor component with correct connected sulfonium S and three substituents; not SAH.",
+            "perception_requirements": "Chemical SAM identity/charge, transferable methyl mapping, ring identity; component role supplied, not residue-name-only.",
+            "raw_measurements": "S-centroid and plane height/offset; ring-normal angle; S-substituent directions; methyl-centroid separately.",
+            "classification_semantics": "Orientation descriptor; L05 en-face/intermediate/edge bins are reference candidates, not energy or Athena criteria.",
+            "sufficient_negative_coverage": "All supported SAM/rings and charge state identified; SAM name without graph cannot yield negative.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SAM.SULFONIUM_PI/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Published sulfonium structural/QM studies; local environments and compound classes not universal energy calibration. SAM graph identity and state-specific angular domain review.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. SAM graph identity and state-specific angular domain review.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "G06",
+      "capability": "SAM methyl-transfer geometry",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "ATHENA.SAM_MTASE.TRANSFER_GEOMETRY",
+      "decisionRequired": "Review selected nucleophile/SAM state and substrate-specific transfer geometry; linearity is not reactivity.",
+      "knownSpecificRequirements": [
+        "Linear approach can also occur in nonreactive tetrel examples; substrate-specific windows require separate empirical study. General Nu API needs separately reviewed extension, state perception and substrate-specific reference data."
+      ],
+      "supportingReference": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM_MTASE.TRANSFER_GEOMETRY.json",
+          "sha256": "6248ec4622ccb577a1f499cb3724990c92ab1cb7a272d0d46aa56d03d5a421a5",
+          "definition": {
+            "rule_id": "ATHENA.SAM_MTASE.TRANSFER_GEOMETRY",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Explicit SAM transferable C/S and caller-selected chemically identified candidate nucleophile, initial sulfur-domain reuse only.",
+            "perception_requirements": "Nucleophile element/charge/bonds/H and source selection; no automatic substrate assertion.",
+            "raw_measurements": "d(Nu,Cm), d(Cm,S), angle(Nu,Cm,S); optional nucleophile approach axes and clash evidence separately; all atom IDs.",
+            "classification_semantics": "Geometric descriptor only. No substrate/transition-state/methylation event from distance and angle.",
+            "sufficient_negative_coverage": "Complete caller-declared nucleophile domain/search; unknown chemistry not false. Descriptor alone does not produce reaction absence.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.SAM_MTASE.TRANSFER_GEOMETRY/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "Linear approach can also occur in nonreactive tetrel examples; substrate-specific windows require separate empirical study. General Nu API needs separately reviewed extension, state perception and substrate-specific reference data.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. General Nu API needs separately reviewed extension, state perception and substrate-specific reference data.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "G07",
+      "capability": "n-to-pi-star motif",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "ATHENA.INT.N_PI_STAR",
+      "decisionRequired": "Review carbonyl donor/acceptor geometry and empirical domain; proximity does not establish orbital donation.",
+      "knownSpecificRequirements": [
+        "L20 nonredundant high-resolution PDB backbone survey; do not extend backbone reference to every ligand carbonyl. L21 sulfur variant remains separate. Structural distribution extraction and chemical-domain limits."
+      ],
+      "supportingReference": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.INT.N_PI_STAR.json",
+          "sha256": "02937d6acaa7b4439c1fa11f3466b0360d78578a384c02cb60ec6e2b4e6810d9",
+          "definition": {
+            "rule_id": "ATHENA.INT.N_PI_STAR",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Start carbonyl O donor to carbonyl C acceptor with explicit bonded atoms; other n donors not assumed.",
+            "perception_requirements": "Distinct donor/acceptor carbonyl identity, resonance/bonds and local substituents.",
+            "raw_measurements": "Odon...Cacc distance; Odon-Cacc-Oacc angle; acceptor carbonyl pyramidalization and out-of-plane approach; backbone connectivity.",
+            "classification_semantics": "Geometric candidate only; NBO/electronic stabilization not established by contact.",
+            "sufficient_negative_coverage": "Complete carbonyl-role enumeration, local coordinates and domain-specific candidate windows once approved.",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.INT.N_PI_STAR/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "L20 nonredundant high-resolution PDB backbone survey; do not extend backbone reference to every ligand carbonyl. L21 sulfur variant remains separate. Structural distribution extraction and chemical-domain limits.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Structural distribution extraction and chemical-domain limits.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    }
+  ]
+}

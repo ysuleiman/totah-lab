@@ -1,0 +1,137 @@
+{
+  "purpose": "Consolidated scientific review; no new inventory authority, rule or implementation",
+  "family": "NETWORK_AND_ENSEMBLE",
+  "entries": [
+    {
+      "capabilityId": "N02",
+      "capability": "Binary/count interaction fingerprints",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "InteractionFingerprint.of retains supplied interactions and residue/type sets. It has no evaluated/unsupported mask and cannot establish scientific zero/absence. No silent migration.",
+      "decisionRequired": "Define fingerprint event identity, count multiplicity and evaluated/unsupported masks before treating zeros as negatives.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "ProLIF fingerprint.py",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "N03",
+      "capability": "Ensemble contact frequencies/probabilistic networks",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Existing ensemble/contact analyses; SystemStateView identities",
+      "decisionRequired": "Define ensemble membership, duplicate treatment and denominator/missing-coverage policy; pose frequency is not probability.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RING4/RING-MD; ProLIF fingerprints",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "N04",
+      "capability": "Contact correlations and co-occurrence networks",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "Historical topology analysis; no generic qualified network rule",
+      "decisionRequired": "Define common-state co-occurrence and missing-coverage/correlation estimand without pairing independent ensembles.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RING-PyMOL pinned README",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "N08",
+      "capability": "2D/3D pharmacophore fingerprints and matching",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "LigandFeature; FeatureTemplateAlignmentEvaluator; OCL PheSA primitives",
+      "decisionRequired": "Define feature correspondences, geometric tolerance and supported query semantics without ranking or biological claims.",
+      "knownSpecificRequirements": [],
+      "supportingReference": "RDKit book; OCL pharmacophore classes",
+      "dossiers": [],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    },
+    {
+      "capabilityId": "G08",
+      "capability": "Typed H-bond/charge/cofactor/second-shell networks",
+      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "existingImplementation": "ATHENA.NETWORK.*",
+      "decisionRequired": "Review typed qualified edge composition, same-state paths, coverage and cofactor attribution; no mechanistic inference.",
+      "knownSpecificRequirements": [
+        "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Not an electrostatics energy network. Typed edge availability/coverage and deterministic path semantics need qualification.",
+        "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Path does not establish catalytic mediation. Typed edge availability/coverage and deterministic path semantics need qualification.",
+        "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. No allostery/cooperativity from connected paths. Typed edge availability/coverage and deterministic path semantics need qualification."
+      ],
+      "supportingReference": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "dossiers": [
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.CHARGE.json",
+          "sha256": "b8c2757c820122dc58dd24547ebf32565c6dd2d35d0ca4201d915f421265ddc5",
+          "definition": {
+            "rule_id": "ATHENA.NETWORK.CHARGE",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Formal charge entities connected by qualified proximity/ion-pair observations",
+            "perception_requirements": "Stable existing graph/evidence refs, explicit edge semantics; do not infer interactions from spatial adjacency.",
+            "raw_measurements": "Charge centers AND member atoms; edge method and scope",
+            "classification_semantics": "Path observed under selected edge profiles; no physical coupling certificate.",
+            "sufficient_negative_coverage": "Full charged group/state search; unsupported charge chemistry blocks network-wide absence",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.NETWORK.CHARGE/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Not an electrostatics energy network. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Not an electrostatics energy network. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.COFACTOR_MEDIATED.json",
+          "sha256": "7cf05c7004bbe668ad853dd00cc9e7731b72db2ba17ccaffeab56f0db1fb476e",
+          "definition": {
+            "rule_id": "ATHENA.NETWORK.COFACTOR_MEDIATED",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Cofactor explicitly belongs to same-state paths built from typed evidence",
+            "perception_requirements": "Stable existing graph/evidence refs, explicit edge semantics; do not infer interactions from spatial adjacency.",
+            "raw_measurements": "Ligand-cofactor-protein or longer paths with independent edge evidence",
+            "classification_semantics": "Path observed under selected edge profiles; no physical coupling certificate.",
+            "sufficient_negative_coverage": "Full selected cofactor partner coverage and every required dependency",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.NETWORK.COFACTOR_MEDIATED/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Path does not establish catalytic mediation. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. Path does not establish catalytic mediation. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        },
+        {
+          "path": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.HBOND.json",
+          "sha256": "27208503311cff09b5839c4ca722eb791383eb5bc2079ddf23049983c877a9dc",
+          "definition": {
+            "rule_id": "ATHENA.NETWORK.HBOND",
+            "version_proposal": "1.0.0-blueprint-draft",
+            "supported_domain": "Directed qualified H-bond legs in one state",
+            "perception_requirements": "Stable existing graph/evidence refs, explicit edge semantics; do not infer interactions from spatial adjacency.",
+            "raw_measurements": "Donor/H/acceptor paths, geometry and per-leg rule certificate",
+            "classification_semantics": "Path observed under selected edge profiles; no physical coupling certificate.",
+            "sufficient_negative_coverage": "Complete supported donor/acceptor enumeration and every leg evaluated",
+            "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+            "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+            "negative_coverage_version": "ATHENA.NETWORK.HBOND/blueprint-negative/1"
+          },
+          "empiricalDataRequirements": "RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. No allostery/cooperativity from connected paths. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "limitations": "Research/design only. Planning readiness is not a seventh evidence status and is not gate eligibility. No allostery/cooperativity from connected paths. Typed edge availability/coverage and deterministic path semantics need qualification.",
+          "sourceMap": {
+            "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+            "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+          }
+        }
+      ],
+      "approvalStatus": "NOT_APPROVED_BY_THIS_PACKAGE",
+      "implementationAuthorizedByThisPackage": false
+    }
+  ]
+}

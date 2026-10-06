@@ -1,0 +1,68 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND\",\"limitations\":[\"Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.\",\"Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative.\"],\"memberQueryIndices\":[1,2],\"negativeCoverageVersion\":\"ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;H2]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\",\"N\",\"O\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"nitrogen\"},{\"count\":2,\"role\":\"imineCarbon\"}],\"roleHeavyDegree\":{\"imineCarbon\":1,\"nitrogen\":2}},\"roles\":{\"carbonAttachment\":[0],\"imineCarbon\":[2],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86\"},{\"id\":\"software/qualification/f07-source-identity-review-20261006/REVIEW.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2\"},{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844\"},{\"id\":\"software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[{\"query\":\"[C]~[N;+1]\",\"reason\":\"Charged core nitrogen outside reviewed neutral-state domain\"},{\"query\":\"[C]~[N;-1]\",\"reason\":\"Charged core nitrogen outside reviewed neutral-state domain\"},{\"query\":\"[C;+1]~[N]\",\"reason\":\"Charged carbon/resonance alternative outside neutral C=N domain\"},{\"query\":\"[C;-1]~[N]\",\"reason\":\"Charged carbon/resonance alternative outside neutral C=N domain\"},{\"query\":\"[N]=[C]-[!#6;!#1]\",\"reason\":\"Imine carbon heteroatom substitution outside carbon-bound domain\"},{\"query\":\"[N]=[C]=[*]\",\"reason\":\"Additional imine-carbon multiple bond outside reviewed exact bond-order domain\"}]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+      "citation": "Pinned neutral motif reference, not an activity or parity claim"
+    },
+    {
+      "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+      "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}
