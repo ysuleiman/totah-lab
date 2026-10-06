@@ -23,23 +23,10 @@ Implementation qualification, research eligibility and current-policy qualificat
 separate. A historical manifest marked QUALIFIED does not establish current-policy
 eligibility. Consult the ledger and exact checkpoint; do not infer activation from counts.
 
-The [I02 H-bond expansion proposal](../../../software/qualification/i02-directional-candidate-review-20261006/REVIEW.txt)
-and its [scientific supporting analysis](../../../software/qualification/i02-directional-candidate-review-20261006/SOURCE_NOTES.txt)
-are pending scientific review. They propose an explicit-H geometric candidate predicate,
-not an activated interaction rule. The historical alcohol/oxygen rule remains unchanged;
-raw-measurement tests do not qualify the proposed expansion.
-
-The [terminal-alkyne candidate](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt)
-has engineering tests through the existing B00/B01 evaluator. Its exact terminal-role
-definition awaits scientific adoption; it is not a production-qualified group.
-
-The [F05 acyl/sulfonyl-chloride candidates](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt)
-likewise have bounded evaluator tests and pinned supporting definitions, pending
-scientific adoption. Their literal source identities imply no reactivity or interaction.
-
-The [F14 isocyanate/isothiocyanate candidates](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt)
-distinguish exact neutral source connectivity from cyanate/thiocyanate isomers and
-unsupported charged representations. Scientific adoption remains pending.
+The approved I02 explicit-H directional candidate and five adopted group identities
+are documented in [their shared supporting-material record](supporting-material/I02_AND_ADOPTED_GROUPS.md).
+The historical H-bond rule and pre-adoption research checkpoints remain unchanged.
+Implementation qualification does not by itself issue a current-policy production receipt.
 
 ## Supporting material and completeness
 

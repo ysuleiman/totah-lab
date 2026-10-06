@@ -54,6 +54,7 @@ public final class RuleAnalyzers {
     }
     public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r){return collector(m,r,null);}
     public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r,totah.lab.athena.design.backend.SubstructureMatcher matcher){
+        if(m.implementationId().equals("athena.hbond-candidate"))return HbondCandidateRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.cysteine-attribution"))return CysteineBackboneAttribution.analyzer(m,r);
         if(m.implementationId().equals("athena.ss-connectivity"))return SourceSulfurConnectivityRules.analyzer(m,r);
         if(m.implementationId().equals("athena.all-members-nonpolar"))return AllMembersNonpolarRules.analyzer(m,r);
@@ -97,6 +98,7 @@ public final class RuleAnalyzers {
         }
     };}
     public static SystemGraphAnalyzer evaluator(RuleManifest m,RuleRequest r){
+        if(m.implementationId().equals("athena.hbond-candidate"))return HbondCandidateRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.cysteine-attribution"))return CysteineBackboneAttribution.analyzer(m,r);
         if(m.implementationId().equals("athena.ss-connectivity"))return SourceSulfurConnectivityRules.analyzer(m,r);
         if(m.implementationId().equals("athena.all-members-nonpolar"))return AllMembersNonpolarRules.analyzer(m,r);

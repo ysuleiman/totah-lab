@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `cf7e4da6b6a1836487e83662faecd41e1ae8283827e3084339ba564a79b72c35`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `12533aa47ee0b5000f5a6a4257f5425b388386393103040773c0167703206c57`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -16,7 +16,7 @@ Disposition is copied without upgrading partial capability coverage.
 | P08 | Functional-group hierarchy and fragment features | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | P09 | Explicit/implicit hydrogens and state preparation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I01 | Hydrophobic contact | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
-| I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
+| I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | I03 | Implicit-H hydrogen-bond approximation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I04 | Weak C-H donor perception | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I05 | Parallel/face-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
@@ -87,7 +87,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F02 | Functional group: Amides and methyl amides | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F03 | Functional group: Esters/acyl linkages | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt) |
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F05 | Functional group: Acid/sulfonyl chlorides | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt) |
+| F05 | Functional group: Acid/sulfonyl chlorides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F07 | Functional group: Imines/oximes/nitroso | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
@@ -96,11 +96,11 @@ Disposition is copied without upgrading partial capability coverage.
 | F11 | Functional group: Sulfonamides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F12 | Functional group: Sulfonic acid/sulfonate ester/sulfone | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F13 | Functional group: Sulfoxide/thioether/thiol/thiocarbonyl | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
-| F14 | Functional group: Isocyanate/isothiocyanate | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f14-isocyanate-review-20261006](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt) |
+| F14 | Functional group: Isocyanate/isothiocyanate | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f14-isocyanate-review-20261006](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F15 | Functional group: Boron motifs | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F16 | Functional group: Alcohol/phenol/ether motifs | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F17 | Functional group: Halogenated motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
-| F18 | Functional group: Terminal alkyne | P2 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [f18-terminal-alkyne-contract-20261006](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt) |
+| F18 | Functional group: Terminal alkyne | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [f18-terminal-alkyne-contract-20261006](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F19 | Functional group: Branched alkyl/cyclopropyl | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 
 ## Disposition scope and qualification limits
@@ -266,11 +266,11 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### I02 — Explicit-H directional hydrogen bond
 
-Existing neutral aliphatic alcohol donor, alcohol/carbonyl O acceptor, explicit-H and neutral C/H/O negative domain only. Expansion separately under scientific review.
+Separately versioned I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/1: 100 reviewed explicit-H class pairs at D-A <=3.5 angstrom and DHA >=130 degrees; ten pyridinium pairs remain unsupported. Historical alcohol/oxygen rule remains unchanged.
 
-**Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+**Qualification:** 949 focused/regression checks, independent replay and preserved historical evidence; implementation-qualified within reviewed domain, no production receipt.
 
-**Existing implementation:** ATHENA.HBOND.DIRECTIONAL
+**Existing implementation:** athena.hbond-candidate/1 + verified role reports + athena.geometry/1
 
 **Supporting source:** PLIP hbonds; ProLIF HBAcceptor/HBDonor; Probe; RING paper
 
@@ -1126,11 +1126,11 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### F05 — Functional group: Acid/sulfonyl chlorides
 
-Review exact acid-chloride/sulfonyl-chloride membership, attachment and charged/resonance exclusions.
+Exact neutral carbon-bound acyl chloride and sulfonyl chloride source identities; approved candidate representation/state exclusions unchanged.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 949 focused/regression checks, independent replay and preserved historical evidence; implementation-qualified within reviewed domain, no production receipt.
 
-**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+**Existing implementation:** Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1238,11 +1238,11 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### F14 — Functional group: Isocyanate/isothiocyanate
 
-Review separate isocyanate/isothiocyanate exact queries and representation domains.
+Exact neutral carbon-bound R-N=C=O and R-N=C=S source identities; approved candidate representation/state exclusions unchanged.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 949 focused/regression checks, independent replay and preserved historical evidence; implementation-qualified within reviewed domain, no production receipt.
 
-**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+**Existing implementation:** Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1290,11 +1290,11 @@ Not qualified by this disposition; exact manifest and preserved group checkpoint
 
 ### F18 — Functional group: Terminal alkyne
 
-Generic neutral C#C identity already implementation-qualified, but it does not require terminal authoritative H. Exact terminal-alkyne H/context predicate needs reviewed definition; do not call generic alkyne terminal.
+Exact source C#C terminal-H identity; distinct occurrences and acetylene correspondence alternatives preserved. Generic alkyne identity remains unchanged.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 949 focused/regression checks, independent replay and preserved historical evidence; implementation-qualified within reviewed domain, no production receipt.
 
-**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+**Existing implementation:** Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 

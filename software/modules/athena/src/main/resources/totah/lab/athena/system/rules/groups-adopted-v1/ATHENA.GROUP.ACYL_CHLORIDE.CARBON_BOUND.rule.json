@@ -1,0 +1,64 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND\",\"limitations\":[\"Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.\",\"No normalization; excluded representations remain unsupported.\",\"Not scientifically adopted; synthetic engineering evaluation only.\"],\"memberQueryIndices\":[1,2,3],\"negativeCoverageVersion\":\"ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[C;!a;+0](=[O;+0])-[Cl;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\",\"O\",\"Cl\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"carbonylCarbon\"},{\"count\":0,\"role\":\"oxygen\"},{\"count\":0,\"role\":\"chlorine\"}],\"roleHeavyDegree\":{\"carbonylCarbon\":3,\"chlorine\":1,\"oxygen\":1}},\"roles\":{\"carbonAttachment\":[0],\"carbonylCarbon\":[1],\"chlorine\":[3],\"oxygen\":[2]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+      "citation": "Pinned reference motifs; narrowed Athena candidate domain, not RDKit parity or scientific approval"
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.",
+    "No normalization; excluded representations remain unsupported.",
+    "Not scientifically adopted; synthetic engineering evaluation only."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

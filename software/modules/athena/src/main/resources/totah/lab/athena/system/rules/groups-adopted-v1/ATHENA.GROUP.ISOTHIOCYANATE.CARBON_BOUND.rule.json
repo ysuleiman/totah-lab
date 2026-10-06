@@ -1,0 +1,64 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_CONTEXT_V2",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "2",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND\",\"limitations\":[\"Prospective neutral carbon-bound N=C=S identity only; no reactivity or interaction implication.\",\"Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.\",\"Engineering candidate only; scientific adoption pending.\"],\"memberQueryIndices\":[1,2,3],\"negativeCoverageVersion\":\"ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;+0]=[C;!a;+0]=[S;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\",\"C\",\"S\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"nitrogen\"},{\"count\":0,\"role\":\"centralCarbon\"},{\"count\":0,\"role\":\"terminalAtom\"}],\"roleHeavyDegree\":{\"centralCarbon\":2,\"nitrogen\":2,\"terminalAtom\":1}},\"roles\":{\"carbonAttachment\":[0],\"centralCarbon\":[2],\"nitrogen\":[1],\"terminalAtom\":[3]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[{\"query\":\"[N;+1]\",\"reason\":\"Conservative exclusion of charged nitrogen representation in initial neutral domain\"},{\"query\":\"[S;-1]\",\"reason\":\"Charge-separated terminal representation outside neutral literal domain\"}]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+      "citation": "Pinned neutral motif reference, not an activity or parity claim"
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Prospective neutral carbon-bound N=C=S identity only; no reactivity or interaction implication.",
+    "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+    "Engineering candidate only; scientific adoption pending."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

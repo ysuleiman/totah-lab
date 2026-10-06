@@ -4210,6 +4210,1136 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND — 1.0.0 (groups-adopted-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND.rule.json) · SHA256 `41932d8a0faa862cc45cbc928b8747b01ebd9054e0dc935fc948c4a389cd5ed0`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.",
+  "No normalization; excluded representations remain unsupported.",
+  "Not scientifically adopted; synthetic engineering evaluation only."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Pinned reference motifs; narrowed Athena candidate domain, not RDKit parity or scientific approval"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND",
+  "limitations": [
+    "Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.",
+    "No normalization; excluded representations remain unsupported.",
+    "Not scientifically adopted; synthetic engineering evaluation only."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[C;!a;+0](=[O;+0])-[Cl;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "O",
+      "Cl"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "carbonylCarbon"
+      },
+      {
+        "count": 0,
+        "role": "oxygen"
+      },
+      {
+        "count": 0,
+        "role": "chlorine"
+      }
+    ],
+    "roleHeavyDegree": {
+      "carbonylCarbon": 3,
+      "chlorine": 1,
+      "oxygen": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "carbonylCarbon": [
+      1
+    ],
+    "chlorine": [
+      3
+    ],
+    "oxygen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.ALKYNE.TERMINAL — 1.0.0 (groups-adopted-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.ALKYNE.TERMINAL.rule.json) · SHA256 `d6bef888db78cbe86874dbe9279ff731dc16fda0b0dcdefad21b86db14fc2e32`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ALKYNE.TERMINAL/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+  "Candidate definition under qualification; current-policy research approval is not conferred.",
+  "Original source charges, H state, stereo and correspondence alternatives are preserved."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+    "sha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
+    "citation": "Existing pinned blueprint/reference inventory; exact literal/state fixtures qualify this bounded identity, not external-engine parity."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ALKYNE.TERMINAL",
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ALKYNE.TERMINAL/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ALKYNE.TERMINAL/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0;H1]#[C;!a;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "terminalCarbon"
+      }
+    ],
+    "roleHeavyDegree": {
+      "terminalCarbon": 1
+    }
+  },
+  "roles": {
+    "partnerCarbon": [
+      1
+    ],
+    "terminalCarbon": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.ISOCYANATE.CARBON_BOUND — 1.0.0 (groups-adopted-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.ISOCYANATE.CARBON_BOUND.rule.json) · SHA256 `22e10e3fc3453eb0f050098e21c0c1ea89bade3867f2b2e33ad3a7701016e8ca`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Prospective neutral carbon-bound N=C=O identity only; no reactivity or interaction implication.",
+  "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+  "Engineering candidate only; scientific adoption pending."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND",
+  "limitations": [
+    "Prospective neutral carbon-bound N=C=O identity only; no reactivity or interaction implication.",
+    "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+    "Engineering candidate only; scientific adoption pending."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[N;!a;+0]=[C;!a;+0]=[O;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "N",
+      "C",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 0,
+        "role": "centralCarbon"
+      },
+      {
+        "count": 0,
+        "role": "terminalAtom"
+      }
+    ],
+    "roleHeavyDegree": {
+      "centralCarbon": 2,
+      "nitrogen": 2,
+      "terminalAtom": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "centralCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ],
+    "terminalAtom": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[N;+1]",
+        "reason": "Conservative exclusion of charged nitrogen representation in initial neutral domain"
+      },
+      {
+        "query": "[O;-1]",
+        "reason": "Charge-separated terminal representation outside neutral literal domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND — 1.0.0 (groups-adopted-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND.rule.json) · SHA256 `a483a3541fc2ebf89c7f60f77ebf8829bbb41adc9f973bbe7036bcd89375388f`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Prospective neutral carbon-bound N=C=S identity only; no reactivity or interaction implication.",
+  "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+  "Engineering candidate only; scientific adoption pending."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND",
+  "limitations": [
+    "Prospective neutral carbon-bound N=C=S identity only; no reactivity or interaction implication.",
+    "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+    "Engineering candidate only; scientific adoption pending."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ISOTHIOCYANATE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[N;!a;+0]=[C;!a;+0]=[S;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "N",
+      "C",
+      "S"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 0,
+        "role": "centralCarbon"
+      },
+      {
+        "count": 0,
+        "role": "terminalAtom"
+      }
+    ],
+    "roleHeavyDegree": {
+      "centralCarbon": 2,
+      "nitrogen": 2,
+      "terminalAtom": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "centralCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ],
+    "terminalAtom": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[N;+1]",
+        "reason": "Conservative exclusion of charged nitrogen representation in initial neutral domain"
+      },
+      {
+        "query": "[S;-1]",
+        "reason": "Charge-separated terminal representation outside neutral literal domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND — 1.0.0 (groups-adopted-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND.rule.json) · SHA256 `9d53db5f9c6b7ff1b9aaa8d75acdd179955bab1963e396e496b2164ab3deebef`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_CONTEXT_V2"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"2"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.",
+  "No normalization; excluded representations remain unsupported.",
+  "Not scientifically adopted; synthetic engineering evaluation only."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Pinned reference motifs; narrowed Athena candidate domain, not RDKit parity or scientific approval"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND",
+  "limitations": [
+    "Prospective literal neutral carbon-bound identity only; no reactivity, covalency prediction, stability or interaction inference.",
+    "No normalization; excluded representations remain unsupported.",
+    "Not scientifically adopted; synthetic engineering evaluation only."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.SULFONYL_CHLORIDE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[S;!a;+0](=[O;+0])(=[O;+0])-[Cl;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "S",
+      "O",
+      "Cl"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "sulfur"
+      },
+      {
+        "count": 0,
+        "role": "oxygens"
+      },
+      {
+        "count": 0,
+        "role": "chlorine"
+      }
+    ],
+    "roleHeavyDegree": {
+      "chlorine": 1,
+      "oxygens": 1,
+      "sulfur": 4
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "chlorine": [
+      4
+    ],
+    "oxygens": [
+      2,
+      3
+    ],
+    "sulfur": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[S;+1]",
+        "reason": "Charged sulfur representation outside literal neutral S(=O)2 domain; no normalization"
+      },
+      {
+        "query": "[S;+2]",
+        "reason": "Charged sulfur representation outside literal neutral S(=O)2 domain; no normalization"
+      }
+    ]
+  }
+}
+```
+
 ## ATHENA.GROUP.AMIDE — 1.0.0 (groups-b01)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AMIDE.rule.json) · SHA256 `116207ed69b6e98d88db3c784dad5909b8b049ccac90e239841aa0515c9a5523`
@@ -14193,6 +15323,131 @@ Current-policy gate status must be established by a valid receipt, not the histo
     "unsupportedQueries": []
   }
 }
+```
+
+## ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE — 1.0.0 (hbond-candidate-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/hbond-candidate-v1/ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE.rule.json) · SHA256 `c0d07888073224d552c5045c5bbd3ae298ae4eda0c3ee7750933fc9ab4297ab8`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_EXPLICIT_H_DIRECTIONAL_CANDIDATE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.hbond-candidate"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Explicit complete selected donor/acceptor component scope; verified existing role reports; explicit authoritative bonded donor H; no pyridinium expansion"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Complete finite common frame; no H inference"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "Generic Finding measurements preserve athena.geometry/1 reports, source identities and all tuples; no new evidence schema"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/negative/1",
+  "supportedDomain": "100 approved named class pairs; explicit source scope only",
+  "requirements": [
+    "VERIFIED_ROLE_REPORTS",
+    "COMPLETE_SCOPE",
+    "COMPLETE_EXPLICIT_H",
+    "COMPLETE_ENUMERATION",
+    "EVALUABLE_GEOMETRY"
+  ],
+  "scope": "EXPLICIT_PARTNER_COMPONENTS",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/1: operational structural candidate only; no favorable energy, binding, persistence, mechanism or causality.",
+  "H-A and acceptor-side angles recorded only; no added cutoff.",
+  "Ten pyridinium pairs remain unsupported and UNKNOWN_INCONCLUSIVE.",
+  "No implicit H, normalization, scientific domain widening or historical rule migration.",
+  "Current-policy scientific receipt/expiry not fabricated; opt-in implementation qualification only."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/i02-directional-candidate-review-20261006/PROPOSED_DEFINITION.json",
+    "sha256": "d9e25a9183e79f7c577cfd96717bb3a0d398823661a03ebc8b11a1caa11927b8",
+    "citation": "I02 definition approved by project user 2026-10-06; latest instruction maps unsupported chemistry to UNKNOWN_INCONCLUSIVE"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
 ```
 
 ## ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY — 1.0.0 (perception-foundation-v1)

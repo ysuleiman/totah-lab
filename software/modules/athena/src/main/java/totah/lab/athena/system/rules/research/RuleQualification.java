@@ -40,7 +40,7 @@ public final class RuleQualification {
         var implementation=manifest.research().schema().endsWith("/2")?ImplementationAccess.of(ResearchCodec.decode(implementationBytes,RuleImplementationQualificationV2.class)):ImplementationAccess.of(ResearchCodec.decode(implementationBytes,RuleImplementationQualification.class));
         var foundation=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.foundationCertificate(),artifacts,pins),SystemGraphCertificate.class);
         var binding=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.stateBinding(),artifacts,pins),SystemStateView.Binding.class);
-        var request=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.request(),artifacts,pins),RuleRequest.class);
+        var request=QualificationRequestCodec.decode(ResearchCodec.read(receipt.request(),artifacts,pins));
         if(!binding.equals(foundation.binding())||!binding.equals(request.state())||receipt.mode()!=eligibility.mode())throw new IOException("receipt state/mode mismatch");
         var result=checked(manifest,eligibility,implementation,foundation,request,context,artifacts,at);
         if(result!=receipt.qualification())throw new IOException("forged qualification status");
