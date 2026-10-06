@@ -1,0 +1,63 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY\",\"limitations\":[\"Exact supplied alpha-amino-carbonyl / neutral amide / alpha-carbon-carbonyl connectivity; no sequence name, L/D, stereochemistry, trans preference or biological validity inferred.\",\"Glycine, substituted alpha carbons, proline-like N-ring substitution, and cyclic peptide connectivity are not excluded. Non-alpha backbones and charged/resonance-alternate peptide bonds need separately defined roles, not silent normalization.\"],\"memberQueryIndices\":[0,1,2,3,4,5,6,7],\"negativeCoverageVersion\":\"ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/pattern\",\"patternVersion\":\"1\",\"query\":\"[N;!a]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;+0]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\",\"N\",\"O\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"C1\"},{\"count\":0,\"role\":\"O1\"},{\"count\":0,\"role\":\"O2\"}],\"roleHeavyDegree\":{\"C1\":3,\"O1\":1,\"O2\":1}},\"roles\":{\"C1\":[2],\"C2\":[6],\"CA1\":[1],\"CA2\":[5],\"N1\":[0],\"N2\":[4],\"O1\":[3],\"O2\":[7]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+      "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+      "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Exact supplied alpha-amino-carbonyl / neutral amide / alpha-carbon-carbonyl connectivity; no sequence name, L/D, stereochemistry, trans preference or biological validity inferred.",
+    "Glycine, substituted alpha carbons, proline-like N-ring substitution, and cyclic peptide connectivity are not excluded. Non-alpha backbones and charged/resonance-alternate peptide bonds need separately defined roles, not silent normalization."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

@@ -26845,6 +26845,1137 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY.rule.json) · SHA256 `c4a340e7a3880dfe2d7c9c86dbe366bffbe710906a74b597488a41e088870b88`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Adjacent neutral source amides on an explicit alpha-backbone path; cyclic/proline/glycine contexts allowed.",
+  "Not arbitrary disconnected ligand carbonyls, sulfur donors, beta-backbones, or normalized charged amide resonance depictions. Identity alone implies no n-to-pi-star interaction."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  },
+  {
+    "locator": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+    "sha256": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27",
+    "citation": "Bartlett et al., Nature Chemical Biology 2010, n-to-pi-star interactions in proteins; Fig2a and Methods: consecutive backbone carbonyl operational geometry. DOI10.1038/nchembio.406; pinned PMC2921280."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY",
+  "limitations": [
+    "Adjacent neutral source amides on an explicit alpha-backbone path; cyclic/proline/glycine contexts allowed.",
+    "Not arbitrary disconnected ligand carbonyls, sulfur donors, beta-backbones, or normalized charged amide resonance depictions. Identity alone implies no n-to-pi-star interaction."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;+0]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "C1"
+      },
+      {
+        "count": 0,
+        "role": "O1"
+      },
+      {
+        "count": 0,
+        "role": "O2"
+      },
+      {
+        "count": 0,
+        "role": "C2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "C1": 3,
+      "C2": 3,
+      "O1": 1,
+      "O2": 1
+    }
+  },
+  "roles": {
+    "C1": [
+      2
+    ],
+    "C2": [
+      6
+    ],
+    "CA1": [
+      1
+    ],
+    "CA2": [
+      5
+    ],
+    "N1": [
+      0
+    ],
+    "N2": [
+      4
+    ],
+    "N3": [
+      8
+    ],
+    "O1": [
+      3
+    ],
+    "O2": [
+      7
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840"
+    },
+    {
+      "id": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY.rule.json) · SHA256 `bd39d85cd0eaab7cc51df248c242b1fc36704c3d57c9ddfdffdae041b0b16794`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied alpha-amino-carbonyl / neutral amide / alpha-carbon-carbonyl connectivity; no sequence name, L/D, stereochemistry, trans preference or biological validity inferred.",
+  "Glycine, substituted alpha carbons, proline-like N-ring substitution, and cyclic peptide connectivity are not excluded. Non-alpha backbones and charged/resonance-alternate peptide bonds need separately defined roles, not silent normalization."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY",
+  "limitations": [
+    "Exact supplied alpha-amino-carbonyl / neutral amide / alpha-carbon-carbonyl connectivity; no sequence name, L/D, stereochemistry, trans preference or biological validity inferred.",
+    "Glycine, substituted alpha carbons, proline-like N-ring substitution, and cyclic peptide connectivity are not excluded. Non-alpha backbones and charged/resonance-alternate peptide bonds need separately defined roles, not silent normalization."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ALPHA_PEPTIDE_LINK.SOURCE_CONNECTIVITY/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;+0]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "C1"
+      },
+      {
+        "count": 0,
+        "role": "O1"
+      },
+      {
+        "count": 0,
+        "role": "O2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "C1": 3,
+      "O1": 1,
+      "O2": 1
+    }
+  },
+  "roles": {
+    "C1": [
+      2
+    ],
+    "C2": [
+      6
+    ],
+    "CA1": [
+      1
+    ],
+    "CA2": [
+      5
+    ],
+    "N1": [
+      0
+    ],
+    "N2": [
+      4
+    ],
+    "O1": [
+      3
+    ],
+    "O2": [
+      7
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY.rule.json) · SHA256 `49c9351b306e481b4cb10fbb0999a6cb4db5871b55b17f8b7ccaf7cf59959bee`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Adjacent neutral source amides on an explicit alpha-backbone path; cyclic/proline/glycine contexts allowed.",
+  "Not arbitrary disconnected ligand carbonyls, sulfur donors, beta-backbones, or normalized charged amide resonance depictions. Identity alone implies no n-to-pi-star interaction."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  },
+  {
+    "locator": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+    "sha256": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27",
+    "citation": "Bartlett et al., Nature Chemical Biology 2010, n-to-pi-star interactions in proteins; Fig2a and Methods: consecutive backbone carbonyl operational geometry. DOI10.1038/nchembio.406; pinned PMC2921280."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY",
+  "limitations": [
+    "Adjacent neutral source amides on an explicit alpha-backbone path; cyclic/proline/glycine contexts allowed.",
+    "Not arbitrary disconnected ligand carbonyls, sulfur donors, beta-backbones, or normalized charged amide resonance depictions. Identity alone implies no n-to-pi-star interaction."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.CYCLIC_DIPEPTIDE.ADJACENT_AMIDES.SOURCE_CONNECTIVITY/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;X3;+0]1-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-[N;!a;X3;+0]-[C;!a;X4;+0]-[C;!a;X3;+0](=[O;X1;+0])-1",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "C1"
+      },
+      {
+        "count": 0,
+        "role": "O1"
+      },
+      {
+        "count": 0,
+        "role": "O2"
+      },
+      {
+        "count": 0,
+        "role": "C2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "C1": 3,
+      "C2": 3,
+      "O1": 1,
+      "O2": 1
+    }
+  },
+  "roles": {
+    "C1": [
+      2
+    ],
+    "C2": [
+      6
+    ],
+    "CA1": [
+      1
+    ],
+    "CA2": [
+      5
+    ],
+    "N1": [
+      0
+    ],
+    "N2": [
+      4
+    ],
+    "N3": [
+      0
+    ],
+    "O1": [
+      3
+    ],
+    "O2": [
+      7
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840"
+    },
+    {
+      "id": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.INT.N_PI_STAR.ADJACENT_BACKBONE_CANDIDATE — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.INT.N_PI_STAR.ADJACENT_BACKBONE_CANDIDATE.rule.json) · SHA256 `224b4e18600c8fe68f34fe62f31135a68b90447e4da73b1edf78462f58324e0f`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_N_PI_BACKBONE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.peptide-geometry"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Verified adjacent source backbone-amide roles and all correspondence alternatives"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Complete finite common-frame O1-C2 distance and O1-C2-O2 angle; independently attributed acceptor substituent plane"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "continuousGeometry": "athena-continuous-geometry/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.INT.N_PI_STAR.ADJACENT_BACKBONE_CANDIDATE/negative/1",
+  "supportedDomain": "Exact selected adjacent source backbone amides only",
+  "requirements": [
+    "EXACT_SOURCE_ROLE_TUPLE",
+    "ALL_CORRESPONDENCES_AGREE",
+    "FINITE_COMMON_FRAME_DISTANCE_ANGLE"
+  ],
+  "scope": "Selected O1,C2,O2,CA2,N3; no whole-system absence",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Geometric candidate within published operational backbone screen, not orbital donation, stabilization, affinity or causality.",
+  "Distance<=3.2 A and99<=O1-C2-O2 angle<=119 degrees. Outside this window means absent for this screen only; the paper explicitly discusses possible interactions outside it.",
+  "Acceptor-carbon out-of-substituent-plane geometry is retained independently; unavailable plane geometry is not fabricated and does not change the distance/angle screen.",
+  "No extrapolation to arbitrary ligand carbonyls, sulfur donors, amide resonance alternatives or other backbones."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  },
+  {
+    "locator": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+    "sha256": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27",
+    "citation": "Bartlett et al., Nature Chemical Biology 2010, n-to-pi-star interactions in proteins; Fig2a and Methods: consecutive backbone carbonyl operational geometry. DOI10.1038/nchembio.406; pinned PMC2921280."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+## ATHENA.INT.N_PI_STAR.CYCLIC_DIPEPTIDE_CANDIDATE — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.INT.N_PI_STAR.CYCLIC_DIPEPTIDE_CANDIDATE.rule.json) · SHA256 `e3ce27a9b6706fd34362bcae57df2c2082f8962c92f3d1f34d77bb9729b43be3`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_N_PI_BACKBONE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.peptide-geometry"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Verified adjacent source backbone-amide roles and all correspondence alternatives"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Complete finite common-frame O1-C2 distance and O1-C2-O2 angle; independently attributed acceptor substituent plane"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "continuousGeometry": "athena-continuous-geometry/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.INT.N_PI_STAR.CYCLIC_DIPEPTIDE_CANDIDATE/negative/1",
+  "supportedDomain": "Exact selected adjacent source backbone amides only",
+  "requirements": [
+    "EXACT_SOURCE_ROLE_TUPLE",
+    "ALL_CORRESPONDENCES_AGREE",
+    "FINITE_COMMON_FRAME_DISTANCE_ANGLE"
+  ],
+  "scope": "Selected O1,C2,O2,CA2,N3; no whole-system absence",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Geometric candidate within published operational backbone screen, not orbital donation, stabilization, affinity or causality.",
+  "Distance<=3.2 A and99<=O1-C2-O2 angle<=119 degrees. Outside this window means absent for this screen only; the paper explicitly discusses possible interactions outside it.",
+  "Acceptor-carbon out-of-substituent-plane geometry is retained independently; unavailable plane geometry is not fabricated and does not change the distance/angle screen.",
+  "No extrapolation to arbitrary ligand carbonyls, sulfur donors, amide resonance alternatives or other backbones."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  },
+  {
+    "locator": "software/qualification/advanced-rule-research-design-20261004/reference/L20.html",
+    "sha256": "5ae4d3bbf7001be8fdd40f1b1af7ad7cc71967606b6c051789d6e15992c59d27",
+    "citation": "Bartlett et al., Nature Chemical Biology 2010, n-to-pi-star interactions in proteins; Fig2a and Methods: consecutive backbone carbonyl operational geometry. DOI10.1038/nchembio.406; pinned PMC2921280."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+## ATHENA.VAL.PEPTIDE_OMEGA.SOURCE_ALPHA_LINK — 1.0.0 (peptide-geometry-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.VAL.PEPTIDE_OMEGA.SOURCE_ALPHA_LINK.rule.json) · SHA256 `37afd401c03f74d6c004a42a19da6d145f6c8d7ff824c21292fa61a07a0973c6`
+
+**family**
+
+```json
+"VALIDATOR"
+```
+
+**profile**
+
+```json
+"ATHENA_PEPTIDE_OMEGA_V1"
+```
+
+**implementationId**
+
+```json
+"athena.peptide-geometry"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Verified exact source alpha-peptide group roles with authoritative H/charge/mapping"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Complete finite common-frame selected CA1-C1-N2-CA2 torsion"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "continuousGeometry": "athena-continuous-geometry/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.VAL.PEPTIDE_OMEGA.SOURCE_ALPHA_LINK/negative/1",
+  "requirements": [
+    "EXACT_SOURCE_ROLE_TUPLE",
+    "ALL_CORRESPONDENCES_AGREE",
+    "FINITE_COMMON_FRAME_TORSION"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Exact supplied source alpha-peptide selected tuple only",
+  "scope": "One explicitly requested CA1-C1-N2-CA2 tuple; not complete protein absence"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Selected source alpha-peptide omega only; not a universal backbone validator.",
+  "CIS_WINDOW: absolute omega<=30; TRANS_WINDOW: 180-absolute omega<=30; otherwise TWISTED_OUTSIDE_WINDOWS. Classification proposition is outside both windows, not biological invalidity.",
+  "No cis-Pro rejection, preference, energy, causality or empirical probability. Missing role/coordinate/plane scope remains inconclusive. Raw torsion is preserved independently."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/wwpdb-xray.txt",
+    "sha256": "8674b70d3706401d1b849033137733d75c470072d714ad7a8eba2673c99c9840",
+    "citation": "wwPDB X-ray validation guide, chirality/planarity section, peptide omega definition (snapshot lines1954-1958). Exact source peptide roles required; residue names alone do not establish connectivity."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY — 1.0.0 (perception-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY.rule.json) · SHA256 `21fa1b805c0d26a9e94cd6a01f09d9f89df402782fb6dced9544b2a942b3d415`

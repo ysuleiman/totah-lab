@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d41d5774e9c189a58826ca5767ae4bc7811e1546429381d2bd047cd004aef35b`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `899d6fee13a03351f95c1c8535f8d1fe25a4dcf87135b328c7aaf606e99c8089`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -55,7 +55,7 @@ Disposition is copied without upgrading partial capability coverage.
 | V09 | Protein Ramachandran validation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V10 | Side-chain rotamer validation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V11 | C-beta deviation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V12 | Cis/trans/twisted peptide geometry | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V12 | Cis/trans/twisted peptide geometry | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v12-peptide-source-geometry-20261006](../../../software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt) |
 | V13 | CaBLAM backbone validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V14 | RNA sugar pucker and backbone suite validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V15 | Hydrogen optimization and Asn/Gln/His flip suggestions | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
@@ -81,7 +81,7 @@ Disposition is copied without upgrading partial capability coverage.
 | G04 | Cysteine environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt), [b06-cysteine-backbone-20261006](../../../software/qualification/b06-cysteine-backbone-20261006/CHECKPOINT.txt) |
 | G05 | SAM sulfonium/methyl/aromatic environment | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G06 | SAM methyl-transfer geometry | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
-| G07 | n-to-pi-star motif | P3 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
+| G07 | n-to-pi-star motif | P3 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [v12-peptide-source-geometry-20261006](../../../software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt) |
 | G08 | Typed H-bond/charge/cofactor/second-shell networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F01 | Functional group: Acids/carboxylates | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F02 | Functional group: Amides and methyl amides | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
@@ -732,13 +732,13 @@ Review idealization algorithm/parameters and modified/D-residue domain before cl
 
 ### V12 — Cis/trans/twisted peptide geometry
 
-Define source peptide linkage, cis/trans/twist classes and context; unusual cis-Pro is not intrinsically invalid.
+Source alpha-peptide omega outside cis/trans30-degree windows; exact selected tuple, cyclic/proline contexts included.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 32 focused tests and1795 selected regression/consumer tests, two independent JVM replays and65 historical golden files. Fresh committed-source follow-up pending.
 
 **Existing implementation:** No qualified equivalent
 
-**Supporting source:** MolProbity cispeptides; wwPDB torsions
+**Supporting source:** docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.
 
 ### V13 — CaBLAM backbone validation
 
@@ -1032,17 +1032,15 @@ Review selected nucleophile/SAM state and substrate-specific transfer geometry; 
 
 ### G07 — n-to-pi-star motif
 
-Review carbonyl donor/acceptor geometry and empirical domain; proximity does not establish orbital donation.
+Adjacent source backbone-amide geometric candidate, O1-C2<=3.2A and99<=O1-C2-O2<=119deg; cyclic dipeptide role alias included, no orbital/energetic claim.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 32 focused tests and1795 selected regression/consumer tests, two independent JVM replays and65 historical golden files. Fresh committed-source follow-up pending.
 
 **Existing implementation:** ATHENA.INT.N_PI_STAR
 
-**Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
+**Supporting source:** docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.INT.N_PI_STAR.json) · SHA256 `02937d6acaa7b4439c1fa11f3466b0360d78578a384c02cb60ec6e2b4e6810d9`
-
-**Remaining scientific requirement:** L20 nonredundant high-resolution PDB backbone survey; do not extend backbone reference to every ligand carbonyl. L21 sulfur variant remains separate. Structural distribution extraction and chemical-domain limits.
 
 ### G08 — Typed H-bond/charge/cofactor/second-shell networks
 

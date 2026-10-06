@@ -1736,29 +1736,35 @@
       "priorDecision": "UNSUPPORTED",
       "priorRationale": "Unusual peptides need evidence, not automatic correction",
       "priorAthenaStatus": "UNSUPPORTED",
-      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
       "sourceInventory": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
       "sourceInventorySha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
       "previousProgramDisposition": "PENDING_RECONCILIATION_NOT_COMPLETE",
       "closure": {
         "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
-        "scope": "Define source peptide linkage, cis/trans/twist classes and context; unusual cis-Pro is not intrinsically invalid.",
+        "scope": "Source alpha-peptide omega outside cis/trans30-degree windows; exact selected tuple, cyclic/proline contexts included.",
         "sourceInventoryEntry": "V12",
-        "scientificSupport": "MolProbity cispeptides; wwPDB torsions",
+        "scientificSupport": "docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.",
         "researchDossiers": [],
         "reviewRequirements": [],
         "currentPolicyQualified": false,
         "newScientificDefinitionApproved": false,
-        "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
+        "qualificationBasis": "32 focused tests and1795 selected regression/consumer tests, two independent JVM replays and65 historical golden files. Fresh committed-source follow-up pending.",
         "existingImplementation": "No qualified equivalent",
-        "qualificationEvidence": [],
-        "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt"
+        "qualificationEvidence": [
+          "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt"
+        ],
+        "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
+        "delegatedScientificAdoption": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt"
       },
       "currentWorkAssessment": {
-        "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
-        "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
-        "remainingDependency": "Pinned wwPDB guide gives omega deviation >30 degrees from cis0/trans180. Raw torsion already available; source peptide role identity and exact ordered CA-C-N-CA scope must be qualified before adopting that operational classification. No cis-Pro biological invalidity claim."
-      }
+        "classification": "READY_FOR_SCIENTIFIC_ADOPTION",
+        "artifact": "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt",
+        "remainingDependency": "No production receipt/expiry supplied. Broader non-alpha/backbone or orbital interpretation not established."
+      },
+      "progressArtifacts": [
+        "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt"
+      ]
     },
     {
       "capabilityId": "V13",
@@ -2625,38 +2631,38 @@
       "priorDecision": "UNSUPPORTED",
       "priorRationale": "Proximity alone cannot establish orbital donation; no exact classifier in inspected exports",
       "priorAthenaStatus": "RESEARCH_REQUIRED",
-      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
       "sourceInventory": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
       "sourceInventorySha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
       "progressArtifacts": [
-        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt"
+        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt",
+        "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt"
       ],
       "note": "New bounded raw geometry or source-state feature substrate is implementation-qualified; this does not close the broader capability, activate an interaction, or provide empirical calibration.",
       "previousProgramDisposition": "PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING",
       "closure": {
         "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
-        "scope": "Review carbonyl donor/acceptor geometry and empirical domain; proximity does not establish orbital donation.",
+        "scope": "Adjacent source backbone-amide geometric candidate, O1-C2<=3.2A and99<=O1-C2-O2<=119deg; cyclic dipeptide role alias included, no orbital/energetic claim.",
         "sourceInventoryEntry": "G07",
-        "scientificSupport": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+        "scientificSupport": "docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.",
         "researchDossiers": [
           "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.INT.N_PI_STAR.json"
         ],
-        "reviewRequirements": [
-          "L20 nonredundant high-resolution PDB backbone survey; do not extend backbone reference to every ligand carbonyl. L21 sulfur variant remains separate. Structural distribution extraction and chemical-domain limits."
-        ],
+        "reviewRequirements": [],
         "currentPolicyQualified": false,
         "newScientificDefinitionApproved": false,
-        "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
+        "qualificationBasis": "32 focused tests and1795 selected regression/consumer tests, two independent JVM replays and65 historical golden files. Fresh committed-source follow-up pending.",
         "existingImplementation": "ATHENA.INT.N_PI_STAR",
         "qualificationEvidence": [
-          "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt"
+          "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt"
         ],
-        "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt"
+        "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
+        "delegatedScientificAdoption": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt"
       },
       "currentWorkAssessment": {
-        "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
-        "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
-        "remainingDependency": "Backbone carbonyl n-to-pi-star structural survey cannot be generalized to every ligand carbonyl or sulfur. Raw O-C distance/approach geometry is available; chemical-role/domain selection and empirical support must remain explicit."
+        "classification": "READY_FOR_SCIENTIFIC_ADOPTION",
+        "artifact": "software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt",
+        "remainingDependency": "No production receipt/expiry supplied. Broader non-alpha/backbone or orbital interpretation not established."
       }
     },
     {
