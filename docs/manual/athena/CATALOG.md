@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `7edf345e6469fb101e92d300268c002cfd47bc5e70886dae384803de12232dd2`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `865f85078048531a34af9ed2db23842e01b424b8a9813e228dc7ad4221c5b3e5`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -87,7 +87,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F02 | Functional group: Amides and methyl amides | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F03 | Functional group: Esters/acyl linkages | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt) |
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F05 | Functional group: Acid/sulfonyl chlorides | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F05 | Functional group: Acid/sulfonyl chlorides | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F07 | Functional group: Imines/oximes/nitroso | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |

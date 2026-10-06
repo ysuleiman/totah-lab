@@ -33,6 +33,10 @@ The [terminal-alkyne candidate](../../../software/qualification/f18-terminal-alk
 has engineering tests through the existing B00/B01 evaluator. Its exact terminal-role
 definition awaits scientific adoption; it is not a production-qualified group.
 
+The [F05 acyl/sulfonyl-chloride candidates](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt)
+likewise have bounded evaluator tests and pinned supporting definitions, pending
+scientific adoption. Their literal source identities imply no reactivity or interaction.
+
 ## Supporting material and completeness
 
 Every rule needs both scientific supporting material and execution qualification.
