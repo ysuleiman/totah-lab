@@ -82,6 +82,7 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.water-bridge")){WaterBridgeRules.validate(m);return;}
         if(m.implementationId().equals("athena.events")){EventAnalysisRules.validate(m);return;}
         if(m.implementationId().equals("athena.peptide-geometry")){PeptideGeometryRules.validate(m);return;}
         if(m.implementationId().equals("athena.hbond-candidate")){HbondCandidateRules.validate(m);return;}

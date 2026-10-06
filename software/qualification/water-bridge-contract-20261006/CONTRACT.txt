@@ -1,0 +1,154 @@
+APPROVED WITH REQUIRED CLARIFICATIONS — 2026-10-06
+WATER_CANDIDATE_UNIVERSE_V1.txt is normative: exact E1-E6 exclusions and
+inventory exhaustiveness independent of all chemical/orientation/leg eligibility.
+User authorized implementation of this clarified contract. Historical proposal follows.
+
+I12 -> I13 SCIENTIFIC CONTRACT PROPOSAL — 2026-10-06
+Starting HEAD e86d44c9e; implemented baseline qualified from 9118d3efe.
+This document specifies the proposed rule before implementation. It is not a
+human scientific approval, production receipt, or claim of full96 completion.
+
+1. CAPABILITY AND DEPENDENCY CHAIN
+P01/B00 exact occurrence matching + P09 authoritative source H + P03 exact
+non-water roles + qualified source correspondence + continuous geometry
+ -> neutral-water source identity and explicit-H directional water legs
+ -> I12 single-water candidate
+ -> I13 bounded multi-water candidate using existing G08/EventPaths.
+The event family, R01/R02 and its schema approval are complete prerequisites.
+I03 implicit-H approximation is NOT a dependency: this contract never places H.
+Metal typing, coordination and implicit-water orientation are not dependencies.
+The 12 external-reference-data requirements remain outside this family.
+
+2. PROPOSED DEFINITION / CHOSEN CONTRACT
+I12 rule: ATHENA.WATER_BRIDGE.EXPLICIT_H_SINGLE/1.0.0.
+I13 rule: ATHENA.WATER_BRIDGE.EXPLICIT_H_MULTI/1.0.0.
+Implementation identity proposed: athena.water-bridge/1.
+Named proposition: an explicit-source-H water-mediated structural candidate,
+not established hydrogen bonding, hydration, energetics or proton transfer.
+Every leg is an exact supplied tuple (D,H,A), with an authoritative SINGLE D-H
+bond, finite nondegenerate coordinates, D-A <= 3.5 angstrom and angle D-H-A
+in [130,180] degrees, vertex H. Preserve D-A, H-A and D-H-A separately.
+These are the pinned ProLIF HBAcceptor/HBDonor defaults, selected as an
+attributed operational definition, not fitted or invented empirical thresholds.
+No lower distance bound, H-A cutoff, inter-leg angle or occupancy threshold is
+added. Source structural validity remains separate from this candidate screen.
+
+Water identity is a supplied neutral nonaromatic oxygen with exactly two
+source hydrogens, no heavy covalent neighbor, and no additional hydrogen or
+covalent edge. Each represented H is neutral and has exactly one SINGLE bond,
+to that O. Retain isotope labels; no isotope-dependent energetic assertion.
+Chemical identity may be expressible with implicit H, but ALL water H atoms
+must be explicit, mapped and coordinate-bearing before ANY incident leg is
+eligible, including a leg on which water is only the acceptor. The same
+water O and both H coordinates are reused throughout the whole path.
+Residue name HOH/WAT and an oxygen position alone are insufficient identity.
+
+Non-water roles reuse the exact pinned I02 source definitions and contexts:
+donors: primary/secondary neutral amine; primary/secondary/tertiary carbon-bound
+ammonium; NH2/NH1 amide; alcohol; phenol; pyrrolic NH.
+acceptors: alcohol O; aldehyde/ketone/ester/amide carbonyl O;
+primary/secondary/tertiary neutral amine; ether O; pyridine-like N.
+New leg classes are these ten donor classes -> water O, water O -> these ten
+acceptor classes, and water O -> water O (21 directed class families).
+Existing I02 source manifests and explicit-H rule remain byte-identical.
+This is not wholesale adoption of the broader ProLIF SMARTS role domains.
+
+I12: a simple path between two distinct non-water endpoint atoms, through
+exactly ONE identified water O, with both incident legs supported in the same
+immutable chemical/coordinate/correspondence state. Endpoint atoms can each
+be donor or acceptor under the specified roles; leg donor direction is retained
+independently of the undirected connectivity of the bridge.
+I13: the same proposition through 2..K distinct identified water O atoms,
+where K is an explicit finite requested search bound (not an empirical cutoff).
+Only water vertices are allowed internally. No non-water transit, repeated
+water, cross-state edge, or shortcut through another endpoint is permitted.
+The existing path engine supplies simple edge paths; retain distinct H tuples
+and correspondence alternatives, not merely a binary residue-pair fingerprint.
+Report water count and each leg. Any sum of leg distances is a path descriptor,
+not endpoint separation or interaction strength.
+
+Joint orientation means the very same supplied state and atom correspondence,
+not separately optimized leg geometries. No water rotation is performed.
+Retain bifurcated candidates if the same H satisfies both leg definitions:
+the chosen source does not impose hydrogen capacity or one-contact exclusivity.
+Do not interpret retained candidates as simultaneously occupied independent bonds.
+Do not introduce lone-pair directions, tetrahedral windows or a new water model.
+
+3. SUPPORTED DOMAIN
+Explicit atom identities, supplied complete covalent topology/H/charge state,
+unique resolved component-to-structure correspondence, qualified angstrom frame,
+and exact non-water role definitions above. Multiple distinct waters and
+disconnected supplied components remain distinct even with similar labels.
+Prepared H coordinates are allowed ONLY as supplied, source-attributed model
+coordinates. They must never be described as experimentally observed H positions.
+Every result is relative to its explicitly selected finite state/event universe.
+
+4. EXCLUSIONS / UNKNOWN CASES
+No O-only water heuristic, H placement/rotation, protonation inference,
+hydronium/hydroxide/peroxide/metal-bound oxygen substitution, or HOH-name typing.
+No sulfur/carboxylate/pyridinium or other unqualified non-water role expansion.
+Missing H/coordinates/charges/topology, degenerate angles, ambiguous mappings,
+incomplete water inventory, unresolved alternate states, unqualified leg sources,
+conflicting assertions or truncated enumeration cannot establish absence.
+Exclude cross-component covalent legs and within-water self-legs. A broken source
+binding/hash is an integrity failure, not an absent bridge.
+Separate alternate water orientations must be evaluated as separate complete
+states. Two individually possible legs in different orientations cannot compose.
+
+5. EVIDENCE AND PROVENANCE
+SOURCE_PINS.json pins the inspected primary implementation bytes. ProLIF revision
+19f1800218387c49536eb9d3e8cd3044fdb337ee: interactions.py HBAcceptor lines100-151;
+water_bridge.py WaterBridge, _first_order_only, _any_order and _merge_metadata.
+The same revision's utils.py angle_between_limits (lines102-129) was retrieved
+for this review; it confirms inclusive angle boundaries. The raw bytes, URL,
+revision, license reference and hash are recorded in SOURCE_PINS.json and
+SOURCE_RETRIEVAL.json. No empirical dataset was downloaded.
+PLIP config/detection/preparation bytes are independent comparison sources.
+All inputs require existing envelope hashes, full state binding, exact source
+role/group manifest digest, source H/topology coverage, coordinate provenance,
+correspondence and raw geometry. Current-policy qualifications reuse existing
+research/implementation receipts and validity; this task invents none.
+Positive path requires qualified, nonconflicting leg evidence (or recomputed
+legs governed by the exact enclosing water-rule qualification). Negative requires
+the existing explicit COMPLETE_EVENT_SCOPE evidence AND complete resolved leg,
+water identity/orientation, relevant candidate universe and bounded traversal.
+Empty selected water data is not a complete solvent inventory. A negative is
+only 'no candidate under this profile in this demonstrated complete scope',
+never 'no physical water bridge'. Preserve every unresolved original status.
+
+6. SOURCE COMPARISON AND JUSTIFICATION
+ProLIF: explicit D-H-A legs with default3.5A/130..180deg, same-frame water joining,
+simple multigraph paths, separate edge alternatives, water-only internal paths.
+Water supplied by caller; MDAnalysis residue handling supplies its identity.
+Athena MODIFY: graph/H identity replaces name/caller-water assumption; exact
+qualified Athena role domains replace unqualified query transfer; preserve full
+source/H alternatives and proof of negative coverage. No cross-engine parity.
+PLIP: first-order only; water-O-to-polar distance2.5..4.1A inclusive; donor
+angle strictly>100deg; acceptor-waterO-donorH angle strictly between71 and140deg.
+Water donor H orientation is not needed by that heuristic. refine_water_bridges
+removes donors already in direct H bonds and selects up to two water-acceptor
+combinations by closeness to110deg. Those are materially different propositions.
+REJECT importing any PLIP cutoff or pruning into the selected explicit-H rule.
+Neither reference proves physical occupancy, energetics or catalytic linkage.
+The explicit-H choice addresses the existing I12 dossier's joint-orientation
+requirement and composes directly into I13 without an inferred-water model.
+
+7. INFRASTRUCTURE / IMPLEMENTATION BOUNDARY
+Reuse FunctionalGroupRules /4 for exact water identity; HbondCandidateSources
+for replay-verified role occurrences; HbondCandidateGeometry/ContinuousGeometryRules
+for geometry; existing typed event keys, source qualification, coverage and
+EventPaths for bounded enumeration; existing evidence/research gate/persistence.
+Add only water-specific chemistry and composition checks. No new generic graph,
+matcher, registry, router, path algorithm or scientific scoring system.
+Before coding, resolve the precise existing-interface input/output composition.
+If that cannot represent water identity/orientation/provenance without changing
+a public API/schema, produce the smallest exact additive contract and request
+approval under AGENTS.md. Do not hide a public contract in opaque properties.
+
+8. ACCEPTANCE
+ACCEPTANCE_MATRIX.json enumerates required cases before qualification. Passing
+source identity tests alone does not qualify water legs, I12 or I13. Run focused
+family tests, affected consumer/regression tests, independent deterministic
+replay, all65 historical comparisons and25 preservation pins, then fresh
+committed-source whole-foundation qualification with empty outputs. Do not move
+to another family before this chain completes or a concrete approval gate blocks it.

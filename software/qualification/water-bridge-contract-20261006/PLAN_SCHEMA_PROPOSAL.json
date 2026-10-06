@@ -1,0 +1,176 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "stateBinding",
+    "first",
+    "second",
+    "waters",
+    "inventoryCoverage",
+    "artifacts",
+    "minimumWaters",
+    "maximumWaters"
+  ],
+  "properties": {
+    "schema": {
+      "const": "athena-water-bridge-plan/1"
+    },
+    "stateBinding": {
+      "$ref": "#/$defs/binding"
+    },
+    "first": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/atom"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "second": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/atom"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "waters": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/atom"
+      },
+      "uniqueItems": true
+    },
+    "inventoryCoverage": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pin"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pin"
+      }
+    },
+    "minimumWaters": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "maximumWaters": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:athena:proposal:water-bridge-plan:1",
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "namespace",
+        "id",
+        "version"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "namespace": {
+          "type": "string",
+          "minLength": 1
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "atom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chainId",
+        "residueNumber",
+        "insertionCode",
+        "atomName"
+      ],
+      "properties": {
+        "chainId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "residueNumber": {
+          "type": "integer"
+        },
+        "insertionCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1
+        },
+        "atomName": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference",
+        "sha256"
+      ],
+      "properties": {
+        "reference": {
+          "$ref": "#/$defs/reference"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "stateSha256",
+        "chemicalSha256",
+        "coordinateSha256",
+        "correspondenceSha256"
+      ],
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/reference"
+        },
+        "stateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "chemicalSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "coordinateSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "correspondenceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "description": "PROPOSED ONLY. Existing record constructors and INPUT_CONTRACT.txt supply semantic validation, pin-kind restrictions and cross-field constraints."
+}

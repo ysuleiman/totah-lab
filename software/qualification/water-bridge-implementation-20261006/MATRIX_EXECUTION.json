@@ -1,0 +1,583 @@
+{
+  "status": "EXECUTION_MAPPING_PENDING_FINAL_CLEAN_SOURCE",
+  "contract": "CONTRACT.txt",
+  "inputContract": "INPUT_CONTRACT.txt",
+  "cases": [
+    {
+      "id": "W01",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Neutral source O with exactly two mapped neutral explicit single-bonded H, complete state and finite coordinates",
+      "expected": "Eligible water identity; preserve both H and source references",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W02",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Same topology with supplied isotope labels",
+      "expected": "Same topological eligibility; isotope metadata unchanged; no energetic assertion",
+      "checks": [
+        "WaterBridgeDomainTest.isotopeLabelsRemainSourceMetadata"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W03",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "HOH-named oxygen with absent H state",
+      "expected": "UNKNOWN_INCONCLUSIVE, never water donor/acceptor eligible",
+      "checks": [
+        "WaterBridgeAcceptanceTest.unresolvedWaterIdentityBlocksNegative"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W04",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Neutral H2O with one or both H implicit",
+      "expected": "Source identity may exist; directional leg remains UNKNOWN_INCONCLUSIVE",
+      "checks": [
+        "WaterBridgeAcceptanceTest.completeInventoryNeverProvidesHydrogenOrientation"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W05",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Hydroxide, hydronium, peroxide, alcohol, or oxygen covalently connected to metal",
+      "expected": "Outside exact neutral-water domain; no water bridge positive",
+      "checks": [
+        "WaterBridgeDomainTest.exactExclusionsNeverBecomeWaterFromInventory"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W06",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Unknown formal charge, missing atom mapping, partial topology, or ambiguous component correspondence",
+      "expected": "UNKNOWN_INCONCLUSIVE; no guessed charge/mapping",
+      "checks": [
+        "WaterBridgeAcceptanceTest.unresolvedWaterIdentityBlocksNegative",
+        "WaterBridgeDomainTest.unresolvedFrameOrCorrespondenceStaysUnknown"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W07",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "H bonded to two O atoms or wrong O-H bond order",
+      "expected": "Conflicting/out-of-domain source state; no positive or false negative",
+      "checks": [
+        "WaterBridgeDomainTest.exactExclusionsNeverBecomeWaterFromInventory"
+      ],
+      "qualificationNote": "Approved clarification E5/E6 conclusively excludes these non-water identities; exclusions do not block complete inventory. Conflicting authoritative evidence remains unknown."
+    },
+    {
+      "id": "W08",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Distinct source waters with matching human-readable residue labels",
+      "expected": "Remain distinct identities; ambiguous source addressing cannot be merged",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "W09",
+      "capability": "I12",
+      "category": "identity",
+      "fixture": "Duplicate selected O or overlapping O/H ownership",
+      "expected": "Reject malformed scope or retain source conflict; never double-count",
+      "checks": [
+        "WaterBridgeAcceptanceTest.duplicateSelectedWaterIsMalformed",
+        "WaterBridgeDomainTest.exactExclusionsNeverBecomeWaterFromInventory"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L01",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Each of ten exact qualified donor classes to neutral water, and water to each of ten qualified acceptor contexts",
+      "expected": "21 directed families including water-water; correct role and context pins",
+      "checks": [
+        "WaterBridgeDomainTest.everyApprovedNonwaterDonorToWater",
+        "WaterBridgeDomainTest.waterToEveryApprovedNonwaterAcceptor"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L02",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "D-A=3.5 angstrom and DHA=130 degrees, independently then simultaneously",
+      "expected": "Included boundaries; use analytically constructed coordinates and report numerical tolerances of test construction only",
+      "checks": [
+        "WaterBridgeDomainTest.sourceWindowBoundaries"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L03",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "D-A just above3.5 or DHA just below130 with complete eligible state",
+      "expected": "Leg ABSENT_FALSE under named operational profile",
+      "checks": [
+        "WaterBridgeDomainTest.sourceWindowBoundaries"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L04",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Positive D-A/DHA with arbitrary H-A or inter-leg angle",
+      "expected": "No extra unsourced cutoff; preserve raw values",
+      "checks": [
+        "WaterBridgeDomainTest.independentDonorDirectionsDoNotConstrainPathDirection",
+        "WaterBridgeDomainTest.sourceWindowBoundaries"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L05",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Zero D-H/H-A vector, coincident D/A, nonfinite coordinates or unqualified frame",
+      "expected": "UNKNOWN_INCONCLUSIVE or source-validation rejection, never a fabricated angle",
+      "checks": [
+        "WaterBridgeDomainTest.degenerateWaterHDoesNotGainEligibilityFromCoverage",
+        "WaterBridgeDomainTest.nonfiniteCoordinatesFailAtSourceConstruction",
+        "WaterBridgeDomainTest.coincidentLegAtomsCannotSupportAbsence",
+        "WaterBridgeDomainTest.unresolvedFrameOrCorrespondenceStaysUnknown"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L06",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Two donor H atoms yield separate tuples; one positive and one negative",
+      "expected": "Retain both and all original roles; no best-H pruning",
+      "checks": [
+        "WaterBridgeDomainTest.explicitHydrogenTuplesAreNotCollapsed",
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L07",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Unsupported pyridinium/sulfur/carboxylate partner",
+      "expected": "Outside profile; no universal chemical negative",
+      "checks": [
+        "WaterBridgeDomainTest.unsupportedSulfurEndpointDoesNotBecomeEligible",
+        "WaterBridgeDomainTest.carboxylatePartnerRemainsOutsideRoleDomain",
+        "WaterBridgeDomainTest.pyridiniumPartnerRemainsOutsideReviewedDomain"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L08",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Same water state accepts one leg and donates another",
+      "expected": "Both legs use exactly the same two explicit H atom positions",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L09",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Same H satisfies two bifurcated outgoing legs",
+      "expected": "Preserve candidate alternatives, with no independent-bond or capacity claim",
+      "checks": [
+        "WaterBridgeDomainTest.independentDonorDirectionsDoNotConstrainPathDirection"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "L10",
+      "capability": "I12/I13",
+      "category": "leg",
+      "fixture": "Two waters connected with a source-qualified D-H-A tuple",
+      "expected": "Water-water leg available to I13; both complete H states required",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P01",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Two valid legs through exactly one water between non-water endpoint atoms",
+      "expected": "I12 SUPPORTED_PRESENT; both complete leg witnesses retained",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P02",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Water accepts from two endpoints, or donates to two acceptor endpoints",
+      "expected": "I12 candidates retained when each explicit leg meets the selected criterion",
+      "checks": [
+        "WaterBridgeDomainTest.independentDonorDirectionsDoNotConstrainPathDirection"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P03",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "O near both endpoints but one explicit H orientation fails",
+      "expected": "No path positive; negative only with complete qualified coverage",
+      "checks": [
+        "WaterBridgeAcceptanceTest.wrongSharedOrientationFailsDespiteCloseOxygens"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P04",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Leg1 positive in orientation A and leg2 positive only in orientation B",
+      "expected": "Never combine across state bindings; no positive",
+      "checks": [
+        "WaterBridgeDomainTest.sourceStateMismatchCannotCombineAlternativeOrientations"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P05",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "One supported leg plus one unknown or unsupported leg",
+      "expected": "UNKNOWN_INCONCLUSIVE if no independent supported path",
+      "checks": [
+        "WaterBridgeAcceptanceTest.unresolvedWaterIdentityBlocksNegative",
+        "WaterBridgeDomainTest.unsupportedSulfurEndpointDoesNotBecomeEligible"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P06",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Direct endpoint-endpoint H bond exists beside a valid water path",
+      "expected": "Water path retained; no PLIP-style pruning",
+      "checks": [
+        "WaterBridgeDomainTest.directHydrogenBondDoesNotPruneWaterBridge"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P07",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Only a direct endpoint-endpoint bond exists",
+      "expected": "No I12 path; a direct bond is not a one-water bridge",
+      "checks": [
+        "WaterBridgeAcceptanceTest.completeEmptyModeledInventoryIsOnlyProfileNegative"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P08",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Valid path with two waters",
+      "expected": "I13 positive; never counted as I12",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P09",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Valid path with exactly K waters and one with K+1 waters",
+      "expected": "Only the explicit selected interval qualifies; report bound, no claim outside it",
+      "checks": [
+        "WaterBridgeAcceptanceTest.explicitWaterPaths",
+        "WaterBridgeDomainTest.waterCountBoundExcludesLongerPathsWithoutClaimOutsideBound"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P10",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Water cycle, repeated water or non-water intermediate",
+      "expected": "No invalid simple-water path; retain valid alternatives",
+      "checks": [
+        "WaterBridgeDomainTest.simpleWaterPathsNeverRepeatWatersOrTransitOtherEndpoints",
+        "EventPathAcceptanceTest.directedCyclicEvidenceYieldsSimplePathsOnly"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P11",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Multiple H tuples on same water pair",
+      "expected": "Distinct edge identities and path alternatives retained",
+      "checks": [
+        "WaterBridgeDomainTest.explicitHydrogenTuplesAreNotCollapsed"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "P12",
+      "capability": "I12/I13",
+      "category": "path",
+      "fixture": "Reverse endpoint query and reverse donor direction",
+      "expected": "Consistent topology with original directed D/H/A roles preserved",
+      "checks": [
+        "WaterBridgeDomainTest.reversingEndpointQueryPreservesWaterWitnesses",
+        "WaterBridgeDomainTest.independentDonorDirectionsDoNotConstrainPathDirection"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C01",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Complete declared source water/endpoint inventory, all eligible legs evaluated and no qualifying path",
+      "expected": "ABSENT_FALSE only for the bound supported profile and scope",
+      "checks": [
+        "WaterBridgeAcceptanceTest.wrongSharedOrientationFailsDespiteCloseOxygens"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C02",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "No waters listed and no complete inventory evidence",
+      "expected": "UNKNOWN_INCONCLUSIVE",
+      "checks": [
+        "WaterBridgeAcceptanceTest.noWaterWithoutInventoryIsUnknown"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C03",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Independently attributed complete empty represented-water inventory",
+      "expected": "Only a modeled-scope negative; never physical solvent absence",
+      "checks": [
+        "WaterBridgeAcceptanceTest.completeEmptyModeledInventoryIsOnlyProfileNegative"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C04",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "A possibly-water O omitted from a claimed complete inventory",
+      "expected": "Completeness fails even if a generic event coverage assertion says complete",
+      "checks": [
+        "WaterBridgeAcceptanceTest.omittedPossiblyWaterOxygenDefeatsCoverageAssertion"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C05",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Missing group/context/H/charge evidence for one relevant component",
+      "expected": "Negative withheld; valid local positives may remain with incomplete scope",
+      "checks": [
+        "WaterBridgeAcceptanceTest.unresolvedWaterIdentityBlocksNegative",
+        "WaterBridgeDomainTest.incompleteGraphWithZeroVisibleHDoesNotConcludeNonwater",
+        "WaterBridgeDomainTest.unsupportedSulfurEndpointDoesNotBecomeEligible"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C06",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Candidate/node/hop budget truncates enumeration before a path is found",
+      "expected": "UNKNOWN_INCONCLUSIVE, complete=false, truncation retained",
+      "checks": [
+        "WaterBridgeAcceptanceTest.truncatedSearchIsNeverNegative"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C07",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Budget truncation after finding a valid path",
+      "expected": "SUPPORTED_PRESENT with complete=false; no exhaustive count",
+      "checks": [
+        "WaterBridgeDomainTest.positiveWitnessSurvivesTraversalTruncation"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C08",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Supported and absent assertions for same leg from different preserved sources",
+      "expected": "Conflict retained, edge ineligible; no arbitrary last-wins",
+      "checks": [
+        "WaterBridgeDomainTest.conflictingChemistrySourcesRemainUnresolved",
+        "WaterBridgeDomainTest.copiedPositiveMeasurementCannotOverrideRecomputation",
+        "EventPathAcceptanceTest.separateDuplicateEventRecordsMergeContradictoryAssertions"
+      ],
+      "qualificationNote": "Water legs are recomputed, never accepted as external leg assertions. Conflicting independently supplied source-chemistry reports become unresolved; altered raw leg measurements fail replay. Existing EventPaths contradictory-event behavior is regression-tested unchanged."
+    },
+    {
+      "id": "C09",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Conflicting inventory-coverage assertions",
+      "expected": "No negative; retain both provenance chains",
+      "checks": [
+        "WaterBridgeAcceptanceTest.contradictoryCoverageCannotSupportAbsence"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "C10",
+      "capability": "I12/I13",
+      "category": "coverage",
+      "fixture": "Large supplied state with relevant waters outside arbitrary pocket radius",
+      "expected": "No pocket-based omission; radius is not a scientific threshold",
+      "checks": [
+        "WaterBridgeDomainTest.requestedRadiusDoesNotCutOffWaterInventory"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B01",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Changed source bytes under a pinned envelope reference/hash",
+      "expected": "Integrity failure, never scientific absence",
+      "checks": [
+        "WaterBridgeAcceptanceTest.provenanceTamperingFailsClosed",
+        "WaterBridgeDomainTest.copiedPositiveMeasurementCannotOverrideRecomputation"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B02",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Changed manifest/role/context/geometry definition or coordinate state binding",
+      "expected": "Reject cross-definition/state replay",
+      "checks": [
+        "WaterBridgeDomainTest.alteredScientificDefinitionCannotReplayApprovedWaterRule",
+        "WaterBridgeAcceptanceTest.changedCoordinateBindingIsRejected"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B03",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Unselected historical or later evidence available in catalog",
+      "expected": "No implicit consumption; selection remains explicit",
+      "checks": [
+        "WaterBridgeCurrentPipelineTest.governedWaterExecution",
+        "WaterBridgeDomainTest.unselectedIndependentEvidenceDoesNotAffectResult"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B04",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Source recorded as prepared hydrogens versus experimental atom source",
+      "expected": "Preserve attribution; do not call prepared H observed",
+      "checks": [
+        "WaterBridgeCurrentPipelineTest.governedWaterExecution"
+      ],
+      "qualificationNote": "Synthetic mixed experimental-O/prepared-H attribution is retained on source envelopes byte-for-byte by current execution; no experimental result or observed H is asserted."
+    },
+    {
+      "id": "B05",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Duplicate exact evidence selection or reordered input artifacts",
+      "expected": "Idempotent deterministic result; source unchanged",
+      "checks": [
+        "WaterBridgeDomainTest.identicalEvidenceIsIdempotent",
+        "WaterBridgeAcceptanceTest.reorderedArtifactInputsReplayIdentically"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B06",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Two distinct interpretations reuse an identity with different bytes",
+      "expected": "Reject identity conflict rather than overwrite",
+      "checks": [
+        "WaterBridgeDomainTest.evidenceOutsideExplicitPlanIsNotConsumed"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B07",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Missing/retracted/expired/inapplicable current-policy review or receipt",
+      "expected": "Existing Research Gate rejects eligibility; no invented receipt",
+      "checks": [
+        "WaterBridgeCurrentPipelineTest.governedWaterExecution"
+      ],
+      "qualificationNote": "Water execution exercises valid/expired/missing-time/inherited-only sources; remaining generic receipt rejection variants are covered by unchanged Research Gate regression."
+    },
+    {
+      "id": "B08",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Persist/read-back/re-evaluate complete family evidence in independent JVMs",
+      "expected": "Identical derived bytes and decisions under identical source state",
+      "checks": [
+        "WaterBridgeAcceptanceTest.main",
+        "WaterBridgeCurrentPipelineTest.main"
+      ],
+      "qualificationNote": "Named fixture assertions and enclosing regression qualification."
+    },
+    {
+      "id": "B09",
+      "capability": "I12/I13",
+      "category": "provenance-binding",
+      "fixture": "Legacy I02/event/path/history and all preservation sentinels",
+      "expected": "Byte-identical manifests and historical outputs; existing tests pass",
+      "checks": [
+        "replay.py",
+        "clean_source.py"
+      ],
+      "qualificationNote": "Must pass on fresh committed sources, with 65 historical byte comparisons and 25 preservation pins before closure."
+    }
+  ],
+  "independentReplayProtocol": "replay.py",
+  "currentPolicyReceiptIssued": false
+}

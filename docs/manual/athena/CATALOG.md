@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `b10397e5f17cf636c261391600dde9291aed5aff8ec3087024558060ec23a946`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `9b198fbea1793573780e8c2bcf3512c5d8a7938fcc877f0e7fcc7ebcbb0f3065`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -26,8 +26,8 @@ Disposition is copied without upgrading partial capability coverage.
 | I09 | Ionic/salt-bridge proximity | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I10 | Halogen bond to atom acceptor | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I11 | Halogen bond to pi system | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| I12 | Single-water H-bond bridge | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| I13 | Multi-water bridge paths | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| I12 | Single-water H-bond bridge | P2 | SCIENTIFIC_REVIEW_REQUIRED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt) |
+| I13 | Multi-water bridge paths | P2 | SCIENTIFIC_REVIEW_REQUIRED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt) |
 | I14 | Metal-ligand pair proximity | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I15 | Metal coordination geometry/complex | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I16 | Van der Waals contact/gap | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |

@@ -1,0 +1,77 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.WATER.NEUTRAL_H2",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.WATER.NEUTRAL_H2\",\"limitations\":[\"Exact neutral source H2O identity only; orientation and inventory completeness are independent.\"],\"memberQueryIndices\":[0],\"negativeCoverageVersion\":\"ATHENA.GROUP.WATER.NEUTRAL_H2/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.WATER.NEUTRAL_H2/pattern\",\"patternVersion\":\"1\",\"query\":\"[O;!a;+0;H2]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"O\"],\"hydrogenRoles\":[{\"count\":2,\"role\":\"oxygen\"}],\"roleHeavyDegree\":{\"oxygen\":0}},\"roles\":{\"oxygen\":[0]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/water-bridge-contract-20261006/CONTRACT.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.water\",\"version\":\"b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603\"},{\"id\":\"software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.water\",\"version\":\"b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d\"},{\"id\":\"software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.water\",\"version\":\"7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c\"},{\"id\":\"software/qualification/water-bridge-contract-20261006/APPROVAL.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.water\",\"version\":\"386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"P\",\"B\",\"F\",\"Cl\",\"Br\",\"I\",\"Zn\",\"Fe\",\"Ca\",\"Mg\",\"Na\",\"K\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
+      "sha256": "b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603",
+      "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+    },
+    {
+      "locator": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
+      "sha256": "b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d",
+      "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+    },
+    {
+      "locator": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
+      "sha256": "7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c",
+      "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+    },
+    {
+      "locator": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
+      "sha256": "386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271",
+      "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Exact neutral source H2O identity only; orientation and inventory completeness are independent."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.WATER.NEUTRAL_H2/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

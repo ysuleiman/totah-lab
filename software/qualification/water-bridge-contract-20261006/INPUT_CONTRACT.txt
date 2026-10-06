@@ -1,0 +1,138 @@
+APPROVED WITH REQUIRED CLARIFICATIONS — 2026-10-06
+WATER_CANDIDATE_UNIVERSE_V1.txt is normative: exact E1-E6 exclusions and
+inventory exhaustiveness independent of all chemical/orientation/leg eligibility.
+User authorized implementation of this clarified contract. Historical proposal follows.
+
+MINIMAL WATER-SPECIFIC SERIALIZED INPUT — PROPOSED, NOT IMPLEMENTED
+
+Approval boundary: the standing completion scope explicitly stops for a public
+API/schema addition. This proposal adds one scientific input payload, not a
+generic framework. No public Java signature or existing JSON layout changes.
+
+Why the existing event plan is not itself sufficient
+athena-event-analysis-plan/1 selects already interpreted edges and asserts
+COMPLETE_EVENT_SCOPE over their keys. It does not declare which water molecules
+were searched before those edges were produced. Reusing a complete edge-list
+claim as proof that missing/omitted water orientations were evaluated would
+manufacture a negative. Conversely, adding water identity to EventPaths would
+mix scientific chemistry into the already qualified generic path algorithm.
+RuleRequest has atoms/first/second and search budgets, but no source-inventory
+coverage assertion. Treating atoms=[] as 'all waters searched' is not acceptable.
+
+Proposed evidence type: athena:water-bridge-plan
+Proposed payload schema: athena-water-bridge-plan/1
+Required exact top-level fields (reject extras, duplicates and trailing JSON):
+  schema: exact string above
+  stateBinding: existing SystemStateView.Binding, all five fields unchanged
+  first: nonempty array of existing AtomReference objects
+  second: nonempty array of existing AtomReference objects
+  waters: array of existing AtomReference objects identifying selected O atoms
+  inventoryCoverage: array of existing {reference,sha256} envelope pins
+  artifacts: array of existing {reference,sha256} envelope pins
+  minimumWaters: integer
+  maximumWaters: integer
+
+first/second are disjoint non-water endpoint atom scopes, not residues selected
+by proximity. Reject duplicates and nonexistent atoms. I12 requires min=max=1;
+I13 requires 2<=min<=max. Search bounds carry no scientific default. Overall
+RuleRequest maximumHops/Nodes/Candidates remain execution limits; exceeding them
+marks search incomplete. Do not convert truncation to a negative.
+RuleRequest atoms/first/second are empty for this profile, preventing two
+competing selections. Its state and manifest bindings are still exact.
+
+waters is an explicit selected source-water inventory, not an assertion of
+neutral-water identity. Derive identity and both H atoms from replay-verified
+group/source-state evidence and authoritative chemistry/correspondence; compare
+against the complete selected state. Preserve listed O-only/unknown entries as
+unresolved rather than dropping them. Distinct source waters cannot share an
+O or H atom. A repeated residue label cannot merge distinct identities.
+
+artifacts selects all and only supplied evidence dependencies, using existing
+hash/reference checks. Include water/non-water group reports, underlying
+source inventory evidence and any qualification context/receipt dependencies.
+No lookup of history-latest, best report, inherited default or auto-selected
+alternate orientation. Exact duplicate evidence is idempotent; conflicting
+same-identity bytes are rejected. Different-source scientific contradictions
+remain explicit unresolved evidence, not silently first/last-wins.
+
+inventoryCoverage uses EXISTING immutable EvidenceInterpretation records and
+existing COMPLETE_EVENT_SCOPE proposition, with a water-specific scope digest:
+SHA256(SystemStateView.bytes({definitionSha256, stateBinding,
+ first: canonical-sorted first, second: canonical-sorted second,
+ waters: canonical-sorted waters, minimumWaters, maximumWaters})).
+The selected water rule's definition determines what that scope means:
+all relevant source waters/candidate endpoints for this declared supplied-state
+scope were included. The assertion's own input pins must identify its source
+inventory/model-selection protocol and must be explicitly supplied. Its method,
+time and limitations are retained. No inference of exhaustive coverage from
+file existence, residue names, positive events or absence of water records.
+The implementation additionally checks graph/mapping/H coverage and compares
+the listed water O atoms with all water/possibly-water O occurrences in the
+claimed complete source state. The assertion cannot override a detected omission.
+Missing/contradictory coverage -> no negative; a fully bound positive witness
+can still be reported with incomplete scope. Empty waters alone -> unknown.
+An explicit, independently sourced complete empty represented-water inventory
+can establish only a modeled-scope negative, never absence of physical solvent.
+
+Each water retains the state's coordinate source/preparation/model provenance
+through existing state and group envelopes. No separate coordinate copy, implicit
+H model, orientation number, occupancy cutoff or atom-property convention is added.
+Unresolved correspondence alternatives are reported; users can select a separate
+fully bound source state per alternative. Do not choose an alternative silently.
+
+Result transport remains the existing athena:rule-measurements envelope and
+Finding/interpretation records. The proposed water-specific measurement payload
+has exact fields:
+  schema = athena-water-bridge-measurements/1
+  definitionSha256, stateBinding, request, plan (existing envelope pin),
+  inputPins (existing pins), waterIdentities, legs, eventAnalysis,
+  paths, complete, assessment, reasons, limitations.
+waterIdentities: per-selected-O records with oxygen AtomReference, hydrogen
+AtomReference array, sourceReportPins, assessment, reasons.
+legs: per class/tuple records with donorClass, acceptorClass, donor, hydrogen,
+acceptor, sourceReportPins, geometry (existing continuous plan/results), eventKey
+(existing athena typed-event key), assessment and reasons.
+paths: ordered event-key sequences from EventPaths, water AtomReference sequence,
+minimumWaters, maximumWaters, assessment. Exact keys: eventKeys, waters,
+minimumWaters, maximumWaters, assessment. The source D/H/A tuple remains in legs.
+eventAnalysis: existing bounded path result including original edges, truncation
+and coverage, with no changes to event/path schemas. This is derived internal
+analysis under the water rule, not a separately issued source qualification.
+complete is a conjunct of inventory, role/H/correspondence, leg and search coverage.
+assessment uses only the existing six statuses; detailed conflicts remain in
+reasons/original evidence and cause UNKNOWN_INCONCLUSIVE if no supported witness.
+
+Composition and qualification
+Two water-specific rule manifests (I12/I13) and a neutral-water group definition
+use the existing RuleManifest shape. Package-private Athena implementation owns
+water science. Existing generic collector/evaluator, evidence preservation and
+Research Gate are reused. A bounded selector reads only the declared water-plan
+artifact list; it is not a new generic routing abstraction.
+Re-evaluate raw source roles, state and geometry on measurement replay; never
+trust a copied positive leg string. Path traversal uses EventPaths unchanged.
+Chemical donor direction is stored in existing extra event roles; path connectivity
+is UNDIRECTED. Internal nodes must be validated water O atoms. Non-water transit
+is excluded by restricting edge scope before the existing traversal; any remaining
+path filtering retains complete/truncated coverage from the original traversal.
+Do not call internal computed edges independently corroborating observations.
+The outer current-policy water rule governs scientific/implementation authority;
+historical event replay and independent source-qualification semantics are unchanged.
+
+The exact nested waterIdentities/legs/path record keys above are part of the
+proposed water payload contract. All arrays are explicitly present, even empty.
+definitionSha256 pins the full selected manifest using RuleRegistry.digest.
+stateBinding and request are the existing serialized records without additions.
+All geometry and eventAnalysis content retains the existing producer schema.
+All assessment strings use existing EvidenceInterpretation.Status values.
+Each leg's unknown/conflicting scientific evidence is UNKNOWN_INCONCLUSIVE with
+original assertions in retained inputs and reasons. Unsupported chemistry is
+UNSUPPORTED at the individual leg. No supported paths + incomplete/unsupported
+scope is UNKNOWN_INCONCLUSIVE overall. Any independently supported path yields
+SUPPORTED_PRESENT with completeness stated separately. Only complete eligible
+scope without paths yields ABSENT_FALSE. Retired/unqualified execution remains
+NOT_EVALUATED; malformed/hash/state violations use the existing failure path.
+No duplicate JSON keys, unknown fields, nonfinite values or silent defaults.
+Changes after approval require a dated delta and renewed applicable review.
+
+Not proposed: new EventPaths API, query engine, graph store, registry abstraction,
+universal water network, inferred orientation solver, or automatic receipt issuer.

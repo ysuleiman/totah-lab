@@ -36020,3 +36020,511 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ```json
 []
 ```
+
+## ATHENA.GROUP.WATER.NEUTRAL_H2 — 1.0.0 (water-bridge-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/water-bridge-v1/ATHENA.GROUP.WATER.NEUTRAL_H2.rule.json) · SHA256 `e7b5a560586aac0bad3dae44b1d0071a813555fde95c016330ff97bcc417c17e`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.WATER.NEUTRAL_H2/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact neutral source H2O identity only; orientation and inventory completeness are independent."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
+    "sha256": "b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
+    "sha256": "b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
+    "sha256": "7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
+    "sha256": "386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.WATER.NEUTRAL_H2",
+  "limitations": [
+    "Exact neutral source H2O identity only; orientation and inventory completeness are independent."
+  ],
+  "memberQueryIndices": [
+    0
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.WATER.NEUTRAL_H2/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.WATER.NEUTRAL_H2/pattern",
+  "patternVersion": "1",
+  "query": "[O;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 2,
+        "role": "oxygen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "oxygen": 0
+    }
+  },
+  "roles": {
+    "oxygen": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.water",
+      "version": "b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603"
+    },
+    {
+      "id": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.water",
+      "version": "b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d"
+    },
+    {
+      "id": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.water",
+      "version": "7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c"
+    },
+    {
+      "id": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
+      "kind": "SOURCE",
+      "namespace": "athena.water",
+      "version": "386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "P",
+      "B",
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "Zn",
+      "Fe",
+      "Ca",
+      "Mg",
+      "Na",
+      "K"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.WATER_BRIDGE.EXPLICIT_H_MULTI — 1.0.0 (water-bridge-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/water-bridge-v1/ATHENA.WATER_BRIDGE.EXPLICIT_H_MULTI.rule.json) · SHA256 `16deeb538e1e609f14f419f452591af5c6e0586c5e537a078f9c8569c87a2cd9`
+
+**family**
+
+```json
+"ENVIRONMENT"
+```
+
+**profile**
+
+```json
+"ATHENA_WATER_BRIDGE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.water-bridge"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Explicit attributed event identity and source qualification"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-water-bridge-measurements/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "athena.water-bridge/negative/1",
+  "supportedDomain": "Approved water-specific source state, roles and explicit-H geometry",
+  "requirements": [
+    "COMPLETE_WATER_INVENTORY",
+    "QUALIFIED_WATER_IDENTITY",
+    "EXPLICIT_H_ORIENTATION",
+    "COMPLETE_ELIGIBLE_LEGS",
+    "COMPLETE_BOUNDED_PATH_SEARCH"
+  ],
+  "scope": "Only selected bound source state and endpoint scopes",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Explicit-source-H water-mediated structural candidates only. No inferred water/H orientation, physical occupancy, energy or catalysis.",
+  "Inventory exhaustiveness does not establish chemistry or leg eligibility."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
+    "sha256": "b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
+    "sha256": "b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
+    "sha256": "7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
+    "sha256": "386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+## ATHENA.WATER_BRIDGE.EXPLICIT_H_SINGLE — 1.0.0 (water-bridge-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/water-bridge-v1/ATHENA.WATER_BRIDGE.EXPLICIT_H_SINGLE.rule.json) · SHA256 `939d1d16138cac30f8d864ee933c5e43cdce855e912377ce82e33a1ebed7e9d8`
+
+**family**
+
+```json
+"ENVIRONMENT"
+```
+
+**profile**
+
+```json
+"ATHENA_WATER_BRIDGE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.water-bridge"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Explicit attributed event identity and source qualification"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-water-bridge-measurements/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "athena.water-bridge/negative/1",
+  "supportedDomain": "Approved water-specific source state, roles and explicit-H geometry",
+  "requirements": [
+    "COMPLETE_WATER_INVENTORY",
+    "QUALIFIED_WATER_IDENTITY",
+    "EXPLICIT_H_ORIENTATION",
+    "COMPLETE_ELIGIBLE_LEGS",
+    "COMPLETE_BOUNDED_PATH_SEARCH"
+  ],
+  "scope": "Only selected bound source state and endpoint scopes",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Explicit-source-H water-mediated structural candidates only. No inferred water/H orientation, physical occupancy, energy or catalysis.",
+  "Inventory exhaustiveness does not establish chemistry or leg eligibility."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
+    "sha256": "b11db397a94f772b279f2ea97f7c3e8cda4a78f3010462ed399da56134dbf603",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
+    "sha256": "b16776beb9f7fd42e57d36ec9fdd9f1fa01d700346079877ee391651e39a0e0d",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
+    "sha256": "7e49bf559cc58eeab6ecae020509036e99463536ed9a531977d18cfb3798be1c",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
+    "sha256": "386818d0e8a5de6415b28abdd608225821353610c180dc57152e2f799fa08271",
+    "citation": "Approved explicit-source-H water contract with two required clarifications; no production receipt."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```

@@ -96,7 +96,7 @@ final class HbondCandidateEnumeration {
         var actual = new TreeSet<AtomReference>(); s.atoms().keySet().stream().filter(a -> selected.contains(SystemStateView.residue(a))).forEach(actual::add);
         return new Scope(List.copyOf(components), complete && !actual.isEmpty() && covered.equals(actual));
     }
-    private static List<AtomReference> hydrogens(SystemStateView state, HbondCandidateSources.Anchor donor) {
+    static List<AtomReference> hydrogens(SystemStateView state, HbondCandidateSources.Anchor donor) {
         var c = donor.report().component(); var coverage = donor.report().payload().path("sourceCoverage").path("atomState").path(donor.atomId());
         if (coverage.path("hydrogenMode").asText().equals("UNKNOWN") || !coverage.path("implicitHydrogenCount").isIntegralNumber()
                 || coverage.path("implicitHydrogenCount").asInt() != 0) return List.of();
