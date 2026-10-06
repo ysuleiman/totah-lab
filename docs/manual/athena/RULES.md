@@ -26965,6 +26965,140 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES — 1.0.0 (implicit-h-proxy-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/implicit-h-proxy-v1/ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES.rule.json) · SHA256 `a532eea1663993ca790dc3ff358017b29c8cc3f8e9b8989390587b520d22aa12`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_IMPLICIT_H_PROXY_V1"
+```
+
+**implementationId**
+
+```json
+"athena.implicit-h-proxy"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Exact five unchanged roles; source-bound independently qualified SP3 producer (not selected); complete source state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Real heavy-atom distance and all heavy-neighbor angles; no hydrogen placement"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-implicit-h-proxy-measurements/1; HEAVY_ATOM_DIRECTIONAL_PROXY"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "I03-A/negative/1",
+  "supportedDomain": "Six neutral SP3 amine pairs; no qualified SP3 producer selected",
+  "requirements": [
+    "VERIFIED_ROLE_REPORTS",
+    "COMPLETE_SCOPE",
+    "QUALIFIED_SP3_ASSIGNMENTS",
+    "COMPLETE_ENUMERATION",
+    "EVALUABLE_GEOMETRY"
+  ],
+  "scope": "EXPLICIT_ATOM_SCOPES",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Raw heavy-atom proxy diagnostics are not observed or inferred H geometry.",
+  "No qualified SP3 producer/protocol selected: scientific evaluation always NOT_EVALUATED; completeness always false.",
+  "No production/current-policy authority or receipt supplied.",
+  "I03-B/C and I04 excluded."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/i03-i04-scientific-review-20261006/I03_CONTRACT.txt",
+    "sha256": "245230ab7a9c7c1c151d0bb773e943cd73d9a172e8a6bdc01df475a1bcfcaed0",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  },
+  {
+    "locator": "software/qualification/i03-i04-scientific-review-20261006/REPRESENTATION_PROPOSAL.txt",
+    "sha256": "6ef300874c2c0b342ae8a13615ab7fec075527b2ab20c6647c8164c10ee1150f",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  },
+  {
+    "locator": "software/qualification/i03-a-implementation-20261006/APPROVAL.txt",
+    "sha256": "4b92b551fb74211f70d1b0fbebb5730672082b4d1ec815978eebc87d6c25653c",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY — 1.0.0 (peptide-geometry-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/peptide-geometry-v1/ATHENA.GROUP.ADJACENT_ALPHA_BACKBONE_AMIDES.SOURCE_CONNECTIVITY.rule.json) · SHA256 `c4a340e7a3880dfe2d7c9c86dbe366bffbe710906a74b597488a41e088870b88`

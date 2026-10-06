@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `12f78458530fd8fb34569b643dd642339d7aaea50ff6467b862f4594078e8f51`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `08849ff4aa6b76cac58eb5816df7c789866da8a52d589e7a05ff5fad789ee0a8`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -284,13 +284,13 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 Choose an attributed implicit-H approximation and validate H/state/preparation domain; cannot call it observed D-H-A.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Engineering qualification only; no qualified SP3 producer, scientific positive/negative eligibility or current-policy receipt
 
-**Existing implementation:** No qualified equivalent
+**Existing implementation:** Opt-in approved I03-A plumbing/predicate; scientific activation unconditionally blocked without a selected independently qualified SP3 producer
 
 **Supporting source:** ProLIF ImplicitHBAcceptor implementation
 
-No reviewed implicit-H placement/uncertainty policy is selected. An observed D-H-A screen cannot be evaluated by inventing H coordinates. Existing preparation algorithms do not establish which inferred geometry/state is scientifically admissible for this rule.
+I03-B/C, inferred-H coordinates, SP/SP2, full ProLIF compatibility and expanded chemistry are unapproved. Exact SP3 assignment producer/protocol remains unselected and scientifically unqualified.
 
 ### I04 — Weak C-H donor perception
 
