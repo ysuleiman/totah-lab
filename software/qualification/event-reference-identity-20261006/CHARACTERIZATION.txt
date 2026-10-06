@@ -1,0 +1,12 @@
+Exact-reference routing correction — 2026-10-06
+Source 079d4b40e used ScientificReference.toString() only as the event-router
+ordering key. Two distinct valid records can share that display string:
+ namespace="n, id=x", id="y", version="1"
+ namespace="n", id="x, id=y", version="1".
+The permanent witness fails against the original router: one explicitly selected
+input disappears from evaluator selection. Admission still preserves both records.
+Fix: compare kind, namespace, id and version as separate record fields.
+No schema, public API, scientific criterion, evidence byte or legacy router changes.
+The exact same witness passes after the internal change. Original characterization,
+source checkpoint and replay remain immutable. Clean-source acceptance must use the
+corrected committed source, not the prior source export.

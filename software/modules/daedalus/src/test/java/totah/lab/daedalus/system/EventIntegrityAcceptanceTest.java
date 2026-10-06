@@ -54,4 +54,12 @@ class EventIntegrityAcceptanceTest {
         f.projection("p",b,List.of(a,z),false);var result=f.result();assertEquals(2,result.path("distinctEventCountsByState").elements().next().path("present").asInt());
         assertTrue(result.toString().contains(RuleRegistry.digest(first)));assertTrue(result.toString().contains(RuleRegistry.digest(f.sourceManifest)));
     }
+    @Test void displayStringCollisionCannotDropExplicitInput()throws Exception {
+        var f=positive();var template=f.artifacts.getFirst();
+        var a=new ScientificReference(ScientificReference.Kind.EVIDENCE_ENVELOPE,"n, id=x","y","1");
+        var b=new ScientificReference(ScientificReference.Kind.EVIDENCE_ENVELOPE,"n","x, id=y","1");assertNotEquals(a,b);assertEquals(a.toString(),b.toString());
+        for(var reference:List.of(a,b))f.artifacts.add(new EvidenceEnvelope(reference,template.evidenceType(),template.payloadFormat(),template.payloadVersion(),template.payloadBase64(),template.artifactPath(),template.payloadSha256(),template.provenance(),template.method(),template.context(),template.subjects(),template.qualifications(),template.limitations(),template.recordedAt()));
+        var routed=EventAssessmentInputs.resolve(f.request(),f.state,f.inputs());
+        assertTrue(routed.stream().anyMatch(e->e.reference().equals(a)));assertTrue(routed.stream().anyMatch(e->e.reference().equals(b)));
+    }
 }

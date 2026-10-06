@@ -50,3 +50,6 @@ binding. It has not been activated by the engineering tests.
 and source/implementation pins preserve the reproducible audit separately from this living
 reference. Supporting sources are linked and hashed rather than duplicated. The original
 prospective proposal and historical checkpoints remain immutable.
+
+Exact reference routing compares the four identity fields independently; display strings
+are not identity keys. The [collision witness and correction](../../../../software/qualification/event-reference-identity-20261006/CHARACTERIZATION.txt) preserve the pre-fix behavior and prevent dropped explicit inputs.

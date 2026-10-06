@@ -22,11 +22,13 @@ final class EventAssessmentInputs {
         var pe=plans.getFirst();var plan=JSON.readTree(pe.readPayload());
         if(!plan.path("schema").asText().equals("athena-event-analysis-plan/1")
                 ||!plan.path("stateBinding").equals(JSON.valueToTree(state.binding()))||!plan.path("artifacts").isArray())throw new IOException("event plan schema/state/selection mismatch");
-        var selected=new TreeMap<String,EvidenceEnvelope>();selected.put(pe.reference().toString(),pe);
+        var order=Comparator.comparing((ScientificReference r)->r.kind().name())
+                .thenComparing(ScientificReference::namespace).thenComparing(ScientificReference::id).thenComparing(ScientificReference::version);
+        var selected=new TreeMap<ScientificReference,EvidenceEnvelope>(order);selected.put(pe.reference(),pe);
         for(var pin:plan.path("artifacts")) {
             var reference=JSON.treeToValue(pin.path("reference"),ScientificReference.class);var e=index.get(reference);
             if(e==null||!e.payloadSha256().equals(pin.path("sha256").asText()))throw new IOException("event input not explicitly supplied or digest mismatch");
-            e.verifyArtifact();selected.put(reference.toString(),e);
+            e.verifyArtifact();selected.put(reference,e);
         }
         return List.copyOf(selected.values());
     }
