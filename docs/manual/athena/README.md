@@ -29,6 +29,10 @@ are pending scientific review. They propose an explicit-H geometric candidate pr
 not an activated interaction rule. The historical alcohol/oxygen rule remains unchanged;
 raw-measurement tests do not qualify the proposed expansion.
 
+The [terminal-alkyne candidate](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt)
+has engineering tests through the existing B00/B01 evaluator. Its exact terminal-role
+definition awaits scientific adoption; it is not a production-qualified group.
+
 ## Supporting material and completeness
 
 Every rule needs both scientific supporting material and execution qualification.

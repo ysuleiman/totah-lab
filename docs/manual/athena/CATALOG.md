@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d29c67c2f65071d42e960221c0208496d61f1ba70b09c177fd403f69178a7520`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `7edf345e6469fb101e92d300268c002cfd47bc5e70886dae384803de12232dd2`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -100,7 +100,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F15 | Functional group: Boron motifs | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F16 | Functional group: Alcohol/phenol/ether motifs | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F17 | Functional group: Halogenated motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
-| F18 | Functional group: Terminal alkyne | P2 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
+| F18 | Functional group: Terminal alkyne | P2 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [f18-terminal-alkyne-contract-20261006](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt) |
 | F19 | Functional group: Branched alkyl/cyclopropyl | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 
 ## Disposition scope and qualification limits

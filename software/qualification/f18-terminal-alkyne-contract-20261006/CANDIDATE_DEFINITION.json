@@ -1,0 +1,76 @@
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ALKYNE.TERMINAL",
+  "limitations": [
+    "Identity only, bounded exact source representation; no donor/acceptor, pKa, interaction or potency implication.",
+    "Candidate definition under qualification; current-policy research approval is not conferred.",
+    "Original source charges, H state, stereo and correspondence alternatives are preserved."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ALKYNE.TERMINAL/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ALKYNE.TERMINAL/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0;H1]#[C;!a;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "role": "terminalCarbon",
+        "count": 1
+      }
+    ],
+    "roleHeavyDegree": {
+      "terminalCarbon": 1
+    }
+  },
+  "roles": {
+    "terminalCarbon": [
+      0
+    ],
+    "partnerCarbon": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
