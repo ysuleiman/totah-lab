@@ -54,6 +54,7 @@ public final class RuleAnalyzers {
     }
     public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r){return collector(m,r,null);}
     public static SystemGraphAnalyzer collector(RuleManifest m,RuleRequest r,totah.lab.athena.design.backend.SubstructureMatcher matcher){
+        if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.peptide-geometry"))return PeptideGeometryRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.hbond-candidate"))return HbondCandidateRules.analyzer(m,r,false);
@@ -100,6 +101,7 @@ public final class RuleAnalyzers {
         }
     };}
     public static SystemGraphAnalyzer evaluator(RuleManifest m,RuleRequest r){
+        if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.events"))return EventAnalysisRules.analyzer(m,r);
         if(m.implementationId().equals("athena.peptide-geometry"))return PeptideGeometryRules.analyzer(m,r,true);

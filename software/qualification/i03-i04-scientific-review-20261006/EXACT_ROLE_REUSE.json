@@ -1,0 +1,526 @@
+{
+  "status": "PROPOSED_SUBSET_NOT_QUALIFIED",
+  "I02FullRoleTable": {
+    "acceptors": {
+      "ALCOHOL_O": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.ALCOHOL",
+          "role": "donor"
+        }
+      ],
+      "ALDEHYDE_CARBONYL_O": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+          "role": "acceptor"
+        }
+      ],
+      "AMIDE_CARBONYL_O": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+          "role": "acceptor"
+        }
+      ],
+      "AMINE_PRIMARY": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY",
+          "role": "acceptor"
+        }
+      ],
+      "AMINE_SECONDARY": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY",
+          "role": "acceptor"
+        }
+      ],
+      "AMINE_TERTIARY": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY",
+          "role": "acceptor"
+        }
+      ],
+      "ESTER_CARBONYL_O": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+          "role": "acceptor"
+        }
+      ],
+      "ETHER_O": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.ETHER_O",
+          "role": "acceptor"
+        }
+      ],
+      "KETONE_CARBONYL_O": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+          "role": "acceptor"
+        }
+      ],
+      "PYRIDINE_LIKE_N": [
+        {
+          "id": "ATHENA.PERCEPTION.ACCEPTOR.PYRIDINE_LIKE_N",
+          "role": "acceptor"
+        }
+      ]
+    },
+    "contexts": {
+      "ALDEHYDE_CARBONYL_O": [
+        {
+          "id": "ATHENA.GROUP.ALDEHYDE.CARBON_SUBSTITUTED",
+          "role": "oxygen"
+        },
+        {
+          "id": "ATHENA.GROUP.ALDEHYDE.FORMALDEHYDE",
+          "role": "oxygen"
+        }
+      ],
+      "AMIDE_CARBONYL_O": [
+        {
+          "id": "ATHENA.GROUP.AMIDE.NH0",
+          "role": "oxygen"
+        },
+        {
+          "id": "ATHENA.GROUP.AMIDE.NH1",
+          "role": "oxygen"
+        },
+        {
+          "id": "ATHENA.GROUP.AMIDE.NH2",
+          "role": "oxygen"
+        }
+      ],
+      "ESTER_CARBONYL_O": [
+        {
+          "id": "ATHENA.GROUP.ESTER",
+          "role": "carbonylOxygen"
+        }
+      ],
+      "KETONE_CARBONYL_O": [
+        {
+          "id": "ATHENA.GROUP.KETONE",
+          "role": "oxygen"
+        }
+      ]
+    },
+    "donors": {
+      "DONOR.ALCOHOL": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.ALCOHOL",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMIDE_NH1": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMIDE_NH1",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMIDE_NH2": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMIDE_NH2",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMINE_PRIMARY": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMINE_SECONDARY": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMMONIUM_PRIMARY": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMMONIUM_PRIMARY",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMMONIUM_SECONDARY": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMMONIUM_SECONDARY",
+          "role": "donor"
+        }
+      ],
+      "DONOR.AMMONIUM_TERTIARY": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.AMMONIUM_TERTIARY",
+          "role": "donor"
+        }
+      ],
+      "DONOR.PHENOL": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.PHENOL",
+          "role": "donor"
+        }
+      ],
+      "DONOR.PYRIDINIUM_NH": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.PYRIDINIUM_NH",
+          "role": "donor"
+        }
+      ],
+      "DONOR.PYRROLIC_NH": [
+        {
+          "id": "ATHENA.PERCEPTION.DONOR.PYRROLIC_NH",
+          "role": "donor"
+        }
+      ]
+    }
+  },
+  "proposedI03Roles": {
+    "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY": {
+      "classificationStates": [
+        "SUPPORTED_PRESENT",
+        "ABSENT_FALSE",
+        "NOT_EVALUATED",
+        "UNSUPPORTED",
+        "UNKNOWN_INCONCLUSIVE",
+        "FAILED"
+      ],
+      "family": "MOTIF",
+      "implementationId": "athena.group",
+      "implementationVersion": "2",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "measurementsProduced": {
+        "role-identities": "athena-group-identities/2"
+      },
+      "negativeCoverage": {
+        "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+        "requirements": [
+          "VALID_DEFINITION",
+          "COMPLETE_GRAPH",
+          "COMPLETE_CHARGE_STATE",
+          "REQUIRED_H_STATE",
+          "AROMATICITY_MODEL",
+          "SUPPORTED_DOMAIN",
+          "EXHAUSTIVE_B00"
+        ],
+        "scope": "EXPLICIT_COMPONENT_ONLY",
+        "supportedDomain": "Explicit complete component; class-scoped exact definition and source-state requirements, never universal donor/acceptor absence.",
+        "version": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY/negative/1"
+      },
+      "parameters": {
+        "definition": {
+          "definition": "Immutable declarative group identity and source-state requirements.",
+          "unit": "policy",
+          "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY\",\"limitations\":[\"Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.\",\"ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.\",\"Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.\",\"Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H2;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":2,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":1}},\"roles\":{\"carbonAttachments\":[0],\"donor\":[1],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}"
+        }
+      },
+      "profile": "ATHENA_GROUP_CONTEXT_V2",
+      "qualification": "NOT_EVALUATED",
+      "referenceArtifacts": [],
+      "requiredCapabilities": [],
+      "requiredChemistry": [
+        "B00 qualified matching",
+        "attributed complete chemical state"
+      ],
+      "requiredGeometry": [],
+      "retired": false,
+      "ruleId": "ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY",
+      "schema": "athena-rule/2",
+      "scientificSources": [
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "sha256": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "sha256": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "tier": "B02",
+      "version": "1.0.0"
+    },
+    "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY": {
+      "classificationStates": [
+        "SUPPORTED_PRESENT",
+        "ABSENT_FALSE",
+        "NOT_EVALUATED",
+        "UNSUPPORTED",
+        "UNKNOWN_INCONCLUSIVE",
+        "FAILED"
+      ],
+      "family": "MOTIF",
+      "implementationId": "athena.group",
+      "implementationVersion": "2",
+      "limitations": [
+        "Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "measurementsProduced": {
+        "role-identities": "athena-group-identities/2"
+      },
+      "negativeCoverage": {
+        "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+        "requirements": [
+          "VALID_DEFINITION",
+          "COMPLETE_GRAPH",
+          "COMPLETE_CHARGE_STATE",
+          "REQUIRED_H_STATE",
+          "AROMATICITY_MODEL",
+          "SUPPORTED_DOMAIN",
+          "EXHAUSTIVE_B00"
+        ],
+        "scope": "EXPLICIT_COMPONENT_ONLY",
+        "supportedDomain": "Explicit complete component; class-scoped exact definition and source-state requirements, never universal donor/acceptor absence.",
+        "version": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY/negative/1"
+      },
+      "parameters": {
+        "definition": {
+          "definition": "Immutable declarative group identity and source-state requirements.",
+          "unit": "policy",
+          "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY\",\"limitations\":[\"Bounded state-specific donor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.\",\"ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.\",\"Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.\",\"Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H1;+0](-[#6])\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":1,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":2}},\"roles\":{\"carbonAttachments\":[0,2],\"donor\":[1],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}"
+        }
+      },
+      "profile": "ATHENA_GROUP_CONTEXT_V2",
+      "qualification": "NOT_EVALUATED",
+      "referenceArtifacts": [],
+      "requiredCapabilities": [],
+      "requiredChemistry": [
+        "B00 qualified matching",
+        "attributed complete chemical state"
+      ],
+      "requiredGeometry": [],
+      "retired": false,
+      "ruleId": "ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY",
+      "schema": "athena-rule/2",
+      "scientificSources": [
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json",
+          "sha256": "ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1"
+        },
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json",
+          "sha256": "f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2"
+        }
+      ],
+      "tier": "B02",
+      "version": "1.0.0"
+    },
+    "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY": {
+      "classificationStates": [
+        "SUPPORTED_PRESENT",
+        "ABSENT_FALSE",
+        "NOT_EVALUATED",
+        "UNSUPPORTED",
+        "UNKNOWN_INCONCLUSIVE",
+        "FAILED"
+      ],
+      "family": "MOTIF",
+      "implementationId": "athena.group",
+      "implementationVersion": "2",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "measurementsProduced": {
+        "role-identities": "athena-group-identities/2"
+      },
+      "negativeCoverage": {
+        "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+        "requirements": [
+          "VALID_DEFINITION",
+          "COMPLETE_GRAPH",
+          "COMPLETE_CHARGE_STATE",
+          "REQUIRED_H_STATE",
+          "AROMATICITY_MODEL",
+          "SUPPORTED_DOMAIN",
+          "EXHAUSTIVE_B00"
+        ],
+        "scope": "EXPLICIT_COMPONENT_ONLY",
+        "supportedDomain": "Explicit complete component; class-scoped exact definition and source-state requirements, never universal donor/acceptor absence.",
+        "version": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/negative/1"
+      },
+      "parameters": {
+        "definition": {
+          "definition": "Immutable declarative group identity and source-state requirements.",
+          "unit": "policy",
+          "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY\",\"limitations\":[\"Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.\",\"ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.\",\"Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.\",\"Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H2;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":2,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":1}},\"roles\":{\"acceptor\":[1],\"carbonAttachments\":[0],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}"
+        }
+      },
+      "profile": "ATHENA_GROUP_CONTEXT_V2",
+      "qualification": "NOT_EVALUATED",
+      "referenceArtifacts": [],
+      "requiredCapabilities": [],
+      "requiredChemistry": [
+        "B00 qualified matching",
+        "attributed complete chemical state"
+      ],
+      "requiredGeometry": [],
+      "retired": false,
+      "ruleId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY",
+      "schema": "athena-rule/2",
+      "scientificSources": [
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.PRIMARY_CARBON_BOUND.rule.json",
+          "sha256": "c61ab9bce382404bfbe43258ff9ac059646770a98e32221df6642bbca741c852"
+        },
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "sha256": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "tier": "B02",
+      "version": "1.0.0"
+    },
+    "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY": {
+      "classificationStates": [
+        "SUPPORTED_PRESENT",
+        "ABSENT_FALSE",
+        "NOT_EVALUATED",
+        "UNSUPPORTED",
+        "UNKNOWN_INCONCLUSIVE",
+        "FAILED"
+      ],
+      "family": "MOTIF",
+      "implementationId": "athena.group",
+      "implementationVersion": "2",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "measurementsProduced": {
+        "role-identities": "athena-group-identities/2"
+      },
+      "negativeCoverage": {
+        "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+        "requirements": [
+          "VALID_DEFINITION",
+          "COMPLETE_GRAPH",
+          "COMPLETE_CHARGE_STATE",
+          "REQUIRED_H_STATE",
+          "AROMATICITY_MODEL",
+          "SUPPORTED_DOMAIN",
+          "EXHAUSTIVE_B00"
+        ],
+        "scope": "EXPLICIT_COMPONENT_ONLY",
+        "supportedDomain": "Explicit complete component; class-scoped exact definition and source-state requirements, never universal donor/acceptor absence.",
+        "version": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY/negative/1"
+      },
+      "parameters": {
+        "definition": {
+          "definition": "Immutable declarative group identity and source-state requirements.",
+          "unit": "policy",
+          "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY\",\"limitations\":[\"Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.\",\"ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.\",\"Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.\",\"Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H1;+0](-[#6])\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":1,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":2}},\"roles\":{\"acceptor\":[1],\"carbonAttachments\":[0,2],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}"
+        }
+      },
+      "profile": "ATHENA_GROUP_CONTEXT_V2",
+      "qualification": "NOT_EVALUATED",
+      "referenceArtifacts": [],
+      "requiredCapabilities": [],
+      "requiredChemistry": [
+        "B00 qualified matching",
+        "attributed complete chemical state"
+      ],
+      "requiredGeometry": [],
+      "retired": false,
+      "ruleId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY",
+      "schema": "athena-rule/2",
+      "scientificSources": [
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.SECONDARY_CARBON_BOUND.rule.json",
+          "sha256": "ce3fa42453ccc9ecdd5ed10fe7553966732615ab32e497cbd46c6e254289d3d1"
+        },
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "sha256": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "tier": "B02",
+      "version": "1.0.0"
+    },
+    "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY": {
+      "classificationStates": [
+        "SUPPORTED_PRESENT",
+        "ABSENT_FALSE",
+        "NOT_EVALUATED",
+        "UNSUPPORTED",
+        "UNKNOWN_INCONCLUSIVE",
+        "FAILED"
+      ],
+      "family": "MOTIF",
+      "implementationId": "athena.group",
+      "implementationVersion": "2",
+      "limitations": [
+        "Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.",
+        "ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.",
+        "Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.",
+        "Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review."
+      ],
+      "measurementsProduced": {
+        "role-identities": "athena-group-identities/2"
+      },
+      "negativeCoverage": {
+        "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+        "requirements": [
+          "VALID_DEFINITION",
+          "COMPLETE_GRAPH",
+          "COMPLETE_CHARGE_STATE",
+          "REQUIRED_H_STATE",
+          "AROMATICITY_MODEL",
+          "SUPPORTED_DOMAIN",
+          "EXHAUSTIVE_B00"
+        ],
+        "scope": "EXPLICIT_COMPONENT_ONLY",
+        "supportedDomain": "Explicit complete component; class-scoped exact definition and source-state requirements, never universal donor/acceptor absence.",
+        "version": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY/negative/1"
+      },
+      "parameters": {
+        "definition": {
+          "definition": "Immutable declarative group identity and source-state requirements.",
+          "unit": "policy",
+          "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY\",\"limitations\":[\"Bounded state-specific acceptor role candidate only; no interaction, strength, protonation prediction, favorable chemistry or biological inference.\",\"ABSENT_FALSE is restricted to this exact class; it is never absence of all donors/acceptors in the system.\",\"Authoritative implicit H can establish role identity but does not supply an oriented D-H coordinate; geometry remains separately unevaluated.\",\"Production activation requires current-policy research eligibility; synthetic implementation qualification does not fabricate review.\"],\"memberQueryIndices\":[1],\"negativeCoverageVersion\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"acyl_or_amidino\",\"patternId\":\"ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/acyl_or_amidino\",\"patternVersion\":\"1\",\"query\":\"[N]-[C](=[O,N,S])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]},{\"anchors\":{\"nitrogen\":[0]},\"hydrogenRoles\":[],\"id\":\"sulfonyl\",\"patternId\":\"ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND/sulfonyl\",\"patternVersion\":\"1\",\"query\":\"[N]-[S](=[O])\",\"rationale\":\"Exclude this exact anchored constitutional context without suppressing unrelated occurrences.\",\"sourceReferences\":[{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b\"}]}],\"patternId\":\"ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[N;!a;X3;H0;+0](-[#6])(-[#6])\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":false,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"N\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"nitrogen\"}],\"roleHeavyDegree\":{\"nitrogen\":3}},\"roles\":{\"acceptor\":[1],\"carbonAttachments\":[0,2,3],\"nitrogen\":[1]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"486c2b1049f56222702302eb611fbf2e5f694723bbc31476c2955aaa13ec762e\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}"
+        }
+      },
+      "profile": "ATHENA_GROUP_CONTEXT_V2",
+      "qualification": "NOT_EVALUATED",
+      "referenceArtifacts": [],
+      "requiredCapabilities": [],
+      "requiredChemistry": [
+        "B00 qualified matching",
+        "attributed complete chemical state"
+      ],
+      "requiredGeometry": [],
+      "retired": false,
+      "ruleId": "ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY",
+      "schema": "athena-rule/2",
+      "scientificSources": [
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v2/ATHENA.GROUP.AMINE.TERTIARY_CARBON_BOUND.rule.json",
+          "sha256": "486c2b1049f56222702302eb611fbf2e5f694723bbc31476c2955aaa13ec762e"
+        },
+        {
+          "citation": "Pinned reviewed blueprint scope and qualified source identity; no external-engine parity claim.",
+          "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json",
+          "sha256": "418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb"
+        }
+      ],
+      "tier": "B02",
+      "version": "1.0.0"
+    }
+  },
+  "I04ApprovedWeakDonorClasses": []
+}

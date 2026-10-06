@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d63995a4e88a596b2a2024dca18181d01e76febdfa6398e028a00acc0a3d5ea0`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `12f78458530fd8fb34569b643dd642339d7aaea50ff6467b862f4594078e8f51`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -17,8 +17,8 @@ Disposition is copied without upgrading partial capability coverage.
 | P09 | Explicit/implicit hydrogens and state preparation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I01 | Hydrophobic contact | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
-| I03 | Implicit-H hydrogen-bond approximation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| I04 | Weak C-H donor perception | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| I03 | Implicit-H hydrogen-bond approximation | P2 | SCIENTIFIC_REVIEW_REQUIRED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt), [i03-a-implementation-20261006](../../../software/qualification/i03-a-implementation-20261006/CHECKPOINT.txt) |
+| I04 | Weak C-H donor perception | P1 | SCIENTIFIC_REVIEW_REQUIRED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt) |
 | I05 | Parallel/face-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I06 | T-shaped/edge-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I07 | Union pi-stacking wrapper | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |

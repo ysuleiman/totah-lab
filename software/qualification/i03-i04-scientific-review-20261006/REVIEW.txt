@@ -1,0 +1,147 @@
+I03 -> I04 SCIENTIFIC REVIEW — 2026-10-06
+Base HEAD e417c6c40d57db55727d797aa8ccfa7d30bcc704. PROPOSAL ONLY; NO IMPLEMENTATION.
+
+DECISIONS FOR APPROVAL
+I03-A: recommend a narrowly named HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES/1,
+not a reconstructed or observed D-H-A interaction. Two existing donor classes by
+three existing acceptor classes; no new chemistry perception. This is a proposed
+operational approximation, not a validated physical H-bond detector. Its exact
+contract and smallest additive payload are in I03_CONTRACT.txt and
+REPRESENTATION_PROPOSAL.txt. Approval must cover the domain, minimum-over-neighbors
+semantics, separate evidence kind, and separate qualification. It must NOT be
+presented as reproduction of the entire ProLIF implicit-H implementation.
+
+I03-B: a prepared/inferred-H coordinate screen is a materially different option.
+Do not implement this alternative without selecting the exact preparation,
+protonation, H placement, conformer/rotation and uncertainty protocol and reviewing
+its class-specific geometry. No bond lengths, orientation optimization, population
+weights or I02 cutoff transfer is proposed here. This option is not implementation
+ready. A source-explicit H can itself be prepared rather than experimentally
+observed: explicitness and observational provenance are different axes.
+
+I03-C: full ProLIF compatibility would additionally require a separately reviewed
+larger chemistry domain, RDKit typing, SP/SP2 behavior and its order-sensitive
+plane construction. This conflicts with the current no-catalog-broadening boundary
+unless limited and reviewed separately. Not proposed for implementation now.
+
+I04: TERMINATE THIS IMPLEMENTATION PHASE AS SCIENTIFICALLY BLOCKED, not closed,
+not absent, and not disproven. Existing evidence establishes reasons to study
+specific C-H contexts but does not establish a selected complete classifier for
+our chemical domain. I04_BLOCKER.txt identifies candidate subfamilies, exact
+missing decisions, source limitations and prospective acceptance cases. No weak
+C-H donor class is adopted; no classification threshold is filled in.
+Approval of I03-A must not implicitly authorize I03-B/C or I04.
+
+EXACT DEPENDENCIES / ORDER
+I03: B00/P01 exact occurrence matching -> P03 unchanged state-specific roles + P09
+source hydrogen inventory -> unique graph/structure correspondence + complete
+source charge/aromaticity/topology -> separately bound SP3 annotation/protocol
+-> existing continuous DISTANCE/ANGLE geometry -> new I03-A predicate/evidence
+-> separate current Research Gate definition/domain/implementation qualification.
+I02 contributes role/source replay patterns and raw geometry implementation only;
+its explicit-H scientific qualification is NOT an edge conferring I03 eligibility.
+N02/N03/N04 coverage/event identity can consume separately qualified I03 events,
+with distinct definition identity and directional-proxy semantics; no automatic
+aggregation with I02. I12/I13 and EventPaths are not dependencies to modify.
+
+I04 explicit-source-H option: B00/P01 + existing exact source motif identity
+(e.g. terminal alkyne F18 or B06 graph-backed alpha-peptide context, depending on
+selected subfamily) + P09 source H -> APPROVED NEW WEAK-DONOR SCIENTIFIC CONTRACT
+-> unchanged eligible acceptor definition -> source-bound C/H/A correspondence
+-> raw I02-style geometry -> separately approved class-specific predicate ->
+Research Gate. None of the source motifs already confers weak-donor eligibility.
+I04 inferred-H option adds a separately approved I03-B preparation/representation
+contract. I03-A heavy-atom proxy provides neither C-H position nor C-H donor
+chemistry and therefore does NOT scientifically unlock I04. I03 -> I04 is the
+requested review order, not a fabricated mandatory scientific dependency.
+
+SOURCE COMPARISON (revision-specific)
+S1 ProLIF interactions.py, commit19f1800218387c49536eb9d3e8cd3044fdb337ee:
+HBAcceptor uses an explicit matched H, D-A<=3.5 A and DHA in [130,180] degrees.
+ImplicitHBAcceptor instead measures heavy-neighbor-centered angles; it creates
+no H coordinate and no DHA angle. Distance<=3.5 A. Ideal angles come from the
+source hybridization table: SP=180, SP2=120, SP3=109.5 degrees. For each center,
+minimum absolute deviation over heavy-neighbor angles is used, NOT maximum,
+not an averaged direction, and not a unique inferred H vector. Donor tolerance
+25 degrees; acceptor tolerance90. For SP2, out-of-plane donor<=30 degrees and
+acceptor<=90. Boundaries are inclusive (rejection uses >); the base Distance
+class uses <=. Water identification is residue-name based in this source and
+optional water behavior can bypass one/both geometry sides. This is NOT the
+qualified I12/I13 water identity and will not be imported.
+
+Source chemistry is broader/different: implicit donor SMARTS includes S and
+charged N contexts; acceptor includes selected F and exclusion patterns. The
+explicit and implicit source acceptor expressions themselves differ. Pin their
+literal source bytes, do not summarize them into a universal donor/acceptor rule.
+The full implicit implementation appends a radius-dependent Vina-like metadata
+term with endpoints -0.425 and0.565 A using CSD radii; its code/comment terminology
+does not establish a calibrated probability. It is not part of I03-A membership,
+will not be imported, and no radii table/dataset is selected by this review.
+Its SP2 plane helper selects the first two heavy neighbors, extending to second
+neighbors when needed: source ordering and insufficient/collinear neighbors need
+an explicit policy before any general SP2 contract. A best-fit plane substitution
+would be a different algorithm, not harmless reuse.
+
+S2 PLIP commit2f4911d307490479ac023b22d6faa8f59b577ca8:
+find_hbd enumerates regular donors and weak pairs from carbon atoms whose direct
+neighbors are exclusively C/H. This does not restrict donors by acidity and can
+include ordinary hydrocarbon C-H while excluding C-H adjacent directly to N/O.
+The pinned hbonds implementation immediately skips typ != 'strong'; normal calls
+use get_hbd and 'strong'. Thus this source does NOT supply an executed weak-bond
+classifier or a validated C-H threshold. Strong-path comparisons are strictly
+0.5 < D-A <4.1 A and DHA>100 degrees. Despite the docstring mentioning H distance,
+the membership comparison uses D-A; H-A is recorded. These strong-path values
+must not be repurposed for I04 or merged with ProLIF's inclusive limits.
+
+S3 IUPAC 2011 recommendation DOI10.1351/PAC-REC-10-01-02: the source frames
+hydrogen bonding as requiring evidence. It is not a transferable numeric
+classifier for these classes. No numeric rule is adopted from its abstract.
+S4 Derewenda et al.1995 DOI10.1006/jmbi.1995.0492, primary abstract: supports
+investigating protein C-H...O, especially alpha-carbon contexts; it does not
+establish our implementation's geometry/preparation contract from the retrieved
+abstract alone.
+S5 Senes et al.2001 DOI10.1073/pnas.161280798, primary abstract: transmembrane
+helix interfaces, including Gly/Ser/Thr-rich interfaces, are a specific context.
+No general ligand C-H threshold or acidity classifier follows. Full methods were
+not successfully retrieved in this review (PMC challenge/PNAS cookie page;
+Europe PMC tool access failed). Do not fill missing methods from memory.
+Source retrieval limitations are evidential limitations, not proof that no
+published defensible C-H protocol exists. Reopening I04 requires actual methods
+and explicit domain adoption, not another generic framework.
+
+SHARED COVERAGE / PROVENANCE / REUSE
+Use immutable state binding, exact atom/mapping identities, selected envelope
+hashes, source graph and all source-state coverage. Preserve experimental,
+prepared and inferred provenance separately, including mixed atom-level sources.
+Source explicit-H presence alone never establishes experimental observation.
+Do not silently repair missing H, charge, hybridization, alternate conformers,
+stereochemistry, topology or source mapping. Conflicting assertions remain
+unresolved (or integrity errors for same-identity changed bytes).
+A positive is an attributed profile-relative witness, never an energetic verdict.
+ABSENT_FALSE requires a complete bound role/candidate inventory, complete
+class/context and directional evidence, eligible geometry and exhaustive traversal
+within declared scope; missing evidence or truncation prevents an exhaustive
+negative. Scope must include possible in-domain unresolved occurrences, not just
+successful positive matches. A positive may survive unrelated incomplete coverage
+with complete=false. A coverage assertion establishes exhaustiveness only; it
+cannot establish chemical eligibility, hybridization or approximation validity.
+Different preparations/states/definitions remain different evidence and are not
+independent corroboration merely because several tools emit similar labels.
+
+Reuse existing matcher and P03/P09 reports; do not add roles to their catalog.
+Reuse ContinuousGeometryRules DISTANCE and ANGLE, group/source correspondence,
+EvidenceEnvelope/EvidenceInterpretation, payload pin checks, COMPLETE_EVENT_SCOPE
+and Research Gate. No new graph, event, path, routing, matching or registry engine.
+HbondCandidateGeometry's existing D/H/A-specific helper must not be called with a
+fake H. Its underlying general continuous geometry operations already handle the
+real-atom triples needed by I03-A. A separate small water-unrelated adapter would
+suffice only AFTER scientific/schema approval. Any typed downstream event needs
+its own I03 definition digest and heavy-atom roles; no hydrogen role fabricated.
+
+ACCEPTANCE / STOP BOUNDARY
+ACCEPTANCE_MATRICES.json is a prospective specification, NOT executed tests or
+qualification. EXACT_ROLE_REUSE.json preserves the existing role definitions and
+exclusions verbatim. SOURCE_PINS.json pins inspected local sources.
+No code, manifest, public API/schema, role catalog, water file or external-data
+row is changed. Counts remain56 bounded/12 architectural/16 definition/12 data.
+I03/I04 remain SCIENTIFIC_REVIEW_REQUIRED. No production receipt is issued.

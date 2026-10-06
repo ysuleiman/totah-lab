@@ -1,0 +1,121 @@
+I03-A PROPOSED BOUNDED CONTRACT — NOT APPROVED / NOT IMPLEMENTED
+Proposed scientific identity: ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES/1.
+
+PROPOSITION
+A selected, source-qualified neutral amine donor/acceptor atom pair satisfies
+an attributed heavy-atom directional proxy derived from the SP3 branch of the
+pinned ProLIF implicit-H screen. No hydrogen coordinate is generated. A positive
+says only that this proxy passes; it does not assert a unique possible H placement,
+observed D-H-A alignment, physical H bond, energy, probability or solvent behavior.
+
+EXACT CLASS PAIRS: 2 donors x3 acceptors =6 named pairs
+D1 ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY: existing carbon-bound neutral nonaromatic
+N, total source H2, heavy degree1, source pattern [#6]-[N;!a;X3;H2;+0].
+D2 ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY: existing carbon-bound neutral nonaromatic
+N, total source H1, heavy degree2, pattern [#6]-[N;!a;X3;H1;+0](-[#6]).
+A1/A2/A3 ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY/SECONDARY/TERTIARY, existing
+neutral carbon-bound N roles with total H2/H1/H0 and heavy degree1/2/3 respectively.
+All exact source exclusions and coverage requirements are those of the pinned
+unchanged manifests in EXACT_ROLE_REUSE.json, not these shorthand descriptions.
+In particular preserve anchored acyl/amidino and sulfonyl exclusions.
+
+Additional profile restrictions (domain narrowing, NOT added role definitions):
+- Both N atoms have independently source-attributed SP3 assignments under an
+  explicitly reviewed, pinned perception protocol; do NOT derive SP3 solely
+  from the class name, valence, fitted angles or a guessed ideal geometry.
+- Every directly bonded heavy neighbor of each N is carbon connected by SINGLE
+  source bond and is nonaromatic with complete source aromaticity evidence.
+  This excludes aniline-like N-aromatic attachment as in the source implicit
+  acceptor exclusions; all required source checks remain independently bound.
+- No explicit donor H occurrence; donor authoritative implicit H count is exactly
+  2 for D1 or1 for D2. No implicit-H inference from toolkit defaults. Mixed or
+  explicit donor H belongs outside this first profile rather than being deleted.
+- Acceptor H inventory is complete and consistent with its unchanged role; its
+  H may be explicit or authoritative implicit, but is not used as a proxy atom.
+- Both centers belong to separate explicitly selected, uniquely mapped components
+  with no cross-component covalent connection. No intramolecular extension.
+- Full component graph, formal charge, H coverage and all relevant neighbor
+  coordinates are supplied in one finite qualified angstrom frame/state.
+- Supported elements are the existing role domain H,C,N,O,S,F,Cl,Br,I; this profile
+  never infers any added metal, water, aromatic, radical or unsupported chemistry.
+
+QUANTITIES AND EXACT PREDICATE
+Let ND be ALL source heavy covalent neighbors of D (1 or2 as above), and NA all
+source heavy covalent neighbors of A (1,2 or3). No selected convenient subset.
+r=distance(D,A) in angstrom.
+For every X in ND: thetaD(X)=angle(X,D,A), central atom D, degrees.
+For every Y in NA: thetaA(Y)=angle(Y,A,D), central atom A, degrees.
+deltaD=min_X |thetaD(X)-109.5|; deltaA=min_Y |thetaA(Y)-109.5|.
+A geometry-eligible pair passes iff r<=3.5 AND deltaD<=25 AND deltaA<=90.
+109.5 comes from the source SP3 ideal-angle table; 3.5,25,90 are source defaults
+of that exact branch. Inclusive equality follows source comparisons. They are
+not newly calibrated class-specific physical cutoffs. No extra H-A, DHA, plane,
+acidity, pKa, hybridization-angle, or collision threshold is introduced.
+The SP3 profile has no plane test. No Vina-like term, radii, score or probability.
+All real-atom distances needed for angle vectors must be positive and finite;
+zero-length vectors, D=A or absent frame make geometry unresolved, not negative.
+These are mathematical validity conditions, not empirical cutoffs. Overlap/clash
+assessment, if supplied separately, is not merged into this proxy's verdict.
+
+SOURCE MATCHING LIMITS
+This profile retains ProLIF's MINIMUM-neighbor deviation, which is permissive:
+one close-to-ideal neighbor may suffice even if other neighbor directions do not.
+In particular the acceptor90-degree deviation gate provides weak discrimination.
+The profile does NOT prove a compatible missing-H orientation. Tightening to
+maximum deviation, using all-neighbor constraints, fitting a lone-pair vector or
+reconstructing H would be a NEW definition requiring separate source justification.
+ProLIF's full SMARTS, SP/SP2 plane branch, water behavior, Vina metadata, and
+larger donor/acceptor domain are not claimed as reproduced. Existing I02 roles
+are narrowed here and never requalified by association with a similar name.
+
+HYDROGEN / HYBRIDIZATION SEMANTICS AND ALTERNATIVES
+There is no hydrogen position, H bond length, azimuth, rotamer search, observation
+claim, population weighting or conformer choice in I03-A. The output geometry
+kind is HEAVY_ATOM_DIRECTIONAL_PROXY, not INFERRED_DHA or OBSERVED_DHA.
+An external SP3 assignment is a source model annotation, not an observable.
+Its exact method/version, preparation graph, sanitization options, binary/source
+hashes and applicable qualification must be preserved. A bare caller string
+'SP3', an unqualified report, or a compatible-looking angle is insufficient.
+This review does not install RDKit or silently substitute OCL hybridization.
+The pinned ProLIF code obtains hybridization through RDKit GetHybridization;
+using another source assignment model is a separately disclosed model transfer
+requiring review. Selection/qualification of the actual source annotation
+producer remains an activation prerequisite even if this contract is approved.
+
+I03-B would instead require a minimal inferred-site record bound to a parent
+state, donor atom, preparation/protocol, anchors, site identity and alternatives.
+It cannot be encoded by inventing a source AtomReference inside that parent state.
+If a preparation produces a new fully attributed molecular state containing H,
+existing state/correspondence can represent its atoms; they are source-explicit
+IN THAT PREPARED STATE, not observations and not the original state. Reusing I02
+geometry arithmetic is possible but I03-B still needs separate applicability and
+qualification. Bond lengths, rotations, protonation, conformer aggregation and
+geometry bounds remain unselected. I03-B has no proposed implementable schema.
+
+EVIDENCE / NEGATIVE COVERAGE
+Each tuple is ordered D->A with donor/acceptor class IDs, full role-definition
+hashes, source occurrence references, state/mapping identity, selected report
+pins, ALL heavy-neighbor identities, SP3 evidence/protocol pins, every raw angle,
+r, deviations, predicate version and reason. Keep directions/classes separate.
+No H tuple is generated and no I02 event key is reused.
+Explicit selection is atom scopes plus complete component chemistry evidence;
+exhaustive enumeration is over all six class pairs in that scope, not positives
+or an arbitrary pocket cutoff. If a selected N could satisfy any declared role
+but charge/H/context/aromaticity/mapping/hybridization evidence is unresolved,
+it remains a possible candidate and blocks a complete scope negative. Known
+out-of-domain occurrences are reported as unsupported, not guessed eligible.
+Missing hybridization evidence is UNKNOWN, known SP2 is out of this profile.
+For a fully eligible pair, a failed distance/deviation is ABSENT_FALSE for this
+proxy only. An empty scope negative requires independent exhaustiveness coverage
+bound to the exact state, selection, definition and class-pair universe. Inventory
+coverage cannot prove chemistry or assignment validity. Bounds/truncation,
+conflicting reports or missing heavy neighbors force complete=false; a valid
+positive can remain present but not exhaustive. No negative statement about all
+hydrogen bonds, other H orientations, other preparations or other chemical classes.
+
+GOVERNANCE
+Both the scientific restriction and additive plan/result payloads require approval.
+No public Java API change is proposed. Production activation additionally requires
+current-policy review of this definition and input model, independent implementation
+qualification, valid invocation authority/time and exact input selection. I02 and
+I12/I13 receipts or qualified semantics cannot be used as I03 scientific receipts.
