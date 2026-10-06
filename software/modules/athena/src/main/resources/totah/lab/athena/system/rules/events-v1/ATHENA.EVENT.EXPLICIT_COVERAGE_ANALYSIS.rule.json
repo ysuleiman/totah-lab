@@ -1,0 +1,54 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.EVENT.EXPLICIT_COVERAGE_ANALYSIS",
+  "version": "1.0.0",
+  "profile": "ATHENA_EVENT_ANALYSIS_V1",
+  "family": "ENVIRONMENT",
+  "tier": "N02/N03/N04/G08/I20",
+  "implementationId": "athena.events",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Explicit attributed event identity and source qualification"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "payload": "athena-event-analysis/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {},
+  "scientificSources": [
+    {
+      "locator": "software/qualification/event-coverage-20261006/APPROVAL.txt",
+      "sha256": "e0971da744f1e61c3bead93e6e146769184015b4b4b9474e0ac769da92a0732d",
+      "citation": "User-approved operational event/coverage contract; not a claim of physical interactions or production authority."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Counts describe explicitly selected observations, not probabilities.",
+    "Typed paths describe topology only, not energy transfer or mechanism.",
+    "Unknown and conflicting source assertions remain preserved.",
+    "No source or legacy fingerprint semantics are changed."
+  ],
+  "negativeCoverage": {
+    "version": "athena.events/negative/1",
+    "supportedDomain": "Explicit applicable state/event universe with resolved source evidence",
+    "requirements": [
+      "EXPLICIT_EVENT_UNIVERSE",
+      "COMPLETE_APPLICABLE_COVERAGE",
+      "RESOLVED_SOURCE_ASSERTIONS"
+    ],
+    "scope": "Only explicitly selected event universe and bounded same-state paths",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

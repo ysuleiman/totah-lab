@@ -64,8 +64,8 @@ final class CurrentRuleExecution {
             registry.require(request.manifestKey(),request.manifestSha256());
             if(!m.key().equals(request.manifestKey())||!RuleRegistry.digest(m).equals(request.manifestSha256())||!state.binding().equals(request.state()))throw new IOException("rule/request/state mismatch");
             if(!foundation.certificate().binding().equals(state.binding())||!foundation.certificate().configurationSha256().equals(SystemStateView.digest(new TreeMap<>(foundationConfiguration))))throw new IOException("foundation binding/configuration mismatch");
-            if(!direct&&m.implementationId().equals("athena.ss-connectivity"))throw new IOException("direct implementation requires evaluateCurrent");
-            if(direct&&!m.implementationId().equals("athena.ss-connectivity"))throw new IOException("direct implementation not registered");
+            if(!direct&&Set.of("athena.ss-connectivity","athena.events").contains(m.implementationId()))throw new IOException("direct implementation requires evaluateCurrent");
+            if(direct&&!Set.of("athena.ss-connectivity","athena.events").contains(m.implementationId()))throw new IOException("direct implementation not registered");
             selected[0]=m;
             return Map.of("manifest",RuleRegistry.digest(m));
         });

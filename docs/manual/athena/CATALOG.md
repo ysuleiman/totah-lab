@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `1d5f6fa0f512aaa15d54b630a6926c6dddd1849e1873f0a4d841d305aa42ecf7`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `474fc4915a3d85b6063c0d5a931160acc61578cd6e3fac5e3f2af8b034806009`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -34,12 +34,12 @@ Disposition is copied without upgrading partial capability coverage.
 | I17 | Steric overlaps/clashes | P0 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | I18 | Pi-hydrogen / X-H-pi geometry | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b05-mixed-geometry-contract-20261005](../../../software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt), [b05-mixed-geometry-v3-20261005](../../../software/qualification/b05-mixed-geometry-v3-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
 | I19 | Disulfide bond versus S-S proximity | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b06-connectivity-coverage-characterization-20261005](../../../software/qualification/b06-connectivity-coverage-characterization-20261005/REVIEW_GATE.txt), [b06-source-connectivity-20261005](../../../software/qualification/b06-source-connectivity-20261005/CHECKPOINT.txt), [direct-assessment-execution-contract-20261005](../../../software/qualification/direct-assessment-execution-contract-20261005/DESIGN.txt), [direct-assessment-current-20261005](../../../software/qualification/direct-assessment-current-20261005/CHECKPOINT.txt), [b06-cysteine-backbone-20261006](../../../software/qualification/b06-cysteine-backbone-20261006/CHECKPOINT.txt) |
-| I20 | Unpaired donor/acceptor/halogen features | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| I20 | Unpaired donor/acceptor/halogen features | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [event-coverage-20261006](../../../software/qualification/event-coverage-20261006/CHECKPOINT.txt) |
 | I21 | Interaction overlap/refinement and pruning | P0 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | N01 | Directional roles and atom/group attribution | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [n01-role-geometry-attribution-20261005](../../../software/qualification/n01-role-geometry-attribution-20261005/CHECKPOINT.txt) |
-| N02 | Binary/count interaction fingerprints | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| N03 | Ensemble contact frequencies/probabilistic networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| N04 | Contact correlations and co-occurrence networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| N02 | Binary/count interaction fingerprints | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [event-coverage-20261006](../../../software/qualification/event-coverage-20261006/CHECKPOINT.txt) |
+| N03 | Ensemble contact frequencies/probabilistic networks | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [event-coverage-20261006](../../../software/qualification/event-coverage-20261006/CHECKPOINT.txt) |
+| N04 | Contact correlations and co-occurrence networks | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [event-coverage-20261006](../../../software/qualification/event-coverage-20261006/CHECKPOINT.txt) |
 | N05 | Residue representation and network edge cardinality | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
 | N06 | Network degree/paths/second shell | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
 | N07 | RMSD-based ensemble clustering | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
@@ -82,7 +82,7 @@ Disposition is copied without upgrading partial capability coverage.
 | G05 | SAM sulfonium/methyl/aromatic environment | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G06 | SAM methyl-transfer geometry | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G07 | n-to-pi-star motif | P3 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [v12-peptide-source-geometry-20261006](../../../software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt) |
-| G08 | Typed H-bond/charge/cofactor/second-shell networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| G08 | Typed H-bond/charge/cofactor/second-shell networks | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [event-coverage-20261006](../../../software/qualification/event-coverage-20261006/CHECKPOINT.txt) |
 | F01 | Functional group: Acids/carboxylates | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F02 | Functional group: Amides and methyl amides | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F03 | Functional group: Esters/acyl linkages | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt) |
@@ -514,11 +514,11 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### I20 — Unpaired donor/acceptor/halogen features
 
-Define profile-relative pairing and exhaustive role/search coverage; unsearched is not unsatisfied.
+Profile-relative unpaired predicate over an explicitly supplied feature and complete partner-event universe; no automatic feature perception or energetic unsatisfaction.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Focused implementation/replay checkpoint; committed-source acceptance follows separately. No production scientific receipt.
 
-**Existing implementation:** No qualified unpaired-site assessment
+**Existing implementation:** EventAnalysisRules/EventInputs/EventCounts/EventPaths + governed evaluateCurrent
 
 **Supporting source:** PLIP find_unpaired_ligand
 
@@ -548,11 +548,11 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### N02 — Binary/count interaction fingerprints
 
-Define fingerprint event identity, count multiplicity and evaluated/unsupported masks before treating zeros as negatives.
+Explicit finite distinct-key counts and per-state assessment masks; legacy fingerprints remain positive-only and unchanged.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Focused implementation/replay checkpoint; committed-source acceptance follows separately. No production scientific receipt.
 
-**Existing implementation:** InteractionFingerprint.of retains supplied interactions and residue/type sets. It has no evaluated/unsupported mask and cannot establish scientific zero/absence. No silent migration.
+**Existing implementation:** EventAnalysisRules/EventInputs/EventCounts/EventPaths + governed evaluateCurrent
 
 **Supporting source:** ProLIF fingerprint.py
 
@@ -560,11 +560,11 @@ InteractionFingerprint preserves positive typed residues and raw records, but ha
 
 ### N03 — Ensemble contact frequencies/probabilistic networks
 
-Define ensemble membership, duplicate treatment and denominator/missing-coverage policy; pose frequency is not probability.
+Explicit immutable ensemble descriptive frequencies with eligible present+absent denominator; zero eligible is undefined, not probability.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Focused implementation/replay checkpoint; committed-source acceptance follows separately. No production scientific receipt.
 
-**Existing implementation:** Existing ensemble/contact analyses; SystemStateView identities
+**Existing implementation:** EventAnalysisRules/EventInputs/EventCounts/EventPaths + governed evaluateCurrent
 
 **Supporting source:** RING4/RING-MD; ProLIF fingerprints
 
@@ -572,11 +572,11 @@ RuleRequest binds one SystemStateView. Existing evidence can preserve arbitrary 
 
 ### N04 — Contact correlations and co-occurrence networks
 
-Define common-state co-occurrence and missing-coverage/correlation estimand without pairing independent ensembles.
+Exact contingency/cooccurrence counts over explicitly corresponding common states only; no independent pairing, Pearson or causality.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Focused implementation/replay checkpoint; committed-source acceptance follows separately. No production scientific receipt.
 
-**Existing implementation:** Historical topology analysis; no generic qualified network rule
+**Existing implementation:** EventAnalysisRules/EventInputs/EventCounts/EventPaths + governed evaluateCurrent
 
 **Supporting source:** RING-PyMOL pinned README
 
@@ -1112,11 +1112,11 @@ Adjacent source backbone-amide geometric candidate, O1-C2<=3.2A and99<=O1-C2-O2<
 
 ### G08 — Typed H-bond/charge/cofactor/second-shell networks
 
-Review typed qualified edge composition, same-state paths, coverage and cofactor attribution; no mechanistic inference.
+Same-state qualified typed evidence edges and bounded simple paths; exhaustive coverage for no-path. No new chemistry, coupling or mechanism.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Focused implementation/replay checkpoint; committed-source acceptance follows separately. No production scientific receipt.
 
-**Existing implementation:** ATHENA.NETWORK.*
+**Existing implementation:** EventAnalysisRules/EventInputs/EventCounts/EventPaths + governed evaluateCurrent
 
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
@@ -1125,12 +1125,6 @@ Review typed qualified edge composition, same-state paths, coverage and cofactor
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.COFACTOR_MEDIATED.json) · SHA256 `7cf05c7004bbe668ad853dd00cc9e7731b72db2ba17ccaffeab56f0db1fb476e`
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.HBOND.json) · SHA256 `27208503311cff09b5839c4ca722eb791383eb5bc2079ddf23049983c877a9dc`
-
-**Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Not an electrostatics energy network. Typed edge availability/coverage and deterministic path semantics need qualification.
-
-**Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Path does not establish catalytic mediation. Typed edge availability/coverage and deterministic path semantics need qualification.
-
-**Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. No allostery/cooperativity from connected paths. Typed edge availability/coverage and deterministic path semantics need qualification.
 
 Qualified typed evidence edges and explicit same-state selection/coverage are required before compositional paths. ResidueGraph spatial edges are not chemical interactions. Existing graph traversal can be reused after the edge/event contract is reviewed.
 

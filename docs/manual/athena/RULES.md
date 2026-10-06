@@ -4085,6 +4085,126 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.EVENT.EXPLICIT_COVERAGE_ANALYSIS — 1.0.0 (events-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/events-v1/ATHENA.EVENT.EXPLICIT_COVERAGE_ANALYSIS.rule.json) · SHA256 `1626e4637dce99fd977d5155a4b611381ad4299d44f4ccf59800af5786bbc244`
+
+**family**
+
+```json
+"ENVIRONMENT"
+```
+
+**profile**
+
+```json
+"ATHENA_EVENT_ANALYSIS_V1"
+```
+
+**implementationId**
+
+```json
+"athena.events"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Explicit attributed event identity and source qualification"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-event-analysis/1"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "athena.events/negative/1",
+  "supportedDomain": "Explicit applicable state/event universe with resolved source evidence",
+  "requirements": [
+    "EXPLICIT_EVENT_UNIVERSE",
+    "COMPLETE_APPLICABLE_COVERAGE",
+    "RESOLVED_SOURCE_ASSERTIONS"
+  ],
+  "scope": "Only explicitly selected event universe and bounded same-state paths",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Counts describe explicitly selected observations, not probabilities.",
+  "Typed paths describe topology only, not energy transfer or mechanism.",
+  "Unknown and conflicting source assertions remain preserved.",
+  "No source or legacy fingerprint semantics are changed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/event-coverage-20261006/APPROVAL.txt",
+    "sha256": "e0971da744f1e61c3bead93e6e146769184015b4b4b9474e0ac769da92a0732d",
+    "citation": "User-approved operational event/coverage contract; not a claim of physical interactions or production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GEOMETRY.CONTINUOUS — 1 (geometry-foundation-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/geometry-foundation-v1/ATHENA.GEOMETRY.CONTINUOUS.rule.json) · SHA256 `f9e4971bf8d025957f9dac0819535916375fb0935dba6181f7ce16ad5fc4e249`

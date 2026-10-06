@@ -15,6 +15,7 @@ final class DirectAssessmentInputs {
     private DirectAssessmentInputs() { }
     static List<EvidenceEnvelope> resolve(RuleManifest manifest,RuleRequest request,SystemStateView state,
                                           List<EvidenceEnvelope> selected)throws IOException {
+        if(manifest.implementationId().equals("athena.events"))return EventAssessmentInputs.resolve(request,state,selected);
         if(!manifest.implementationId().equals("athena.ss-connectivity")||!state.binding().equals(request.state()))
             throw new IOException("unsupported direct input binding");
         var applicable=new TreeMap<String,EvidenceEnvelope>();

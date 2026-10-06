@@ -1,0 +1,97 @@
+EVENT PAYLOAD CONTRACTS /1 — 2026-10-06
+Exact implementation of the approved NETWORK_CONTRACT_PROPOSAL.txt boundary.
+All objects reject unknown/missing fields, duplicate JSON keys and trailing tokens.
+Use existing EvidenceEnvelope, EvidenceInterpretation, ScientificReference,
+EvidenceSubject and SystemStateView.Binding. No public Java type or schema changes
+outside these three approved payloads.
+
+Notation: pin={reference: EvidenceEnvelope ScientificReference,sha256: lowercase
+64-digit payload hash}. Binding is the existing complete state/chemical/coordinate/
+correspondence hash binding. JSON object keys are canonicalized via SystemStateView;
+ordered arrays remain ordered. Digest is SHA256 of canonical bytes.
+
+athena-typed-event-set/1:
+ {schema,stateBinding,profiles:[profile],events:[event]}
+ profile={definitionSha256,implementationId,implementationVersion,manifest:pin}
+ definitionSha256 binds the exact RuleRegistry manifest digest, including its rule
+ definition/profile/version. Multiple explicit profiles are permitted in one state.
+ event={key,observations:[assertion]}
+ key={definitionSha256,direction:DIRECTED|UNDIRECTED,
+      roles:[{role,entity:EvidenceSubject}],correspondenceAlternative}
+ Roles are ordered, uniquely named, nonempty. All entities reference the selected
+ state. The explicit alternative is part of identity: never infer equivalence.
+ assertion={source:pin,coverage:[pin],qualification:null|{receipt:pin|null,context:pin|null}}
+ Source is an existing EvidenceExchange-encoded EvidenceInterpretation, with method
+ namespace=implementationId, id=manifestKey/evaluate, version=manifest digest.
+ It binds measurements.stateBinding (canonical binding string), eventScope (key
+ digest), proposition=EVENT. All its input pins must be explicitly supplied.
+ All six original statuses and their independent assertions survive output.
+ Coverage is an independently supplied interpretation: same binding/eventScope,
+ proposition=COMPLETE_EVENT_SCOPE, SUPPORTED_PRESENT. Any conflicting/nonpositive
+ coverage prevents absence. Coverage inputs are also explicit/hash checked.
+ Duplicate identical assertions/keys are idempotent; contradictory assertions
+ coexist. Conflicting positive/negative evidence is unresolved, regardless of age.
+ A missing event is UNKNOWN_INCONCLUSIVE. A raw negative without coverage is not
+ eligible. Positive-only legacy records cannot manufacture negatives.
+ Qualification null: descriptive assertion only, not a qualified typed edge.
+ Historical /2 sources: explicit qualified, nonretired manifest, null receipt/context.
+ /3 sources: existing RuleQualification.verify against exact supplied receipt,
+ context/dependency closure at source recordedAt, plus selected state binding.
+ No receipts, scientific signatures, expiry or authority are issued here.
+
+athena-event-analysis-plan/1:
+ {schema,stateBinding,operation,artifacts:[pin],states:[{binding,eventSet:pin}],
+  projections:[projection],path:null|path}
+ stateBinding is the execution anchor. states is the explicit finite ensemble;
+ same identity/different content fails. Repeated identical selections are idempotent.
+ No historical catalog lookup or independent-ensemble pairing. artifacts selects
+ the exact dependency closure; preservation/admission does not imply selection.
+ projection={id,members:[{state:Binding,events:[key],coverage:[pin],feature:null|EvidenceSubject}]}
+ All correspondences are explicitly supplied. Missing state/projection is unknown.
+ Duplicate keys within a projection count once. No matcher embedding becomes a new
+ event unless its explicit identity differs; producer must reuse an occurrence key
+ for automorphisms already established as equivalent. Ambiguous alternatives remain.
+ Ordinary projection scope digest={projection:id,events:sorted-distinct-key-digests}.
+ Presence:any resolved positive unless conflicting. Absence:all members absent AND
+ independently complete enumeration; empty enumeration still requires coverage.
+ EVENT_COUNTS reports distinct raw event counts per state and projection counts
+ across states; eligible=present+absent, fraction={numerator,denominator} or null.
+ Conflicting is a separately reported subset of unevaluable, not double-counted.
+ COOCCURRENCE_COUNTS uses only common explicitly corresponding states with all
+ projections resolved; sorted projection order defines bit strings. Exact contingency
+ and joint counts, excluded-state masks. No probability/correlation estimand.
+ UNPAIRED: exactly one feature/state/projection, one selected profile. Every listed
+ partner event must involve that feature. Scope digest adds feature and
+ profileDefinitionSha256 to the ordinary projection scope. If events empty, exactly
+ one selected profile is required. Full absence -> unpaired present; a resolved
+ partner -> unpaired absent; otherwise unknown. No unsatisfied-energy inference.
+ SIMPLE_PATHS: exactly one state, no projections.
+ path={start:EvidenceSubject,end:EvidenceSubject,fromRole,toRole,maximumLength,coverage:[pin]}
+ Distinct endpoints, explicit positive length; all selected events contain named
+ endpoint roles. Only resolved positive qualified edges traversed; directed/undirected
+ respected. Bounded iterative simple-path enumeration uses RuleRequest hop/node/
+ candidate bounds and canonical result ordering. No repeated node.
+ Path coverage scope digest={events:sorted-distinct-key-digests,fromRole,toRole}.
+ A found path establishes only existence. Complete no-path requires qualified
+ resolved edges/negatives, explicit complete edge universe and exhaustive requested
+ traversal. Resource truncation is inconclusive for absence. A shorter declared
+ maximumLength is the scoped proposition, never a global no-path statement.
+
+athena-event-analysis/1:
+ {schema,operation,plan:pin,implementation,manifestSha256,inputs:[pin],states:[Binding],
+  distinctEventCountsByState,assessment,...operation-specific fields}
+ Counts include selected,present,absent,eligible,conflicting,unevaluable,fraction,
+ per-key/state cells with resolved status, originalStatuses and source pins.
+ Projection results include explicit correspondence; cooccurrence includes projection
+ order, contingency, excludedStates, eligible,joint,fraction. Paths include paths of
+ exact event-key digests,eventSources,complete,truncated,requestedMaximumLength,
+ coverage,assessment. Unpaired includes its explicit scoped proposition.
+ Derived output is a new Finding/evidence record. Source bytes are never rewritten.
+ A counts SUPPORTED_PRESENT means the descriptive computation was produced, not
+ that every input resolved. Inactive /2 template remains NOT_EVALUATED; production
+ current-policy execution requires existing /3 governance and is not activated here.
+
+Owners: Athena EventPayload/EventInputs/EventCounts/EventPaths/EventAnalysisRules/
+EventSourceQualification; Daedalus EventAssessmentInputs + existing CurrentRuleExecution.
+No legacy InteractionFingerprint migration. No raw geometry, H placement, new groups,
+new interaction cutoffs, probabilities, causality, energy transfer or mechanism.

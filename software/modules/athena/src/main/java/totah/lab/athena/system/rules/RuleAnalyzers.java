@@ -99,6 +99,7 @@ public final class RuleAnalyzers {
         }
     };}
     public static SystemGraphAnalyzer evaluator(RuleManifest m,RuleRequest r){
+        if(m.implementationId().equals("athena.events"))return EventAnalysisRules.analyzer(m,r);
         if(m.implementationId().equals("athena.peptide-geometry"))return PeptideGeometryRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.hbond-candidate"))return HbondCandidateRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.cysteine-attribution"))return CysteineBackboneAttribution.analyzer(m,r);
