@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `2161cad9197803097a5f3f0d12c6a5e3ffa473b722abe216cbb196f9608f3779`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d41d5774e9c189a58826ca5767ae4bc7811e1546429381d2bd047cd004aef35b`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -62,10 +62,10 @@ Disposition is copied without upgrading partial capability coverage.
 | V16 | Global clashscore/percentiles/composite MolProbity score | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | V17 | Ligand geometry / Mogul empirical distributions | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V18 | Composition, missing atoms, alternate conformations, occupancy/B factors, linkage | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V19 | X-ray experimental-data and refinement validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V20 | X-ray local map/model fit | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V21 | NMR ensemble/shift/constraint validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V22 | EM map validation and map-model fit | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V19 | X-ray experimental-data and refinement validation | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V20 | X-ray local map/model fit | P2 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V21 | NMR ensemble/shift/constraint validation | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V22 | EM map validation and map-model fit | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
 | A01 | SMIRNOFF hierarchical parameter precedence and typed serialization | P0 | EXPLICIT_ARCHITECTURAL_DISPOSITION | [a01-disposition-20261005](../../../software/qualification/a01-disposition-20261005/CHECKPOINT.txt) |
 | A02 | Constraints and bond/angle/proper/improper torsion parameter families | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A03 | vdW and electrostatics parameter families | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
@@ -89,19 +89,19 @@ Disposition is copied without upgrading partial capability coverage.
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F05 | Functional group: Acid/sulfonyl chlorides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F07 | Functional group: Imines/oximes/nitroso | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt), [f07-source-identity-20261006](../../../software/qualification/f07-source-identity-20261006/CHECKPOINT.txt), [foundation-post-f07-clean-source-20261006](../../../software/qualification/foundation-post-f07-clean-source-20261006/CHECKPOINT.txt) |
-| F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F07 | Functional group: Imines/oximes/nitroso | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt), [f07-source-identity-20261006](../../../software/qualification/f07-source-identity-20261006/CHECKPOINT.txt), [foundation-post-f07-clean-source-20261006](../../../software/qualification/foundation-post-f07-clean-source-20261006/CHECKPOINT.txt), [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
 | F09 | Functional group: Nitriles | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F10 | Functional group: Nitro groups | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F11 | Functional group: Sulfonamides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F12 | Functional group: Sulfonic acid/sulfonate ester/sulfone | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F13 | Functional group: Sulfoxide/thioether/thiol/thiocarbonyl | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F14 | Functional group: Isocyanate/isothiocyanate | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f14-isocyanate-review-20261006](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
-| F15 | Functional group: Boron motifs | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F15 | Functional group: Boron motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
 | F16 | Functional group: Alcohol/phenol/ether motifs | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F17 | Functional group: Halogenated motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F18 | Functional group: Terminal alkyne | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [f18-terminal-alkyne-contract-20261006](../../../software/qualification/f18-terminal-alkyne-contract-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
-| F19 | Functional group: Branched alkyl/cyclopropyl | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F19 | Functional group: Branched alkyl/cyclopropyl | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
 
 ## Disposition scope and qualification limits
 
@@ -1162,13 +1162,13 @@ Nine exact source identities; acyclic/exocyclic/endocyclic neutral imines includ
 
 ### F08 — Functional group: Azo/hydrazine/diazo/azide
 
-Review azo/hydrazine/diazo/azide graph and resonance/state domains separately.
+Fourteen exact N-N source-state identities; neutral hydrazine/diazene H variants, two diazo depictions, diazonium, two azide depictions; cyclic/shared attachments included. Other charged/aromatic N-N states need separate exact definitions, not ring-engine work.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 1832/1832 implemented-foundation consumer tests including92 new tests; five independent JVM comparisons. Fresh committed-source qualification follows this source commit; no production receipt.
 
 **Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
-**Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
+**Supporting source:** Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md
 
 ### F09 — Functional group: Nitriles
 
@@ -1250,13 +1250,13 @@ Exact neutral carbon-bound R-N=C=O and R-N=C=S source identities; approved candi
 
 ### F15 — Functional group: Boron motifs
 
-Review boron coordination/charge/valence and exact bounded motif queries.
+B(OH)2/B(OH)(OR)/B(OR)2 plus separate B(-1) four-SINGLE-heavy-bond source predicate; cyclic/shared attachments included. No speciation or normalization.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 1832/1832 implemented-foundation consumer tests including92 new tests; five independent JVM comparisons. Fresh committed-source qualification follows this source commit; no production receipt.
 
 **Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
-**Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
+**Supporting source:** Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md
 
 ### F16 — Functional group: Alcohol/phenol/ether motifs
 
@@ -1304,14 +1304,12 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### F19 — Functional group: Branched alkyl/cyclopropyl
 
-Review exact branched-alkyl/cyclopropyl occurrence boundaries; no maximal-fragment inference.
+Carbon branch-point degree3/4, exact tert-butyl membership, carbon SINGLE-bond triangle; substituted/fused/spiro included. Maximal alkyl-fragment boundary is not inferred.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 1832/1832 implemented-foundation consumer tests including92 new tests; five independent JVM comparisons. Fresh committed-source qualification follows this source commit; no production receipt.
 
 **Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
-**Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
+**Supporting source:** Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json) · SHA256 `ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.

@@ -1,0 +1,74 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY\",\"limitations\":[\"Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.\",\"Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.\",\"Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized.\"],\"memberQueryIndices\":[1,2,3,4],\"negativeCoverageVersion\":\"ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/pattern\",\"patternVersion\":\"1\",\"query\":\"[*]-[C;!a;+0](-[C;H3;+0])(-[C;H3;+0])-[C;H3;+0]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"center\"},{\"count\":3,\"role\":\"methyl1\"},{\"count\":3,\"role\":\"methyl2\"},{\"count\":3,\"role\":\"methyl3\"}],\"roleHeavyDegree\":{\"center\":4,\"methyl1\":1,\"methyl2\":1,\"methyl3\":1}},\"roles\":{\"attachment\":[0],\"center\":[1],\"methyl1\":[2],\"methyl2\":[3],\"methyl3\":[4]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86\"},{\"id\":\"software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7\"},{\"id\":\"software/qualification/foundation-closure-execution-20261006/REQUEST.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+      "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+    },
+    {
+      "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+      "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+      "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+    },
+    {
+      "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+      "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+    "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+    "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

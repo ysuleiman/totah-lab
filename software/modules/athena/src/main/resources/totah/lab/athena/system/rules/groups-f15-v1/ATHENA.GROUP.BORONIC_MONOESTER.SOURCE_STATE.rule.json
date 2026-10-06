@@ -1,0 +1,69 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "B01",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "group-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE\",\"limitations\":[\"Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.\",\"B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.\",\"Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition.\"],\"memberQueryIndices\":[1,2,3],\"negativeCoverageVersion\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/negative/1\",\"occurrenceExclusions\":[{\"anchors\":{\"boron\":[0],\"oxygen1\":[1]},\"hydrogenRoles\":[],\"id\":\"oxygen1-noncarbon\",\"patternId\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-noncarbon\",\"patternVersion\":\"1\",\"query\":\"[B]-[O]-[!#6]\",\"rationale\":\"Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3\"},{\"id\":\"software/qualification/foundation-closure-execution-20261006/REQUEST.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c\"}]},{\"anchors\":{\"boron\":[0],\"oxygen1\":[1]},\"hydrogenRoles\":[],\"id\":\"oxygen1-double\",\"patternId\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-double\",\"patternVersion\":\"1\",\"query\":\"[B]-[O]=[*]\",\"rationale\":\"Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3\"},{\"id\":\"software/qualification/foundation-closure-execution-20261006/REQUEST.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c\"}]},{\"anchors\":{\"boron\":[0],\"oxygen1\":[1]},\"hydrogenRoles\":[],\"id\":\"oxygen1-triple\",\"patternId\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-triple\",\"patternVersion\":\"1\",\"query\":\"[B]-[O]#[*]\",\"rationale\":\"Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3\"},{\"id\":\"software/qualification/foundation-closure-execution-20261006/REQUEST.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c\"}]}],\"patternId\":\"ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[B;+0](-[O;+0;H0])-[O;+0;H1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"B\",\"O\",\"C\"],\"hydrogenRoles\":[{\"count\":0,\"role\":\"boron\"},{\"count\":0,\"role\":\"oxygen1\"},{\"count\":1,\"role\":\"oxygen2\"}],\"roleHeavyDegree\":{\"boron\":3,\"oxygen1\":2,\"oxygen2\":1}},\"roles\":{\"attachment\":[0],\"boron\":[1],\"oxygen1\":[2],\"oxygen2\":[3]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3\"},{\"id\":\"software/qualification/foundation-closure-execution-20261006/REQUEST.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.foundation\",\"version\":\"ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"H\",\"C\",\"N\",\"O\",\"S\",\"F\",\"Cl\",\"Br\",\"I\",\"B\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+      "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+    },
+    {
+      "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+      "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+    "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+    "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

@@ -23,8 +23,8 @@ final class FunctionalGroupRules {
             "REQUIRED_H_STATE","AROMATICITY_MODEL","SUPPORTED_DOMAIN","EXHAUSTIVE_B00");
 
     static void validate(RuleManifest m) {
-        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!Set.of("1","2","3").contains(m.implementationVersion())
-                ||!m.profile().equals(m.implementationVersion().equals("3")?"ATHENA_GROUP_MAPPING_V3":m.implementationVersion().equals("2")?"ATHENA_GROUP_CONTEXT_V2":"ATHENA_GROUP_B01_V1")||m.family()!=RuleManifest.Family.MOTIF
+        if(!Set.of("athena-rule/2","athena-rule/3").contains(m.schema())||!Set.of("1","2","3","4").contains(m.implementationVersion())
+                ||!m.profile().equals(m.implementationVersion().equals("4")?"ATHENA_GROUP_SOURCE_H_V4":m.implementationVersion().equals("3")?"ATHENA_GROUP_MAPPING_V3":m.implementationVersion().equals("2")?"ATHENA_GROUP_CONTEXT_V2":"ATHENA_GROUP_B01_V1")||m.family()!=RuleManifest.Family.MOTIF
                 ||!m.requiredCapabilities().isEmpty()||!m.parameters().keySet().equals(Set.of("definition"))
                 ||!m.negativeCoverage().requirements().equals(NEGATIVE))throw new IllegalArgumentException("B01 manifest contract");
         try {definition(m);}catch(Exception e){throw new IllegalArgumentException("invalid group definition",e);}
@@ -161,7 +161,7 @@ final class FunctionalGroupRules {
             state.graph().structure().bonds().stream().filter(b->map.containsValue(b.atom1())||map.containsValue(b.atom2())).forEach(actual::add);
             var mapped=new HashSet<totah.lab.gaia.structure.Bond>();
             // V3 preserves incomplete mapping as missing coverage. V1/V2 replay keeps its historical behavior.
-            boolean constructMappedBonds=!manifest.implementationVersion().equals("3")
+            boolean constructMappedBonds=!Set.of("3","4").contains(manifest.implementationVersion())
                     ||graph.bonds().stream().allMatch(b->map.get(b.firstAtomId())!=null&&map.get(b.secondAtomId())!=null
                         &&!map.get(b.firstAtomId()).equals(map.get(b.secondAtomId())));
             if(constructMappedBonds)graph.bonds().forEach(b->mapped.add(new totah.lab.gaia.structure.Bond(map.get(b.firstAtomId()),map.get(b.secondAtomId()),totah.lab.gaia.chemistry.BondOrder.valueOf(b.order().name()))));
@@ -203,6 +203,14 @@ final class FunctionalGroupRules {
                 var roleMap=new TreeMap<String,List<String>>();
                 for(var role:roleIndices.entrySet()) {var values=new ArrayList<String>();for(int i:role.getValue())values.add(mapped(embedding,i,ids));roleMap.put(role.getKey(),List.copyOf(values));}
                 boolean known=true;
+                // V4 requires declared source H for each matched member/query-context atom,
+                // including variable-H roles. OCL inference is never source-state evidence.
+                // Unrelated unknown atoms still prevent exhaustive negatives, not local positives.
+                if(manifest.implementationVersion().equals("4"))for(var target:embedding) {
+                    var atom=graph.atom(target.asText()).orElseThrow();
+                    if(contains(d.path("requiredState").path("hydrogenElements"),atom.element())
+                            &&!hCounts.containsKey(atom.id())) {known=false;localStateMissing=true;}
+                }
                 for(var constraint:d.path("requiredState").path("hydrogenRoles")) {
                     String role=text(constraint,"role");int required=constraint.path("count").intValue();
                     if(!roleMap.containsKey(role))throw new IllegalArgumentException("unknown H role");

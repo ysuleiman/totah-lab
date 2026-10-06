@@ -1,0 +1,304 @@
+Proceed from the current pushed branch state after F07 qualification.
+
+The objective is now **full closure of the accepted 96-capability general chemistry/geometry foundation**.
+
+Do not optimize for METTL7, first-rule activation, or a narrow first version.
+
+Do not intentionally defer chemically valid coverage merely to make implementation easier.
+
+## Current state
+
+Accepted capability inventory:
+
+- 96 total capabilities
+- 44 `BOUNDED_SUPPORTED_DOMAIN_QUALIFIED`
+- 40 `SCIENTIFIC_REVIEW_REQUIRED`
+- 12 `EXPLICIT_ARCHITECTURAL_DISPOSITION`
+
+The remaining 40 scientific-review capabilities are already consolidated into six review families:
+
+1. SOURCE CHEMISTRY
+2. INTERACTIONS / ENVIRONMENT
+3. NETWORK / ENSEMBLE
+4. STRUCTURAL VALIDATION
+5. EXPERIMENTAL VALIDATION
+6. SPECIALIZED CHEMISTRY
+
+Use:
+
+`software/qualification/foundation-consolidated-review-20261006/REVIEW.txt`
+
+and its family JSON files as the starting review package.
+
+## Standing instruction
+
+Work through **all 40 remaining scientific-review rows**.
+
+For every row:
+
+1. inspect the existing dossier, source pins, implementation, and qualification history;
+2. determine the full scientifically valid supported domain that can be justified now;
+3. do not narrow the domain merely for convenience;
+4. reuse existing perception, graph, geometry, state, evidence, replay, and qualification infrastructure;
+5. implement and qualify everything supported by the approved/pinned scientific evidence;
+6. assign a justified terminal disposition;
+7. continue immediately to the next independent row.
+
+Do not stop after each individual capability.
+
+## Scientific review behavior
+
+For each of the six consolidated families, classify each unresolved capability into one of:
+
+- `READY_FOR_SCIENTIFIC_ADOPTION`
+- `REQUIRES_EXTERNAL_REFERENCE_DATA`
+- `REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION`
+- `INGESTION_ONLY_BY_ARCHITECTURE`
+- `UNSUPPORTED_WITH_JUSTIFIED_EVIDENCE`
+
+For all `READY_FOR_SCIENTIFIC_ADOPTION` rows:
+
+- adopt the exact scientifically supportable definition from the pinned sources;
+- preserve all stated limitations and representation assumptions;
+- implement and qualify the complete supported domain;
+- do not create artificial “first version” exclusions where existing qualified machinery can correctly support the broader chemistry.
+
+If a chemically valid subtype can be handled using existing qualified ring/aromaticity/state/topology infrastructure, include it now.
+
+Only exclude a subtype when there is a concrete scientific ambiguity, missing representation capability, or missing source evidence.
+
+Record the exact reason for every exclusion.
+
+## SOURCE CHEMISTRY
+
+Complete F08, F15, F19 and representation/normalization rows V04/A07/A08 as far as the available pinned source evidence allows.
+
+In particular:
+
+- distinguish azo/diazene, hydrazine, diazo and azide states explicitly;
+- do not blindly inherit incorrect or ambiguous source labels;
+- distinguish boronic acid, boronic ester and charged boronate states;
+- distinguish branching and actual cyclopropyl/ring topology;
+- preserve query/dummy/enhanced-stereo distinctions;
+- do not invent normalization, alert rejection, tautomer equivalence or parent stripping without an explicit reviewed policy.
+
+Implement the full scientifically supportable domain now.
+
+## INTERACTIONS / ENVIRONMENT
+
+Complete all scientifically supportable definitions for:
+
+- I03 implicit-H H-bond approximation
+- I04 weak C-H donor interactions
+- I10/I11 halogen interactions
+- I12/I13 water bridges
+- P07/I14/I15 metal-binding and coordination
+- I17 steric overlap/clash interpretation
+- I20 unpaired-feature semantics
+
+Do not reuse unrelated thresholds merely because they are convenient.
+
+Where an empirical threshold is required, use only reviewed/pinned evidence.
+
+Separate:
+- identity
+- measured geometry
+- inferred geometry
+- classification
+- energetic/mechanistic interpretation
+
+Do not collapse them.
+
+## NETWORK / ENSEMBLE
+
+Complete N02/N03/N04/G08/N08 using explicit operational semantics.
+
+At minimum preserve:
+
+- exact event identity
+- explicit eligible-state denominator
+- unevaluable-state counts
+- evaluated masks
+- no pose-fraction-as-probability claim
+- no co-occurrence-as-causality claim
+- no topological path-as-mechanism claim
+- explicit correspondence/state provenance
+- no potency/ranking inference from pharmacophore matching unless separately reviewed
+
+Use existing transport/evidence structures unless a real gap is demonstrated.
+
+## STRUCTURAL VALIDATION
+
+For V07–V18:
+
+- implement everything that can be justified from existing pinned empirical/reference resources;
+- do not manufacture empirical distributions;
+- do not substitute generic geometry thresholds for missing reference libraries;
+- preserve exact applicability domains;
+- distinguish raw measurement from outlier interpretation.
+
+Where actual external empirical grids/libraries are genuinely required and not pinned, classify:
+
+`REQUIRES_EXTERNAL_REFERENCE_DATA`
+
+and identify exactly:
+- dataset/library name
+- version/release requirement
+- license requirement
+- fields needed
+- why existing data are insufficient
+
+Then continue with every independent row.
+
+## EXPERIMENTAL VALIDATION
+
+For V19–V22:
+
+Separate:
+
+1. ingestion/preservation of external validation reports/data;
+2. Athena-native computation of experimental validation metrics.
+
+If actual diffraction/maps/restraints/shifts are required and absent, do not fabricate them.
+
+Implement and qualify ingestion/preservation semantics where scientifically and architecturally justified.
+
+Classify computation-dependent portions as requiring the exact missing experimental data.
+
+Do not let absent experimental data stop unrelated foundation closure.
+
+## SPECIALIZED CHEMISTRY
+
+Complete all supportable definitions for:
+
+- G03 sulfur-pi/chalcogen-related environments
+- G05 SAM/SAH environment
+- G06 SAM methyl-transfer geometry
+- G07 n→π* motifs
+
+Preserve chemical-state distinctions.
+
+Do not generalize methionine evidence to cysteine without justification.
+
+Do not turn raw geometry into reactivity or catalysis.
+
+Where a mechanistic classification requires additional empirical evidence, separate the measured geometry capability from the unsupported interpretation.
+
+## No artificial partial coverage
+
+This instruction is explicit:
+
+Do not create a narrow “v1” merely because the broader scientifically valid domain is harder.
+
+If current qualified infrastructure can represent and test a legitimate subtype, support it now.
+
+Examples:
+- cyclic/endocyclic variants should not be excluded solely for convenience;
+- alternate chemically valid graph states should be explicitly represented where source evidence supports them;
+- overlapping identities should coexist rather than destructively selecting one label;
+- symmetry alternatives should remain explicit.
+
+## Missing external data
+
+If a row truly cannot be scientifically completed without external data:
+
+1. identify the exact missing dependency;
+2. preserve the row as unresolved for that exact reason;
+3. continue every other independent row;
+4. consolidate all missing-data blockers into one final dependency list.
+
+Do not stop the whole program for one missing dataset.
+
+## Implementation authority
+
+For scientifically approved/adoptable definitions, complete end-to-end without intermediate approval:
+
+- production implementation
+- integration
+- acceptance tests
+- negative/boundary tests
+- consumer regression
+- deterministic serialization
+- evidence round-trip
+- replay
+- independent-JVM replay
+- clean-source qualification
+- documentation
+- ledger reconciliation
+- focused commits
+- push and remote verification
+
+Do not ask for approval for ordinary implementation choices.
+
+## Public/API/schema boundary
+
+Stop only if completing a capability genuinely requires:
+
+- a public API change;
+- schema change;
+- governance/authority semantic change;
+- changing previously approved scientific meaning;
+- weakening replay/preservation;
+- or resolving a genuine contradiction.
+
+Do not invent new frameworks if existing infrastructure can support the capability.
+
+## Push policy
+
+All completed qualified commits must be pushed.
+
+After each safe coherent batch:
+
+- push `codex/mmp-chemistry-roundtrip`;
+- verify remote HEAD includes the commit and all ancestors.
+
+Do not leave qualified committed foundation work local-only.
+
+## Final completion condition
+
+Do not call the foundation complete until:
+
+- all 96 accepted capabilities have justified terminal dispositions;
+- every scientifically supportable capability has been implemented and qualified;
+- every truly unsupported capability has an explicit evidence-backed reason;
+- every missing external-data dependency is listed exactly;
+- stale ledger state is reconciled;
+- all implementation commits are pushed;
+- no qualification depends on layered historical project classes;
+- fresh committed-source compilation succeeds from empty outputs;
+- whole-foundation acceptance passes;
+- isolation tests pass;
+- independent-JVM replay is deterministic;
+- historical scientific replay remains byte-identical;
+- preservation hashes pass.
+
+At the end, produce:
+
+`FINAL_96_CAPABILITY_FOUNDATION_QUALIFICATION`
+
+with:
+
+```text
+TOTAL_CAPABILITIES = 96
+QUALIFIED =
+ARCHITECTURAL_DISPOSITIONS =
+UNSUPPORTED_WITH_JUSTIFICATION =
+REQUIRES_EXTERNAL_REFERENCE_DATA =
+OTHER_UNRESOLVED =
+
+WHOLE_FOUNDATION_COMPLETE =
+YES / NO
+
+CLEAN_SOURCE_TEST_COUNT =
+ISOLATION_TEST_COUNT =
+HISTORICAL_REPLAY_STATUS =
+PRESERVATION_STATUS =
+REMOTE_HEAD =
+```
+
+Also produce a final table with one row per capability:
+
+| ID | Capability | Final disposition | Scientific basis | Implementation status | Qualification status | Remaining dependency |
+|---|---|---|---|---|---|---|
+
+The objective is to **finish the whole accepted general foundation**, not to produce another intermediate architecture phase.

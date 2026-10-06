@@ -6796,6 +6796,2328 @@ Current-policy gate status must be established by a valid receipt, not the histo
 }
 ```
 
+## ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND.rule.json) · SHA256 `d64c751fd36620ee648d4abe32c865dfff68cbc93fec08618dd288bd3812f15f`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 2,
+        "role": "imineCarbon"
+      }
+    ],
+    "roleHeavyDegree": {
+      "imineCarbon": 1,
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC.rule.json) · SHA256 `65535f070985f1583c21b5b8fae4ec4b3b6b5f3d4d4ea340c24459ee79370ced`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ACYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;R0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC.rule.json) · SHA256 `f19289f6957104d11543742e71bcd347fc1228b8afaaf5d0c578cc840d10cce0`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.ENDOCYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC.rule.json) · SHA256 `7a5f9e1825f22b59c7d3423e24872e13f415bf6ca35e22c947e235ade3fa3eec`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_CARBON_BOUND.EXOCYCLIC/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0;R0]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_H.ACYCLIC_C — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_H.ACYCLIC_C.rule.json) · SHA256 `79b0d28b196bc988cf56dad2964cc71182c78901588f4d6e1acb2ad1986e34c6`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_H.ACYCLIC_C/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]=[C;!a;+0;R0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      1
+    ],
+    "nitrogen": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_H.CYCLIC_C — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_H.CYCLIC_C.rule.json) · SHA256 `73b936a883d102675681d8349f7477d0c944e573b90c5bfbb0c9e335e1ab64a6`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_H.CYCLIC_C/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]=[C;!a;+0;R]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      1
+    ],
+    "nitrogen": [
+      0
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND.rule.json) · SHA256 `12128c1a75915e00f47021afb45ea802a50e19bfe0f819c49f949845f9eb37db`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.IMINE.N_METHYL.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[C;H3;+0]-[N;!a;+0;R0]=[C;!a;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 3,
+        "role": "methylCarbon"
+      },
+      {
+        "count": 0,
+        "role": "nitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "methylCarbon": 1,
+      "nitrogen": 2
+    }
+  },
+  "roles": {
+    "attachment": [
+      1
+    ],
+    "imineCarbon": [
+      2
+    ],
+    "methylCarbon": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.NITROSO.CARBON_BOUND — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.NITROSO.CARBON_BOUND.rule.json) · SHA256 `daf7a0b70b8b24ce3b9542f24d817bc87b99cabad8ce6735664a9bf6978ec0ef`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.NITROSO.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.NITROSO.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.NITROSO.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.NITROSO.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;!a;+0]=[O;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 0,
+        "role": "oxygen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2,
+      "oxygen": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ],
+    "oxygen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[#6]-[N;+1]~[O]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[#6]-[N;-1]~[O]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;+1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;-1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      }
+    ]
+  }
+}
+```
+
+## ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND — 1.0.0 (groups-f07-source-h-v4)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-source-h-v4/ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND.rule.json) · SHA256 `aae9e78dac1483fa534b807d7799b0e099cb382d02511dc3556e7f2840663910`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+  "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned neutral motif reference, not an activity or parity claim"
+  },
+  {
+    "locator": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+    "sha256": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2",
+    "citation": "User-approved exact F07 definition, 2026-10-06; attributed approval retained in qualification checkpoint."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND",
+  "limitations": [
+    "Exact approved F07 source identity only; no normalization, universal chemistry, reactivity, donor/acceptor, pKa, E/Z equivalence or biological claim.",
+    "Complete authoritative source H/charge/mapping required. Unsupported representations remain non-negative."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.OXIME.HYDROXY.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0]=[N;!a;+0]-[O;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen"
+      },
+      {
+        "count": 1,
+        "role": "oxygen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2,
+      "oxygen": 1
+    }
+  },
+  "roles": {
+    "imineCarbon": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ],
+    "oxygen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-review-20261006/REVIEW.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "a9649aa5a19ab23c2cd0cb9addf09fb3f4aff0df138af24c2f353675f53ea5f2"
+    },
+    {
+      "id": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.METHYL.rule.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "80eef53d3abea081529b56b7d2fda608db932f7cdd2400a83205d9c7d1314844"
+    },
+    {
+      "id": "software/qualification/f07-source-identity-20261006/SCOPE_AMENDMENT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "39955558d0e768e255a3c53433c487377faeffab7c81b78586e6e84717dc156c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[C]~[N;+1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C]~[N;-1]",
+        "reason": "Charged core nitrogen outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;+1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[N]~[O;-1]",
+        "reason": "Charged oxygen/resonance alternative outside reviewed neutral-state domain"
+      },
+      {
+        "query": "[C;+1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[C;-1]~[N]",
+        "reason": "Charged carbon/resonance alternative outside neutral C=N domain"
+      },
+      {
+        "query": "[N]=[C]-[!#6;!#1]",
+        "reason": "Imine carbon heteroatom substitution outside carbon-bound domain"
+      },
+      {
+        "query": "[N]=[C]=[*]",
+        "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
+      }
+    ]
+  }
+}
+```
+
 ## ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND — 1.0.0 (groups-f07-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f07-v1/ATHENA.GROUP.IMINE.METHYLENE.CARBON_BOUND.rule.json) · SHA256 `6f30202f3c72a712c2483491c70cafa0ed05ee20c389fba4767adb6947f83955`
@@ -9114,6 +11436,6757 @@ Current-policy gate status must be established by a valid receipt, not the histo
         "reason": "Additional imine-carbon multiple bond outside reviewed exact bond-order domain"
       }
     ]
+  }
+}
+```
+
+## ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE.rule.json) · SHA256 `123e051ff7be1058ee63d20dc5771ba3970905cfc85c4849986b37709b17341d`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.AZIDE.CARBON_BOUND.DOUBLE_DOUBLE/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[N;+0]=[N;+1]=[N;-1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "attachedNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "centralNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "terminalNitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "attachedNitrogen": 2,
+      "centralNitrogen": 2,
+      "terminalNitrogen": 1
+    }
+  },
+  "roles": {
+    "attachedNitrogen": [
+      1
+    ],
+    "attachment": [
+      0
+    ],
+    "centralNitrogen": [
+      2
+    ],
+    "terminalNitrogen": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE.rule.json) · SHA256 `f383142cd656e4d35e61f1cc184368a356e41d0117ba6ec4ab199c8fae8e5d08`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.AZIDE.CARBON_BOUND.SINGLE_TRIPLE/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[N;-1]-[N;+1]#[N;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "attachedNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "centralNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "terminalNitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "attachedNitrogen": 2,
+      "centralNitrogen": 2,
+      "terminalNitrogen": 1
+    }
+  },
+  "roles": {
+    "attachedNitrogen": [
+      1
+    ],
+    "attachment": [
+      0
+    ],
+    "centralNitrogen": [
+      2
+    ],
+    "terminalNitrogen": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0.rule.json) · SHA256 `1d236289e7ab227071c30b256d2d4908fa3fceed767a8db9800224e339795de8`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H0/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H0]=[N;!a;+0;H0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 0,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 2,
+      "nitrogen2": 2
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1.rule.json) · SHA256 `0270cda136c036b6609c741402fdf2e920249dbdc578276211067613b57e6603`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H0_H1/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H0]=[N;!a;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 1,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 2,
+      "nitrogen2": 1
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1.rule.json) · SHA256 `33139eda70a986019baa257bf395527554a7c1b9b1e0b095970c93071384ed43`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](=[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](=[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.DIAZENE.NEUTRAL.H1_H1/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]=[N;!a;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 1,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 1,
+      "nitrogen2": 1
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG.rule.json) · SHA256 `7191c3c704ca7fa701bc27176c7d36c665f987f6b6b2ab066872dd14c7441c71`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.DIAZO.C_DOUBLE_N_POS_DOUBLE_N_NEG/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0]=[N;+1]=[N;-1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "centralNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "terminalNitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "centralNitrogen": 2,
+      "terminalNitrogen": 1
+    }
+  },
+  "roles": {
+    "carbon": [
+      0
+    ],
+    "centralNitrogen": [
+      1
+    ],
+    "terminalNitrogen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N.rule.json) · SHA256 `22ef249d2700253db9dc6f6b3bbb94a9064ef7a67fe38ee62247dfc13ad50519`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.DIAZO.C_NEG_SINGLE_N_POS_TRIPLE_N/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;-1]-[N;+1]#[N;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "centralNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "terminalNitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "centralNitrogen": 2,
+      "terminalNitrogen": 1
+    }
+  },
+  "roles": {
+    "carbon": [
+      0
+    ],
+    "centralNitrogen": [
+      1
+    ],
+    "terminalNitrogen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.DIAZONIUM.CARBON_BOUND — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.DIAZONIUM.CARBON_BOUND.rule.json) · SHA256 `9f88144a5e3a33ee8b54ae8678b2e97e8e0640a5dc29196c004017c0f321777b`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.DIAZONIUM.CARBON_BOUND/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.DIAZONIUM.CARBON_BOUND",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.DIAZONIUM.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.DIAZONIUM.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6;+0]-[N;+1]#[N;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "centralNitrogen"
+      },
+      {
+        "count": 0,
+        "role": "terminalNitrogen"
+      }
+    ],
+    "roleHeavyDegree": {
+      "centralNitrogen": 2,
+      "terminalNitrogen": 1
+    }
+  },
+  "roles": {
+    "attachment": [
+      0
+    ],
+    "centralNitrogen": [
+      1
+    ],
+    "terminalNitrogen": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0.rule.json) · SHA256 `ba71e5d1e08f9eb32b10c0e9173e3e59d23786b13d97ecf5b3584f79f078d8b2`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H0/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H0]-[N;!a;+0;H0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 0,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 3,
+      "nitrogen2": 3
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1.rule.json) · SHA256 `ce47854dab83d23d843baae117f8d1760c69dbba93e4443e9e3d6bceb3f10322`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H1/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H0]-[N;!a;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 1,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 3,
+      "nitrogen2": 2
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2.rule.json) · SHA256 `fdf07e2644dea638db5ac2b7d3063f325d05522b5d7754365240e499866d2e78`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H0_H2/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H0]-[N;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 2,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 3,
+      "nitrogen2": 1
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1.rule.json) · SHA256 `6d29a41b371f7e3368f271e38bcfab1659444c620338e39b936f40701f3dcdd9`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H1/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]-[N;!a;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 1,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 2,
+      "nitrogen2": 2
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2.rule.json) · SHA256 `0c22282ed862fc768c9946a35dbb852a567c5d02d82cd3746497c0a624eac0af`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H1_H2/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H1]-[N;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 2,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 2,
+      "nitrogen2": 1
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2 — 1.0.0 (groups-f08-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f08-v1/ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2.rule.json) · SHA256 `0182532e54ae4d858baa77f36e06bf9d4564cec4bd20cbb4b76e8b5211c797af`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+  "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+  "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Source motif precedent; labels corrected by explicit bond/charge/state, not copied as scientific truth. No functional interpretation."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2",
+  "limitations": [
+    "Exact supplied N-N bond/charge/H state; no reactivity, donor/acceptor, toxicity, tautomer/resonance equivalence or biological claim.",
+    "Neutral hydrazine/diazene endpoints are nonaromatic; cyclic connectivity and substituent identity are not arbitrarily excluded. Aromatic N-N bonds require a separate identity rather than this nonaromatic name.",
+    "Diazo, diazonium and azide source charge/bond depictions are independent identities, never normalized or merged. Source graph validity is separately assessed."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/nitrogen1-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          0
+        ],
+        "nitrogen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen1-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/nitrogen1-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-double",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/nitrogen2-extra-double",
+      "patternVersion": "1",
+      "query": "[N](-[N])=[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "nitrogen1": [
+          1
+        ],
+        "nitrogen2": [
+          0
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "nitrogen2-extra-triple",
+      "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/nitrogen2-extra-triple",
+      "patternVersion": "1",
+      "query": "[N](-[N])#[*]",
+      "rationale": "Selected core plus a distinct extra multiple bond is outside this source N valence/bond-order identity.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+        },
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.HYDRAZINE.NEUTRAL.H2_H2/pattern",
+  "patternVersion": "1",
+  "query": "[N;!a;+0;H2]-[N;!a;+0;H2]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 2,
+        "role": "nitrogen1"
+      },
+      {
+        "count": 2,
+        "role": "nitrogen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen1": 1,
+      "nitrogen2": 1
+    }
+  },
+  "roles": {
+    "nitrogen1": [
+      0
+    ],
+    "nitrogen2": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE — 1.0.0 (groups-f15-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f15-v1/ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE.rule.json) · SHA256 `ca9a09eb00890250dedd364eda58270204822055adfc5ae50513be8a3c4b932e`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+  "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+  "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE",
+  "limitations": [
+    "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+    "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+    "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+  ],
+  "memberQueryIndices": [
+    0
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.BORON.FOUR_SINGLE_BONDS.FORMAL_MINUS_ONE/pattern",
+  "patternVersion": "1",
+  "query": "[B;-1](-[*])(-[*])(-[*])-[*]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "B",
+      "O",
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "boron"
+      }
+    ],
+    "roleHeavyDegree": {
+      "boron": 4
+    }
+  },
+  "roles": {
+    "boron": [
+      0
+    ],
+    "neighbor1": [
+      1
+    ],
+    "neighbor2": [
+      2
+    ],
+    "neighbor3": [
+      3
+    ],
+    "neighbor4": [
+      4
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "B"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE — 1.0.0 (groups-f15-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f15-v1/ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE.rule.json) · SHA256 `e52aa33f94d7f22d9d8c4456f315c3814a1dc927adb30f2e45a2237a5512c8c0`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+  "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+  "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE",
+  "limitations": [
+    "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+    "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+    "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.BORONIC_ACID.SOURCE_STATE/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[B;+0](-[O;+0;H1])-[O;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "B",
+      "O",
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "boron"
+      },
+      {
+        "count": 1,
+        "role": "oxygen1"
+      },
+      {
+        "count": 1,
+        "role": "oxygen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "boron": 3,
+      "oxygen1": 1,
+      "oxygen2": 1
+    }
+  },
+  "roles": {
+    "attachment": [
+      0
+    ],
+    "boron": [
+      1
+    ],
+    "oxygen1": [
+      2
+    ],
+    "oxygen2": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "B"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE — 1.0.0 (groups-f15-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f15-v1/ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE.rule.json) · SHA256 `7c2d71e31379cbd75113c124e07b91a5a95eac91a9acace021502f6c0897a6b1`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+  "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+  "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE",
+  "limitations": [
+    "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+    "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+    "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-noncarbon",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen1-noncarbon",
+      "patternVersion": "1",
+      "query": "[B]-[O]-[!#6]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-double",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen1-double",
+      "patternVersion": "1",
+      "query": "[B]-[O]=[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-triple",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen1-triple",
+      "patternVersion": "1",
+      "query": "[B]-[O]#[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen2-noncarbon",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen2-noncarbon",
+      "patternVersion": "1",
+      "query": "[B]-[O]-[!#6]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen2-double",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen2-double",
+      "patternVersion": "1",
+      "query": "[B]-[O]=[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen2": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen2-triple",
+      "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/oxygen2-triple",
+      "patternVersion": "1",
+      "query": "[B]-[O]#[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.BORONIC_DIESTER.SOURCE_STATE/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[B;+0](-[O;+0;H0])-[O;+0;H0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "B",
+      "O",
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "boron"
+      },
+      {
+        "count": 0,
+        "role": "oxygen1"
+      },
+      {
+        "count": 0,
+        "role": "oxygen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "boron": 3,
+      "oxygen1": 2,
+      "oxygen2": 2
+    }
+  },
+  "roles": {
+    "attachment": [
+      0
+    ],
+    "boron": [
+      1
+    ],
+    "oxygen1": [
+      2
+    ],
+    "oxygen2": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "B"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE — 1.0.0 (groups-f15-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f15-v1/ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE.rule.json) · SHA256 `f829874ec7b6b55fe8a01c1ba3b92828614706a85d21a4f50ceec23f1f9549c5`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+  "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+  "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+    "sha256": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "B-C/O/O motif precedent, refined into exact supplied H/charge/connectivity states; no reaction semantics."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE",
+  "limitations": [
+    "Source connectivity/charge/H attribution only; no pKa, boron Lewis acidity, reactivity, stability, physiological population or binding claim.",
+    "B(OH)2, B(OH)(OR), and B(OR)2 remain distinct neutral three-coordinate states. Cyclic/shared-carbon attachments are allowed. No RDKit reaction/parent stripping is performed.",
+    "Four-SINGLE-bond B(-1) is a separate exact supplied topology/charge descriptor, not automatic acid/ester identity, boronate speciation or universal charged-boron classifier. Other bond/charge/coordination states are retained outside this definition."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/negative/1",
+  "occurrenceExclusions": [
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-noncarbon",
+      "patternId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-noncarbon",
+      "patternVersion": "1",
+      "query": "[B]-[O]-[!#6]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-double",
+      "patternId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-double",
+      "patternVersion": "1",
+      "query": "[B]-[O]=[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    },
+    {
+      "anchors": {
+        "boron": [
+          0
+        ],
+        "oxygen1": [
+          1
+        ]
+      },
+      "hydrogenRoles": [],
+      "id": "oxygen1-triple",
+      "patternId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/oxygen1-triple",
+      "patternVersion": "1",
+      "query": "[B]-[O]#[*]",
+      "rationale": "Ester oxygen other heavy attachment must be carbon through a supplied SINGLE bond; shared/cyclic attachment is allowed.",
+      "sourceReferences": [
+        {
+          "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+        },
+        {
+          "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+          "kind": "SOURCE",
+          "namespace": "athena.foundation",
+          "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+        }
+      ]
+    }
+  ],
+  "patternId": "ATHENA.GROUP.BORONIC_MONOESTER.SOURCE_STATE/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[B;+0](-[O;+0;H0])-[O;+0;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "B",
+      "O",
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "boron"
+      },
+      {
+        "count": 0,
+        "role": "oxygen1"
+      },
+      {
+        "count": 1,
+        "role": "oxygen2"
+      }
+    ],
+    "roleHeavyDegree": {
+      "boron": 3,
+      "oxygen1": 2,
+      "oxygen2": 1
+    }
+  },
+  "roles": {
+    "attachment": [
+      0
+    ],
+    "boron": [
+      1
+    ],
+    "oxygen1": [
+      2
+    ],
+    "oxygen2": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__Functional_Group_Hierarchy.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "3f50f5169183643cd88d60e5212968277f96e4a5a7b77858d3729d58342611c3"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I",
+      "B"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS — 1.0.0 (groups-f19-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f19-v1/ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS.rule.json) · SHA256 `50489b358e93e0ae0d11d55f579b113480bd2d7b09c3042da6aab81a9d5d9b3c`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+  "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+  "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+    "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS",
+  "limitations": [
+    "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+    "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+    "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+  ],
+  "memberQueryIndices": [
+    0
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.CARBON_BRANCH_POINT.FOUR_CARBON_NEIGHBORS/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0;H0](-[#6])(-[#6])(-[#6])-[#6]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "center"
+      }
+    ],
+    "roleHeavyDegree": {
+      "center": 4
+    }
+  },
+  "roles": {
+    "center": [
+      0
+    ],
+    "neighbor1": [
+      1
+    ],
+    "neighbor2": [
+      2
+    ],
+    "neighbor3": [
+      3
+    ],
+    "neighbor4": [
+      4
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS — 1.0.0 (groups-f19-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f19-v1/ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS.rule.json) · SHA256 `d1a4660b87c6eda8a558eab864b8880c21f62289c8b25057ea24e64afbfdbeb2`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+  "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+  "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+    "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS",
+  "limitations": [
+    "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+    "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+    "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+  ],
+  "memberQueryIndices": [
+    0
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.CARBON_BRANCH_POINT.THREE_CARBON_NEIGHBORS/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0;H1](-[#6])(-[#6])-[#6]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 1,
+        "role": "center"
+      }
+    ],
+    "roleHeavyDegree": {
+      "center": 3
+    }
+  },
+  "roles": {
+    "center": [
+      0
+    ],
+    "neighbor1": [
+      1
+    ],
+    "neighbor2": [
+      2
+    ],
+    "neighbor3": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE — 1.0.0 (groups-f19-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f19-v1/ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE.rule.json) · SHA256 `f478b4442fea185f91d7f5fcd0900a95c06ad7c7be5df5b811e6a2789d30c064`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+  "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+  "Complete source charge, topology, mapping and aromaticity required. H is preserved as supplied/unknown; no hydrogen-count or valence-validity proposition is made by a triangle."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+    "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE",
+  "limitations": [
+    "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+    "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+    "Complete source charge, topology, mapping and aromaticity required. H is preserved as supplied/unknown; no hydrogen-count or valence-validity proposition is made by a triangle."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.CARBON_SINGLE_BOND_TRIANGLE/pattern",
+  "patternVersion": "1",
+  "query": "[C;!a;+0]1-[C;!a;+0]-[C;!a;+0]-1",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "carbon1": [
+      0
+    ],
+    "carbon2": [
+      1
+    ],
+    "carbon3": [
+      2
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY — 1.0.0 (groups-f19-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-f19-v1/ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY.rule.json) · SHA256 `188b68de103362def817d21bb96b3df7de2bd8efcd49685b9b5581ff05e9f679`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "group-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+  "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+  "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+    "sha256": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+    "sha256": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  },
+  {
+    "locator": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+    "sha256": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c",
+    "citation": "Pinned source topology precedent / reviewed graph-identity architecture / explicit closure authorization; not an interaction criterion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY",
+  "limitations": [
+    "Exact supplied neutral nonaromatic carbon topology; member/context boundaries are explicit. No maximal fragment, hydrophobicity, strain, reactivity, interaction or potency inference.",
+    "Triangle means three distinct carbon atoms joined by three SINGLE edges, including substituted/fused/spiro contexts. No ring-size or ring-system preference is inferred.",
+    "Complete authoritative C hydrogen, charge, topology, mapping and aromaticity state required. Source graph is never normalized."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.TERT_BUTYL.SOURCE_CONNECTIVITY/pattern",
+  "patternVersion": "1",
+  "query": "[*]-[C;!a;+0](-[C;H3;+0])(-[C;H3;+0])-[C;H3;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C"
+    ],
+    "hydrogenRoles": [
+      {
+        "count": 0,
+        "role": "center"
+      },
+      {
+        "count": 3,
+        "role": "methyl1"
+      },
+      {
+        "count": 3,
+        "role": "methyl2"
+      },
+      {
+        "count": 3,
+        "role": "methyl3"
+      }
+    ],
+    "roleHeavyDegree": {
+      "center": 4,
+      "methyl1": 1,
+      "methyl2": 1,
+      "methyl3": 1
+    }
+  },
+  "roles": {
+    "attachment": [
+      0
+    ],
+    "center": [
+      1
+    ],
+    "methyl1": [
+      2
+    ],
+    "methyl2": [
+      3
+    ],
+    "methyl3": [
+      4
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    },
+    {
+      "id": "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7"
+    },
+    {
+      "id": "software/qualification/foundation-closure-execution-20261006/REQUEST.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "version": "ec1d07f10fb9b8fcd26259564a316c380a01f4286f453fe98b25b2c311eac32c"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": []
   }
 }
 ```
