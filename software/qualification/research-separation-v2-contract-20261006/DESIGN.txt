@@ -1,0 +1,105 @@
+PROSPECTIVE /2 SCIENTIFIC REVIEW / IMPLEMENTATION AUTHORITY SEPARATION
+2026-10-06. Public API/schema proposal only. No production policy/receipt issued.
+
+APPROVED SCIENTIFIC/GOVERNANCE SEMANTICS
+Scientific reviewer AGENT:athena.foundation.authority:project-user:1.
+Implementation reviewer/context issuer AGENT:athena.foundation.authority:codex-local-qualification:1.
+Explicit per-rule reviewedAt/validUntil; no universal lifetime, default, automatic renewal,
+retroactive expiry or fabricated human approval. Implementation authority attests only
+actual verified work and never approves a scientific definition.
+Scientific changes require rereview; implementation-only changes require fresh implementation
+qualification/receipt but do not erase unchanged valid definition/domain approval.
+NOT_APPLICABLE audits are attributed, valid results. Applicable empirical data still required.
+
+VERIFIED /1 CONFLICTS
+ResearchCodec.definition includes implementationId, implementationVersion, referenceArtifacts.
+ScientificRuleResearchGate requires "implementation version" invalidation in the policy.
+RuleQualification.checked uses policy.authorizedReviewers for implementation attestations;
+ScientificRuleResearchGate uses the same list for human scientific review.
+A shared list cannot express approved role separation without granting excess authority.
+Changing /1 silently would invalidate historical digest/replay semantics. Preserve /1 unchanged.
+25 tests pass, including4 permanent characterization witnesses; run/tests.log.
+
+EXACT ADDITIVE PUBLIC DOCUMENT TYPES
+1. New record RuleReviewPolicyV2, schema athena-rule-review-policy/2, components:
+String schema, String id, String version, List<String> applicableRulePrefixes,
+List<String> requiredSystems, List<String> requiredAuditCategories,
+List<ScientificReference> authorizedScientificReviewers,
+List<ScientificReference> authorizedImplementationReviewers,
+List<ScientificReference> authorizedContextIssuers,
+String freshnessMode, boolean requireExpiryAfterReview,
+List<String> scientificInvalidatingChangeKinds,
+List<String> implementationInvalidatingChangeKinds,
+List<String> requiredQualificationChecks, String canonicalizationVersion.
+Use existing canonical JSON engine. freshnessMode remains EXPLICIT_EXPIRY; no lifetime field.
+Scientific invalidation: definition, domain, perception, measurement, references/distributions,
+classification/thresholds, negative coverage. Implementation invalidation: implementation
+identity/version, source/artifact pins, fixtures/tests, execution/context/receipt binding.
+Material scientific source changes live in scientificSources; implementation-only provenance
+must not be falsely represented as scientific definition content.
+
+2. New record RuleImplementationQualificationV2,
+schema athena-rule-implementation-qualification/2, components:
+String schema, String ruleKey, String definitionSha256, String domainSha256,
+String manifestSha256, List<Source> implementationPins, List<Source> fixturePins,
+List<RuleImplementationQualification.Check> checkResults,
+ScientificReference reviewer, Source reviewSource, Instant completedAt.
+The exact manifest digest binds the report to the executable implementation version and
+configuration. Reusing an old report after an implementation change must fail even when
+scientific definition/domain hashes are unchanged. Existing Check is reused.
+
+3. Add overloads, retaining every existing method:
+ScientificRuleResearchGate.evaluate(RuleManifest, RuleReviewPolicyV2, RulePolicyContext,
+    ResearchArtifactReader, Instant, QualificationMode) -> ResearchEligibility throws IOException.
+RuleQualification.qualify(RuleManifest, ResearchEligibility,
+    RuleImplementationQualificationV2, SystemGraphCertificate, SystemStateView,
+    RuleRequest, RulePolicyContext, ResearchArtifactReader, Instant)
+    -> RuleQualificationReceipt throws IOException.
+Existing verify signature remains; dispatches the pinned report/policy schema internally.
+ResearchDocuments encode/decode extends its existing canonical handling, no second codec.
+CurrentRuleExecution dispatches admitted policy/report versions and reuses one gate path.
+No RuleExecutionPipeline signature or ResearchExecutionInputs change.
+
+4. Existing ResearchBinding and RuleResearchDossier component signatures unchanged;
+add strictly paired /2 schema + athena-rule-definition-projection/2 vocabulary.
+/1 schema permits projection/1 only; /2 permits projection/2 only.
+No implicit upgrade or mixed policy/binding/dossier/implementation-report combinations.
+Manifest remains athena-rule/3; new current-policy documents use opt-in /2 bindings.
+No EvidenceExchange, molecular graph, classifier, evidence status or chemistry schema change.
+
+EXACT PROJECTION /2
+From current /1 field projection retain:
+schema, ruleId, version, profile, family, tier, requiredCapabilities, requiredChemistry,
+requiredGeometry, measurementsProduced, classificationStates, parameters, scientificSources,
+limitations, negativeCoverage; include domainSha256 as before.
+Exclude implementationId, implementationVersion, referenceArtifacts. They remain bound by
+full manifest digest, implementation report, eligibility and receipt. Domain and definition
+must remain identical to reuse human review; no automatic semantic-equivalence inference.
+If an implementation-only change alters any retained scientific field, fail reuse and
+require explicit reviewed migration; do not erase fields to keep a digest stable.
+Policy requires materially relevant scientific sources in scientificSources/domain/dossier;
+referenceArtifacts cannot hide scientific definition changes as mere implementation pins.
+
+INTERNAL REUSE / PRESERVATION
+Shared internal policy/report adapters may normalize version-specific metadata for existing
+checks; do not duplicate admission, current execution, source verification or time authority.
+Old constructors/record codecs, bytes, definition digests, /1 expiry and replay unchanged.
+Historical /1 remains historical even where it has a combined authority list.
+New real authorities are not activated by this prospective document.
+
+ACCEPTANCE
+Human-only science; executor-only implementation/context; swapped/unauthorized roles fail.
+Implementation-only version change: scientific digest unchanged; old report/receipt rejected;
+new verified report may qualify against unchanged still-valid human review.
+Changes to definition/domain/perception/measurement/threshold/coverage/scientific sources:
+old scientific approval rejected. Full provenance/source tamper and expiry fail closed.
+Per-rule different validity intervals; no universal default; expired evidence preserved.
+NOT_APPLICABLE exact graph accepted with attribution; applicable unanalyzed dataset rejected.
+No automatic review, renewal, receipt or imported fixture authority. Mixed versions fail.
+Historical bytes/replay, current runCurrent/evaluateCurrent, invocation counts, admission,
+explicit input selection, persistence/read-back and independent-JVM replay unchanged.
+
+REVIEW BOUNDARY
+User approved the semantics, not these new Java record types/overloads/payload versions.
+Approve the exact additive /2 contract before implementation under the standing API/schema
+rule. This gate concerns current-policy qualification, not unrelated foundation implementations.

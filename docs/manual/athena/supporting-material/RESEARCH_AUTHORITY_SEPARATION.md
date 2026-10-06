@@ -1,0 +1,9 @@
+# Scientific authority and implementation qualification
+
+The user-approved policy has separate authorities: `AGENT:athena.foundation.authority:project-user:1` approves scientific definitions; `AGENT:athena.foundation.authority:codex-local-qualification:1` may attest verified implementation/tests and execution context. Neither role grants the other authority.
+
+Validity is explicitly selected per rule during scientific review. There is no universal lifetime, default expiry or automatic renewal. Implementation-only changes require new implementation qualification and receipt; scientific review remains applicable only while the exact reviewed scientific definition/domain and validity remain intact. Material scientific changes require rereview. `NOT_APPLICABLE` is valid when attributed; applicable datasets must still support the claimed domain.
+
+The existing `/1` gate cannot fully express this separation: its definition digest includes implementation identity/version, and both review roles use one authorization list. The [pinned characterization and prospective contract](../../../../software/qualification/research-separation-v2-contract-20261006/DESIGN.txt) describe the smallest proposed additive `/2` evolution. It is not implemented. Historical `/1` remains immutable; no prior review is silently upgraded. The earlier12-month proposal was rejected, not adopted.
+
+This is governance/qualification provenance, not a scientific classifier. Supporting evidence is the exact pinned gate implementation and25 passing characterization/regression tests. No empirical lifetime is asserted and no new literature research is needed to establish the implementation mismatch. Current-policy qualification still requires authorized scientific review, valid eligibility, implementation qualification and valid execution/receipt binding. No receipts are automatically issued.

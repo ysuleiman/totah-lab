@@ -86,3 +86,5 @@ Bounded sulfur/backbone attribution: [support and limitations](supporting-materi
 Source representation boundary: [V03 evidence and pending contract](supporting-material/V03_REPRESENTATION.md).
 
 V03 opt-in representation and operation matrix: [supporting material](supporting-material/EXPLICIT_RADICAL_STATE.md).
+
+Review authority and per-rule validity: [approved semantics and prospective implementation](supporting-material/RESEARCH_AUTHORITY_SEPARATION.md).
