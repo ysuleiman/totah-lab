@@ -1,0 +1,51 @@
+V03 PROSPECTIVE EXPLICIT RADICAL-STATE REPRESENTATION — REVIEW GATE
+2026-10-06. No production change made.
+
+OBSERVED
+OCL2026.7.2 parses [CH3], [CH2], [O] with nonzero atom radical state.
+MolecularGraph.Atom has no dedicated radical field; its properties are opaque.
+OclGraphMapper does not read/write OCL atom radical state. Public decodeStructure
+rejects all three through its faithful canonical round-trip guard. This is safe
+unsupported behavior, not a qualified radical representation or a chemistry-negative.
+C, [13CH4], [Na+] remain representable. Existing isotope permutation tests pass.
+
+SMALLEST PROPOSED CONTRACT
+Keep MolecularGraph.Atom and historical JSON layouts unchanged. Reserve one explicitly
+versioned property key in the existing atom.properties map:
+athena.ocl.atomRadicalState/1
+Allowed exact values: NONE, S, D, T, corresponding only to the pinned OCL constants
+cAtomRadicalStateNone, cAtomRadicalStateS, cAtomRadicalStateD, cAtomRadicalStateT.
+This is attributed OCL per-atom source state, not a molecule-wide spin multiplicity,
+reactivity, stability, physiological population or electron-density inference.
+Missing property means NOT_SUPPLIED, never an authoritative NONE assertion.
+Unknown values remain preserved in original evidence and fail checked unsupported
+conversion, rather than being ignored. Conflicting source assertions are not resolved.
+Source input/method/OCL version remains pinned by existing evidence provenance.
+
+Public opt-in factory proposed (signature only):
+public static OclMolecularBackend forExplicitRadicalState();
+Legacy constructor, forChemicalStateValidation(), method identity and all historical
+replay remain unchanged. New instance has a separately versioned implementation identity.
+No implicit activation in sanitizer, matcher, interaction or fragment consumers.
+No typed graph replacement, alternate matcher or new EvidenceExchange schema.
+
+The new mode must both set/get the exact OCL radical property and retain the existing
+canonical round-trip guard; isotope/charge/H/stereo/coordinates/order are not normalized.
+Per-atom radical property is part of graph identity/delta through existing properties.
+Mapper must not overwrite contradictory supplied property on source reserialization.
+Unsupported downstream scientific domains stay unsupported; this is representation only.
+Qualification must establish whether each backend operation can safely consume the
+new state. An unqualified operation must fail explicitly; do not inherit whole-backend
+chemistry qualification from successful decode/encode.
+
+ACCEPTANCE BEFORE ANY IMPLEMENTATION QUALIFICATION
+NONE versus absent; S/D/T exact OCL correspondence and source provenance; invalid token;
+radical+isotope+charge and explicit-H cases; stable IDs/permutation; immutable source;
+properties serialization/evidence journal round-trip; graph delta; independent JVM;
+all affected consumers; byte-identical historical replay. Preserve current rejection
+witnesses. No scientific rule/domain widening or radical reactivity classifier.
+
+DECISION REQUIRED
+Approve this additive property contract and opt-in public factory, or prefer a typed
+Atom API evolution (which would require a separate compatibility proposal). Do not
+implement either before approval. The inventory is not closed by this proposal.

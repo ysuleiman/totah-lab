@@ -82,3 +82,5 @@ all explicit artifacts; only verified, applicable selected evidence reaches the 
 evaluator. History is never an implicit input. See [supporting rationale and boundaries](supporting-material/DIRECT_ASSESSMENT_EXECUTION.md).
 
 Bounded sulfur/backbone attribution: [support and limitations](supporting-material/CYSTEINE_BACKBONE.md).
+
+Source representation boundary: [V03 evidence and pending contract](supporting-material/V03_REPRESENTATION.md).
