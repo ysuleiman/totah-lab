@@ -1,0 +1,66 @@
+F07 — NEXT EXACT SOURCE-IDENTITY SCIENTIFIC REVIEW (NOT IMPLEMENTED)
+2026-10-06. Prepared after I02/F05/F14/F18 adoption; no runtime group was activated.
+
+The existing RDKit FunctionalGroups source (pinned below) contains specific imine
+subsets rather than one universal imine rule. Proposed first bounded domains are:
+
+1. IMINE.N_METHYL.CARBON_BOUND: neutral, nonaromatic C=N-C(H3).
+   Members: imine C and N. N-methyl carbon and other one-bond neighbors are context.
+   N has exactly two heavy neighbors, H0; methyl context carbon has one heavy neighbor,
+   authoritative H3. Imine C has 0/1/2 carbon single-bond substituents and respectively
+   authoritative H2/H1/H0. Heteroatom substitutions and aromatic/endocyclic imine N
+   are outside this first definition. N-methyl identity must reuse the approved methyl
+   predicate/correspondence, not infer H3 from an OCL match alone.
+
+2. IMINE.METHYLENE.CARBON_BOUND: neutral, nonaromatic R(C)-N=CH2.
+   Members: imine C and N. Carbon R and one-bond neighbors are context.
+   C has only N as heavy neighbor and authoritative H2; N has exactly two heavy
+   neighbors and H0. The source C-N attachment is SINGLE. Aromatic/endocyclic N and
+   heteroatom-attached/formaldehyde-imine variants are outside this first definition.
+   The two imine subset identities may overlap; do not destructively choose a label.
+
+3. OXIME.HYDROXY.CARBON_BOUND: neutral nonaromatic C=N-O-H.
+   Members: C/N/O; carbon substituents and explicit H remain attributed context.
+   N has two heavy neighbors/H0; O has one heavy neighbor/H1. C has 0/1/2 carbon
+   single-bond substituents and H2/H1/H0. O-alkyl oxime ethers are not this exact
+   hydroxy identity. No tautomerization, E/Z assignment or oxime stereochemistry
+   inference. Supplied E/Z state is preserved without claiming chemical equivalence.
+
+4. NITROSO.CARBON_BOUND: neutral nonaromatic R(C)-N=O.
+   Members: N/O; attachment carbon and one-bond neighbors remain context.
+   N has two heavy neighbors/H0; O one heavy neighbor/H0. Carbon-N is SINGLE.
+   Nitrite R-O-N=O and nitro charge-separated N/O are distinct representations;
+   do not normalize them into this identity.
+
+Each proposed identity requires authoritative complete graph/mapping/charge/H state
+and exact bond orders. Charged/resonance alternatives outside the reviewed state
+remain unsupported/inconclusive, not normalized. No lone-pair, donor/acceptor,
+reactivity, pKa, covalent inhibition, toxicity, affinity or biological claim.
+Symmetry-equivalent mappings are alternatives of a member-set occurrence; genuinely
+different occurrences survive. Overlaps with existing identities remain independent.
+
+REVIEW DECISION REQUIRED
+These are proposed membership/state boundaries, not already approved scientific rules.
+Approval is needed before production qualification. No public API/schema is proposed:
+reuse B00, existing group /2 interpreter, source coverage, evidence and qualification.
+If a proposed endocyclic exclusion cannot be expressed within the qualified query
+substrate, it must remain unsupported rather than adding a new ring engine.
+
+SUPPORT / LIMITATIONS
+RDKit Data/FunctionalGroups.txt at pinned commit
+fece8caa860bdf6c9c82bdb9253f22a0cf87150c, lines28-31, is source motif precedent:
+nitroso, oxime and two specific imine patterns. SOURCE_PINS.json links immutable
+local bytes. This is not primary experimental evidence or an exhaustive nomenclature.
+ADOPT exact graph motifs as research candidates. MODIFY to explicit neutral state,
+carbon attachment, member/context boundaries and authoritative H coverage. REJECT
+automatic RDKit parity, universal imine coverage, inferred reactivity and source
+normalization. No empirical threshold/dataset is relevant to these exact source
+predicates. No new research, calculator, matcher, API or schema has been implemented.
+
+MANDATORY ACCEPTANCE AFTER APPROVAL
+Positive/constitutional near-miss fixtures for each exact subtype; N-methyl vs
+N-ethyl and methylene vs substituted C; hydroxy oxime vs ether; nitroso vs nitrite/nitro;
+charged/resonance and unknown H; cyclic/aromatic boundary; explicit H; overlap of
+both imine subsets; multiple occurrences; all B00 alternatives; atom/bond permutations;
+source immutability; evidence round-trip; independent-JVM replay; existing consumer
+comparison. Literal query candidates must be tested, not presumed from source labels.

@@ -1,0 +1,73 @@
+{
+  "rule_id": "ATHENA.PERCEPTION.DONOR",
+  "version_proposal": "1.0.0-blueprint-draft",
+  "baseline_concepts": [
+    "P03",
+    "P09"
+  ],
+  "supported_domain": "Separate neutral amine NH, amide NH, ammonium NH, alcohol/phenol OH and pyrrolic NH classes; sulfur donor domain separately pending. No donor H from feature name.",
+  "perception_requirements": "Separate neutral amine NH, amide NH, ammonium NH, alcohol/phenol OH and pyrrolic NH classes; sulfur donor domain separately pending. No donor H from feature name.; existing OCL graph matching only, after dialect qualification.",
+  "raw_measurements": "D/H/attached-heavy atom IDs; bond order, formal charge, H source and orientation when present.",
+  "classification_semantics": "State-specific donor role, not HB detection. Tertiary neutral amine without H is not an observed D-H donor even if a pharmacophore marks potential ionization.",
+  "sufficient_negative_coverage": "Every supported donor class and explicit/implicit H state accounted for; unknown H state prevents negative.",
+  "qualification_fixtures": [
+    "primary/secondary/tertiary amines",
+    "quaternary ammonium",
+    "amide NH vs tertiary amide",
+    "pyrrole vs pyridine",
+    "protonated heteroaromatic"
+  ],
+  "empirical_data_requirements": "NH-carbonyl primary study identified but full text unavailable; class-specific directional windows not approved. Exact graph predicates can be tested separately. Sulfur pending distinct research.",
+  "historical_measurement_sufficiency": "Full source graph/state can support recollection; prior contact lists or generic feature labels alone cannot. Append new attributed evidence, never backfill old records.",
+  "limitations": "NH-carbonyl primary study identified but full text unavailable; class-specific directional windows not approved. Exact graph predicates can be tested separately. Sulfur pending distinct research.",
+  "backlog_item": "B02",
+  "priority": "P0",
+  "definition": {
+    "rule_id": "ATHENA.PERCEPTION.DONOR",
+    "version_proposal": "1.0.0-blueprint-draft",
+    "supported_domain": "Separate neutral amine NH, amide NH, ammonium NH, alcohol/phenol OH and pyrrolic NH classes; sulfur donor domain separately pending. No donor H from feature name.",
+    "perception_requirements": "Separate neutral amine NH, amide NH, ammonium NH, alcohol/phenol OH and pyrrolic NH classes; sulfur donor domain separately pending. No donor H from feature name.; existing OCL graph matching only, after dialect qualification.",
+    "raw_measurements": "D/H/attached-heavy atom IDs; bond order, formal charge, H source and orientation when present.",
+    "classification_semantics": "State-specific donor role, not HB detection. Tertiary neutral amine without H is not an observed D-H donor even if a pharmacophore marks potential ionization.",
+    "sufficient_negative_coverage": "Every supported donor class and explicit/implicit H state accounted for; unknown H state prevents negative.",
+    "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+    "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+    "negative_coverage_version": "ATHENA.PERCEPTION.DONOR/blueprint-negative/1"
+  },
+  "proposed_definition_sha256": "934f45c44fc60de53efc8c668cc477389c86ee7eb4b88b4b01fad9ee7d999071",
+  "reviewed_definition_sha256": null,
+  "review_status": "PROPOSED_FOR_REVIEW_NOT_ELIGIBLE",
+  "common_requirements": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/COMMON_REQUIREMENTS.json",
+    "sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061"
+  },
+  "source_map": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+    "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+  },
+  "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+  "freshness_policy": "Research draft only; final authorized review must name exact definition digest and validUntil. No reviewer/approval invented. Re-review on chemistry/query/dialect/aromaticity/H/charge/stereo/measurement/domain/reference/threshold/negative-coverage change or source invalidation. No current-policy eligibility from these drafts.",
+  "negative_coverage_version": "ATHENA.PERCEPTION.DONOR/blueprint-negative/1",
+  "decisions": [
+    {
+      "decision": "ADOPT",
+      "criterion": "Preserve explicit chemistry/state and raw measurements",
+      "rationale": "D/H/attached-heavy atom IDs; bond order, formal charge, H source and orientation when present."
+    },
+    {
+      "decision": "MODIFY",
+      "criterion": "External feature/detector behavior as Athena definition",
+      "rationale": "Separate neutral amine NH, amide NH, ammonium NH, alcohol/phenol OH and pyrrolic NH classes; sulfur donor domain separately pending. No donor H from feature name."
+    },
+    {
+      "decision": "REJECT",
+      "criterion": "Automatic equivalence, truth, potency or favorable energy from feature/contact label",
+      "rationale": "Outside declared chemistry/structural claim."
+    },
+    {
+      "decision": "UNSUPPORTED",
+      "criterion": "Immediate current-policy qualification",
+      "rationale": "NH-carbonyl primary study identified but full text unavailable; class-specific directional windows not approved. Exact graph predicates can be tested separately. Sulfur pending distinct research."
+    }
+  ]
+}

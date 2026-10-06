@@ -1,0 +1,73 @@
+{
+  "rule_id": "ATHENA.PERCEPTION.ACCEPTOR",
+  "version_proposal": "1.0.0-blueprint-draft",
+  "baseline_concepts": [
+    "P03",
+    "P09"
+  ],
+  "supported_domain": "Review neutral amine lone-pair role, carbonyl/ether O and pyridine-like N separately; exclude protonated N and amide N in those domains. Acid OH, sulfur, organic F are separate unresolved/unsupported classes.",
+  "perception_requirements": "Review neutral amine lone-pair role, carbonyl/ether O and pyridine-like N separately; exclude protonated N and amide N in those domains. Acid OH, sulfur, organic F are separate unresolved/unsupported classes.; existing OCL graph matching only, after dialect qualification.",
+  "raw_measurements": "Acceptor atom and attached atoms, valence/resonance/charge/H, ring role; optional orientation vectors preserve underlying atoms.",
+  "classification_semantics": "Role candidate under narrow class definition, not universal acceptor strength or interaction. Do not import all FDef Hydroxyl/F matches.",
+  "sufficient_negative_coverage": "All supported classes and protonation/tautomer state complete; excluded classes reported, never system-wide false.",
+  "qualification_fixtures": [
+    "amine vs ammonium",
+    "amide N vs carbonyl O",
+    "pyridine vs pyrrole",
+    "acid vs carboxylate",
+    "F attached to C not generic accepted"
+  ],
+  "empirical_data_requirements": "Primary F/carboxylate abstracts support domain caution; full class-specific datasets and query semantics require review. No strength ranking.",
+  "historical_measurement_sufficiency": "Full source graph/state can support recollection; prior contact lists or generic feature labels alone cannot. Append new attributed evidence, never backfill old records.",
+  "limitations": "Primary F/carboxylate abstracts support domain caution; full class-specific datasets and query semantics require review. No strength ranking.",
+  "backlog_item": "B02",
+  "priority": "P0",
+  "definition": {
+    "rule_id": "ATHENA.PERCEPTION.ACCEPTOR",
+    "version_proposal": "1.0.0-blueprint-draft",
+    "supported_domain": "Review neutral amine lone-pair role, carbonyl/ether O and pyridine-like N separately; exclude protonated N and amide N in those domains. Acid OH, sulfur, organic F are separate unresolved/unsupported classes.",
+    "perception_requirements": "Review neutral amine lone-pair role, carbonyl/ether O and pyridine-like N separately; exclude protonated N and amide N in those domains. Acid OH, sulfur, organic F are separate unresolved/unsupported classes.; existing OCL graph matching only, after dialect qualification.",
+    "raw_measurements": "Acceptor atom and attached atoms, valence/resonance/charge/H, ring role; optional orientation vectors preserve underlying atoms.",
+    "classification_semantics": "Role candidate under narrow class definition, not universal acceptor strength or interaction. Do not import all FDef Hydroxyl/F matches.",
+    "sufficient_negative_coverage": "All supported classes and protonation/tautomer state complete; excluded classes reported, never system-wide false.",
+    "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+    "common_requirements_sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061",
+    "negative_coverage_version": "ATHENA.PERCEPTION.ACCEPTOR/blueprint-negative/1"
+  },
+  "proposed_definition_sha256": "5d72863cebf7ed5e5a37e06cbd55a739f67491137b705848a6d804309f9f68c2",
+  "reviewed_definition_sha256": null,
+  "review_status": "PROPOSED_FOR_REVIEW_NOT_ELIGIBLE",
+  "common_requirements": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/COMMON_REQUIREMENTS.json",
+    "sha256": "dcedb0bf8719a0a21062d46387579c0bb68c704e71ddc40ce15da5f4b8d23061"
+  },
+  "source_map": {
+    "path": "software/qualification/rule-qualification-blueprint-20261005/FIVE_PILLAR_SOURCES.json",
+    "sha256": "ff7d7c8bc3eaa12b44f5ca5963bd22b498c8efc23ffc0b4832cdee3de18d24dc"
+  },
+  "coordinate_state_requirements": "One explicitly selected immutable structural/chemical state; source IDs, bonds, charge/H/stereo, coordinate units, component roles, complete system scope and alternate/model identity. Pocket is a view only.",
+  "freshness_policy": "Research draft only; final authorized review must name exact definition digest and validUntil. No reviewer/approval invented. Re-review on chemistry/query/dialect/aromaticity/H/charge/stereo/measurement/domain/reference/threshold/negative-coverage change or source invalidation. No current-policy eligibility from these drafts.",
+  "negative_coverage_version": "ATHENA.PERCEPTION.ACCEPTOR/blueprint-negative/1",
+  "decisions": [
+    {
+      "decision": "ADOPT",
+      "criterion": "Preserve explicit chemistry/state and raw measurements",
+      "rationale": "Acceptor atom and attached atoms, valence/resonance/charge/H, ring role; optional orientation vectors preserve underlying atoms."
+    },
+    {
+      "decision": "MODIFY",
+      "criterion": "External feature/detector behavior as Athena definition",
+      "rationale": "Review neutral amine lone-pair role, carbonyl/ether O and pyridine-like N separately; exclude protonated N and amide N in those domains. Acid OH, sulfur, organic F are separate unresolved/unsupported classes."
+    },
+    {
+      "decision": "REJECT",
+      "criterion": "Automatic equivalence, truth, potency or favorable energy from feature/contact label",
+      "rationale": "Outside declared chemistry/structural claim."
+    },
+    {
+      "decision": "UNSUPPORTED",
+      "criterion": "Immediate current-policy qualification",
+      "rationale": "Primary F/carboxylate abstracts support domain caution; full class-specific datasets and query semantics require review. No strength ranking."
+    }
+  ]
+}

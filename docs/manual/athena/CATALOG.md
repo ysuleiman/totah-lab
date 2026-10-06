@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `12533aa47ee0b5000f5a6a4257f5425b388386393103040773c0167703206c57`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `8489f3d3f2876080c70598905d7088d217b7f0b9b6f58f7acd8cfeb7df01808d`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -89,7 +89,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F05 | Functional group: Acid/sulfonyl chlorides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F07 | Functional group: Imines/oximes/nitroso | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F07 | Functional group: Imines/oximes/nitroso | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt) |
 | F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F09 | Functional group: Nitriles | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F10 | Functional group: Nitro groups | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
@@ -1157,6 +1157,8 @@ Review imine/oxime/nitroso definitions separately, including H, charge and bond 
 **Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
+
+**Remaining scientific requirement:** Approve the exact four proposed bounded source-identity domains; the source motif labels alone do not authorize production chemistry.
 
 ### F08 — Functional group: Azo/hydrazine/diazo/azide
 
