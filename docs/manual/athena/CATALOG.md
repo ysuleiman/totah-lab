@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `899d6fee13a03351f95c1c8535f8d1fe25a4dcf87135b328c7aaf606e99c8089`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `a78e2afa9f6c2bcd44bdd76004e300ceb72f764c7e05aed1c941b224e1344b7d`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -50,22 +50,22 @@ Disposition is copied without upgrading partial capability coverage.
 | V04 | Representation/query/dummy/enhanced-stereo validation | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V05 | Stereo syntax and authoritative stereo validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V06 | 2D layout/dimensionality checks | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
-| V07 | Bond-length and bond-angle validation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V08 | Chirality/planarity validation in coordinates | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V09 | Protein Ramachandran validation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V10 | Side-chain rotamer validation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V11 | C-beta deviation | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V07 | Bond-length and bond-angle validation | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
+| V08 | Chirality/planarity validation in coordinates | P1 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
+| V09 | Protein Ramachandran validation | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
+| V10 | Side-chain rotamer validation | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
+| V11 | C-beta deviation | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
 | V12 | Cis/trans/twisted peptide geometry | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v12-peptide-source-geometry-20261006](../../../software/qualification/v12-peptide-source-geometry-20261006/CHECKPOINT.txt) |
-| V13 | CaBLAM backbone validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V14 | RNA sugar pucker and backbone suite validation | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V13 | CaBLAM backbone validation | P3 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
+| V14 | RNA sugar pucker and backbone suite validation | P3 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
 | V15 | Hydrogen optimization and Asn/Gln/His flip suggestions | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | V16 | Global clashscore/percentiles/composite MolProbity score | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
-| V17 | Ligand geometry / Mogul empirical distributions | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V17 | Ligand geometry / Mogul empirical distributions | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
 | V18 | Composition, missing atoms, alternate conformations, occupancy/B factors, linkage | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| V19 | X-ray experimental-data and refinement validation | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
-| V20 | X-ray local map/model fit | P2 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
-| V21 | NMR ensemble/shift/constraint validation | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
-| V22 | EM map validation and map-model fit | P3 | SCIENTIFIC_REVIEW_REQUIRED | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V19 | X-ray experimental-data and refinement validation | P3 | REQUIRES_EXTERNAL_REFERENCE_DATA | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V20 | X-ray local map/model fit | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V21 | NMR ensemble/shift/constraint validation | P3 | REQUIRES_EXTERNAL_REFERENCE_DATA | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
+| V22 | EM map validation and map-model fit | P3 | REQUIRES_EXTERNAL_REFERENCE_DATA | [foundation-closure-execution-20261006](../../../software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt) |
 | A01 | SMIRNOFF hierarchical parameter precedence and typed serialization | P0 | EXPLICIT_ARCHITECTURAL_DISPOSITION | [a01-disposition-20261005](../../../software/qualification/a01-disposition-20261005/CHECKPOINT.txt) |
 | A02 | Constraints and bond/angle/proper/improper torsion parameter families | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A03 | vdW and electrostatics parameter families | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
@@ -222,6 +222,8 @@ Define metal identity/oxidation, donor state and coordination context; zinc-bind
 
 **Supporting source:** BaseFeatures ZnBinder1..6
 
+Zinc-binding motif identity must name the exact donor states/coordination context. Existing donor/acceptor identities are not metal ligation assertions; no element-only metal-binding label.
+
 ### P08 — Functional-group hierarchy and fragment features
 
 45 declarative group definitions with overlap and correspondence alternatives; no unlimited functional-group catalog.
@@ -288,6 +290,8 @@ Choose an attributed implicit-H approximation and validate H/state/preparation d
 
 **Supporting source:** ProLIF ImplicitHBAcceptor implementation
 
+No reviewed implicit-H placement/uncertainty policy is selected. An observed D-H-A screen cannot be evaluated by inventing H coordinates. Existing preparation algorithms do not establish which inferred geometry/state is scientifically admissible for this rule.
+
 ### I04 — Weak C-H donor perception
 
 Define weak C-H donor classes, attachment/acidity scope and independent geometric controls.
@@ -297,6 +301,8 @@ Define weak C-H donor classes, attachment/acidity scope and independent geometri
 **Existing implementation:** No qualified weak-H-bond rule
 
 **Supporting source:** PLIP find_hbd and PLInteraction constructor
+
+Exact weak C-H donor class scope and directionality/window remain distinct from ordinary donor roles. Methyl identity and raw POINT_PAIR_GROUP geometry are implemented; no universal favorable C-H interaction follows from C/H elements.
 
 ### I05 — Parallel/face-to-face pi stacking
 
@@ -378,6 +384,8 @@ Review separate Cl/Br/I donor environments and carbonyl-acceptor directional cri
 
 **Remaining scientific requirement:** Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1.
 
+Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration.
+
 ### I11 — Halogen bond to pi system
 
 Define aromatic-face acceptance, halogen axis and element-specific geometry separately from atom-acceptor rules.
@@ -387,6 +395,8 @@ Define aromatic-face acceptance, halogen axis and element-specific geometry sepa
 **Existing implementation:** No qualified equivalent
 
 **Supporting source:** RING4 primary paper non-covalent bond section
+
+Aromatic-face halogen interaction requires explicit face/axis/angular/radius definition separate from atom-acceptor I10; ring and mixed geometry exist. Do not silently substitute atom distance thresholds.
 
 ### I12 — Single-water H-bond bridge
 
@@ -402,6 +412,8 @@ Define water identity/orientation and two compatible directional legs with compl
 
 **Remaining scientific requirement:** PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported.
 
+Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge.
+
 ### I13 — Multi-water bridge paths
 
 Define same-state multiwater path validity, orientation consistency, search bounds and negative coverage.
@@ -411,6 +423,8 @@ Define same-state multiwater path validity, orientation consistency, search boun
 **Existing implementation:** SystemStateView traversal primitive only
 
 **Supporting source:** ProLIF water_bridge.py
+
+I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path.
 
 ### I14 — Metal-ligand pair proximity
 
@@ -422,6 +436,8 @@ Select element/oxidation/donor pair domains and justified proximity references w
 
 **Supporting source:** ProLIF MetalDonor/MetalAcceptor; RING4
 
+Raw selected metal/donor distances already supported by generic geometry. A proximity class needs exact element/oxidation/donor reference and cutoff; absent oxidation/state cannot be inferred from an atom name.
+
 ### I15 — Metal coordination geometry/complex
 
 Specify coordination number/geometry, ligand typing, waters and complete candidate sphere.
@@ -431,6 +447,8 @@ Specify coordination number/geometry, ligand typing, waters and complete candida
 **Existing implementation:** Reference registration only
 
 **Supporting source:** PLIP metal_complexation and find_metal_binding
+
+Coordination number/geometry requires complete candidate sphere, donor/water typing, treatment of competing geometries and metal state. Generic centroid/angle machinery is available; no universal coordination template is selected.
 
 ### I16 — Van der Waals contact/gap
 
@@ -463,6 +481,8 @@ Select radii/H/bond/altloc/water protocol and justified overlap classes; I16 gap
 **Remaining scientific requirement:** Probe2 source and reference practice pinned; no new benchmark run. Serious-overlap reference0.4A is protocol-specific. No Probe parity effort; select Athena radius/H protocol and qualify categories against curated fixtures before new profile.
 
 **Remaining scientific requirement:** Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.
+
+I16 retains attributed continuous surface gaps. A serious-clash class needs the exact radii/H/bond-exclusion/altloc/water protocol and empirical validation; Probe 0.4 A belongs to its own protocol, not all radius models.
 
 ### I18 — Pi-hydrogen / X-H-pi geometry
 
@@ -502,6 +522,8 @@ Define profile-relative pairing and exhaustive role/search coverage; unsearched 
 
 **Supporting source:** PLIP find_unpaired_ligand
 
+Profile-relative unpaired semantics require explicit evaluated event universe and completeness for each feature. Legacy InteractionFingerprint stores positive interactions only, so an omitted bit does not prove a negative. Shared event/mask contract is needed.
+
 ### I21 — Interaction overlap/refinement and pruning
 
 Reject destructive pruning as evidence policy; retain optional display/filter provenance
@@ -534,6 +556,8 @@ Define fingerprint event identity, count multiplicity and evaluated/unsupported 
 
 **Supporting source:** ProLIF fingerprint.py
 
+InteractionFingerprint preserves positive typed residues and raw records, but has no explicit evaluated/unsupported universe or count multiplicity contract. New event/mask input/output semantics require a prospective additive payload contract; do not reinterpret absent entries as zero.
+
 ### N03 — Ensemble contact frequencies/probabilistic networks
 
 Define ensemble membership, duplicate treatment and denominator/missing-coverage policy; pose frequency is not probability.
@@ -544,6 +568,8 @@ Define ensemble membership, duplicate treatment and denominator/missing-coverage
 
 **Supporting source:** RING4/RING-MD; ProLIF fingerprints
 
+RuleRequest binds one SystemStateView. Existing evidence can preserve arbitrary records but no reviewed ensemble membership/duplicate/eligible-denominator/missing-mask contract exists. Requires an explicit versioned selection contract, not an implicit set of all historical observations.
+
 ### N04 — Contact correlations and co-occurrence networks
 
 Define common-state co-occurrence and missing-coverage/correlation estimand without pairing independent ensembles.
@@ -553,6 +579,8 @@ Define common-state co-occurrence and missing-coverage/correlation estimand with
 **Existing implementation:** Historical topology analysis; no generic qualified network rule
 
 **Supporting source:** RING-PyMOL pinned README
+
+N03 explicit common-state membership/masks plus exact co-occurrence/correlation estimand; no pairing of independent pose ensembles. Do not add probabilistic or causal interpretation.
 
 ### N05 — Residue representation and network edge cardinality
 
@@ -600,6 +628,8 @@ Define feature correspondences, geometric tolerance and supported query semantic
 
 **Supporting source:** RDKit book; OCL pharmacophore classes
 
+Exact feature correspondence, query/match universe, geometric tolerance and negative coverage must be declared. Existing OCL atomic query matching is not a 3D pharmacophore matcher; no ranking/affinity semantics are inferred.
+
 ### V01 — Valence/sanitization and nonempty graph validation
 
 Dimensional topology/valence and independent source-state checks; no repair or universal chemical validity.
@@ -646,6 +676,8 @@ Review query/dummy/enhanced-stereo representability and validation scope separat
 
 **Supporting source:** RDKit FeaturesValidation; OclGraphMapper
 
+OclGraphMapper supports specific atom parity strings and rejects unsupported bond stereo; MolecularGraph has no reviewed query-atom/dummy/enhanced-stereo-group semantics. Generic properties can preserve unknown assertions but do not execute them. Need exact additive opt-in representation/operation contract before new property semantics; do not silently cast a query molecule as a physical one.
+
 ### V05 — Stereo syntax and authoritative stereo validation
 
 Reviewed dimensional stereo assessment and unknown/unsupported handling; no invented stereo success from charge failure.
@@ -678,6 +710,8 @@ Select chemical-context reference lengths/angles, uncertainty and outlier defini
 
 **Supporting source:** MolProbity geometry; wwPDB standard geometry
 
+Pinned wwPDB guide specifies comparison to reference means/sigmas; neither a complete reviewed CCD/monomer release nor all context-dependent uncertainty tables are bundled. Need release/accession, atom/bond/state mapping, units, target and sigma, applicability and redistribution license. Existing raw distances/angles are implemented; no universal sigma is valid.
+
 ### V08 — Chirality/planarity validation in coordinates
 
 Define coordinate stereo/planarity comparison against supplied chemistry and qualified reference domain.
@@ -687,6 +721,8 @@ Define coordinate stereo/planarity comparison against supplied chemistry and qua
 **Existing implementation:** Graph stereo checks only; no full coordinate validator qualified
 
 **Supporting source:** wwPDB model/ligand quality; MolProbity geometry
+
+Raw plane diagnostics exist. Arbitrary atom ordering cannot establish chiral sign, and wwPDB sidechain planarity uses precomputed reference deviations. Need pinned component stereochemical ordering, expected configurations, group membership, normalization and applicable reference deviations. Guide thresholds alone do not supply these references.
 
 ### V09 — Protein Ramachandran validation
 
@@ -702,6 +738,8 @@ Review exact Ramachandran grid release, license, interpolation and residue/pepti
 
 **Remaining scientific requirement:** Pinned reference_data Top8000 README/tree; actual rama8000 grids not downloaded/calibrated. Do not substitute older rama.combined restraint tables. Grid selection/license packaging/interpolation and peptide-class handling.
 
+Need pinned actual grid release (not README), license/redistribution terms, residue/peptide classes, axes/binning/periodicity, density values, interpolation and outlier interpretation. Older restraint tables are not a substitute.
+
 ### V10 — Side-chain rotamer validation
 
 Review rotamer reference grid, symmetry, interpolation and complete chi/altloc coverage.
@@ -716,6 +754,8 @@ Review rotamer reference grid, symmetry, interpolation and complete chi/altloc c
 
 **Remaining scientific requirement:** Top8000 ultimate rotamer contour grids identified; not downloaded/reimplemented. Current cctbx 0.003/0.02 cutoffs belong to that distribution. Curated multidimensional library/interpolation and symmetry handling required.
 
+Need exact multidimensional chi grids, residue/protonation/altloc class membership, symmetry/periodicity, interpolation, normalization and release/license. Pinned cctbx 0.003/0.02 use that distribution; constants alone are insufficient.
+
 ### V11 — C-beta deviation
 
 Review idealization algorithm/parameters and modified/D-residue domain before classifying C-beta deviation.
@@ -729,6 +769,8 @@ Review idealization algorithm/parameters and modified/D-residue domain before cl
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.CBETA_DEVIATION.json) · SHA256 `28c726d4d444bd553ab3a8792d75e61052aaa17d25ed3942634551a5a7c1fc41`
 
 **Remaining scientific requirement:** cctbx cbetadev implementation pinned; parameter/ideal geometry dependency closure not yet bundled. Reference idealization algorithm/parameters, residue-specific handling and applicability.
+
+Pinned cbetadev algorithm exists; complete ideal geometry/monomer parameter closure and residue/D/modified-residue applicability are not bundled/qualified. Need immutable release/license and parameter files; do not substitute a generic ideal C-beta.
 
 ### V12 — Cis/trans/twisted peptide geometry
 
@@ -750,6 +792,8 @@ Review CaBLAM empirical contours, dimensionality and complete backbone selection
 
 **Supporting source:** MolProbity CaBLAM
 
+Need exact contour release, high-dimensional axes, residue/secondary-structure applicability, interpolation and thresholds plus license. Raw backbone dihedrals cannot reproduce empirical probability contours.
+
 ### V14 — RNA sugar pucker and backbone suite validation
 
 Review RNA atom/topology domains and pucker/suite reference distributions.
@@ -759,6 +803,8 @@ Review RNA atom/topology domains and pucker/suite reference distributions.
 **Existing implementation:** No qualified equivalent
 
 **Supporting source:** MolProbity sugarpuckers/suites; wwPDB
+
+Need exact Richardson/wwPDB suite/pucker reference release, conformer definitions, atom names-to-authoritative-graph correspondence, periodic angle/suite rules, exclusions and license. Generic torsion measurements are not RNA validation.
 
 ### V15 — Hydrogen optimization and Asn/Gln/His flip suggestions
 
@@ -790,6 +836,8 @@ Establish licensed empirical ligand geometry distributions and sample coverage; 
 
 **Supporting source:** wwPDB ligand geometry
 
+Need authorized versioned distributions, fragment/state matching rules, sample counts/exclusions and outlier definition; redistribution/access license required. No generic bond geometry substitutes for Mogul empirical data.
+
 ### V18 — Composition, missing atoms, alternate conformations, occupancy/B factors, linkage
 
 Review missing-atom/composition/altloc/occupancy/linkage propositions and uncertainty propagation per source format.
@@ -799,6 +847,8 @@ Review missing-atom/composition/altloc/occupancy/linkage propositions and uncert
 **Existing implementation:** SystemStateView identities/mapping; source fields
 
 **Supporting source:** wwPDB composition/linkage/model quality
+
+Expected composition/missing-atom assertion requires an external expected-component/topology model; occupancy/altloc/linkage scopes are format-dependent. Preserve source metadata, distinguish absent field from zero, and specify conflict/evaluation policy before classifying incompleteness.
 
 ### V19 — X-ray experimental-data and refinement validation
 
@@ -810,6 +860,8 @@ Define external diffraction/refinement report ingestion and data provenance; coo
 
 **Supporting source:** wwPDB X-ray data/refinement guide
 
+Need structure factors or intensities with uncertainties, R-free flags, unit cell/space group, resolution/selection, refinement protocol/model correspondence and data accession/license. Source report ingestion separately qualified; no native metric computed.
+
 ### V20 — X-ray local map/model fit
 
 Define experimental map/state alignment and map-model metric domain.
@@ -819,6 +871,8 @@ Define experimental map/state alignment and map-model metric domain.
 **Existing implementation:** Evidence can preserve reports; evaluator absent
 
 **Supporting source:** wwPDB fit-of-model-and-data
+
+Need map coefficients/grid, origin/sampling, frame/model binding, resolution/selection, metric definition and accession/license. Coordinates alone do not establish density fit. Report ingestion separately qualified.
 
 ### V21 — NMR ensemble/shift/constraint validation
 
@@ -830,6 +884,8 @@ Define experimental shifts/restraints and ensemble correspondence; coordinate ag
 
 **Supporting source:** wwPDB NMR guide
 
+Need units, ambiguity/assignment policy, experimental accession/license and ensemble/model correspondence; individual restraints and unavailable observations retained. Report ingestion separately qualified.
+
 ### V22 — EM map validation and map-model fit
 
 Define map-only vs model-fit criteria, resolutions/masks and source provenance.
@@ -839,6 +895,8 @@ Define map-only vs model-fit criteria, resolutions/masks and source provenance.
 **Existing implementation:** Evidence storage only; no evaluator
 
 **Supporting source:** wwPDB EM guide
+
+Need grid/origin/sampling/alignment, map-only versus model-fit metric, halfmaps and masks where required, resolution/protocol and accession/license. Report ingestion separately qualified.
 
 ### A01 — SMIRNOFF hierarchical parameter precedence and typed serialization
 
@@ -910,6 +968,8 @@ Review specific alert catalog/version/domain and advisory semantics; never autom
 
 **Supporting source:** RDKit FilterCatalog.h
 
+Select an immutable alert catalog/version and exact query dialect coverage with advisory-only assessment meaning. A FilterCatalog API source is not the complete catalog or evidence that each alert predicts a property. Matcher exists; no automatic rejection/chemical-risk truth is adopted.
+
 ### A08 — Tautomers, normalization, fragment parents and stereochemical identity
 
 Review optional derived normalization/tautomer identities without mutation of source evidence.
@@ -919,6 +979,8 @@ Review optional derived normalization/tautomer identities without mutation of so
 **Existing implementation:** MolecularGraph; CanonicalIdentityService; transformation lineage
 
 **Supporting source:** RDKit book; OCL backend; Athena graph machinery
+
+Select explicit derived normalization/tautomer/fragment-parent transformation policy, stereochemical invariants and lineage. Existing canonical identity is representation-specific; neutralization/parent stripping cannot be inferred from a reference implementation. Source graph remains immutable.
 
 ### A09 — Molecular descriptors/fingerprints/shape and torsion resources
 
@@ -980,6 +1042,8 @@ Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi
 
 **Remaining scientific requirement:** Methionine-aromatic structural survey supports thioether domain; not a cysteine classifier training set. State-specific domain and empirical geometry distributions.
 
+Existing thioether/thiol/thiolate/disulfide source distinctions and raw geometry do not establish one sulfur-pi/chalcogen class. Methionine survey is not cysteine evidence; each sulfur state/partner/geometry domain requires its own supported criterion.
+
 ### G04 — Cysteine environment
 
 Source-linked bounded cysteine backbone/geometry attribution; no reactivity/pKa/environment classifier.
@@ -1016,6 +1080,8 @@ Review SAM/SAH identity and sulfonium/methyl/aromatic domains; no ammonium-pi pa
 
 **Remaining scientific requirement:** Published sulfonium structural/QM studies; local environments and compound classes not universal energy calibration. SAM graph identity and state-specific angular domain review.
 
+Source SAM/SAH identity and sulfonium/methyl/aromatic orientation must remain separate. Existing graph/groups/geometry can preserve selected measurements; no universal SAM-aromatic window or ammonium-to-sulfonium transfer is justified.
+
 ### G06 — SAM methyl-transfer geometry
 
 Review selected nucleophile/SAM state and substrate-specific transfer geometry; linearity is not reactivity.
@@ -1029,6 +1095,8 @@ Review selected nucleophile/SAM state and substrate-specific transfer geometry; 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM_MTASE.TRANSFER_GEOMETRY.json) · SHA256 `6248ec4622ccb577a1f499cb3724990c92ab1cb7a272d0d46aa56d03d5a421a5`
 
 **Remaining scientific requirement:** Linear approach can also occur in nonreactive tetrel examples; substrate-specific windows require separate empirical study. General Nu API needs separately reviewed extension, state perception and substrate-specific reference data.
+
+Raw selected donor-methyl/nucleophile distances and approach angles are supported. General SAM/substrate identity and reaction-competent windows require exact state/role definitions; no catalysis inferred from a linear tuple.
 
 ### G07 — n-to-pi-star motif
 
@@ -1063,6 +1131,8 @@ Review typed qualified edge composition, same-state paths, coverage and cofactor
 **Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Path does not establish catalytic mediation. Typed edge availability/coverage and deterministic path semantics need qualification.
 
 **Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. No allostery/cooperativity from connected paths. Typed edge availability/coverage and deterministic path semantics need qualification.
+
+Qualified typed evidence edges and explicit same-state selection/coverage are required before compositional paths. ResidueGraph spatial edges are not chemical interactions. Existing graph traversal can be reused after the edge/event contract is reviewed.
 
 ### F01 — Functional group: Acids/carboxylates
 

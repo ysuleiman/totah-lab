@@ -1,0 +1,866 @@
+[
+  {
+    "id": "P01",
+    "capability": "SMARTS/SMIRKS and reusable atom/group queries",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit book; OCL backend; OpenFF ParameterHandler; ProLIF base",
+    "implementation": "SubstructureMatcher + OclMolecularBackend.match",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Corrected OCL query dialect and distinct-target occurrence mapping only; no universal SMARTS/SMIRKS or cross-engine parity."
+  },
+  {
+    "id": "P02",
+    "capability": "Valence/aromaticity/conjugation/hybridization/ring perception",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit book; OCL source; PLIP find_rings; RING paper",
+    "implementation": "MolecularGraph; OclGraphMapper; AromaticRingPerception",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Attributed reviewed aromatic 5/6 cycles and fused membership; dimensional valence validation. No universal hybridization/conjugation classifier or arbitrary ring model."
+  },
+  {
+    "id": "P03",
+    "capability": "Donor and acceptor features",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit BaseFeatures; ProLIF HBAcceptor; OCL PharmacophoreCalculator",
+    "implementation": "OclLigandFeaturePerceiver; AthenaScientificRules",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "17 reviewed donor/acceptor role identities and bounded composition; not directional interactions or all possible chemistry."
+  },
+  {
+    "id": "P04",
+    "capability": "Positive/negative ionizable features versus formal charge",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "BaseFeatures; OCL IonizableGroupDetector; PLIP find_charged",
+    "implementation": "FormalChargeAssignments; ChargedGroupPerception",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "8 atomic charge/nonpolar features plus reviewed carboxylate/ammonium exact group formal-charge sums; no pKa/ionization inference."
+  },
+  {
+    "id": "P05",
+    "capability": "Hydrophobe and lumped hydrophobe features",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit BaseFeatures; ProLIF Hydrophobic; PLIP hydrophobic_atoms",
+    "implementation": "OclLigandFeaturePerceiver; HydrophobicAtomPerception",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed atom predicates and all-members aromatic-carbocycle predicate; no hydrophobic free energy or maximal-subgraph grouping."
+  },
+  {
+    "id": "P06",
+    "capability": "Aromatic pharmacophore/centroid features",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "BaseFeatures; OCL PharmacophoreCalculator; ProLIF BasePiStacking",
+    "implementation": "AromaticRingPerception; LigandFeature.AROMATIC_RING/PI_FEATURE",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Qualified ring attribution and independent centroid/plane V2; broader pharmacophore interpretation excluded."
+  },
+  {
+    "id": "P07",
+    "capability": "Zinc-binding pharmacophore motifs",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "BaseFeatures ZnBinder1..6",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Zinc-binding motif identity must name the exact donor states/coordination context. Existing donor/acceptor identities are not metal ligation assertions; no element-only metal-binding label."
+  },
+  {
+    "id": "P08",
+    "capability": "Functional-group hierarchy and fragment features",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "OCL matcher; LigandFeature.CUSTOM; lineage mapping",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "45 declarative group definitions with overlap and correspondence alternatives; no unlimited functional-group catalog."
+  },
+  {
+    "id": "P09",
+    "capability": "Explicit/implicit hydrogens and state preparation",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "PLIP preparation; RING usage; MolProbity guide; RDKit book",
+    "implementation": "SystemStateView.protonationQualified; source graph",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Authoritative source-H consistency and explicit/implicit/unknown separation in reviewed graph domains; no H placement or protonation preparation."
+  },
+  {
+    "id": "I01",
+    "capability": "Hydrophobic contact",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "PLIP detection/refinement; ProLIF Hydrophobic; Athena manifest",
+    "implementation": "ATHENA.HYDROPHOBIC.CONTACT",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing neutral-carbon bounded contact definition unchanged."
+  },
+  {
+    "id": "I02",
+    "capability": "Explicit-H directional hydrogen bond",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "PLIP hbonds; ProLIF HBAcceptor/HBDonor; Probe; RING paper",
+    "implementation": "athena.hbond-candidate/1 + verified role reports + athena.geometry/1",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Separately versioned I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/1: 100 reviewed explicit-H class pairs at D-A <=3.5 angstrom and DHA >=130 degrees; ten pyridinium pairs remain unsupported. Historical alcohol/oxygen rule remains unchanged."
+  },
+  {
+    "id": "I03",
+    "capability": "Implicit-H hydrogen-bond approximation",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "ProLIF ImplicitHBAcceptor implementation",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "No reviewed implicit-H placement/uncertainty policy is selected. An observed D-H-A screen cannot be evaluated by inventing H coordinates. Existing preparation algorithms do not establish which inferred geometry/state is scientifically admissible for this rule."
+  },
+  {
+    "id": "I04",
+    "capability": "Weak C-H donor perception",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "PLIP find_hbd and PLInteraction constructor",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Exact weak C-H donor class scope and directionality/window remain distinct from ordinary donor roles. Methyl identity and raw POINT_PAIR_GROUP geometry are implemented; no universal favorable C-H interaction follows from C/H elements."
+  },
+  {
+    "id": "I05",
+    "capability": "Parallel/face-to-face pi stacking",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF FaceToFace/BasePiStacking; PLIP pistacking",
+    "implementation": "ATHENA.PI_STACKING.GEOMETRY",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing isolated neutral six-carbon ring pi-stacking geometry; no energetic claim or widened ring domain."
+  },
+  {
+    "id": "I06",
+    "capability": "T-shaped/edge-to-face pi stacking",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF EdgeToFace; PLIP pistacking",
+    "implementation": "ATHENA.PI_STACKING.GEOMETRY",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing T-shaped mode within the same bounded pi-stacking implementation; no independent qualification count."
+  },
+  {
+    "id": "I07",
+    "capability": "Union pi-stacking wrapper",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF PiStacking.detect",
+    "implementation": "Single Athena stacking family with geometry class",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing union of pi-stacking modes; wrapper is not another chemical observation."
+  },
+  {
+    "id": "I08",
+    "capability": "Cation-pi",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF CationPi/PiCation; PLIP pication; RING paper",
+    "implementation": "ATHENA.PI_CATION.GEOMETRY",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing bounded ammonium/neutral carbocycle cation-pi geometry only."
+  },
+  {
+    "id": "I09",
+    "capability": "Ionic/salt-bridge proximity",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "PLIP saltbridge; ProLIF Cationic/Anionic; RING paper",
+    "implementation": "ATHENA.SALT_BRIDGE.PROXIMITY",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing ammonium/carboxylate proximity definition, not electrostatic energy."
+  },
+  {
+    "id": "I10",
+    "capability": "Halogen bond to atom acceptor",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "ProLIF XBAcceptor/XBDonor; PLIP halogen",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration."
+  },
+  {
+    "id": "I11",
+    "capability": "Halogen bond to pi system",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RING4 primary paper non-covalent bond section",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Aromatic-face halogen interaction requires explicit face/axis/angular/radius definition separate from atom-acceptor I10; ring and mixed geometry exist. Do not silently substitute atom distance thresholds."
+  },
+  {
+    "id": "I12",
+    "capability": "Single-water H-bond bridge",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "PLIP water_bridges; ProLIF WaterBridge",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge."
+  },
+  {
+    "id": "I13",
+    "capability": "Multi-water bridge paths",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "ProLIF water_bridge.py",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path."
+  },
+  {
+    "id": "I14",
+    "capability": "Metal-ligand pair proximity",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "ProLIF MetalDonor/MetalAcceptor; RING4",
+    "implementation": "RAW_PAIR_GEOMETRY_QUALIFIED_12_TESTS; COORDINATION_CLASSIFICATION_NOT_QUALIFIED",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Raw selected metal/donor distances already supported by generic geometry. A proximity class needs exact element/oxidation/donor reference and cutoff; absent oxidation/state cannot be inferred from an atom name."
+  },
+  {
+    "id": "I15",
+    "capability": "Metal coordination geometry/complex",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "PLIP metal_complexation and find_metal_binding",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Coordination number/geometry requires complete candidate sphere, donor/water typing, treatment of competing geometries and metal state. Generic centroid/angle machinery is available; no universal coordination template is selected."
+  },
+  {
+    "id": "I16",
+    "capability": "Van der Waals contact/gap",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF VdWContact; Probe atomprops/probe.c; RING docs",
+    "implementation": "StericClashAnalysis; Element radii; proximity measurements",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Attributed continuous d-(r1+r2) descriptor only; no clash or favorable-contact classification."
+  },
+  {
+    "id": "I17",
+    "capability": "Steric overlaps/clashes",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "Probe source; MolProbity clashes; wwPDB guide",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "I16 retains attributed continuous surface gaps. A serious-clash class needs the exact radii/H/bond-exclusion/altloc/water protocol and empirical validation; Probe 0.4 A belongs to its own protocol, not all radius models."
+  },
+  {
+    "id": "I18",
+    "capability": "Pi-hydrogen / X-H-pi geometry",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RING4 primary paper; research task",
+    "implementation": "Proposed ATHENA.INT.CH_PI.GEOMETRY",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Explicit methyl/ring-to-V3 raw geometry attribution; no CH-pi favorable-interaction classifier."
+  },
+  {
+    "id": "I19",
+    "capability": "Disulfide bond versus S-S proximity",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RING3/4 papers; RuleAnalyzers.sulfur",
+    "implementation": "SULF.SS.001; sulfur measurements",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Versioned authoritative source S-S connectivity with complete-negative coverage and bounded backbone attribution; no oxidation-state or redox classifier."
+  },
+  {
+    "id": "I20",
+    "capability": "Unpaired donor/acceptor/halogen features",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "PLIP find_unpaired_ligand",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Profile-relative unpaired semantics require explicit evaluated event universe and completeness for each feature. Legacy InteractionFingerprint stores positive interactions only, so an omitted bit does not prove a negative. Shared event/mask contract is needed."
+  },
+  {
+    "id": "I21",
+    "capability": "Interaction overlap/refinement and pruning",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "PLIP refine_*; RING usage",
+    "implementation": "Immutable raw measurements; separate assessments",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Reject destructive pruning as evidence policy; retain optional display/filter provenance"
+  },
+  {
+    "id": "N01",
+    "capability": "Directional roles and atom/group attribution",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "ProLIF invert_role/metadata; PLIP Mapper; Athena sources",
+    "implementation": "SystemStateView; InteractionMeasurements; evidence subjects",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Exact bounded role/group-to-continuous-geometry attribution with state/correspondence preservation."
+  },
+  {
+    "id": "N02",
+    "capability": "Binary/count interaction fingerprints",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "ProLIF fingerprint.py",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "InteractionFingerprint preserves positive typed residues and raw records, but has no explicit evaluated/unsupported universe or count multiplicity contract. New event/mask input/output semantics require a prospective additive payload contract; do not reinterpret absent entries as zero."
+  },
+  {
+    "id": "N03",
+    "capability": "Ensemble contact frequencies/probabilistic networks",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RING4/RING-MD; ProLIF fingerprints",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "RuleRequest binds one SystemStateView. Existing evidence can preserve arbitrary records but no reviewed ensemble membership/duplicate/eligible-denominator/missing-mask contract exists. Requires an explicit versioned selection contract, not an implicit set of all historical observations."
+  },
+  {
+    "id": "N04",
+    "capability": "Contact correlations and co-occurrence networks",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RING-PyMOL pinned README",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "N03 explicit common-state membership/masks plus exact co-occurrence/correlation estimand; no pairing of independent pose ensembles. Do not add probabilistic or causal interpretation."
+  },
+  {
+    "id": "N05",
+    "capability": "Residue representation and network edge cardinality",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RING usage; Athena graph contract",
+    "implementation": "ResidueGraph authoritative + SystemStateView derived spatial traversal",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Authoritative full ResidueGraph plus exact atom/residue attribution and separate spatial/covalent/interaction views; no inferred chemical edge."
+  },
+  {
+    "id": "N06",
+    "capability": "Network degree/paths/second shell",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RING4 output; Athena GEO.PATH/GEO.SHELL",
+    "implementation": "SystemStateView neighborhood/path operations",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing bounded SystemStateView.neighborhood spatial traversal, cycle handling, hop/budget completeness and second-shell attribution; no physical coupling or unreviewed typed-network composition."
+  },
+  {
+    "id": "N07",
+    "capability": "RMSD-based ensemble clustering",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "RING-PyMOL README",
+    "implementation": "Existing pose-comparison infrastructure; not interaction classifier",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Consciously defer separate ensemble-analysis tool; no new clustering here"
+  },
+  {
+    "id": "N08",
+    "capability": "2D/3D pharmacophore fingerprints and matching",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RDKit book; OCL pharmacophore classes",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Exact feature correspondence, query/match universe, geometric tolerance and negative coverage must be declared. Existing OCL atomic query matching is not a 3D pharmacophore matcher; no ranking/affinity semantics are inferred."
+  },
+  {
+    "id": "V01",
+    "capability": "Valence/sanitization and nonempty graph validation",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit Validate; OCL backend",
+    "implementation": "MolecularSanitizer; SystemGraphValidation",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Dimensional topology/valence and independent source-state checks; no repair or universal chemical validity."
+  },
+  {
+    "id": "V02",
+    "capability": "Fragment/salt/solvent and neutral-charge checks",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit Validate; OCL sanitizer",
+    "implementation": "MolecularGraph components; sanitizer limitations",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Explicit neutrality policy on supplied scope, independently of structural validity; disconnected components preserved without salt/solvent interpretation."
+  },
+  {
+    "id": "V03",
+    "capability": "Isotopes, allowed/disallowed elements and radicals",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit Validate; MolecularGraph",
+    "implementation": "MolecularGraph isotope/element fields; capability checks",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Opt-in explicit radical representation and identity round-trip with granular unsupported-operation guards; no general radical chemistry."
+  },
+  {
+    "id": "V04",
+    "capability": "Representation/query/dummy/enhanced-stereo validation",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RDKit FeaturesValidation; OclGraphMapper",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "OclGraphMapper supports specific atom parity strings and rejects unsupported bond stereo; MolecularGraph has no reviewed query-atom/dummy/enhanced-stereo-group semantics. Generic properties can preserve unknown assertions but do not execute them. Need exact additive opt-in representation/operation contract before new property semantics; do not silently cast a query molecule as a physical one."
+  },
+  {
+    "id": "V05",
+    "capability": "Stereo syntax and authoritative stereo validation",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "RDKit Validate; OCL backend",
+    "implementation": "StereochemistryService; OclMolecularBackend",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed dimensional stereo assessment and unknown/unsupported handling; no invented stereo success from charge failure."
+  },
+  {
+    "id": "V06",
+    "capability": "2D layout/dimensionality checks",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "RDKit Validate",
+    "implementation": "No rule equivalent required",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Do not transplant 2D drawing thresholds into protein geometry"
+  },
+  {
+    "id": "V07",
+    "capability": "Bond-length and bond-angle validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity geometry; wwPDB standard geometry",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Pinned wwPDB guide specifies comparison to reference means/sigmas; neither a complete reviewed CCD/monomer release nor all context-dependent uncertainty tables are bundled. Need release/accession, atom/bond/state mapping, units, target and sigma, applicability and redistribution license. Existing raw distances/angles are implemented; no universal sigma is valid."
+  },
+  {
+    "id": "V08",
+    "capability": "Chirality/planarity validation in coordinates",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB model/ligand quality; MolProbity geometry",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Raw plane diagnostics exist. Arbitrary atom ordering cannot establish chiral sign, and wwPDB sidechain planarity uses precomputed reference deviations. Need pinned component stereochemical ordering, expected configurations, group membership, normalization and applicable reference deviations. Guide thresholds alone do not supply these references."
+  },
+  {
+    "id": "V09",
+    "capability": "Protein Ramachandran validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity Ramachandran; wwPDB torsion angles",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need pinned actual grid release (not README), license/redistribution terms, residue/peptide classes, axes/binning/periodicity, density values, interpolation and outlier interpretation. Older restraint tables are not a substitute."
+  },
+  {
+    "id": "V10",
+    "capability": "Side-chain rotamer validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity rotamer guide; OCL TorsionDB inventory",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need exact multidimensional chi grids, residue/protonation/altloc class membership, symmetry/periodicity, interpolation, normalization and release/license. Pinned cctbx 0.003/0.02 use that distribution; constants alone are insufficient."
+  },
+  {
+    "id": "V11",
+    "capability": "C-beta deviation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity Cbeta guide",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Pinned cbetadev algorithm exists; complete ideal geometry/monomer parameter closure and residue/D/modified-residue applicability are not bundled/qualified. Need immutable release/license and parameter files; do not substitute a generic ideal C-beta."
+  },
+  {
+    "id": "V12",
+    "capability": "Cis/trans/twisted peptide geometry",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.",
+    "implementation": "No qualified equivalent",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Source alpha-peptide omega outside cis/trans30-degree windows; exact selected tuple, cyclic/proline contexts included."
+  },
+  {
+    "id": "V13",
+    "capability": "CaBLAM backbone validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity CaBLAM",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need exact contour release, high-dimensional axes, residue/secondary-structure applicability, interpolation and thresholds plus license. Raw backbone dihedrals cannot reproduce empirical probability contours."
+  },
+  {
+    "id": "V14",
+    "capability": "RNA sugar pucker and backbone suite validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "MolProbity sugarpuckers/suites; wwPDB",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need exact Richardson/wwPDB suite/pucker reference release, conformer definitions, atom names-to-authoritative-graph correspondence, periodic angle/suite rules, exclusions and license. Generic torsion measurements are not RNA validation."
+  },
+  {
+    "id": "V15",
+    "capability": "Hydrogen optimization and Asn/Gln/His flip suggestions",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "MolProbity/wwPDB flip notes",
+    "implementation": "Source-state representation only in reviewed graph pipeline",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Never change coordinates or protonation to manufacture favorable contacts"
+  },
+  {
+    "id": "V16",
+    "capability": "Global clashscore/percentiles/composite MolProbity score",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "MolProbity summary guide; wwPDB overview",
+    "implementation": "Separate capability assessments; no master evidence score",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "May preserve external score as evidence; do not collapse Athena evidence into it"
+  },
+  {
+    "id": "V17",
+    "capability": "Ligand geometry / Mogul empirical distributions",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB ligand geometry",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need authorized versioned distributions, fragment/state matching rules, sample counts/exclusions and outlier definition; redistribution/access license required. No generic bond geometry substitutes for Mogul empirical data."
+  },
+  {
+    "id": "V18",
+    "capability": "Composition, missing atoms, alternate conformations, occupancy/B factors, linkage",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "wwPDB composition/linkage/model quality",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Expected composition/missing-atom assertion requires an external expected-component/topology model; occupancy/altloc/linkage scopes are format-dependent. Preserve source metadata, distinguish absent field from zero, and specify conflict/evaluation policy before classifying incompleteness."
+  },
+  {
+    "id": "V19",
+    "capability": "X-ray experimental-data and refinement validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB X-ray data/refinement guide",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need structure factors or intensities with uncertainties, R-free flags, unit cell/space group, resolution/selection, refinement protocol/model correspondence and data accession/license. Source report ingestion separately qualified; no native metric computed."
+  },
+  {
+    "id": "V20",
+    "capability": "X-ray local map/model fit",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB fit-of-model-and-data",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need map coefficients/grid, origin/sampling, frame/model binding, resolution/selection, metric definition and accession/license. Coordinates alone do not establish density fit. Report ingestion separately qualified."
+  },
+  {
+    "id": "V21",
+    "capability": "NMR ensemble/shift/constraint validation",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB NMR guide",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need units, ambiguity/assignment policy, experimental accession/license and ensemble/model correspondence; individual restraints and unavailable observations retained. Report ingestion separately qualified."
+  },
+  {
+    "id": "V22",
+    "capability": "EM map validation and map-model fit",
+    "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+    "scientificBasis": "wwPDB EM guide",
+    "implementation": "RAW_GEOMETRY_OR_PRESERVATION_ONLY",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Need grid/origin/sampling/alignment, map-only versus model-fit metric, halfmaps and masks where required, resolution/protocol and accession/license. Report ingestion separately qualified."
+  },
+  {
+    "id": "A01",
+    "capability": "SMIRNOFF hierarchical parameter precedence and typed serialization",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "OpenFF ParameterHandler; prior SMIRNOFF audit",
+    "implementation": "RuleRegistry version/hash/typed fields; OCL matcher",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Adopt explicit ordering/versioning patterns; do not use last-wins to erase scientific disagreement"
+  },
+  {
+    "id": "A02",
+    "capability": "Constraints and bond/angle/proper/improper torsion parameter families",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "Constraints/Bonds/Angles/ProperTorsions/ImproperTorsions handlers",
+    "implementation": "Existing energy modules are separate; no analyzer equivalent",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Keep force field physics separate from classification rules"
+  },
+  {
+    "id": "A03",
+    "capability": "vdW and electrostatics parameter families",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "vdW/Electrostatics handlers",
+    "implementation": "Existing energy infrastructure separate",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Do not turn classifier registry into force-field engine"
+  },
+  {
+    "id": "A04",
+    "capability": "Library/AM1-BCC/charge-increment/NAGL charge assignment",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "LibraryCharges/ToolkitAM1BCC/ChargeIncrementModel/NAGLCharges",
+    "implementation": "Amber charges source of truth; FormalChargeAssignments distinct",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "No automatic charge replacement; retain attribution if external evidence supplied"
+  },
+  {
+    "id": "A05",
+    "capability": "GBSA implicit solvent parameterization",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "GBSA handler",
+    "implementation": "No scientific contact-rule equivalent",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Cannot stand in for water networks or measured burial"
+  },
+  {
+    "id": "A06",
+    "capability": "Virtual-site charge geometry",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "VirtualSiteHandler",
+    "implementation": "No authoritative-atom substitution allowed",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Learn frame/provenance handling; never present virtual charge sites as measured atoms"
+  },
+  {
+    "id": "A07",
+    "capability": "Chemical alerts and substructure filter catalogs",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RDKit FilterCatalog.h",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Select an immutable alert catalog/version and exact query dialect coverage with advisory-only assessment meaning. A FilterCatalog API source is not the complete catalog or evidence that each alert predicts a property. Matcher exists; no automatic rejection/chemical-risk truth is adopted."
+  },
+  {
+    "id": "A08",
+    "capability": "Tautomers, normalization, fragment parents and stereochemical identity",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "RDKit book; OCL backend; Athena graph machinery",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Select explicit derived normalization/tautomer/fragment-parent transformation policy, stereochemical invariants and lineage. Existing canonical identity is representation-specific; neutralization/parent stripping cannot be inferred from a reference implementation. Source graph remains immutable."
+  },
+  {
+    "id": "A09",
+    "capability": "Molecular descriptors/fingerprints/shape and torsion resources",
+    "disposition": "EXPLICIT_ARCHITECTURAL_DISPOSITION",
+    "scientificBasis": "RDKit source tree/book; OCL installed JAR inventory",
+    "implementation": "Existing design/recognition/energy services; not qualified by this audit",
+    "qualification": "Accepted architectural disposition; not a scientific classifier",
+    "remainingDependencyOrBoundedScope": "Considered as adjacent tool families; do not duplicate QSAR/scoring pipelines"
+  },
+  {
+    "id": "G01",
+    "capability": "Methyl environment",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "ATHENA.GROUP.METHYL.ENVIRONMENT",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Qualified methyl identity and explicit methyl/ring raw geometry channels only; no burial or magic-methyl prediction."
+  },
+  {
+    "id": "G02",
+    "capability": "Vicinal-disulfide-compatible geometry",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "ATHENA.SULF.VICINAL",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Source-linked cysteine backbone/peptide linkage and raw geometry only; no vicinal-disulfide compatibility distribution."
+  },
+  {
+    "id": "G03",
+    "capability": "Sulfur-pi and chalcogen-O",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Existing thioether/thiol/thiolate/disulfide source distinctions and raw geometry do not establish one sulfur-pi/chalcogen class. Methionine survey is not cysteine evidence; each sulfur state/partner/geometry domain requires its own supported criterion."
+  },
+  {
+    "id": "G04",
+    "capability": "Cysteine environment",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "ATHENA.SULF.CYS_ENVIRONMENT",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Source-linked bounded cysteine backbone/geometry attribution; no reactivity/pKa/environment classifier."
+  },
+  {
+    "id": "G05",
+    "capability": "SAM sulfonium/methyl/aromatic environment",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Source SAM/SAH identity and sulfonium/methyl/aromatic orientation must remain separate. Existing graph/groups/geometry can preserve selected measurements; no universal SAM-aromatic window or ammonium-to-sulfonium transfer is justified."
+  },
+  {
+    "id": "G06",
+    "capability": "SAM methyl-transfer geometry",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Raw selected donor-methyl/nucleophile distances and approach angles are supported. General SAM/substrate identity and reaction-competent windows require exact state/role definitions; no catalysis inferred from a linear tuple."
+  },
+  {
+    "id": "G07",
+    "capability": "n-to-pi-star motif",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "docs/manual/athena/supporting-material/PEPTIDE_GEOMETRY.md; pinned wwPDB guide and Bartlett et al.2010 Fig2a/Methods.",
+    "implementation": "ATHENA.INT.N_PI_STAR",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Adjacent source backbone-amide geometric candidate, O1-C2<=3.2A and99<=O1-C2-O2<=119deg; cyclic dipeptide role alias included, no orbital/energetic claim."
+  },
+  {
+    "id": "G08",
+    "capability": "Typed H-bond/charge/cofactor/second-shell networks",
+    "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+    "scientificBasis": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+    "implementation": "UNDER_REVIEW",
+    "qualification": "Full capability NOT QUALIFIED; only explicitly linked subparts qualified",
+    "remainingDependencyOrBoundedScope": "Qualified typed evidence edges and explicit same-state selection/coverage are required before compositional paths. ResidueGraph spatial edges are not chemical interactions. Existing graph traversal can be reused after the edge/event contract is reviewed."
+  },
+  {
+    "id": "F01",
+    "capability": "Functional group: Acids/carboxylates",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed carboxylic-acid/carboxylate source identity domains; no normalization."
+  },
+  {
+    "id": "F02",
+    "capability": "Functional group: Amides and methyl amides",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "NH2/NH1/NH0 neutral amide identity domains with preserved attachments; no separately qualified methyl-amide substitution rule."
+  },
+  {
+    "id": "F03",
+    "capability": "Functional group: Esters/acyl linkages",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Original B01 ester identity and overlapping carbonyl; broader acyl transformations excluded."
+  },
+  {
+    "id": "F04",
+    "capability": "Functional group: Aldehydes/ketones/carbonyls",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed aldehyde/ketone/carbonyl graph identities, not arbitrary resonance normalization."
+  },
+  {
+    "id": "F05",
+    "capability": "Functional group: Acid/sulfonyl chlorides",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Exact neutral carbon-bound acyl chloride and sulfonyl chloride source identities; approved candidate representation/state exclusions unchanged."
+  },
+  {
+    "id": "F06",
+    "capability": "Functional group: Amine subclasses",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed neutral amine and carbon-bound ammonium subclasses with explicit state coverage."
+  },
+  {
+    "id": "F07",
+    "capability": "Functional group: Imines/oximes/nitroso",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "FunctionalGroupRules athena.group/2; B00 matcher; nine opt-in groups-f07-v1 manifests; existing heteroaromatic identities.",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Nine exact source identities; acyclic/exocyclic/endocyclic neutral imines included. Existing aromatic identities reused. No universal imine/charged-resonance or current-policy receipt claim."
+  },
+  {
+    "id": "F08",
+    "capability": "Functional group: Azo/hydrazine/diazo/azide",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Fourteen exact N-N source-state identities; neutral hydrazine/diazene H variants, two diazo depictions, diazonium, two azide depictions; cyclic/shared attachments included. Other charged/aromatic N-N states need separate exact definitions, not ring-engine work."
+  },
+  {
+    "id": "F09",
+    "capability": "Functional group: Nitriles",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed nitrile graph identity only."
+  },
+  {
+    "id": "F10",
+    "capability": "Functional group: Nitro groups",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed supplied nitro representation; charge separation is not automatically a charged interaction group."
+  },
+  {
+    "id": "F11",
+    "capability": "Functional group: Sulfonamides",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed sulfonamide graph identities; no universal donor/acceptor classification."
+  },
+  {
+    "id": "F12",
+    "capability": "Functional group: Sulfonic acid/sulfonate ester/sulfone",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Literal neutral S(=O)2 carbon-bound sulfone identity only; sulfonic acid/sulfonate ester are not implemented by that definition."
+  },
+  {
+    "id": "F13",
+    "capability": "Functional group: Sulfoxide/thioether/thiol/thiocarbonyl",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed thiol/thiolate/thioether/sulfoxide graph domains; no sulfur interaction, arbitrary oxidation/resonance or thiocarbonyl expansion."
+  },
+  {
+    "id": "F14",
+    "capability": "Functional group: Isocyanate/isothiocyanate",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Exact neutral carbon-bound R-N=C=O and R-N=C=S source identities; approved candidate representation/state exclusions unchanged."
+  },
+  {
+    "id": "F15",
+    "capability": "Functional group: Boron motifs",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "B(OH)2/B(OH)(OR)/B(OR)2 plus separate B(-1) four-SINGLE-heavy-bond source predicate; cyclic/shared attachments included. No speciation or normalization."
+  },
+  {
+    "id": "F16",
+    "capability": "Functional group: Alcohol/phenol/ether motifs",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Reviewed alcohol/phenol/ether identities and exact state domains only."
+  },
+  {
+    "id": "F17",
+    "capability": "Functional group: Halogenated motifs",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Existing qualified carbon-bound F/Cl/Br/I identity and exact attachment roles. No halogen bond, unusual valence or ionization claim."
+  },
+  {
+    "id": "F18",
+    "capability": "Functional group: Terminal alkyne",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer",
+    "implementation": "Existing B00 / athena.group/2; opt-in groups-adopted-v1 production manifests",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Exact source C#C terminal-H identity; distinct occurrences and acetylene correspondence alternatives preserved. Generic alkyne identity remains unchanged."
+  },
+  {
+    "id": "F19",
+    "capability": "Functional group: Branched alkyl/cyclopropyl",
+    "disposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+    "scientificBasis": "Pinned RDKit motifs refined into explicit source-state predicates; docs/manual/athena/supporting-material/SOURCE_CHEMISTRY_CLOSURE.md",
+    "implementation": "Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors",
+    "qualification": "Bounded checkpoint; no production receipt",
+    "remainingDependencyOrBoundedScope": "Carbon branch-point degree3/4, exact tert-butyl membership, carbon SINGLE-bond triangle; substituted/fused/spiro included. Maximal alkyl-fragment boundary is not inferred."
+  }
+]

@@ -1,0 +1,9 @@
+Use java and --class-path from test-command.json; cwd BUILD.json source.
+For each main in REPLAY.json independentJvmComparisons, run
+java -Xmx512m -cp <class-path> totah.lab.daedalus.system.<main> <distinct-output.json>
+twice in independent JVMs and compare bytes/hashes.
+Run AthenaScientificRulesAcceptanceTest with a NONEXISTENT output directory;
+compare65 files to ocl-query-b00-corrected-20261005/final-run/scientific-replay-one.
+An initial wrapper attempt pre-created the output directory and failed before
+replay with FileAlreadyExistsException; corrected invocation passed unchanged code.
+Verify BASELINE_TRACKED.json hashes. Compilation/test/isolation commands are pinned.
