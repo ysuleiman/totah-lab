@@ -1,0 +1,104 @@
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND",
+  "limitations": [
+    "Prospective neutral carbon-bound N=C=O identity only; no reactivity or interaction implication.",
+    "Connectivity is not a cyanate/thiocyanate equivalence; no normalization of charged resonance forms.",
+    "Engineering candidate only; scientific adoption pending."
+  ],
+  "memberQueryIndices": [
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.GROUP.ISOCYANATE.CARBON_BOUND/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[N;!a;+0]=[C;!a;+0]=[O;+0]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": false,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "N",
+      "C",
+      "O"
+    ],
+    "hydrogenRoles": [
+      {
+        "role": "nitrogen",
+        "count": 0
+      },
+      {
+        "role": "centralCarbon",
+        "count": 0
+      },
+      {
+        "role": "terminalAtom",
+        "count": 0
+      }
+    ],
+    "roleHeavyDegree": {
+      "nitrogen": 2,
+      "centralCarbon": 2,
+      "terminalAtom": 1
+    }
+  },
+  "roles": {
+    "carbonAttachment": [
+      0
+    ],
+    "nitrogen": [
+      1
+    ],
+    "centralCarbon": [
+      2
+    ],
+    "terminalAtom": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "kind": "SOURCE",
+      "namespace": "athena.foundation",
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__FunctionalGroups.txt",
+      "version": "9faf6e0f5ace2da09eb655270c335df11193cb2b55e1b63f83cc5b2dde69fb86"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "H",
+      "C",
+      "N",
+      "O",
+      "S",
+      "F",
+      "Cl",
+      "Br",
+      "I"
+    ],
+    "unsupportedQueries": [
+      {
+        "query": "[N;+1]",
+        "reason": "Conservative exclusion of charged nitrogen representation in initial neutral domain"
+      },
+      {
+        "query": "[O;-1]",
+        "reason": "Charge-separated terminal representation outside neutral literal domain"
+      }
+    ]
+  }
+}

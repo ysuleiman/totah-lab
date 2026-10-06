@@ -37,6 +37,10 @@ The [F05 acyl/sulfonyl-chloride candidates](../../../software/qualification/f05-
 likewise have bounded evaluator tests and pinned supporting definitions, pending
 scientific adoption. Their literal source identities imply no reactivity or interaction.
 
+The [F14 isocyanate/isothiocyanate candidates](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt)
+distinguish exact neutral source connectivity from cyanate/thiocyanate isomers and
+unsupported charged representations. Scientific adoption remains pending.
+
 ## Supporting material and completeness
 
 Every rule needs both scientific supporting material and execution qualification.

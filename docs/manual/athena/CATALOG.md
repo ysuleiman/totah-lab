@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `865f85078048531a34af9ed2db23842e01b424b8a9813e228dc7ad4221c5b3e5`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `cf7e4da6b6a1836487e83662faecd41e1ae8283827e3084339ba564a79b72c35`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -96,7 +96,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F11 | Functional group: Sulfonamides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F12 | Functional group: Sulfonic acid/sulfonate ester/sulfone | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F13 | Functional group: Sulfoxide/thioether/thiol/thiocarbonyl | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
-| F14 | Functional group: Isocyanate/isothiocyanate | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| F14 | Functional group: Isocyanate/isothiocyanate | P2 | SCIENTIFIC_REVIEW_REQUIRED | [f14-isocyanate-review-20261006](../../../software/qualification/f14-isocyanate-review-20261006/CHECKPOINT.txt) |
 | F15 | Functional group: Boron motifs | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F16 | Functional group: Alcohol/phenol/ether motifs | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F17 | Functional group: Halogenated motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
