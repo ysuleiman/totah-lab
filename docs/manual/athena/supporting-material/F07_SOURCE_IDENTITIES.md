@@ -87,3 +87,5 @@ aromatic attribution, evidence round-trip and immutable source state.
 
 Qualification establishes implementation of these attributed definitions, not a
 production Research Gate receipt. No existing detector is migrated automatically.
+
+[Fresh committed-source qualification](../../../../software/qualification/foundation-post-f07-clean-source-20261006/CHECKPOINT.txt): 1,740 foundation tests plus 3 isolation tests passed; historical replay and preservation remain exact.

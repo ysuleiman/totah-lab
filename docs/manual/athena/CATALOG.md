@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `e42bd2de865a7d5916486088da821051928f1d90d046e724f7c123dc40a61bd5`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `2161cad9197803097a5f3f0d12c6a5e3ffa473b722abe216cbb196f9608f3779`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -89,7 +89,7 @@ Disposition is copied without upgrading partial capability coverage.
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F05 | Functional group: Acid/sulfonyl chlorides | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f05-acyl-sulfonyl-chloride-review-20261006](../../../software/qualification/f05-acyl-sulfonyl-chloride-review-20261006/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | F06 | Functional group: Amine subclasses | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F07 | Functional group: Imines/oximes/nitroso | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt), [f07-source-identity-20261006](../../../software/qualification/f07-source-identity-20261006/CHECKPOINT.txt) |
+| F07 | Functional group: Imines/oximes/nitroso | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [f07-source-identity-review-20261006](../../../software/qualification/f07-source-identity-review-20261006/REVIEW.txt), [f07-source-identity-20261006](../../../software/qualification/f07-source-identity-20261006/CHECKPOINT.txt), [foundation-post-f07-clean-source-20261006](../../../software/qualification/foundation-post-f07-clean-source-20261006/CHECKPOINT.txt) |
 | F08 | Functional group: Azo/hydrazine/diazo/azide | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | F09 | Functional group: Nitriles | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F10 | Functional group: Nitro groups | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
@@ -1152,7 +1152,7 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 Nine exact source identities; acyclic/exocyclic/endocyclic neutral imines included. Existing aromatic identities reused. No universal imine/charged-resonance or current-policy receipt claim.
 
-**Qualification:** 33 F07 focused checks, 982 combined checks; independent replay and historical preservation; fresh committed-source confirmation follows in a separately pinned checkpoint.
+**Qualification:** 33 F07 tests; 982 focused/regression checks; fresh committed-source whole foundation 1740/1740 plus 3/3 isolation; independent-JVM and historical replay, preservation.
 
 **Existing implementation:** FunctionalGroupRules athena.group/2; B00 matcher; nine opt-in groups-f07-v1 manifests; existing heteroaromatic identities.
 
