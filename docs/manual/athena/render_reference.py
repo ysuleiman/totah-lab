@@ -18,6 +18,28 @@ for e in entries:
         assert p.is_file(),s
         refs.append(f'[{p.parent.name}]({link(p)})')
     a.append('| '+' | '.join([e['capabilityId'],e['capability'].replace('|','/'),e['priority'],e['currentDisposition'],', '.join(refs)])+' |')
+# Render scope and review limits from the same ledger; no second manual inventory.
+a += ['', '## Disposition scope and qualification limits', '',
+      'Bounded qualification denotes the linked implementation checkpoint only. It is not a current-policy receipt.',
+      'SCIENTIFIC_REVIEW_REQUIRED records an explicit review disposition, not implemented behavior.', '']
+for e in entries:
+    closure=e.get('closure')
+    if not closure:
+        continue
+    a += [f"### {e['capabilityId']} — {e['capability']}", '', closure['scope'], '',
+          '**Qualification:** '+closure['qualificationBasis'], '',
+          '**Supporting source:** '+str(closure.get('scientificSupport') or 'See pinned inventory entry and linked checkpoints.'), '']
+    for dossier in closure.get('researchDossiers',[]):
+        path=root/dossier
+        assert path.is_file(), dossier
+        a += [f'[Research dossier]({link(path)}) · SHA256 `{pin(path)}`', '']
+    for requirement in closure.get('reviewRequirements',[]):
+        if requirement:
+            a += ['**Remaining scientific requirement:** '+requirement, '']
+    if closure.get('expansionReview'):
+        a += [f"[Class-pair review package]({link(root/closure['expansionReview'])})", '']
+    if closure.get('outsideBoundedDomain'):
+        a += [closure['outsideBoundedDomain'], '']
 b=['# Scientific rule records','','Generated links and fields; manifests and dossiers remain authoritative.', '', 'Shared perception/group/role support: [Mobley 2018](supporting-material/MOBLEY_2018.md).', '', 'Current-policy gate status must be established by a valid receipt, not the historical qualification field. Supporting-material completeness is not inferred from a citation or from this rendering.','']
 for p in sorted(resources.rglob('*.rule.json')):
     d=json.loads(p.read_text())

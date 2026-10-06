@@ -1,0 +1,222 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.HBOND.DIRECTIONAL",
+  "version": "1.0.0",
+  "profile": "ATHENA_SCIENTIFIC_V1",
+  "family": "INTERACTION",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.scientific",
+  "implementationVersion": "1",
+  "qualification": "QUALIFIED",
+  "retired": false,
+  "requiredCapabilities": [
+    "DISTANCE_QUERIES"
+  ],
+  "requiredChemistry": [
+    "Candidate-local validated MolecularGraph correspondence and explicit source topology",
+    "Existing injected OCL sanitizer/SMARTS matcher, with backend evidence",
+    "Neutral aliphatic alcohol donors/acceptors and carbonyl oxygen acceptors; explicit donor H and single D-H bond; neutral C/H/O-only scope for a complete negative. Other donor/acceptor classes remain unsupported."
+  ],
+  "requiredGeometry": [
+    "finite common-frame coordinates",
+    "explicit source atom identities"
+  ],
+  "measurementsProduced": {
+    "raw": "Existing native candidate geometry before threshold classification",
+    "candidateSupported": "Candidate-local source chemistry proof, independent of negative coverage",
+    "negativeCoverage": "All eight versioned obligations; booleans with missing-requirement reasons",
+    "perceptionProvenance": "Original component, sanitizer, patterns and backend method/version evidence"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "minDist": {
+      "value": "0.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "hydrophobicDistMax": {
+      "value": "4",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "saltBridgeDistMax": {
+      "value": "5.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackDistMax": {
+      "value": "5.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackParallelAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackTShapeAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackOffsetMax": {
+      "value": "2",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationDistMax": {
+      "value": "6",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationOffsetMax": {
+      "value": "2",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationTertamineAngleMax": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenDistMax": {
+      "value": "4",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenAcceptorAngle": {
+      "value": "120",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenDonorAngle": {
+      "value": "165",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "hydrogenAcceptorCutoff": {
+      "value": "2.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "donorAcceptorCutoff": {
+      "value": "3.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "minDonorAngleDegrees": {
+      "value": "120",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "donorBondCutoff": {
+      "value": "1.35",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "pattern.alcohol": {
+      "value": "[O;H1;+0]-[C;X4]",
+      "unit": "policy",
+      "definition": "OCL SMARTS; query:0 is the role anchor; carboxylate retains full query atom membership. No independent matcher."
+    },
+    "pattern.carbonyl": {
+      "value": "[O;X1;+0]=[C;+0]",
+      "unit": "policy",
+      "definition": "OCL SMARTS; query:0 is the role anchor; carboxylate retains full query atom membership. No independent matcher."
+    },
+    "pattern.ammonium": {
+      "value": "[N+;X4]",
+      "unit": "policy",
+      "definition": "OCL SMARTS; query:0 is the role anchor; carboxylate retains full query atom membership. No independent matcher."
+    },
+    "pattern.carboxylate": {
+      "value": "[O-]-[C](=[O])",
+      "unit": "policy",
+      "definition": "OCL SMARTS; query:0 is the role anchor; carboxylate retains full query atom membership. No independent matcher."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/athena-rule-definitions-review-20261004/DESIGN.txt",
+      "sha256": "f26cd6d0dcc224e508f9c186c425cff0ef150d9dba6f596ea4196f6a10ded3cf",
+      "citation": "User-approved Athena definitions and primary-literature source map; operational criteria, not affinity calibration"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/AthenaScientificRules.java",
+      "sha256": "c0eaaa77be80657bae156bcc2d7cb8ac620eecb563f5d32afceb27b3d7310712",
+      "citation": "Athena domain and negative-coverage implementation"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/interaction/InteractionMeasurements.java",
+      "sha256": "a0f3d78cd3807bc7dbf64a13b4726d0da9f9b7cc0c2d3e4f7a25f3f20a709d7d",
+      "citation": "Unchanged legacy measurement authority"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "910c96cdf4703cdd5ab651a035fa5acf37d178d03c3023bac2f381c02c476010",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleManifest.java",
+      "sha256": "ef0e74f3e291a86b66605dfe37034a347e057121bcf18e71de5af81d1fae46ab",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleRegistry.java",
+      "sha256": "dca2843232fa99ef96c07bd77ca763393fa4faefb3c0890efabcd10bf1c0d895",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    },
+    {
+      "locator": "software/modules/daedalus/src/main/java/totah/lab/daedalus/system/RuleExecutionPipeline.java",
+      "sha256": "c83995854c0ffcf28212c4bbd1452719248dcd39d303d190c9d7e0faca6e72d8",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    },
+    {
+      "locator": "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclMolecularBackend.java",
+      "sha256": "2487b93dd164aa729093524e0b8b163cc3ec413cca645664d7277d136a70837d",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    },
+    {
+      "locator": "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclGraphMapper.java",
+      "sha256": "f17487e6f1fa62a6ca783548bff4057d234ad468fc1cce13477f592d749c06e5",
+      "citation": "Pinned registry/evaluation/orchestration or existing OCL implementation; no external scientific authority substitution"
+    }
+  ],
+  "limitations": [
+    "Qualified only in the stated chemical domain and explicit partner scope; no universal chemistry completeness claim.",
+    "A supported positive does not imply complete coverage. ABSENT_FALSE requires every negativeCoverage obligation.",
+    "No binding energy, potency, inhibition, physical coupling or METTL7 interpretation.",
+    "Historical measurements lacking candidate-local eligibility/coverage cannot be reused as /2 evidence; collect new attributed measurements from the same immutable state.",
+    "Legacy detector algorithms, profile bytes and certificates remain unchanged; external references are not production authorities."
+  ],
+  "negativeCoverage": {
+    "version": "athena-negative-coverage/1",
+    "supportedDomain": "Neutral aliphatic alcohol donors/acceptors and carbonyl oxygen acceptors; explicit donor H and single D-H bond; neutral C/H/O-only scope for a complete negative. Other donor/acceptor classes remain unsupported.",
+    "requirements": [
+      "EXPLICIT_PARTNER_SCOPE",
+      "EXPLICIT_CONNECTIVITY",
+      "UNAMBIGUOUS_CHEMICAL_MAPPING",
+      "SUPPORTED_CHEMICAL_DOMAIN",
+      "FORMAL_STATE_COVERAGE",
+      "PERCEPTION_ENUMERATION_COMPLETE",
+      "SEARCH_ENUMERATION_COMPLETE",
+      "FINITE_GEOMETRY"
+    ],
+    "scope": "EXPLICIT_PARTNERS_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}
