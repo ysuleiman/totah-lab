@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `a78e2afa9f6c2bcd44bdd76004e300ceb72f764c7e05aed1c941b224e1344b7d`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `1d5f6fa0f512aaa15d54b630a6926c6dddd1849e1873f0a4d841d305aa42ecf7`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -72,7 +72,7 @@ Disposition is copied without upgrading partial capability coverage.
 | A04 | Library/AM1-BCC/charge-increment/NAGL charge assignment | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A05 | GBSA implicit solvent parameterization | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A06 | Virtual-site charge geometry | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
-| A07 | Chemical alerts and substructure filter catalogs | P3 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| A07 | Chemical alerts and substructure filter catalogs | P3 | SCIENTIFIC_REVIEW_REQUIRED | [a07-embedded-catalog-characterization-20261006](../../../software/qualification/a07-embedded-catalog-characterization-20261006/CHECKPOINT.txt) |
 | A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | G01 | Methyl environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
@@ -968,7 +968,7 @@ Review specific alert catalog/version/domain and advisory semantics; never autom
 
 **Supporting source:** RDKit FilterCatalog.h
 
-Select an immutable alert catalog/version and exact query dialect coverage with advisory-only assessment meaning. A FilterCatalog API source is not the complete catalog or evidence that each alert predicts a property. Matcher exists; no automatic rejection/chemical-risk truth is adopted.
+Pinned OCL contains890 embedded PAINS entries. Exact encoded-query to SMARTS roundtrip demonstrated for386, not established for504; B00 accepts886 generated queries and explicitly rejects4. Existing PainsDetector bypasses B00 and returns labels without Athena atom mappings. Need qualified lossless transfer/domain/fixtures plus advisory meaning; do not equate catalog membership with toxicity or automatic rejection.
 
 ### A08 — Tautomers, normalization, fragment parents and stereochemical identity
 
