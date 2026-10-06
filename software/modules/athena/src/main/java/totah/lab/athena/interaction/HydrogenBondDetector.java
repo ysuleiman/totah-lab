@@ -56,6 +56,13 @@ public final class HydrogenBondDetector {
             Structure receptor,
             Structure ligand,
             InteractionThresholds thresholds) {
+        return detect(receptor, ligand, thresholds, InteractionMeasurements.Observer.NONE);
+    }
+
+    List<Interaction> detect(
+            Structure receptor,
+            Structure ligand,
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         Objects.requireNonNull(receptor, "receptor");
         Objects.requireNonNull(ligand, "ligand");
@@ -74,10 +81,10 @@ public final class HydrogenBondDetector {
                 List<Atom> receptorAtoms = residue.getAtoms();
                 hydrogenBonds(bonds, residueId,
                         donorSites(receptorAtoms, thresholds),
-                        ligandAcceptors, true, thresholds);
+                        ligandAcceptors, true, thresholds, observer);
                 hydrogenBonds(bonds, residueId,
                         ligandDonors, acceptors(receptorAtoms),
-                        false, thresholds);
+                        false, thresholds, observer);
             }
         }
         return List.copyOf(bonds);
@@ -89,7 +96,7 @@ public final class HydrogenBondDetector {
             List<DonorSite> donors,
             List<Atom> acceptors,
             boolean proteinDonor,
-            InteractionThresholds thresholds) {
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         for (DonorSite donor : donors) {
             for (Atom acceptor : acceptors) {
@@ -99,12 +106,10 @@ public final class HydrogenBondDetector {
                         .distance(acceptor.getPosition());
                 double angle = angleDegrees(
                         donor.heavyAtom(), donor.hydrogen(), acceptor);
-                if (hydrogenDistance > thresholds.hydrogenAcceptorCutoff()
-                        || heavyDistance <= thresholds.minDist()
-                        || heavyDistance > thresholds.donorAcceptorCutoff()
-                        || angle < thresholds.minDonorAngleDegrees()) {
-                    continue;
-                }
+                var measurements = java.util.Map.of("distance", heavyDistance, "hydrogenDistance", hydrogenDistance, "angle", angle);
+                observer.accept("HBOND", proteinDonor ? List.of(donor.heavyAtom(), donor.hydrogen()) : List.of(acceptor),
+                        proteinDonor ? List.of(acceptor) : List.of(donor.heavyAtom(), donor.hydrogen()), measurements);
+                if (InteractionMeasurements.classify("HBOND", measurements, thresholds) == null) continue;
                 bonds.add(new Interaction(
                         InteractionType.HYDROGEN_BOND,
                         residue,

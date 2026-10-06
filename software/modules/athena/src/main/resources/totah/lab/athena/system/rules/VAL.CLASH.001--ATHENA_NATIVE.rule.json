@@ -1,0 +1,67 @@
+{
+  "schema": "athena-rule/1",
+  "ruleId": "VAL.CLASH.001",
+  "version": "1.0.0",
+  "profile": "ATHENA_NATIVE",
+  "family": "VALIDATOR",
+  "tier": "engineering-method",
+  "implementationId": "native.clash",
+  "implementationVersion": "1",
+  "qualification": "QUALIFIED",
+  "retired": false,
+  "requiredCapabilities": [
+    "CLASH_ANALYSIS"
+  ],
+  "requiredChemistry": [],
+  "requiredGeometry": [
+    "finite common-frame coordinates",
+    "explicit source atom identities"
+  ],
+  "measurementsProduced": {
+    "geometry": "angstrom/degree; explicit per-field keys and source identities"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "radiusScale": {
+      "value": "0.7",
+      "unit": "dimensionless",
+      "definition": "Existing native strict scaled-vdW overlap; same-residue, H and bonded exclusions"
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Existing Gaia/Athena measurement implementation; engineering qualification only"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Versioned Java collector/evaluator"
+    },
+    {
+      "locator": "software/modules/gaia/src/main/java/totah/lab/gaia/chemistry/Element.java",
+      "sha256": "9aaca5656c6af250f7a762e2411011c10e75e486484f99456968f4c29af34f26",
+      "citation": "Native radii table; NOT Probe/MolProbity radii"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/clash/StericClashAnalysis.java",
+      "sha256": "e5ee05f08555148b760705f30ee45466f5cfb3a5c3faa919d459566137c8aff0",
+      "citation": "Existing native clash algorithm; NOT Probe"
+    }
+  ],
+  "limitations": [
+    "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+    "Only explicit input state/selection and declared coverage; no implicit current truth.",
+    "Existing clash output is protocol-filtered, not an exhaustive pre-threshold pair list. Its collection key includes radiusScale; changing scale requires collection from the preserved source state."
+  ]
+}

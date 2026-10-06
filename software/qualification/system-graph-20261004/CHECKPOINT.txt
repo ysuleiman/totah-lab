@@ -1,0 +1,81 @@
+QUALIFIED — system graph view, immutable evidence preservation and capability certification
+2026-10-04
+Contract: software/qualification/system-graph-contract-20261004/DESIGN.txt
+Branch: codex/mmp-chemistry-roundtrip
+Base HEAD: 9212150b7d32af7ed173ac6697897b4a5661c053
+No commit or push performed. Stop boundary reached; no fragment growing/generation.
+
+Implementation
+Mnemosyne: opaque EvidenceEnvelope, state-scoped EvidenceSubject collections,
+append-only EvidenceInterpretation and six distinct assessment states. Existing
+History, Exchange, Catalog and branch query path extended additively. Original
+Observation/Assessment records and meanings unchanged. No alternate journal/catalog.
+Exchange /3 and record /3 added. Legacy /1 and /2 records keep their original
+schemas/bytes/digests; mixed histories retain original record encodings.
+Unknown payloads require no scientific parser for admission. External artifacts are
+stream-verified before publication and on read-back; missing/changed bytes fail closed.
+Athena: SystemStateView composes original full ResidueGraph and current MolecularGraph
+components, exact correspondence, charges and source frame. Spatial, covalent and
+supplied interaction traversal relations remain distinct. No persistent spatial
+edges, new molecular model, inferred bonds, recharging or scientific motif algorithm.
+Independent capability checks and adapters reuse current chemistry services,
+ResidueGraph distance queries, StericClashAnalysis and InteractionProfiler.
+Daedalus: inputs and state are admitted and read back before validation/analyzers;
+failures append assessments, never remove inputs. Certification preserves only
+capability-specific qualifications, not a global verdict. New runs evaluate their
+explicit inputs, not inherited state snapshots; inherited records remain unchanged.
+
+Validation — final qualified source
+bash software/qualification/system-graph-20261004/validate.sh
+Java 21 targeted compile: 165 sources; cached local dependencies, no downloads or
+Maven reactor build. Full selected JUnit: 238 found/started/passed; 0 failed,
+0 skipped, 0 aborted. Breakdown: 113 prior fragment/graph/interaction regressions,
+106 existing Mnemosyne tests, 7 new opaque-evidence tests, 12 new system tests.
+235 tests run in integration classpath; 3 foundation tests in isolated classpath.
+See validation.log, junit/, junit-foundation/ and ACCEPTANCE.txt.
+
+Fresh-process / frozen acceptance
+bash software/qualification/system-graph-20261004/replay.sh NEW_OUTPUT_DIRECTORY
+Recorded final run: qualified-replay/ (two synthetic JVMs and two frozen-fixture JVMs).
+Certificates, every published catalog snapshot and frozen engineering reports match
+byte-for-byte across independently started JVMs. See REPLAY.txt.
+Frozen fixture: exact pose 1158590, run 2892, all seven contract source hashes verified.
+Full source receptor + frozen parent ligand: 4042 atoms; SAM retains all 49 atoms,
+including hydrogens. Original receptor Atom objects, coordinates, types, partial
+charges and order preserved. Ligand chain gets an explicitly recorded component
+namespace; raw source identity remains in the immutable source artifact.
+C202/C203 neighborhoods measured without imposing a direct path; sulfur distance
+preserved and motif interpretation UNSUPPORTED (no new sulfur rule/bond assertion).
+The old helper's certified SDF/pose bridge was reused, not its cropped receptor.
+No new METTL7 conclusion, assay inference, docking, scoring or energetics.
+Only qualified-replay/ is the final replay acceptance. Earlier frozen*/ directories
+retain development diagnostics, including the caught unordered-map replay defect.
+
+Real-fixture capability scope / limitations
+Distance queries and neighborhood traversal: QUALIFIED for the explicit common frame.
+Clashes: QUALIFIED for existing scaled-vdW calculation, subject to its stated
+same-residue/bond exclusions and missing-connectivity physical limitations.
+Graph transformations: QUALIFIED only for the explicitly supplied parent component
+MolecularGraph and correspondence. No authorization to edit; no claim of complete
+protein/SAM chemistry. The prior absolute-reference SDF stereo caveat remains.
+Interaction typing and H-bond analysis: CONDITIONAL; source preparation/charge/H
+coverage incomplete. Detector measurements retained without a negative-chemistry claim.
+Energetics: NOT_EVALUATED. Covalent geometry rules: NOT_EVALUATED.
+Missing motif evaluators: UNSUPPORTED. Traversal exhaustion means incomplete coverage.
+Spatial paths imply neither chemical interactions nor physical coupling.
+External artifact durability depends on preserving the original authoritative files;
+changes are detected, not repaired or silently replaced. No DB/UI/application wiring.
+The immutable state snapshot is evidence, not a second executable molecular model;
+reconstruction still uses the authoritative graph/chemistry readers.
+
+Preservation / review
+154835 pre-existing files checked: no missing files, no unexpected stat changes.
+Only five intended existing Mnemosyne files changed. Full scientific corpus was not
+rehash-scanned; seven frozen fixture pins were reverified cryptographically.
+Prior 113-test checkpoint hashes all unchanged: 25 checkpoint artifacts, 129 sources,
+243 compiled classes, 15 runtime jars. See PRIOR_CHECKPOINT_HASH_VERIFICATION.json.
+Existing tracked/untracked science, prior qualification artifacts and .git preserved.
+Final diff reviewed for source attribution, canonical replay, append-only lineage,
+legacy compatibility, independent capability failure, and evidence-first publication.
+Changed files in CHANGED_FILES.txt; source/runtime/compiled hashes accompany checkpoint.
+No next milestone begun. Ready for review at this separate checkpoint.

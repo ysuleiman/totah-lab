@@ -31,6 +31,8 @@ public final class EvidenceExchange {
     public static final String RECORD_SCHEMA = "mnemosyne-record/1";
     public static final String DISCOVERY_SCHEMA = "mnemosyne-exchange/2";
     public static final String DISCOVERY_RECORD_SCHEMA = "mnemosyne-record/2";
+    public static final String EVIDENCE_SCHEMA = "mnemosyne-exchange/3";
+    public static final String EVIDENCE_RECORD_SCHEMA = "mnemosyne-record/3";
     public static final int MAX_BYTES = 16 * 1024 * 1024;
     private static final Comparator<ScientificReference> REFERENCES = Comparator
             .comparing((ScientificReference r) -> r.kind().name()).thenComparing(ScientificReference::namespace)
@@ -59,7 +61,8 @@ public final class EvidenceExchange {
     public enum RecordType {
         REFERENCE(ScientificReference.class), OBSERVATION(Observation.class), REVIEW(Review.class),
         ASSESSMENT(Assessment.class), REVIEW_CHANGE(EvidenceHistory.ReviewChange.class),
-        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class);
+        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class),
+        ENVELOPE(EvidenceEnvelope.class), INTERPRETATION(EvidenceInterpretation.class);
         private final Class<?> javaType;
         RecordType(Class<?> javaType) { this.javaType = javaType; }
         static RecordType of(Object value) {
@@ -74,7 +77,7 @@ public final class EvidenceExchange {
     public record Manifest(String schema, ScientificReference reference, ScientificReference creationActivity,
                            Instant createdAt, Optional<ScientificReference> parent, List<RecordDigest> records) {
         public Manifest {
-            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
+            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema) && !EVIDENCE_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
             reference.require(SNAPSHOT); creationActivity.require(ACTIVITY); Objects.requireNonNull(createdAt);
             parent = Objects.requireNonNull(parent); parent.ifPresent(p -> p.require(SNAPSHOT));
             if (parent.filter(reference::equals).isPresent()) throw new IllegalArgumentException("self-parent snapshot");
@@ -89,10 +92,11 @@ public final class EvidenceExchange {
             return other instanceof Snapshot s && manifest.equals(s.manifest)
                     && history.observations().equals(s.history.observations()) && history.reviews().equals(s.history.reviews())
                     && history.assessments().equals(s.history.assessments()) && history.changes().equals(s.history.changes())
-                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals());
+                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals())
+                    && history.envelopes().equals(s.history.envelopes()) && history.interpretations().equals(s.history.interpretations());
         }
         @Override public int hashCode() {
-            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals());
+            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals(), history.envelopes(), history.interpretations());
         }
     }
 
@@ -101,7 +105,7 @@ public final class EvidenceExchange {
         var records = records(history);
         var entries = new ArrayList<RecordDigest>();
         for (var record : records) entries.add(new RecordDigest(reference(record), RecordType.of(record), sha256(encodeRecord(record))));
-        var snapshot = new Snapshot(new Manifest(history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
+        var snapshot = new Snapshot(new Manifest(!history.envelopes().isEmpty() || !history.interpretations().isEmpty() ? EVIDENCE_SCHEMA : history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
         verify(snapshot);
         return snapshot;
     }
@@ -138,7 +142,7 @@ public final class EvidenceExchange {
     public Snapshot decode(byte[] bytes) throws IOException {
         try {
             var root = parse(bytes); fields(root, "schema", "manifest", "manifestSha256", "records");
-            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
+            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema")) && !EVIDENCE_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
             if (!sha256(canonical(root.get("manifest"))).equals(text(root, "manifestSha256")))
                 throw new IOException("manifest digest mismatch");
             text(root.get("manifest"), "createdAt");
@@ -165,8 +169,14 @@ public final class EvidenceExchange {
 
     private void verify(Snapshot snapshot) throws IOException {
         var records = records(snapshot.history());
-        if (!snapshot.history().descriptions().isEmpty() && !DISCOVERY_SCHEMA.equals(snapshot.manifest().schema()))
+        if (!snapshot.history().descriptions().isEmpty() && SCHEMA.equals(snapshot.manifest().schema()))
             throw new IOException("description requires exchange v2");
+        if ((!snapshot.history().envelopes().isEmpty() || !snapshot.history().interpretations().isEmpty()) && !EVIDENCE_SCHEMA.equals(snapshot.manifest().schema()))
+            throw new IOException("opaque evidence requires exchange v3");
+        for (var envelope : snapshot.history().envelopes().values())
+            if (envelope.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates evidence");
+        for (var interpretation : snapshot.history().interpretations().values())
+            if (interpretation.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates interpretation");
         var actual = new ArrayList<RecordDigest>();
         for (var record : records) actual.add(new RecordDigest(reference(record), RecordType.of(record), contentDigest(record)));
         if (!snapshot.manifest().records().equals(actual)) throw new IOException("manifest membership/content mismatch");
@@ -184,6 +194,8 @@ public final class EvidenceExchange {
             if (change.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates contained change");
     }
     private static String recordSchema(Object record) {
+        if (record instanceof EvidenceEnvelope || record instanceof EvidenceInterpretation
+                || record instanceof ScientificReference r && (r.kind() == EVIDENCE_ENVELOPE || r.kind() == EVIDENCE_INTERPRETATION)) return EVIDENCE_RECORD_SCHEMA;
         if (record instanceof DiscoveryDescription || record instanceof DiscoveryDescription.Withdrawal
                 || record instanceof ScientificReference r && (r.kind() == DISCOVERY_DESCRIPTION || r.kind() == DISCOVERY_WITHDRAWAL))
             return DISCOVERY_RECORD_SCHEMA;
@@ -201,13 +213,23 @@ public final class EvidenceExchange {
             for (var r : records) if (r instanceof Assessment assessment) history = history.append(assessment);
             for (var r : records) if (r instanceof DiscoveryDescription description) history = history.append(description);
             for (var r : records) if (r instanceof DiscoveryDescription.Withdrawal withdrawal) history = history.append(withdrawal);
+            for (var r : records) if (r instanceof EvidenceEnvelope e) history = history.append(e);
+            var pending = new ArrayList<EvidenceInterpretation>();
+            for (var r : records) if (r instanceof EvidenceInterpretation i) pending.add(i);
+            while (!pending.isEmpty()) {
+                int before = pending.size();
+                for (var i : List.copyOf(pending)) if (i.supersedes().isEmpty() || history.interpretations().containsKey(i.supersedes().orElseThrow())) {
+                    history = history.append(i); pending.remove(i);
+                }
+                if (pending.size() == before) throw new IllegalArgumentException("unresolved/cyclic interpretation ancestry");
+            }
             return history;
         } catch (IllegalArgumentException | NullPointerException error) { throw new IOException("inconsistent self-contained history", error); }
     }
     private Object readRecord(JsonNode wrapper) throws IOException {
         fields(wrapper, "schema", "type", "data");
         String schema = text(wrapper, "schema");
-        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
+        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema) && !EVIDENCE_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
         if (!wrapper.get("data").isObject()) throw new IOException("record data object required");
         try {
             var type = RecordType.valueOf(text(wrapper, "type"));
@@ -216,6 +238,7 @@ public final class EvidenceExchange {
             if (type == RecordType.ASSESSMENT) text(data, "recordedAt");
             if (type == RecordType.REVIEW_CHANGE) { text(data, "effectiveAt"); text(data, "recordedAt"); }
             if (type == RecordType.DISCOVERY_DESCRIPTION || type == RecordType.DISCOVERY_WITHDRAWAL) text(data, "recordedAt");
+            if (type == RecordType.ENVELOPE || type == RecordType.INTERPRETATION) text(data, "recordedAt");
             Object record = json.treeToValue(data, type.javaType);
             if (!recordSchema(record).equals(text(wrapper, "schema"))) throw new IOException("record type/schema mismatch");
             return record;
@@ -226,6 +249,7 @@ public final class EvidenceExchange {
         var result = new ArrayList<Object>(); result.addAll(history.observations().values()); result.addAll(history.reviews().values());
         result.addAll(history.assessments().values()); result.addAll(history.changes().values());
         result.addAll(history.descriptions().values()); result.addAll(history.withdrawals().values());
+        result.addAll(history.envelopes().values()); result.addAll(history.interpretations().values());
         result.sort(Comparator.comparing(EvidenceExchange::reference, REFERENCES)); return List.copyOf(result);
     }
     private static ScientificReference reference(Object record) {
@@ -233,6 +257,7 @@ public final class EvidenceExchange {
             case Observation o -> o.reference(); case Review r -> r.reference(); case Assessment a -> a.reference();
             case EvidenceHistory.ReviewChange c -> c.reference();
             case DiscoveryDescription d -> d.reference(); case DiscoveryDescription.Withdrawal w -> w.reference();
+            case EvidenceEnvelope e -> e.reference(); case EvidenceInterpretation i -> i.reference();
             default -> throw new IllegalArgumentException("only history records may be contained in snapshots");
         };
     }

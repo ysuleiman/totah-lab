@@ -1,0 +1,228 @@
+SYSTEM GRAPH + EVIDENCE PRESERVATION + STARTUP CERTIFICATION
+Implementation contract for review — NOT implemented or qualified
+2026-10-04
+Base: codex/mmp-chemistry-roundtrip
+HEAD: 9212150b7d32af7ed173ac6697897b4a5661c053
+
+1. Boundary and ownership
+Implement only durable evidence integration, a read-only state-qualified system
+view, and capability-specific startup certification. Stop after qualification.
+No fragment growing, chemistry generation, docking, rescoring, energies, biological
+mode selection, new METTL7 conclusion, generic inventory, DB/UI wiring, WELD,
+Hephaestus consolidation or module restructuring. No new molecular representation.
+
+Gaia: existing Structure/Atom/Residue/Bond and full ResidueGraph remain structure
+and coordinate authority. Pocket is a derived computational view, not a filter on
+which entities may influence or be recorded in analysis.
+Current chemistry backend: MolecularGraph and chemical services keep ownership.
+Athena: system-view correspondence, chemistry/geometry checks, scientific analyzer
+contracts and capability/certificate interpretation. Existing graph-edit receipts,
+interaction and clash records remain authoritative within their scoped methods.
+Mnemosyne: immutable evidence envelopes, provenance, append-only interpretation
+history, integrity/admission and persistence. No molecular classes or scientific
+rules move into Mnemosyne.
+Daedalus: orchestrates preserve/build/validate/analyze/certify/publish via existing
+modules; publication is a returned/read-back qualified handle, not web/database work.
+
+2. Reuse and exact integration points
+Gaia graph/ResidueGraph: original structure, residue nodes, sequence edges,
+withinDistance(), atomProximities(), view(). Spatial relationships are derived,
+not new persistent covalent edges. AtomPairDistance/ResidueDistance remain usable.
+Athena design/backend/MolecularGraph: chemical atom/bond state and Delta replay.
+CanonicalIdentityService, MolecularSanitizer, StereochemistryService: existing
+chemical validation when inputs/services can support the requested check.
+Athena pocket/evidence/ComponentChemistryEvidence and FormalChargeAssignments:
+source-qualified chemistry bindings; never substitute partial for formal charge.
+Athena interaction/InteractionProfiler: existing classified interactions with raw
+measurements, thresholds, perception provenance and limitations.
+Athena clash/StericClashAnalysis: existing clash results and explicit radii/scale.
+Athena geometry and pocket/architecture: existing spatial measurements, not new
+energy or mechanistic models. FragmentRegionFitCalculator remains unchanged unless
+a concrete adapter integration is required; do not regenerate its old checkpoint.
+
+Mnemosyne extension points:
+- ScientificReference.Kind: new envelope/interpretation kinds, not new molecular IDs.
+- EvidenceHistory: additive immutable maps and append overloads for new records.
+- EvidenceExchange: version-3 record/snapshot support, extending the existing codec.
+- EvidenceAdmission: unchanged append-only/integrity policy, including inherited
+  envelope/interpretation digests; interpretation support is NOT an admission test.
+- EvidenceSnapshotCatalog: reuse seed/append/read and non-replacing durable writes.
+- EvidenceBranchView/EvidenceQueries: additive accessors for new records, explicit
+  snapshot selection, existing branch isolation and history semantics.
+- EvidenceLineage: reuse ancestry and corruption checks, no branch preference.
+Do not add a second catalog, independent evidence inventory or competing journal.
+The existing design journal may reference persisted evidence/certificate pins;
+it is not a replacement for the general immutable evidence store.
+
+Existing daedalus.evidence.index.ScientificStateIndex remains the source-discovery
+read layer. Do not use its explicitly requested latest-query helpers to choose a
+system state, overwrite evidence, or resolve contradictory findings.
+
+3. Proposed public additions / schema changes requiring review
+Names are proposed concrete implementation targets, not existing classes:
+mnemosyne.EvidenceEnvelope
+  reference; open namespaced evidenceType and payloadFormat/version strings;
+  exact opaque payload bytes (defensively copied, encoded without reinterpretation)
+  or a verified durable artifact reference; source/artifact/receipt references;
+  producing method/version; context; qualifications and limitations as supplied;
+  ordered state-scoped subject references and collections; original payload digest.
+mnemosyne.EvidenceInterpretation
+  immutable versioned identity; referenced envelopes; evaluator/method version;
+  exact configuration/evidence pins; subjects; assessment status; measurements;
+  reasoning; limitations; optional explicit supersedes reference. Never overwrites.
+mnemosyne.EvidenceSubject
+  versioned state reference + open entity-kind string + source/local entity reference,
+  or an immutable explicit member collection. Supports atom, residue, fragment,
+  molecule, component, transformation, coordinate state, whole system and future
+  kinds without importing domain classes. Unknown/unresolved kinds are preserved.
+
+New exchange/record schema /3; old /1 and /2 accepted unchanged. Old records retain
+original encodings/digests. Existing Observation, Assessment and their enum meanings
+are NOT rewritten to approximate these new semantics. Extend History and branch
+query constructors/accessors compatibly; enumerate any unavoidable breaking change
+before coding rather than silently changing a public record constructor.
+Unknown PAYLOAD types under the known envelope are durably readable and round-trip.
+Unknown outer transport schemas and corrupt bytes are not falsely admitted as valid
+records: retain source artifact and record decode/integrity limitations separately.
+Large evidence remains in its verified durable authoritative artifact, with locator
+and digest; do not duplicate large scientific datasets or impose chemistry parsing
+as a prerequisite to preservation. A missing artifact cannot be claimed preserved.
+
+athena.system.SystemStateView (proposed package)
+  read-only composition of original full ResidueGraph, component MolecularGraph
+  references, exact atom correspondence and explicit source/coordinate state pins.
+  No new atom/bond storage representation. Missing correspondence is explicit.
+  Neighborhood traversal returns existing relationships plus traversal coverage.
+athena.system.SystemGraphCertificate
+  immutable identity/digests, validation findings, per-capability qualifications,
+  analyzer assessment references, preserved-evidence snapshot pin and limitations.
+athena.system.SystemGraphAnalyzer
+  versioned analyzer contract with required capabilities, exact configuration,
+  subject/neighborhood selection and explicit output assessments.
+daedalus.system.SystemQualificationPipeline
+  orchestrates lifecycle, durable read-back, analyzer isolation and publication gate.
+No new third-party dependencies. Existing module direction stays acyclic.
+
+4. State identity / binding
+Bind state to exact source system/components, chemical graph content, full coordinate
+frame digest, atom ordering, correspondence digest and source artifacts. Reuse
+AtomReference/ResidueId/MolecularGraph IDs; qualify them by system/coordinate state.
+A bare residue number, component ID or canonical chemical identity is insufficient.
+Preserve distinct coordinate/protonation states, symmetry alternatives and mapping
+ambiguity. Do not silently choose a correspondence, infer missing bonds, reconstruct
+hydrogens, recharge atoms or turn component ideal coordinates into pose coordinates.
+Frame consistency requires source/frame provenance as well as numerical checks;
+plausible coordinates alone cannot prove that independently sourced components align.
+
+5. Preservation and lifecycle
+Source/evidence preservation precedes evaluator execution and capability publication.
+BUILD -> VALIDATE -> ANALYZE -> CERTIFY -> PUBLISH is the qualified-use lifecycle,
+not permission to erase malformed, unsupported or failed source inputs.
+Append and read back evidence before running analyzers. Failure appends FAILED and
+keeps input evidence/state. Unknown type appends UNSUPPORTED, not a storage rejection.
+Contradictions coexist, even between evaluator versions. No timestamp preference,
+master score or automatic scientific resolution. New interpretation/certificate =
+new immutable record, never mutation or replacement of the observation.
+
+Assessment status values:
+SUPPORTED_PRESENT, ABSENT_FALSE, NOT_EVALUATED, UNSUPPORTED,
+UNKNOWN_INCONCLUSIVE, FAILED.
+Presence of an evidence record remains separate from support for its proposition.
+ABSENT_FALSE requires a completed applicable check with sufficient coverage; an empty
+result caused by missing H/type information is not a negative chemical finding.
+
+Capability status values:
+QUALIFIED, CONDITIONAL, NOT_EVALUATED, UNSUPPORTED, FAILED.
+Each capability includes required checks and reasons; no aggregate graph PASS/FAIL.
+At minimum: distance queries, neighborhood traversal, graph transformations, clash
+analysis, interaction typing and H-bond analysis. Energetics stays NOT_EVALUATED.
+Missing chemistry can qualify distances while leaving chemical capabilities
+conditional/unsupported. Failed coordinate/correspondence checks block dependent
+capabilities, not unrelated evidence preservation.
+Callers request capabilities and explicitly inspect conditions. Conditional is not
+silently promoted to qualified. Verify certificate/state/config/evidence bindings
+at use time; a stale certificate cannot authorize a changed state.
+
+6. Validation / analysis
+Chemical: topology, authoritative bond orders, available formal charges, stereo,
+component identity, H/protonation availability, unresolved chemistry. Do not claim
+that successful sanitization certifies a biological protonation state.
+Geometry: finite coordinates, explicit covalent geometry under named criteria,
+coincident atoms, clashes, spatial-index versus brute-force fixture agreement,
+component frame provenance/consistency. Missing evaluable rules => NOT_EVALUATED
+or UNSUPPORTED, not invented validation. No new covalent-geometry force field.
+Correspondence: endpoint existence, declared mapping cardinality, completeness and
+ambiguity; unmapped references remain evidence subjects with resolution status.
+
+Traversal starts from any explicit atom/residue and can continue outward through
+separately labelled chemical/spatial/interaction relationships. Distance cutoff,
+atom selection, hop limit, visit budget and traversal completeness are recorded.
+Cycles use visited identities; exhausted limits mean incomplete coverage, not
+absence beyond the boundary. Pocket membership and ligand contacts never stop it.
+No physical coupling or biological interaction inferred from a spatial path.
+
+Initial analyzers: adapters around existing distance/clash/interaction services,
+plus the validation checks above. The requested motif list is NOT authorization for
+new scientific motif detectors. Hydrogen-bond networks, sulfur motifs, electrostatic
+mechanisms etc. without existing qualified rules remain explicit unsupported requests.
+For Cys/Cys demonstration: preserve actual sulfur-atom distance measurements and
+subjects; report motif rule UNSUPPORTED if none exists, or INCONCLUSIVE if an existing
+rule lacks necessary inputs. No invented disulfide threshold or bond assertion.
+
+7. Frozen real-data fixture (read-only, not selected for assay agreement)
+Parent netarsudil pose 1158590, run 2892, parent_netarsudil s806519 m1, Q6UX53.
+Pinned DB readback identifies this exact preserved pose; no docking rerun.
+Use the WHOLE METTL7B_SAM_receptor.pdbqt, not the 8-Angstrom cropped environment
+used in the old real-control helper. It contains CYS A202 and CYS A203 including SG,
+and SAM. Preserve every original atom, including hydrogens, and all source types/
+partial charges. No inferred protein/SAM covalent topology or complete protonation.
+Pose plus parent SDF/certified correspondence provide the existing chemical bridge.
+Preserve the earlier SDF stereo qualification and any ambiguous mapping explicitly.
+Fixture hashes/paths and exact pose metadata are in FIXTURE.json alongside this file.
+Acceptance shows traversal of A202/A203 and surrounding graph with explicit coverage.
+Do not force a particular spatial path at a cutoff where it does not exist. Confirm
+arbitrary second-shell traversal in synthetic fixtures independently. No new METTL7
+mechanistic interpretation or mechanistic-state update follows from this engineering
+fixture; existing scientific evidence remains unchanged.
+
+8. Required acceptance tests
+P1 Unknown payload type survives durable write/read, exact bytes/digest and subjects.
+P2 Contradictory observations/methods coexist across snapshots and journal references.
+P3 NOT_EVALUATED differs from ABSENT_FALSE after serialization and queries.
+P4 Evaluator exception retains durably committed evidence; appends FAILED.
+P5 Later interpretation appends without changing original payload/hash or prior records.
+G1 Valid synthetic state receives an immutable, read-back certificate.
+G2 Partial chemistry qualifies distance capability and conditions H-bond capability.
+G3 Second-shell traversal beyond direct ligand contact; arbitrary residue identities.
+G4 Unsupported evidence survives certification and remains queryable by its reference.
+G5 Analyzer failure leaves state/evidence intact and blocks only dependent capabilities.
+G6 Contradictory motif assessments survive without ranking or overwrite.
+G7 Ruleset upgrade produces distinct certificate; previous bytes/digest unchanged.
+G8 Changed contact cutoff changes derived findings where appropriate, never evidence.
+G9 Changed coordinate, chemistry, correspondence, config or input-evidence pin makes
+   a previously bound certificate inapplicable to that changed state.
+G10 Indexed versus brute-force distances; boundary inclusion, H selection, cycles,
+    traversal budgets, incomplete coverage and out-of-pocket influence.
+G11 Atom/residue/component/transformation/system and entity collections round-trip;
+    unresolved/unknown subjects are preserved without false resolution.
+G12 Existing exchange /1 /2 round-trip unchanged; append-only identity conflict and
+    tamper detection; branch isolation; interrupted writes and durable read-back.
+R1 Frozen fixture pins, exact pose identity, complete coordinate/frame preservation,
+   explicit C202/C203 traversal and qualified/unsupported Cys/Cys motif handling.
+No real-data numerical outcome is predeclared or used to select the fixture.
+
+9. Build, preservation and exit
+Before implementation capture branch/HEAD/diff, pre-existing file stats and relevant
+source/artifact hashes. Never clean/reset/stage unrelated work or rewrite prior
+qualification artifacts. Keep the 113-test fragment-region-fit checkpoint intact.
+Run targeted Java 21/JUnit 5 builds for changed modules and relevant existing
+Mnemosyne/graph/interaction/clash tests, using local dependencies. Avoid broad Maven
+reactor builds and downloads. Record exact discovered/run/passed/skipped counts;
+this contract makes no claim that new tests have run or that schemas are qualified.
+Reverify source pins, old encoding compatibility, independent-process replay and
+preservation. Stop at a separate qualified checkpoint, without growing fragments.
+
+Review boundary
+This contract explicitly lists the new public types, generic evidence schema /3,
+additive history/query APIs and capability meanings for approval before code changes.
+Root AGENTS.md says: "Never change public APIs without asking."

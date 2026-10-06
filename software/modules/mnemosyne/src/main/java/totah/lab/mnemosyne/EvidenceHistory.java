@@ -23,14 +23,17 @@ public final class EvidenceHistory {
     private final Map<ScientificReference, DiscoveryDescription> descriptions;
     private final Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals;
 
-    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
+    private final Map<ScientificReference, EvidenceEnvelope> envelopes;
+    private final Map<ScientificReference, EvidenceInterpretation> interpretations;
+    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
     private EvidenceHistory(Map<ScientificReference, Observation> observations, Map<ScientificReference, Review> reviews,
                             Map<ScientificReference, Assessment> assessments, Map<ScientificReference, ReviewChange> changes,
                             Map<ScientificReference, DiscoveryDescription> descriptions,
-                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals) {
+                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals, Map<ScientificReference, EvidenceEnvelope> envelopes, Map<ScientificReference, EvidenceInterpretation> interpretations) {
         this.observations = Map.copyOf(observations); this.reviews = Map.copyOf(reviews);
         this.assessments = Map.copyOf(assessments); this.changes = Map.copyOf(changes);
         this.descriptions = Map.copyOf(descriptions); this.withdrawals = Map.copyOf(withdrawals);
+        this.envelopes = Map.copyOf(envelopes); this.interpretations = Map.copyOf(interpretations);
     }
     public Map<ScientificReference, Observation> observations() { return observations; }
     public Map<ScientificReference, Review> reviews() { return reviews; }
@@ -38,12 +41,12 @@ public final class EvidenceHistory {
     public Map<ScientificReference, ReviewChange> changes() { return changes; }
     public EvidenceHistory append(Observation observation) {
         var next = add(observations, observation.reference(), observation);
-        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals);
+        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
     }
     public EvidenceHistory append(Review review) {
         require(observations, review.observation());
         var next = add(reviews, review.reference(), review);
-        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals);
+        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
     }
     public EvidenceHistory append(Assessment assessment) {
         if (assessments.containsKey(assessment.reference())) {
@@ -62,7 +65,7 @@ public final class EvidenceHistory {
                     || !admissible(review.reference(), assessment.recordedAt(), assessment.recordedAt())))
                 throw new IllegalArgumentException("finding requires an admissible present observation");
         }
-        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals);
+        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals, envelopes, interpretations);
     }
 
     /** Historical records are never removed. Retraction/supersession only changes scoped admissibility. */
@@ -93,7 +96,7 @@ public final class EvidenceHistory {
                     || !replacement.reviewedAt().isAfter(old.reviewedAt()))
                 throw new IllegalArgumentException("replacement must be a later review of the same scoped observation by the same reviewer");
         });
-        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals);
+        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals, envelopes, interpretations);
     }
 
     public Map<ScientificReference, DiscoveryDescription> descriptions() { return descriptions; }
@@ -104,7 +107,7 @@ public final class EvidenceHistory {
         if (!new EvidenceExchange().contentDigest(observation).equals(description.observationSha256()))
             throw new IllegalArgumentException("discovery observation digest mismatch");
         var next = add(descriptions, description.reference(), description);
-        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals);
+        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals, envelopes, interpretations);
     }
     public EvidenceHistory append(DiscoveryDescription.Withdrawal withdrawal) {
         if (withdrawals.containsKey(withdrawal.reference())) { add(withdrawals, withdrawal.reference(), withdrawal); return this; }
@@ -120,7 +123,29 @@ public final class EvidenceHistory {
                 throw new IllegalArgumentException("replacement must be a later description of the same observation by the same agent");
         });
         return new EvidenceHistory(observations, reviews, assessments, changes, descriptions,
-                add(withdrawals, withdrawal.reference(), withdrawal));
+                add(withdrawals, withdrawal.reference(), withdrawal), envelopes, interpretations);
+    }
+
+    public Map<ScientificReference, EvidenceEnvelope> envelopes() { return envelopes; }
+    public Map<ScientificReference, EvidenceInterpretation> interpretations() { return interpretations; }
+    public EvidenceHistory append(EvidenceEnvelope envelope) {
+        var next = add(envelopes, envelope.reference(), envelope);
+        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, next, interpretations);
+    }
+    public EvidenceHistory append(EvidenceInterpretation interpretation) {
+        for (var input : interpretation.inputs()) {
+            var source = require(envelopes, input.reference());
+            try {
+                if (!new EvidenceExchange().contentDigest(source).equals(input.sha256())) throw new IllegalArgumentException("input evidence digest mismatch");
+            } catch (IOException error) { throw new IllegalArgumentException("unencodable input", error); }
+            if (source.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("interpretation predates evidence");
+        }
+        interpretation.supersedes().ifPresent(id -> {
+            var prior = require(interpretations, id);
+            if (prior.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("supersession predates prior interpretation");
+        });
+        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, envelopes,
+                add(interpretations, interpretation.reference(), interpretation));
     }
 
     public boolean admissible(ScientificReference reviewId, Instant knownAt, Instant effectiveAt) {

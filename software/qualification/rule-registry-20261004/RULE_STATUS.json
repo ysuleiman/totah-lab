@@ -1,0 +1,500 @@
+[
+  {
+    "ruleId": "GEO.PATH.001",
+    "profile": "ATHENA_NATIVE",
+    "version": "1.0.0",
+    "implementationId": "native.geometry",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth."
+    ]
+  },
+  {
+    "ruleId": "GEO.PROX.001",
+    "profile": "ATHENA_NATIVE",
+    "version": "1.0.0",
+    "implementationId": "native.geometry",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth."
+    ]
+  },
+  {
+    "ruleId": "GEO.SHELL.001",
+    "profile": "ATHENA_NATIVE",
+    "version": "1.0.0",
+    "implementationId": "native.geometry",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth."
+    ]
+  },
+  {
+    "ruleId": "INT.CATPI.001",
+    "profile": "ATHENA_NATIVE_PI_CATION",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative formal-charge assignments",
+      "complete ring and charge group perception",
+      "evaluable amine guard"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.CATPI.001",
+    "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_PI_CATION",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative formal-charge assignments",
+      "complete ring and charge group perception",
+      "evaluable amine guard"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.CATPI.001",
+    "profile": "PLIP_3_0_1_PI_CATION",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "Same PLIP ring construction as PI_STACKING",
+      "Protein ARG/HIS/LYS side-chain nitrogen centroid; ligand functional-group heuristics for ammonium/amine/sulfonium/guanidine; peptide/region mode uses protein-group path",
+      "Ligand tertiary-amine neighbor plane guard and early ring-loop break; histidine stacking suppression; no formal-charge or partial-charge substitution",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.HALOGEN.001",
+    "profile": "PLIP_3_0_1_HALOGEN_BOND",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "Binding-site acceptor O/N/S with exactly one eligible C/N/P/S neighbor Y; ligand F/Cl/Br/I with exactly one carbon neighbor",
+      "Angles Y-acceptor-halogen and acceptor-halogen-carbon; atom identity and original mapper required; actual source eligibility differs from its abbreviated docstring",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.HBOND.001",
+    "profile": "ATHENA_NATIVE_HBOND",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES",
+      "HBOND_ANALYSIS"
+    ],
+    "requiredChemistry": [
+      "qualified protonation/hydrogen state",
+      "AD4 donor/acceptor typing",
+      "explicit donor hydrogens"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.HBOND.001",
+    "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_HBOND",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES",
+      "HBOND_ANALYSIS"
+    ],
+    "requiredChemistry": [
+      "qualified protonation/hydrogen state",
+      "AD4 donor/acceptor typing",
+      "explicit donor hydrogens"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.HBOND.001",
+    "profile": "PLIP_3_0_1_HBOND",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "Original OpenBabel IsHbondAcceptor excluding F/Cl/Br/I; IsHbondDonor and actually bonded IsHbondDonorH; regular/strong mode, not AD4 nearest-heavy pairing",
+      "Ligand donor hydrogens remapped from the original complex; donor-H-acceptor angle; H-acceptor distance recorded without threshold",
+      "Salt-bridge group overlap suppresses hydrogen bonds; at most one retained contact per donor chosen by largest donor angle",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.HYDRO.001",
+    "profile": "ATHENA_NATIVE_HYDROPHOBIC",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative covalent topology",
+      "carbon C/H-neighbor perception"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.HYDRO.001",
+    "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_HYDROPHOBIC",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative covalent topology",
+      "carbon C/H-neighbor perception"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.HYDRO.001",
+    "profile": "PLIP_3_0_1_HYDROPHOBIC",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "OpenBabel carbon atoms whose complete direct neighbor atomic-number set is a subset of {1,6}; alternate conformers excluded; original-ID mapping",
+      "Identical original atom excluded; refinement suppresses stacked-ring pairs, chooses closest protein contact per ligand atom/residue number, then connected ligand hydrophobic patches or reciprocal peptide grouping",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.METAL.001",
+    "profile": "PLIP_3_0_1_METAL_COMPLEX",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "Exact config.METAL_IONS type list; ligand metal identity, original maps and PLIP protein/ligand/water target typing",
+      "Protein side-chain O in ASP/GLU/SER/THR/TYR, HIS N, CYS S and main-chain O; ligand O/N/S neighborhood heuristics and water; not element-only distance selection",
+      "Target angular signatures and greedy assignment for coordination 2-6, one-target NA case, fit-score selection and surplus-target exclusion; water-only complexes vetoed",
+      "Source typing contains string-versus-integer hydrogen-neighbor tests and other heuristics; do not silently substitute chemically corrected behavior and call it PLIP",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.PIPI.001",
+    "profile": "ATHENA_NATIVE_PI_STACKING",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete aromatic ring perception",
+      "nondegenerate ring planes"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.PIPI.001",
+    "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_PI_STACKING",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete aromatic ring perception",
+      "nondegenerate ring planes"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.PIPI.001",
+    "profile": "PLIP_3_0_1_PI_STACKING",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "OpenBabel SSSR, 5/6-member rings; aromatic flag OR TYR/TRP/HIS/PHE residue recognition OR ring_is_planar; UNL atom ordering remapped",
+      "Ring centroid; normal from ordered atoms 0,2,4; folded normal angle and minimum mutual center-to-plane projected offset; not Athena least-squares plane",
+      "Parallel and perpendicular tests retain source strict boundaries; downstream hydrophobic and histidine cation refinements depend on stacks",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.SALT.001",
+    "profile": "ATHENA_NATIVE_SALT_BRIDGE",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative formal-charge assignments",
+      "complete charge group perception"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.SALT.001",
+    "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_SALT_BRIDGE",
+    "version": "1.0.0",
+    "implementationId": "native.interaction",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [
+      "complete authoritative formal-charge assignments",
+      "complete charge group perception"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+      "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+    ]
+  },
+  {
+    "ruleId": "INT.SALT.001",
+    "profile": "PLIP_3_0_1_SALT_BRIDGE",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "Protein positive ARG/HIS/LYS side-chain nitrogen centers and negative ASP/GLU side-chain oxygen centers; optional nucleic-acid phosphate and modified-residue policies",
+      "Ligand functional-group heuristics for amines, sulfonium, phosphate, sulfonic acid, sulfate, carboxylate and guanidine; centroid versus central-atom rules preserved; peptide/region mode separate",
+      "Opposite-sign group-center distance, not closest atom; original perception quirks retained as source limitations, not repaired by an unqualified port",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "INT.WATER.001",
+    "profile": "PLIP_3_0_1_WATER_BRIDGE",
+    "version": "1.0.0",
+    "implementationId": "external.plip",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [],
+    "requiredChemistry": [
+      "PLIP acceptor/donor-H perception and explicit water oxygen identity; altloc/original map and ligand-centroid bounding selection",
+      "First-degree paths through the SAME water; inclusive water-to-acceptor/donor-heavy distances, strict donor-H-water and acceptor-water-H angles",
+      "Suppress donors already in direct H-bonds; reduce duplicate water/acceptor paths and limit water partners using source 110-degree preference and exact loop/update behavior",
+      "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+    ],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Reference definition only; no qualified exact-PLIP execution adapter.",
+      "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+      "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+    ]
+  },
+  {
+    "ruleId": "SULF.ENV.001",
+    "profile": "ATHENA_SOURCE_MEASUREMENTS",
+    "version": "1.0.0",
+    "implementationId": "native.sulfur",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "No vicinal disulfide compatibility classifier or sulfur-aromatic classifier qualified. Geometry cannot establish S-S bonding or oxidation."
+    ]
+  },
+  {
+    "ruleId": "SULF.PI.001",
+    "profile": "ATHENA_SOURCE_MEASUREMENTS",
+    "version": "1.0.0",
+    "implementationId": "native.sulfur",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "No vicinal disulfide compatibility classifier or sulfur-aromatic classifier qualified. Geometry cannot establish S-S bonding or oxidation."
+    ]
+  },
+  {
+    "ruleId": "SULF.SS.001",
+    "profile": "ATHENA_SOURCE_MEASUREMENTS",
+    "version": "1.0.0",
+    "implementationId": "native.sulfur",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "No vicinal disulfide compatibility classifier or sulfur-aromatic classifier qualified. Geometry cannot establish S-S bonding or oxidation."
+    ]
+  },
+  {
+    "ruleId": "SULF.VICINAL.001",
+    "profile": "ATHENA_SOURCE_MEASUREMENTS",
+    "version": "1.0.0",
+    "implementationId": "native.sulfur",
+    "qualification": "UNSUPPORTED",
+    "requiredCapabilities": [
+      "DISTANCE_QUERIES"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "No vicinal disulfide compatibility classifier or sulfur-aromatic classifier qualified. Geometry cannot establish S-S bonding or oxidation."
+    ]
+  },
+  {
+    "ruleId": "VAL.CLASH.001",
+    "profile": "ATHENA_NATIVE",
+    "version": "1.0.0",
+    "implementationId": "native.clash",
+    "qualification": "QUALIFIED",
+    "requiredCapabilities": [
+      "CLASH_ANALYSIS"
+    ],
+    "requiredChemistry": [],
+    "limitations": [
+      "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+      "Only explicit input state/selection and declared coverage; no implicit current truth.",
+      "Existing clash output is protocol-filtered, not an exhaustive pre-threshold pair list. Its collection key includes radiusScale; changing scale requires collection from the preserved source state."
+    ]
+  }
+]

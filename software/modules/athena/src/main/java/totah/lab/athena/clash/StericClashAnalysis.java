@@ -228,15 +228,27 @@ public final class StericClashAnalysis {
 
         List<Clash> clashes = new ArrayList<>();
 
+        // A full receptor frame may be large while the scoped ligand is small.
+        // Visit exactly the same pairs in the same order without an environment/environment
+        // quadratic scan. Unscoped callers retain the original all-pairs traversal.
+        List<Integer> scopedIndices = new ArrayList<>();
+        if (scope != null) {
+            for (int i = 0; i < heavyAtoms.size(); i++) {
+                if (scope.contains(heavyAtoms.get(i).reference())) scopedIndices.add(i);
+            }
+        }
+
         for (int firstIndex = 0;
              firstIndex < heavyAtoms.size();
              firstIndex++) {
 
             HeavyAtom first = heavyAtoms.get(firstIndex);
 
-            for (int secondIndex = firstIndex + 1;
-                 secondIndex < heavyAtoms.size();
-                 secondIndex++) {
+            boolean firstScoped = scope == null || scope.contains(first.reference());
+            int end = firstScoped ? heavyAtoms.size() : scopedIndices.size();
+            for (int cursor = firstScoped ? firstIndex + 1 : 0; cursor < end; cursor++) {
+                int secondIndex = firstScoped ? cursor : scopedIndices.get(cursor);
+                if (secondIndex <= firstIndex) continue;
 
                 HeavyAtom second = heavyAtoms.get(secondIndex);
 

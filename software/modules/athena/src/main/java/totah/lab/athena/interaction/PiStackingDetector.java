@@ -54,6 +54,13 @@ public final class PiStackingDetector {
             List<AromaticRing> proteinRings,
             List<AromaticRing> ligandRings,
             InteractionThresholds thresholds) {
+        return detect(proteinRings, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
+    }
+
+    List<Interaction> detect(
+            List<AromaticRing> proteinRings,
+            List<AromaticRing> ligandRings,
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         Objects.requireNonNull(proteinRings, "proteinRings");
         Objects.requireNonNull(ligandRings, "ligandRings");
@@ -75,16 +82,14 @@ public final class PiStackingDetector {
                 if (ligandPlane.isEmpty()) {
                     continue;
                 }
-                InteractionType type = classify(
-                        proteinRing, proteinPlane.get(),
-                        ligandRing, ligandPlane.get(), thresholds);
-                if (type == null) {
-                    continue;
-                }
-                double distance = proteinRing.centroid()
-                        .distance(ligandRing.centroid());
-                double angle = proteinPlane.get()
-                        .angleToDegrees(ligandPlane.get());
+                double distance = proteinRing.centroid().distance(ligandRing.centroid());
+                double angle = proteinPlane.get().angleToDegrees(ligandPlane.get());
+                double offset = Math.min(inPlaneOffset(proteinPlane.get(), ligandRing.centroid()),
+                        inPlaneOffset(ligandPlane.get(), proteinRing.centroid()));
+                var measurements = Map.of("distance", distance, "angle", angle, "offset", offset);
+                observer.accept("PI_STACKING", proteinRing.atoms(), ligandRing.atoms(), measurements);
+                InteractionType type = InteractionMeasurements.classify("PI_STACKING", measurements, thresholds);
+                if (type == null) continue;
                 stacks.add(new Interaction(
                         type,
                         proteinRing.owner(),
@@ -99,35 +104,6 @@ public final class PiStackingDetector {
             }
         }
         return List.copyOf(stacks);
-    }
-
-    private static InteractionType classify(
-            AromaticRing proteinRing,
-            Plane3D proteinPlane,
-            AromaticRing ligandRing,
-            Plane3D ligandPlane,
-            InteractionThresholds thresholds) {
-
-        double distance = proteinRing.centroid()
-                .distance(ligandRing.centroid());
-        if (distance <= thresholds.minDist()
-                || distance > thresholds.piStackDistMax()) {
-            return null;
-        }
-        double offset = Math.min(
-                inPlaneOffset(proteinPlane, ligandRing.centroid()),
-                inPlaneOffset(ligandPlane, proteinRing.centroid()));
-        if (offset > thresholds.piStackOffsetMax()) {
-            return null;
-        }
-        double angle = proteinPlane.angleToDegrees(ligandPlane);
-        if (angle <= thresholds.piStackParallelAngleDev()) {
-            return InteractionType.PI_STACK_PARALLEL;
-        }
-        if (Math.abs(90.0 - angle) <= thresholds.piStackTShapeAngleDev()) {
-            return InteractionType.PI_STACK_T_SHAPED;
-        }
-        return null;
     }
 
     /** In-plane distance of {@code center} projected into {@code plane}. */

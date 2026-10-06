@@ -28,6 +28,8 @@ public final class EvidenceBranchView {
     public record DescriptionState(DiscoveryDescription record, Optional<DiscoveryDescription.Withdrawal> withdrawal) {
         public DescriptionState { Objects.requireNonNull(record); withdrawal = Objects.requireNonNull(withdrawal); }
     }
+    private final List<EvidenceEnvelope> envelopes;
+    private final List<EvidenceInterpretation> interpretations;
     private final List<DescriptionState> descriptions;
     private final List<DiscoveryDescription.Withdrawal> withdrawals;
     private final EvidenceAdmission.Pin selected;
@@ -46,6 +48,8 @@ public final class EvidenceBranchView {
         this.path = List.copyOf(path);
         this.provenance = List.copyOf(provenance);
         var history = snapshot.history();
+        envelopes = history.envelopes().values().stream().sorted(Comparator.comparing(EvidenceEnvelope::reference, REFERENCES)).toList();
+        interpretations = history.interpretations().values().stream().sorted(Comparator.comparing(EvidenceInterpretation::reference, REFERENCES)).toList();
         withdrawals = history.withdrawals().values().stream()
                 .sorted(Comparator.comparing(DiscoveryDescription.Withdrawal::reference, REFERENCES)).toList();
         var withdrawalByDescription = new HashMap<ScientificReference, DiscoveryDescription.Withdrawal>();
@@ -97,6 +101,8 @@ public final class EvidenceBranchView {
         return new EvidenceBranchView(target.pin(), Objects.requireNonNull(last), path,
                 firstInclusion.values().stream().sorted(Comparator.comparing(p -> p.record().reference(), REFERENCES)).toList());
     }
+    public List<EvidenceEnvelope> envelopes() { return envelopes; }
+    public List<EvidenceInterpretation> interpretations() { return interpretations; }
     public List<DescriptionState> descriptions() { return descriptions; }
     public List<DiscoveryDescription.Withdrawal> withdrawals() { return withdrawals; }
     public EvidenceAdmission.Pin selected() { return selected; }

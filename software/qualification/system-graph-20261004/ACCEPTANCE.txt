@@ -1,0 +1,37 @@
+Contract acceptance map (all passed)
+New Mnemosyne tests: OpaqueEvidenceAcceptanceTest (O).
+New integration tests: SystemQualificationAcceptanceTest (S).
+
+P1 / G4 / G11: O.unknownBinaryPayloadAndEverySubjectKindSurviveDurableReadBack;
+  S.failedAnalyzerLeavesInputsIntactAndOtherCapabilitiesUsable.
+P2 / P3: O.contradictoryObservationsAndAllAssessmentStatesCoexist.
+P4 / G5: S.failedAnalyzerLeavesInputsIntactAndOtherCapabilitiesUsable;
+  S.failedChemicalValidationBlocksChemicalCapabilitiesButPreservesGeometryAndEvidence.
+P5: O.newInterpretationDoesNotChangeEarlierEvidenceOrSibling.
+G1 / G2: S.validStateCertificateAndPartialChemistryHaveSeparateCapabilities;
+  S.existingInteractionAndClashAdaptersPreserveCoverageLimits.
+G3: S.secondShellTraversalIsGeneralAndDoesNotAssertChemicalEdges (arbitrary residue
+  IDs 1,17,48,92; no special C203 production rule).
+G6 / G7: S.contradictoryMotifsAndRulesetUpgradePreserveOldCertificate.
+G8: S.cutoffChangesAnalysisNeverDeletesEvidenceAndReplayIsIdempotent.
+G9: S.staleStateConfigurationEvidenceAndRulesetAreRejected;
+  S.chemistryAndCorrespondenceChangesInvalidateCertificate.
+G10: S.indexedQueriesMatchBruteForceIncludingBoundaryAndCycleTraversal;
+  S.secondShellTraversalIsGeneralAndDoesNotAssertChemicalEdges;
+  existing ResidueGraphTest and 113-test fragment-region-fit suite.
+G11 mapping resolution: S.unresolvedAndAmbiguousCorrespondenceSurviveWithoutGlobalRejection.
+G12: O.legacyV1V2BytesRemainExactAndNewEnvelopeUsesV3;
+  O.changedRecordCannotOverwriteAndWrongInputDigestFails;
+  O.newInterpretationDoesNotChangeEarlierEvidenceOrSibling;
+  all existing exchange/admission/catalog/lineage/branch/query/discovery tests,
+  including EvidenceSnapshotCatalogAcceptanceTest.interruptedPrivateStagingIsNotACatalogEntry.
+External evidence: O.externalArtifactMustVerifyAndReadBackDetectsChangedBytes;
+  O.missingArtifactNeverClaimsDurablePreservation.
+State attribution: S.newRunNeverAttributesItsMeasurementsToAnInheritedState.
+R1: FrozenSystemAcceptance.java; qualified-replay/frozen-{1,2}/acceptance.json.
+Independent-process determinism: replay.sh / REPLAY.txt; synthetic and full frozen
+certificates, reports and all three catalog snapshots compare byte-for-byte.
+
+Schema compatibility golden files were captured with the unmodified pre-task codec,
+then copied to mnemosyne/src/test/resources/evidence-v3-compatibility. They were not
+regenerated with the new codec. Prior committed discovery-v1 fixtures are unchanged.

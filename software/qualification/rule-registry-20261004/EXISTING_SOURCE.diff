@@ -1,0 +1,274 @@
+--- software/qualification/rule-registry-20261004/before/HydrogenBondDetector.java
++++ software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrogenBondDetector.java
+@@ -56,6 +56,13 @@
+             Structure receptor,
+             Structure ligand,
+             InteractionThresholds thresholds) {
++        return detect(receptor, ligand, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            Structure receptor,
++            Structure ligand,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(receptor, "receptor");
+         Objects.requireNonNull(ligand, "ligand");
+@@ -74,10 +81,10 @@
+                 List<Atom> receptorAtoms = residue.getAtoms();
+                 hydrogenBonds(bonds, residueId,
+                         donorSites(receptorAtoms, thresholds),
+-                        ligandAcceptors, true, thresholds);
++                        ligandAcceptors, true, thresholds, observer);
+                 hydrogenBonds(bonds, residueId,
+                         ligandDonors, acceptors(receptorAtoms),
+-                        false, thresholds);
++                        false, thresholds, observer);
+             }
+         }
+         return List.copyOf(bonds);
+@@ -89,7 +96,7 @@
+             List<DonorSite> donors,
+             List<Atom> acceptors,
+             boolean proteinDonor,
+-            InteractionThresholds thresholds) {
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         for (DonorSite donor : donors) {
+             for (Atom acceptor : acceptors) {
+@@ -99,12 +106,10 @@
+                         .distance(acceptor.getPosition());
+                 double angle = angleDegrees(
+                         donor.heavyAtom(), donor.hydrogen(), acceptor);
+-                if (hydrogenDistance > thresholds.hydrogenAcceptorCutoff()
+-                        || heavyDistance <= thresholds.minDist()
+-                        || heavyDistance > thresholds.donorAcceptorCutoff()
+-                        || angle < thresholds.minDonorAngleDegrees()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", heavyDistance, "hydrogenDistance", hydrogenDistance, "angle", angle);
++                observer.accept("HBOND", proteinDonor ? List.of(donor.heavyAtom(), donor.hydrogen()) : List.of(acceptor),
++                        proteinDonor ? List.of(acceptor) : List.of(donor.heavyAtom(), donor.hydrogen()), measurements);
++                if (InteractionMeasurements.classify("HBOND", measurements, thresholds) == null) continue;
+                 bonds.add(new Interaction(
+                         InteractionType.HYDROGEN_BOND,
+                         residue,
+--- software/qualification/rule-registry-20261004/before/HydrophobicContactDetector.java
++++ software/modules/athena/src/main/java/totah/lab/athena/interaction/HydrophobicContactDetector.java
+@@ -47,6 +47,14 @@
+             HydrophobicAtoms proteinHydrophobic,
+             HydrophobicAtoms ligandHydrophobic,
+             InteractionThresholds thresholds) {
++        return detect(protein, proteinHydrophobic, ligandHydrophobic, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            Structure protein,
++            HydrophobicAtoms proteinHydrophobic,
++            HydrophobicAtoms ligandHydrophobic,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(protein, "protein");
+         Objects.requireNonNull(proteinHydrophobic, "proteinHydrophobic");
+@@ -64,10 +72,9 @@
+             for (Atom ligandAtom : ligandHydrophobic.atoms()) {
+                 double distance = proteinAtom.getPosition()
+                         .distance(ligandAtom.getPosition());
+-                if (distance <= thresholds.minDist()
+-                        || distance > thresholds.hydrophobicDistMax()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", distance);
++                observer.accept("HYDROPHOBIC", List.of(proteinAtom), List.of(ligandAtom), measurements);
++                if (InteractionMeasurements.classify("HYDROPHOBIC", measurements, thresholds) == null) continue;
+                 contacts.add(new Interaction(
+                         InteractionType.HYDROPHOBIC_CONTACT,
+                         residue,
+--- software/qualification/rule-registry-20261004/before/SaltBridgeDetector.java
++++ software/modules/athena/src/main/java/totah/lab/athena/interaction/SaltBridgeDetector.java
+@@ -37,6 +37,13 @@
+             List<ChargedGroup> proteinGroups,
+             List<ChargedGroup> ligandGroups,
+             InteractionThresholds thresholds) {
++        return detect(proteinGroups, ligandGroups, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<ChargedGroup> proteinGroups,
++            List<ChargedGroup> ligandGroups,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinGroups, "proteinGroups");
+         Objects.requireNonNull(ligandGroups, "ligandGroups");
+@@ -50,10 +57,9 @@
+                 }
+                 double distance = proteinGroup.chargeCenter()
+                         .distance(ligandGroup.chargeCenter());
+-                if (distance <= thresholds.minDist()
+-                        || distance > thresholds.saltBridgeDistMax()) {
+-                    continue;
+-                }
++                var measurements = java.util.Map.of("distance", distance);
++                observer.accept("SALT_BRIDGE", proteinGroup.atoms(), ligandGroup.atoms(), measurements);
++                if (InteractionMeasurements.classify("SALT_BRIDGE", measurements, thresholds) == null) continue;
+                 bridges.add(new Interaction(
+                         InteractionType.SALT_BRIDGE,
+                         proteinGroup.owner(),
+--- software/qualification/rule-registry-20261004/before/PiStackingDetector.java
++++ software/modules/athena/src/main/java/totah/lab/athena/interaction/PiStackingDetector.java
+@@ -54,6 +54,13 @@
+             List<AromaticRing> proteinRings,
+             List<AromaticRing> ligandRings,
+             InteractionThresholds thresholds) {
++        return detect(proteinRings, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<AromaticRing> proteinRings,
++            List<AromaticRing> ligandRings,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinRings, "proteinRings");
+         Objects.requireNonNull(ligandRings, "ligandRings");
+@@ -75,16 +82,14 @@
+                 if (ligandPlane.isEmpty()) {
+                     continue;
+                 }
+-                InteractionType type = classify(
+-                        proteinRing, proteinPlane.get(),
+-                        ligandRing, ligandPlane.get(), thresholds);
+-                if (type == null) {
+-                    continue;
+-                }
+-                double distance = proteinRing.centroid()
+-                        .distance(ligandRing.centroid());
+-                double angle = proteinPlane.get()
+-                        .angleToDegrees(ligandPlane.get());
++                double distance = proteinRing.centroid().distance(ligandRing.centroid());
++                double angle = proteinPlane.get().angleToDegrees(ligandPlane.get());
++                double offset = Math.min(inPlaneOffset(proteinPlane.get(), ligandRing.centroid()),
++                        inPlaneOffset(ligandPlane.get(), proteinRing.centroid()));
++                var measurements = Map.of("distance", distance, "angle", angle, "offset", offset);
++                observer.accept("PI_STACKING", proteinRing.atoms(), ligandRing.atoms(), measurements);
++                InteractionType type = InteractionMeasurements.classify("PI_STACKING", measurements, thresholds);
++                if (type == null) continue;
+                 stacks.add(new Interaction(
+                         type,
+                         proteinRing.owner(),
+@@ -101,35 +106,6 @@
+         return List.copyOf(stacks);
+     }
+ 
+-    private static InteractionType classify(
+-            AromaticRing proteinRing,
+-            Plane3D proteinPlane,
+-            AromaticRing ligandRing,
+-            Plane3D ligandPlane,
+-            InteractionThresholds thresholds) {
+-
+-        double distance = proteinRing.centroid()
+-                .distance(ligandRing.centroid());
+-        if (distance <= thresholds.minDist()
+-                || distance > thresholds.piStackDistMax()) {
+-            return null;
+-        }
+-        double offset = Math.min(
+-                inPlaneOffset(proteinPlane, ligandRing.centroid()),
+-                inPlaneOffset(ligandPlane, proteinRing.centroid()));
+-        if (offset > thresholds.piStackOffsetMax()) {
+-            return null;
+-        }
+-        double angle = proteinPlane.angleToDegrees(ligandPlane);
+-        if (angle <= thresholds.piStackParallelAngleDev()) {
+-            return InteractionType.PI_STACK_PARALLEL;
+-        }
+-        if (Math.abs(90.0 - angle) <= thresholds.piStackTShapeAngleDev()) {
+-            return InteractionType.PI_STACK_T_SHAPED;
+-        }
+-        return null;
+-    }
+-
+     /** In-plane distance of {@code center} projected into {@code plane}. */
+     private static double inPlaneOffset(Plane3D plane, Point3D center) {
+         return plane.centroid().distance(plane.project(center));
+--- software/qualification/rule-registry-20261004/before/PiCationDetector.java
++++ software/modules/athena/src/main/java/totah/lab/athena/interaction/PiCationDetector.java
+@@ -66,6 +66,15 @@
+             List<ChargedGroup> ligandGroups,
+             List<AromaticRing> ligandRings,
+             InteractionThresholds thresholds) {
++        return detect(proteinGroups, proteinRings, ligandGroups, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
++    }
++
++    List<Interaction> detect(
++            List<ChargedGroup> proteinGroups,
++            List<AromaticRing> proteinRings,
++            List<ChargedGroup> ligandGroups,
++            List<AromaticRing> ligandRings,
++            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
+ 
+         Objects.requireNonNull(proteinGroups, "proteinGroups");
+         Objects.requireNonNull(proteinRings, "proteinRings");
+@@ -79,7 +88,7 @@
+                 continue;
+             }
+             for (AromaticRing ring : ligandRings) {
+-                evaluate(group, ring, true, thresholds, interactions);
++                evaluate(group, ring, true, thresholds, interactions, observer);
+             }
+         }
+         for (ChargedGroup group : ligandGroups) {
+@@ -87,7 +96,7 @@
+                 continue;
+             }
+             for (AromaticRing ring : proteinRings) {
+-                evaluate(group, ring, false, thresholds, interactions);
++                evaluate(group, ring, false, thresholds, interactions, observer);
+             }
+         }
+         return List.copyOf(interactions);
+@@ -98,33 +107,23 @@
+             AromaticRing ring,
+             boolean proteinGroup,
+             InteractionThresholds thresholds,
+-            List<Interaction> interactions) {
++            List<Interaction> interactions, InteractionMeasurements.Observer observer) {
+ 
+         Optional<Plane3D> plane = InteractionGeometry.ringPlane(ring);
+         if (plane.isEmpty()) {
+             return;
+         }
+         double distance = ring.centroid().distance(group.chargeCenter());
+-        if (distance <= thresholds.minDist()
+-                || distance > thresholds.piCationDistMax()) {
+-            return;
+-        }
+-        double offset = plane.get().centroid()
+-                .distance(plane.get().project(group.chargeCenter()));
+-        if (offset > thresholds.piCationOffsetMax()) {
+-            return;
+-        }
+-        Double tertamineAngle = null;
+-        if (group.type() == ChargedGroupType.AMINE) {
+-            tertamineAngle = tertamineAngle(group, plane.get());
+-            if (tertamineAngle == null) {
+-                // Guard not evaluable (too few neighbor atoms): the
+-                // distance/offset gates alone decide.
+-            } else if (tertamineAngle
+-                    > thresholds.piCationTertamineAngleMax()) {
+-                return;
+-            }
+-        }
++        double offset = plane.get().centroid().distance(plane.get().project(group.chargeCenter()));
++        Double tertamineAngle = group.type() == ChargedGroupType.AMINE ? tertamineAngle(group, plane.get()) : null;
++        var measurements = new java.util.TreeMap<String,Double>();
++        measurements.put("distance", distance); measurements.put("offset", offset);
++        measurements.put("amineGuardRequired", group.type() == ChargedGroupType.AMINE ? 1.0 : 0.0);
++        if (tertamineAngle != null) measurements.put("angle", tertamineAngle);
++        observer.accept("PI_CATION", proteinGroup ? group.atoms() : ring.atoms(),
++                proteinGroup ? ring.atoms() : group.atoms(), measurements);
++        // Preserve native behavior: an unevaluable amine guard is skipped. Registry coverage marks this conditional.
++        if (InteractionMeasurements.classify("PI_CATION", measurements, thresholds) == null) return;
+         interactions.add(new Interaction(
+                 InteractionType.PI_CATION,
+                 proteinGroup ? group.owner() : ring.owner(),

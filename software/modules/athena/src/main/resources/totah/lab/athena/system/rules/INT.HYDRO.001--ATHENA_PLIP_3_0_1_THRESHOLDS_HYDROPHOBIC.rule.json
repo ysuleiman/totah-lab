@@ -1,0 +1,166 @@
+{
+  "schema": "athena-rule/1",
+  "ruleId": "INT.HYDRO.001",
+  "version": "1.0.0",
+  "profile": "ATHENA_PLIP_3_0_1_THRESHOLDS_HYDROPHOBIC",
+  "family": "INTERACTION",
+  "tier": "engineering-method",
+  "implementationId": "native.interaction",
+  "implementationVersion": "1",
+  "qualification": "QUALIFIED",
+  "retired": false,
+  "requiredCapabilities": [
+    "DISTANCE_QUERIES"
+  ],
+  "requiredChemistry": [
+    "complete authoritative covalent topology",
+    "carbon C/H-neighbor perception"
+  ],
+  "requiredGeometry": [
+    "finite common-frame coordinates",
+    "explicit source atom identities"
+  ],
+  "measurementsProduced": {
+    "geometry": "angstrom/degree; explicit per-field keys and source identities"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "minDist": {
+      "value": "0.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "hydrophobicDistMax": {
+      "value": "4",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "saltBridgeDistMax": {
+      "value": "5.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackDistMax": {
+      "value": "5.5",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackParallelAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackTShapeAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piStackOffsetMax": {
+      "value": "2",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationDistMax": {
+      "value": "6",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationOffsetMax": {
+      "value": "2",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "piCationTertamineAngleMax": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenDistMax": {
+      "value": "4",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenAcceptorAngle": {
+      "value": "120",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenDonorAngle": {
+      "value": "165",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "halogenAngleDev": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "hydrogenAcceptorCutoff": {
+      "value": "UNGATED",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "donorAcceptorCutoff": {
+      "value": "4.1",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "minDonorAngleDegrees": {
+      "value": "100",
+      "unit": "degree",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    },
+    "donorBondCutoff": {
+      "value": "1.35",
+      "unit": "angstrom",
+      "definition": "Native Athena bounds: distance lower exclusive/upper inclusive; angular bounds inclusive; donor preparation cutoff explicit."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/basic/config.py",
+      "sha256": "e9d2d73fcf1e1edaf515ed06b55948603fbdf2662186965a74258ef3d60962cd",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/structure/detection.py",
+      "sha256": "4479b9a86eac810c3cb657a0cbc6b5c055c67018fc9c3591d938f06ced142365",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/structure/preparation.py",
+      "sha256": "da7480c071b76526c11a2e30f1426f3a266eb17b74e97b3bde2bc1a91ad8eaaa",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/basic/supplemental.py",
+      "sha256": "9d33b8c7340f775af0d652bca25858a680d84012372a8e429f845d0df0348ea7",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Versioned Java collector/evaluator"
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/interaction/InteractionMeasurements.java",
+      "sha256": "a0f3d78cd3807bc7dbf64a13b4726d0da9f9b7cc0c2d3e4f7a25f3f20a709d7d",
+      "citation": "Shared native detector measurement and classification math"
+    }
+  ],
+  "limitations": [
+    "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+    "Only explicit input state/selection and declared coverage; no implicit current truth.",
+    "Athena native perception and inclusive bounds; NOT exact PLIP execution.",
+    "Raw detector predicates before cross-class refinement; native profiler retains its separate refinement output."
+  ]
+}

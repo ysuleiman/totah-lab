@@ -1,0 +1,107 @@
+{
+  "schema": "athena-rule/1",
+  "ruleId": "INT.PIPI.001",
+  "version": "1.0.0",
+  "profile": "PLIP_3_0_1_PI_STACKING",
+  "family": "INTERACTION",
+  "tier": "engineering-method",
+  "implementationId": "external.plip",
+  "implementationVersion": "1",
+  "qualification": "UNSUPPORTED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "OpenBabel SSSR, 5/6-member rings; aromatic flag OR TYR/TRP/HIS/PHE residue recognition OR ring_is_planar; UNL atom ordering remapped",
+    "Ring centroid; normal from ordered atoms 0,2,4; folded normal angle and minimum mutual center-to-plane projected offset; not Athena least-squares plane",
+    "Parallel and perpendicular tests retain source strict boundaries; downstream hydrophobic and histidine cation refinements depend on stacks",
+    "pinned PLIP/OpenBabel perception and preparation parity; runtime not qualified"
+  ],
+  "requiredGeometry": [
+    "finite common-frame coordinates",
+    "explicit source atom identities"
+  ],
+  "measurementsProduced": {
+    "geometry": "angstrom/degree; explicit per-field keys and source identities"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "distanceMaximum": {
+      "value": "5.5",
+      "unit": "angstrom",
+      "definition": "strict ring-center"
+    },
+    "angleDeviation": {
+      "value": "30",
+      "unit": "degree",
+      "definition": "strict parallel/perpendicular; parallel zero excluded"
+    },
+    "offsetMaximum": {
+      "value": "2",
+      "unit": "angstrom",
+      "definition": "strict minimum mutual projection"
+    },
+    "distanceMinimum": {
+      "value": "0.5",
+      "unit": "angstrom",
+      "definition": "strict global lower bound"
+    },
+    "bindingSiteSelectionDistance": {
+      "value": "7.5",
+      "unit": "angstrom",
+      "definition": "PLIP BS_DIST preselection policy; never applied as a full-system graph exclusion in Athena"
+    },
+    "ringPlanarityDeviation": {
+      "value": "5",
+      "unit": "degree",
+      "definition": "supplemental.ring_is_planar local normals; not least-squares RMS plane deviation"
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/basic/config.py",
+      "sha256": "e9d2d73fcf1e1edaf515ed06b55948603fbdf2662186965a74258ef3d60962cd",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/structure/detection.py",
+      "sha256": "4479b9a86eac810c3cb657a0cbc6b5c055c67018fc9c3591d938f06ced142365",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/structure/preparation.py",
+      "sha256": "da7480c071b76526c11a2e30f1426f3a266eb17b74e97b3bde2bc1a91ad8eaaa",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    },
+    {
+      "locator": "https://raw.githubusercontent.com/pharmai/plip/2f4911d307490479ac023b22d6faa8f59b577ca8/plip/basic/supplemental.py",
+      "sha256": "9d33b8c7340f775af0d652bca25858a680d84012372a8e429f845d0df0348ea7",
+      "citation": "PLIP 3.0.1; Schake, Bolz et al. 2025 doi:10.1093/nar/gkaf361"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Versioned Java collector/evaluator"
+    },
+    {
+      "locator": "software/qualification/rule-registry-20261004/reference/ALGORITHM_REQUIREMENTS.json",
+      "sha256": "15c3ee6e820a9b3213124689b8bc0e4f225e59c3c249a9a821e0632f45d969b6",
+      "citation": "Audited PLIP algorithm/perception prerequisite map"
+    }
+  ],
+  "limitations": [
+    "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+    "Only explicit input state/selection and declared coverage; no implicit current truth.",
+    "Reference definition only; no qualified exact-PLIP execution adapter.",
+    "Thresholds alone do not define PLIP. Exact code, perception, filtering, water/metal algorithms and runtime dependency versions are not qualified; no exact parity claimed.",
+    "PLIP source describes selected threshold relaxation for structural-quality tolerance; source literature and implemented thresholds are distinct."
+  ]
+}

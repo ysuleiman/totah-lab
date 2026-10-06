@@ -1,0 +1,289 @@
+--- software/qualification/system-graph-20261004/before/EvidenceBranchView.java
++++ software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceBranchView.java
+@@ -28,6 +28,8 @@
+     public record DescriptionState(DiscoveryDescription record, Optional<DiscoveryDescription.Withdrawal> withdrawal) {
+         public DescriptionState { Objects.requireNonNull(record); withdrawal = Objects.requireNonNull(withdrawal); }
+     }
++    private final List<EvidenceEnvelope> envelopes;
++    private final List<EvidenceInterpretation> interpretations;
+     private final List<DescriptionState> descriptions;
+     private final List<DiscoveryDescription.Withdrawal> withdrawals;
+     private final EvidenceAdmission.Pin selected;
+@@ -46,6 +48,8 @@
+         this.path = List.copyOf(path);
+         this.provenance = List.copyOf(provenance);
+         var history = snapshot.history();
++        envelopes = history.envelopes().values().stream().sorted(Comparator.comparing(EvidenceEnvelope::reference, REFERENCES)).toList();
++        interpretations = history.interpretations().values().stream().sorted(Comparator.comparing(EvidenceInterpretation::reference, REFERENCES)).toList();
+         withdrawals = history.withdrawals().values().stream()
+                 .sorted(Comparator.comparing(DiscoveryDescription.Withdrawal::reference, REFERENCES)).toList();
+         var withdrawalByDescription = new HashMap<ScientificReference, DiscoveryDescription.Withdrawal>();
+@@ -97,6 +101,8 @@
+         return new EvidenceBranchView(target.pin(), Objects.requireNonNull(last), path,
+                 firstInclusion.values().stream().sorted(Comparator.comparing(p -> p.record().reference(), REFERENCES)).toList());
+     }
++    public List<EvidenceEnvelope> envelopes() { return envelopes; }
++    public List<EvidenceInterpretation> interpretations() { return interpretations; }
+     public List<DescriptionState> descriptions() { return descriptions; }
+     public List<DiscoveryDescription.Withdrawal> withdrawals() { return withdrawals; }
+     public EvidenceAdmission.Pin selected() { return selected; }
+--- software/qualification/system-graph-20261004/before/EvidenceExchange.java
++++ software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceExchange.java
+@@ -31,6 +31,8 @@
+     public static final String RECORD_SCHEMA = "mnemosyne-record/1";
+     public static final String DISCOVERY_SCHEMA = "mnemosyne-exchange/2";
+     public static final String DISCOVERY_RECORD_SCHEMA = "mnemosyne-record/2";
++    public static final String EVIDENCE_SCHEMA = "mnemosyne-exchange/3";
++    public static final String EVIDENCE_RECORD_SCHEMA = "mnemosyne-record/3";
+     public static final int MAX_BYTES = 16 * 1024 * 1024;
+     private static final Comparator<ScientificReference> REFERENCES = Comparator
+             .comparing((ScientificReference r) -> r.kind().name()).thenComparing(ScientificReference::namespace)
+@@ -59,7 +61,8 @@
+     public enum RecordType {
+         REFERENCE(ScientificReference.class), OBSERVATION(Observation.class), REVIEW(Review.class),
+         ASSESSMENT(Assessment.class), REVIEW_CHANGE(EvidenceHistory.ReviewChange.class),
+-        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class);
++        DISCOVERY_DESCRIPTION(DiscoveryDescription.class), DISCOVERY_WITHDRAWAL(DiscoveryDescription.Withdrawal.class),
++        ENVELOPE(EvidenceEnvelope.class), INTERPRETATION(EvidenceInterpretation.class);
+         private final Class<?> javaType;
+         RecordType(Class<?> javaType) { this.javaType = javaType; }
+         static RecordType of(Object value) {
+@@ -74,7 +77,7 @@
+     public record Manifest(String schema, ScientificReference reference, ScientificReference creationActivity,
+                            Instant createdAt, Optional<ScientificReference> parent, List<RecordDigest> records) {
+         public Manifest {
+-            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
++            if (!SCHEMA.equals(schema) && !DISCOVERY_SCHEMA.equals(schema) && !EVIDENCE_SCHEMA.equals(schema)) throw new IllegalArgumentException("unsupported manifest schema");
+             reference.require(SNAPSHOT); creationActivity.require(ACTIVITY); Objects.requireNonNull(createdAt);
+             parent = Objects.requireNonNull(parent); parent.ifPresent(p -> p.require(SNAPSHOT));
+             if (parent.filter(reference::equals).isPresent()) throw new IllegalArgumentException("self-parent snapshot");
+@@ -89,10 +92,11 @@
+             return other instanceof Snapshot s && manifest.equals(s.manifest)
+                     && history.observations().equals(s.history.observations()) && history.reviews().equals(s.history.reviews())
+                     && history.assessments().equals(s.history.assessments()) && history.changes().equals(s.history.changes())
+-                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals());
++                    && history.descriptions().equals(s.history.descriptions()) && history.withdrawals().equals(s.history.withdrawals())
++                    && history.envelopes().equals(s.history.envelopes()) && history.interpretations().equals(s.history.interpretations());
+         }
+         @Override public int hashCode() {
+-            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals());
++            return Objects.hash(manifest, history.observations(), history.reviews(), history.assessments(), history.changes(), history.descriptions(), history.withdrawals(), history.envelopes(), history.interpretations());
+         }
+     }
+ 
+@@ -101,7 +105,7 @@
+         var records = records(history);
+         var entries = new ArrayList<RecordDigest>();
+         for (var record : records) entries.add(new RecordDigest(reference(record), RecordType.of(record), sha256(encodeRecord(record))));
+-        var snapshot = new Snapshot(new Manifest(history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
++        var snapshot = new Snapshot(new Manifest(!history.envelopes().isEmpty() || !history.interpretations().isEmpty() ? EVIDENCE_SCHEMA : history.descriptions().isEmpty() ? SCHEMA : DISCOVERY_SCHEMA, id, activity, createdAt, parent, entries), history);
+         verify(snapshot);
+         return snapshot;
+     }
+@@ -138,7 +142,7 @@
+     public Snapshot decode(byte[] bytes) throws IOException {
+         try {
+             var root = parse(bytes); fields(root, "schema", "manifest", "manifestSha256", "records");
+-            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
++            if (!SCHEMA.equals(text(root, "schema")) && !DISCOVERY_SCHEMA.equals(text(root, "schema")) && !EVIDENCE_SCHEMA.equals(text(root, "schema"))) throw new IOException("unsupported exchange schema");
+             if (!sha256(canonical(root.get("manifest"))).equals(text(root, "manifestSha256")))
+                 throw new IOException("manifest digest mismatch");
+             text(root.get("manifest"), "createdAt");
+@@ -165,8 +169,14 @@
+ 
+     private void verify(Snapshot snapshot) throws IOException {
+         var records = records(snapshot.history());
+-        if (!snapshot.history().descriptions().isEmpty() && !DISCOVERY_SCHEMA.equals(snapshot.manifest().schema()))
++        if (!snapshot.history().descriptions().isEmpty() && SCHEMA.equals(snapshot.manifest().schema()))
+             throw new IOException("description requires exchange v2");
++        if ((!snapshot.history().envelopes().isEmpty() || !snapshot.history().interpretations().isEmpty()) && !EVIDENCE_SCHEMA.equals(snapshot.manifest().schema()))
++            throw new IOException("opaque evidence requires exchange v3");
++        for (var envelope : snapshot.history().envelopes().values())
++            if (envelope.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates evidence");
++        for (var interpretation : snapshot.history().interpretations().values())
++            if (interpretation.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates interpretation");
+         var actual = new ArrayList<RecordDigest>();
+         for (var record : records) actual.add(new RecordDigest(reference(record), RecordType.of(record), contentDigest(record)));
+         if (!snapshot.manifest().records().equals(actual)) throw new IOException("manifest membership/content mismatch");
+@@ -184,6 +194,8 @@
+             if (change.recordedAt().isAfter(snapshot.manifest().createdAt())) throw new IOException("snapshot predates contained change");
+     }
+     private static String recordSchema(Object record) {
++        if (record instanceof EvidenceEnvelope || record instanceof EvidenceInterpretation
++                || record instanceof ScientificReference r && (r.kind() == EVIDENCE_ENVELOPE || r.kind() == EVIDENCE_INTERPRETATION)) return EVIDENCE_RECORD_SCHEMA;
+         if (record instanceof DiscoveryDescription || record instanceof DiscoveryDescription.Withdrawal
+                 || record instanceof ScientificReference r && (r.kind() == DISCOVERY_DESCRIPTION || r.kind() == DISCOVERY_WITHDRAWAL))
+             return DISCOVERY_RECORD_SCHEMA;
+@@ -201,13 +213,23 @@
+             for (var r : records) if (r instanceof Assessment assessment) history = history.append(assessment);
+             for (var r : records) if (r instanceof DiscoveryDescription description) history = history.append(description);
+             for (var r : records) if (r instanceof DiscoveryDescription.Withdrawal withdrawal) history = history.append(withdrawal);
++            for (var r : records) if (r instanceof EvidenceEnvelope e) history = history.append(e);
++            var pending = new ArrayList<EvidenceInterpretation>();
++            for (var r : records) if (r instanceof EvidenceInterpretation i) pending.add(i);
++            while (!pending.isEmpty()) {
++                int before = pending.size();
++                for (var i : List.copyOf(pending)) if (i.supersedes().isEmpty() || history.interpretations().containsKey(i.supersedes().orElseThrow())) {
++                    history = history.append(i); pending.remove(i);
++                }
++                if (pending.size() == before) throw new IllegalArgumentException("unresolved/cyclic interpretation ancestry");
++            }
+             return history;
+         } catch (IllegalArgumentException | NullPointerException error) { throw new IOException("inconsistent self-contained history", error); }
+     }
+     private Object readRecord(JsonNode wrapper) throws IOException {
+         fields(wrapper, "schema", "type", "data");
+         String schema = text(wrapper, "schema");
+-        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
++        if (!RECORD_SCHEMA.equals(schema) && !DISCOVERY_RECORD_SCHEMA.equals(schema) && !EVIDENCE_RECORD_SCHEMA.equals(schema)) throw new IOException("unsupported record schema");
+         if (!wrapper.get("data").isObject()) throw new IOException("record data object required");
+         try {
+             var type = RecordType.valueOf(text(wrapper, "type"));
+@@ -216,6 +238,7 @@
+             if (type == RecordType.ASSESSMENT) text(data, "recordedAt");
+             if (type == RecordType.REVIEW_CHANGE) { text(data, "effectiveAt"); text(data, "recordedAt"); }
+             if (type == RecordType.DISCOVERY_DESCRIPTION || type == RecordType.DISCOVERY_WITHDRAWAL) text(data, "recordedAt");
++            if (type == RecordType.ENVELOPE || type == RecordType.INTERPRETATION) text(data, "recordedAt");
+             Object record = json.treeToValue(data, type.javaType);
+             if (!recordSchema(record).equals(text(wrapper, "schema"))) throw new IOException("record type/schema mismatch");
+             return record;
+@@ -226,6 +249,7 @@
+         var result = new ArrayList<Object>(); result.addAll(history.observations().values()); result.addAll(history.reviews().values());
+         result.addAll(history.assessments().values()); result.addAll(history.changes().values());
+         result.addAll(history.descriptions().values()); result.addAll(history.withdrawals().values());
++        result.addAll(history.envelopes().values()); result.addAll(history.interpretations().values());
+         result.sort(Comparator.comparing(EvidenceExchange::reference, REFERENCES)); return List.copyOf(result);
+     }
+     private static ScientificReference reference(Object record) {
+@@ -233,6 +257,7 @@
+             case Observation o -> o.reference(); case Review r -> r.reference(); case Assessment a -> a.reference();
+             case EvidenceHistory.ReviewChange c -> c.reference();
+             case DiscoveryDescription d -> d.reference(); case DiscoveryDescription.Withdrawal w -> w.reference();
++            case EvidenceEnvelope e -> e.reference(); case EvidenceInterpretation i -> i.reference();
+             default -> throw new IllegalArgumentException("only history records may be contained in snapshots");
+         };
+     }
+--- software/qualification/system-graph-20261004/before/EvidenceHistory.java
++++ software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceHistory.java
+@@ -23,14 +23,17 @@
+     private final Map<ScientificReference, DiscoveryDescription> descriptions;
+     private final Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals;
+ 
+-    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
++    private final Map<ScientificReference, EvidenceEnvelope> envelopes;
++    private final Map<ScientificReference, EvidenceInterpretation> interpretations;
++    public EvidenceHistory() { this(Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()); }
+     private EvidenceHistory(Map<ScientificReference, Observation> observations, Map<ScientificReference, Review> reviews,
+                             Map<ScientificReference, Assessment> assessments, Map<ScientificReference, ReviewChange> changes,
+                             Map<ScientificReference, DiscoveryDescription> descriptions,
+-                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals) {
++                            Map<ScientificReference, DiscoveryDescription.Withdrawal> withdrawals, Map<ScientificReference, EvidenceEnvelope> envelopes, Map<ScientificReference, EvidenceInterpretation> interpretations) {
+         this.observations = Map.copyOf(observations); this.reviews = Map.copyOf(reviews);
+         this.assessments = Map.copyOf(assessments); this.changes = Map.copyOf(changes);
+         this.descriptions = Map.copyOf(descriptions); this.withdrawals = Map.copyOf(withdrawals);
++        this.envelopes = Map.copyOf(envelopes); this.interpretations = Map.copyOf(interpretations);
+     }
+     public Map<ScientificReference, Observation> observations() { return observations; }
+     public Map<ScientificReference, Review> reviews() { return reviews; }
+@@ -38,12 +41,12 @@
+     public Map<ScientificReference, ReviewChange> changes() { return changes; }
+     public EvidenceHistory append(Observation observation) {
+         var next = add(observations, observation.reference(), observation);
+-        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals);
++        return next == observations ? this : new EvidenceHistory(next, reviews, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(Review review) {
+         require(observations, review.observation());
+         var next = add(reviews, review.reference(), review);
+-        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals);
++        return next == reviews ? this : new EvidenceHistory(observations, next, assessments, changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(Assessment assessment) {
+         if (assessments.containsKey(assessment.reference())) {
+@@ -62,7 +65,7 @@
+                     || !admissible(review.reference(), assessment.recordedAt(), assessment.recordedAt())))
+                 throw new IllegalArgumentException("finding requires an admissible present observation");
+         }
+-        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals);
++        return new EvidenceHistory(observations, reviews, add(assessments, assessment.reference(), assessment), changes, descriptions, withdrawals, envelopes, interpretations);
+     }
+ 
+     /** Historical records are never removed. Retraction/supersession only changes scoped admissibility. */
+@@ -93,7 +96,7 @@
+                     || !replacement.reviewedAt().isAfter(old.reviewedAt()))
+                 throw new IllegalArgumentException("replacement must be a later review of the same scoped observation by the same reviewer");
+         });
+-        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals);
++        return new EvidenceHistory(observations, reviews, assessments, add(changes, change.reference(), change), descriptions, withdrawals, envelopes, interpretations);
+     }
+ 
+     public Map<ScientificReference, DiscoveryDescription> descriptions() { return descriptions; }
+@@ -104,7 +107,7 @@
+         if (!new EvidenceExchange().contentDigest(observation).equals(description.observationSha256()))
+             throw new IllegalArgumentException("discovery observation digest mismatch");
+         var next = add(descriptions, description.reference(), description);
+-        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals);
++        return next == descriptions ? this : new EvidenceHistory(observations, reviews, assessments, changes, next, withdrawals, envelopes, interpretations);
+     }
+     public EvidenceHistory append(DiscoveryDescription.Withdrawal withdrawal) {
+         if (withdrawals.containsKey(withdrawal.reference())) { add(withdrawals, withdrawal.reference(), withdrawal); return this; }
+@@ -120,7 +123,29 @@
+                 throw new IllegalArgumentException("replacement must be a later description of the same observation by the same agent");
+         });
+         return new EvidenceHistory(observations, reviews, assessments, changes, descriptions,
+-                add(withdrawals, withdrawal.reference(), withdrawal));
++                add(withdrawals, withdrawal.reference(), withdrawal), envelopes, interpretations);
++    }
++
++    public Map<ScientificReference, EvidenceEnvelope> envelopes() { return envelopes; }
++    public Map<ScientificReference, EvidenceInterpretation> interpretations() { return interpretations; }
++    public EvidenceHistory append(EvidenceEnvelope envelope) {
++        var next = add(envelopes, envelope.reference(), envelope);
++        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, next, interpretations);
++    }
++    public EvidenceHistory append(EvidenceInterpretation interpretation) {
++        for (var input : interpretation.inputs()) {
++            var source = require(envelopes, input.reference());
++            try {
++                if (!new EvidenceExchange().contentDigest(source).equals(input.sha256())) throw new IllegalArgumentException("input evidence digest mismatch");
++            } catch (IOException error) { throw new IllegalArgumentException("unencodable input", error); }
++            if (source.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("interpretation predates evidence");
++        }
++        interpretation.supersedes().ifPresent(id -> {
++            var prior = require(interpretations, id);
++            if (prior.recordedAt().isAfter(interpretation.recordedAt())) throw new IllegalArgumentException("supersession predates prior interpretation");
++        });
++        return new EvidenceHistory(observations, reviews, assessments, changes, descriptions, withdrawals, envelopes,
++                add(interpretations, interpretation.reference(), interpretation));
+     }
+ 
+     public boolean admissible(ScientificReference reviewId, Instant knownAt, Instant effectiveAt) {
+--- software/qualification/system-graph-20261004/before/EvidenceSnapshotCatalog.java
++++ software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/EvidenceSnapshotCatalog.java
+@@ -76,6 +76,7 @@
+         var found = find(expected.reference());
+         if (found.isPresent() && !pin(found.orElseThrow()).equals(expected))
+             throw new IOException("catalog snapshot digest mismatch");
++        if (found.isPresent()) for (var envelope : found.orElseThrow().history().envelopes().values()) envelope.verifyArtifact();
+         return found;
+     }
+ 
+@@ -97,6 +98,7 @@
+     private Result publish(EvidenceExchange.Snapshot incoming, EvidenceAdmission.Expectation expected,
+                            EvidenceAdmission.Result decision) throws IOException {
+         requireDirectory();
++        for (var envelope : incoming.history().envelopes().values()) envelope.verifyArtifact();
+         byte[] bytes = exchange.encode(incoming);
+         var destination = path(incoming.manifest().reference());
+         var existing = find(incoming.manifest().reference());
+--- software/qualification/system-graph-20261004/before/ScientificReference.java
++++ software/modules/mnemosyne/src/main/java/totah/lab/mnemosyne/ScientificReference.java
+@@ -6,7 +6,7 @@
+ public record ScientificReference(Kind kind, String namespace, String id, String version) {
+     public enum Kind {
+         ARTIFACT, SOURCE, SUBJECT, ENDPOINT, METHOD, CONTEXT, ACTIVITY, OBSERVATION,
+-        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT, DISCOVERY_DESCRIPTION, DISCOVERY_WITHDRAWAL
++        REVIEW, ASSESSMENT, PROPOSITION, CRITERION, POLICY, AGENT, RECEIPT, REVIEW_CHANGE, SNAPSHOT, DISCOVERY_DESCRIPTION, DISCOVERY_WITHDRAWAL, EVIDENCE_ENVELOPE, EVIDENCE_INTERPRETATION
+     }
+ 
+     public ScientificReference {

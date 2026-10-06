@@ -37,6 +37,13 @@ public final class SaltBridgeDetector {
             List<ChargedGroup> proteinGroups,
             List<ChargedGroup> ligandGroups,
             InteractionThresholds thresholds) {
+        return detect(proteinGroups, ligandGroups, thresholds, InteractionMeasurements.Observer.NONE);
+    }
+
+    List<Interaction> detect(
+            List<ChargedGroup> proteinGroups,
+            List<ChargedGroup> ligandGroups,
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         Objects.requireNonNull(proteinGroups, "proteinGroups");
         Objects.requireNonNull(ligandGroups, "ligandGroups");
@@ -50,10 +57,9 @@ public final class SaltBridgeDetector {
                 }
                 double distance = proteinGroup.chargeCenter()
                         .distance(ligandGroup.chargeCenter());
-                if (distance <= thresholds.minDist()
-                        || distance > thresholds.saltBridgeDistMax()) {
-                    continue;
-                }
+                var measurements = java.util.Map.of("distance", distance);
+                observer.accept("SALT_BRIDGE", proteinGroup.atoms(), ligandGroup.atoms(), measurements);
+                if (InteractionMeasurements.classify("SALT_BRIDGE", measurements, thresholds) == null) continue;
                 bridges.add(new Interaction(
                         InteractionType.SALT_BRIDGE,
                         proteinGroup.owner(),

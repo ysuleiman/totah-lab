@@ -47,6 +47,14 @@ public final class HydrophobicContactDetector {
             HydrophobicAtoms proteinHydrophobic,
             HydrophobicAtoms ligandHydrophobic,
             InteractionThresholds thresholds) {
+        return detect(protein, proteinHydrophobic, ligandHydrophobic, thresholds, InteractionMeasurements.Observer.NONE);
+    }
+
+    List<Interaction> detect(
+            Structure protein,
+            HydrophobicAtoms proteinHydrophobic,
+            HydrophobicAtoms ligandHydrophobic,
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         Objects.requireNonNull(protein, "protein");
         Objects.requireNonNull(proteinHydrophobic, "proteinHydrophobic");
@@ -64,10 +72,9 @@ public final class HydrophobicContactDetector {
             for (Atom ligandAtom : ligandHydrophobic.atoms()) {
                 double distance = proteinAtom.getPosition()
                         .distance(ligandAtom.getPosition());
-                if (distance <= thresholds.minDist()
-                        || distance > thresholds.hydrophobicDistMax()) {
-                    continue;
-                }
+                var measurements = java.util.Map.of("distance", distance);
+                observer.accept("HYDROPHOBIC", List.of(proteinAtom), List.of(ligandAtom), measurements);
+                if (InteractionMeasurements.classify("HYDROPHOBIC", measurements, thresholds) == null) continue;
                 contacts.add(new Interaction(
                         InteractionType.HYDROPHOBIC_CONTACT,
                         residue,

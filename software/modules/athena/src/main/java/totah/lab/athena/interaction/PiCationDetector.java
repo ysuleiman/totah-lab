@@ -66,6 +66,15 @@ public final class PiCationDetector {
             List<ChargedGroup> ligandGroups,
             List<AromaticRing> ligandRings,
             InteractionThresholds thresholds) {
+        return detect(proteinGroups, proteinRings, ligandGroups, ligandRings, thresholds, InteractionMeasurements.Observer.NONE);
+    }
+
+    List<Interaction> detect(
+            List<ChargedGroup> proteinGroups,
+            List<AromaticRing> proteinRings,
+            List<ChargedGroup> ligandGroups,
+            List<AromaticRing> ligandRings,
+            InteractionThresholds thresholds, InteractionMeasurements.Observer observer) {
 
         Objects.requireNonNull(proteinGroups, "proteinGroups");
         Objects.requireNonNull(proteinRings, "proteinRings");
@@ -79,7 +88,7 @@ public final class PiCationDetector {
                 continue;
             }
             for (AromaticRing ring : ligandRings) {
-                evaluate(group, ring, true, thresholds, interactions);
+                evaluate(group, ring, true, thresholds, interactions, observer);
             }
         }
         for (ChargedGroup group : ligandGroups) {
@@ -87,7 +96,7 @@ public final class PiCationDetector {
                 continue;
             }
             for (AromaticRing ring : proteinRings) {
-                evaluate(group, ring, false, thresholds, interactions);
+                evaluate(group, ring, false, thresholds, interactions, observer);
             }
         }
         return List.copyOf(interactions);
@@ -98,33 +107,23 @@ public final class PiCationDetector {
             AromaticRing ring,
             boolean proteinGroup,
             InteractionThresholds thresholds,
-            List<Interaction> interactions) {
+            List<Interaction> interactions, InteractionMeasurements.Observer observer) {
 
         Optional<Plane3D> plane = InteractionGeometry.ringPlane(ring);
         if (plane.isEmpty()) {
             return;
         }
         double distance = ring.centroid().distance(group.chargeCenter());
-        if (distance <= thresholds.minDist()
-                || distance > thresholds.piCationDistMax()) {
-            return;
-        }
-        double offset = plane.get().centroid()
-                .distance(plane.get().project(group.chargeCenter()));
-        if (offset > thresholds.piCationOffsetMax()) {
-            return;
-        }
-        Double tertamineAngle = null;
-        if (group.type() == ChargedGroupType.AMINE) {
-            tertamineAngle = tertamineAngle(group, plane.get());
-            if (tertamineAngle == null) {
-                // Guard not evaluable (too few neighbor atoms): the
-                // distance/offset gates alone decide.
-            } else if (tertamineAngle
-                    > thresholds.piCationTertamineAngleMax()) {
-                return;
-            }
-        }
+        double offset = plane.get().centroid().distance(plane.get().project(group.chargeCenter()));
+        Double tertamineAngle = group.type() == ChargedGroupType.AMINE ? tertamineAngle(group, plane.get()) : null;
+        var measurements = new java.util.TreeMap<String,Double>();
+        measurements.put("distance", distance); measurements.put("offset", offset);
+        measurements.put("amineGuardRequired", group.type() == ChargedGroupType.AMINE ? 1.0 : 0.0);
+        if (tertamineAngle != null) measurements.put("angle", tertamineAngle);
+        observer.accept("PI_CATION", proteinGroup ? group.atoms() : ring.atoms(),
+                proteinGroup ? ring.atoms() : group.atoms(), measurements);
+        // Preserve native behavior: an unevaluable amine guard is skipped. Registry coverage marks this conditional.
+        if (InteractionMeasurements.classify("PI_CATION", measurements, thresholds) == null) return;
         interactions.add(new Interaction(
                 InteractionType.PI_CATION,
                 proteinGroup ? group.owner() : ring.owner(),

@@ -1,0 +1,50 @@
+{
+  "schema": "athena-rule/1",
+  "ruleId": "GEO.PROX.001",
+  "version": "1.0.0",
+  "profile": "ATHENA_NATIVE",
+  "family": "ENVIRONMENT",
+  "tier": "engineering-method",
+  "implementationId": "native.geometry",
+  "implementationVersion": "1",
+  "qualification": "QUALIFIED",
+  "retired": false,
+  "requiredCapabilities": [
+    "DISTANCE_QUERIES"
+  ],
+  "requiredChemistry": [],
+  "requiredGeometry": [
+    "finite common-frame coordinates",
+    "explicit source atom identities"
+  ],
+  "measurementsProduced": {
+    "geometry": "angstrom/degree; explicit per-field keys and source identities"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {},
+  "scientificSources": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Existing Gaia/Athena measurement implementation; engineering qualification only"
+    }
+  ],
+  "referenceArtifacts": [
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java",
+      "sha256": "6d3347d13ea0ca05a9df6754816d87adee9ff3d39d365df7a944d0b97f0a8f39",
+      "citation": "Versioned Java collector/evaluator"
+    }
+  ],
+  "limitations": [
+    "No binding energy, inhibition, oxidation, causality or physical coupling claim.",
+    "Only explicit input state/selection and declared coverage; no implicit current truth."
+  ]
+}

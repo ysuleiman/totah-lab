@@ -76,6 +76,7 @@ public final class EvidenceSnapshotCatalog {
         var found = find(expected.reference());
         if (found.isPresent() && !pin(found.orElseThrow()).equals(expected))
             throw new IOException("catalog snapshot digest mismatch");
+        if (found.isPresent()) for (var envelope : found.orElseThrow().history().envelopes().values()) envelope.verifyArtifact();
         return found;
     }
 
@@ -97,6 +98,7 @@ public final class EvidenceSnapshotCatalog {
     private Result publish(EvidenceExchange.Snapshot incoming, EvidenceAdmission.Expectation expected,
                            EvidenceAdmission.Result decision) throws IOException {
         requireDirectory();
+        for (var envelope : incoming.history().envelopes().values()) envelope.verifyArtifact();
         byte[] bytes = exchange.encode(incoming);
         var destination = path(incoming.manifest().reference());
         var existing = find(incoming.manifest().reference());

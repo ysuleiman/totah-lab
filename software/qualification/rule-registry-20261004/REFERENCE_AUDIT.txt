@@ -1,0 +1,137 @@
+REFERENCE ARCHITECTURES AND COMPLETE PLIP FAMILY — audited 2026-10-04
+No new scientific classifiers inferred from these references.
+PLIP source version: 3.0.1; revision 2f4911d307490479ac023b22d6faa8f59b577ca8.
+Exact upstream files retained under reference/, original license included. SHA256
+pins in reference/SOURCES.json and checkpoint manifests. Source inspection covered
+preparation.py, detection.py, supplemental.py AND config.py; config alone insufficient.
+These source files are references, never executed/imported into the Java pipeline.
+
+A. Implementation audit / authoritative source map
+HYDROPHOBIC: preparation.hydrophobic_atoms; detection.hydrophobic_interactions;
+PLInteraction.refine_hydrophobic. Carbon-neighbor perception, exclusions and refinement.
+HBOND: preparation.find_hba/find_hbd and Ligand donor remapping; detection.hbonds;
+PLInteraction.refine_hbonds_ldon/pdon. OpenBabel roles/H bonds, not AD4 nearest-heavy.
+PI_STACKING: preparation.find_rings + supplemental.ring_is_planar; detection.pistacking.
+OpenBabel SSSR/planarity, selected-atom normals and centroid/projection geometry.
+PI_CATION: preparation.find_charged/is_functional_group; detection.pication;
+PLInteraction.refine_pication. Charge construction, ligand-tertiary-amine guard/loop order.
+SALT_BRIDGE: preparation.find_charged/append_if_charged_func_group; detection.saltbridge.
+Group-center construction and signs, not closest atom distance or partial-charge sum.
+HALOGEN_BOND: BindingSite.find_hal/Ligand.find_hal; detection.halogen.
+Explicit donor-neighbor and acceptor-neighbor eligibility plus directional angles.
+WATER_BRIDGE: Ligand.water; detection.water_bridges; PLInteraction.refine_water_bridges.
+Same-water, first-degree paths, donor/acceptor geometry, H-bond suppression and capacity.
+METAL_COMPLEX: config.METAL_IONS; both find_metal_binding methods;
+detection.metal_complexation. Typed targets, fitted coordination, exclusions, water-only veto.
+
+Exact numeric thresholds and bound conventions for each family are in the respective
+PLIP_3_0_1 manifest; scientific comments/citations remain in pinned config.py. Do not
+apply a universal strict-bound convention: water distances are inclusive; amine guard
+has its own comparison. Metal geometry uses angular-fit heuristics, not just 3 A.
+The complete code is authoritative for ordering, special modes and exclusions.
+
+Perception/preparation differences material to qualification:
+- PLIP normally adds polar hydrogens; this frozen-state pipeline never does so.
+- Original atom mapping and alternate-conformer filtering affect candidate identity.
+- PLIP ring membership/normal construction differs from Athena chordless-cycle and
+  least-squares-plane methods. Equal numerical thresholds do not imply equal results.
+- PLIP functional-group heuristics are not a proof of a biological ionization state;
+  the Java registry requires authoritative formal-charge coverage for negative claims.
+- Binding-site atom selection, ligand definitions and DNA/peptide/intra modes are
+  separate upstream policies. Full system graph ownership remains unchanged here.
+See the exact pinned source rather than replacing its behavior with method names.
+
+B. Existing infrastructure / decision matrix
+Function                         Existing authority                          Decision
+Atoms/bonds/coordinates            Gaia Structure/ResidueGraph                reuse
+Source chemical state              MolecularGraph + OclGraphMapper            reuse
+SMARTS/substructure matches        SubstructureMatcher/OclMolecularBackend     reuse OCL SSSearcher
+Donor/acceptor perception           native AD4 prepared-state detector         native only; not PLIP parity
+Hydrophobic perception             HydrophobicAtomPerception                  preserve bond/AD4 provenance
+Ring perception/plane              AromaticRingPerception / Plane3D            native only; PLIP differences explicit
+Charge perception                  ChargedGroupPerception/formal assignments  both partners; guard source coverage
+Distance/angle/torsion              Point3D/Vector3D/Dihedral                   reuse
+Raw candidate collection            existing five detectors' shared loops      additive measurement observer
+Cross-family refinements            InteractionRefinements                     preserve existing behavior/tests
+Halogen native detector             HalogenBondDetector                        exists; native registration deferred
+Water/metal perception+algorithms    no complete Athena equivalent identified    PLIP profiles UNSUPPORTED
+Reference radii                     Gaia Element table                         pin separately from algorithm
+Clash algorithm                     StericClashAnalysis                        native scaled-vdW, NOT Probe
+Ideal covalent geometry rules       foundation marks NOT_EVALUATED             remains unqualified
+Opaque observations/interpretation  Mnemosyne /3                               unchanged
+Certificates/orchestration          SystemGraphCertificate/qualification flow   reuse; explicit rule digest
+
+No exact PLIP family is advertised as executable parity in this checkpoint. All eight
+are registered UNSUPPORTED with missing prerequisites and original definitions.
+Ten executable native profiles cover five families with native and explicitly named
+PLIP-threshold parameter sets. These are NOT called exact PLIP rules. Qualification
+compares native/reference-threshold results on shared measurements and retains both.
+No water/metal approximation or hidden substitution. Halogen source audited even
+though its native registration is deferred. Registered unsupported != absent evidence.
+
+C. OpenFF / SMIRNOFF architectural reference
+Source: https://openforcefield.github.io/standards/standards/smirnoff/
+Captured as reference/openff-smirnoff.html (content hash pinned).
+Relevant architecture: chemical pattern matching, declared aromaticity model, versioned
+serialization, units and ordered specificity/assignment. Its later-match precedence
+belongs to parameter assignment, not universal scientific conflict resolution.
+Existing OCL matcher already provides SMARTS matching and stable query-to-target atom
+IDs with backend evidence. New matcher, SMARTS dialect or force-field assignment is
+unnecessary. OCL semantics are not silently labeled OpenFF/OpenEye semantics.
+Here profiles assess independently; conflicts coexist. No global last-rule-wins.
+Existing native refinement order is method-specific and retains raw detections.
+No SMIRNOFF force constants, charging model, energy function or parameterization added.
+
+D. MolProbity / Probe architectural reference
+Source: https://github.com/rlabduke/probe/blob/master/README.probe.txt
+Captured as reference/probe-readme.txt. Upstream deprecates this legacy Probe in favor
+of CCTBX Probe2; no assertion that Athena implements either program.
+Probe examines atom-surface contacts with explicit H and defined radii/preparation;
+its dot-based contact classification is not the native heavy-atom overlap algorithm.
+Keep a reference radii/ideal-geometry dataset, its source and its validation algorithm
+separately attributable. This milestone pins Gaia's current radii table separately
+from StericClashAnalysis. It does not import Probe radii or qualify ideal-geometry checks.
+Changing a numerical radius/algorithm requires new method/reference provenance;
+matching one cutoff alone cannot establish MolProbity/Probe validation equivalence.
+
+E. Target separation implemented
+Perception: existing native chemistry classes or existing injected OCL matcher.
+Measurement: shared Java detector geometry and Gaia utilities, explicit state/coverage.
+Reference parameters: strict versioned JSON manifests and content-addressed artifacts.
+Classification: named allowlisted Java predicates; no JSON expression interpreter.
+Qualification/provenance: manifest digest, prerequisites, coverage, method/reference pins.
+Result/evidence: independent immutable collection envelopes + attributed assessments.
+No new residue-specific chemical classifier; sulfur collector records requested
+standard atom-role geometry with source identity and missing/undefined states only.
+
+F. Algorithm details and parity limitations
+reference/ALGORITHM_REQUIREMENTS.json is included by digest in every external profile.
+It records the per-family perception, geometric construction and refinement prerequisites.
+Additional common policies: config BS_DIST=7.5 A is an upstream preselection parameter,
+not permission for a derived Pocket to remove evidence from the full system graph.
+Alternate conformers, original atom mapping, ligand extraction, model/chain/region modes
+and polar-H preparation must be pinned before any future exact-parity qualification.
+The INTRA filter additionally removes same-residue contacts and deduplicates unordered
+residue pairs using rounded distances; this is not Athena's full-identity refinement.
+
+Actual code differs from shorthand chemical descriptions in places. For example,
+is_functional_group compares string '1' with integer neighbor atomic numbers; metal
+alcohol perception also counts string '1'. Water refinement's replacement path stores
+an angle where other entries store distance from 110 degrees. Ring normals come from
+selected ordered atoms, not a fitted plane. Exact-code parity would have to preserve or
+explicitly version such behavior; none has been silently fixed or ported here.
+Metal fitting uses mean Euclidean norms of matched angular residuals, rather than an
+energy or a conventional normalized RMS deviation. Single-target geometry is NA;
+coordination candidates are 2-6. The source's 0.5/3.5 selection heuristics are retained
+with angular-score units and the full algorithm reference, not treated as distances.
+
+No PLIP/OpenBabel runtime was installed or executed. The pinned PLIP source version is
+3.0.1 at the recorded revision; dependency/runtime parity remains unqualified. References
+are source-audited definitions, not a claim of numerical comparison against a running
+PLIP installation. Native-versus-reference-threshold comparisons execute Java only.
+
+The clash wrapper intentionally records the existing protocol-filtered native output.
+It does not mislabel this as all pre-threshold atom pairs: radiusScale is part of its
+collection identity. A changed clash threshold requires recollection from the same
+immutable source state. Five interaction collectors retain pre-threshold candidates
+within their declared partner scope and candidate budget.
