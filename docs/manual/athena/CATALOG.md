@@ -1,12 +1,12 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d73e09c63e1f44291988a6aa574373692dc98bd0c36418f563f80517f309d55b`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `992e090280ba16fd0dc78472cf21c8b51ebe2563a179ceccb62c3ffb0c60e654`.
 
 Disposition is copied without upgrading partial capability coverage.
 
 | ID | Capability | Priority | Disposition | Evidence |
 |---|---|---|---|---|
-| P01 | SMARTS/SMIRKS and reusable atom/group queries | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
+| P01 | SMARTS/SMIRKS and reusable atom/group queries | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | P02 | Valence/aromaticity/conjugation/hybridization/ring perception | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [aromatic-systems-20261005](../../../software/qualification/aromatic-systems-20261005/CHECKPOINT.txt) |
 | P03 | Donor and acceptor features | P0 | BOUNDED_COMPOSITION_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [chemical-role-perception-20261005](../../../software/qualification/chemical-role-perception-20261005/CHECKPOINT.txt), [p03-role-closure-20261005](../../../software/qualification/p03-role-closure-20261005/CHECKPOINT.txt) |
 | P04 | Positive/negative ionizable features versus formal charge | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt), [charge-groups-20261005](../../../software/qualification/charge-groups-20261005/CHECKPOINT.txt) |
@@ -14,16 +14,16 @@ Disposition is copied without upgrading partial capability coverage.
 | P06 | Aromatic pharmacophore/centroid features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [aromatic-systems-20261005](../../../software/qualification/aromatic-systems-20261005/CHECKPOINT.txt), [p06-centroid-v2-20261005](../../../software/qualification/p06-centroid-v2-20261005/CHECKPOINT.txt) |
 | P07 | Zinc-binding pharmacophore motifs | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | P08 | Functional-group hierarchy and fragment features | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| P09 | Explicit/implicit hydrogens and state preparation | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
-| I01 | Hydrophobic contact | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| I02 | Explicit-H directional hydrogen bond | P0 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| P09 | Explicit/implicit hydrogens and state preparation | P0 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
+| I01 | Hydrophobic contact | P1 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
+| I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I03 | Implicit-H hydrogen-bond approximation | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I04 | Weak C-H donor perception | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| I05 | Parallel/face-to-face pi stacking | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| I06 | T-shaped/edge-to-face pi stacking | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| I05 | Parallel/face-to-face pi stacking | P1 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
+| I06 | T-shaped/edge-to-face pi stacking | P1 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I07 | Union pi-stacking wrapper | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| I08 | Cation-pi | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
-| I09 | Ionic/salt-bridge proximity | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| I08 | Cation-pi | P1 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
+| I09 | Ionic/salt-bridge proximity | P1 | BOUNDED_IMPLEMENTATION_QUALIFIED_RESEARCH_GATE_PENDING | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I10 | Halogen bond to atom acceptor | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I11 | Halogen bond to pi system | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | I12 | Single-water H-bond bridge | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
@@ -85,7 +85,7 @@ Disposition is copied without upgrading partial capability coverage.
 | G08 | Typed H-bond/charge/cofactor/second-shell networks | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | F01 | Functional group: Acids/carboxylates | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt) |
 | F02 | Functional group: Amides and methyl amides | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
-| F03 | Functional group: Esters/acyl linkages | P1 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
+| F03 | Functional group: Esters/acyl linkages | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt) |
 | F04 | Functional group: Aldehydes/ketones/carbonyls | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | F05 | Functional group: Acid/sulfonyl chlorides | P2 | PENDING_RECONCILIATION_NOT_COMPLETE |  |
 | F06 | Functional group: Amine subclasses | P1 | PARTIAL_SUPPORTED_DOMAINS_REMAINDER_PENDING | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
