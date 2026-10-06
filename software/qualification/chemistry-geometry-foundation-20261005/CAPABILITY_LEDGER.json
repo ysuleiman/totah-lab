@@ -768,47 +768,49 @@
       "priorDecision": "UNSUPPORTED",
       "priorRationale": "No water model/protonation/leg-coverage qualification yet",
       "priorAthenaStatus": "UNSUPPORTED",
-      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
       "sourceInventory": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
       "sourceInventorySha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
-      "previousProgramDisposition": "PENDING_RECONCILIATION_NOT_COMPLETE",
+      "previousProgramDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
       "closure": {
         "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
-        "scope": "Define water identity/orientation and two compatible directional legs with complete water/H coverage.",
+        "scope": "Explicit-source-H structural candidate with exactly one neutral internal water; all directional legs coexist in one immutable supplied state.",
         "sourceInventoryEntry": "I12",
-        "scientificSupport": "PLIP water_bridges; ProLIF WaterBridge",
+        "scientificSupport": "Pinned source definitions compared explicitly in water-bridge-contract-20261006/CONTRACT.txt and SOURCE_PINS.json; direct user approval with two normative clarifications.",
         "researchDossiers": [
           "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.WATER_BRIDGE.PATH.json"
         ],
-        "reviewRequirements": [
-          "PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported."
-        ],
+        "reviewRequirements": [],
         "currentPolicyQualified": false,
-        "newScientificDefinitionApproved": false,
-        "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
-        "existingImplementation": "Reference registration only",
-        "qualificationEvidence": [],
+        "newScientificDefinitionApproved": true,
+        "qualificationBasis": "2027 full committed-source tests +3 source-identical supplemental matrix tests +3 isolation;98 family tests;50 matrix cases;11 independent JVM pairs;65 historical files exact;25 pins intact. No production receipt.",
+        "existingImplementation": "WaterBridgeInputs/WaterIdentity/WaterBridgeLegs/WaterBridgeRules compose existing matcher, source roles, geometry, coverage, Research Gate and unchanged EventPaths.",
+        "qualificationEvidence": [
+          "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt"
+        ],
         "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
-        "outsideBoundedDomain": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge."
+        "outsideBoundedDomain": "No implicit-H orientation, inferred waters, PLIP heuristic/pruning, occupancy/energy interpretation, extra donor/acceptor chemistry or physical solvent completeness."
       },
       "currentWorkAssessment": {
-        "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
-        "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
-        "remainingDependency": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge."
+        "classification": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+        "artifact": "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
+        "remainingDependency": null
       },
-      "remainingClosureDependency": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge.",
-      "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json",
+      "remainingClosureDependency": null,
+      "remainingClosureAssessment": "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
       "progressArtifacts": [
         "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
         "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
         "software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json",
         "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
         "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
-        "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt"
+        "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
+        "software/qualification/water-bridge-implementation-20261006/VALIDATION.json",
+        "software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json"
       ],
       "currentContractReview": {
         "date": "2026-10-06",
-        "status": "APPROVED_WITH_TWO_CLARIFICATIONS_IMPLEMENTATION_IN_QUALIFICATION",
+        "status": "APPROVED_CLARIFIED_IMPLEMENTED_AND_BOUNDED_QUALIFIED",
         "dependencyOrder": [
           "I12",
           "I13"
@@ -817,10 +819,40 @@
         "inputContract": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
         "acceptanceMatrix": "software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json",
         "implementationStarted": true,
-        "dispositionChanged": false,
+        "dispositionChanged": true,
         "approval": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
         "candidateUniverse": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt"
-      }
+      },
+      "historicalPreWaterGate": {
+        "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+        "closure": {
+          "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
+          "scope": "Define water identity/orientation and two compatible directional legs with complete water/H coverage.",
+          "sourceInventoryEntry": "I12",
+          "scientificSupport": "PLIP water_bridges; ProLIF WaterBridge",
+          "researchDossiers": [
+            "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.WATER_BRIDGE.PATH.json"
+          ],
+          "reviewRequirements": [
+            "PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported."
+          ],
+          "currentPolicyQualified": false,
+          "newScientificDefinitionApproved": false,
+          "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
+          "existingImplementation": "Reference registration only",
+          "qualificationEvidence": [],
+          "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
+          "outsideBoundedDomain": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge."
+        },
+        "currentWorkAssessment": {
+          "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
+          "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
+          "remainingDependency": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge."
+        },
+        "remainingClosureDependency": "Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge.",
+        "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json"
+      },
+      "note": "User-approved explicit-source-H water candidate only; bounded engineering qualification is separate from current-policy scientific activation."
     },
     {
       "capabilityId": "I13",
@@ -829,43 +861,47 @@
       "priorDecision": "UNSUPPORTED",
       "priorRationale": "Geometric path is not physical coupling; preserve intermediate entities",
       "priorAthenaStatus": "UNSUPPORTED",
-      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
       "sourceInventory": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
       "sourceInventorySha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
-      "previousProgramDisposition": "PENDING_RECONCILIATION_NOT_COMPLETE",
+      "previousProgramDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
       "closure": {
         "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
-        "scope": "Define same-state multiwater path validity, orientation consistency, search bounds and negative coverage.",
+        "scope": "Explicit-source-H structural candidate with 2..K distinct neutral internal waters, explicitly bounded K; all directional legs coexist in one immutable supplied state.",
         "sourceInventoryEntry": "I13",
-        "scientificSupport": "ProLIF water_bridge.py",
+        "scientificSupport": "Pinned source definitions compared explicitly in water-bridge-contract-20261006/CONTRACT.txt and SOURCE_PINS.json; direct user approval with two normative clarifications.",
         "researchDossiers": [],
         "reviewRequirements": [],
         "currentPolicyQualified": false,
-        "newScientificDefinitionApproved": false,
-        "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
-        "existingImplementation": "EventPaths provides bounded same-state typed topology; water-specific chemical/orientation validity is not implemented.",
-        "qualificationEvidence": [],
+        "newScientificDefinitionApproved": true,
+        "qualificationBasis": "2027 full committed-source tests +3 source-identical supplemental matrix tests +3 isolation;98 family tests;50 matrix cases;11 independent JVM pairs;65 historical files exact;25 pins intact. No production receipt.",
+        "existingImplementation": "WaterBridgeInputs/WaterIdentity/WaterBridgeLegs/WaterBridgeRules compose existing matcher, source roles, geometry, coverage, Research Gate and unchanged EventPaths.",
+        "qualificationEvidence": [
+          "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt"
+        ],
         "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
-        "outsideBoundedDomain": "Approved event contract now supplies explicit edge identity, path multiplicity, bounds and negative coverage. Remaining scientific dependency: I12 qualified water identity/directional legs and orientation-compatible multiwater composition. Do not implement another path engine or treat O-only proximity as water H bonding."
+        "outsideBoundedDomain": "No implicit-H orientation, inferred waters, PLIP heuristic/pruning, occupancy/energy interpretation, extra donor/acceptor chemistry or physical solvent completeness."
       },
       "currentWorkAssessment": {
-        "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
-        "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
-        "remainingDependency": "I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path."
+        "classification": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+        "artifact": "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
+        "remainingDependency": null
       },
-      "remainingClosureDependency": "I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path.",
-      "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json",
+      "remainingClosureDependency": null,
+      "remainingClosureAssessment": "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
       "progressArtifacts": [
         "software/qualification/water-bridge-contract-20261006/CONTRACT.txt",
         "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
         "software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json",
         "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt",
         "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
-        "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt"
+        "software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt",
+        "software/qualification/water-bridge-implementation-20261006/VALIDATION.json",
+        "software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json"
       ],
       "currentContractReview": {
         "date": "2026-10-06",
-        "status": "APPROVED_WITH_TWO_CLARIFICATIONS_IMPLEMENTATION_IN_QUALIFICATION",
+        "status": "APPROVED_CLARIFIED_IMPLEMENTED_AND_BOUNDED_QUALIFIED",
         "dependencyOrder": [
           "I12",
           "I13"
@@ -874,10 +910,36 @@
         "inputContract": "software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt",
         "acceptanceMatrix": "software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json",
         "implementationStarted": true,
-        "dispositionChanged": false,
+        "dispositionChanged": true,
         "approval": "software/qualification/water-bridge-contract-20261006/APPROVAL.json",
         "candidateUniverse": "software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt"
-      }
+      },
+      "historicalPreWaterGate": {
+        "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+        "closure": {
+          "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
+          "scope": "Define same-state multiwater path validity, orientation consistency, search bounds and negative coverage.",
+          "sourceInventoryEntry": "I13",
+          "scientificSupport": "ProLIF water_bridge.py",
+          "researchDossiers": [],
+          "reviewRequirements": [],
+          "currentPolicyQualified": false,
+          "newScientificDefinitionApproved": false,
+          "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
+          "existingImplementation": "EventPaths provides bounded same-state typed topology; water-specific chemical/orientation validity is not implemented.",
+          "qualificationEvidence": [],
+          "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
+          "outsideBoundedDomain": "Approved event contract now supplies explicit edge identity, path multiplicity, bounds and negative coverage. Remaining scientific dependency: I12 qualified water identity/directional legs and orientation-compatible multiwater composition. Do not implement another path engine or treat O-only proximity as water H bonding."
+        },
+        "currentWorkAssessment": {
+          "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
+          "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
+          "remainingDependency": "I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path."
+        },
+        "remainingClosureDependency": "I12 water/leg definition plus exact same-state path multiplicity, orientation consistency, traversal bound and negative-coverage policy. Existing spatial traversal is not an H-bond path.",
+        "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json"
+      },
+      "note": "User-approved explicit-source-H water candidate only; bounded engineering qualification is separate from current-policy scientific activation."
     },
     {
       "capabilityId": "I14",

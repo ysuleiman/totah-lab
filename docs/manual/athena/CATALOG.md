@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `9b198fbea1793573780e8c2bcf3512c5d8a7938fcc877f0e7fcc7ebcbb0f3065`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d63995a4e88a596b2a2024dca18181d01e76febdfa6398e028a00acc0a3d5ea0`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -26,8 +26,8 @@ Disposition is copied without upgrading partial capability coverage.
 | I09 | Ionic/salt-bridge proximity | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I10 | Halogen bond to atom acceptor | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I11 | Halogen bond to pi system | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| I12 | Single-water H-bond bridge | P2 | SCIENTIFIC_REVIEW_REQUIRED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt) |
-| I13 | Multi-water bridge paths | P2 | SCIENTIFIC_REVIEW_REQUIRED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt) |
+| I12 | Single-water H-bond bridge | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
+| I13 | Multi-water bridge paths | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
 | I14 | Metal-ligand pair proximity | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I15 | Metal coordination geometry/complex | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I16 | Van der Waals contact/gap | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
@@ -400,31 +400,29 @@ Aromatic-face halogen interaction requires explicit face/axis/angular/radius def
 
 ### I12 — Single-water H-bond bridge
 
-Define water identity/orientation and two compatible directional legs with complete water/H coverage.
+Explicit-source-H structural candidate with exactly one neutral internal water; all directional legs coexist in one immutable supplied state.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2027 full committed-source tests +3 source-identical supplemental matrix tests +3 isolation;98 family tests;50 matrix cases;11 independent JVM pairs;65 historical files exact;25 pins intact. No production receipt.
 
-**Existing implementation:** Reference registration only
+**Existing implementation:** WaterBridgeInputs/WaterIdentity/WaterBridgeLegs/WaterBridgeRules compose existing matcher, source roles, geometry, coverage, Research Gate and unchanged EventPaths.
 
-**Supporting source:** PLIP water_bridges; ProLIF WaterBridge
+**Supporting source:** Pinned source definitions compared explicitly in water-bridge-contract-20261006/CONTRACT.txt and SOURCE_PINS.json; direct user approval with two normative clarifications.
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.WATER_BRIDGE.PATH.json) · SHA256 `bd504e9bd3ece084ed54b8bb1f97c491070fc85a1f5a14d9d2f44a3d263ed21b`
 
-**Remaining scientific requirement:** PLIP/ProLIF practices surveyed; no general O-only geometry proof. Dataset needed for any inferred-water orientation policy. Water perception/directional H-bond domain and coherent orientation coverage remain unsupported.
-
-Water molecule/H-state identity and orientation-consistent two-leg candidate policy are not part of the existing carbon-bound donor/acceptor domain. Need explicit water perception and compatibility semantics; O-only proximity cannot establish a directional bridge.
+No implicit-H orientation, inferred waters, PLIP heuristic/pruning, occupancy/energy interpretation, extra donor/acceptor chemistry or physical solvent completeness.
 
 ### I13 — Multi-water bridge paths
 
-Define same-state multiwater path validity, orientation consistency, search bounds and negative coverage.
+Explicit-source-H structural candidate with 2..K distinct neutral internal waters, explicitly bounded K; all directional legs coexist in one immutable supplied state.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2027 full committed-source tests +3 source-identical supplemental matrix tests +3 isolation;98 family tests;50 matrix cases;11 independent JVM pairs;65 historical files exact;25 pins intact. No production receipt.
 
-**Existing implementation:** EventPaths provides bounded same-state typed topology; water-specific chemical/orientation validity is not implemented.
+**Existing implementation:** WaterBridgeInputs/WaterIdentity/WaterBridgeLegs/WaterBridgeRules compose existing matcher, source roles, geometry, coverage, Research Gate and unchanged EventPaths.
 
-**Supporting source:** ProLIF water_bridge.py
+**Supporting source:** Pinned source definitions compared explicitly in water-bridge-contract-20261006/CONTRACT.txt and SOURCE_PINS.json; direct user approval with two normative clarifications.
 
-Approved event contract now supplies explicit edge identity, path multiplicity, bounds and negative coverage. Remaining scientific dependency: I12 qualified water identity/directional legs and orientation-compatible multiwater composition. Do not implement another path engine or treat O-only proximity as water H bonding.
+No implicit-H orientation, inferred waters, PLIP heuristic/pruning, occupancy/energy interpretation, extra donor/acceptor chemistry or physical solvent completeness.
 
 ### I14 — Metal-ligand pair proximity
 
