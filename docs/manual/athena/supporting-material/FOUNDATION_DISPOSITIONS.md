@@ -46,7 +46,7 @@ protonation/state requirements, coverage requirements and needed boundary tests.
 
 The new clean-source suite builds from a Git export with empty output directories
 and pinned third-party JARs. It exercises existing implemented domains and failure
-boundaries; it cannot qualify the 46 scientific-review dispositions as classifiers.
+boundaries; it cannot qualify the 44 scientific-review dispositions as classifiers.
 Program disposition completeness, implementation tests and current-policy scientific
 qualification must always be reported separately. Whole-foundation closure additionally
 requires the complete acceptance conditions in the accepted scope amendment.

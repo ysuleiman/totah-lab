@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `3bddd6283e7f4143722317cd9906f5397ae231ef3c9aeacf69f775150ce69289`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `343fad8cd7ebc35ee3f42ae651e7eb3dd8720dba5c1b855c141dc02813a8b8a7`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -40,8 +40,8 @@ Disposition is copied without upgrading partial capability coverage.
 | N02 | Binary/count interaction fingerprints | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | N03 | Ensemble contact frequencies/probabilistic networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | N04 | Contact correlations and co-occurrence networks | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| N05 | Residue representation and network edge cardinality | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
-| N06 | Network degree/paths/second shell | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| N05 | Residue representation and network edge cardinality | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
+| N06 | Network degree/paths/second shell | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
 | N07 | RMSD-based ensemble clustering | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | N08 | 2D/3D pharmacophore fingerprints and matching | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | V01 | Valence/sanitization and nonempty graph validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
@@ -114,6 +114,8 @@ Corrected OCL query dialect and distinct-target occurrence mapping only; no univ
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** SubstructureMatcher + OclMolecularBackend.match
+
 **Supporting source:** RDKit book; OCL backend; OpenFF ParameterHandler; ProLIF base
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -124,6 +126,8 @@ Attributed reviewed aromatic 5/6 cycles and fused membership; dimensional valenc
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** MolecularGraph; OclGraphMapper; AromaticRingPerception
+
 **Supporting source:** RDKit book; OCL source; PLIP find_rings; RING paper
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AROMATIC.json) · SHA256 `423614c70fe4e5c9b5947b1074a71ba316e63b9c622cd632776929c2788df192`
@@ -132,12 +136,6 @@ Attributed reviewed aromatic 5/6 cycles and fused membership; dimensional valenc
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.AROMATIC.json) · SHA256 `bac24710a81ebfe95e3a9a81bfe7df8125e731901fe6e2b1a1d461dde0d38b04`
 
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Planarity alone is not aromaticity; preserve overlapping rings. Exact query strings require review and OCL fixture qualification; do not add new engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** No energetic aromatic criterion. Need OCL ring/dialect fixtures and independent ring oracle before new geometry domains.
-
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
 ### P03 — Donor and acceptor features
@@ -145,6 +143,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 17 reviewed donor/acceptor role identities and bounded composition; not directional interactions or all possible chemistry.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** OclLigandFeaturePerceiver; AthenaScientificRules
 
 **Supporting source:** RDKit BaseFeatures; ProLIF HBAcceptor; OCL PharmacophoreCalculator
 
@@ -160,18 +160,6 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json) · SHA256 `f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Primary F/carboxylate abstracts support domain caution; full class-specific datasets and query semantics require review. No strength ranking.
-
-**Remaining scientific requirement:** NH-carbonyl primary study identified but full text unavailable; class-specific directional windows not approved. Exact graph predicates can be tested separately. Sulfur pending distinct research.
-
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
 ### P04 — Positive/negative ionizable features versus formal charge
@@ -179,6 +167,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 8 atomic charge/nonpolar features plus reviewed carboxylate/ammonium exact group formal-charge sums; no pKa/ionization inference.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** FormalChargeAssignments; ChargedGroupPerception
 
 **Supporting source:** BaseFeatures; OCL IonizableGroupDetector; PLIP find_charged
 
@@ -190,14 +180,6 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.IONIZABLE_MOTIF.json) · SHA256 `e0a767b6d402eae297a4ba53a6b28ca61d45b1cb1b879849841a8617428ba875`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph identity predicate; charged-group equivalence fixtures needed. No protonation inference or pKa calibration.
-
-**Remaining scientific requirement:** Chemical recognition requires curated graph fixtures, not a fitted distance distribution; any pKa claim would require a separate qualified method.
-
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
 ### P05 — Hydrophobe and lumped hydrophobe features
@@ -206,11 +188,11 @@ Reviewed atom predicates and all-members aromatic-carbocycle predicate; no hydro
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** OclLigandFeaturePerceiver; HydrophobicAtomPerception
+
 **Supporting source:** RDKit BaseFeatures; ProLIF Hydrophobic; PLIP hydrophobic_atoms
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.NONPOLAR.json) · SHA256 `da87aab516fda062ddde0c4d0dd496d92416eceaf07a449f61594a68bcad013d`
-
-**Remaining scientific requirement:** Feature recognition can be tested; packing/burial/energetic interpretation needs separate references. No generic all-neutral-C equivalence.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -220,15 +202,13 @@ Qualified ring attribution and independent centroid/plane V2; broader pharmacoph
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** AromaticRingPerception; LigandFeature.AROMATIC_RING/PI_FEATURE
+
 **Supporting source:** BaseFeatures; OCL PharmacophoreCalculator; ProLIF BasePiStacking
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HETEROAROMATIC.json) · SHA256 `7f0b888233e03de41632181792ed2f3816d125d924c3f1f50ade1ae1700de5dd`
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.AROMATIC.json) · SHA256 `bac24710a81ebfe95e3a9a81bfe7df8125e731901fe6e2b1a1d461dde0d38b04`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** No energetic aromatic criterion. Need OCL ring/dialect fixtures and independent ring oracle before new geometry domains.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -238,6 +218,8 @@ Define metal identity/oxidation, donor state and coordination context; zinc-bind
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** OCL matcher can express motifs; no qualified classifier
+
 **Supporting source:** BaseFeatures ZnBinder1..6
 
 ### P08 — Functional-group hierarchy and fragment features
@@ -246,11 +228,11 @@ Define metal identity/oxidation, donor state and coordination context; zinc-bind
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** OCL matcher; LigandFeature.CUSTOM; lineage mapping
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ALKYL.json) · SHA256 `ec6bd407031c2ef7227148de29dacf2351e972ae5ea3f8b7966f6331f6506af7`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -260,15 +242,13 @@ Authoritative source-H consistency and explicit/implicit/unknown separation in r
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** SystemStateView.protonationQualified; source graph
+
 **Supporting source:** PLIP preparation; RING usage; MolProbity guide; RDKit book
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.ACCEPTOR.json) · SHA256 `418069591b794f0c68285d91c124a46d8a3462a49b0f8c72a579deaaa86a2feb`
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PERCEPTION.DONOR.json) · SHA256 `f33531ba78b0ce7d0e8474349ffdb8a308d0082f018c4b8cdedb6a1ab41799d2`
-
-**Remaining scientific requirement:** Primary F/carboxylate abstracts support domain caution; full class-specific datasets and query semantics require review. No strength ranking.
-
-**Remaining scientific requirement:** NH-carbonyl primary study identified but full text unavailable; class-specific directional windows not approved. Exact graph predicates can be tested separately. Sulfur pending distinct research.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -277,6 +257,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Existing neutral-carbon bounded contact definition unchanged.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** ATHENA.HYDROPHOBIC.CONTACT
 
 **Supporting source:** PLIP detection/refinement; ProLIF Hydrophobic; Athena manifest
 
@@ -287,6 +269,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Existing neutral aliphatic alcohol donor, alcohol/carbonyl O acceptor, explicit-H and neutral C/H/O negative domain only. Expansion separately under scientific review.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** ATHENA.HBOND.DIRECTIONAL
 
 **Supporting source:** PLIP hbonds; ProLIF HBAcceptor/HBDonor; Probe; RING paper
 
@@ -300,6 +284,8 @@ Choose an attributed implicit-H approximation and validate H/state/preparation d
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified equivalent
+
 **Supporting source:** ProLIF ImplicitHBAcceptor implementation
 
 ### I04 — Weak C-H donor perception
@@ -308,6 +294,8 @@ Define weak C-H donor classes, attachment/acidity scope and independent geometri
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified weak-H-bond rule
+
 **Supporting source:** PLIP find_hbd and PLInteraction constructor
 
 ### I05 — Parallel/face-to-face pi stacking
@@ -315,6 +303,8 @@ Define weak C-H donor classes, attachment/acidity scope and independent geometri
 Existing isolated neutral six-carbon ring pi-stacking geometry; no energetic claim or widened ring domain.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** ATHENA.PI_STACKING.GEOMETRY
 
 **Supporting source:** ProLIF FaceToFace/BasePiStacking; PLIP pistacking
 
@@ -326,6 +316,8 @@ Existing T-shaped mode within the same bounded pi-stacking implementation; no in
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** ATHENA.PI_STACKING.GEOMETRY
+
 **Supporting source:** ProLIF EdgeToFace; PLIP pistacking
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -336,11 +328,11 @@ Existing union of pi-stacking modes; wrapper is not another chemical observation
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Single Athena stacking family with geometry class
+
 **Supporting source:** ProLIF PiStacking.detect
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.PI_STACKING.GEOMETRY.json) · SHA256 `a35e5eb11552c39d97868a0a13f4173755f1f276aa75780cae1fdae85978b125`
-
-**Remaining scientific requirement:** Empirical PDB ring distributions required; McGaughey/Hunter primary full text access unresolved here. Modern L14/L16 findings caution against one energetic explanation. No adoption of 3.3-4.5 or4.0-5.5 boxes; full source/domain calibration and directional collection needed.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -349,6 +341,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Existing bounded ammonium/neutral carbocycle cation-pi geometry only.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** ATHENA.PI_CATION.GEOMETRY
 
 **Supporting source:** ProLIF CationPi/PiCation; PLIP pication; RING paper
 
@@ -360,6 +354,8 @@ Existing ammonium/carboxylate proximity definition, not electrostatic energy.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** ATHENA.SALT_BRIDGE.PROXIMITY
+
 **Supporting source:** PLIP saltbridge; ProLIF Cationic/Anionic; RING paper
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -369,6 +365,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Review separate Cl/Br/I donor environments and carbonyl-acceptor directional criteria; survey radii are not automatic cutoffs.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** HalogenBondDetector; INT.HALOGEN.001
 
 **Supporting source:** ProLIF XBAcceptor/XBDonor; PLIP halogen
 
@@ -386,6 +384,8 @@ Define aromatic-face acceptance, halogen axis and element-specific geometry sepa
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified equivalent
+
 **Supporting source:** RING4 primary paper non-covalent bond section
 
 ### I12 — Single-water H-bond bridge
@@ -393,6 +393,8 @@ Define aromatic-face acceptance, halogen axis and element-specific geometry sepa
 Define water identity/orientation and two compatible directional legs with complete water/H coverage.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Reference registration only
 
 **Supporting source:** PLIP water_bridges; ProLIF WaterBridge
 
@@ -406,6 +408,8 @@ Define same-state multiwater path validity, orientation consistency, search boun
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** SystemStateView traversal primitive only
+
 **Supporting source:** ProLIF water_bridge.py
 
 ### I14 — Metal-ligand pair proximity
@@ -413,6 +417,8 @@ Define same-state multiwater path validity, orientation consistency, search boun
 Select element/oxidation/donor pair domains and justified proximity references without implying coordination.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Reference registration only
 
 **Supporting source:** ProLIF MetalDonor/MetalAcceptor; RING4
 
@@ -422,6 +428,8 @@ Specify coordination number/geometry, ligand typing, waters and complete candida
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Reference registration only
+
 **Supporting source:** PLIP metal_complexation and find_metal_binding
 
 ### I16 — Van der Waals contact/gap
@@ -430,11 +438,11 @@ Attributed continuous d-(r1+r2) descriptor only; no clash or favorable-contact c
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** StericClashAnalysis; Element radii; proximity measurements
+
 **Supporting source:** ProLIF VdWContact; Probe atomprops/probe.c; RING docs
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.VDW_CONTACT.json) · SHA256 `3b9b8361b5f088c2538742b85d1bd8ec046e625a301a3a462aa86335ce8fd9cb`
-
-**Remaining scientific requirement:** Word1999 abstract and current Probe sources support protocol separation. Historical0.05A criterion remains unverified; current0.4A not transplanted.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -443,6 +451,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Select radii/H/bond/altloc/water protocol and justified overlap classes; I16 gap alone is not a clash criterion.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** StericClashAnalysis; VAL.CLASH.001
 
 **Supporting source:** Probe source; MolProbity clashes; wwPDB guide
 
@@ -460,11 +470,11 @@ Explicit methyl/ring-to-V3 raw geometry attribution; no CH-pi favorable-interact
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Proposed ATHENA.INT.CH_PI.GEOMETRY
+
 **Supporting source:** RING4 primary paper; research task
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.INT.CH_PI.GEOMETRY.json) · SHA256 `478f3a987a4cd69e50bb8860ad8f5915e555f6817c70b8383a2e49d43b2cb401`
-
-**Remaining scientific requirement:** L02 PDB survey and supplementary instance/CASF lists; hydrogen placement and structural-quality filters must be reproduced before calibration. Curated dataset extraction and validated H placement; no energy function or docking port.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -474,11 +484,11 @@ Versioned authoritative source S-S connectivity with complete-negative coverage 
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** SULF.SS.001; sulfur measurements
+
 **Supporting source:** RING3/4 papers; RuleAnalyzers.sulfur
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.DISULFIDE.json) · SHA256 `d23e37734c02d2fdb115a8366ff8a3eb43aabedb8495af24ea78cf6dca1ecd35`
-
-**Remaining scientific requirement:** L03 validated disulfide examples are prospective fixtures; explicit graph predicate does not require fitting a distance cutoff. Research-policy review and exact source-assertion domain mapping; no change to historical SULF.SS.001.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -488,6 +498,8 @@ Define profile-relative pairing and exhaustive role/search coverage; unsearched 
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified unpaired-site assessment
+
 **Supporting source:** PLIP find_unpaired_ligand
 
 ### I21 — Interaction overlap/refinement and pruning
@@ -496,6 +508,8 @@ Reject destructive pruning as evidence policy; retain optional display/filter pr
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Immutable raw measurements; separate assessments
+
 **Supporting source:** PLIP refine_*; RING usage
 
 ### N01 — Directional roles and atom/group attribution
@@ -503,6 +517,8 @@ Reject destructive pruning as evidence policy; retain optional display/filter pr
 Exact bounded role/group-to-continuous-geometry attribution with state/correspondence preservation.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** SystemStateView; InteractionMeasurements; evidence subjects
 
 **Supporting source:** ProLIF invert_role/metadata; PLIP Mapper; Athena sources
 
@@ -514,6 +530,8 @@ Define fingerprint event identity, count multiplicity and evaluated/unsupported 
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** InteractionFingerprint.of retains supplied interactions and residue/type sets. It has no evaluated/unsupported mask and cannot establish scientific zero/absence. No silent migration.
+
 **Supporting source:** ProLIF fingerprint.py
 
 ### N03 — Ensemble contact frequencies/probabilistic networks
@@ -521,6 +539,8 @@ Define fingerprint event identity, count multiplicity and evaluated/unsupported 
 Define ensemble membership, duplicate treatment and denominator/missing-coverage policy; pose frequency is not probability.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing ensemble/contact analyses; SystemStateView identities
 
 **Supporting source:** RING4/RING-MD; ProLIF fingerprints
 
@@ -530,33 +550,43 @@ Define common-state co-occurrence and missing-coverage/correlation estimand with
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Historical topology analysis; no generic qualified network rule
+
 **Supporting source:** RING-PyMOL pinned README
 
 ### N05 — Residue representation and network edge cardinality
 
-Review node/edge identity, attribution and cardinality policy beyond existing full graph; never restrict evidence to coarse nodes.
+Authoritative full ResidueGraph plus exact atom/residue attribution and separate spatial/covalent/interaction views; no inferred chemical edge.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Existing accepted system-graph implementation/checkpoint and SystemQualificationAcceptanceTest; re-exercised in clean-source suite. No current-policy scientific receipt.
+
+**Existing implementation:** ResidueGraph authoritative + SystemStateView derived spatial traversal
 
 **Supporting source:** RING usage; Athena graph contract
 
+Typed chemical-network rules remain under separate scientific review; geometric reachability is not chemical coupling.
+
 ### N06 — Network degree/paths/second shell
 
-Review typed-edge admissibility, path bounds and completeness; spatial traversal is not interaction coupling.
+Existing bounded SystemStateView.neighborhood spatial traversal, cycle handling, hop/budget completeness and second-shell attribution; no physical coupling or unreviewed typed-network composition.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** Existing accepted system-graph implementation/checkpoint and SystemQualificationAcceptanceTest; re-exercised in clean-source suite. No current-policy scientific receipt.
+
+**Existing implementation:** SystemStateView neighborhood/path operations
 
 **Supporting source:** RING4 output; Athena GEO.PATH/GEO.SHELL
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.NETWORK.SECOND_SHELL.json) · SHA256 `84abfd54600e531c970bcf5a4af331c26d3e987459ff3ca8a6ac8a27d306892d`
 
-**Remaining scientific requirement:** RING/ProLIF network/fingerprint practice provides architecture, not causal structural dataset. Spatial paths never chemical coupling. Typed edge availability/coverage and deterministic path semantics need qualification.
+Typed chemical-network rules remain under separate scientific review; geometric reachability is not chemical coupling.
 
 ### N07 — RMSD-based ensemble clustering
 
 Consciously defer separate ensemble-analysis tool; no new clustering here
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing pose-comparison infrastructure; not interaction classifier
 
 **Supporting source:** RING-PyMOL README
 
@@ -566,6 +596,8 @@ Define feature correspondences, geometric tolerance and supported query semantic
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** LigandFeature; FeatureTemplateAlignmentEvaluator; OCL PheSA primitives
+
 **Supporting source:** RDKit book; OCL pharmacophore classes
 
 ### V01 — Valence/sanitization and nonempty graph validation
@@ -573,6 +605,8 @@ Define feature correspondences, geometric tolerance and supported query semantic
 Dimensional topology/valence and independent source-state checks; no repair or universal chemical validity.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** MolecularSanitizer; SystemGraphValidation
 
 **Supporting source:** RDKit Validate; OCL backend
 
@@ -584,6 +618,8 @@ Explicit neutrality policy on supplied scope, independently of structural validi
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** MolecularGraph components; sanitizer limitations
+
 **Supporting source:** RDKit Validate; OCL sanitizer
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -593,6 +629,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Opt-in explicit radical representation and identity round-trip with granular unsupported-operation guards; no general radical chemistry.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** MolecularGraph isotope/element fields; capability checks
 
 **Supporting source:** RDKit Validate; MolecularGraph
 
@@ -604,6 +642,8 @@ Review query/dummy/enhanced-stereo representability and validation scope separat
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Graph mapper and sanitizer; unresolved mapping retained
+
 **Supporting source:** RDKit FeaturesValidation; OclGraphMapper
 
 ### V05 — Stereo syntax and authoritative stereo validation
@@ -611,6 +651,8 @@ Review query/dummy/enhanced-stereo representability and validation scope separat
 Reviewed dimensional stereo assessment and unknown/unsupported handling; no invented stereo success from charge failure.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** StereochemistryService; OclMolecularBackend
 
 **Supporting source:** RDKit Validate; OCL backend
 
@@ -622,6 +664,8 @@ Do not transplant 2D drawing thresholds into protein geometry
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No rule equivalent required
+
 **Supporting source:** RDKit Validate
 
 ### V07 — Bond-length and bond-angle validation
@@ -629,6 +673,8 @@ Do not transplant 2D drawing thresholds into protein geometry
 Select chemical-context reference lengths/angles, uncertainty and outlier definition.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Geometry primitives; no qualified reference-distribution validator found
 
 **Supporting source:** MolProbity geometry; wwPDB standard geometry
 
@@ -638,6 +684,8 @@ Define coordinate stereo/planarity comparison against supplied chemistry and qua
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Graph stereo checks only; no full coordinate validator qualified
+
 **Supporting source:** wwPDB model/ligand quality; MolProbity geometry
 
 ### V09 — Protein Ramachandran validation
@@ -645,6 +693,8 @@ Define coordinate stereo/planarity comparison against supplied chemistry and qua
 Review exact Ramachandran grid release, license, interpolation and residue/peptide classes.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No qualified equivalent found in inspected rule surfaces
 
 **Supporting source:** MolProbity Ramachandran; wwPDB torsion angles
 
@@ -658,6 +708,8 @@ Review rotamer reference grid, symmetry, interpolation and complete chi/altloc c
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified protein rotamer validator in registry
+
 **Supporting source:** MolProbity rotamer guide; OCL TorsionDB inventory
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.ROTAMER.json) · SHA256 `ab2869dee8a88310936e3c54d23f09b8fdd885e613e83985a8ef47201ac4bba6`
@@ -669,6 +721,8 @@ Review rotamer reference grid, symmetry, interpolation and complete chi/altloc c
 Review idealization algorithm/parameters and modified/D-residue domain before classifying C-beta deviation.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No qualified equivalent
 
 **Supporting source:** MolProbity Cbeta guide
 
@@ -682,6 +736,8 @@ Define source peptide linkage, cis/trans/twist classes and context; unusual cis-
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified equivalent
+
 **Supporting source:** MolProbity cispeptides; wwPDB torsions
 
 ### V13 — CaBLAM backbone validation
@@ -689,6 +745,8 @@ Define source peptide linkage, cis/trans/twist classes and context; unusual cis-
 Review CaBLAM empirical contours, dimensionality and complete backbone selection.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No qualified equivalent
 
 **Supporting source:** MolProbity CaBLAM
 
@@ -698,6 +756,8 @@ Review RNA atom/topology domains and pucker/suite reference distributions.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No qualified equivalent
+
 **Supporting source:** MolProbity sugarpuckers/suites; wwPDB
 
 ### V15 — Hydrogen optimization and Asn/Gln/His flip suggestions
@@ -705,6 +765,8 @@ Review RNA atom/topology domains and pucker/suite reference distributions.
 Never change coordinates or protonation to manufacture favorable contacts
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Source-state representation only in reviewed graph pipeline
 
 **Supporting source:** MolProbity/wwPDB flip notes
 
@@ -714,6 +776,8 @@ May preserve external score as evidence; do not collapse Athena evidence into it
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Separate capability assessments; no master evidence score
+
 **Supporting source:** MolProbity summary guide; wwPDB overview
 
 ### V17 — Ligand geometry / Mogul empirical distributions
@@ -721,6 +785,8 @@ May preserve external score as evidence; do not collapse Athena evidence into it
 Establish licensed empirical ligand geometry distributions and sample coverage; no generic substitute.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No qualified equivalent
 
 **Supporting source:** wwPDB ligand geometry
 
@@ -730,6 +796,8 @@ Review missing-atom/composition/altloc/occupancy/linkage propositions and uncert
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** SystemStateView identities/mapping; source fields
+
 **Supporting source:** wwPDB composition/linkage/model quality
 
 ### V19 — X-ray experimental-data and refinement validation
@@ -737,6 +805,8 @@ Review missing-atom/composition/altloc/occupancy/linkage propositions and uncert
 Define external diffraction/refinement report ingestion and data provenance; coordinates alone insufficient.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No generic-rule implementation
 
 **Supporting source:** wwPDB X-ray data/refinement guide
 
@@ -746,6 +816,8 @@ Define experimental map/state alignment and map-model metric domain.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Evidence can preserve reports; evaluator absent
+
 **Supporting source:** wwPDB fit-of-model-and-data
 
 ### V21 — NMR ensemble/shift/constraint validation
@@ -753,6 +825,8 @@ Define experimental map/state alignment and map-model metric domain.
 Define experimental shifts/restraints and ensemble correspondence; coordinate agreement is not experimental validation.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Evidence storage supports opaque reports; no evaluator
 
 **Supporting source:** wwPDB NMR guide
 
@@ -762,6 +836,8 @@ Define map-only vs model-fit criteria, resolutions/masks and source provenance.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Evidence storage only; no evaluator
+
 **Supporting source:** wwPDB EM guide
 
 ### A01 — SMIRNOFF hierarchical parameter precedence and typed serialization
@@ -769,6 +845,8 @@ Define map-only vs model-fit criteria, resolutions/masks and source provenance.
 Adopt explicit ordering/versioning patterns; do not use last-wins to erase scientific disagreement
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** RuleRegistry version/hash/typed fields; OCL matcher
 
 **Supporting source:** OpenFF ParameterHandler; prior SMIRNOFF audit
 
@@ -778,6 +856,8 @@ Keep force field physics separate from classification rules
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Existing energy modules are separate; no analyzer equivalent
+
 **Supporting source:** Constraints/Bonds/Angles/ProperTorsions/ImproperTorsions handlers
 
 ### A03 — vdW and electrostatics parameter families
@@ -785,6 +865,8 @@ Keep force field physics separate from classification rules
 Do not turn classifier registry into force-field engine
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing energy infrastructure separate
 
 **Supporting source:** vdW/Electrostatics handlers
 
@@ -794,6 +876,8 @@ No automatic charge replacement; retain attribution if external evidence supplie
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Amber charges source of truth; FormalChargeAssignments distinct
+
 **Supporting source:** LibraryCharges/ToolkitAM1BCC/ChargeIncrementModel/NAGLCharges
 
 ### A05 — GBSA implicit solvent parameterization
@@ -801,6 +885,8 @@ No automatic charge replacement; retain attribution if external evidence supplie
 Cannot stand in for water networks or measured burial
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** No scientific contact-rule equivalent
 
 **Supporting source:** GBSA handler
 
@@ -810,6 +896,8 @@ Learn frame/provenance handling; never present virtual charge sites as measured 
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** No authoritative-atom substitution allowed
+
 **Supporting source:** VirtualSiteHandler
 
 ### A07 — Chemical alerts and substructure filter catalogs
@@ -817,6 +905,8 @@ Learn frame/provenance handling; never present virtual charge sites as measured 
 Review specific alert catalog/version/domain and advisory semantics; never automatic evidence rejection.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing matcher; no qualification of these catalogs
 
 **Supporting source:** RDKit FilterCatalog.h
 
@@ -826,6 +916,8 @@ Review optional derived normalization/tautomer identities without mutation of so
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** MolecularGraph; CanonicalIdentityService; transformation lineage
+
 **Supporting source:** RDKit book; OCL backend; Athena graph machinery
 
 ### A09 — Molecular descriptors/fingerprints/shape and torsion resources
@@ -833,6 +925,8 @@ Review optional derived normalization/tautomer identities without mutation of so
 Considered as adjacent tool families; do not duplicate QSAR/scoring pipelines
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing design/recognition/energy services; not qualified by this audit
 
 **Supporting source:** RDKit source tree/book; OCL installed JAR inventory
 
@@ -842,11 +936,11 @@ Qualified methyl identity and explicit methyl/ring raw geometry channels only; n
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** ATHENA.GROUP.METHYL.ENVIRONMENT
+
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.METHYL.ENVIRONMENT.json) · SHA256 `830719f35dccbb0a94bb7d10e3139b6859ceb66ed24f30d83b00f9f2d5bba9ff`
-
-**Remaining scientific requirement:** Published matched methyl effects motivate multidimensional description, not universal potency/geometry cutoffs. Qualified group recognition and independent SASA/CH-pi subchannels; graph-only methyl identity could be qualified first.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -856,11 +950,11 @@ Source-linked cysteine backbone/peptide linkage and raw geometry only; no vicina
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** ATHENA.SULF.VICINAL
+
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.VICINAL.json) · SHA256 `ad481eaa5ce4fd1abb639310f354b65a9d46c486df1fb78301b6271ff4dbdefb`
-
-**Remaining scientific requirement:** L03 curated cis/trans examples and Tables1/2; small class populations require cautious compatibility, not universal SG threshold. Curated coordinate/state extraction and classifier calibration not performed.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -869,6 +963,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi/O partner domains independently.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** ATHENA.SULF.PI / ATHENA.SULF.CHALCOGEN_O
 
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
@@ -890,11 +986,11 @@ Source-linked bounded cysteine backbone/geometry attribution; no reactivity/pKa/
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** ATHENA.SULF.CYS_ENVIRONMENT
+
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.CYS_ENVIRONMENT.json) · SHA256 `62381b2bfa60142a311cdad33d69abd6e0f9bfa7bcd938712f32a01fb05e8c43`
-
-**Remaining scientific requirement:** Different sulfur mechanisms across references motivate separate state labels; no universal Cys reactivity dataset qualified. Charge/H-bond/SASA coverage and modified-residue mapping.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -903,6 +999,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Review SAM/SAH identity and sulfonium/methyl/aromatic domains; no ammonium-pi parameter transplant.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** ATHENA.SAM.*
 
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
@@ -924,6 +1022,8 @@ Review selected nucleophile/SAM state and substrate-specific transfer geometry; 
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** ATHENA.SAM_MTASE.TRANSFER_GEOMETRY
+
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM_MTASE.TRANSFER_GEOMETRY.json) · SHA256 `6248ec4622ccb577a1f499cb3724990c92ab1cb7a272d0d46aa56d03d5a421a5`
@@ -936,6 +1036,8 @@ Review carbonyl donor/acceptor geometry and empirical domain; proximity does not
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** ATHENA.INT.N_PI_STAR
+
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.INT.N_PI_STAR.json) · SHA256 `02937d6acaa7b4439c1fa11f3466b0360d78578a384c02cb60ec6e2b4e6810d9`
@@ -947,6 +1049,8 @@ Review carbonyl donor/acceptor geometry and empirical domain; proximity does not
 Review typed qualified edge composition, same-state paths, coverage and cofactor attribution; no mechanistic inference.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** ATHENA.NETWORK.*
 
 **Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
 
@@ -968,15 +1072,13 @@ Reviewed carboxylic-acid/carboxylate source identity domains; no normalization.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBOXYLATE.json) · SHA256 `120a1f195039521a18e292001b45d0be993291edace2cb4d96a50e07bf160a0d`
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBOXYLIC_ACID.json) · SHA256 `083a7bc55823e8462abe7f0985926ca9e7c8ffa7db7ca8b6231db6757bc34148`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -986,11 +1088,11 @@ NH2/NH1/NH0 neutral amide identity domains with preserved attachments; no separa
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMIDE.json) · SHA256 `047c3049e8037c894797c17b6e617e5ecfc1ef50b6d416fa527cf7e83790205b`
-
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Amide N must not become generic acceptor from element alone. Exact query strings require review and OCL fixture qualification; do not add new engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -1000,11 +1102,11 @@ Original B01 ester identity and overlapping carbonyl; broader acyl transformatio
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.ESTER.json) · SHA256 `37e2506fb154d5f88c12c10b2de508dc8eef7e9bf40857b347aa3708c93279ac`
-
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Distinguish acid, carbonate, carbamate; preserve overlapping carbonyl labels. Exact query strings require review and OCL fixture qualification; do not add new engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -1014,11 +1116,11 @@ Reviewed aldehyde/ketone/carbonyl graph identities, not arbitrary resonance norm
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.CARBONYL.json) · SHA256 `37d81bf5565fae5d543126d8459abb27de4de5c1427eb0065e66b7484d0a8ec1`
-
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Carboxylate resonance is separate; do not infer neutral carbonyl from one bond depiction. Exact query strings require review and OCL fixture qualification; do not add new engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -1028,6 +1130,8 @@ Review exact acid-chloride/sulfonyl-chloride membership, attachment and charged/
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 ### F06 — Functional group: Amine subclasses
@@ -1036,11 +1140,11 @@ Reviewed neutral amine and carbon-bound ammonium subclasses with explicit state 
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.AMINE.json) · SHA256 `4fe20a026c3a571b5bc8070de3fb21052adf5fad2546ac7d9a400f41ffb0a25b`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
@@ -1050,6 +1154,8 @@ Review imine/oxime/nitroso definitions separately, including H, charge and bond 
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 ### F08 — Functional group: Azo/hydrazine/diazo/azide
@@ -1058,6 +1164,8 @@ Review azo/hydrazine/diazo/azide graph and resonance/state domains separately.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 ### F09 — Functional group: Nitriles
@@ -1065,6 +1173,8 @@ Review azo/hydrazine/diazo/azide graph and resonance/state domains separately.
 Reviewed nitrile graph identity only.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1076,6 +1186,8 @@ Reviewed supplied nitro representation; charge separation is not automatically a
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -1085,6 +1197,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Reviewed sulfonamide graph identities; no universal donor/acceptor classification.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1096,6 +1210,8 @@ Literal neutral S(=O)2 carbon-bound sulfone identity only; sulfonic acid/sulfona
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
@@ -1105,6 +1221,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Reviewed thiol/thiolate/thioether/sulfoxide graph domains; no sulfur interaction, arbitrary oxidation/resonance or thiocarbonyl expansion.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1116,14 +1234,6 @@ Reviewed thiol/thiolate/thioether/sulfoxide graph domains; no sulfur interaction
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.THIOLATE.json) · SHA256 `805796ea08144a329e4dde12e5c4cad143ba1a592a70b5803a17391a09127987`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Missing H knowledge is unknown, not thiolate. Exact query strings require review and OCL fixture qualification; do not add new engine.
-
-**Remaining scientific requirement:** No empirical distance threshold for exact graph predicate; expert-curated molecules and query dialect fixtures needed. Ionizable feature is not proof of thiolate state. Exact query strings require review and OCL fixture qualification; do not add new engine.
-
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
 ### F14 — Functional group: Isocyanate/isothiocyanate
@@ -1131,6 +1241,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Review separate isocyanate/isothiocyanate exact queries and representation domains.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1140,6 +1252,8 @@ Review boron coordination/charge/valence and exact bounded motif queries.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 ### F16 — Functional group: Alcohol/phenol/ether motifs
@@ -1147,6 +1261,8 @@ Review boron coordination/charge/valence and exact bounded motif queries.
 Reviewed alcohol/phenol/ether identities and exact state domains only.
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1156,12 +1272,6 @@ Reviewed alcohol/phenol/ether identities and exact state domains only.
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.PHENOL.json) · SHA256 `1868fd7684192688ee5c58b117f29eef3f6330c906246c221edbb872f69be5b6`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
 Not qualified by this disposition. Consult pinned checkpoint limitations and linked research dossier; broader behavior requires explicit review and separate implementation qualification.
 
 ### F17 — Functional group: Halogenated motifs
@@ -1170,11 +1280,11 @@ Existing qualified carbon-bound F/Cl/Br/I identity and exact attachment roles. N
 
 **Qualification:** Implementation checkpoint within explicit domain only; no current-policy scientific receipt granted.
 
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
+
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json) · SHA256 `27c940e949327cf2f5c38b4a2a7ec856c1a5588b5175b6922bc313a090fca0ae`
-
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
 
 Not qualified by this disposition; exact manifest and preserved group checkpoint define limits.
 
@@ -1183,6 +1293,8 @@ Not qualified by this disposition; exact manifest and preserved group checkpoint
 Generic neutral C#C identity already implementation-qualified, but it does not require terminal authoritative H. Exact terminal-alkyne H/context predicate needs reviewed definition; do not call generic alkyne terminal.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 
@@ -1193,6 +1305,8 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 Review exact branched-alkyl/cyclopropyl occurrence boundaries; no maximal-fragment inference.
 
 **Qualification:** Disposition of scope/review need; no implemented capability implied.
+
+**Existing implementation:** Existing OCL SubstructureMatcher; proposed ATHENA.GROUP.* descriptors
 
 **Supporting source:** FunctionalGroups.txt; Functional_Group_Hierarchy.txt; OCL AtomFunctionAnalyzer
 

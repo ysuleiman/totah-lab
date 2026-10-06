@@ -28,6 +28,7 @@ for e in entries:
         continue
     a += [f"### {e['capabilityId']} — {e['capability']}", '', closure['scope'], '',
           '**Qualification:** '+closure['qualificationBasis'], '',
+          '**Existing implementation:** '+closure.get('existingImplementation','See linked checkpoint'), '',
           '**Supporting source:** '+str(closure.get('scientificSupport') or 'See pinned inventory entry and linked checkpoints.'), '']
     for dossier in closure.get('researchDossiers',[]):
         path=root/dossier
