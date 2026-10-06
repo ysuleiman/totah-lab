@@ -1,0 +1,66 @@
+I02 CONCRETE SCIENTIFIC REVIEW — 2026-10-06
+Base: 5b41087ea35154354ca6a8c4b354285045460115. NOT APPROVED / NOT IMPLEMENTED.
+
+Decision requested
+Approve a separately named, bounded explicit-H directional candidate definition:
+  ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE
+  D-A <= 3.5 angstrom AND angle(D-H,A-H) >= 130 degrees (vertex H).
+Finite nondegenerate geometry and exact source donor/acceptor/H identity are mandatory.
+H-A and acceptor-antecedent angles are preserved independently; no new cutoff on them.
+This is an operational H-bond candidate screen, NOT a physically proven hydrogen bond.
+Do not silently describe approval of this screen as completion of universal H bonding.
+
+The 100 proposed pairs are individually listed in CLASS_PAIRS.json:
+10 donor classes (primary/secondary neutral amine; primary/secondary/tertiary
+carbon-bound ammonium; NH2/NH1 amide; alcohol; phenol; pyrrolic NH)
+against 10 acceptor contexts (alcohol O; aldehyde/ketone/ester/amide carbonyl O;
+primary/secondary/tertiary neutral amine; ether O; pyridine-like N).
+The shared window is intentional operational screening precedent, not a finding that
+these pairs have identical chemistry, strength or optimal geometry. Each pair retains
+its own state domain and can later be separately redefined without changing the others.
+
+Ten generic pyridinium-NH pairs remain unsupported pending adequate definition support.
+They are not silently treated as saturated ammonium or neutral pyrrolic NH. There is no
+water, sulfur, carboxylate or intracomponent expansion here. These exclusions remain
+visible scientific gaps. No physical-H-bond negative follows from any excluded pair.
+
+Why this proposal, rather than copying Athena's 120-degree criterion
+Pinned ProLIF uses this 3.5/130 operational screen. Its primary paper explicitly
+acknowledges disagreement between detection definitions. HBPLUS includes acceptor-side
+angles and more permissive donor angles; PLIP differs again. None supplies universal
+class-pair calibration. The proposal adopts a clearly attributed operational definition
+and keeps raw geometry so additional class-specific directional rules can coexist.
+No class-specific empirical distributions were acquired or claimed.
+
+Accepting this changes the scientific proposition for the NEW rule explicitly. If the
+desired proposition instead requires complete acceptor-lone-pair geometry or physically
+established bonding, this proposal is insufficient and must not be approved as that rule.
+SOURCE_NOTES.txt preserves alternatives and limitations, including inaccessible sources.
+
+Implementation reuse after scientific approval
+Existing B00/OCL -> FunctionalGroupRules / B01 and P03 occurrence payloads -> exact
+SystemStateView correspondence -> ContinuousGeometryRules DISTANCE/ANGLE -> existing
+EvidenceEnvelope and attributed Finding/interpretation -> governed evaluation/persistence.
+No new molecular representation, SMARTS engine or public Java API is proposed. Existing
+generic findings can hold candidate assessments; raw athena.geometry/1 remains authority.
+Do not retrofit raw legacy InteractionMeasurements: its native donor/AD4 preparation
+path does not enumerate this expanded source-role domain. Compose the existing explicit
+role/geometry machinery instead. Keep implementation in athena.system.rules and bounded
+acceptance/orchestration tests in daedalus.system. Daedalus does not own chemistry.
+
+Resolve ONLY explicitly supplied applicable role/geometry/state evidence, verify hashes
+and provenance, preserve before evaluation, retain all D-H/A alternatives. No history
+auto-selection, fake measurement, best-H pruning, implicit bond inference or universal
+atom types. Current-policy research review and implementation qualification remain
+separate; no real review expiry, receipt or production activation is fabricated here.
+
+Legacy compatibility
+ATHENA.HBOND.DIRECTIONAL/1.0.0/athena.scientific/2 remains unchanged. Four overlapping
+historical contexts are evaluated separately only when explicitly requested. Its amine
+near/far witnesses remain UNKNOWN_INCONCLUSIVE. The new profile's results must never
+replace the historical certificates or be used as backward-compatible aliases.
+
+Acceptance
+ACCEPTANCE_PLAN.json specifies per-pair boundary/state/coverage tests and regressions.
+Current raw-measurement tests prove calculator reuse only, NOT classifier qualification.
+No new scientific criterion executes before this review. No other capability starts.

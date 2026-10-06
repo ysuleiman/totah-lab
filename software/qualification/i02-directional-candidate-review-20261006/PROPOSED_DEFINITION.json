@@ -1,0 +1,65 @@
+{
+  "proposalId": "I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/1",
+  "status": "SCIENTIFIC_REVIEW_REQUIRED",
+  "proposedRuleId": "ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE",
+  "proposition": "The explicitly supplied D-H/A tuple, in a supported separately named chemical class pair, satisfies the reviewed directional geometric candidate predicate. Not proof of an energetically favorable hydrogen bond.",
+  "geometry": {
+    "donorAcceptorDistanceAngstrom": {
+      "upperInclusive": 3.5
+    },
+    "donorHydrogenAcceptorAngleDegrees": {
+      "lowerInclusive": 130,
+      "upperInclusive": 180,
+      "vertex": "H",
+      "vectors": [
+        "D-H",
+        "A-H"
+      ]
+    },
+    "hydrogenAcceptorDistance": "MEASURE_AND_PRESERVE_ONLY; no independent cutoff proposed",
+    "acceptorDirectionality": "Measure H-A-X and D-A-X for every authoritative directly bonded heavy antecedent X; no qualifying window, inferred lone pair or hybridization direction is proposed."
+  },
+  "domain": "100 explicitly listed class pairs, using 10 existing donor role domains and 10 acceptor contexts. Generic pyridinium-NH pairs excluded. No water, sulfur, carboxylate, organic-F, proton-sharing or intracomponent contact expansion.",
+  "geometryValidity": "Finite common-frame supplied coordinates, distinct mapped D/H/A identities; explicit authoritative single D-H bond; nonzero D-H, H-A and D-A vectors. Degeneracy is unavailable, not zero-angle evidence. No physical lower-distance threshold invented.",
+  "scope": "Only explicitly selected different authoritative components with no conflicting cross-component covalent assertion. No residue naming or AD4 label as role authority. All correspondence alternatives and explicit donor H atoms preserved; no best-H/one-bond pruning.",
+  "negativeMeaning": "No tuple satisfying this exact class-pair predicate within the requested complete scope. Never absence of all hydrogen bonding, no donor/acceptor potential, or absence of favorable interactions.",
+  "negativeCoverageVersion": "I02.EXPLICIT_H_DIRECTIONAL_CANDIDATE/negative/1",
+  "negativeRequirements": [
+    "all selected graph/state/frame hashes verified",
+    "complete applicable B00/B01/P03 source-state and correspondence coverage",
+    "exact donor class and acceptor context established",
+    "all relevant explicit donor H atoms present and mapped; authoritative H count reconciled",
+    "exhaustive selected donor-H/acceptor enumeration without truncation",
+    "finite nondegenerate measurements for every applicable tuple",
+    "no conflicting input assertion; preserved alternatives assessed independently",
+    "all pair-specific prerequisites complete; unsupported classes never counted as evaluated negatives"
+  ],
+  "positiveCoverage": "Complete candidate-local role/state/explicit-H/coordinate proof and both numerical criteria; a positive never establishes complete search coverage.",
+  "assessmentStates": {
+    "SUPPORTED_PRESENT": "At least one fully attributable qualifying tuple; retain all qualifying tuples and unresolved alternatives.",
+    "ABSENT_FALSE": "Every applicable tuple demonstrably evaluated and none passes; exact supported pair scope only.",
+    "UNKNOWN_INCONCLUSIVE": "Missing H, incomplete state/search/mapping, conflicting assertions or geometry.",
+    "UNSUPPORTED": "Class/domain or required representation outside reviewed support.",
+    "FAILED": "Attributed execution/perception failure; preserve input evidence.",
+    "NOT_EVALUATED": "Not run or not scientifically approved; research artifacts never authorize evaluation."
+  },
+  "scientificBasis": "Operational precedent: pinned ProLIF HBAcceptor and SingleAngle. Primary ProLIF paper explicitly describes threshold disagreement. These values are not calibrated class-specific optima. The proposal consciously reuses an established screen while keeping each chemistry pair separately reviewable.",
+  "supportSufficiency": {
+    "operationalScreenProposal": true,
+    "empiricalClassSpecificCalibration": false,
+    "physicalBondExistence": false,
+    "humanApproved": false
+  },
+  "nonClaims": [
+    "binding energy",
+    "potency",
+    "favorable chemistry",
+    "pKa/protonation inference",
+    "acceptor lone-pair alignment",
+    "exhaustive physical hydrogen bonding",
+    "RDKit/OCL/ProLIF execution parity",
+    "empirical false-positive/false-negative rate"
+  ],
+  "legacy": "ATHENA.HBOND.DIRECTIONAL/1.0.0/athena.scientific/2 remains byte-identical; no aliases or default migration. Legacy amine witnesses remain UNKNOWN_INCONCLUSIVE.",
+  "review": "No authorized review, expiry, implementation receipt or QUALIFIED status is created. Accepting this is an explicit operational scientific-definition decision, not evidence of a universal hydrogen-bond cutoff."
+}

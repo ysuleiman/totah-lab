@@ -23,6 +23,12 @@ Implementation qualification, research eligibility and current-policy qualificat
 separate. A historical manifest marked QUALIFIED does not establish current-policy
 eligibility. Consult the ledger and exact checkpoint; do not infer activation from counts.
 
+The [I02 H-bond expansion proposal](../../../software/qualification/i02-directional-candidate-review-20261006/REVIEW.txt)
+and its [scientific supporting analysis](../../../software/qualification/i02-directional-candidate-review-20261006/SOURCE_NOTES.txt)
+are pending scientific review. They propose an explicit-H geometric candidate predicate,
+not an activated interaction rule. The historical alcohol/oxygen rule remains unchanged;
+raw-measurement tests do not qualify the proposed expansion.
+
 ## Supporting material and completeness
 
 Every rule needs both scientific supporting material and execution qualification.

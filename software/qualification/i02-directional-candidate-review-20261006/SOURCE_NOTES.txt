@@ -1,0 +1,84 @@
+I02 SUPPORTING MATERIAL / AUTHOR ANALYSIS — 2026-10-06
+Local source hashes: LOCAL_SOURCE_PINS.json. Source documents are linked, not duplicated.
+
+PROLIF_2021
+Bouysset C, Fiorucci S. ProLIF: a library to encode molecular interactions as
+fingerprints. Journal of Cheminformatics 13,72 (2021).
+DOI 10.1186/s13321-021-00548-6.
+https://link.springer.com/article/10.1186/s13321-021-00548-6
+Read: Implementation, Tables 2/3 context, threshold-variation paragraph.
+Establishes configurable SMARTS-plus-geometry fingerprint practice, not unique physical
+cutoffs. Explicitly discusses differing H-A/D-A definitions. No pair-specific
+calibration dataset extracted. ADOPT separation of perception and geometry; MODIFY
+to Athena authoritative supplied state, complete-negative coverage and all evidence.
+REJECT inference/preparation as a substitute for supplied H/state. PMC access returned
+a challenge; Springer publisher text was readable. No article copy redistributed.
+
+PROLIF_PINNED_IMPLEMENTATION
+Commit 19f1800218387c49536eb9d3e8cd3044fdb337ee, already preserved in the knowledge audit.
+interactions.py HBAcceptor lines100-152; base.py SingleAngle lines310-377.
+Actual detector measures donor-acceptor distance <=3.5 and DHA default130..180.
+H is explicit in donor query. No H-A or acceptor-antecedent cutoff in this class.
+SMARTS exclusions, charge/aromatic distinctions and library match behavior matter;
+Athena does NOT copy the SMARTS or claim RDKit equivalence. Generic charged aromatic
+donor coverage is not established by its special charged aromatic alternative.
+ADOPT as proposed operational geometric precedent; MODIFY perception to B00/P03 and
+stable complete correspondence. REJECT first/best-match loss as evidence semantics.
+Exact angular boundary in the proposed Athena predicate is explicitly inclusive;
+no claim of full ProLIF boundary/float/execution parity.
+
+HBPLUS
+McDonald IK, Thornton JM. Satisfying hydrogen bonding potential in proteins.
+J Mol Biol 238:777-793 (1994), DOI 10.1006/jmbi.1994.1334.
+Official EBI referral https://www.ebi.ac.uk/thornton-srv/software/HBPLUS/ links
+https://github.com/RomanLas/HBPLUS. Retrieved archive digests in HBPLUS_RETRIEVAL.json.
+Read manual3.3 and hbp_hhb.c calc_hb, including actual antecedent rejection logic.
+Defaults: D-A3.9, H-A2.5; DHA/DAAA/HAAA90 degrees; aromatic-axis handling separate.
+Multiple antecedents affect the minimum angle. Hydrogen placement and missing-H
+fallbacks exist. ADOPT documenting acceptor geometry and all prerequisites; REJECT
+automatic H placement, silent missing-H fallback and copying residue tables. Do not
+claim paper full text read or reproduce its statistics. Software was not run or linked.
+Restrictive terms appear in manual; source remains outside repository, with hashes.
+
+CUFF_2006
+Cuff AL, Janes RW, Martin ACR. Analysing the ability to retain sidechain hydrogen-bonds
+in mutant proteins. Bioinformatics22:1464-1470 (2006). DOI10.1093/bioinformatics/btl120.
+https://academic.oup.com/bioinformatics/article/22/12/1464/207501
+Read Introduction geometry paragraph/Fig1 and Methods donor/acceptor scope.
+Protein-context geometric detection uses H-A2.5 and generous90-degree angles;
+hydrogen-unavailable treatment is different. Supports comparison to a permissive
+operational definition, not calibration of every small-molecule class pair. ADOPT
+keeping explicit-H and missing-H questions separate. REJECT using its modeled-H
+branch or protein residue labels as Athena chemical authority. No grids/distributions
+or accessions acquired, no energetic inference adopted. This does not validate130
+as a physically optimal threshold.
+
+PLIP
+Previously pinned3.0.1, commit2f4911d307490479ac023b22d6faa8f59b577ca8.
+Read detection.py hbonds lines67-105 and config.py lines46-50. Actual checks use
+strict0.5<D-A<4.1 and DHA>100; H-A is recorded, not thresholded. The docstring's
+distance wording does not substitute for executed code. Preparation/OpenBabel and
+refinement exclusions remain separate sources of difference. ADOPT measurement vs
+evaluation distinction; REJECT using its tolerance as unexplained universal truth.
+Existing full PLIP audit preserved; no parity implementation undertaken.
+
+SOURCE LIMITATIONS / NEGATIVE RESEARCH
+Taylor R, Kennard O, Versichel W. Geometry of N-H...O=C hydrogen bond III:
+Hydrogen-bond distances and angles. Acta Cryst B40:280-288 (1984).
+DOI10.1107/S010876818400210X. Prior audit full-text limit remains unresolved.
+No numerical thresholds or class statistics imported from citation/search snippets.
+Arunan et al. Definition of the hydrogen bond (IUPAC Recommendations2011).
+Pure Appl Chem83:1637-1641. DOI10.1351/PAC-REC-10-01-02.
+Official full-text/index retrieval403 on this attempt; prior abstract metadata only.
+No110-degree threshold adopted from search snippets. These access failures are not
+negative scientific findings. No empirical dataset, fitted distribution, force field,
+energetic calculation or universal physical H-bond ground truth is claimed.
+
+Scientific recommendation and uncertainty
+Use the candidate proposal only if an explicit operational screen is the intended
+product proposition. All100 pairs remain human-review candidates; local software
+precedent is NOT automatic scientific authority. Ten pyridinium pairs remain open.
+Acceptor alignment and class-specific calibration remain separately unresolved.
+No review interval is fabricated; scientific approval must bind exact definition/domain
+digests and explicit validity under the accepted governance contract when a real
+current-policy package is authorized.
