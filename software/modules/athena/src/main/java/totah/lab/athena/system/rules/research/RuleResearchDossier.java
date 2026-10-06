@@ -38,8 +38,8 @@ public record RuleResearchDossier(String schema, String id, String version, Stri
         public Review { Objects.requireNonNull(reviewer); Objects.requireNonNull(decisionSource); Objects.requireNonNull(reviewedAt);
             Objects.requireNonNull(validUntil); Objects.requireNonNull(policy); ResearchCodec.hash(approvedDefinitionSha256); ResearchCodec.hash(approvedDomainSha256); }
     }
-    public RuleResearchDossier { ResearchCodec.schema(schema,"athena-rule-research-dossier/1"); ResearchCodec.text(id); ResearchCodec.text(version);
-        ResearchCodec.text(ruleKey); ResearchCodec.hash(definitionSha256); ResearchCodec.schema(projectionVersion,"athena-rule-definition-projection/1");
+    public RuleResearchDossier { if(!Set.of("athena-rule-research-dossier/1","athena-rule-research-dossier/2").contains(schema))throw new IllegalArgumentException("unsupported research schema"); ResearchCodec.text(id); ResearchCodec.text(version);
+        ResearchCodec.text(ruleKey); ResearchCodec.hash(definitionSha256); ResearchCodec.schema(projectionVersion,schema.endsWith("/2")?"athena-rule-definition-projection/2":"athena-rule-definition-projection/1");
         Objects.requireNonNull(domain); sources=List.copyOf(sources); implementationAudits=List.copyOf(implementationAudits);
         literatureAudits=List.copyOf(literatureAudits); datasetAudits=List.copyOf(datasetAudits); decisions=List.copyOf(decisions);
         unresolvedRequirements=ResearchCodec.strings(unresolvedRequirements); Objects.requireNonNull(review); }

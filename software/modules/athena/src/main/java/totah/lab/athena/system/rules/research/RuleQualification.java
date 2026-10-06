@@ -13,11 +13,21 @@ public final class RuleQualification {
     public static RuleQualificationReceipt qualify(RuleManifest manifest,ResearchEligibility eligibility,
             RuleImplementationQualification implementation,SystemGraphCertificate foundation,SystemStateView state,
             RuleRequest request,RulePolicyContext context,ResearchArtifactReader artifacts,Instant evaluatedAt)throws IOException {
+        return qualifyShared(manifest,eligibility,ImplementationAccess.of(implementation),foundation,state,request,context,artifacts,evaluatedAt);
+    }
+    public static RuleQualificationReceipt qualify(RuleManifest manifest,ResearchEligibility eligibility,
+            RuleImplementationQualificationV2 implementation,SystemGraphCertificate foundation,SystemStateView state,
+            RuleRequest request,RulePolicyContext context,ResearchArtifactReader artifacts,Instant evaluatedAt)throws IOException {
+        return qualifyShared(manifest,eligibility,ImplementationAccess.of(implementation),foundation,state,request,context,artifacts,evaluatedAt);
+    }
+    private static RuleQualificationReceipt qualifyShared(RuleManifest manifest,ResearchEligibility eligibility,
+            ImplementationAccess implementation,SystemGraphCertificate foundation,SystemStateView state,
+            RuleRequest request,RulePolicyContext context,ResearchArtifactReader artifacts,Instant evaluatedAt)throws IOException {
         Objects.requireNonNull(state);
         if(!state.binding().equals(foundation.binding())||!state.binding().equals(request.state()))throw new IOException("state binding mismatch");
         var status=checked(manifest,eligibility,implementation,foundation,request,context,artifacts,evaluatedAt);
         return new RuleQualificationReceipt("athena-rule-qualification-receipt/1",manifest.key(),RuleRegistry.digest(manifest),
-                ResearchCodec.pin(eligibility),ResearchCodec.pin(implementation),statePin(foundation),statePin(state.binding()),statePin(request),
+                ResearchCodec.pin(eligibility),ResearchCodec.pin(implementation.document()),statePin(foundation),statePin(state.binding()),statePin(request),
                 status,eligibility.mode(),evaluatedAt,List.of(status==SystemGraphCertificate.Status.QUALIFIED?"RESEARCH_AND_IMPLEMENTATION_VERIFIED":"HISTORICAL_REPLAY_ONLY"));
     }
     public static void verify(RuleManifest manifest,RuleQualificationReceipt receipt,RulePolicyContext context,
@@ -26,7 +36,8 @@ public final class RuleQualification {
                 ||!receipt.evaluatedAt().equals(at))throw new IOException("receipt rule/time binding mismatch");
         var pins=new TreeSet<String>();
         var eligibility=ResearchCodec.decode(ResearchCodec.read(receipt.eligibility(),artifacts,pins),ResearchEligibility.class);
-        var implementation=ResearchCodec.decode(ResearchCodec.read(receipt.implementationReport(),artifacts,pins),RuleImplementationQualification.class);
+        var implementationBytes=ResearchCodec.read(receipt.implementationReport(),artifacts,pins);
+        var implementation=manifest.research().schema().endsWith("/2")?ImplementationAccess.of(ResearchCodec.decode(implementationBytes,RuleImplementationQualificationV2.class)):ImplementationAccess.of(ResearchCodec.decode(implementationBytes,RuleImplementationQualification.class));
         var foundation=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.foundationCertificate(),artifacts,pins),SystemGraphCertificate.class);
         var binding=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.stateBinding(),artifacts,pins),SystemStateView.Binding.class);
         var request=ResearchCodec.JSON.readValue(ResearchCodec.read(receipt.request(),artifacts,pins),RuleRequest.class);
@@ -37,25 +48,30 @@ public final class RuleQualification {
         if(!receipt.reasons().equals(List.of(expectedReason)))throw new IOException("receipt reasons mismatch");
     }
     private static SystemGraphCertificate.Status checked(RuleManifest manifest,ResearchEligibility eligibility,
-            RuleImplementationQualification implementation,SystemGraphCertificate foundation,RuleRequest request,
+            ImplementationAccess implementation,SystemGraphCertificate foundation,RuleRequest request,
             RulePolicyContext context,ResearchArtifactReader artifacts,Instant at)throws IOException {
         if(!manifest.schema().equals("athena-rule/3"))throw new IOException("historical manifest cannot issue current qualification");
         if(manifest.retired())throw new IOException("retired rule");
         var pins=new TreeSet<String>();
-        var policy=ResearchCodec.decode(ResearchCodec.read(manifest.research().reviewPolicy(),artifacts,pins),RuleReviewPolicy.class);
-        var fresh=new ScientificRuleResearchGate().evaluate(manifest,policy,context,artifacts,at,eligibility.mode());
+        var policyBytes=ResearchCodec.read(manifest.research().reviewPolicy(),artifacts,pins);
+        boolean v2=manifest.research().schema().endsWith("/2");
+        var policy=v2?ReviewPolicyAccess.of(ResearchCodec.decode(policyBytes,RuleReviewPolicyV2.class)):ReviewPolicyAccess.of(ResearchCodec.decode(policyBytes,RuleReviewPolicy.class));
+        if(implementation.v2()!=v2)throw new IOException("mixed research versions");
+        if(v2&&!implementation.manifestSha256().equals(RuleRegistry.digest(manifest)))throw new IOException("implementation manifest mismatch");
+        var gate=new ScientificRuleResearchGate();
+        var fresh=v2?gate.evaluate(manifest,(RuleReviewPolicyV2)policy.document(),context,artifacts,at,eligibility.mode()):gate.evaluate(manifest,(RuleReviewPolicy)policy.document(),context,artifacts,at,eligibility.mode());
         if(!fresh.equals(eligibility)||!fresh.eligible())throw new IOException("research ineligible or receipt changed: "+fresh.reasons());
         if(!request.manifestKey().equals(manifest.key())||!request.manifestSha256().equals(RuleRegistry.digest(manifest)))throw new IOException("request rule pin mismatch");
         if(!implementation.ruleKey().equals(manifest.key())||!implementation.definitionSha256().equals(manifest.research().definitionSha256())
                 ||!implementation.domainSha256().equals(manifest.research().domain().sha256()))throw new IOException("implementation definition/domain mismatch");
-        if(!policy.authorizedReviewers().contains(implementation.reviewer())||implementation.completedAt().isAfter(at))throw new IOException("implementation authority/time mismatch");
+        if(!policy.implementationReviewers().contains(implementation.reviewer())||implementation.completedAt().isAfter(at))throw new IOException("implementation authority/time mismatch");
         if(implementation.implementationPins().isEmpty()||implementation.fixturePins().isEmpty())throw new IOException("implementation/fixture provenance missing");
         var checks=new HashMap<String,RuleImplementationQualification.Check>();implementation.checkResults().forEach(c->checks.put(c.id(),c));
         if(implementation.checkResults().stream().anyMatch(c->!c.passed())||policy.requiredQualificationChecks().stream().anyMatch(id->!checks.containsKey(id)))throw new IOException("implementation checks missing/failed");
-        ResearchCodec.verifySources(implementation,artifacts,pins);
+        ResearchCodec.verifySources(implementation.document(),artifacts,pins);
         // These input documents must already be admitted; constructing a public record is not sufficient.
         ResearchCodec.read(ResearchCodec.pin(eligibility),artifacts,pins);
-        ResearchCodec.read(ResearchCodec.pin(implementation),artifacts,pins);
+        ResearchCodec.read(ResearchCodec.pin(implementation.document()),artifacts,pins);
         ResearchCodec.read(statePin(foundation),artifacts,pins);
         ResearchCodec.read(statePin(foundation.binding()),artifacts,pins);
         ResearchCodec.read(statePin(request),artifacts,pins);

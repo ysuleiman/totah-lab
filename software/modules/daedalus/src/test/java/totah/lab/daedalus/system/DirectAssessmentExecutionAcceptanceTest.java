@@ -21,8 +21,13 @@ class DirectAssessmentExecutionAcceptanceTest {
     static EvidenceEnvelope wrap(SystemStateView s,String id,String type,byte[] bytes) {
         return SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"direct-input"),id,type,bytes,REVIEWER,s.subject(),AT,List.of("synthetic engineering fixture only"));
     }
-    static Result run(Path directory,String variant)throws Exception {
-        var f=DirectAssessmentResearchFixture.create(SourceSulfurConnectivityAcceptanceTest.model(),variant);var m=variant.equals("schema2")?SourceSulfurConnectivityAcceptanceTest.model():f.manifest();
+    static Result run(Path directory,String variant)throws Exception { return run(directory,variant,false); }
+    static Result run(Path directory,String variant,boolean v2)throws Exception {
+        var legacy=DirectAssessmentResearchFixture.create(SourceSulfurConnectivityAcceptanceTest.model(),variant);
+        var modern=v2?ResearchV2Fixtures.upgrade(legacy,variant):null;
+        var selectedManifest=v2?modern.manifest():legacy.manifest();
+        var artifactBytes=v2?modern.bytes():legacy.bytes();var policyContext=v2?modern.context():legacy.context();var raw=v2?modern.raw():legacy.raw();
+        var m=variant.equals("schema2")?SourceSulfurConnectivityAcceptanceTest.model():selectedManifest;
         var state=SourceSulfurConnectivityAcceptanceTest.state(variant.equals("positive"));
         if(variant.equals("conflict"))state=SourceSulfurConnectivityAcceptanceTest.structural(state,totah.lab.gaia.structure.ConnectivityProvenance.EXPLICIT,true,totah.lab.gaia.chemistry.BondOrder.SINGLE);
         if(variant.equals("unrelated-component"))state=AthenaScientificRulesAcceptanceTest.system(List.of(SourceSulfurConnectivityAcceptanceTest.source(false).graph(),B01FunctionalGroupAcceptanceTest.fixture("aldehyde").graph()),true,false);
@@ -30,12 +35,13 @@ class DirectAssessmentExecutionAcceptanceTest {
         var pipeline=AthenaScientificRulesAcceptanceTest.pipeline();var catalog=new EvidenceSnapshotCatalog(directory);
         var foundation=pipeline.run(catalog,Optional.empty(),state,List.of(coverage),Map.of(),List.of(),ref(ScientificReference.Kind.ACTIVITY,"direct-foundation"),AT);
         var inputs=new ArrayList<EvidenceEnvelope>();int i=0;
-        for(var bytes:new TreeMap<>(f.bytes()).values())inputs.add(wrap(state,"research-"+i++,"fixture:research",bytes));
-        byte[] context=ResearchDocuments.encode(f.context());var cp=ResearchGatePipelineAcceptanceTest.pin(context);
+        for(var bytes:new TreeMap<>(artifactBytes).values())inputs.add(wrap(state,"research-"+i++,"fixture:research",bytes));
+        byte[] context=ResearchDocuments.encode(policyContext);var cp=ResearchGatePipelineAcceptanceTest.pin(context);
         inputs.add(wrap(state,"context","athena:rule-policy-context",context));
-        var impl=new RuleImplementationQualification("athena-rule-implementation-qualification/1",variant.equals("bad-implementation")?"wrong":m.key(),f.manifest().research().definitionSha256(),f.manifest().research().domain().sha256(),List.of(f.raw()),List.of(f.raw()),
-                variant.equals("missing-check")?List.of():List.of(new RuleImplementationQualification.Check("synthetic-positive",!variant.equals("failed-check"),f.raw(),"synthetic")),REVIEWER,f.raw(),AT);
-        byte[] ib=ResearchDocuments.encode(impl);var ip=ResearchGatePipelineAcceptanceTest.pin(ib);inputs.add(wrap(state,"implementation","athena:rule-implementation-qualification",ib));
+        var impl=new RuleImplementationQualification("athena-rule-implementation-qualification/1",variant.equals("bad-implementation")?"wrong":m.key(),selectedManifest.research().definitionSha256(),selectedManifest.research().domain().sha256(),List.of(raw),List.of(raw),
+                variant.equals("missing-check")?List.of():List.of(new RuleImplementationQualification.Check("synthetic-positive",!variant.equals("failed-check"),raw,"synthetic")),REVIEWER,raw,AT);
+        Object selectedImplementation=v2&&!variant.equals("mixed-report")?new RuleImplementationQualificationV2("athena-rule-implementation-qualification/2",impl.ruleKey(),impl.definitionSha256(),impl.domainSha256(),variant.equals("wrong-manifest")?"0".repeat(64):RuleRegistry.digest(m),impl.implementationPins(),impl.fixturePins(),impl.checkResults(),variant.equals("swapped-implementation")?ResearchV2Fixtures.SCIENCE:ResearchV2Fixtures.EXECUTOR,impl.reviewSource(),impl.completedAt()):impl;
+        byte[] ib=ResearchDocuments.encode(selectedImplementation);var ip=ResearchGatePipelineAcceptanceTest.pin(ib);inputs.add(wrap(state,"implementation","athena:rule-implementation-qualification",ib));
         if(!Set.of("inherited","no-coverage").contains(variant))inputs.add(coverage);
         // Unsupported opaque evidence must survive admission but never become an evaluator input.
         inputs.add(wrap(state,"opaque","fixture:uninterpreted","uninterpreted".getBytes(java.nio.charset.StandardCharsets.UTF_8)));

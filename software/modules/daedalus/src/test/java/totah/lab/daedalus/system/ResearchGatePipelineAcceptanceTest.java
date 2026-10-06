@@ -20,29 +20,34 @@ class ResearchGatePipelineAcceptanceTest {
     @TempDir Path temp;
     record Outcome(EvidenceHistory history,RuleExecutionPipeline.Result result,RuleManifest manifest,RulePolicyContext context) { }
     static RuleManifest.Source pin(byte[] value){String h=EvidenceExchange.sha256(value);return new RuleManifest.Source("sha256:"+h,h,"synthetic test pin");}
-    static Outcome run(Path directory,String variant)throws Exception {
-        var f=ResearchGateAcceptanceTest.fixture(variant);var m=f.manifest();
+    static Outcome run(Path directory,String variant)throws Exception { return run(directory,variant,false); }
+    static Outcome run(Path directory,String variant,boolean v2)throws Exception {
+        var legacy=ResearchGateAcceptanceTest.fixture(variant);
+        var modern=v2?ResearchV2Fixtures.upgrade(legacy,variant):null;
+        var m=v2?modern.manifest():legacy.manifest();
+        var artifactBytes=v2?modern.bytes():legacy.bytes();var policyContext=v2?modern.context():legacy.context();var raw=v2?modern.raw():legacy.raw();
         var chemical=B01FunctionalGroupAcceptanceTest.fixture("aldehyde");var state=system(List.of(chemical.graph()),true,false);
         var pipeline=pipeline();var catalog=new EvidenceSnapshotCatalog(directory);
         var foundation=pipeline.run(catalog,Optional.empty(),state,List.of(),Map.of(),List.of(),ref(ScientificReference.Kind.ACTIVITY,"foundation"),AT);
         var inputs=new ArrayList<EvidenceEnvelope>();int i=0;
-        for(var bytes:new TreeMap<>(f.bytes()).values())inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"artifact"),"a"+i++,"fixture:research-source",bytes,REVIEWER,state.subject(),AT,List.of("synthetic administrative fixture")));
-        byte[] context=ResearchDocuments.encode(f.context());var contextPin=pin(context);
+        for(var bytes:new TreeMap<>(artifactBytes).values())inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"artifact"),"a"+i++,"fixture:research-source",bytes,REVIEWER,state.subject(),AT,List.of("synthetic administrative fixture")));
+        byte[] context=ResearchDocuments.encode(policyContext);var contextPin=pin(context);
         inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"context"),"source","athena:rule-policy-context",context,REVIEWER,state.subject(),AT,List.of()));
         var implementation=new RuleImplementationQualification("athena-rule-implementation-qualification/1",m.key(),m.research().definitionSha256(),m.research().domain().sha256(),
-                List.of(f.raw()),List.of(f.raw()),variant.equals("missing-check")?List.of():List.of(new RuleImplementationQualification.Check("synthetic-positive",!variant.equals("failed-check"),f.raw(),"synthetic domain")),REVIEWER,f.raw(),AT);
-        byte[] implementationBytes=ResearchDocuments.encode(implementation);var implementationPin=pin(implementationBytes);
+                List.of(raw),List.of(raw),variant.equals("missing-check")?List.of():List.of(new RuleImplementationQualification.Check("synthetic-positive",!variant.equals("failed-check"),raw,"synthetic domain")),REVIEWER,raw,AT);
+        Object selectedImplementation=v2&&!variant.equals("mixed-report")?new RuleImplementationQualificationV2("athena-rule-implementation-qualification/2",implementation.ruleKey(),implementation.definitionSha256(),implementation.domainSha256(),variant.equals("wrong-manifest")?"0".repeat(64):variant.equals("stale-implementation")?RuleRegistry.digest(ResearchV2Fixtures.upgrade(legacy,"valid").manifest()):RuleRegistry.digest(m),implementation.implementationPins(),implementation.fixturePins(),implementation.checkResults(),variant.equals("swapped-implementation")?ResearchV2Fixtures.SCIENCE:ResearchV2Fixtures.EXECUTOR,implementation.reviewSource(),implementation.completedAt()):implementation;
+        byte[] implementationBytes=ResearchDocuments.encode(selectedImplementation);var implementationPin=pin(implementationBytes);
         inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"implementation"),"source","athena:rule-implementation-qualification",implementationBytes,REVIEWER,state.subject(),AT,List.of()));
         inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"coverage"),"source","athena:group-source-coverage",SystemStateView.bytes(B01FunctionalGroupAcceptanceTest.coverage(state,chemical)),REVIEWER,state.subject(),AT,List.of()));
         inputs.add(SystemQualificationPipeline.envelope(ref(ScientificReference.Kind.ACTIVITY,"definition"),"source","athena:group-definition",m.parameters().get("definition").value().getBytes(java.nio.charset.StandardCharsets.UTF_8),REVIEWER,state.subject(),AT,List.of()));
         var executor=variant.equals("missing-time-authority")?new RuleExecutionPipeline(pipeline,OCL):new RuleExecutionPipeline(pipeline,OCL,(c,at)->{
-            if(variant.equals("replayed-current-time")||!AT.equals(at)||!c.issuer().equals(REVIEWER))throw new java.io.IOException("time context not authorized by fixture authority");
+            if(variant.equals("replayed-current-time")||!AT.equals(at)||!c.issuer().equals(v2?ResearchV2Fixtures.EXECUTOR:REVIEWER))throw new java.io.IOException("time context not authorized by fixture authority");
         });
         var result=executor.runCurrent(catalog,foundation,Map.of(),new RuleRegistry().register(m),ResearchDocuments.encode(m),B01FunctionalGroupAcceptanceTest.request(state,m),Optional.empty(),
                 new RuleExecutionPipeline.ResearchExecutionInputs(inputs,contextPin,implementationPin),ref(ScientificReference.Kind.ACTIVITY,"current"),AT);
         var history=catalog.read(result.published().catalogSnapshot()).orElseThrow().history();
         for(var input:inputs)assertArrayEquals(input.readPayload(),history.envelopes().get(input.reference()).readPayload());
-        return new Outcome(history,result,m,f.context());
+        return new Outcome(history,result,m,policyContext);
     }
     @Test void currentExecutionPreservesEverythingBeforeQualifiedClassification()throws Exception {
         var out=run(temp,"valid");assertTrue(out.result.measurements().isPresent());

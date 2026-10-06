@@ -15,25 +15,36 @@ public final class ScientificRuleResearchGate {
 
     public ResearchEligibility evaluate(RuleManifest manifest,RuleReviewPolicy policy,RulePolicyContext context,
             ResearchArtifactReader artifacts,Instant evaluatedAt,QualificationMode mode)throws IOException {
+        return evaluateShared(manifest,ReviewPolicyAccess.of(policy),context,artifacts,evaluatedAt,mode);
+    }
+    public ResearchEligibility evaluate(RuleManifest manifest,RuleReviewPolicyV2 policy,RulePolicyContext context,
+            ResearchArtifactReader artifacts,Instant evaluatedAt,QualificationMode mode)throws IOException {
+        return evaluateShared(manifest,ReviewPolicyAccess.of(policy),context,artifacts,evaluatedAt,mode);
+    }
+    private ResearchEligibility evaluateShared(RuleManifest manifest,ReviewPolicyAccess policy,RulePolicyContext context,
+            ResearchArtifactReader artifacts,Instant evaluatedAt,QualificationMode mode)throws IOException {
         Objects.requireNonNull(artifacts);Objects.requireNonNull(evaluatedAt);Objects.requireNonNull(mode);
         if(!manifest.schema().equals("athena-rule/3"))throw new IllegalArgumentException("historical policy is not current research eligibility");
         var binding=manifest.research();var reasons=new TreeSet<String>();var checked=new TreeSet<String>();
+        if(policy.v2()!=binding.schema().equals("athena-rule-research-binding/2"))reasons.add("MIXED_RESEARCH_VERSIONS");
         var definition=ResearchCodec.definition(manifest);
         if(!definition.equals(binding.definitionSha256()))reasons.add("DEFINITION_DIGEST_MISMATCH");
-        if(!ResearchCodec.digest(policy).equals(binding.reviewPolicy().sha256()))reasons.add("POLICY_BINDING_MISMATCH");
+        if(!ResearchCodec.digest(policy.document()).equals(binding.reviewPolicy().sha256()))reasons.add("POLICY_BINDING_MISMATCH");
         if(!context.policy().equals(binding.reviewPolicy()))reasons.add("CONTEXT_POLICY_MISMATCH");
         if(!context.asOf().equals(evaluatedAt))reasons.add("CONTEXT_TIME_MISMATCH");
         if(!policy.authorizedContextIssuers().contains(context.issuer()))reasons.add("UNAUTHORIZED_CONTEXT_ISSUER");
         if(policy.applicableRulePrefixes().stream().noneMatch(manifest.ruleId()::startsWith))reasons.add("RULE_OUTSIDE_POLICY");
         if(!new HashSet<>(policy.requiredSystems()).containsAll(SYSTEMS))reasons.add("POLICY_SYSTEM_COVERAGE_MISSING");
-        if(!new HashSet<>(policy.invalidatingChangeKinds()).containsAll(CHANGES))reasons.add("POLICY_INVALIDATION_COVERAGE_MISSING");
+        if(policy.v2() && !new HashSet<>(policy.implementationChanges()).containsAll(Set.of("implementation identity/version","source/artifact pins","fixtures/tests","execution/context/receipt binding")))reasons.add("POLICY_IMPLEMENTATION_INVALIDATION_COVERAGE_MISSING");
+        var requiredChanges=policy.v2()?Set.of("definition","domain","perception","measurement","references/distributions","classification/thresholds","negative coverage"):CHANGES;
+        if(!new HashSet<>(policy.invalidatingChangeKinds()).containsAll(requiredChanges))reasons.add("POLICY_INVALIDATION_COVERAGE_MISSING");
         if(policy.requiredQualificationChecks().isEmpty())reasons.add("IMPLEMENTATION_CHECK_POLICY_MISSING");
         if(!new HashSet<>(policy.requiredAuditCategories()).equals(Set.of("IMPLEMENTATION","LITERATURE","DATASET")))reasons.add("UNSUPPORTED_AUDIT_CATEGORY_POLICY");
         if(new HashSet<>(policy.requiredSystems()).size()!=policy.requiredSystems().size()
                 ||new HashSet<>(policy.requiredQualificationChecks()).size()!=policy.requiredQualificationChecks().size())reasons.add("DUPLICATE_POLICY_IDENTITY");
         // Verify original admitted bytes, not just objects supplied by the caller.
         byte[] policyBytes=ResearchCodec.read(binding.reviewPolicy(),artifacts,checked);
-        if(!Arrays.equals(policyBytes,ResearchCodec.bytes(policy)))reasons.add("NONCANONICAL_OR_DIFFERENT_POLICY");
+        if(!Arrays.equals(policyBytes,ResearchCodec.bytes(policy.document())))reasons.add("NONCANONICAL_OR_DIFFERENT_POLICY");
         ResearchCodec.verifySources(context,artifacts,checked);
         byte[] domainBytes=ResearchCodec.read(binding.domain(),artifacts,checked);
         byte[] dossierBytes=ResearchCodec.read(binding.dossier(),artifacts,checked);
@@ -49,6 +60,7 @@ public final class ScientificRuleResearchGate {
             ResearchCodec.verifySources(domain,artifacts,checked);
         }
         if(dossier!=null){
+            if(policy.v2()!=dossier.schema().equals("athena-rule-research-dossier/2"))reasons.add("MIXED_RESEARCH_VERSIONS");
             if(!Arrays.equals(dossierBytes,ResearchCodec.bytes(dossier)))reasons.add("NONCANONICAL_DOSSIER");
             if(!dossier.ruleKey().equals(manifest.key())||!dossier.definitionSha256().equals(definition)
                     ||!dossier.domain().equals(binding.domain()))reasons.add("DOSSIER_DEFINITION_DOMAIN_MISMATCH");

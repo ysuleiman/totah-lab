@@ -1,0 +1,325 @@
+APPROVED.
+
+Implement the exact additive `/2` contract described in:
+
+`software/qualification/research-separation-v2-contract-20261006/DESIGN.txt`
+
+under the following approval boundary.
+
+## Approved public additions
+
+### `RuleReviewPolicyV2`
+
+Schema:
+
+`athena-rule-review-policy/2`
+
+Approved exactly with the proposed separation of:
+
+- `authorizedScientificReviewers`
+- `authorizedImplementationReviewers`
+- `authorizedContextIssuers`
+
+and with:
+
+- explicit per-rule review/expiry;
+- `freshnessMode = EXPLICIT_EXPIRY`;
+- no universal lifetime;
+- no automatic renewal;
+- no retroactive expiry;
+- no fabricated approval;
+- separate scientific and implementation invalidation classes.
+
+Scientific review authority must not authorize implementation qualification.
+
+Implementation/context authority must not authorize scientific definitions.
+
+---
+
+### `RuleImplementationQualificationV2`
+
+Schema:
+
+`athena-rule-implementation-qualification/2`
+
+Approved with the proposed binding to:
+
+- `ruleKey`
+- `definitionSha256`
+- `domainSha256`
+- `manifestSha256`
+- implementation pins
+- fixture pins
+- qualification checks
+- implementation reviewer
+- review source
+- completion time
+
+The full manifest digest must bind the implementation qualification to the exact executable implementation/configuration state.
+
+An implementation change must invalidate reuse of the old implementation qualification/receipt even where the scientific definition and domain remain unchanged.
+
+---
+
+### Public overloads
+
+Approved:
+
+```java
+ScientificRuleResearchGate.evaluate(
+    RuleManifest,
+    RuleReviewPolicyV2,
+    RulePolicyContext,
+    ResearchArtifactReader,
+    Instant,
+    QualificationMode
+) -> ResearchEligibility
+```
+
+and:
+
+```java
+RuleQualification.qualify(
+    RuleManifest,
+    ResearchEligibility,
+    RuleImplementationQualificationV2,
+    SystemGraphCertificate,
+    SystemStateView,
+    RuleRequest,
+    RulePolicyContext,
+    ResearchArtifactReader,
+    Instant
+) -> RuleQualificationReceipt
+```
+
+Retain every existing public signature.
+
+Do not silently change `/1` behavior through shared internal code.
+
+---
+
+## Approved binding/version model
+
+Preserve existing `ResearchBinding` and `RuleResearchDossier` Java component signatures.
+
+Add only the proposed paired `/2` schema/vocabulary.
+
+Required pairing:
+
+```text
+/1 binding/dossier -> projection/1
+/2 binding/dossier -> projection/2
+```
+
+Mixed `/1` and `/2` policy/binding/dossier/implementation-report combinations must fail closed.
+
+There is no implicit upgrade from historical `/1` documents.
+
+`athena-rule/3` remains the manifest schema.
+
+---
+
+## Approved scientific projection `/2`
+
+The scientific definition projection retains:
+
+- schema
+- ruleId
+- version
+- profile
+- family
+- tier
+- requiredCapabilities
+- requiredChemistry
+- requiredGeometry
+- measurementsProduced
+- classificationStates
+- parameters
+- scientificSources
+- limitations
+- negativeCoverage
+- domainSha256 as already defined
+
+Exclude:
+
+- `implementationId`
+- `implementationVersion`
+- `referenceArtifacts`
+
+Those remain bound through the full manifest/provenance/implementation qualification path.
+
+Do not move scientifically material information into `referenceArtifacts` merely to preserve a scientific digest.
+
+If an implementation revision alters any retained scientific field, it is a scientific change and requires renewed scientific review.
+
+Do not infer semantic equivalence automatically.
+
+---
+
+## Invalidating-change semantics
+
+Approved separation:
+
+### Scientific invalidation
+
+Includes changes to:
+
+- definition
+- domain
+- perception semantics
+- measurement semantics
+- scientific references/distributions
+- classification or thresholds
+- negative coverage
+- materially relevant scientific sources
+
+These require new scientific review.
+
+### Implementation invalidation
+
+Includes changes to:
+
+- implementation identity/version
+- executable/source/artifact pins
+- fixtures/tests
+- execution binding
+- context binding
+- implementation qualification
+- receipt binding
+
+These require new implementation qualification/receipt but must not erase an unchanged, still-valid scientific review.
+
+---
+
+## Authority semantics
+
+Approved:
+
+```text
+Scientific reviewer:
+AGENT:athena.foundation.authority:project-user:1
+
+Implementation reviewer/context issuer:
+AGENT:athena.foundation.authority:codex-local-qualification:1
+```
+
+These identities are role-specific.
+
+Do not broaden either authority.
+
+Do not activate additional authorities implicitly.
+
+Do not allow the implementation authority to attest scientific approval, and do not treat scientific approval as implementation qualification.
+
+---
+
+## Temporal semantics
+
+Approved:
+
+- `reviewedAt` and `validUntil` remain explicit per rule/review;
+- no universal expiry interval;
+- no default review lifetime;
+- no automatic extension;
+- no automatic renewal;
+- no retroactive expiration policy;
+- expired review evidence remains preserved historically.
+
+---
+
+## NOT_APPLICABLE
+
+Preserve `NOT_APPLICABLE` as an attributed, valid audit outcome where the relevant system/data genuinely do not apply.
+
+Do not use `NOT_APPLICABLE` to bypass required analysis of applicable empirical data.
+
+Applicable but unanalyzed data must fail qualification rather than being converted to `NOT_APPLICABLE`.
+
+---
+
+## Historical `/1` preservation
+
+This is mandatory.
+
+Do not modify historical `/1`:
+
+- codecs;
+- bytes;
+- canonicalization;
+- scientific digests;
+- authority semantics;
+- expiry behavior;
+- replay behavior;
+- persisted artifacts.
+
+The known `/1` defects remain historical facts.
+
+The purpose of `/2` is to correct them prospectively without rewriting history.
+
+---
+
+## Internal implementation
+
+Shared internal adapters are allowed where useful.
+
+They may normalize version-specific metadata for common verification paths.
+
+They must not cause `/1` and `/2` semantic behavior to collapse into one policy.
+
+Reuse existing:
+
+- admission;
+- current execution;
+- source verification;
+- canonical JSON machinery;
+- time authority;
+- persistence/replay infrastructure.
+
+Do not introduce a second research-document codec.
+
+Do not change:
+
+- `RuleExecutionPipeline`
+- `ResearchExecutionInputs`
+- `EvidenceExchange`
+- molecular graph schemas
+- classifier schemas
+- evidence-status schemas
+- chemistry schemas
+
+unless a separate review gate is reached.
+
+---
+
+## Required acceptance behavior
+
+Qualification must demonstrate:
+
+- scientific authority alone can approve scientific content;
+- implementation authority alone can qualify implementation/context;
+- swapped authorities fail;
+- unauthorized authorities fail;
+- implementation-only version changes preserve the `/2` scientific digest;
+- old implementation qualification/receipt fails after implementation change;
+- a fresh verified implementation report can qualify against an unchanged, still-valid scientific review;
+- scientific changes invalidate old scientific approval;
+- source/provenance tampering fails;
+- expiry fails closed;
+- rules may have different review validity intervals;
+- no universal lifetime is introduced;
+- `NOT_APPLICABLE` works only with exact attribution/applicability semantics;
+- applicable unanalyzed empirical datasets fail;
+- mixed `/1`/`/2` versions fail;
+- no automatic review, renewal, qualification or receipt is generated;
+- historical `/1` bytes and replay remain unchanged;
+- `runCurrent` / `evaluateCurrent`, admission, invocation counts, explicit input selection, persistence/read-back and independent-JVM replay remain valid.
+
+## Scope boundary
+
+This approval authorizes the specified additive public `/2` API/schema contract.
+
+It does **not** authorize unrelated API/schema changes.
+
+If implementation exposes a material conflict requiring a change to the approved record components, method signatures, projection vocabulary, authority semantics, version-pairing rules or invalidation semantics, stop for review rather than silently modifying the contract.
+
+Implement, qualify, preserve `/1`, and stop at the separately qualified `/2` checkpoint before any policy activation or production receipt issuance.

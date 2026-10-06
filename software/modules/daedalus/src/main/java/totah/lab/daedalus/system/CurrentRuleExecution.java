@@ -89,8 +89,10 @@ final class CurrentRuleExecution {
             context[0]=ResearchDocuments.decode(researchReader.read(research.policyContext()),RulePolicyContext.class);
             if(timeAuthority==null)throw new IOException("CURRENT execution requires an application time authority");
             timeAuthority.verifyCurrent(context[0],at);
-            var policy=ResearchDocuments.decode(researchReader.read(m.research().reviewPolicy()),RuleReviewPolicy.class);
-            eligibility[0]=new ScientificRuleResearchGate().evaluate(m,policy,context[0],researchReader,at,QualificationMode.CURRENT);
+            var policyBytes=researchReader.read(m.research().reviewPolicy());var researchGate=new ScientificRuleResearchGate();
+            eligibility[0]=m.research().schema().endsWith("/2")
+                    ? researchGate.evaluate(m,ResearchDocuments.decode(policyBytes,RuleReviewPolicyV2.class),context[0],researchReader,at,QualificationMode.CURRENT)
+                    : researchGate.evaluate(m,ResearchDocuments.decode(policyBytes,RuleReviewPolicy.class),context[0],researchReader,at,QualificationMode.CURRENT);
             return Map.of("eligible",Boolean.toString(eligibility[0].eligible()),"payload",new String(ResearchDocuments.encode(eligibility[0]),StandardCharsets.UTF_8));
         });
         current=step(catalog,current,state,inputs,List.of(gate),run,"research",at);
@@ -100,8 +102,10 @@ final class CurrentRuleExecution {
         if(!eligibility[0].eligible())return new RuleExecutionPipeline.Result(current,Optional.ofNullable(measurement));
         var qualificationReader=reader(catalog,current,inputs);var receipt=new RuleQualificationReceipt[1];
         var qualification=check("rule-qualification",()->{
-            var implementation=ResearchDocuments.decode(qualificationReader.read(research.implementationReport()),RuleImplementationQualification.class);
-            receipt[0]=RuleQualification.qualify(m,eligibility[0],implementation,foundation.certificate(),state,request,context[0],qualificationReader,at);
+            var reportBytes=qualificationReader.read(research.implementationReport());
+            receipt[0]=m.research().schema().endsWith("/2")
+                    ? RuleQualification.qualify(m,eligibility[0],ResearchDocuments.decode(reportBytes,RuleImplementationQualificationV2.class),foundation.certificate(),state,request,context[0],qualificationReader,at)
+                    : RuleQualification.qualify(m,eligibility[0],ResearchDocuments.decode(reportBytes,RuleImplementationQualification.class),foundation.certificate(),state,request,context[0],qualificationReader,at);
             return Map.of("payload",new String(ResearchDocuments.encode(receipt[0]),StandardCharsets.UTF_8));
         });
         current=step(catalog,current,state,inputs,List.of(qualification),run,"qualification",at);

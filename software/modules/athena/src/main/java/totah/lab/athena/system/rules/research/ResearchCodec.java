@@ -65,7 +65,7 @@ final class ResearchCodec {
         var root=JSON.valueToTree(manifest);var projected=JSON.createObjectNode();
         for(String key:List.of("schema","ruleId","version","profile","family","tier","implementationId","implementationVersion",
                 "requiredCapabilities","requiredChemistry","requiredGeometry","measurementsProduced","classificationStates","parameters",
-                "scientificSources","referenceArtifacts","limitations","negativeCoverage"))projected.set(key,root.required(key));
+                "scientificSources","referenceArtifacts","limitations","negativeCoverage")){ if(!manifest.research().projectionVersion().equals("athena-rule-definition-projection/2") || !List.of("implementationId","implementationVersion","referenceArtifacts").contains(key))projected.set(key,root.required(key)); }
         projected.put("domainSha256",manifest.research().domain().sha256());return digest(projected);
     }
     static void verifySources(Object object,ResearchArtifactReader reader,Set<String> checked)throws IOException {
