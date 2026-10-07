@@ -64,8 +64,8 @@ final class CurrentRuleExecution {
             registry.require(request.manifestKey(),request.manifestSha256());
             if(!m.key().equals(request.manifestKey())||!RuleRegistry.digest(m).equals(request.manifestSha256())||!state.binding().equals(request.state()))throw new IOException("rule/request/state mismatch");
             if(!foundation.certificate().binding().equals(state.binding())||!foundation.certificate().configurationSha256().equals(SystemStateView.digest(new TreeMap<>(foundationConfiguration))))throw new IOException("foundation binding/configuration mismatch");
-            if(!direct&&Set.of("athena.ss-connectivity","athena.events").contains(m.implementationId()))throw new IOException("direct implementation requires evaluateCurrent");
-            if(direct&&!Set.of("athena.ss-connectivity","athena.events").contains(m.implementationId()))throw new IOException("direct implementation not registered");
+            if(!direct&&Set.of("athena.ss-connectivity","athena.events","athena.i03-n-sp3-s1").contains(m.implementationId()))throw new IOException("direct implementation requires evaluateCurrent");
+            if(direct&&!Set.of("athena.ss-connectivity","athena.events","athena.i03-n-sp3-s1").contains(m.implementationId()))throw new IOException("direct implementation not registered");
             selected[0]=m;
             return Map.of("manifest",RuleRegistry.digest(m));
         });
@@ -117,7 +117,7 @@ final class CurrentRuleExecution {
         if(direct) {
             var applicable=new ArrayList<EvidenceEnvelope>();
             var selection=check("direct-input-selection",()->{
-                applicable.addAll(DirectAssessmentInputs.resolve(m,request,state,research.artifacts()));
+                applicable.addAll(DirectAssessmentInputs.resolve(m,request,state,m.implementationId().equals("athena.i03-n-sp3-s1")?inputs:research.artifacts()));
                 return Map.of("selectedInputs",new String(SystemStateView.bytes(applicable.stream()
                         .map(e->Map.of("reference",e.reference(),"sha256",e.payloadSha256())).toList()),StandardCharsets.UTF_8));
             });
@@ -134,7 +134,7 @@ final class CurrentRuleExecution {
             public List<Finding> analyze(SystemStateView s,List<EvidenceEnvelope> e,Map<String,String> config)throws Exception {
                 timeAuthority.verifyCurrent(context[0],at);
                 registry.requireCurrent(m.key(),RuleRegistry.digest(m),receipt[0],context[0],finalReader,at);
-                var applicable=direct?DirectAssessmentInputs.resolve(m,request,s,research.artifacts()):e;
+                var applicable=direct?DirectAssessmentInputs.resolve(m,request,s,m.implementationId().equals("athena.i03-n-sp3-s1")?verifiedInputs:research.artifacts()):e;
                 if(direct&&!applicable.equals(verifiedInputs))throw new IOException("selected applicable inputs changed after verification");
                 return evaluator.analyze(s,applicable,config);
             }

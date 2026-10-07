@@ -1,0 +1,70 @@
+PRIMARY SOURCE AND EXTERNAL REFERENCE COMPARISON — 2026-10-06
+This is a small synthetic characterization panel, not an empirical dataset,
+benchmark distribution, accuracy estimate, independent scientific corroboration
+or source of authority. No Athena SP3 classifier was implemented or executed.
+SMILES parser defaults in this panel are deliberately disclosed external-tool
+behavior; they may NOT be imported as Athena source charge/H/aromaticity/NONE.
+
+RDKit:
+Actual installed reference runtime2026.03.4, Python3.14; exact selected binary
+hashes, build string and parser options in RDKIT_REFERENCE_RESULTS.json.
+Version-matched upstream tag Release_2026_03_4 resolves to commit
+8afba32ec539dcb2369bc84549d802aca3f7eb39; ConjugHybrid.cpp is pinned locally.
+Earlier foundation reference fece8caa860bdf6c9c82bdb9253f22a0cf87150c is also
+retained separately, not presented as the runtime's exact source/binary closure.
+Conjugation and hybridization are separate operations. numBondsPlusLonePairs uses
+charge, valence, degree and radicals; setHybridization's four-orbital branch may
+choose SP2 when an incident bond is marked conjugated (degree<=3), otherwise SP3.
+Broader element/stereo branches and exceptions are not adopted by Athena.
+We have NOT independently certified the installed wheel against the upstream
+source commit or frozen its complete dynamic dependency closure. Reference only.
+
+OpenChemLib:
+Pinned local JAR2026.7.2 with SHA256 in OCL_REFERENCE_PROTOCOL.json; upstream tag
+2026.7.2 resolves to e18e34e33e56f8574d7224b7443ec54fada2378f. Downloaded tag and
+immutable-commit ExtendedMolecule.java bytes were verified identical.
+getAtomPi returns an atom pi-electron/bond-related count; it does NOT answer whether
+an N lone pair participates in resonance. isFlatNitrogen is a different boolean
+heuristic, with aromatic/pi, amide/enamine, ortho-substitution, three-membered-ring
+and pyramidal-bridgehead logic. Neither pi=0 nor flat=false is an SP3 certificate.
+No OpenChemLib flatness decision or steric/ring heuristic is imported into S1.
+
+Observed distinctions, exact synthetic SMILES retained in REFERENCE_PANEL.tsv:
+- Methyl/di-/trimethylamine: RDKit SP3; OCL pi0/flat=false.
+- Acetamide: RDKit SP2; OCL pi0/flat=true. Thus zero OCL pi does not establish SP3.
+- Sulfonamide CS(=O)(=O)[NH2:1]: RDKit SP3; OCL pi0/flat=true.
+  These APIs describe different propositions. S1 excludes this context regardless.
+- Hindered aniline Cc1cccc(C)c1[N:1](C)C: RDKit SP2; OCL flat=false.
+  S1 excludes all direct aromatic attachments and does not adopt a steric rescue.
+- Ynamine C#C[NH2:1]: RDKit SP2; OCL pi0/flat=false. S1 rejects the unsaturated
+  adjacent-carbon environment without declaring a universal physical SP2 state.
+- Enamine C=C[NH2:1]: RDKit SP2; OCL flat=true; S1 excludes direct carbon unsaturation.
+- Methylammonium/quaternary ammonium, the represented aminyl radical, hydrazine
+  and the represented zinc-dative example all have RDKit SP3 in this panel.
+  They remain outside S1; SP3 labels do not imply approved I03 role eligibility.
+- The aminyl example retains RDKit radicalElectrons1 and OCL radical token32.
+  The dative example retains OCL metalNeighbors1. Those facts must not be dropped.
+- Benzylamine, allylamine and the alpha-carbonyl spacer example differ from direct
+  aromatic/alkenic/carbonyl N attachment; the saturated spacer is decisive for S1.
+- Aziridine, pyrrolidine, piperidine and quinuclidine have RDKit SP3/OCL flat=false
+  here. This is not proof that every N bond angle is109.5 or of pure orbital mixing.
+
+Reference interpretation:
+The same label or a superficially similar API must never substitute for the
+reviewed Athena proposition. Agreement is useful for finding encoding mistakes;
+disagreement requires preserving distinct definitions and examining source facts,
+not majority voting or declaring a toolkit ground truth. No agreement percentage
+is computed. The S1 decision rules are proposed scientific choices, not fitted to
+these31 outputs. Positive/negative S1 cases still require a separately qualified
+source-evidence protocol and independent implementation tests after approval.
+
+Primary links:
+https://goldbook.iupac.org/terms/view/H02874/1000
+https://www.rdkit.org/docs/RDKit_Book.html#Molecular-Sanitization
+https://github.com/rdkit/rdkit/blob/8afba32ec539dcb2369bc84549d802aca3f7eb39/Code/GraphMol/ConjugHybrid.cpp
+https://github.com/Actelion/openchemlib/blob/e18e34e33e56f8574d7224b7443ec54fada2378f/src/main/java/com/actelion/research/chem/ExtendedMolecule.java
+IUPAC's hybridization definition concerns orbital combinations; it does not endorse
+this graph classifier or supply an empirical cutoff. S1 is an explicit operational
+model for review. Source excerpts/line locations and local bytes are available in
+reference/; upstream license notices are preserved. All numeric I03 geometry
+thresholds remain the separately approved I03-A contract, not part of S1.

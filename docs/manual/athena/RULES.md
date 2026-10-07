@@ -26965,6 +26965,309 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.I03.N_SP3.SATURATED_CARBON_ATTACHMENTS — 1.0.0 (i03-n-sp3-s1-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/i03-n-sp3-s1-v1/ATHENA.I03.N_SP3.SATURATED_CARBON_ATTACHMENTS.rule.json) · SHA256 `be005e84d5e19804136341030382494c91eb6a8f486f0417150ae65aed6c54b9`
+
+**family**
+
+```json
+"VALIDATOR"
+```
+
+**profile**
+
+```json
+"ATHENA_I03_N_SP3_S1_V1"
+```
+
+**implementationId**
+
+```json
+"athena.i03-n-sp3-s1"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Exact five unchanged P03 roles",
+  "P09 attributed complete source state",
+  "Explicit V03 NONE on every component atom",
+  "ATHENA.I03.SP3_SOURCE_SCOPE/1 or approved /2; exact scope record and source protocol independently qualified"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "proposition": "SOURCE_ATOM_HYBRIDIZATION",
+  "hybridization": "SP3 | NOT_SP3 | UNSUPPORTED | UNKNOWN"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.I03.N_SP3.SATURATED_CARBON_ATTACHMENTS/negative/1",
+  "supportedDomain": "Approved neutral closed-shell source nitrogen boundary and five admission roles",
+  "requirements": [
+    "explicit selected atom enumeration",
+    "complete consistent source facts",
+    "complete lossless source scope",
+    "independently qualified S1 invocation"
+  ],
+  "scope": "Model-relative selected atoms only; NOT_SP3 never an interaction negative",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Formal bounded source-graph model only; no physical hybridization, geometry, inferred H or interaction conclusion",
+  "No production scope authority or scientific qualification is supplied by this manifest"
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/CONTRACT_PROPOSAL.txt",
+    "sha256": "c2bc20e0bcf845f44c9e84188fa246c892e6887e8d009ee30446dfc6a07b3ff7",
+    "citation": "Approved S1 contract and evidence semantics; approval is not a scientific receipt"
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Approved S1 contract and evidence semantics; approval is not a scientific receipt"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/APPROVAL.txt",
+    "sha256": "d048e4ba124bbf6b5fc56484a4e71a82d3e06858628217d8e672a3846247f0e9",
+    "citation": "Approved S1 contract and evidence semantics; approval is not a scientific receipt"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Approved additive source-scope /2 representation distinction; /1 semantics unchanged"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Approved additive source-scope /2 representation distinction; /1 semantics unchanged"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+## ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES — 1.1.0 (implicit-h-proxy-s1-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/implicit-h-proxy-s1-v1/ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES.rule.json) · SHA256 `f300bbb55461b2d15791444c531d3f5fcc0f9e5056156eeaf633bd7c347677c8`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_IMPLICIT_H_PROXY_S1_V1"
+```
+
+**implementationId**
+
+```json
+"athena.implicit-h-proxy-s1"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Exact five unchanged roles; independently qualified S1 endpoint assignments and exact attributed source-scope evidence; complete source state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Real heavy-atom distance and all heavy-neighbor angles; no hydrogen placement"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-implicit-h-proxy-measurements/1; HEAVY_ATOM_DIRECTIONAL_PROXY"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES/S1/negative/1",
+  "supportedDomain": "Six approved neutral amine class pairs with source-bound S1 eligibility; heavy-atom proxy only",
+  "requirements": [
+    "VERIFIED_ROLE_REPORTS",
+    "COMPLETE_SCOPE",
+    "QUALIFIED_SP3_ASSIGNMENTS",
+    "COMPLETE_ENUMERATION",
+    "EVALUABLE_GEOMETRY",
+    "Both endpoints independently qualified under S1 including independent source-scope authority"
+  ],
+  "scope": "EXPLICIT_ATOM_SCOPES",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Raw heavy-atom proxy diagnostics are not observed or inferred H geometry.",
+  "S1 endpoint, exact source-scope and separate I03 composition qualifications are all required; inventory coverage cannot establish chemistry.",
+  "No production/current-policy authority or receipt supplied.",
+  "I03-B/C and I04 excluded."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/i03-i04-scientific-review-20261006/I03_CONTRACT.txt",
+    "sha256": "245230ab7a9c7c1c151d0bb773e943cd73d9a172e8a6bdc01df475a1bcfcaed0",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  },
+  {
+    "locator": "software/qualification/i03-i04-scientific-review-20261006/REPRESENTATION_PROPOSAL.txt",
+    "sha256": "6ef300874c2c0b342ae8a13615ab7fec075527b2ab20c6647c8164c10ee1150f",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  },
+  {
+    "locator": "software/qualification/i03-a-implementation-20261006/APPROVAL.txt",
+    "sha256": "4b92b551fb74211f70d1b0fbebb5730672082b4d1ec815978eebc87d6c25653c",
+    "citation": "User-approved I03-A only; activation prerequisite unresolved"
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/CONTRACT_PROPOSAL.txt",
+    "sha256": "c2bc20e0bcf845f44c9e84188fa246c892e6887e8d009ee30446dfc6a07b3ff7",
+    "citation": "Approved S1 composition applicability; no production receipt implied"
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Approved S1 composition applicability; no production receipt implied"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/APPROVAL.txt",
+    "sha256": "d048e4ba124bbf6b5fc56484a4e71a82d3e06858628217d8e672a3846247f0e9",
+    "citation": "Approved S1 composition applicability; no production receipt implied"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Approved additive source-scope /2 representation distinction; /1 semantics unchanged"
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Approved additive source-scope /2 representation distinction; /1 semantics unchanged"
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES — 1.0.0 (implicit-h-proxy-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/implicit-h-proxy-v1/ATHENA.I03.HEAVY_ATOM_DIRECTIONAL_PROXY_SP3_AMINES.rule.json) · SHA256 `a532eea1663993ca790dc3ff358017b29c8cc3f8e9b8989390587b520d22aa12`

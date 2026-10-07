@@ -15,6 +15,10 @@ final class DirectAssessmentInputs {
     private DirectAssessmentInputs() { }
     static List<EvidenceEnvelope> resolve(RuleManifest manifest,RuleRequest request,SystemStateView state,
                                           List<EvidenceEnvelope> selected)throws IOException {
+        if(manifest.implementationId().equals("athena.i03-n-sp3-s1")) {
+            if(!state.binding().equals(request.state()))throw new IOException("S1 direct state mismatch");
+            return List.copyOf(selected); // Current invocation only; never the inherited catalog. S1 checks all pins and scope.
+        }
         if(manifest.implementationId().equals("athena.events"))return EventAssessmentInputs.resolve(request,state,selected);
         if(!manifest.implementationId().equals("athena.ss-connectivity")||!state.binding().equals(request.state()))
             throw new IOException("unsupported direct input binding");

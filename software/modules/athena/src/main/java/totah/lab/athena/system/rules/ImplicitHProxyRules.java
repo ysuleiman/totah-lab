@@ -42,7 +42,7 @@ final class ImplicitHProxyRules {
             }
         };
     }
-    private static JsonNode build(SystemStateView s,RuleManifest m,RuleRequest request,ImplicitHProxyInputs input)throws Exception{
+    static JsonNode build(SystemStateView s,RuleManifest m,RuleRequest request,ImplicitHProxyInputs input)throws Exception{
         var reasons=new TreeSet<>(input.reasons);var candidates=new ArrayList<Object>();
         var pairs=HbondCandidateRules.parameter(m,"classPairs");int considered=0;
         outer:for(var pair:pairs){String dc=pair.path("donorClass").asText(),ac=pair.path("acceptorClass").asText();

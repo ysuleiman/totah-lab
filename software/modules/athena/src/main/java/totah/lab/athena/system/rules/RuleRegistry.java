@@ -82,6 +82,8 @@ public final class RuleRegistry {
         }return registry;
     }
     private static void validate(RuleManifest m) {
+        if(m.implementationId().equals("athena.implicit-h-proxy-s1")){S1ImplicitHProxyRules.validate(m);return;}
+        if(m.implementationId().equals("athena.i03-n-sp3-s1")){S1NitrogenRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy")){ImplicitHProxyRules.validate(m);return;}
         if(m.implementationId().equals("athena.water-bridge")){WaterBridgeRules.validate(m);return;}
         if(m.implementationId().equals("athena.events")){EventAnalysisRules.validate(m);return;}

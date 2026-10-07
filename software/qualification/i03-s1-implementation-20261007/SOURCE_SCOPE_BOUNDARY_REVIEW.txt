@@ -1,0 +1,46 @@
+2026-10-07 — implementation boundary requiring clarification, not implemented
+
+S1-052 requires a known incident dative/coordinate connection to produce
+OUT_OF_DOMAIN. The approved ATHENA.I03.SP3_SOURCE_SCOPE/1 measurements allow
+connectionCoverage only COMPLETE_ORDINARY_COVALENT_NO_COORDINATION or UNKNOWN.
+MolecularGraph.BondOrder has no dative/coordinate/zero-order representation.
+Thus the approved representation can prevent admission of this source, but cannot
+distinguish a known nonordinary connection from missing/lossy source coverage.
+Do not invent a property key, reinterpret an ordinary SINGLE edge, or overload
+an interpretation status to supply an unapproved connection-exclusion meaning.
+Current implementation therefore preserves UNKNOWN / ineligible for this boundary;
+it does not claim the requested OUT_OF_DOMAIN diagnostic is qualified.
+
+Smallest proposed additive clarification, NOT APPROVED / NOT IMPLEMENTED:
+ATHENA.I03.SP3_SOURCE_SCOPE/2 retains exactly the existing fields and adds one
+connectionCoverage value: KNOWN_NON_ORDINARY_CONNECTION.
+This value asserts an explicitly source-recorded dative, coordinate, zero-order,
+or metal connection incident on the selected component. It does not follow from
+nearby metals, geometry, toolkit defaults or absence of a representable bond.
+The raw original source, preparation/reader protocol and exact attributed scope
+record must be pinned and independently reviewed. Reasons identify the original
+connection occurrence and endpoint identities; existing input records retain the
+witness. No graph conversion or new graph primitive is proposed.
+
+With independent applicable scope and S1 qualification, an uncontested /2
+KNOWN_NON_ORDINARY_CONNECTION witness yields S1 UNSUPPORTED (OUT_OF_DOMAIN),
+never NOT_SP3 or an I03 interaction negative. With missing authority it remains
+NOT_EVALUATED; with materially conflicting assertions it remains UNKNOWN.
+Legacy /1 UNKNOWN never acquires this meaning and /1 rejects the new token.
+COMPLETE_ORDINARY_COVALENT_NO_COORDINATION still supplies exhaustiveness only,
+not identity, charge, H counts, radical state, role or scientific authority.
+All other approved S1 chemical clauses and five admission roles remain unchanged.
+
+Acceptance additions before implementing /2:
+1. Attributed explicit dative -> UNSUPPORTED with qualified exact scope record.
+2. Attributed explicit coordinate/zero-order/metal connection -> UNSUPPORTED.
+3. Nearby unconnected metal without an incident source record -> no exclusion.
+4. Missing/lossy source coverage -> UNKNOWN, not UNSUPPORTED.
+5. /1 UNKNOWN unchanged; /1 new token rejected.
+6. COMPLETE and KNOWN contrary source witnesses -> UNKNOWN; preserve both.
+7. Changed original bytes, endpoints, state or protocol -> rejection/ineligibility.
+8. Scope or S1 authority absent -> NOT_EVALUATED; no I03 negative or activation.
+
+This is an additive public scientific payload clarification and therefore needs
+user approval. No /2 decoder or producer has been implemented. Full scientific
+closure of S1-052, and unconditional activation removal, must wait.

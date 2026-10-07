@@ -1,0 +1,186 @@
+PROPOSED SCIENTIFIC CONTRACT — NOT APPROVED / NOT IMPLEMENTED
+ATHENA.I03.N_SP3.SATURATED_CARBON_ATTACHMENTS/1 (S1)
+Date: 2026-10-06; qualified implementation baseline622045b38.
+
+1. PROPOSITION AND LIMIT
+Assign the explicit model label SP3 to a source nitrogen only when it satisfies
+this bounded neutral, closed-shell, three-sigma-bond amine graph contract. This
+is an Athena Lewis/valence model assignment for I03-A applicability, not a measured
+orbital decomposition, proof of tetrahedral geometry, unique lone-pair direction,
+H orientation, basicity, donor strength or favorable interaction. The integer
+valence conditions below define the reviewed model; they are not an unreviewed
+fallback heuristic. A formal lone pair follows within this closed-shell neutral
+three-bond N model; no general electron-configuration algorithm is proposed.
+
+This producer is a CONSERVATIVE SUBSET of the existing I03-A input domain, not
+coverage of every nitrogen that could ever be called SP3. No universal atom
+hybridization or SP/SP2 classifier. Non-SP3 outputs below are bounded diagnostics.
+No new donor/acceptor role is introduced. Six existing ordered interaction class
+pairs remain unchanged; production activation is NOT granted by this proposal.
+
+2. EXACT CLASSES AND PATTERNS
+The only admission roles (unchanged full manifests in EXACT_ROLE_REUSE.json):
+ATHENA.PERCEPTION.DONOR.AMINE_PRIMARY
+ATHENA.PERCEPTION.DONOR.AMINE_SECONDARY
+ATHENA.PERCEPTION.ACCEPTOR.AMINE_PRIMARY
+ATHENA.PERCEPTION.ACCEPTOR.AMINE_SECONDARY
+ATHENA.PERCEPTION.ACCEPTOR.AMINE_TERTIARY
+The chemical patterns are respectively N(C)H2, N(C)2H1, N(C)3H0; all N-C/N-H
+edges SINGLE, N nonaromatic, formal charge0, source electronic token NONE.
+The same primary/secondary N can have separately attributed donor and acceptor
+roles. The assignment is atom-level and role-independent once these admissible
+role witnesses are supplied; it does not merge the roles or ordered I03 pairs.
+Tertiary amine is acceptor-only in I03-A; ammonia has no admitted class.
+
+Let Cn be the complete set of direct non-H neighbors of candidate n, k=|Cn|,
+and h(n)=count(distinct explicit source H bonded to n)+authoritative implicitH(n).
+SP3 requires exactly one of (k,h(n))=(1,2),(2,1),(3,0); k+h(n)=3;
+all direct heavy neighbors are carbon and all incident bonds are SINGLE;
+no aromatic/delocalized incident bond; known nonaromatic N and each Cn;
+N formal charge0 and complete, consistent authoritative H state.
+N may carry explicit or authoritative implicit H for assignment through its
+acceptor role; mixed inventories must be fully attributed and consistent. This
+does not relax I03-A donor eligibility: donor N must independently have zero
+explicit H and authoritative implicitH2/1. An SP3 assignment never deletes H or
+qualifies a donor role by itself.
+Explicit H occurrences are neutral, nonaromatic, degree1 with a SINGLE bond,
+no implicit H of their own, and independently supplied electronic token NONE.
+Do not count Atom.explicitHydrogens a second time. Existing source-coverage
+explicitHydrogenAtomIds and implicitHydrogenCount are the authoritative inventory.
+
+For EACH carbon c in Cn (the additional conservative saturation guard):
+formal charge0; source electronic token NONE; known nonaromatic;
+complete list of ALL incident bonds, every one SINGLE and nonaromatic;
+number of explicit neighbor occurrences + authoritative implicitH(c) =4.
+Explicit bound H has the same consistency conditions above. No carbon
+hybridization label is requested or inferred. This is a finite local bond/count
+predicate. N plus its carbon attachments and every edge incident on those carbons
+is the decision neighborhood; complete component topology supplies it.
+No selected convenient subset of a carbon's incident bonds is permitted.
+
+Every component atom must have authoritative source identity/formal charge,
+source H counts consistent with graph, known aromaticity under the existing pinned
+source protocol, and explicit electronic-state coverage as described below.
+Supported component elements remain H,C,N,O,S,F,Cl,Br,I. Remote ordinary carbonyl,
+aromatic, or charged groups do not automatically disqualify a candidate provided
+all facts are covered and the direct carbon attachments satisfy the guard.
+The proposal allows saturated cyclic/bridged N environments satisfying the same
+pattern, including aziridine and quinuclidine. This is a formal model assignment;
+no claim that their bond angles equal109.5 degrees or that strain is negligible.
+An acyclic-only alternative is separately surfaced for approval in REVIEW.txt.
+
+3. REQUIRED INDEPENDENT SOURCE FACTS
+- Exact immutable SystemStateView binding, component graph and source artifact
+  pins; unique total injective atom correspondence; source and system topology
+  agree. Preserve atom identities/order; no normalizing, protonating, tautomerizing,
+  deleting H, adding H or sanitizing the source into eligibility.
+- Complete authoritative charges, H inventories/modes, aromaticity evidence and
+  exact ordinary bond orders. A toolkit default, SMARTS role name, default false
+  aromatic flag or missing H annotation is not a source fact.
+- Explicit V03 electronic-state token athena.ocl.atomRadicalState/1=NONE for
+  EVERY atom of the selected component, including represented explicit H, with
+  pinned source/preparation provenance. This is an existing representation token,
+  not a call to OCL to produce electronic state. Absence of the property is UNKNOWN;
+  zero returned by an unqualified toolkit is not an assertion of NONE.
+  Any explicit S/D/T token in the component is outside S1. This whole-component
+  closed-shell restriction is conservative and requires approval. It is a formal
+  supplied electronic-state model, not proof of the molecule's quantum ground state.
+- Lossless source atom/connection scope: a separately attributed source-scope
+  interpretation must establish that the selected component and its incident
+  connections are completely represented as ordinary covalent connections with
+  no omitted/represented coordinate, dative, zero-order or metal connection.
+  This is a represented-source proposition, not proof that physical coordination
+  is impossible. MolecularGraph has no DATIVE bond type: an adapter that discards
+  such input cannot qualify this assertion. EXPLICIT connectivity alone is not
+  sufficient proof of lossless coordination coverage. See EVIDENCE_PROPOSAL.txt.
+- Replay the unchanged exact role manifests and their occurrence-local exclusions.
+  A role match alone proves neither closed shell nor the new saturation guard.
+Source-scope coverage proves coverage only; it cannot assign charge, H state,
+aromaticity, NONE, bond order or SP3, and cannot repair a missing property.
+
+4. RESONANCE / CHEMICAL EXCLUSIONS
+Preserve exact existing [N]-[C](=[O,N,S]) and [N]-[S](=[O]) exclusions with anchored
+witnesses. They cover the existing acyl/amidino and sulfonyl contexts; do not
+replace them with a toolkit class label or enlarge their SMARTS silently.
+Additional S1 guard excludes EVERY directly attached carbon having a multiple or
+aromatic incident bond, known nonzero charge, or non-four-coordinate ordinary
+source pattern. This covers N-C=C (enamine), N-C#C (ynamine), N-C=O/N/S,
+N-aromatic-C and analogous source unsaturation without a generic resonance engine.
+Direct attachment to non-carbon heavy atoms is outside S1, including N-S/O/N/P/B
+or a metal. Explicit unsupported radical/electronic or coordination context is
+outside S1. Unknown versions/facts are UNKNOWN, not negative.
+No remote resonance search, steric rescue, ring-size threshold, pKa/acidity rule,
+partial-charge cutoff, or geometry-based exception. Benzyl/allyl/alpha-carbonyl
+amines with a saturated carbon spacer are not confused with direct attachment
+of N to an aromatic/alkenic/carbonyl carbon. All other conditions still apply.
+
+Class treatment:
+Amides/carbamates/ureas/thioamides: existing anchored exclusion; OUT_OF_DOMAIN,
+including twisted/bridgehead variants; no blanket physical SP2 assertion.
+Amidines/guanidines: amino N excluded by context; imino N has direct N multiple
+bond (bounded NOT_SP3 diagnostic when applicable); no tautomer/protonation choice.
+Sulfonamides: non-carbon neighbor and existing sulfonyl exclusion; OUT_OF_DOMAIN.
+Aniline-like attachment: OUT_OF_DOMAIN even with ortho substitution or a constrained
+pyramidal N. No steric rescue. Toolkit disagreement cannot enlarge this profile.
+Charged N (ammonium, quaternary N, anions, N-oxides): OUT_OF_DOMAIN, NOT blanket
+NOT_SP3. Quaternary ammonium may receive SP3 in another model but has no S1 role.
+Radicals/open-shell: any known S/D/T in component OUT_OF_DOMAIN; missing/contradictory
+NONE evidence UNKNOWN. Do not infer electronic state from ordinary valence.
+Metals/coordination: known incident coordinate/dative/metal connection or metal
+in the selected component OUT_OF_DOMAIN; unknown/lossy connection scope UNKNOWN.
+Unrelated metal in a separately represented component does not itself prove a
+connection; its absence from the covalent graph does not prove noncoordination.
+Unusual valence/query atoms/ambiguous bonds: OUT_OF_DOMAIN if conclusively outside
+ordinary supported patterns, UNKNOWN if facts conflict or remain unresolved.
+Nitrogen isotopes use the same element/count model; isotope/source identity is
+preserved. Deuterium/tritium count as H only via authoritative element/isotope
+identity; no isotope geometry or energetic inference.
+
+5. DECISIONS AND PRECEDENCE
+Integrity failure (changed bytes, identity collision, malformed reference/schema,
+foreign state) rejects the invocation, preserving original evidence.
+Conflicting material source facts -> UNKNOWN_INCONCLUSIVE; preserve every witness.
+A conclusively known exclusion can exclude the model without inventing missing
+facts, but never override a contradiction concerning that exclusion's witness.
+With complete internally consistent applicable source facts:
+SP3: all S1 clauses and at least one exact admitted role satisfied.
+NOT_SP3: only a neutral closed-shell source N with a known directly incident
+DOUBLE/TRIPLE bond or known aromatic N; report the exact witness. This means
+incompatible with S1's nonaromatic three-single-bond model, not an implemented
+SP2/SP determination, spectroscopy result or interaction-negative. Such boundary
+atoms cannot be admitted through the five positive roles.
+UNSUPPORTED/OUT_OF_DOMAIN: other known excluded classes, resonance contexts,
+charge, radical, coordination, element or unusual-valence cases. These must not
+be collapsed into NOT_SP3 or silently dropped as qualified negative chemistry.
+UNKNOWN: any unresolved required admission/exclusion fact, missing coverage,
+ambiguous correspondence, inconsistent role/source evidence or unqualified input
+provenance. No default SP3, default neutral, default NONE or convenient resonance form.
+A returned SP3 model label remains scientifically ineligible until producer
+implementation, definition, input model and current invocation are independently
+qualified. Approval of this document alone would not issue authority.
+
+6. GEOMETRY
+NONE. No coordinates, fitted plane, pyramidalization, angle sum, distance,
+inversion barrier or orbital calculation contributes to assignment. Changing
+coordinates cannot change its chemical decision, but produces a different full
+state binding and requires a new attributed invocation. Source identity and
+preparation remain bound. I03-A later uses its unchanged real-heavy-atom numeric
+predicate; neither that109.5-degree reference nor a passing proxy proves SP3.
+No hydrogen position is created or claimed to be observed.
+
+7. NEGATIVE COVERAGE / I03 COMPOSITION
+Enumerate every explicitly selected N; record SP3/NOT_SP3/OUT_OF_DOMAIN/UNKNOWN
+with provenance. Missing classes/evidence never yield an empty covered negative.
+No state-wide or physical non-hydrogen-bond conclusion. Completeness is relative
+to the explicit selection AND this S1 applicability contract. A result from a
+strict subset cannot be advertised as exhaustive for alternative SP3 models.
+I03 negative coverage additionally requires independent inventory exhaustiveness,
+complete unchanged role/source chemistry, both endpoints qualified under S1,
+all neighbor geometry and enumeration coverage, and current scientific authority.
+NOT_SP3 or OUT_OF_DOMAIN is not an ABSENT_FALSE hydrogen bond. UNKNOWN at a
+potentially eligible selected N blocks complete scientific negative coverage.
+An incomplete positive inventory cannot certify counts. Inventory/source-scope
+coverage and producer qualification remain independent propositions.
+Future composition must explicitly bind S1 protocol/qualification to I03-A scope;
+no reuse of the old full-manifest digest/receipt after activation applicability
+changes. Do not alter historical I03, I02, water or event/path interpretations.
