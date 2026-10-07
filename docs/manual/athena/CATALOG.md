@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `900855f206e6ad24a1daba26068a914dc38171278e60cdba3294e227ca425efb`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `743a3c5682ad954303647469586efda837ae1fb50b8e69201ba25ca4f2ca2bd1`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -17,7 +17,7 @@ Disposition is copied without upgrading partial capability coverage.
 | P09 | Explicit/implicit hydrogens and state preparation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I01 | Hydrophobic contact | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
-| I03 | Implicit-H hydrogen-bond approximation | P2 | SCIENTIFIC_REVIEW_REQUIRED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt), [i03-a-implementation-20261006](../../../software/qualification/i03-a-implementation-20261006/CHECKPOINT.txt), [i03-s1-implementation-20261007](../../../software/qualification/i03-s1-implementation-20261007/CHECKPOINT.txt) |
+| I03 | Implicit-H hydrogen-bond approximation | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt), [i03-a-implementation-20261006](../../../software/qualification/i03-a-implementation-20261006/CHECKPOINT.txt), [i03-s1-implementation-20261007](../../../software/qualification/i03-s1-implementation-20261007/CHECKPOINT.txt) |
 | I04 | Weak C-H donor perception | P1 | SCIENTIFIC_REVIEW_REQUIRED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt) |
 | I05 | Parallel/face-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I06 | T-shaped/edge-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
@@ -282,15 +282,15 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### I03 — Implicit-H hydrogen-bond approximation
 
-Choose an attributed implicit-H approximation and validate H/state/preparation domain; cannot call it observed D-H-A.
+Approved I03-A six neutral amine donor/acceptor pairs; heavy-atom minimum-over-neighbors directional proxy with independently qualified bounded S1 source assignments. No observed/inferred H coordinates or physical hydrogen-bond assertion.
 
-**Qualification:** Engineering qualification only; no qualified SP3 producer, scientific positive/negative eligibility or current-policy receipt
+**Qualification:** 2226 fresh committed-source tests +3 isolation;137 S1/composition tests, including16 separately governed composition checks;94 S1 matrix cases;16 independent JVM pairs;13 legacy hashes unchanged;65 historical files exact;25 pins intact. No production authority.
 
-**Existing implementation:** Opt-in approved I03-A plumbing/predicate; scientific activation unconditionally blocked without a selected independently qualified SP3 producer
+**Existing implementation:** Opt-in athena.i03-n-sp3-s1/1 source producer and athena.implicit-h-proxy-s1/1 composition; historical I03-A version1.0.0 remains blocked and unchanged.
 
-**Supporting source:** ProLIF ImplicitHBAcceptor implementation
+**Supporting source:** User-approved I03-A contract and bounded S1 source-graph model; source differences and external-only RDKit/OCL probes preserved in linked review. No toolkit is an assignment authority.
 
-I03-B/C, inferred-H coordinates, SP/SP2, full ProLIF compatibility and expanded chemistry are unapproved. Exact SP3 assignment producer/protocol remains unselected and scientifically unqualified.
+No I03-B/C, inferred-H coordinates, SP/SP2 proxy, full ProLIF compatibility, new chemistry roles or universal hybridization. S1 exclusions remain outside this model. Real execution requires independent exact source-scope, S1 producer and composition qualification under current authority.
 
 ### I04 — Weak C-H donor perception
 

@@ -64,7 +64,7 @@ result={'sourceCommit':build['commit'],'scope':'User-approved bounded S1 source 
  'cleanCommittedSourceTests':len(cases),'S1AndCompositionTests':len(s1),'S1ProducerScopeAndPredicateTests':len(s1)-len(composition),'separateI03CompositionTests':len(composition),'unchangedLegacyI03Tests':len(legacy),'unchangedWaterFamilyTests':len(water),
  'S1AcceptanceMatrixCases':94,'isolationTests':3,'failures':0,'skips':0,'independentJvmPairs':16,'previousReplayHashesUnchanged':13,'historicalFilesByteIdentical':65,'preservationPinsIntact':25,
  'protectedTrackedFilesUnchanged':preservation['protectedTrackedFilesUnchanged'],'SP3ProducerSelected':True,'S1BoundedImplementationQualified':True,'separateI03CompositionQualified':True,
- 'historicalI03UnconditionalBlockPreserved':True,'currentPolicyScientificRulesQualified':0,'productionReceiptsIssued':0,'productionSourceScopeAuthorityIssued':False,
+ 'historicalI03UnconditionalBlockPreserved':True,'originalI03ReviewMatrixPreserved':True,'compositionQualificationScope':'Six admitted pairs and governed positive/negative/unknown execution; exhaustive negative requires eligible measured pairs. Unsupported-only selections remain unknown, not interaction absence.','currentPolicyScientificRulesQualified':0,'productionReceiptsIssued':0,'productionSourceScopeAuthorityIssued':False,
  'I04':'SCIENTIFIC_REVIEW_REQUIRED; not implemented','externalRowsUnchanged':12,'pushed':False}
 write(q/'QUALIFICATION.json',result)
 print(json.dumps(result,indent=2))
