@@ -10,6 +10,11 @@ paths=set(prior['sourcePins'])
 paths.update(p for p in tracked if p.startswith('software/modules/') and '/src/' in p)
 for prefix in ['i02-directional-candidate-review-20261006','f18-terminal-alkyne-contract-20261006','f05-acyl-sulfonyl-chloride-review-20261006','f14-isocyanate-review-20261006','event-coverage-20261006','water-bridge-contract-20261006','i03-i04-scientific-review-20261006','i03-a-implementation-20261006','i03-sp3-source-review-20261006','i03-s1-implementation-20261007','foundation-supportable-pass-20261007']:
  paths.update(p for p in tracked if p.startswith('software/qualification/'+prefix+'/') and p.endswith(('.json','.txt')))
+# Include every exact scientific source newly pinned by this family, including Python sources.
+for p,digest in json.loads((repo/'software/qualification/foundation-supportable-pass-20261007/i10/SOURCE_PINS.json').read_text()).items():
+ assert p in tracked,p
+ assert hashlib.sha256(subprocess.check_output(['git','show',revision+':'+p])).hexdigest()==digest,p
+ paths.add(p)
 archive=subprocess.check_output(['git','archive',revision,'--',*sorted(paths)])
 tarfile.open(fileobj=io.BytesIO(archive)).extractall(source,filter='data')
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
