@@ -7,6 +7,7 @@ v=json.loads((q/'g03/QUALIFICATION.json').read_text());assert v['boundedImplemen
 ledger=json.loads((f/'CAPABILITY_LEDGER.json').read_text());before=copy.deepcopy(ledger);row=next(r for r in ledger['entries'] if r['capabilityId']=='G03')
 row.setdefault('historicalPreG03Gate',{k:copy.deepcopy(row[k]) for k in ['currentDisposition','closure','currentWorkAssessment','remainingClosureDependency','remainingClosureAssessment']})
 row['currentDisposition']='BOUNDED_SUPPORTED_DOMAIN_QUALIFIED'
+row['note']='The exact selected Met/Phe source-survey contact is bounded implementation-qualified. Broader sulfur-pi and chalcogen-O definitions remain outside this closure; no production/current-policy or energetic qualification is implied.'
 row['closure'].update({'scope':'Exact selected source MET/PHE pair under the finite neutral amide-context graph contract, identical ring isotope descriptors, and qualified positive SD-centroid distance <=7 A. Raw normal angle is diagnostic only. Chalcogen-O is outside this closure.',
 'qualificationBasis':f"{v['cleanCommittedSourceTests']} fresh committed-source tests +3 isolation;{v['focusedG03Tests']} focused G03;22 JVM pairs,21 prior hashes unchanged;65 historical files and25 pins exact.",
 'existingImplementation':'Opt-in athena.met-phe-survey/1 leaf and two declarative group/4 source contexts. Existing geometry/3 POINT_PAIR_GROUP, matching, source scope, correspondence and Research Gate reused unchanged.',

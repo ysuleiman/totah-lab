@@ -31,7 +31,7 @@
     },
     {
       "id": "G03-04",
-      "case": "PHE substituted/hetero/fused ring",
+      "case": "PHE substituted/hetero/fused ring; plain and flagged Kekule source order",
       "expected": "UNSUPPORTED; no aromatic domain extension",
       "checks": [
         "boundedExclusionsAreNotContactAbsence"
@@ -67,10 +67,11 @@
     {
       "id": "G03-08",
       "case": "degenerate/nonfinite/unqualified geometry",
-      "expected": "UNKNOWN; raw quantities kept with own eligibility",
+      "expected": "UNKNOWN for degenerate/unqualified geometry; nonfinite coordinates rejected by unchanged Point3D source boundary before evaluation.",
       "checks": [
         "unknownCannotBecomeNegative",
-        "diagnosticOrRepresentationVariationDoesNotAddCriterion"
+        "diagnosticOrRepresentationVariationDoesNotAddCriterion",
+        "nonfiniteSourceCoordinatesAreRejectedBeforeEvaluation"
       ]
     },
     {
@@ -92,7 +93,8 @@
         "changedStateCannotConsumePriorEvidence",
         "sameIdentityChangedBytesRejected",
         "changedRawGeometryCannotReplay",
-        "exactOrderedAnchorTupleCannotBeReplaced"
+        "exactOrderedAnchorTupleCannotBeReplaced",
+        "identicalCoordinatesInAnotherStateCannotReplay"
       ]
     },
     {
