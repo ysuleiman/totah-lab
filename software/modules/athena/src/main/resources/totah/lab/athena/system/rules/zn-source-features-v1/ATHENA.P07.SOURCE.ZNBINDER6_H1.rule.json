@@ -1,0 +1,73 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.P07.SOURCE.ZNBINDER6_H1",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "P07_SOURCE_PATTERN",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "source-pattern-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.P07.SOURCE.ZNBINDER6_H1\",\"limitations\":[\"Literal original source-feature branch; no zinc-binding role or interaction assertion.\",\"Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf.\"],\"memberQueryIndices\":[0,1,2,3,4,5],\"negativeCoverageVersion\":\"ATHENA.P07.SOURCE.ZNBINDER6_H1/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.P07.SOURCE.ZNBINDER6_H1/pattern\",\"patternVersion\":\"1\",\"query\":\"[#6]-[P;!a](=[O;!a])(-[O;!a])-[C,O,N;!a]-[*;H1]\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\",\"N\",\"O\",\"S\",\"P\"],\"hydrogenRoles\":[],\"roleHeavyDegree\":{}},\"roles\":{\"q0\":[0],\"q1\":[1],\"q2\":[2],\"q3\":[3],\"q4\":[4],\"q5\":[5]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.p07.source\",\"version\":\"0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a\"},{\"id\":\"software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv\",\"kind\":\"SOURCE\",\"namespace\":\"athena.p07.source\",\"version\":\"a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8\"},{\"id\":\"software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef\",\"kind\":\"SOURCE\",\"namespace\":\"athena.p07.source\",\"version\":\"766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"\",\"elements\":[\"C\",\"N\",\"O\",\"S\",\"P\"],\"unsupportedQueries\":[]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+      "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+    },
+    {
+      "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+      "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+    },
+    {
+      "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+      "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.P07.SOURCE.ZNBINDER6_H1/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

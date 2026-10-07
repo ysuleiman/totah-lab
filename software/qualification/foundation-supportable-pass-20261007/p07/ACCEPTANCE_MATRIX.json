@@ -1,61 +1,107 @@
 {
   "contract": "ATHENA.P07.RDKIT_ZNBINDER_SOURCE_FEATURES_NEUTRAL_HEAVY/1",
-  "status": "DEFINED_NOT_IMPLEMENTED",
+  "status": "IMPLEMENTED_PENDING_QUALIFICATION",
   "cases": [
     {
       "id": "P07-01",
       "case": "ZnBinder1..5 exact neutral heavy graph positives",
-      "expected": "Each original feature retained with all query-index members and maps"
+      "expected": "Each original feature retained with all query-index members and maps",
+      "checks": [
+        "independentReferencePanel"
+      ]
     },
     {
       "id": "P07-02",
       "case": "ZnBinder6 explicit aliphatic-C and wildcard H1 branches, including C-H1 overlap",
-      "expected": "One original feature union by complete query target atom set; all original-index alternatives and branch attribution retained"
+      "expected": "One original feature union by complete query target atom set; all original-index alternatives and branch attribution retained",
+      "checks": [
+        "independentReferencePanel",
+        "branchUnionRetainsBothOverlappingWitnesses"
+      ]
     },
     {
       "id": "P07-03",
       "case": "Thioether/amide/O-alkyl and terminal-NH2/OH0 near misses",
-      "expected": "Exact feature ABSENT_FALSE only under complete source/domain coverage"
+      "expected": "Exact feature ABSENT_FALSE only under complete source/domain coverage",
+      "checks": [
+        "independentReferencePanel"
+      ]
     },
     {
       "id": "P07-04",
       "case": "Distinct original feature names overlapping same molecule",
-      "expected": "Separate named occurrences, never merged because labels suggest same chemistry"
+      "expected": "Separate named occurrences, never merged because labels suggest same chemistry",
+      "checks": [
+        "distinctOriginalNamesStaySeparate"
+      ]
     },
     {
       "id": "P07-05",
       "case": "Explicit graph H, charged whole component, nonordinary source",
-      "expected": "UNSUPPORTED; no H stripping/neutralization/inferred coordination"
+      "expected": "UNSUPPORTED; no H stripping/neutralization/inferred coordination",
+      "checks": [
+        "independentReferencePanel",
+        "excludedSourceIsNotEligibility"
+      ]
     },
     {
       "id": "P07-06",
       "case": "Missing/contradictory H/charge/aromaticity/NONE/graph/scope",
-      "expected": "UNKNOWN_INCONCLUSIVE; no scientifically supported positive/negative"
+      "expected": "UNKNOWN_INCONCLUSIVE; no scientifically supported positive/negative",
+      "checks": [
+        "unresolvedEvidenceNeverSuppliesFeatureTruth",
+        "conflictingCoverageRemainsUnknown"
+      ]
     },
     {
       "id": "P07-07",
       "case": "Missing one ZnBinder6 branch, truncated matching or incomplete source",
-      "expected": "UNKNOWN for original feature negative; retain raw witnesses without completeness claim"
+      "expected": "UNKNOWN for original feature negative; retain raw witnesses without completeness claim",
+      "checks": [
+        "missingOneOrBranchCannotProveNegative",
+        "enumerationBudgetDoesNotInventExhaustiveCount"
+      ]
     },
     {
       "id": "P07-08",
       "case": "Changed FDef, branch query, matcher, original source or definition",
-      "expected": "Reject provenance/definition mismatch"
+      "expected": "Reject provenance/definition mismatch",
+      "checks": [
+        "changedQueryAndSelfQualificationAreRejected",
+        "sameIdentityChangedBytesRejected",
+        "changedBranchWitnessCannotReplay",
+        "changedRawSnapshotCannotReplay"
+      ]
     },
     {
       "id": "P07-09",
       "case": "No independent feature/scope current authority",
-      "expected": "NOT_EVALUATED; synthetic receipts never production"
+      "expected": "NOT_EVALUATED; synthetic receipts never production",
+      "checks": [
+        "featureAndScopeAuthorityRemainIndependent",
+        "ZnSourceFeatureCurrentPipelineTest",
+        "inheritedSourceIsNotConsumed"
+      ]
     },
     {
       "id": "P07-10",
       "case": "Duplicate/reordered atoms/inputs and symmetric alternatives",
-      "expected": "Stable original IDs, complete alternatives and deterministic output"
+      "expected": "Stable original IDs, complete alternatives and deterministic output",
+      "checks": [
+        "duplicateReorderedInputsAreIdentical",
+        "sourceAtomOrderPreservesFeatureMembership",
+        "distinctTargetSetsSharingSulfurAreRetained",
+        "symmetricQueryAlternativesInsideOneUnionAreRetained"
+      ]
     },
     {
       "id": "P07-11",
       "case": "Governed execution/full regression/JVM/history65/pins25/committed source",
-      "expected": "Required before bounded closure"
+      "expected": "Required before bounded closure",
+      "checks": [
+        "ZnSourceFeatureCurrentPipelineTest"
+      ]
     }
-  ]
+  ],
+  "coverageNote": "34 synthetic graphs retain independently generated RDKit2026.03.4 annotations and exact original-query expected counts; tests do not certify real zinc binding, production chemistry preparation or universal toolkit parity. Reordered source graphs compare atom-set membership/status; exact same-state reordered evidence compares complete findings. Exact FDef/scientific-artifact and matcher-version binding reuses the qualified Research Gate/B00 regressions; family-specific mutation tests exercise query/branch, raw snapshot and selected artifact identity, not a new engine."
 }
