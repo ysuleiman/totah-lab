@@ -1,0 +1,105 @@
+A07 ADDITIVE REPRESENTATION BOUNDARY — proposal, not implementation/authority
+2026-10-07
+
+Concrete need: the pinned OCL PAINS catalog has890 exact native IDCode queries.
+The existing SMARTS conversion is losslessly demonstrated for386 only. A new
+read-only inventory (NativeQueryAudit.java/native-query-audit.tsv) finds827 entries
+with atom query features,99 with bond query features,62 with atom lists,111 with
+non-ABS ESR atoms and one with excluded query atoms. All890 are single-component.
+Only530 native canonical parse/re-encode cycles are byte-stable; the remaining360
+must not be called equivalent merely because they parse. Native parser execution
+of immutable original IDCode bytes avoids the lossy SMARTS conversion; it does
+not prove match semantics or make canonical re-encoding an equality authority.
+No production use of reflection or PainsDetector's separate indexed matcher.
+
+PROPOSED SMALLEST PUBLIC ADDITION (requires approval before implementation)
+SubstructureMatcher adds a default overload:
+  Result match(String queryFormat, String query, MolecularGraph graph)
+      throws MolecularBackendException;
+The default accepts only "ATHENA_SMARTS_ENVELOPE/1" and delegates to the unchanged
+existing match(String,MolecularGraph). Every other format throws a checked error.
+OclMolecularBackend overrides it to add exactly "OCL_IDCODE_QUERY/2026.7.2".
+No other backend behavior changes. Existing two-argument method, its implementation
+version, messages, source-state checks and historical replay remain byte-identical.
+The new format gets a distinct backend evidence implementation version
+"athena-ocl-idcode-occurrences/1"; it cannot satisfy an old B00 requirement by name.
+
+NATIVE QUERY CONTRACT
+Exact original UTF-8 native IDCode bytes and their SHA256 are authoritative inputs;
+no SMARTS conversion, neutralization, query simplification, canonical replacement,
+reserialization or target chemistry inference. Pinned jar hash remains
+2e1642f29f09c1def25dc405a77973c28bae02355a6807320e42f1dc4cd157c9.
+IDCodeParser(false) is the explicit source compiler, the same constructor used by
+the catalog characterization. Require a nonempty fragment query and reject any
+excluded query atom before matching: an absent target cannot receive an atom map.
+The literal source query defines all atom/bond/query/ESR features. Do not claim
+unqualified ESR/dialect features are executable: gate their admission on the new
+representation acceptance matrix; unresolved entries remain ineligible individually.
+
+Reuse the existing OCL SSSearcher rigorous enumeration, default match mode, target
+OclGraphMapper and H validation, stable source IDs, distinct-target-atom-set grouping,
+all compiled-query-index correspondence alternatives and deterministic representative.
+No separate matcher or graph engine. Any internal helper extraction must preserve
+old B00 byte outputs through its unchanged branch and regression fixtures. Query
+index means native parser index, not original SMILES atom order. Evidence includes
+format, original query hash, source-state hash, jar hash, parser and match mode,
+explicit supported-feature profile and complete alternative atom correspondences.
+
+PROPOSED ADDITIVE CATALOG PAYLOAD (also requires approval)
+athena-advisory-alert-catalog/1:
+  schema: exact schema string;
+  catalogId: "OCL.PAINS"; catalogVersion: "2026.7.2";
+  sourceJarSha256: exact jar hash;
+  orderedCatalogSha256: previously characterized length-prefixed original entries;
+  entries: ordered array of {index:integer0..889, label:string,
+    queryFormat:"OCL_IDCODE_QUERY/2026.7.2", query:string,
+    querySha256:lowercase SHA256};
+No gaps/duplicates/reordering or invented labels permitted. Source jar is an
+immutable research source, not an authority signature. Catalog extraction is an
+explicit attributed build/research artifact; production consumes the pinned payload
+rather than reflecting into a private field. Admission of entries is separate from
+the immutable catalog; retaining an entry does not prove it supported/qualified.
+
+SCIENTIFIC CONTRACT
+ATHENA.A07.OCL_PAINS_ADVISORY_OCCURRENCES/1: report exact catalog-entry query
+occurrences in a complete supported concrete immutable molecular source state,
+with per-entry status and mapped atoms. This is advisory source-catalog membership;
+not toxicity, assay interference, drug-likeness, rejection, binding, or a master score.
+The exact source query is the bounded definition. Do not claim RDKit PAINS parity.
+Target domain is the existing concrete OCL graph/matcher state domain, with complete
+source charge/H/aromaticity/correspondence required before a negative. Unsupported
+source enhanced stereo/query/dummy features are not silently removed. A target
+containing assertions the mapper cannot represent remains unsupported/unknown.
+
+COVERAGE / PROVENANCE
+A positive exact qualified entry witness may coexist with other unqualified entries.
+Per-entry ABSENT_FALSE requires exhaustive rigorous enumeration and full applicable
+source/query coverage. Catalog-wide absence requires all890 entries qualified and
+exhaustively negative; one excluded query or unknown feature blocks that claim.
+Persist every entry disposition; no marketing claim that386 or889 equals890.
+Original graph remains immutable. Catalog/source/entry/query/compiled-index mapping,
+jar, state and current Research Gate evidence are independently bound. Missing
+current authority is NOT_EVALUATED; missing facts UNKNOWN; excluded representation
+UNSUPPORTED; malformed/identity-mismatched bytes rejected. No fabricated authority.
+
+ACCEPTANCE MATRIX REQUIRED BEFORE ADMISSION
+- Every entry: exact catalog ordering/hash/label, parse feature inventory, explicit
+  supported vs rejected status; parser acceptance alone is not qualification.
+- Positive and near-miss concrete targets for each admitted query feature/profile;
+  entry-specific positive witnesses must be attributable, not guessed from labels.
+- Lists, negation, aromatic/ring/degree/H/charge/bond-order/stereo/ESR semantics where
+  present; unsupported features fail closed. Canonical instability retained as a
+  diagnostic; no equation of two queries from labels or coincidental match examples.
+- Excluded atoms checked rejection with no partial atom map.
+- Overlap/symmetry/disconnected targets, stable-ID reorder and all correspondence
+  alternatives; exact duplicates are idempotent; partial/truncated coverage unknown.
+- Missing/contradictory source H/charge/aromaticity, unsupported target representation,
+  changed original query/catalog/state bytes, format confusion and source collisions.
+- Separate source review/current scientific gate; no auto-activation from a jar hash.
+- Existing B00 replay exact, independent JVM, full affected/regression/65historical/
+  25preservation checks and fresh committed-source qualification.
+
+Decision requested: approve only this additive native-query representation/overload
+and catalog payload for subsequent bounded implementation/qualification. Approval
+would not qualify any entry or authorize new chemistry, inferred target state,
+production receipts, generic framework, or automatic full-A07 closure.

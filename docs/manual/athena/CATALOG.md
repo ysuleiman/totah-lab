@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `743a3c5682ad954303647469586efda837ae1fb50b8e69201ba25ca4f2ca2bd1`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d3971d994e000b4eaa825df2f3a85d7dc0a8bd708685425fdc732f5a9156ce7c`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -24,7 +24,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I07 | Union pi-stacking wrapper | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I08 | Cation-pi | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I09 | Ionic/salt-bridge proximity | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
-| I10 | Halogen bond to atom acceptor | P1 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| I10 | Halogen bond to atom acceptor | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | I11 | Halogen bond to pi system | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I12 | Single-water H-bond bridge | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
 | I13 | Multi-water bridge paths | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
@@ -368,23 +368,19 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### I10 — Halogen bond to atom acceptor
 
-Review separate Cl/Br/I donor environments and carbonyl-acceptor directional criteria; survey radii are not automatic cutoffs.
+Exact selected carbon-bound neutral Cl/Br/I–neutral-carbonyl tuple under the explicitly adopted ProLIF numeric window; separate element and carbon aromaticity retained. Structural candidate only, not physical bond or energy.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2271 fresh committed-source tests +3 isolation;45 focused I10;17 JVM pairs,16 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** HalogenBondDetector; INT.HALOGEN.001
+**Existing implementation:** Opt-in athena.halogen-carbonyl/1; legacy HalogenBondDetector and INT.HALOGEN.001 unchanged.
 
-**Supporting source:** ProLIF XBAcceptor/XBDonor; PLIP halogen
+**Supporting source:** Exact pinned ProLIF DoubleAngle window3.5A/130..180/80..140; restricted unchanged source roles. PLIP and survey definitions preserved separately in CONTRACT.txt. Adopted under REQUEST.txt authorization.
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json) · SHA256 `27c940e949327cf2f5c38b4a2a7ec856c1a5588b5175b6922bc313a090fca0ae`
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.HALOGEN_BOND.DIRECTIONAL.json) · SHA256 `c992114e366e8ade1eca44434144bec0415bc4ac7a6377e3a7c6b2dedffbb6d6`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1.
-
-Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration.
+No fluorine/At/noncarbon donor/other acceptor/pi/same-component/charged or radical core; no whole-system negative, energy, biological assertion or full ProLIF/PLIP parity. Independent current source-scope and I10 authority required.
 
 ### I11 — Halogen bond to pi system
 

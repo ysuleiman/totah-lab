@@ -818,38 +818,78 @@
       "priorDecision": "MODIFY",
       "priorRationale": "Review chemical domain before extending; preserve legacy behavior",
       "priorAthenaStatus": "LEGACY_ONLY; scientific qualification separately gated",
-      "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
       "sourceInventory": "software/qualification/rule-qualification-blueprint-20261005/REFERENCE_CAPABILITY_INVENTORY.json",
       "sourceInventorySha256": "2a777173f7580190d743b153c3f9c1fa13832e37ab0bb28360f4abddc01c09d0",
       "previousProgramDisposition": "PENDING_RECONCILIATION_NOT_COMPLETE",
       "closure": {
         "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
-        "scope": "Review separate Cl/Br/I donor environments and carbonyl-acceptor directional criteria; survey radii are not automatic cutoffs.",
+        "scope": "Exact selected carbon-bound neutral Cl/Br/I\u2013neutral-carbonyl tuple under the explicitly adopted ProLIF numeric window; separate element and carbon aromaticity retained. Structural candidate only, not physical bond or energy.",
         "sourceInventoryEntry": "I10",
-        "scientificSupport": "ProLIF XBAcceptor/XBDonor; PLIP halogen",
+        "scientificSupport": "Exact pinned ProLIF DoubleAngle window3.5A/130..180/80..140; restricted unchanged source roles. PLIP and survey definitions preserved separately in CONTRACT.txt. Adopted under REQUEST.txt authorization.",
         "researchDossiers": [
           "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json",
           "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.HALOGEN_BOND.DIRECTIONAL.json"
         ],
-        "reviewRequirements": [
-          "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
-          "Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1."
-        ],
+        "reviewRequirements": [],
         "currentPolicyQualified": false,
-        "newScientificDefinitionApproved": false,
-        "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
-        "existingImplementation": "HalogenBondDetector; INT.HALOGEN.001",
-        "qualificationEvidence": [],
+        "newScientificDefinitionApproved": true,
+        "qualificationBasis": "2271 fresh committed-source tests +3 isolation;45 focused I10;17 JVM pairs,16 prior hashes unchanged;65 historical files and25 pins exact.",
+        "existingImplementation": "Opt-in athena.halogen-carbonyl/1; legacy HalogenBondDetector and INT.HALOGEN.001 unchanged.",
+        "qualificationEvidence": [
+          "software/qualification/foundation-supportable-pass-20261007/i10/QUALIFICATION.json",
+          "software/qualification/foundation-supportable-pass-20261007/i10/MATRIX_EXECUTION.json",
+          "software/qualification/foundation-supportable-pass-20261007/i10/REPLAY.json"
+        ],
         "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
-        "outsideBoundedDomain": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration."
+        "outsideBoundedDomain": "No fluorine/At/noncarbon donor/other acceptor/pi/same-component/charged or radical core; no whole-system negative, energy, biological assertion or full ProLIF/PLIP parity. Independent current source-scope and I10 authority required."
       },
       "currentWorkAssessment": {
-        "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
-        "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
-        "remainingDependency": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration."
+        "classification": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+        "artifact": "software/qualification/foundation-supportable-pass-20261007/i10/CHECKPOINT.txt",
+        "remainingDependency": null
       },
-      "remainingClosureDependency": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration.",
-      "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json"
+      "remainingClosureDependency": null,
+      "remainingClosureAssessment": "software/qualification/foundation-supportable-pass-20261007/i10/CHECKPOINT.txt",
+      "historicalPreI10Gate": {
+        "currentDisposition": "SCIENTIFIC_REVIEW_REQUIRED",
+        "closure": {
+          "basis": "User-approved standing completion categories, 2026-10-06; disposition is not production/current-policy qualification",
+          "scope": "Review separate Cl/Br/I donor environments and carbonyl-acceptor directional criteria; survey radii are not automatic cutoffs.",
+          "sourceInventoryEntry": "I10",
+          "scientificSupport": "ProLIF XBAcceptor/XBDonor; PLIP halogen",
+          "researchDossiers": [
+            "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.HALOGENATED.json",
+            "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.HALOGEN_BOND.DIRECTIONAL.json"
+          ],
+          "reviewRequirements": [
+            "Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.",
+            "Auffinger PDB survey: O-contact radii sums Cl3.27/Br3.37/I3.50A and directional distributions are references, not automatically Athena cutoffs. Element-specific radii/geometry and carbon-environment qualification; high-priority independent task after original priority1."
+          ],
+          "currentPolicyQualified": false,
+          "newScientificDefinitionApproved": false,
+          "qualificationBasis": "Disposition of scope/review need; no implemented capability implied.",
+          "existingImplementation": "HalogenBondDetector; INT.HALOGEN.001",
+          "qualificationEvidence": [],
+          "consolidatedReview": "software/qualification/foundation-consolidated-review-20261006/REVIEW.txt",
+          "outsideBoundedDomain": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration."
+        },
+        "currentWorkAssessment": {
+          "classification": "REQUIRES_EXPLICIT_ADDITIONAL_DEFINITION",
+          "artifact": "software/qualification/foundation-closure-execution-20261006/ASSESSMENT.json",
+          "remainingDependency": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration."
+        },
+        "remainingClosureDependency": "Pinned atom-acceptor halogen definitions/distributions require reconciliation into an explicit element/carbon-environment/acceptor directional candidate protocol. Radii sums and mature-program cutoffs are not interchangeable. Continue source-specific adoption analysis; no historical detector migration.",
+        "remainingClosureAssessment": "software/qualification/foundation-remaining-gates-20261006/REMAINING35.json"
+      },
+      "currentContractReview": {
+        "date": "2026-10-07",
+        "status": "BOUNDED_IMPLEMENTATION_QUALIFIED",
+        "contract": "software/qualification/foundation-supportable-pass-20261007/i10/CONTRACT.txt",
+        "authorization": "software/qualification/foundation-supportable-pass-20261007/REQUEST.txt",
+        "sourceCommit": "6a0aa4e123803accb37680d8f44a5873797629d3",
+        "productionAuthority": false
+      }
     },
     {
       "capabilityId": "I11",

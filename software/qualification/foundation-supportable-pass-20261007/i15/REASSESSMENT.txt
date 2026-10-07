@@ -1,0 +1,44 @@
+I15 COORDINATION GEOMETRY — source/protocol review, 2026-10-07
+Dependencies: exact metal/source state, independently typed ligand/water roles,
+complete applicable coordination sphere, correspondence and same-state geometry.
+I14 proximity does not provide any of these coordination assignments by itself.
+Existing angle/geometry and immutable evidence machinery is sufficient numerically.
+
+Pinned PLIP metal_complexation was re-read end to end. It constructs a candidate
+sphere from metal_binding_lig+metal_binding_bs under strict distance<METAL_DIST_MAX
+(3.0 in the pinned config), then fits angle-signature heuristics for coordination
+numbers2..6. Donor selection is supplied by PLIP preparation, not by the numeric
+function. Its score is the mean over targets of sqrt(sum(angle deviations squared)),
+not one conventional RMS over the entire sphere. Missing ideal-angle matches are
+skipped; e.g. the tetrahedral signature has four109.5 entries per target, while a
+four-target sphere has three other target directions. Greedy target/angle assignment,
+coordination-count ordering and0.5/3.5 heuristic comparisons choose a result; unused
+targets may be excluded. Water-only results are discarded. These are exact source
+semantics to preserve if that specific engine protocol is ever adopted; they are
+not general chemical definitions of complete coordination geometry.
+
+ProLIF's broader2.8-distance MetalDonor definition is a different pair operation;
+it supplies neither a complete sphere nor this PLIP chooser. No combination of the
+two can establish a metal coordination geometry without additional source meaning.
+The approved source-scope/2 KNOWN_NON_ORDINARY_CONNECTION distinguishes a known
+source connection from unknown coverage. It does NOT certify that a complete
+coordination sphere has been enumerated, assign a valence contribution, or type
+all ligands. Do not expand /2 to those propositions implicitly.
+
+Current exact blocker: no qualified source/preparation protocol selecting complete
+I15 coordination spheres and donor/water states for a declared element/oxidation
+subdomain; no reviewed policy reconciling the PLIP heuristic's exclusions with
+complete-sphere negative coverage. Porting just the angle table would conceal
+these missing scientific prerequisites. Universal ideal geometry or an invented
+angular tolerance is not proposed.
+
+Disposition stays SCIENTIFIC_REVIEW_REQUIRED, not implemented. A future exact
+PLIP-source protocol adoption would require its preparation/type domain and all
+heuristics explicitly, or an independent selected-source-sphere contract with
+attributable geometry rules. No new generic geometry engine is needed.
+Acceptance obligations: exact ideal vs distorted vs competing geometries; missing
+ligand/water, competing altloc/state, ambiguous role/mapping, incomplete sphere,
+known nonordinary vs unknown source connection, target-order sensitivity, excluded
+ligands retained as evidence, water-only semantics, each source boundary, current
+independent authority and immutable replay. Expected classifications await the
+missing sphere/domain contract; no numerical answers invented.

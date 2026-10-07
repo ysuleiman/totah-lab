@@ -1,0 +1,31 @@
+I17 STERIC CLASH — source/protocol review, 2026-10-07
+Dependencies: exact atom/H/preparation/radius assignments; ordinary graph exclusion
+policy; alternate-conformer/occupancy treatment; complete selected same-state pair
+scope and qualified raw radius-gap geometry. I16 remains geometry, not this class.
+
+Pinned Probe README says implicit hydrogens are inadequate and requires coordinates
+for all H. Source probe.c uses LowGoodCut=-0.4, carbonyl radius scaling, dot/contact
+classification, bonded/contact exclusions and explicit altloc/occupancy filters.
+The2014 occupancy code can remove contacts involving a blank-altloc atom when
+summed occupancies<=1. Thus an arbitrary selected pair gap<=-0.4 is not execution
+of this complete protocol. atomprops.c reads the actual radius table from its
+atomprops.h dependency and selects explicit vs nuclear H radii; the inspected
+pinned atomprops.c is not itself the complete numeric radius table.
+Existing cctbx Probe scoring-source excerpts likewise operate on prepared/typed
+atom data; their thresholds do not supply that data/protocol automatically.
+
+Unresolved: exact attributable preparation/radius/type/exclusion/altloc/occupancy
+protocol admitted for Athena source state, plus complete applicable pair coverage.
+A narrower explicitly adopted protocol might be defensible, but cannot be made by
+copying0.4 onto arbitrary Athena radii. Missing occupancy-field presence is part of
+V18's source semantics; a default numeric1 or0 cannot certify a source assertion.
+No invented radius, H placement, occupancy policy or overlap threshold is used.
+
+Disposition SCIENTIFIC_REVIEW_REQUIRED; I16 unaffected. No I17 implementation.
+Acceptance prerequisites: exact atom-type radii and H preparation; bonded1-2/1-3/
+1-4 policy; alternate states/blank altloc/partial occupancy; polar contacts vs
+nonpolar overlaps; carbonyl scaling; strict/inclusive category boundaries; selected
+pair vs system-wide negative coverage; missing typing/H/radii/source metadata;
+source/definition/state binding, independent current authority and historical replay.
+Without selecting the complete protocol, positive/negative classifications would
+be invented. Existing geometry is sufficient once these scientific inputs are fixed.
