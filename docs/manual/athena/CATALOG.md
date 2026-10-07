@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `f67c59cef86d376280f7742b24514dd5cefd118c1fab555554f1b77102324fd9`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `171b6a9e31a7cb5538f35d2e192eafe5e7a3363bc2128b57c516a3aae05e3d83`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -77,7 +77,7 @@ Disposition is copied without upgrading partial capability coverage.
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | G01 | Methyl environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
 | G02 | Vicinal-disulfide-compatible geometry | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt), [b06-cysteine-backbone-20261006](../../../software/qualification/b06-cysteine-backbone-20261006/CHECKPOINT.txt) |
-| G03 | Sulfur-pi and chalcogen-O | P1 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
+| G03 | Sulfur-pi and chalcogen-O | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G04 | Cysteine environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt), [b06-cysteine-backbone-20261006](../../../software/qualification/b06-cysteine-backbone-20261006/CHECKPOINT.txt) |
 | G05 | SAM sulfonium/methyl/aromatic environment | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
 | G06 | SAM methyl-transfer geometry | P2 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
@@ -1016,13 +1016,13 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### G03 — Sulfur-pi and chalcogen-O
 
-Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi/O partner domains independently.
+Exact selected source MET/PHE pair under the finite neutral amide-context graph contract, identical ring isotope descriptors, and qualified positive SD-centroid distance <=7 A. Raw normal angle is diagnostic only. Chalcogen-O is outside this closure.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2532 fresh committed-source tests +3 isolation;61 focused G03;22 JVM pairs,21 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** ATHENA.SULF.PI / ATHENA.SULF.CHALCOGEN_O
+**Existing implementation:** Opt-in athena.met-phe-survey/1 leaf and two declarative group/4 source contexts. Existing geometry/3 POINT_PAIR_GROUP, matching, source scope, correspondence and Research Gate reused unchanged.
 
-**Supporting source:** Attached advanced-rule request; existing Athena sources; no external parity asserted
+**Supporting source:** Pinned L04 source survey convention, intentionally bounded Phe-only source graph. No energy, affinity, biological role, sulfur-state transfer or chalcogen-O inference.
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.THIOETHER.json) · SHA256 `ee158666e9f07c58ac5b01b4233a542f1f7ee8a86ba96dba327836caf434d7c3`
 
@@ -1030,13 +1030,7 @@ Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi
 
 [Research dossier](../../../software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.PI.json) · SHA256 `dde09e189408db17c7954c0b99a5e4f092f5c53514f806930b24d33371f099e6`
 
-**Remaining scientific requirement:** Graph-role fixture corpus and exact OCL query review required. No empirical binding claim or new chemical engine.
-
-**Remaining scientific requirement:** L07 structural/QM state comparison; L21 alternative n-pi sulfur chemistry has different donor/acceptor roles and must not be conflated. Sulfur perception and independent reference distributions; no Cys classifier currently.
-
-**Remaining scientific requirement:** Methionine-aromatic structural survey supports thioether domain; not a cysteine classifier training set. State-specific domain and empirical geometry distributions.
-
-Existing thioether/thiol/thiolate/disulfide source distinctions and raw geometry do not establish one sulfur-pi/chalcogen class. Methionine survey is not cysteine evidence; each sulfur state/partner/geometry domain requires its own supported criterion.
+Chalcogen-O, Tyr/Trp/fused/hetero rings, sulfur oxidation/charge/extra substituents, free termini, explicit-H source graphs, missing/conflicting source facts, mixed ring isotope descriptors and nonordinary connections. No whole-system absence, no energy, occupancy or biological interpretation.
 
 ### G04 — Cysteine environment
 
