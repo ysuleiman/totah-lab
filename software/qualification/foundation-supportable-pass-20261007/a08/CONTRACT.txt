@@ -1,0 +1,81 @@
+ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT/1 — proposed bounded adoption
+2026-10-07; contract before implementation
+
+Dependency chain: complete immutable declared source components/correspondence,
+P09 charge/H/aromaticity facts and explicit electronic state; independently reviewed
+ordinary-connection source scope; existing immutable MolecularGraph and evidence,
+Research Gate/current execution. No tautomer or normalization engine is needed for
+this restricted fragment-parent policy. Existing topology transactions require a
+connected parent and are deliberately not broadened to delete disconnected salts.
+
+Source comparison: RDKit Fragment.cpp at the already pinned source revision defines
+LargestFragmentChooser with configurable preferOrganic/useAtomCount/countHeavyAtomsOnly.
+It can use H-inclusive counts, an approximate atomic-number/isotope/charge weight,
+and canonical-SMILES tie breaking; choose() also sanitizes. These are distinct policy
+choices, not chemical truth. Athena adopts only the uniquely maximal heavy-atom
+component branch with preferOrganic=false/useAtomCount=true/countHeavyAtomsOnly=true,
+in a domain with no explicit H vertices. Ties are unresolved; no weight, canonical
+string or incidental input-order tie breaker is substituted. Source code's counter
+still iterates explicit H vertices even when countHeavyAtomsOnly=true, so excluding
+explicit-H graphs is a substantive representation restriction, not an ignored detail.
+No RDKit parity or resanitization is claimed. This is optional derived parent
+selection; never a statement that discarded components are salts, irrelevant, or
+chemically inactive.
+
+Exact supported domain: a finite explicitly declared SystemStateView component
+universe, each component a nonempty connected complete ordinary source graph with
+one lossless atom mapping. Union of mappings must cover all atoms in the bound
+state exactly once, with no intercomponent ordinary or known nonordinary connections.
+Every component needs independently reviewed source-scope evidence and known explicit
+NONE, source charge/H/aromaticity facts for all atoms. Charged components are retained
+as charged; no neutralization/proton transfer occurs. No explicit H atom is admitted;
+authoritative implicit H facts are retained as separate original coverage evidence.
+Unknown or contradictory source state prevents selection, not just a negative label.
+No geometry, molecular mass, pKa, preferred organic class, strain or energy contributes.
+
+Policy: count source non-H atom occurrences in each complete component. If exactly
+one component has the greatest count, select its exact original graph as the derived
+parent view. Require every candidate component to be eligible before making that
+comparison. A single complete component is its own parent view. Equal maximum counts
+remain UNKNOWN_INCONCLUSIVE with all tied identities retained; do not choose by name,
+order, charge or carbon content. Empty/unbound/incomplete input remains unknown.
+Source query/dummy/unrepresentable enhanced stereo or nonordinary connections are
+outside this profile; explicit source stereo within existing representation is copied
+without reinterpretation. No normalization or tautomer identity equivalence is asserted.
+
+Lineage/provenance: selection produces separate immutable interpretation, not source
+mutation. Selected graph bytes, atom records, bond records, source IDs, charges,
+H coverage, stereo, coordinates and source metadata are preserved exactly. Atom/bond
+lineage is identity mapping for selected members. Every nonselected component remains
+referenced with its exact graph digest; no destructive deletion. Original state,
+component universe, all source coverage/scope witnesses, policy/source revision and
+independent current qualification are pinned. A parent graph without its retained
+coverage/provenance is not an independently prepared molecule.
+
+Outcome semantics: SUPPORTED_PRESENT means this literal policy selected a unique
+parent view. NOT_EVALUATED without current authority; UNKNOWN on missing/conflicting
+state or a tie; UNSUPPORTED for excluded representation/connection scope. This
+selection operation makes no ABSENT_FALSE molecular interaction or activity claim.
+No production authority or receipt is created by implementing the policy.
+
+Reuse: existing bound state snapshot as raw collector payload; existing
+EvidenceInterpretation measurement map for counts, selected component/graph/coverage,
+excluded identities and atom/bond lineage. No new public Java API, source graph,
+serialization schema, generic transformation framework or automatic cleanup hook.
+No modification of existing TopologyEditTransactionEngine behavior is required:
+the original immutable component is reused as a derived view, rather than applying
+an unsupported edit to a disconnected source graph.
+
+Acceptance matrix: unique different-size components in both input orders; single
+component; tied chemically different and identical-size components; larger inorganic
+component (no organic preference); charged selected component remains charged;
+unknown charge/H/aromaticity/NONE/connection or missing candidate; overlapping or
+incomplete mapping; explicit-H representation; known source coordination; preserved
+stereo/atom ordering/bonds/coordinates/metadata; all discarded components still
+readable; repeated execution has identical lineage/bytes; altered source/policy/state
+cannot replay; independent current and source authority; governed execution;
+affected regressions/independent JVM/historical65/pins25/fresh committed source.
+
+Status: defined review route; not implemented. Tautomer/normalization/neutralization
+and automatic largest-fragment tie handling remain explicitly outside this bounded
+policy. No claim that an arbitrary chemical mixture has one scientifically correct parent.

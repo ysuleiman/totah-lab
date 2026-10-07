@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `1862d9364af89e02842affd6b75dc4f661b23e5d91c1ba630d97d99e95adb262`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `a0ba30bc644f857a38eacfb6c589b2816417cb123478f5f29afb0dbd11503406`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -43,7 +43,7 @@ Disposition is copied without upgrading partial capability coverage.
 | N05 | Residue representation and network edge cardinality | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
 | N06 | Network degree/paths/second shell | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [system-graph-20261004](../../../software/qualification/system-graph-20261004/CHECKPOINT.txt) |
 | N07 | RMSD-based ensemble clustering | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
-| N08 | 2D/3D pharmacophore fingerprints and matching | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| N08 | 2D/3D pharmacophore fingerprints and matching | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | V01 | Valence/sanitization and nonempty graph validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V02 | Fragment/salt/solvent and neutral-charge checks | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V03 | Isotopes, allowed/disallowed elements and radicals | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v03-representation-boundary-20261006](../../../software/qualification/v03-representation-boundary-20261006/CHECKPOINT.txt), [v03-explicit-radical-20261006](../../../software/qualification/v03-explicit-radical-20261006/CHECKPOINT.txt) |
@@ -614,15 +614,15 @@ Consciously defer separate ensemble-analysis tool; no new clustering here
 
 ### N08 — 2D/3D pharmacophore fingerprints and matching
 
-Define feature correspondences, geometric tolerance and supported query semantics without ranking or biological claims.
+One explicitly selected ordered correspondence of three neutral carbonyl O features in one complete source component and three attributed query points; existing rigid RMSD <= supplied reviewed bound. No default tolerance or global search.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2368 fresh committed-source tests +3 isolation;58 focused N08;19 JVM pairs,18 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** LigandFeature; FeatureTemplateAlignmentEvaluator; OCL PheSA primitives
+**Existing implementation:** Opt-in athena.selected-pharmacophore/1; existing carbonyl identities and FeatureTemplateAlignmentEvaluator unchanged; query geometry remains distinct from observed source coordinates.
 
-**Supporting source:** RDKit book; OCL pharmacophore classes
+**Supporting source:** Exact user-approved N08 contract and additive attributed query payload; exact query SHA-256 bound into independently reviewed manifest parameters; unchanged mathematical alignment. No empirical tolerance invented.
 
-Exact feature correspondence, query/match universe, geometric tolerance and negative coverage must be declared. Existing OCL atomic query matching is not a 3D pharmacophore matcher; no ranking/affinity semantics are inferred.
+No other roles, partial correspondence, collinear/coincident triplets, search, source-state mixing, inferred geometry, default tolerance or whole-molecule negative. Exact query and source-scope current authority independently required.
 
 ### V01 — Valence/sanitization and nonempty graph validation
 

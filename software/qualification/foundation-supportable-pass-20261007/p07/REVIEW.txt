@@ -1,0 +1,43 @@
+P07 SOURCE-FEATURE REASSESSMENT — draft before any implementation, 2026-10-07
+Exact dependency: pinned RDKit BaseFeatures ZnBinder1..6 definitions -> existing
+B00 qualified OCL query dialect/correspondence -> P09 complete source state ->
+existing feature/group attribution, provenance and Research Gate. This is not
+metal coordination; I14/I15 are not providers of Zn-binding feature truth.
+
+The source actually defines six ligand-only graph features. It has no selected
+metal atom, oxidation-state input, coordination sphere or interaction threshold.
+Therefore asking those feature definitions to prove actual zinc binding is a
+category error. Conversely, silently naming every ligand O/N/S a zinc binder
+would be an invalid broadening. A defensible bounded adoption must retain the
+exact named source patterns and label the result as advisory source-feature
+identity, explicitly with metal/coordination context NOT_EVALUATED. It must never
+imply that Zn is present, binds the motif, has charge+2, or coordinates these atoms.
+
+Exact pinned pattern/weight comparison:
+ZnBinder1 [S;D1]-[#6]                 weights1,0
+ZnBinder2 [#6]-C(=O)-C-[S;D1]         weights0,0,1,0,1
+ZnBinder3 [#6]-C(=O)-C-C-[S;D1]       weights0,0,1,0,0,1
+ZnBinder4 [#6]-C(=O)-N-[O;D1]         weights0,0,1,0,1
+ZnBinder5 [#6]-C(=O)-[O;D1]           weights0,0,1,1
+ZnBinder6 [#6]-P(=O)(-O)-[C,O,N]-[C,H] weights0,0,1,1,0,0
+The source attributes these to combichem.fdl. That upstream text is not itself
+present; no unverified upstream definition is substituted for the pinned FDef.
+
+Possible bounded adoption: literal named feature occurrences in neutral closed-shell
+ordinary complete source components, with all exact source atom charge/H/aromaticity
+facts and original query-index role membership retained. This is a formal source-
+feature predicate, not empirical chelation. Exact supported H/degree semantics must
+be characterized under OCL versus the RDKit source before admission. In particular,
+D1 and explicit graph H cannot be assumed equivalent between source dialects.
+No full RDKit feature engine parity, feature-center weights, or metal coordination
+will be asserted without separately qualifying those propositions.
+
+Next required review/qualification work: evaluate the six literal query dialects
+against hand-defined positive/near-miss/charged/H-state/tautomer examples; select
+precise supported forms per motif, retain unsupported forms individually, and
+record source-dependent exclusions. Complete negative requires a supported entire
+selected component and exhaustive matching, not just missing a convenient match.
+Missing source state or unqualified query transfer blocks the negative.
+
+No P07 classifier implemented or ledger closure claimed at this draft stage.
+This is a supportable route to investigate, not an irreducible-data blocker.

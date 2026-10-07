@@ -36517,6 +36517,168 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.N08.SELECTED_THREE_CARBONYL_TEMPLATE_RMSD — 1.0.0 (selected-pharmacophore-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/selected-pharmacophore-v1/ATHENA.N08.SELECTED_THREE_CARBONYL_TEMPLATE_RMSD.rule.json) · SHA256 `a178984d908a3ac6a1feb47b71e2be116b9d8543b113b116643275c08bec078c`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_N08_SELECTED_TEMPLATE_V1"
+```
+
+**implementationId**
+
+```json
+"athena.selected-pharmacophore"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Three exact unchanged neutral carbonyl-O source occurrences in one complete immutable component",
+  "Independent source-scope and source chemistry qualification"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Finite distinct noncollinear observed source and query-template triplets; exact ordered correspondence"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-continuous-geometry/1",
+  "rmsdAngstrom": "selected-template RMSD",
+  "maximumRmsdAngstrom": "explicit attributed query bound; no default"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.N08.SELECTED_THREE_CARBONYL_TEMPLATE_RMSD/negative/1",
+  "scope": "EXACT_SELECTED_ELIGIBLE_CORRESPONDENCE_ONLY",
+  "requirements": [
+    "EXACT_THREE_CARBONYL_OCCURRENCES",
+    "COMPLETE_SOURCE_CHEMISTRY",
+    "INDEPENDENT_SOURCE_SCOPE_AUTHORITY",
+    "FINITE_QUALIFIED_NONCOLLINEAR_TRIPLETS",
+    "EXACT_REVIEWED_TEMPLATE_HASH",
+    "INDEPENDENT_CURRENT_QUERY_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "One selected correspondence and attributed query bound only."
+}
+```
+
+**limitations**
+
+```json
+[
+  "Selected three-carbonyl correspondence only; no search, whole-molecule negative, affinity or feature equivalence.",
+  "Query coordinates are QUERY_TEMPLATE geometry, never observed atoms or inferred H.",
+  "No default tolerance, production authority or automatic activation. Independent exact-template and source-scope current authority required."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/n08/CONTRACT_AND_BOUNDARY_REVIEW.txt",
+    "sha256": "c36e4231a858f5038620b81e949607c0992c2209560ac1aa3bf07e8fe4b11e56",
+    "citation": "Approved bounded selected-template definition or unchanged mathematical alignment; no default chemical tolerance."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/n08/APPROVAL.txt",
+    "sha256": "f2f708500877b33f726e7f8a1d4f32dad5ae94ba0a226fe8c1448f0a4b51ca11",
+    "citation": "Approved bounded selected-template definition or unchanged mathematical alignment; no default chemical tolerance."
+  },
+  {
+    "locator": "software/modules/athena/src/main/java/totah/lab/athena/design/grammar/FeatureTemplateAlignmentEvaluator.java",
+    "sha256": "bbc298ee3a3d8d125c9d32fbaa71be78c3f15e6440b952ec519788fff70ae1c9",
+    "citation": "Approved bounded selected-template definition or unchanged mathematical alignment; no default chemical tolerance."
+  },
+  {
+    "locator": "software/modules/athena/src/main/java/totah/lab/athena/pocket/compare/KabschRigidPointAligner.java",
+    "sha256": "dca4f286af24b9389bb3f57142ed46a3cbb2db8988de67879e344d4970b452ec",
+    "citation": "Approved bounded selected-template definition or unchanged mathematical alignment; no default chemical tolerance."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O.rule.json",
+    "sha256": "d4c7f17b24d6923ea6e214241bb9e0f6771811a535764fd4cf4439c8f8641852",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.SULF.SS_CONNECTIVITY — 1.0.0 (ss-connectivity-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/ss-connectivity-v1/ATHENA.SULF.SS_CONNECTIVITY.rule.json) · SHA256 `ef6cfd10234d65c434cb05b8d6aaf472be292816fc73a5d70ea47e8485c9e137`

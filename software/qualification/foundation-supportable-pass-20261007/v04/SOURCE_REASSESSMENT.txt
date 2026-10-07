@@ -1,0 +1,34 @@
+V04 — representability is separate from molecular truth, 2026-10-07
+Pinned RDKit FeaturesValidation checks query atoms/bonds, dummy atoms, aliases,
+aromatic and dative bond types, and enhanced stereo groups under separate optional
+allow flags. It reports forbidden representation features; it does not prove a
+chemical molecule invalid. Neither absence of a query flag nor presence of a parsed
+atom makes a source molecular assertion chemically true.
+
+The qualified Athena concrete MolecularGraph/OclGraphMapper cannot encode arbitrary
+native query predicates or enhanced ESR groups as executable chemistry. Generic
+properties may retain source bytes without granting those bytes an interpretation.
+The concrete need is now proven by A07's native-query inventory: atom/bond query
+features, atom lists, ESR annotations and an excluded query atom occur in the exact
+catalog. Do not convert those queries through a lossy SMARTS representation or strip
+features to make the concrete mapper accept them.
+
+The pending A07 public-boundary proposal provides a concrete bounded V04 route:
+original OCL native query bytes remain query evidence; explicit parser/matcher format
+and a separately qualified feature-admission profile determine representability for
+that operation. Rejected/excluded/unknown features remain individually unavailable;
+no source query is relabelled an observed physical molecule. Dummy/query/enhanced-
+stereo semantics outside that selected format remain unsupported, not false chemistry.
+
+Dependency: exact native format/source version -> lossless attributed query parsing
+and feature inventory -> feature-specific operation matrix -> separately qualified
+native matcher branch -> evidence/current gate. No new graph representation is
+needed if the approved native boundary suffices. Its public overload/payload approval
+is still required; N08 approval does not approve this different boundary.
+
+Acceptance: parsed original query bytes remain immutable; each native feature bit
+is mapped to a reviewed admitted/rejected outcome; atom lists/negation/query bonds/
+ESR/excluded atoms and target dummy/enhanced stereo controls; cross-format confusion;
+unknown bits; changed source/parser/jar; mapping preservation and independent replay.
+Native parse success or canonical re-encoding alone does not pass this matrix.
+No V04 implementation or closure claimed while this public boundary is pending.
