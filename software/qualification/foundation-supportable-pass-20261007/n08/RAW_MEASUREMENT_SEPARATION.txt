@@ -1,0 +1,13 @@
+2026-10-07 — approved-contract conformance correction before closure
+The first implementation exposed raw distance geometry without current review,
+but computed query RMSD only after chemistry/current eligibility. The approved
+contract requires raw coordinates/RMSD to remain independent of classification.
+Corrected the N08 leaf to compute the same existing mathematical fit whenever
+source/query geometry is evaluable, retaining rawFitStatus, RMSD, query bound and
+source/query attribution even when chemistry or authority remains unresolved.
+The final scientific verdict still requires every original chemistry, coverage,
+exact query hash and current authority check. The raw fit's passed flag cannot
+supply scientific eligibility. Degenerate/unqualified geometry yields no RMSD.
+No default tolerance, schema expansion, source-role change or production authority.
+The source-afd7dadf9 independent replay passed but its full run was superseded;
+only a fresh committed-source run of this correction can close N08.

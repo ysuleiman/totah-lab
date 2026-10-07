@@ -45,7 +45,8 @@ final class SelectedPharmacophoreRules {
                 var raw=RuleAnalyzers.collector(geometry,gr).analyze(s,plans,Map.of()).getFirst().measurements().get("payload");
                 var values=new TreeMap<String,String>();values.put("payload",raw);values.put("proposition","SELECTED_THREE_CARBONYL_TEMPLATE_QUERY");values.put("sourcePins",canonical(sources.pins()));values.put("tuple",canonical(t));values.put("definitionSha256",RuleRegistry.digest(m));values.put("templateGeometryKind","QUERY_TEMPLATE");values.put("sourceGeometryKind","OBSERVED_SOURCE_COORDINATES");
                 if(template!=null){values.put("templatePin",canonical(pin(templates.getFirst())));values.put("template",canonical(template));}
-                if(!evaluate)return List.of(finding(s,SUPPORTED_PRESENT,values,"Raw source geometry and attributed query; source chemistry and query satisfaction not evaluated"));
+                var fit=rawFit(s,oxygen,template,JSON.readTree(raw),values);
+                if(!evaluate)return List.of(finding(s,SUPPORTED_PRESENT,values,"Raw source coordinates/query RMSD where geometrically evaluable; chemistry and query satisfaction not evaluated"));
                 var measured=inputs.values().stream().filter(e->e.evidenceType().equals("athena:rule-measurements")).toList();require(measured.size()==1&&measured.getFirst().method().equals(SelectedPharmacophoreRules.method(m,false))&&read(measured.getFirst()).equals(JSON.readTree(raw)),"N08 measurement replay mismatch");
                 if(template==null||m.parameters().get("templateSha256").value().equals("UNBOUND"))return List.of(finding(s,NOT_EVALUATED,values,"No exact bound reviewed query; no default template or tolerance"));
                 require(m.parameters().get("templateSha256").value().equals(templates.getFirst().payloadSha256()),"N08 exact reviewed template bytes mismatch");
@@ -60,18 +61,27 @@ final class SelectedPharmacophoreRules {
                 var status=HalogenCarbonylRules.sourceFacts(s,component,report.payload().path("sourceCoverage"),inputs.values());if(status!=SUPPORTED_PRESENT)return List.of(finding(s,status,values,"Source facts incomplete, conflicting or outside domain"));
                 if(!report.complete())return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Complete source role coverage required"));
                 for(int i=0;i<3;i++)if(!HalogenCarbonylRules.roles(report,List.of("carbonylOxygen","carbonylCarbon"),t.subList(2*i,2*i+2)))return List.of(finding(s,UNSUPPORTED,values,"Selected anchors do not identify three exact neutral carbonyl occurrences"));
-                var rawOps=JSON.readTree(raw).path("operations");for(int i=0;i<3;i++){Double distance=HalogenCarbonylRules.value(rawOps,i,"distanceAngstrom");if(distance==null||distance<=0)return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Qualified distinct finite source coordinates required"));}
-                var sourcePoints=new ArrayList<Point3D>();for(var atom:oxygen)sourcePoints.add(s.atoms().get(atom).getPosition());var queryPoints=new ArrayList<Point3D>();for(var point:template.path("points"))queryPoints.add(point(point.path("coordinates")));
-                if(!noncollinear(sourcePoints)||!noncollinear(queryPoints))return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Degenerate or nonfinite triplet; no meaningful selected fit"));
-                var sourceMap=new TreeMap<String,Point3D>();var targetMap=new TreeMap<String,Point3D>();for(int i=0;i<3;i++){String id=text(template.path("points").get(i),"featureId");sourceMap.put(id,sourcePoints.get(i));targetMap.put(id,queryPoints.get(i));}
-                require(sourceMap.size()==3&&sourceMap.keySet().equals(targetMap.keySet()),"N08 exact three-to-three coverage");
-                double bound=number(template.get("maximumRmsdAngstrom"));FeatureTemplateAlignmentEvaluator.AlignmentEvidence alignment;try{alignment=new FeatureTemplateAlignmentEvaluator().evaluate(text(template,"templateId"),sourceMap,targetMap,bound);}catch(IllegalArgumentException ex){return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Numerically unresolved finite rigid alignment"));}
-                if(!alignment.evaluated()||alignment.rmsd()==null||!Double.isFinite(alignment.rmsd()))return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Finite evaluated rigid alignment required"));
-                values.put("rmsdAngstrom",alignment.rmsd().toString());values.put("maximumRmsdAngstrom",Double.toString(bound));values.put("correspondingFeatureIds",canonical(alignment.correspondingFeatureIds()));values.put("sourcePoints",canonical(sourcePoints));
+                if(fit.isEmpty())return List.of(finding(s,UNKNOWN_INCONCLUSIVE,values,"Qualified finite nondegenerate selected fit required"));
+                var alignment=fit.orElseThrow();
                 return List.of(finding(s,alignment.passed()?SUPPORTED_PRESENT:ABSENT_FALSE,values,"Exact selected template correspondence only; no whole-molecule negative"));
             }
             private Finding finding(SystemStateView s,EvidenceInterpretation.Status status,Map<String,String> values,String reason){return new Finding(evaluate?"evaluate":"collect",List.of(s.subject()),status,values,List.of(reason),m.limitations());}
         };
+    }
+    private static Optional<FeatureTemplateAlignmentEvaluator.AlignmentEvidence> rawFit(SystemStateView s,List<totah.lab.gaia.structure.AtomReference> oxygen,JsonNode template,JsonNode raw,Map<String,String> values) {
+        values.put("rawFitStatus",NOT_EVALUATED.name());
+        if(template==null)return Optional.empty();
+        values.put("maximumRmsdAngstrom",Double.toString(number(template.get("maximumRmsdAngstrom"))));values.put("rawFitStatus",UNKNOWN_INCONCLUSIVE.name());
+        for(int i=0;i<3;i++){Double distance=HalogenCarbonylRules.value(raw.path("operations"),i,"distanceAngstrom");if(distance==null||distance<=0)return Optional.empty();}
+        var sourcePoints=new ArrayList<Point3D>();for(var atom:oxygen)sourcePoints.add(s.atoms().get(atom).getPosition());var queryPoints=new ArrayList<Point3D>();for(var point:template.path("points"))queryPoints.add(point(point.path("coordinates")));
+        values.put("sourcePoints",canonical(sourcePoints));
+        if(!noncollinear(sourcePoints)||!noncollinear(queryPoints))return Optional.empty();
+        var sourceMap=new TreeMap<String,Point3D>();var targetMap=new TreeMap<String,Point3D>();for(int i=0;i<3;i++){String id=text(template.path("points").get(i),"featureId");sourceMap.put(id,sourcePoints.get(i));targetMap.put(id,queryPoints.get(i));}
+        require(sourceMap.size()==3&&sourceMap.keySet().equals(targetMap.keySet()),"N08 exact three-to-three coverage");
+        FeatureTemplateAlignmentEvaluator.AlignmentEvidence fit;try{fit=new FeatureTemplateAlignmentEvaluator().evaluate(text(template,"templateId"),sourceMap,targetMap,number(template.get("maximumRmsdAngstrom")));}catch(IllegalArgumentException ex){return Optional.empty();}
+        if(!fit.evaluated()||fit.rmsd()==null||!Double.isFinite(fit.rmsd()))return Optional.empty();
+        values.put("rawFitStatus",SUPPORTED_PRESENT.name());values.put("rmsdAngstrom",fit.rmsd().toString());values.put("correspondingFeatureIds",canonical(fit.correspondingFeatureIds()));
+        return Optional.of(fit); // The raw passed flag never supplies chemical identity or current authority.
     }
     static void validateTemplate(JsonNode n)throws java.io.IOException {
         fields(n,"schema","templateId","points","coordinateUnit","maximumRmsdAngstrom","sourceReferences","sourceProtocol","limitations");require(text(n,"schema").equals("athena-selected-pharmacophore-template/1")&&text(n,"coordinateUnit").equals("angstrom"),"N08 query schema/unit");require(text(n,"templateId").matches(".+/[^/\\s]+"),"versioned template identifier required");
