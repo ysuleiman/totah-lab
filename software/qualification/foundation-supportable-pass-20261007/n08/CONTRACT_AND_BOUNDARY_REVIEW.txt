@@ -1,0 +1,93 @@
+N08 — SMALLEST SELECTED PHARMACOPHORE-TEMPLATE CONTRACT, FOR APPROVAL
+ATHENA.N08.SELECTED_THREE_CARBONYL_TEMPLATE_RMSD/1
+2026-10-07; no implementation yet
+
+Dependency chain: unchanged P03 neutral CARBONYL_O identities and P09 source
+coverage -> exact source correspondence and qualified same-state coordinates ->
+existing FeatureTemplateAlignmentEvaluator/KabschRigidPointAligner -> independently
+reviewed explicit query template and Research Gate. No new matcher, feature finder,
+graph search, alignment algorithm, fingerprint engine or chemistry role.
+
+Bounded question: does one explicitly selected ordered correspondence of exactly
+three distinct neutral carbonyl-O feature occurrences satisfy an explicitly supplied
+three-point template RMSD bound under the existing rigid least-squares alignment?
+Each oxygen retains its exact mapped carbonyl carbon; all six source atoms distinct.
+All three source occurrences must coexist in one complete immutable component/state.
+The three template feature IDs are distinct and each requires the exact unchanged
+CARBONYL_O role. User-provided correspondence selects the feature-to-template mapping;
+no search, best-of-many selection, feature substitution or chemical equivalence
+inference. This is selected 3D query satisfaction, not general 2D fingerprints,
+whole-molecule pharmacophore search, full RDKit/PheSA compatibility or affinity.
+
+Existing FeatureTemplateAlignmentEvaluator intersects feature names and can ignore
+missing requested names. The wrapper must first require exact three-to-three coverage
+and correct source roles before invoking it. Never accept a convenient partial fit.
+Both point triplets require finite distinct noncollinear coordinates; exact zero
+cross-product is degenerate, with no invented angular/planarity tolerance. Proper
+rigid alignment and RMSD reuse the existing implementation. No chirality, orientation
+of a lone pair, directional acceptor vector or inferred H geometry is claimed.
+
+The threshold is a required attributed QUERY INPUT, not an Athena scientific default.
+No fixed pharmacophore tolerance is selected or invented. Qualification uses clearly
+synthetic query values only to verify mathematical behavior; no engineering example
+becomes production scientific authority. Real execution must bind the exact query
+bytes/source/protocol and maximumRmsdAngstrom into its independently reviewed current
+scientific definition/manifest. A missing/unreviewed bound is NOT_EVALUATED, never
+an invented default. Pass iff computed finite RMSD <= that exact supplied bound,
+inclusive, without epsilon or rounding. Report RMSD and query bound separately.
+
+Source comparison: RDKit feature definitions and OCL pharmacophore facilities supply
+different feature perception/center/dialect meanings. This profile instead reuses
+only Athena's already-qualified carbonyl atom roles. Existing Athena alignment is a
+mathematical operation against a caller-configured maximum, not a universal chemical
+window. P07 catalog weights, generic centroids and full toolkit feature catalogs are
+not silently merged into these oxygen point features.
+
+PROPOSED ADDITIVE PUBLIC PAYLOAD — approval required before implementation
+athena-selected-pharmacophore-template/1:
+  schema: exact schema string;
+  templateId: nonempty versioned source-query identifier;
+  points: exactly three ordered objects {featureId:nonempty unique string,
+    requiredRole:"ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O",
+    coordinates:{x:finite number,y:finite number,z:finite number}};
+  coordinateUnit:"angstrom";
+  maximumRmsdAngstrom: finite number >=0, mandatory, no default;
+  sourceReferences: nonempty immutable scientific source references;
+  sourceProtocol: exact versioned method reference;
+  limitations: array of strings.
+Strict fields; duplicate identities, unknown roles, missing/nonfinite bounds or
+positions and malformed provenance are rejected. These coordinates are QUERY_TEMPLATE
+geometry, not observed atoms or an inferred molecular conformer. Existing evidence
+envelope pins original payload bytes. The exact template pin must be in the rule's
+scientific parameters/current review scope; an unrelated valid receipt cannot
+approve a different template. Existing RuleRequest.atoms selects the six ordered
+source anchors [O1,C1,O2,C2,O3,C3]. No public Java API change is proposed.
+
+Coverage/status: exact role/state/mapping/source/coordinate/query coverage required.
+Only this selected correspondence may receive ABSENT_FALSE when its evaluated RMSD
+exceeds the supplied bound. Missing or conflicting chemistry/mapping/frame gives
+UNKNOWN_INCONCLUSIVE; excluded roles/components/degenerate geometry are explicitly
+reported without claiming global absence. No current query+rule authority gives
+NOT_EVALUATED. Changed bytes/definitions/state/selection cannot replay. Retain raw
+coordinates/RMSD and query provenance independently of classification. No ensemble,
+count, alternative-correspondence or global-pharmacophore negative claim.
+
+Acceptance matrix before activation:
+- Identical and rigidly transformed triplets, explicit source-carbonyl identity;
+  nonmatching shape with fully eligible selected mapping.
+- Exact computed RMSD boundary and adjacent bound values; supplied zero bound;
+  missing/negative/nonfinite bound rejected and no default manufactured.
+- Missing one query/source feature, duplicated source atom or feature ID, wrong role,
+  alternate mapping, swapped oxygen/carbon anchors, component/state mixing.
+- Collinear/coincident/nonfinite points and unqualified source frame; no arbitrary
+  alignment interpreted as meaningful geometry.
+- Source H/charge/aromaticity/NONE/scope gaps and contradictions; query coordinates
+  never relabeled observed or explicit-H directional evidence.
+- Changed query/source/method/definition/state bytes, identity collisions, expired
+  or cross-template current authority, inherited historical evidence.
+- Old alignment consumers unchanged; current governed execution, independent JVM,
+  historical65, pins25 and fresh committed-source qualification.
+
+Approval sought only for this exact additive query payload and bounded contract.
+It does not approve a default tolerance, new chemistry roles, generic pharmacophore
+search, inferred H positions, biological conclusions or production receipts.

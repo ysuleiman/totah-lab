@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `d3971d994e000b4eaa825df2f3a85d7dc0a8bd708685425fdc732f5a9156ce7c`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `1862d9364af89e02842affd6b75dc4f661b23e5d91c1ba630d97d99e95adb262`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -28,7 +28,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I11 | Halogen bond to pi system | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I12 | Single-water H-bond bridge | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
 | I13 | Multi-water bridge paths | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/INPUT_CONTRACT.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/ACCEPTANCE_MATRIX.json), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/WATER_CANDIDATE_UNIVERSE_V1.txt), [water-bridge-contract-20261006](../../../software/qualification/water-bridge-contract-20261006/APPROVAL.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/CHECKPOINT.txt), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/VALIDATION.json), [water-bridge-implementation-20261006](../../../software/qualification/water-bridge-implementation-20261006/MATRIX_EXECUTION.json) |
-| I14 | Metal-ligand pair proximity | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| I14 | Metal-ligand pair proximity | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | I15 | Metal coordination geometry/complex | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
 | I16 | Van der Waals contact/gap | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/CHECKPOINT.txt), [vdw-contact-i16-20261005](../../../software/qualification/vdw-contact-i16-20261005/REVIEWED_DOSSIER.json) |
 | I17 | Steric overlaps/clashes | P0 | SCIENTIFIC_REVIEW_REQUIRED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt) |
@@ -422,15 +422,15 @@ No implicit-H orientation, inferred waters, PLIP heuristic/pruning, occupancy/en
 
 ### I14 — Metal-ligand pair proximity
 
-Select element/oxidation/donor pair domains and justified proximity references without implying coordination.
+Exact selected source monatomic Zn2+ and unchanged neutral carbonyl-O in separate components, 0 < distance <= 2.8 angstrom; source-structural proximity only, not coordination or energy.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2310 fresh committed-source tests +3 isolation;39 focused I14;18 JVM pairs,17 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** Reference registration only
+**Existing implementation:** Opt-in athena.zinc-carbonyl/1; source metal and neutral carbonyl coverage remain independent.
 
-**Supporting source:** ProLIF MetalDonor/MetalAcceptor; RING4
+**Supporting source:** Exact pinned ProLIF MetalDonor distance window 2.8 angstrom, restricted to source monatomic Zn2+ and unchanged carbonyl role; PLIP coordination definitions remain separate. Adopted under REQUEST.txt authorization.
 
-Raw selected metal/donor distances already supported by generic geometry. A proximity class needs exact element/oxidation/donor reference and cutoff; absent oxidation/state cannot be inferred from an atom name.
+No other metals/charges/bonded or H-bearing Zn/other acceptors/same-component/nonordinary or unresolved source state; no whole-system negative, coordination sphere, energy or full-engine parity. Independent current source-scope and I14 authority required.
 
 ### I15 — Metal coordination geometry/complex
 

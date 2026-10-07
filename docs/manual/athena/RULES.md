@@ -37145,3 +37145,164 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ```json
 []
 ```
+
+## ATHENA.I14.ZN2_CARBONYL_PROXIMITY — 1.0.0 (zinc-carbonyl-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zinc-carbonyl-v1/ATHENA.I14.ZN2_CARBONYL_PROXIMITY.rule.json) · SHA256 `be83c6b5e26b866c2a996599bb3e20b4c1229e187ef6477775ca6025b9725c5b`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_I14_ZN2_CARBONYL_V1"
+```
+
+**implementationId**
+
+```json
+"athena.zinc-carbonyl"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Source-declared monatomic Zn2+; complete charge/H/aromaticity/electronic/connection evidence",
+  "Unchanged neutral carbonyl-O role and independent exact source-scope qualification"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Exact selected same-state Zn-O distance"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-continuous-geometry-measurements/1",
+  "proposition": "SELECTED_ZN2_CARBONYL_PROLIF_WINDOW_PROXIMITY"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.I14.ZN2_CARBONYL_PROXIMITY/negative/1",
+  "scope": "EXACT_SELECTED_ELIGIBLE_PAIR_ONLY",
+  "requirements": [
+    "COMPLETE_EXACT_SOURCE_STATE",
+    "MONATOMIC_SOURCE_ZN2",
+    "UNCHANGED_CARBONYL_ROLE",
+    "INDEPENDENT_SOURCE_SCOPE_AUTHORITY",
+    "FINITE_QUALIFIED_DISTANCE",
+    "INDEPENDENT_CURRENT_I14_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Exact selected monatomic source Zn2+/neutral carbonyl pair only; no coordination or system-wide absence."
+}
+```
+
+**limitations**
+
+```json
+[
+  "Source-specific selected proximity candidate only; no coordination, energy, occupancy, biological or whole-system negative claim.",
+  "No default activation or production authority. Explicit independent source-scope and current I14 qualification required.",
+  "Other metals/states, bonded Zn, other ligands and complete coordination spheres are outside this profile."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/i14/CONTRACT.txt",
+    "sha256": "ee797112ec1db0bd16890d09cfd3377ee553d7805e8f521200745b887702742b",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/REQUEST.txt",
+    "sha256": "4f1814fe4e9793792f145f991ac000f265d46df248bc3dda55d001bb5ea51ce2",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/prolif--prolif__interactions__interactions.py",
+    "sha256": "9b891c16eae1340269b6860131b9bef6f8d9676a54171e0b9c48b6c7aa1b6798",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/prolif--prolif__interactions__base.py",
+    "sha256": "3c10fe88839767db22eb43e7b535e087af1d98e60e07a21a2b1708e0727aad91",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O.rule.json",
+    "sha256": "d4c7f17b24d6923ea6e214241bb9e0f6771811a535764fd4cf4439c8f8641852",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Pinned bounded I14 definition, source operational window or unchanged source-scope/role dependency; no coordination or production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
