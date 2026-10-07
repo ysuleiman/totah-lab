@@ -1,0 +1,12 @@
+2026-10-07 — independent replay qualification failure preserved
+Source c49bed6e2: previous18 JVM pairs passed, but N08 pair differed in exact
+query payload hash and consequently manifest definition hash. Query coordinates
+were built by JSON.valueToTree(Map.of(...)); Java map iteration order changed the
+original serialized input field order across JVMs. Canonical displayed query content
+and the scientific result were unchanged. Production correctly pinned original
+bytes; no production canonicalization or relaxed provenance check is introduced.
+Correction: synthetic coordinate nodes are built in explicit x,y,z insertion order.
+The original failing artifacts remain /private/tmp/n08-replay-final and the outdated
+full run /private/tmp/n08-clean-final was stopped before claiming qualification.
+A new committed-source run and independent replay are required; no closure from
+this failed attempt. No production implementation or legacy source changed.
