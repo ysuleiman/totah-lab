@@ -57,6 +57,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.i03-n-sp3-s1"))return S1NitrogenRules.analyzer(m,r);
         if(m.implementationId().equals("athena.halogen-carbonyl"))return HalogenCarbonylRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.zinc-carbonyl"))return ZincCarbonylRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.selected-pharmacophore"))return SelectedPharmacophoreRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,false);
@@ -108,6 +109,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.i03-n-sp3-s1"))return S1NitrogenRules.analyzer(m,r);
         if(m.implementationId().equals("athena.halogen-carbonyl"))return HalogenCarbonylRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.zinc-carbonyl"))return ZincCarbonylRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.selected-pharmacophore"))return SelectedPharmacophoreRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,true);
