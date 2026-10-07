@@ -1,0 +1,988 @@
+Compiled from "BondLengthSet.java"
+public class com.actelion.research.chem.conf.BondLengthSet {
+  private static final java.lang.String cBondDataFile;
+
+  private static java.lang.String sCustomBondDataFile;
+
+  private static boolean isInitialized;
+
+  private static int[] BOND_ID;
+
+  private static int[] BOND_COUNT;
+
+  private static float[] BOND_LENGTH;
+
+  private static float[] BOND_STDDEV;
+
+  public static final float DEFAULT_BOND_LENGTH;
+
+  public static final float DEFAULT_BOND_STDDEV;
+
+  private static final boolean[] CONSIDER_PI;
+
+  private final float[] mBondLength;
+
+  private final float[] mBondStdDev;
+
+  public com.actelion.research.chem.conf.BondLengthSet(com.actelion.research.chem.StereoMolecule);
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: aload_1
+       5: bipush        7
+       7: invokevirtual #3                  // Method com/actelion/research/chem/StereoMolecule.ensureHelperArrays:(I)V
+      10: aload_0
+      11: aload_1
+      12: invokevirtual #4                  // Method com/actelion/research/chem/StereoMolecule.getAllBonds:()I
+      15: newarray       float
+      17: putfield      #5                  // Field mBondLength:[F
+      20: aload_0
+      21: aload_1
+      22: invokevirtual #4                  // Method com/actelion/research/chem/StereoMolecule.getAllBonds:()I
+      25: newarray       float
+      27: putfield      #6                  // Field mBondStdDev:[F
+      30: iconst_0
+      31: istore_2
+      32: iload_2
+      33: aload_1
+      34: invokevirtual #4                  // Method com/actelion/research/chem/StereoMolecule.getAllBonds:()I
+      37: if_icmpge     102
+      40: aload_1
+      41: iload_2
+      42: invokestatic  #7                  // Method getBondIndex:(Lcom/actelion/research/chem/StereoMolecule;I)I
+      45: istore_3
+      46: iload_3
+      47: iconst_m1
+      48: if_icmpne     76
+      51: aload_0
+      52: getfield      #5                  // Field mBondLength:[F
+      55: iload_2
+      56: aload_1
+      57: iload_2
+      58: invokestatic  #8                  // Method getBondLengthFromCovalentRadii:(Lcom/actelion/research/chem/StereoMolecule;I)F
+      61: fastore
+      62: aload_0
+      63: getfield      #6                  // Field mBondStdDev:[F
+      66: iload_2
+      67: aload_1
+      68: iload_2
+      69: invokestatic  #9                  // Method getStdDevFromCovalentRadii:(Lcom/actelion/research/chem/StereoMolecule;I)F
+      72: fastore
+      73: goto          96
+      76: aload_0
+      77: getfield      #5                  // Field mBondLength:[F
+      80: iload_2
+      81: iload_3
+      82: invokestatic  #10                 // Method getBondLength:(I)F
+      85: fastore
+      86: aload_0
+      87: getfield      #6                  // Field mBondStdDev:[F
+      90: iload_2
+      91: iload_3
+      92: invokestatic  #11                 // Method getBondStdDev:(I)F
+      95: fastore
+      96: iinc          2, 1
+      99: goto          32
+     102: return
+
+  public static void setCustomDataFile(java.lang.String);
+    Code:
+       0: aload_0
+       1: putstatic     #12                 // Field sCustomBondDataFile:Ljava/lang/String;
+       4: iconst_0
+       5: putstatic     #13                 // Field isInitialized:Z
+       8: return
+
+  private static void initialize();
+    Code:
+       0: getstatic     #13                 // Field isInitialized:Z
+       3: ifne          215
+       6: ldc           #14                 // class com/actelion/research/chem/conf/BondLengthSet
+       8: dup
+       9: astore_0
+      10: monitorenter
+      11: getstatic     #12                 // Field sCustomBondDataFile:Ljava/lang/String;
+      14: ifnonnull     25
+      17: ldc           #15                 // String bondLengthData.txt
+      19: invokestatic  #16                 // Method com/actelion/research/chem/conf/TorsionDB.openReader:(Ljava/lang/String;)Ljava/io/BufferedReader;
+      22: goto          42
+      25: new           #17                 // class java/io/BufferedReader
+      28: dup
+      29: new           #18                 // class java/io/FileReader
+      32: dup
+      33: getstatic     #12                 // Field sCustomBondDataFile:Ljava/lang/String;
+      36: invokespecial #19                 // Method java/io/FileReader."<init>":(Ljava/lang/String;)V
+      39: invokespecial #20                 // Method java/io/BufferedReader."<init>":(Ljava/io/Reader;)V
+      42: astore_1
+      43: aload_1
+      44: invokevirtual #21                 // Method java/io/BufferedReader.readLine:()Ljava/lang/String;
+      47: astore_2
+      48: aload_2
+      49: ifnonnull     56
+      52: iconst_0
+      53: goto          60
+      56: aload_2
+      57: invokestatic  #22                 // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+      60: istore_3
+      61: iload_3
+      62: newarray       int
+      64: putstatic     #23                 // Field BOND_ID:[I
+      67: iload_3
+      68: newarray       float
+      70: putstatic     #24                 // Field BOND_LENGTH:[F
+      73: iload_3
+      74: newarray       float
+      76: putstatic     #25                 // Field BOND_STDDEV:[F
+      79: iload_3
+      80: newarray       int
+      82: putstatic     #26                 // Field BOND_COUNT:[I
+      85: iconst_0
+      86: istore        4
+      88: iload         4
+      90: iload_3
+      91: if_icmpge     187
+      94: aload_1
+      95: invokevirtual #21                 // Method java/io/BufferedReader.readLine:()Ljava/lang/String;
+      98: astore        5
+     100: aload         5
+     102: ifnull        181
+     105: aload         5
+     107: ldc           #27                 // String \\t
+     109: invokevirtual #28                 // Method java/lang/String.split:(Ljava/lang/String;)[Ljava/lang/String;
+     112: astore        6
+     114: aload         6
+     116: arraylength
+     117: iconst_4
+     118: if_icmpne     181
+     121: getstatic     #23                 // Field BOND_ID:[I
+     124: iload         4
+     126: aload         6
+     128: iconst_0
+     129: aaload
+     130: invokestatic  #22                 // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+     133: iastore
+     134: getstatic     #24                 // Field BOND_LENGTH:[F
+     137: iload         4
+     139: aload         6
+     141: iconst_1
+     142: aaload
+     143: invokestatic  #29                 // Method java/lang/Float.parseFloat:(Ljava/lang/String;)F
+     146: fastore
+     147: getstatic     #25                 // Field BOND_STDDEV:[F
+     150: iload         4
+     152: aload         6
+     154: iconst_2
+     155: aaload
+     156: invokestatic  #29                 // Method java/lang/Float.parseFloat:(Ljava/lang/String;)F
+     159: fastore
+     160: getstatic     #26                 // Field BOND_COUNT:[I
+     163: iload         4
+     165: aload         6
+     167: iconst_3
+     168: aaload
+     169: invokestatic  #22                 // Method java/lang/Integer.parseInt:(Ljava/lang/String;)I
+     172: iastore
+     173: goto          181
+     176: astore        7
+     178: goto          187
+     181: iinc          4, 1
+     184: goto          88
+     187: aload_1
+     188: invokevirtual #31                 // Method java/io/BufferedReader.close:()V
+     191: iconst_1
+     192: putstatic     #13                 // Field isInitialized:Z
+     195: goto          203
+     198: astore_1
+     199: aload_1
+     200: invokevirtual #33                 // Method java/io/IOException.printStackTrace:()V
+     203: aload_0
+     204: monitorexit
+     205: goto          215
+     208: astore        8
+     210: aload_0
+     211: monitorexit
+     212: aload         8
+     214: athrow
+     215: return
+    Exception table:
+       from    to  target type
+         121   173   176   Class java/lang/NumberFormatException
+          11   195   198   Class java/io/IOException
+          11   205   208   any
+         208   212   208   any
+
+  public float getLength(int);
+    Code:
+       0: aload_0
+       1: getfield      #5                  // Field mBondLength:[F
+       4: iload_1
+       5: faload
+       6: freturn
+
+  public float getStdDev(int);
+    Code:
+       0: aload_0
+       1: getfield      #6                  // Field mBondStdDev:[F
+       4: iload_1
+       5: faload
+       6: freturn
+
+  public static java.lang.String getBondIDString(int);
+    Code:
+       0: iload_0
+       1: iconst_m1
+       2: if_icmpne     10
+       5: ldc           #34                 // String unknown
+       7: goto          18
+      10: getstatic     #23                 // Field BOND_ID:[I
+      13: iload_0
+      14: iaload
+      15: invokestatic  #35                 // Method idToString:(I)Ljava/lang/String;
+      18: areturn
+
+  public static java.lang.String idToString(int);
+    Code:
+       0: iload_0
+       1: iconst_m1
+       2: if_icmpne     8
+       5: ldc           #34                 // String unknown
+       7: areturn
+       8: iload_0
+       9: ldc           #36                 // int 251658240
+      11: iand
+      12: bipush        24
+      14: ishr
+      15: istore_1
+      16: iload_0
+      17: ldc           #37                 // int 16646144
+      19: iand
+      20: bipush        17
+      22: ishr
+      23: istore_2
+      24: iload_0
+      25: sipush        4064
+      28: iand
+      29: iconst_5
+      30: ishr
+      31: istore_3
+      32: iload_0
+      33: ldc           #38                 // int 98304
+      35: iand
+      36: bipush        15
+      38: ishr
+      39: istore        4
+      41: iload_0
+      42: bipush        24
+      44: iand
+      45: iconst_3
+      46: ishr
+      47: istore        5
+      49: iload_0
+      50: sipush        28672
+      53: iand
+      54: bipush        12
+      56: ishr
+      57: istore        6
+      59: iload_0
+      60: bipush        7
+      62: iand
+      63: istore        7
+      65: iload_2
+      66: invokestatic  #39                 // Method isPiConsidered:(I)Z
+      69: ifeq          95
+      72: new           #40                 // class java/lang/StringBuilder
+      75: dup
+      76: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+      79: ldc           #42                 // String pi
+      81: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      84: iload         4
+      86: invokevirtual #44                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+      89: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      92: goto          97
+      95: ldc           #46                 // String
+      97: astore        8
+      99: iload_3
+     100: invokestatic  #39                 // Method isPiConsidered:(I)Z
+     103: ifeq          129
+     106: new           #40                 // class java/lang/StringBuilder
+     109: dup
+     110: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+     113: ldc           #42                 // String pi
+     115: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     118: iload         5
+     120: invokevirtual #44                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     123: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     126: goto          131
+     129: ldc           #46                 // String
+     131: astore        9
+     133: new           #40                 // class java/lang/StringBuilder
+     136: dup
+     137: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+     140: ldc           #47                 // String c
+     142: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     145: iload         6
+     147: invokevirtual #44                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     150: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     153: astore        10
+     155: new           #40                 // class java/lang/StringBuilder
+     158: dup
+     159: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+     162: ldc           #47                 // String c
+     164: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     167: iload         7
+     169: invokevirtual #44                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     172: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     175: astore        11
+     177: iload_1
+     178: bipush        8
+     180: if_icmpne     188
+     183: ldc           #48                 // String d
+     185: goto          221
+     188: new           #40                 // class java/lang/StringBuilder
+     191: dup
+     192: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+     195: iload_1
+     196: bipush        7
+     198: if_icmple     206
+     201: ldc           #49                 // String a
+     203: goto          208
+     206: ldc           #46                 // String
+     208: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     211: iload_1
+     212: bipush        7
+     214: iand
+     215: invokevirtual #44                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     218: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     221: astore        12
+     223: new           #40                 // class java/lang/StringBuilder
+     226: dup
+     227: invokespecial #41                 // Method java/lang/StringBuilder."<init>":()V
+     230: aload         12
+     232: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     235: getstatic     #50                 // Field com/actelion/research/chem/Molecule.cAtomLabel:[Ljava/lang/String;
+     238: iload_2
+     239: aaload
+     240: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     243: aload         8
+     245: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     248: aload         10
+     250: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     253: getstatic     #50                 // Field com/actelion/research/chem/Molecule.cAtomLabel:[Ljava/lang/String;
+     256: iload_3
+     257: aaload
+     258: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     261: aload         9
+     263: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     266: aload         11
+     268: invokevirtual #43                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     271: invokevirtual #45                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     274: areturn
+
+  public static int getBondIndex(int, boolean, boolean, int, int, int, int, int, int, boolean);
+    Code:
+       0: iload_0
+       1: iload_1
+       2: iload_2
+       3: iload_3
+       4: iload         4
+       6: iload         5
+       8: iload         6
+      10: iload         7
+      12: iload         8
+      14: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+      17: invokestatic  #52                 // Method lookupBondIndex:(I)I
+      20: istore        10
+      22: iload         9
+      24: ifne          81
+      27: iload         10
+      29: iconst_m1
+      30: if_icmpne     81
+      33: iload_0
+      34: iload_1
+      35: iload_2
+      36: iload_3
+      37: iload         4
+      39: iload         5
+      41: iload         6
+      43: bipush        7
+      45: bipush        7
+      47: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+      50: invokestatic  #52                 // Method lookupBondIndex:(I)I
+      53: istore        10
+      55: iload         10
+      57: iconst_m1
+      58: if_icmpne     81
+      61: iload_0
+      62: iload_1
+      63: iload_2
+      64: iload_3
+      65: iload         4
+      67: iconst_3
+      68: iconst_3
+      69: bipush        7
+      71: bipush        7
+      73: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+      76: invokestatic  #52                 // Method lookupBondIndex:(I)I
+      79: istore        10
+      81: iload         10
+      83: ireturn
+
+  private static int getBondID(int, boolean, boolean, int, int, int, int, int, int);
+    Code:
+       0: iload_3
+       1: getstatic     #53                 // Field CONSIDER_PI:[Z
+       4: arraylength
+       5: if_icmpge     25
+       8: getstatic     #53                 // Field CONSIDER_PI:[Z
+      11: iload_3
+      12: baload
+      13: ifeq          25
+      16: iconst_3
+      17: iload         5
+      19: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+      22: goto          26
+      25: iconst_0
+      26: istore        9
+      28: iload         4
+      30: getstatic     #53                 // Field CONSIDER_PI:[Z
+      33: arraylength
+      34: if_icmpge     55
+      37: getstatic     #53                 // Field CONSIDER_PI:[Z
+      40: iload         4
+      42: baload
+      43: ifeq          55
+      46: iconst_3
+      47: iload         6
+      49: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+      52: goto          56
+      55: iconst_0
+      56: istore        10
+      58: bipush        7
+      60: iload         7
+      62: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+      65: istore        7
+      67: bipush        7
+      69: iload         8
+      71: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+      74: istore        8
+      76: iload         7
+      78: iload         9
+      80: iconst_3
+      81: ishl
+      82: iadd
+      83: bipush        127
+      85: iload_3
+      86: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+      89: iconst_5
+      90: ishl
+      91: iadd
+      92: istore        11
+      94: iload         8
+      96: iload         10
+      98: iconst_3
+      99: ishl
+     100: iadd
+     101: bipush        127
+     103: iload         4
+     105: invokestatic  #54                 // Method java/lang/Math.min:(II)I
+     108: iconst_5
+     109: ishl
+     110: iadd
+     111: istore        12
+     113: iload_2
+     114: ifeq          122
+     117: bipush        8
+     119: goto          134
+     122: iload_1
+     123: ifeq          133
+     126: bipush        8
+     128: iload_0
+     129: iadd
+     130: goto          134
+     133: iload_0
+     134: istore        13
+     136: iload         13
+     138: bipush        24
+     140: ishl
+     141: iload         11
+     143: iload         12
+     145: if_icmpge     159
+     148: iload         11
+     150: bipush        12
+     152: ishl
+     153: iload         12
+     155: iadd
+     156: goto          167
+     159: iload         12
+     161: bipush        12
+     163: ishl
+     164: iload         11
+     166: iadd
+     167: iadd
+     168: ireturn
+
+  public static int getBondIndex(com.actelion.research.chem.StereoMolecule, int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: iconst_0
+       3: invokestatic  #55                 // Method getBondIndex:(Lcom/actelion/research/chem/StereoMolecule;IZ)I
+       6: ireturn
+
+  public static int getBondIndex(com.actelion.research.chem.StereoMolecule, int, boolean);
+    Code:
+       0: aload_0
+       1: iconst_0
+       2: iload_1
+       3: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+       6: istore_3
+       7: aload_0
+       8: iconst_1
+       9: iload_1
+      10: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+      13: istore        4
+      15: aload_0
+      16: iload_3
+      17: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      20: istore        5
+      22: aload_0
+      23: iload         4
+      25: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      28: istore        6
+      30: aload_0
+      31: iload_3
+      32: invokevirtual #58                 // Method com/actelion/research/chem/StereoMolecule.getConnAtoms:(I)I
+      35: istore        7
+      37: aload_0
+      38: iload         4
+      40: invokevirtual #58                 // Method com/actelion/research/chem/StereoMolecule.getConnAtoms:(I)I
+      43: istore        8
+      45: aload_0
+      46: iload_1
+      47: invokevirtual #59                 // Method com/actelion/research/chem/StereoMolecule.getBondOrder:(I)I
+      50: aload_0
+      51: iload_1
+      52: invokevirtual #60                 // Method com/actelion/research/chem/StereoMolecule.isAromaticBond:(I)Z
+      55: aload_0
+      56: iload_1
+      57: invokevirtual #61                 // Method com/actelion/research/chem/StereoMolecule.isDelocalizedBond:(I)Z
+      60: iload         5
+      62: iload         6
+      64: aload_0
+      65: iload_3
+      66: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+      69: aload_0
+      70: iload         4
+      72: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+      75: iload         7
+      77: iload         8
+      79: iload_2
+      80: invokestatic  #63                 // Method getBondIndex:(IZZIIIIIIZ)I
+      83: ireturn
+
+  public static int getBondID(com.actelion.research.chem.StereoMolecule, int, int);
+    Code:
+       0: aload_0
+       1: iconst_0
+       2: iload_1
+       3: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+       6: istore_3
+       7: aload_0
+       8: iconst_1
+       9: iload_1
+      10: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+      13: istore        4
+      15: aload_0
+      16: iload_3
+      17: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      20: istore        5
+      22: aload_0
+      23: iload         4
+      25: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      28: istore        6
+      30: aload_0
+      31: iload_3
+      32: invokevirtual #58                 // Method com/actelion/research/chem/StereoMolecule.getConnAtoms:(I)I
+      35: istore        7
+      37: aload_0
+      38: iload         4
+      40: invokevirtual #58                 // Method com/actelion/research/chem/StereoMolecule.getConnAtoms:(I)I
+      43: istore        8
+      45: iload_2
+      46: iconst_2
+      47: if_icmpne     90
+      50: aload_0
+      51: iload_1
+      52: invokevirtual #59                 // Method com/actelion/research/chem/StereoMolecule.getBondOrder:(I)I
+      55: aload_0
+      56: iload_1
+      57: invokevirtual #60                 // Method com/actelion/research/chem/StereoMolecule.isAromaticBond:(I)Z
+      60: aload_0
+      61: iload_1
+      62: invokevirtual #61                 // Method com/actelion/research/chem/StereoMolecule.isDelocalizedBond:(I)Z
+      65: iload         5
+      67: iload         6
+      69: aload_0
+      70: iload_3
+      71: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+      74: aload_0
+      75: iload         4
+      77: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+      80: iload         7
+      82: iload         8
+      84: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+      87: goto          163
+      90: iload_2
+      91: iconst_1
+      92: if_icmpne     135
+      95: aload_0
+      96: iload_1
+      97: invokevirtual #59                 // Method com/actelion/research/chem/StereoMolecule.getBondOrder:(I)I
+     100: aload_0
+     101: iload_1
+     102: invokevirtual #60                 // Method com/actelion/research/chem/StereoMolecule.isAromaticBond:(I)Z
+     105: aload_0
+     106: iload_1
+     107: invokevirtual #61                 // Method com/actelion/research/chem/StereoMolecule.isDelocalizedBond:(I)Z
+     110: iload         5
+     112: iload         6
+     114: aload_0
+     115: iload_3
+     116: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+     119: aload_0
+     120: iload         4
+     122: invokestatic  #62                 // Method getAtomPi:(Lcom/actelion/research/chem/StereoMolecule;I)I
+     125: bipush        7
+     127: bipush        7
+     129: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+     132: goto          163
+     135: aload_0
+     136: iload_1
+     137: invokevirtual #59                 // Method com/actelion/research/chem/StereoMolecule.getBondOrder:(I)I
+     140: aload_0
+     141: iload_1
+     142: invokevirtual #60                 // Method com/actelion/research/chem/StereoMolecule.isAromaticBond:(I)Z
+     145: aload_0
+     146: iload_1
+     147: invokevirtual #61                 // Method com/actelion/research/chem/StereoMolecule.isDelocalizedBond:(I)Z
+     150: iload         5
+     152: iload         6
+     154: iconst_3
+     155: iconst_3
+     156: bipush        7
+     158: bipush        7
+     160: invokestatic  #51                 // Method getBondID:(IZZIIIIII)I
+     163: ireturn
+
+  public static final boolean isPiConsidered(int);
+    Code:
+       0: iload_0
+       1: getstatic     #53                 // Field CONSIDER_PI:[Z
+       4: arraylength
+       5: if_icmpge     20
+       8: getstatic     #53                 // Field CONSIDER_PI:[Z
+      11: iload_0
+      12: baload
+      13: ifeq          20
+      16: iconst_1
+      17: goto          21
+      20: iconst_0
+      21: ireturn
+
+  public static int getAtomPi(com.actelion.research.chem.StereoMolecule, int);
+    Code:
+       0: iload_1
+       1: aload_0
+       2: invokevirtual #64                 // Method com/actelion/research/chem/StereoMolecule.getAtoms:()I
+       5: if_icmplt     10
+       8: iconst_0
+       9: ireturn
+      10: aload_0
+      11: iload_1
+      12: invokevirtual #65                 // Method com/actelion/research/chem/StereoMolecule.isAromaticAtom:(I)Z
+      15: ifeq          38
+      18: aload_0
+      19: iload_1
+      20: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      23: bipush        6
+      25: if_icmpne     38
+      28: aload_0
+      29: iload_1
+      30: invokevirtual #66                 // Method com/actelion/research/chem/StereoMolecule.getAtomCharge:(I)I
+      33: ifeq          38
+      36: iconst_1
+      37: ireturn
+      38: aload_0
+      39: iload_1
+      40: invokevirtual #67                 // Method com/actelion/research/chem/StereoMolecule.getAtomPi:(I)I
+      43: ireturn
+
+  public static float lookupBondLength(com.actelion.research.chem.StereoMolecule, int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: invokestatic  #7                  // Method getBondIndex:(Lcom/actelion/research/chem/StereoMolecule;I)I
+       5: istore_2
+       6: iload_2
+       7: iconst_m1
+       8: if_icmpne     19
+      11: aload_0
+      12: iload_1
+      13: invokestatic  #8                  // Method getBondLengthFromCovalentRadii:(Lcom/actelion/research/chem/StereoMolecule;I)F
+      16: goto          23
+      19: iload_2
+      20: invokestatic  #10                 // Method getBondLength:(I)F
+      23: freturn
+
+  public static float getBondLengthFromCovalentRadii(com.actelion.research.chem.StereoMolecule, int);
+    Code:
+       0: aload_0
+       1: aload_0
+       2: iconst_0
+       3: iload_1
+       4: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+       7: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      10: istore_2
+      11: aload_0
+      12: aload_0
+      13: iconst_1
+      14: iload_1
+      15: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+      18: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      21: istore_3
+      22: iload_2
+      23: invokestatic  #68                 // Method getCovalentRadius:(I)F
+      26: iload_3
+      27: invokestatic  #68                 // Method getCovalentRadius:(I)F
+      30: fadd
+      31: freturn
+
+  public static float getStdDevFromCovalentRadii(com.actelion.research.chem.StereoMolecule, int);
+    Code:
+       0: aload_0
+       1: aload_0
+       2: iconst_0
+       3: iload_1
+       4: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+       7: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      10: istore_2
+      11: aload_0
+      12: aload_0
+      13: iconst_1
+      14: iload_1
+      15: invokevirtual #56                 // Method com/actelion/research/chem/StereoMolecule.getBondAtom:(II)I
+      18: invokevirtual #57                 // Method com/actelion/research/chem/StereoMolecule.getAtomicNo:(I)I
+      21: istore_3
+      22: iload_2
+      23: getstatic     #69                 // Field com/actelion/research/chem/conf/VDWRadii.COVALENT_RADIUS:[F
+      26: arraylength
+      27: if_icmpge     35
+      30: ldc           #70                 // float 0.05f
+      32: goto          37
+      35: ldc           #71                 // float 0.125f
+      37: iload_3
+      38: getstatic     #69                 // Field com/actelion/research/chem/conf/VDWRadii.COVALENT_RADIUS:[F
+      41: arraylength
+      42: if_icmpge     50
+      45: ldc           #70                 // float 0.05f
+      47: goto          52
+      50: ldc           #71                 // float 0.125f
+      52: fadd
+      53: freturn
+
+  private static float getCovalentRadius(int);
+    Code:
+       0: iload_0
+       1: getstatic     #69                 // Field com/actelion/research/chem/conf/VDWRadii.COVALENT_RADIUS:[F
+       4: arraylength
+       5: if_icmpge     16
+       8: getstatic     #69                 // Field com/actelion/research/chem/conf/VDWRadii.COVALENT_RADIUS:[F
+      11: iload_0
+      12: faload
+      13: goto          37
+      16: iload_0
+      17: getstatic     #72                 // Field com/actelion/research/chem/conf/VDWRadii.VDW_RADIUS:[F
+      20: arraylength
+      21: if_icmpge     35
+      24: ldc           #73                 // float 0.6f
+      26: getstatic     #72                 // Field com/actelion/research/chem/conf/VDWRadii.VDW_RADIUS:[F
+      29: iload_0
+      30: faload
+      31: fmul
+      32: goto          37
+      35: ldc           #74                 // float 1.8f
+      37: freturn
+
+  public static float getBondLength(int);
+    Code:
+       0: iload_0
+       1: iconst_m1
+       2: if_icmpne     10
+       5: ldc           #75                 // float 2.0005f
+       7: goto          15
+      10: getstatic     #24                 // Field BOND_LENGTH:[F
+      13: iload_0
+      14: faload
+      15: freturn
+
+  public static float getBondCount(int);
+    Code:
+       0: iload_0
+       1: iconst_m1
+       2: if_icmpne     9
+       5: fconst_0
+       6: goto          15
+       9: getstatic     #26                 // Field BOND_COUNT:[I
+      12: iload_0
+      13: iaload
+      14: i2f
+      15: freturn
+
+  public static float getBondStdDev(int);
+    Code:
+       0: iload_0
+       1: iconst_m1
+       2: if_icmpne     9
+       5: fconst_1
+       6: goto          14
+       9: getstatic     #25                 // Field BOND_STDDEV:[F
+      12: iload_0
+      13: faload
+      14: freturn
+
+  private static int lookupBondIndex(int);
+    Code:
+       0: getstatic     #13                 // Field isInitialized:Z
+       3: ifne          9
+       6: invokestatic  #76                 // Method initialize:()V
+       9: sipush        4096
+      12: istore_1
+      13: sipush        2048
+      16: istore_2
+      17: iconst_0
+      18: istore_3
+      19: iload_3
+      20: bipush        13
+      22: if_icmpge     94
+      25: iload_1
+      26: getstatic     #23                 // Field BOND_ID:[I
+      29: arraylength
+      30: if_icmpge     42
+      33: iload_0
+      34: getstatic     #23                 // Field BOND_ID:[I
+      37: iload_1
+      38: iaload
+      39: if_icmpge     46
+      42: iconst_m1
+      43: goto          60
+      46: iload_0
+      47: getstatic     #23                 // Field BOND_ID:[I
+      50: iload_1
+      51: iaload
+      52: if_icmpne     59
+      55: iconst_0
+      56: goto          60
+      59: iconst_1
+      60: istore        4
+      62: iload         4
+      64: ifne          69
+      67: iload_1
+      68: ireturn
+      69: iload         4
+      71: ifge          80
+      74: iload_1
+      75: iload_2
+      76: isub
+      77: goto          83
+      80: iload_1
+      81: iload_2
+      82: iadd
+      83: istore_1
+      84: iload_2
+      85: iconst_2
+      86: idiv
+      87: istore_2
+      88: iinc          3, 1
+      91: goto          19
+      94: iconst_m1
+      95: ireturn
+
+  static {};
+    Code:
+       0: aconst_null
+       1: putstatic     #12                 // Field sCustomBondDataFile:Ljava/lang/String;
+       4: iconst_0
+       5: putstatic     #13                 // Field isInitialized:Z
+       8: bipush        17
+      10: newarray       boolean
+      12: dup
+      13: iconst_0
+      14: iconst_0
+      15: bastore
+      16: dup
+      17: iconst_1
+      18: iconst_0
+      19: bastore
+      20: dup
+      21: iconst_2
+      22: iconst_0
+      23: bastore
+      24: dup
+      25: iconst_3
+      26: iconst_0
+      27: bastore
+      28: dup
+      29: iconst_4
+      30: iconst_0
+      31: bastore
+      32: dup
+      33: iconst_5
+      34: iconst_1
+      35: bastore
+      36: dup
+      37: bipush        6
+      39: iconst_1
+      40: bastore
+      41: dup
+      42: bipush        7
+      44: iconst_1
+      45: bastore
+      46: dup
+      47: bipush        8
+      49: iconst_1
+      50: bastore
+      51: dup
+      52: bipush        9
+      54: iconst_0
+      55: bastore
+      56: dup
+      57: bipush        10
+      59: iconst_0
+      60: bastore
+      61: dup
+      62: bipush        11
+      64: iconst_0
+      65: bastore
+      66: dup
+      67: bipush        12
+      69: iconst_0
+      70: bastore
+      71: dup
+      72: bipush        13
+      74: iconst_0
+      75: bastore
+      76: dup
+      77: bipush        14
+      79: iconst_0
+      80: bastore
+      81: dup
+      82: bipush        15
+      84: iconst_1
+      85: bastore
+      86: dup
+      87: bipush        16
+      89: iconst_1
+      90: bastore
+      91: putstatic     #53                 // Field CONSIDER_PI:[Z
+      94: return
+}

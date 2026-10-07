@@ -26840,6 +26840,186 @@ Current-policy gate status must be established by a valid receipt, not the histo
 }
 ```
 
+## ATHENA.I10.CARBON_BOUND_HALOGEN_CARBONYL_DIRECTIONAL_CANDIDATE — 1.0.0 (halogen-carbonyl-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/halogen-carbonyl-v1/ATHENA.I10.CARBON_BOUND_HALOGEN_CARBONYL_DIRECTIONAL_CANDIDATE.rule.json) · SHA256 `2ee7b16feb4387001e3698efd05039b8da0143f558e609aff81335a9775dcf9d`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_I10_HALOGEN_CARBONYL_V1"
+```
+
+**implementationId**
+
+```json
+"athena.halogen-carbonyl"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Explicit complete immutable source chemistry and independently reviewed connection/electronic scope",
+  "Carbon-bound Cl/Br/I and unchanged neutral carbonyl-O role"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Selected same-state distance and two directed angles"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-continuous-geometry-measurements/1",
+  "proposition": "SELECTED_CARBON_HALOGEN_CARBONYL_DIRECTIONAL_CANDIDATE"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.I10.CARBON_BOUND_HALOGEN_CARBONYL_DIRECTIONAL_CANDIDATE/negative/1",
+  "supportedDomain": "Exact selected intercomponent C-X/O=C tuple under CONTRACT.txt",
+  "requirements": [
+    "EXACT_SOURCE_ROLES",
+    "INDEPENDENT_SOURCE_SCOPE",
+    "COMPLETE_SOURCE_FACTS",
+    "UNAMBIGUOUS_MAPPING",
+    "THREE_FINITE_COMMON_FRAME_MEASUREMENTS"
+  ],
+  "scope": "EXPLICIT_SELECTED_TUPLE_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Selected structural candidate only; not energy, physical bond proof or ProLIF/PLIP parity.",
+  "No whole-system absence; negative applies only to the eligible selected tuple.",
+  "Independent current I10 and source-scope authority required; no default activation."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/i10/CONTRACT.txt",
+    "sha256": "af85ed98d71ed6a257c76e082041ff0598538ef046542a4c9e669d2b5ca1c636",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/REQUEST.txt",
+    "sha256": "4f1814fe4e9793792f145f991ac000f265d46df248bc3dda55d001bb5ea51ce2",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/prolif--prolif__interactions__interactions.py",
+    "sha256": "9b891c16eae1340269b6860131b9bef6f8d9676a54171e0b9c48b6c7aa1b6798",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/prolif--prolif__interactions__base.py",
+    "sha256": "3c10fe88839767db22eb43e7b535e087af1d98e60e07a21a2b1708e0727aad91",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/water-bridge-contract-20261006/prolif-utils.py",
+    "sha256": "d93a5556badaee1402bdba60a4d112964bf42b82b7584dd9ecde8b4d1f260991",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/rule-registry-20261004/reference/plip-detection.py",
+    "sha256": "4479b9a86eac810c3cb657a0cbc6b5c055c67018fc9c3591d938f06ced142365",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/rule-registry-20261004/reference/plip-config.py",
+    "sha256": "e9d2d73fcf1e1edaf515ed06b55948603fbdf2662186965a74258ef3d60962cd",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.HALOGENATED.rule.json",
+    "sha256": "7549d08367dd187f99c7607c4bf07a912e4344efbe6f1c01d48d56f4043a2f2e",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O.rule.json",
+    "sha256": "d4c7f17b24d6923ea6e214241bb9e0f6771811a535764fd4cf4439c8f8641852",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Exact adopted bounded definition, authorization, source comparison or unchanged dependency; no production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE — 1.0.0 (hbond-candidate-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/hbond-candidate-v1/ATHENA.HBOND.EXPLICIT_H_DIRECTIONAL_CANDIDATE.rule.json) · SHA256 `c0d07888073224d552c5045c5bbd3ae298ae4eda0c3ee7750933fc9ab4297ab8`
