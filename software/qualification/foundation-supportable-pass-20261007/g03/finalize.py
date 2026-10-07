@@ -10,9 +10,9 @@ build=json.loads((b/'BUILD.json').read_text())
 for p,h in build['sourcePins'].items():
  if p.startswith('software/modules/'):assert sha(repo/p)==h,p
 cases=[c for p in (b/'junit').glob('TEST-*.xml') for c in ET.parse(p).getroot().findall('testcase')]
-assert len(cases)==2522,len(cases)
+assert len(cases)==2524,len(cases)
 assert all(all(c.find(t) is None for t in ['failure','error','skipped']) for c in cases)
-selected=[c for c in cases if 'MetPheSurvey' in c.get('classname','')];assert len(selected)==51,len(selected)
+selected=[c for c in cases if 'MetPheSurvey' in c.get('classname','')];assert len(selected)==53,len(selected)
 replay=json.loads((r/'REPLAY.json').read_text());prior=json.loads((repo/'software/qualification/foundation-supportable-pass-20261007/p07/REPLAY.json').read_text())
 assert len(replay['independentJvmComparisons'])==22
 for n,h in prior['independentJvmComparisons'].items():assert replay['independentJvmComparisons'][n]==h,n

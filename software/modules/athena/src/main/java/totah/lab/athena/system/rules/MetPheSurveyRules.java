@@ -97,7 +97,7 @@ final class MetPheSurveyRules {
     /** Exact finite source-graph admission, without valence, peptide-sequence or geometry inference. */
     private record Context(SystemStateView.Component component,JsonNode coverage) {
         totah.lab.athena.design.backend.MolecularGraph.Atom atom(String id){return component.chemistry().atom(id).orElseThrow();}
-        Map<String,String> neighbors(String id){var n=new TreeMap<String,String>();for(var b:component.chemistry().bonds()){String other=b.firstAtomId().equals(id)?b.secondAtomId():b.secondAtomId().equals(id)?b.firstAtomId():null;if(other!=null)n.put(other,b.aromatic()?"AROMATIC":b.order().name());}return n;}
+        Map<String,String> neighbors(String id){var n=new TreeMap<String,String>();for(var b:component.chemistry().bonds()){String other=b.firstAtomId().equals(id)?b.secondAtomId():b.secondAtomId().equals(id)?b.firstAtomId():null;if(other!=null)n.put(other,b.aromatic()&&!b.order().name().equals("AROMATIC")?"NONCANONICAL_AROMATIC_SOURCE":b.order().name());}return n;}
         boolean fact(String id,String element,boolean aromatic,int h){var a=atom(id);return a.element().equals(element)&&a.formalCharge()==0&&a.aromatic()==aromatic&&coverage.path("atomState").path(id).path("implicitHydrogenCount").asInt(-1)==h;}
         boolean pattern(String id,String e,boolean aromatic,int h,Map<String,String> neighbors){return fact(id,e,aromatic,h)&&neighbors(id).equals(neighbors);}
         boolean single(String id,String e,int h,String... n){var expected=new TreeMap<String,String>();for(var x:n)expected.put(x,"SINGLE");return pattern(id,e,false,h,expected);}
