@@ -32,7 +32,7 @@ Exact chemistry to independently qualify:
   CA and the previous carbonyl C and known H1; own carbonyl C single to CA and
   following N, double to O, H0; neutral N/C/O and complete source connectivity.
   This deliberately excludes free termini, unknown links and modified selected-residue contexts.
-- Require identical source isotope descriptors for all six ring carbons;
+- Require all ring C isotope masses equal and source isotope states identical;
   thus existing centroid equals the nominal uniform-carbon-mass center in this
   source-representation convention. Mixed-isotope rings remain unsupported; no
   experimental isotope composition is inferred.
@@ -42,9 +42,9 @@ Exact chemistry to independently qualify:
   methionine sulfoxide, sulfonium, Tyr/Trp/heteroaromatics, fused rings, substituted
   Phe sidechains, nonordinary connections, repeated or cross-state ring members.
 
-Geometry/reuse: selected Met CG/SD plus exact six ring members; existing version3
-POINT_PAIR_GROUP with [CG,SD] provides the SD-to-centroid distance and acute normal
-angle under its qualified unique-plane coverage. Distance proposition does not derive favorability from ring normal.
+Geometry/reuse: selected S plus exact six ring members; existing POINT_PLANE can
+provide point-to-centroid distance and acute angle under its qualified unique-plane
+coverage. Distance proposition does not derive favorability from ring normal.
 Degenerate/nonfinite/unqualified source coordinates remain unknown, not negative.
 Existing group/correspondence/source-scope/evidence/current gate are sufficient;
 no new matcher, ring/path engine, empirical histogram or public schema is needed.
@@ -66,8 +66,8 @@ This is a bounded source-definition adoption under REQUEST.txt, not production
 authority. No public schema/API change or G03 ledger closure is implied.
 
 Normative source-identity and graph-role detail
-Select the ordered eight source atom occurrences [MET:CG, SD, PHE:CG, CD1, CE1,
-CZ, CE2, CD2]. Each atom must have a unique exact occurrence in the bound state and
+Select the ordered seven source atom occurrences [MET:SD, PHE:CG, CD1, CE1, CZ,
+CE2, CD2]. Each atom must have a unique exact occurrence in the bound state and
 one lossless component mapping; MET and PHE must be distinct source residues.
 The state snapshot pins source residue name, chain, residue number, insertion code,
 atom name and source metadata. Reject duplicate selected names/ambiguous residue
@@ -115,7 +115,7 @@ a proposition made by this rule.
 
 Reuse is mandatory: existing immutable state/correspondence; existing source-group
 and source-H consistency machinery; independent S1 source-scope/current Gate;
-unchanged continuous version3 POINT_PAIR_GROUP operation for centroid distance/raw angle. New
+unchanged continuous POINT_PLANE operation for centroid distance/raw angle. New
 code, if needed, is one G03-specific chemical-role/pair predicate with declarative
 source patterns. No new matcher, graph, ring, generic gate or path infrastructure.
 The mathematical plane eligibility is inherited from existing geometry qualification;
@@ -134,45 +134,3 @@ degenerate, not an ABSENT_FALSE contact. For eligible pairs, <=7A is present and
 >7A is selected-pair absent under this exact convention. The source survey does
 not specify floating-point equality policy; inclusive7A is explicitly adopted here,
 not asserted as byte-level reproduction of its unavailable analysis program.
-
-Implementation-reuse correction before code,2026-10-08: the previous review named
-POINT_PLANE incorrectly; that operation only returns perpendicular distance and
-in-plane offset. Reuse the already qualified POINT_PAIR_GROUP version3 operation
-without adding a primitive or deriving a replacement geometry engine. The ordered
-pair is [Met CG,Met SD], the group is the exact six Phe ring atoms, and the contact
-quantity is secondCentroidDistanceAngstrom. The raw secondCentroidNormalAngleDegrees
-is diagnostic only; first-centroid distance and CG-SD-centroid angle remain raw
-and impose no extra chemical/contact threshold. The additional explicit CG anchor
-is already required by the Met graph definition; it is not inferred or synthesized.
-Raw measurement eligibility stays separate from chemical-source eligibility.
-The earlier seven-anchor/POINT_PLANE text is superseded and preserved in
-CONTRACT_BEFORE_GEOMETRY_REUSE_CORRECTION.txt. No implementation existed under it.
-
-Exact ledger dependency chain: P01/B00 matching -> F13 thioether identity and
-P06 six-carbon aromatic identity; P09 source-H consistency, P04 formal charge,
-P02 declared aromaticity and V03 explicit NONE/isotope descriptors -> N01 exact
-source correspondence/attribution -> already-qualified continuous mixed geometry
-(used by G01/I18/G02) -> G03 source-specific selected survey contact. G02 source
-peptide attribution is reused as an architectural precedent, not a disulfide
-classification dependency. P03 donor/acceptor catalogs are unchanged and irrelevant
-to this sulfur/ring contact. No generic source/geometry primitive is introduced.
-
-Backbone-boundary completion before implementation: previousC has exactly three
-heavy neighbors: selected N by SINGLE, previousO by DOUBLE and one nonaromatic
-neutral carbon by SINGLE; its source H count is0. previousO is neutral nonaromatic
-O with exactly previousC as neighbor and source H0. previousC/previousO are in
-the same different source residue from the selected MET/PHE. The remaining
-carbon attachment has known source H/state but is not assigned a residue class.
-Following N is neutral nonaromatic, connected to selected carbonyl C by SINGLE;
-all of its actual heavy neighbors are carbon by ordinary SINGLE bonds. Its total
-heavy-neighbor count is1,2 or3 with independently known H count2,1 or0 respectively.
-This is an explicit formal-source amide context, not an inferred valence or SP3
-assignment. All involved source bonds, H counts and electronic states must be
-complete and independently supported. Components containing explicit-H vertices
-or elements beyond C/N/O/S are outside this initial source-H graph profile.
-These restrictions are graph-domain definitions; no acidity/strain/energy threshold.
-
-Raw mixed-geometry quantities remain independently eligible: the CG-SD-centroid
-angle is retained as an unused diagnostic. Its degeneracy does not itself veto
-an otherwise finite positive SD-centroid distance and unique ring normal. Neither
-that angle nor a CG-SD bond-length criterion is introduced into contact eligibility.

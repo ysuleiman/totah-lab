@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `af9a7a2e5c891f4332e4436b8f318418ec908982b6065890753c600db650f979`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `f67c59cef86d376280f7742b24514dd5cefd118c1fab555554f1b77102324fd9`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -12,7 +12,7 @@ Disposition is copied without upgrading partial capability coverage.
 | P04 | Positive/negative ionizable features versus formal charge | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt), [charge-groups-20261005](../../../software/qualification/charge-groups-20261005/CHECKPOINT.txt) |
 | P05 | Hydrophobe and lumped hydrophobe features | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [charge-nonpolar-perception-20261005](../../../software/qualification/charge-nonpolar-perception-20261005/CHECKPOINT.txt), [all-members-nonpolar-20261005](../../../software/qualification/all-members-nonpolar-20261005/CHECKPOINT.txt) |
 | P06 | Aromatic pharmacophore/centroid features | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt), [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [aromatic-systems-20261005](../../../software/qualification/aromatic-systems-20261005/CHECKPOINT.txt), [p06-centroid-v2-20261005](../../../software/qualification/p06-centroid-v2-20261005/CHECKPOINT.txt) |
-| P07 | Zinc-binding pharmacophore motifs | P2 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| P07 | Zinc-binding pharmacophore motifs | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | P08 | Functional-group hierarchy and fragment features | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [foundation-vocabulary-20261005](../../../software/qualification/foundation-vocabulary-20261005/CHECKPOINT.txt) |
 | P09 | Explicit/implicit hydrogens and state preparation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [b01-functional-group-20261005](../../../software/qualification/b01-functional-group-20261005/CHECKPOINT.txt), [foundation-groups-20261005](../../../software/qualification/foundation-groups-20261005/CHECKPOINT.txt), [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I01 | Hydrophobic contact | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
@@ -214,15 +214,15 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### P07 — Zinc-binding pharmacophore motifs
 
-Define metal identity/oxidation, donor state and coordination context; zinc-binding motif is not established coordination.
+Six literal RDKit ZnBinder source-feature identities, seven explicit OCL transfer branches, in one complete neutral heavy C/N/O/S/P source component. OR union retains all correspondences; no actual zinc-binding/coordination assertion.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2471 fresh committed-source tests +3 isolation;65 focused P07;21 JVM pairs,20 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** OCL matcher can express motifs; no qualified classifier
+**Existing implementation:** Opt-in athena.zn-source-features/1 and seven declarative group/4 branches; existing matcher, source-H consistency, scope and Research Gate unchanged.
 
-**Supporting source:** BaseFeatures ZnBinder1..6
+**Supporting source:** Pinned RDKit BaseFeatures.fdef and explicitly reviewed transferred queries;34 synthetic reference cases. Advisory literal feature identity only; no full-toolkit parity or chemical binding authority.
 
-Zinc-binding motif identity must name the exact donor states/coordination context. Existing donor/acceptor identities are not metal ligation assertions; no element-only metal-binding label.
+No explicit-H targets, charged components, incomplete/conflicting source state, nonordinary connections, weighted centers, inferred H or actual zinc binding. Feature negatives require all original OR branches and independent current source/feature authority.
 
 ### P08 — Functional-group hierarchy and fragment features
 

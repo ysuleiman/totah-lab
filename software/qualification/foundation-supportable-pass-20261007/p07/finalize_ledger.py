@@ -42,7 +42,7 @@ Continue the authorized pass from ../CHECKPOINT.txt; this is not the end of the 
 Initial qualified613a56a40 was pushed and remote-verified; see PUSH_VERIFICATION.json.
 P07 clean-source qualified; read p07/CHECKPOINT.txt. Remaining22:10 scientific +12 data.
 Next supportable implementation: G03 Met/Phe survey contact from its explicit chemical/source contract.
-I04 primary methods recovered; preparation/domain choice remains open (i04/METHODS_RECOVERY_REVIEW.txt). I11/I15/I17 source/protocol gaps recorded; none falsely closed.
+I04 primary methods recovered; explicit glycine option B awaits scientific approval (i04/EXPLICIT_GLYCINE_OPTION_REVIEW.txt). I11/I15/I17 source/protocol gaps recorded; none falsely closed.
 A07 native-query API/catalog boundary proposed; approval pending. No public change yet.
 External12 availability rechecked: actual COD/MTZ/NEF/example maps found; see
 EXTERNAL_DATA_REASSESSMENT.json. Presence is not qualification; no external row closed.

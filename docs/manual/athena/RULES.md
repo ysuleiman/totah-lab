@@ -37617,3 +37617,1741 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ```json
 []
 ```
+
+## ATHENA.P07.RDKIT_ZNBINDER_SOURCE_FEATURES_NEUTRAL_HEAVY — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.RDKIT_ZNBINDER_SOURCE_FEATURES_NEUTRAL_HEAVY.rule.json) · SHA256 `d353627529454d5dca1ea7d95e5132b49680a6a03ecd063a9a15a6dae0ecfddb`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_P07_ZN_SOURCE_FEATURES_V1"
+```
+
+**implementationId**
+
+```json
+"athena.zn-source-features"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Complete selected neutral heavy C/N/O/S/P component; independent original source scope, charge, source-H consistency, aromaticity and explicit NONE",
+  "Seven pinned group/4 branches; original names and overlapping OR branch union remain explicit"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "existing exact state snapshot",
+  "sourceFeatureOccurrences": "six original source feature identities with branch attribution and query-index correspondences"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.RDKIT_ZNBINDER_SOURCE_FEATURES_NEUTRAL_HEAVY/coverage/1",
+  "scope": "EXACT_SELECTED_COMPLETE_COMPONENT_PER_ORIGINAL_FEATURE",
+  "requirements": [
+    "COMPLETE_SOURCE_STATE",
+    "INDEPENDENT_SOURCE_SCOPE",
+    "ALL_OR_BRANCHES_EXHAUSTIVE",
+    "CURRENT_POLICY_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Neutral heavy C/N/O/S/P source component; both ZnBinder6 branches required for negative coverage."
+}
+```
+
+**limitations**
+
+```json
+[
+  "Advisory source-pattern identities only; no actual zinc binding, coordination, affinity or role-catalog broadening.",
+  "No explicit-H target, normalization, inferred H, weighted center, default activation or production authority.",
+  "Negatives are original-feature-specific within the one complete selected eligible component."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER1 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER1.rule.json) · SHA256 `db298c91811685d25ca6ba2441fd2bd98a658a11f7df1f19018c62174f91d85f`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER1",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER1/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER1/pattern",
+  "patternVersion": "1",
+  "query": "[S;!a;D1]-[#6]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER2 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER2.rule.json) · SHA256 `edf2a26a0b7490255ebb5cff138e251c8ddc72ac51d07087e55d900244633765`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER2/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER2",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER2/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER2/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[C;!a](=[O;!a])-[C;!a]-[S;!a;D1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ],
+    "q4": [
+      4
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER3 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER3.rule.json) · SHA256 `e3a41d4b500259add51cc1d2de8c64623110e582e2842ca33e4d6e1ff2e7758e`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER3/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER3",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER3/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER3/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[C;!a](=[O;!a])-[C;!a]-[C;!a]-[S;!a;D1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ],
+    "q4": [
+      4
+    ],
+    "q5": [
+      5
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER4 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER4.rule.json) · SHA256 `26dfece9ed8bdbfe648b1fe2b7cc50d3cca51dbbd3d0ede781410151fe28ee83`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER4/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER4",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER4/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER4/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[C;!a](=[O;!a])-[N;!a]-[O;!a;D1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ],
+    "q4": [
+      4
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER5 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER5.rule.json) · SHA256 `252f984b3befc11c3fbd88ddbf9e93d6ccf00c9ac19e224f126687c47cddfea5`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER5/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER5",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER5/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER5/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[C;!a](=[O;!a])-[O;!a;D1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER6_C — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER6_C.rule.json) · SHA256 `4711d32d7f853fe3aaa3aa74e67fd3cdb302a019a856cc244683432c389d2692`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER6_C/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER6_C",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER6_C/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER6_C/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[P;!a](=[O;!a])(-[O;!a])-[C,O,N;!a]-[C;!a]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ],
+    "q4": [
+      4
+    ],
+    "q5": [
+      5
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
+
+## ATHENA.P07.SOURCE.ZNBINDER6_H1 — 1.0.0 (zn-source-features-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/zn-source-features-v1/ATHENA.P07.SOURCE.ZNBINDER6_H1.rule.json) · SHA256 `fdfd0c94b41e8c5007fe92fe1a9be3fd9c23a7070b0a810bcf012a1926334114`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_GROUP_SOURCE_H_V4"
+```
+
+**implementationId**
+
+```json
+"athena.group"
+```
+
+**implementationVersion**
+
+```json
+"4"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "B00 qualified matching",
+  "attributed complete chemical state"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "source-pattern-identities": "athena-group-identities/2"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.P07.SOURCE.ZNBINDER6_H1/negative/1",
+  "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+  "requirements": [
+    "VALID_DEFINITION",
+    "COMPLETE_GRAPH",
+    "COMPLETE_CHARGE_STATE",
+    "REQUIRED_H_STATE",
+    "AROMATICITY_MODEL",
+    "SUPPORTED_DOMAIN",
+    "EXHAUSTIVE_B00"
+  ],
+  "scope": "EXPLICIT_COMPONENT_ONLY",
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+  "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+    "sha256": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+    "sha256": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  },
+  {
+    "locator": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+    "sha256": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784",
+    "citation": "Exact bounded RDKit source-pattern identity and explicit OCL transfer; no zinc binding or coordination assertion."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
+**Exact declarative definition (rendered, not independently maintained)**
+
+```json
+{
+  "contextPolicy": "ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT",
+  "definitionVersion": "1.0.0",
+  "groupId": "ATHENA.P07.SOURCE.ZNBINDER6_H1",
+  "limitations": [
+    "Literal original source-feature branch; no zinc-binding role or interaction assertion.",
+    "Whole-component neutral/source-scope eligibility is imposed independently by the P07 composing leaf."
+  ],
+  "memberQueryIndices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "negativeCoverageVersion": "ATHENA.P07.SOURCE.ZNBINDER6_H1/negative/1",
+  "occurrenceExclusions": [],
+  "patternId": "ATHENA.P07.SOURCE.ZNBINDER6_H1/pattern",
+  "patternVersion": "1",
+  "query": "[#6]-[P;!a](=[O;!a])(-[O;!a])-[C,O,N;!a]-[*;H1]",
+  "requiredMatcher": "2026.7.2/athena-ocl-occurrences/2",
+  "requiredState": {
+    "aromaticity": true,
+    "formalCharge": true,
+    "graphCompleteness": true,
+    "hydrogenConsistencyQueries": {
+      "0": "[*;H0]",
+      "1": "[*;H1]",
+      "2": "[*;H2]",
+      "3": "[*;H3]",
+      "4": "[*;H4]"
+    },
+    "hydrogenElements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "hydrogenRoles": [],
+    "roleHeavyDegree": {}
+  },
+  "roles": {
+    "q0": [
+      0
+    ],
+    "q1": [
+      1
+    ],
+    "q2": [
+      2
+    ],
+    "q3": [
+      3
+    ],
+    "q4": [
+      4
+    ],
+    "q5": [
+      5
+    ]
+  },
+  "schema": "athena-group-definition/2",
+  "sourceReferences": [
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/CONTRACT.txt",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "0ac5d08904648026f9b26de5b6f725e365d099177e46f9b50de3b05ad8582e1a"
+    },
+    {
+      "id": "software/qualification/foundation-supportable-pass-20261007/p07/bounded-queries.tsv",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "a452d2d48ca83058aed0191bf39aa17499cbe51011648bfae339669c5ee93bc8"
+    },
+    {
+      "id": "software/qualification/scientific-rule-knowledge-audit-20261004/reference/rdkit--Data__BaseFeatures.fdef",
+      "kind": "SOURCE",
+      "namespace": "athena.p07.source",
+      "version": "766f9790513f8f94c67ec6d1c8b6d5bede59b81f6da8c2081f57e49fb28d9784"
+    }
+  ],
+  "supportedDomain": {
+    "coveredAtomQuery": "",
+    "elements": [
+      "C",
+      "N",
+      "O",
+      "S",
+      "P"
+    ],
+    "unsupportedQueries": []
+  }
+}
+```
