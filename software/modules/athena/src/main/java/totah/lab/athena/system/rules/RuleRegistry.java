@@ -83,6 +83,7 @@ public final class RuleRegistry {
     }
     private static void validate(RuleManifest m) {
         if(m.implementationId().equals("athena.halogen-carbonyl")){HalogenCarbonylRules.validate(m);return;}
+        if(m.implementationId().equals("athena.zinc-carbonyl")){ZincCarbonylRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy-s1")){S1ImplicitHProxyRules.validate(m);return;}
         if(m.implementationId().equals("athena.i03-n-sp3-s1")){S1NitrogenRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy")){ImplicitHProxyRules.validate(m);return;}

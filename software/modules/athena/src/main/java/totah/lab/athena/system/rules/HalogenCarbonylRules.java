@@ -75,19 +75,23 @@ final class HalogenCarbonylRules {
         require(operation(ops.get(0),"DISTANCE",List.of(t.get(1),t.get(2)))&&operation(ops.get(1),"ANGLE",t.subList(0,3))&&operation(ops.get(2),"ANGLE",List.of(t.get(1),t.get(2),t.get(3))),"I10 tuple/geometry mismatch");
     }
     private static boolean operation(JsonNode n,String kind,List<AtomReference> atoms){return n.path("kind").asText().equals(kind)&&n.path("atoms").equals(JSON.valueToTree(atoms));}
-    private static Double value(JsonNode ops,int index,String name){var q=ops.path(index).path("quantities").path(name);if(!q.path("status").asText().equals("SUPPORTED_PRESENT")||!q.hasNonNull("value"))return null;double value=Double.parseDouble(q.path("value").asText());return Double.isFinite(value)?value:null;}
-    private static SystemStateView.Component component(SystemStateView s,AtomReference first,AtomReference second) {
+    static Double value(JsonNode ops,int index,String name){var q=ops.path(index).path("quantities").path(name);if(!q.path("status").asText().equals("SUPPORTED_PRESENT")||!q.hasNonNull("value"))return null;double value=Double.parseDouble(q.path("value").asText());return Double.isFinite(value)?value:null;}
+    static SystemStateView.Component component(SystemStateView s,AtomReference first,AtomReference second) {
         var found=s.components().stream().filter(c->c.correspondenceAlternatives().size()==1&&c.correspondenceAlternatives().getFirst().containsValue(first)&&c.correspondenceAlternatives().getFirst().containsValue(second)).toList();return found.size()==1?found.getFirst():null;
     }
-    private static String sourceId(SystemStateView.Component c,AtomReference atom){return c.correspondenceAlternatives().getFirst().entrySet().stream().filter(e->e.getValue().equals(atom)).map(Map.Entry::getKey).findFirst().orElseThrow();}
-    private static boolean roles(HbondCandidateSources.Report r,List<String> names,List<AtomReference> tuple) {
+    static String sourceId(SystemStateView.Component c,AtomReference atom){return c.correspondenceAlternatives().getFirst().entrySet().stream().filter(e->e.getValue().equals(atom)).map(Map.Entry::getKey).findFirst().orElseThrow();}
+    static boolean roles(HbondCandidateSources.Report r,List<String> names,List<AtomReference> tuple) {
         var map=r.component().correspondenceAlternatives().getFirst();
         for(var occurrence:r.payload().path("occurrences"))for(var roles:occurrence.path("roleCorrespondenceAlternatives")) {
             var found=new ArrayList<AtomReference>();for(var name:names){var ids=roles.path(name);if(ids.size()==1)found.add(map.get(ids.get(0).asText()));}if(found.equals(tuple))return true;
         }return false;
     }
     private static EvidenceInterpretation.Status sourceFacts(SystemStateView s,HbondCandidateSources.Report r,Collection<EvidenceEnvelope> inputs)throws Exception {
-        var c=r.component();var coverage=r.payload().path("sourceCoverage");var map=c.correspondenceAlternatives().getFirst();
+        return sourceFacts(s,r.component(),r.payload().path("sourceCoverage"),inputs);
+    }
+    // The I14 leaf reuses these exact already-qualified source facts; no new chemistry authority.
+    static EvidenceInterpretation.Status sourceFacts(SystemStateView s,SystemStateView.Component c,JsonNode coverage,Collection<EvidenceEnvelope> inputs)throws Exception {
+        var map=c.correspondenceAlternatives().getFirst();
         if(map.size()!=c.chemistry().atoms().size()||new HashSet<>(map.values()).size()!=map.size())return UNKNOWN_INCONCLUSIVE;
         for(var e:inputs)if(e.evidenceType().equals("athena:group-source-coverage")){var other=read(e);if(other.path("componentReference").equals(JSON.valueToTree(c.identity()))&&!other.equals(coverage))return UNKNOWN_INCONCLUSIVE;}
         var expected=new HashSet<totah.lab.gaia.structure.Bond>();
