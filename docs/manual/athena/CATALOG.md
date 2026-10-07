@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `a0ba30bc644f857a38eacfb6c589b2816417cb123478f5f29afb0dbd11503406`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `af9a7a2e5c891f4332e4436b8f318418ec908982b6065890753c600db650f979`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -73,7 +73,7 @@ Disposition is copied without upgrading partial capability coverage.
 | A05 | GBSA implicit solvent parameterization | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A06 | Virtual-site charge geometry | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A07 | Chemical alerts and substructure filter catalogs | P3 | SCIENTIFIC_REVIEW_REQUIRED | [a07-embedded-catalog-characterization-20261006](../../../software/qualification/a07-embedded-catalog-characterization-20261006/CHECKPOINT.txt) |
-| A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | G01 | Methyl environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
 | G02 | Vicinal-disulfide-compatible geometry | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b06-cysteine-identity-contract-20261006](../../../software/qualification/b06-cysteine-identity-contract-20261006/DESIGN.txt), [b06-cysteine-backbone-20261006](../../../software/qualification/b06-cysteine-backbone-20261006/CHECKPOINT.txt) |
@@ -966,15 +966,15 @@ Pinned OCL contains890 embedded PAINS entries. Exact encoded-query to SMARTS rou
 
 ### A08 — Tautomers, normalization, fragment parents and stereochemical identity
 
-Review optional derived normalization/tautomer identities without mutation of source evidence.
+Optional unique-largest eligible heavy-source component view over one complete declared state; exact source graph/atom/bond lineage and all nonselected components retained. No normalization or tie-break.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2406 fresh committed-source tests +3 isolation;38 focused A08;20 JVM pairs,19 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** MolecularGraph; CanonicalIdentityService; transformation lineage
+**Existing implementation:** Opt-in athena.source-fragment-parent/1; existing immutable state snapshot, source coverage/scope, correspondence and Research Gate; no graph edits.
 
-**Supporting source:** RDKit book; OCL backend; Athena graph machinery
+**Supporting source:** Pinned RDKit Fragment.cpp comparison; explicit bounded unique heavy-count source policy under REQUEST.txt. No RDKit normalization/parity, chemical validity, salt or biological inference.
 
-Select explicit derived normalization/tautomer/fragment-parent transformation policy, stereochemical invariants and lineage. Existing canonical identity is representation-specific; neutralization/parent stripping cannot be inferred from a reference implementation. Source graph remains immutable.
+No explicit-H vertices, incomplete/overlapping source universe, unresolved source chemistry, known nonordinary connection, query/dummy/unrepresented stereo, tie choice, tautomerization or neutralization. Independent current source and parent-policy authority required.
 
 ### A09 — Molecular descriptors/fingerprints/shape and torsion resources
 

@@ -13,11 +13,12 @@
     {
       "id": "A08-02",
       "case": "Input component order reversed",
-      "expected": "Same selected identity, graph bytes and lineage; deterministic canonical output",
+      "expected": "Correct unique largest source component in both component orders; exact same-state reordered supplied evidence has byte-identical finding. Different source-state bindings are not asserted identical.",
       "checks": [
         "uniqueParentPreservesExactGraphAndIdentityLineage",
         "duplicateAndReorderedEvidenceIsIdempotent"
-      ]
+      ],
+      "qualificationPrecision": "The reverse synthetic fixture reconstructs component identities under its own state binding; it tests order-independent selection, not identical lineage IDs across different source states."
     },
     {
       "id": "A08-03",

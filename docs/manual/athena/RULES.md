@@ -36679,6 +36679,155 @@ Current-policy gate status must be established by a valid receipt, not the histo
 []
 ```
 
+## ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT — 1.0.0 (source-fragment-parent-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/source-fragment-parent-v1/ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT.rule.json) · SHA256 `cd62c62490d8d8408f2a3b2509f8ba33ac28fcfc758ee6e2c2584316a7b39aba`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_A08_SOURCE_PARENT_V1"
+```
+
+**implementationId**
+
+```json
+"athena.source-fragment-parent"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Complete immutable concrete heavy-source components and lossless whole-state correspondence",
+  "Known source charge/H/aromaticity/NONE and independent ordinary-connection source-scope authority"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "existing bound source state snapshot",
+  "selectedGraph": "exact original immutable source-component view",
+  "atomLineage": "identity source-atom correspondence",
+  "bondLineage": "identity source bond records"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT/coverage/1",
+  "scope": "WHOLE_DECLARED_SOURCE_COMPONENT_UNIVERSE",
+  "requirements": [
+    "COMPLETE_DISJOINT_SOURCE_UNIVERSE",
+    "KNOWN_SOURCE_FACTS",
+    "INDEPENDENT_SOURCE_SCOPE",
+    "CURRENT_POLICY_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Complete concrete heavy-source component universe; no molecular interaction negative is made."
+}
+```
+
+**limitations**
+
+```json
+[
+  "Optional derived source-component view only; no chemical edits, neutralization, tautomer equivalence, salt identity or biological inference.",
+  "All source graphs and metadata remain immutable and referenced; selected atom/bond lineage is identity.",
+  "No mass/string/organic tie-break, default activation or production receipt."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/a08/CONTRACT.txt",
+    "sha256": "aceeb63f07f3efd7cbc2feb53d28de3c592466c3b80ad4560d4da9d7fed947aa",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/a08/reference/rdkit-Fragment.cpp",
+    "sha256": "0eac5c32fa4bd02e29717fcd1accc66c386618259ccf49a1e0ddf31519d4e42a",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/REQUEST.txt",
+    "sha256": "4f1814fe4e9793792f145f991ac000f265d46df248bc3dda55d001bb5ea51ce2",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  },
+  {
+    "locator": "software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclGraphMapper.java",
+    "sha256": "05e1fe7097e2b90e42732be939a60b9008bb8a0045b725ab0a328171a4f56659",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Pinned unique-heavy-source parent policy or unchanged source representation/scope; no chemical normalization or authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.SULF.SS_CONNECTIVITY — 1.0.0 (ss-connectivity-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/ss-connectivity-v1/ATHENA.SULF.SS_CONNECTIVITY.rule.json) · SHA256 `ef6cfd10234d65c434cb05b8d6aaf472be292816fc73a5d70ea47e8485c9e137`

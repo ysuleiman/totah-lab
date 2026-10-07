@@ -1,0 +1,300 @@
+{
+  "basis": "A08 bounded closure in ongoing supportable pass; all other rows and12 external requirements preserved. Availability reassessment is separate.",
+  "ledger": "software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json",
+  "ledgerSha256": "af9a7a2e5c891f4332e4436b8f318418ec908982b6065890753c600db650f979",
+  "priorDependencyMap": "software/qualification/foundation-supportable-pass-20261007/REMAINING24.json",
+  "priorDependencyMapSha256": "a937c2d9a7d01b3d2ecce0e7fd33f118575eca1ce475e7abbc0319faa9f7d535",
+  "closedInThisFamily": [
+    "A08"
+  ],
+  "definitionRepresentationRequirements": [
+    {
+      "capabilityId": "P07",
+      "capability": "Zinc-binding pharmacophore motifs",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Define metal identity/oxidation, donor state and coordination context; zinc-binding motif is not established coordination.",
+      "existingImplementation": "OCL matcher can express motifs; no qualified classifier",
+      "existingSourceArtifacts": [],
+      "support": "BaseFeatures ZnBinder1..6",
+      "scopeLimitation": "Zinc-binding motif identity must name the exact donor states/coordination context. Existing donor/acceptor identities are not metal ligation assertions; no element-only metal-binding label.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "I04",
+      "capability": "Weak C-H donor perception",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Define weak C-H donor classes, attachment/acidity scope and independent geometric controls.",
+      "existingImplementation": "No qualified weak-H-bond rule",
+      "existingSourceArtifacts": [],
+      "support": "PLIP find_hbd and PLInteraction constructor",
+      "scopeLimitation": "Exact weak C-H donor class scope and directionality/window remain distinct from ordinary donor roles. Methyl identity and raw POINT_PAIR_GROUP geometry are implemented; no universal favorable C-H interaction follows from C/H elements.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "I11",
+      "capability": "Halogen bond to pi system",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Define aromatic-face acceptance, halogen axis and element-specific geometry separately from atom-acceptor rules.",
+      "existingImplementation": "No qualified equivalent",
+      "existingSourceArtifacts": [],
+      "support": "RING4 primary paper non-covalent bond section",
+      "scopeLimitation": "Aromatic-face halogen interaction requires explicit face/axis/angular/radius definition separate from atom-acceptor I10; ring and mixed geometry exist. Do not silently substitute atom distance thresholds.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "I15",
+      "capability": "Metal coordination geometry/complex",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Specify coordination number/geometry, ligand typing, waters and complete candidate sphere.",
+      "existingImplementation": "Reference registration only",
+      "existingSourceArtifacts": [],
+      "support": "PLIP metal_complexation and find_metal_binding",
+      "scopeLimitation": "Coordination number/geometry requires complete candidate sphere, donor/water typing, treatment of competing geometries and metal state. Generic centroid/angle machinery is available; no universal coordination template is selected.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "I17",
+      "capability": "Steric overlaps/clashes",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Select radii/H/bond/altloc/water protocol and justified overlap classes; I16 gap alone is not a clash criterion.",
+      "existingImplementation": "StericClashAnalysis; VAL.CLASH.001",
+      "existingSourceArtifacts": [
+        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.CLASH.json",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.VDW_CONTACT.json"
+      ],
+      "support": "Probe source; MolProbity clashes; wwPDB guide",
+      "scopeLimitation": "I16 retains attributed continuous surface gaps. A serious-clash class needs the exact radii/H/bond-exclusion/altloc/water protocol and empirical validation; Probe 0.4 A belongs to its own protocol, not all radius models.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V04",
+      "capability": "Representation/query/dummy/enhanced-stereo validation",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review query/dummy/enhanced-stereo representability and validation scope separately from molecular truth.",
+      "existingImplementation": "Graph mapper and sanitizer; unresolved mapping retained",
+      "existingSourceArtifacts": [],
+      "support": "RDKit FeaturesValidation; OclGraphMapper",
+      "scopeLimitation": "OclGraphMapper supports specific atom parity strings and rejects unsupported bond stereo; MolecularGraph has no reviewed query-atom/dummy/enhanced-stereo-group semantics. Generic properties can preserve unknown assertions but do not execute them. Need exact additive opt-in representation/operation contract before new property semantics; do not silently cast a query molecule as a physical one.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V18",
+      "capability": "Composition, missing atoms, alternate conformations, occupancy/B factors, linkage",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review missing-atom/composition/altloc/occupancy/linkage propositions and uncertainty propagation per source format.",
+      "existingImplementation": "SystemStateView identities/mapping; source fields",
+      "existingSourceArtifacts": [],
+      "support": "wwPDB composition/linkage/model quality",
+      "scopeLimitation": "Expected composition/missing-atom assertion requires an external expected-component/topology model; occupancy/altloc/linkage scopes are format-dependent. Preserve source metadata, distinguish absent field from zero, and specify conflict/evaluation policy before classifying incompleteness.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "A07",
+      "capability": "Chemical alerts and substructure filter catalogs",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review specific alert catalog/version/domain and advisory semantics; never automatic evidence rejection.",
+      "existingImplementation": "Existing matcher; no qualification of these catalogs",
+      "existingSourceArtifacts": [
+        "software/qualification/a07-embedded-catalog-characterization-20261006/CHECKPOINT.txt"
+      ],
+      "support": "RDKit FilterCatalog.h",
+      "scopeLimitation": "Pinned OCL contains890 embedded PAINS entries. Exact encoded-query to SMARTS roundtrip demonstrated for386, not established for504; B00 accepts886 generated queries and explicitly rejects4. Existing PainsDetector bypasses B00 and returns labels without Athena atom mappings. Need qualified lossless transfer/domain/fixtures plus advisory meaning; do not equate catalog membership with toxicity or automatic rejection.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "G03",
+      "capability": "Sulfur-pi and chalcogen-O",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review sulfur state-specific thioether/thiol/thiolate/disulfide/sulfonium and pi/O partner domains independently.",
+      "existingImplementation": "ATHENA.SULF.PI / ATHENA.SULF.CHALCOGEN_O",
+      "existingSourceArtifacts": [
+        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.GROUP.THIOETHER.json",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.CHALCOGEN_O.json",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SULF.PI.json"
+      ],
+      "support": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "scopeLimitation": "Existing thioether/thiol/thiolate/disulfide source distinctions and raw geometry do not establish one sulfur-pi/chalcogen class. Methionine survey is not cysteine evidence; each sulfur state/partner/geometry domain requires its own supported criterion.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "G05",
+      "capability": "SAM sulfonium/methyl/aromatic environment",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review SAM/SAH identity and sulfonium/methyl/aromatic domains; no ammonium-pi parameter transplant.",
+      "existingImplementation": "ATHENA.SAM.*",
+      "existingSourceArtifacts": [
+        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.AROMATIC_ENVIRONMENT.json",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.METHYL_PI.json",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM.SULFONIUM_PI.json"
+      ],
+      "support": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "scopeLimitation": "Source SAM/SAH identity and sulfonium/methyl/aromatic orientation must remain separate. Existing graph/groups/geometry can preserve selected measurements; no universal SAM-aromatic window or ammonium-to-sulfonium transfer is justified.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "G06",
+      "capability": "SAM methyl-transfer geometry",
+      "disposition": "SCIENTIFIC_REVIEW_REQUIRED",
+      "specificUnresolvedRequirement": "Review selected nucleophile/SAM state and substrate-specific transfer geometry; linearity is not reactivity.",
+      "existingImplementation": "ATHENA.SAM_MTASE.TRANSFER_GEOMETRY",
+      "existingSourceArtifacts": [
+        "software/qualification/continuous-geometry-20261005/CHECKPOINT.txt",
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.SAM_MTASE.TRANSFER_GEOMETRY.json"
+      ],
+      "support": "Attached advanced-rule request; existing Athena sources; no external parity asserted",
+      "scopeLimitation": "Raw selected donor-methyl/nucleophile distances and approach angles are supported. General SAM/substrate identity and reaction-competent windows require exact state/role definitions; no catalysis inferred from a linear tuple.",
+      "unblockedByEventContract": false
+    }
+  ],
+  "externalReferenceDataRequirements": [
+    {
+      "capabilityId": "V07",
+      "capability": "Bond-length and bond-angle validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Select chemical-context reference lengths/angles, uncertainty and outlier definition.",
+      "existingImplementation": "Geometry primitives; no qualified reference-distribution validator found",
+      "existingSourceArtifacts": [],
+      "support": "MolProbity geometry; wwPDB standard geometry",
+      "scopeLimitation": "Pinned wwPDB guide specifies comparison to reference means/sigmas; neither a complete reviewed CCD/monomer release nor all context-dependent uncertainty tables are bundled. Need release/accession, atom/bond/state mapping, units, target and sigma, applicability and redistribution license. Existing raw distances/angles are implemented; no universal sigma is valid.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V08",
+      "capability": "Chirality/planarity validation in coordinates",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Define coordinate stereo/planarity comparison against supplied chemistry and qualified reference domain.",
+      "existingImplementation": "Graph stereo checks only; no full coordinate validator qualified",
+      "existingSourceArtifacts": [],
+      "support": "wwPDB model/ligand quality; MolProbity geometry",
+      "scopeLimitation": "Raw plane diagnostics exist. Arbitrary atom ordering cannot establish chiral sign, and wwPDB sidechain planarity uses precomputed reference deviations. Need pinned component stereochemical ordering, expected configurations, group membership, normalization and applicable reference deviations. Guide thresholds alone do not supply these references.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V09",
+      "capability": "Protein Ramachandran validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Review exact Ramachandran grid release, license, interpolation and residue/peptide classes.",
+      "existingImplementation": "No qualified equivalent found in inspected rule surfaces",
+      "existingSourceArtifacts": [
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.RAMACHANDRAN.json"
+      ],
+      "support": "MolProbity Ramachandran; wwPDB torsion angles",
+      "scopeLimitation": "Need pinned actual grid release (not README), license/redistribution terms, residue/peptide classes, axes/binning/periodicity, density values, interpolation and outlier interpretation. Older restraint tables are not a substitute.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V10",
+      "capability": "Side-chain rotamer validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Review rotamer reference grid, symmetry, interpolation and complete chi/altloc coverage.",
+      "existingImplementation": "No qualified protein rotamer validator in registry",
+      "existingSourceArtifacts": [
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.ROTAMER.json"
+      ],
+      "support": "MolProbity rotamer guide; OCL TorsionDB inventory",
+      "scopeLimitation": "Need exact multidimensional chi grids, residue/protonation/altloc class membership, symmetry/periodicity, interpolation, normalization and release/license. Pinned cctbx 0.003/0.02 use that distribution; constants alone are insufficient.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V11",
+      "capability": "C-beta deviation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Review idealization algorithm/parameters and modified/D-residue domain before classifying C-beta deviation.",
+      "existingImplementation": "No qualified equivalent",
+      "existingSourceArtifacts": [
+        "software/qualification/rule-qualification-blueprint-20261005/dossiers/ATHENA.VAL.CBETA_DEVIATION.json"
+      ],
+      "support": "MolProbity Cbeta guide",
+      "scopeLimitation": "Pinned cbetadev algorithm exists; complete ideal geometry/monomer parameter closure and residue/D/modified-residue applicability are not bundled/qualified. Need immutable release/license and parameter files; do not substitute a generic ideal C-beta.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V13",
+      "capability": "CaBLAM backbone validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Review CaBLAM empirical contours, dimensionality and complete backbone selection.",
+      "existingImplementation": "No qualified equivalent",
+      "existingSourceArtifacts": [],
+      "support": "MolProbity CaBLAM",
+      "scopeLimitation": "Need exact contour release, high-dimensional axes, residue/secondary-structure applicability, interpolation and thresholds plus license. Raw backbone dihedrals cannot reproduce empirical probability contours.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V14",
+      "capability": "RNA sugar pucker and backbone suite validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Review RNA atom/topology domains and pucker/suite reference distributions.",
+      "existingImplementation": "No qualified equivalent",
+      "existingSourceArtifacts": [],
+      "support": "MolProbity sugarpuckers/suites; wwPDB",
+      "scopeLimitation": "Need exact Richardson/wwPDB suite/pucker reference release, conformer definitions, atom names-to-authoritative-graph correspondence, periodic angle/suite rules, exclusions and license. Generic torsion measurements are not RNA validation.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V17",
+      "capability": "Ligand geometry / Mogul empirical distributions",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Establish licensed empirical ligand geometry distributions and sample coverage; no generic substitute.",
+      "existingImplementation": "No qualified equivalent",
+      "existingSourceArtifacts": [],
+      "support": "wwPDB ligand geometry",
+      "scopeLimitation": "Need authorized versioned distributions, fragment/state matching rules, sample counts/exclusions and outlier definition; redistribution/access license required. No generic bond geometry substitutes for Mogul empirical data.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V19",
+      "capability": "X-ray experimental-data and refinement validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Define external diffraction/refinement report ingestion and data provenance; coordinates alone insufficient.",
+      "existingImplementation": "No generic-rule implementation",
+      "existingSourceArtifacts": [
+        "software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt"
+      ],
+      "support": "wwPDB X-ray data/refinement guide",
+      "scopeLimitation": "Need structure factors or intensities with uncertainties, R-free flags, unit cell/space group, resolution/selection, refinement protocol/model correspondence and data accession/license. Source report ingestion separately qualified; no native metric computed.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V20",
+      "capability": "X-ray local map/model fit",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Define experimental map/state alignment and map-model metric domain.",
+      "existingImplementation": "Evidence can preserve reports; evaluator absent",
+      "existingSourceArtifacts": [
+        "software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt"
+      ],
+      "support": "wwPDB fit-of-model-and-data",
+      "scopeLimitation": "Need map coefficients/grid, origin/sampling, frame/model binding, resolution/selection, metric definition and accession/license. Coordinates alone do not establish density fit. Report ingestion separately qualified.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V21",
+      "capability": "NMR ensemble/shift/constraint validation",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Define experimental shifts/restraints and ensemble correspondence; coordinate agreement is not experimental validation.",
+      "existingImplementation": "Evidence storage supports opaque reports; no evaluator",
+      "existingSourceArtifacts": [
+        "software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt"
+      ],
+      "support": "wwPDB NMR guide",
+      "scopeLimitation": "Need units, ambiguity/assignment policy, experimental accession/license and ensemble/model correspondence; individual restraints and unavailable observations retained. Report ingestion separately qualified.",
+      "unblockedByEventContract": false
+    },
+    {
+      "capabilityId": "V22",
+      "capability": "EM map validation and map-model fit",
+      "disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
+      "specificUnresolvedRequirement": "Define map-only vs model-fit criteria, resolutions/masks and source provenance.",
+      "existingImplementation": "Evidence storage only; no evaluator",
+      "existingSourceArtifacts": [
+        "software/qualification/foundation-closure-execution-20261006/CHECKPOINT.txt"
+      ],
+      "support": "wwPDB EM guide",
+      "scopeLimitation": "Need grid/origin/sampling/alignment, map-only versus model-fit metric, halfmaps and masks where required, resolution/protocol and accession/license. Report ingestion separately qualified.",
+      "unblockedByEventContract": false
+    }
+  ]
+}
