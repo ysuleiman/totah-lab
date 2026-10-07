@@ -69,7 +69,7 @@ final class ZincCarbonylRules {
         };
     }
     static boolean predicate(double distance){return Double.isFinite(distance)&&distance>0&&distance<=2.8;}
-    private static void verifyCoverage(SystemStateView s,SystemStateView.Component component,JsonNode n)throws Exception {
+    static void verifyCoverage(SystemStateView s,SystemStateView.Component component,JsonNode n)throws Exception {
         fields(n,"schema","stateBinding","componentReference","completeGraph","atomState","sourceReferences","limitations");
         require(text(n,"schema").equals("athena-group-source-coverage/1")&&binding(n.get("stateBinding")).equals(s.binding()),"Metal source coverage binding");
         require(n.path("atomState").isObject(),"Metal atom source facts required");

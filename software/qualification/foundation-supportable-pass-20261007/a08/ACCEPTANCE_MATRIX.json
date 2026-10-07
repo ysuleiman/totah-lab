@@ -1,61 +1,103 @@
 {
   "contract": "ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT/1",
-  "status": "DEFINED_NOT_IMPLEMENTED",
+  "status": "IMPLEMENTED_PENDING_QUALIFICATION",
   "cases": [
     {
       "id": "A08-01",
       "case": "Unique largest and single component",
-      "expected": "SUPPORTED_PRESENT; exact original selected graph and retained discarded references"
+      "expected": "SUPPORTED_PRESENT; exact original selected graph and retained discarded references",
+      "checks": [
+        "uniqueParentPreservesExactGraphAndIdentityLineage"
+      ]
     },
     {
       "id": "A08-02",
       "case": "Input component order reversed",
-      "expected": "Same selected identity, graph bytes and lineage; deterministic canonical output"
+      "expected": "Same selected identity, graph bytes and lineage; deterministic canonical output",
+      "checks": [
+        "uniqueParentPreservesExactGraphAndIdentityLineage",
+        "duplicateAndReorderedEvidenceIsIdempotent"
+      ]
     },
     {
       "id": "A08-03",
       "case": "Equal maximum size including chemically distinct ties",
-      "expected": "UNKNOWN_INCONCLUSIVE; all tied identities retained"
+      "expected": "UNKNOWN_INCONCLUSIVE; all tied identities retained",
+      "checks": [
+        "tiedComponentsNeverUseChargeOrStringTieBreak"
+      ]
     },
     {
       "id": "A08-04",
       "case": "Larger inorganic or charged component",
-      "expected": "Select strictly by count; preserve charge; no organic preference or neutralization"
+      "expected": "Select strictly by count; preserve charge; no organic preference or neutralization",
+      "checks": [
+        "uniqueParentPreservesExactGraphAndIdentityLineage"
+      ]
     },
     {
       "id": "A08-05",
       "case": "Explicit-H/query/dummy/nonordinary connection",
-      "expected": "UNSUPPORTED; no source stripping or implicit representation change"
+      "expected": "UNSUPPORTED; no source stripping or implicit representation change",
+      "checks": [
+        "excludedSourcesAreNotSilentlyProjected",
+        "unrepresentedSourceFeaturesAreNotSilentlyDiscarded"
+      ]
     },
     {
       "id": "A08-06",
       "case": "Missing charge/H/aromaticity/NONE/connection",
-      "expected": "UNKNOWN_INCONCLUSIVE; no convenient partial-universe winner"
+      "expected": "UNKNOWN_INCONCLUSIVE; no convenient partial-universe winner",
+      "checks": [
+        "missingAndConflictingSourceCannotSelectConvenientParent",
+        "conflictingCoverageCannotRemoveSmallerCandidate"
+      ]
     },
     {
       "id": "A08-07",
       "case": "Overlapping/incomplete candidate mappings or omitted source atom",
-      "expected": "UNKNOWN_INCONCLUSIVE; exact complete universe required"
+      "expected": "UNKNOWN_INCONCLUSIVE; exact complete universe required",
+      "checks": [
+        "entireSourceUniverseMustBeCompleteAndDisjoint"
+      ]
     },
     {
       "id": "A08-08",
       "case": "Changed state, policy or coverage bytes; identity collision",
-      "expected": "Reject changed replay; conflict remains unknown"
+      "expected": "Reject changed replay; conflict remains unknown",
+      "checks": [
+        "changedBytesUnderSameIdentityRejected",
+        "changedRawSourceSnapshotCannotReplay",
+        "noProductionFlagOrAlternativeTiePolicy"
+      ]
     },
     {
       "id": "A08-09",
       "case": "Missing/expired current or independent source authority",
-      "expected": "NOT_EVALUATED"
+      "expected": "NOT_EVALUATED",
+      "checks": [
+        "sourceScopeAuthorityIsIndependent",
+        "noCurrentAuthority",
+        "expiredParentAuthorityCannotSelect",
+        "inheritedSourceIsNotImplicitlyConsumed"
+      ]
     },
     {
       "id": "A08-10",
       "case": "Selected stereo, atom order, bonds, coordinates and metadata",
-      "expected": "Byte-identical source graph with identity atom/bond lineage"
+      "expected": "Byte-identical source graph with identity atom/bond lineage",
+      "checks": [
+        "uniqueParentPreservesExactGraphAndIdentityLineage"
+      ]
     },
     {
       "id": "A08-11",
       "case": "Governed execution, independent JVM, regression/history/pins",
-      "expected": "Required before bounded qualification"
+      "expected": "Required before bounded qualification",
+      "checks": [
+        "SourceFragmentParentCurrentPipelineTest"
+      ]
     }
-  ]
+  ],
+  "coverageNote": "Concrete MolecularGraph does not encode native query/ESR semantics; dummy and unsupported atom/bond stereo labels are rejection fixtures. Opaque metadata remains uninterpreted. This matrix does not qualify a query importer."
 }

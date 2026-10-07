@@ -85,6 +85,7 @@ public final class RuleRegistry {
         if(m.implementationId().equals("athena.halogen-carbonyl")){HalogenCarbonylRules.validate(m);return;}
         if(m.implementationId().equals("athena.zinc-carbonyl")){ZincCarbonylRules.validate(m);return;}
         if(m.implementationId().equals("athena.selected-pharmacophore")){SelectedPharmacophoreRules.validate(m);return;}
+        if(m.implementationId().equals("athena.source-fragment-parent")){SourceFragmentParentRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy-s1")){S1ImplicitHProxyRules.validate(m);return;}
         if(m.implementationId().equals("athena.i03-n-sp3-s1")){S1NitrogenRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy")){ImplicitHProxyRules.validate(m);return;}
