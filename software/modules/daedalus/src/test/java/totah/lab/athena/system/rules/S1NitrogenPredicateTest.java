@@ -80,6 +80,8 @@ class S1NitrogenPredicateTest {
     @Test void toolkitHybridizationPropertiesCannotRescueYnamine(){var f=graph("N,C,C","0-1 1#2","2,0,1");var as=new ArrayList<>(f.graph.atoms());var a=as.getFirst();as.set(0,new MolecularGraph.Atom(a.id(),a.element(),a.isotope(),a.formalCharge(),0,a.aromatic(),null,null,Map.of(S1NitrogenPredicate.RADICAL,"NONE","RDKit.hybridization","SP3","OCL.flatNitrogen","false")));assertEquals("UNSUPPORTED",decision(new Example(new MolecularGraph(as,f.graph.bonds(),Map.of()),f.coverage)));}
     @Test void unresolvedChargeCannotOverflowIntoNeutral(){var f=primary();((ObjectNode)f.coverage.path("atomState").path("a0")).put("formalCharge",4294967296L);assertEquals("UNKNOWN",decision(f));}
 
+    @TestFactory Stream<DynamicTest> remoteElectronicFactsAreRequiredForWholeComponent(){return Stream.of("NONE","MISSING","S","D","T").map(token->DynamicTest.dynamicTest("remote O electronic state "+token,()->{var f=graph("N,C,C,O","0-1 1-2 2-3","2,2,2,1");f=atom(f,3,null,null,token,null,null);assertEquals(token.equals("NONE")?"SP3":token.equals("MISSING")?"UNKNOWN":"UNSUPPORTED",decision(f));}));}
+
     @Test void missingBondOrderCoverageCannotBeRecoveredFromOrdinaryProjection(){var f=primary();f.coverage.put("completeGraph","UNKNOWN_INCONCLUSIVE");assertEquals("UNKNOWN",decision(f));}
 
 }
