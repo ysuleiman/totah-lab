@@ -1,0 +1,99 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.G03.SOURCE.CARBON_RING",
+  "version": "1.0.0",
+  "profile": "ATHENA_GROUP_SOURCE_H_V4",
+  "family": "MOTIF",
+  "tier": "G03_SOURCE_CONTEXT",
+  "implementationId": "athena.group",
+  "implementationVersion": "4",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "B00 qualified matching",
+    "attributed complete chemical state"
+  ],
+  "requiredGeometry": [],
+  "measurementsProduced": {
+    "source-identities": "athena-group-identities/2"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "{\"contextPolicy\":\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\",\"definitionVersion\":\"1.0.0\",\"groupId\":\"ATHENA.G03.SOURCE.CARBON_RING\",\"limitations\":[\"Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.\",\"Initial bounded domains only; no resonance/protonation normalization.\",\"Implementation qualification does not confer Scientific Rule Research Gate eligibility.\"],\"memberQueryIndices\":[0,1,2,3,4,5],\"negativeCoverageVersion\":\"ATHENA.G03.SOURCE.CARBON_RING/negative/1\",\"occurrenceExclusions\":[],\"patternId\":\"ATHENA.G03.SOURCE.CARBON_RING/pattern\",\"patternVersion\":\"1\",\"query\":\"c1ccccc1\",\"requiredMatcher\":\"2026.7.2/athena-ocl-occurrences/2\",\"requiredState\":{\"aromaticity\":true,\"formalCharge\":true,\"graphCompleteness\":true,\"hydrogenConsistencyQueries\":{\"0\":\"[*;H0]\",\"1\":\"[*;H1]\",\"2\":\"[*;H2]\",\"3\":\"[*;H3]\",\"4\":\"[*;H4]\"},\"hydrogenElements\":[\"C\",\"N\",\"O\",\"S\"],\"hydrogenRoles\":[],\"roleCharges\":{\"ringMembers\":0}},\"roles\":{\"ringMembers\":[0,1,2,3,4,5]},\"schema\":\"athena-group-definition/2\",\"sourceReferences\":[{\"id\":\"software/qualification/advanced-rule-research-design-20261004/reference/L04.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"c377b7437a5192e2db6a7f817ef1d02f2dd384e6b581a0be13a32a8ff8b9b2bf\"},{\"id\":\"software/qualification/foundation-supportable-pass-20261007/g03/CONTRACT.txt\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"b5c5f0e3ead1671bcd77892bd75017b1bf1a86ed038f1db64cc508fa817b8266\"},{\"id\":\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/CysteineBackboneAttribution.java\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"d922b9569032e65191289dfe17e7ee7e6f1de1ab9389d758ec9820d9470f77ee\"},{\"id\":\"software/modules/athena/src/main/java/totah/lab/athena/system/SystemStateView.java\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"e153af17ebf5741a776fc4d1f5e6bd7b8d3d395597655c8250ddbc1068cc714f\"},{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"ccf55d6bb85df5469528cf4bdb7bf6a11108510990b370d4fb65aac4305e861a\"},{\"id\":\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/ContinuousGeometryRules.java\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"f9836cc3cd3079a3530905d6e67f30638021bcb6cf0655bec2ef97a31b4a36f6\"},{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.THIOETHER.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"5a2f8f18c4bc5c592ed9e0b462f0420fdf0b4377cf8b6be042df2e64506a76c3\"},{\"id\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AROMATIC.rule.json\",\"kind\":\"SOURCE\",\"namespace\":\"athena.g03.source\",\"version\":\"218b65a203fc08fc56646f40291da1afc6ae5b4e1262b2f90dd6d8c45865bf78\"}],\"supportedDomain\":{\"coveredAtomQuery\":\"[c]\",\"elements\":[\"C\",\"N\",\"O\",\"S\"],\"unsupportedQueries\":[{\"query\":\"[n]\",\"reason\":\"heteroaromatic domain deferred\"},{\"query\":\"[o]\",\"reason\":\"heteroaromatic domain deferred\"},{\"query\":\"[s]\",\"reason\":\"heteroaromatic domain deferred\"},{\"query\":\"[p]\",\"reason\":\"heteroaromatic domain deferred\"}]}}",
+      "unit": "policy",
+      "definition": "Immutable declarative group identity and source-state requirements."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/advanced-rule-research-design-20261004/reference/L04.txt",
+      "sha256": "c377b7437a5192e2db6a7f817ef1d02f2dd384e6b581a0be13a32a8ff8b9b2bf",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/qualification/foundation-supportable-pass-20261007/g03/CONTRACT.txt",
+      "sha256": "b5c5f0e3ead1671bcd77892bd75017b1bf1a86ed038f1db64cc508fa817b8266",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/CysteineBackboneAttribution.java",
+      "sha256": "d922b9569032e65191289dfe17e7ee7e6f1de1ab9389d758ec9820d9470f77ee",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/SystemStateView.java",
+      "sha256": "e153af17ebf5741a776fc4d1f5e6bd7b8d3d395597655c8250ddbc1068cc714f",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION.rule.json",
+      "sha256": "ccf55d6bb85df5469528cf4bdb7bf6a11108510990b370d4fb65aac4305e861a",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/java/totah/lab/athena/system/rules/ContinuousGeometryRules.java",
+      "sha256": "f9836cc3cd3079a3530905d6e67f30638021bcb6cf0655bec2ef97a31b4a36f6",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.THIOETHER.rule.json",
+      "sha256": "5a2f8f18c4bc5c592ed9e0b462f0420fdf0b4377cf8b6be042df2e64506a76c3",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AROMATIC.rule.json",
+      "sha256": "218b65a203fc08fc56646f40291da1afc6ae5b4e1262b2f90dd6d8c45865bf78",
+      "citation": "Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.",
+    "Initial bounded domains only; no resonance/protonation normalization.",
+    "Implementation qualification does not confer Scientific Rule Research Gate eligibility."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.G03.SOURCE.CARBON_RING/negative/1",
+    "supportedDomain": "Explicit complete source component under this declarative definition; see definition payload.",
+    "requirements": [
+      "VALID_DEFINITION",
+      "COMPLETE_GRAPH",
+      "COMPLETE_CHARGE_STATE",
+      "REQUIRED_H_STATE",
+      "AROMATICITY_MODEL",
+      "SUPPORTED_DOMAIN",
+      "EXHAUSTIVE_B00"
+    ],
+    "scope": "EXPLICIT_COMPONENT_ONLY",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

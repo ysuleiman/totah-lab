@@ -1,66 +1,114 @@
 {
   "contract": "ATHENA.G03.SOURCE_MET_PHE_SURVEY_CONTACT/1",
-  "status": "DEFINED_NOT_IMPLEMENTED",
+  "status": "IMPLEMENTED_QUALIFICATION_PENDING",
   "cases": [
     {
       "id": "G03-01",
       "case": "exact pair and 7/nextUp7",
-      "expected": "Explicit source roles + finite selected distance, <=7 positive; >7 selected negative"
+      "expected": "Explicit source roles + finite selected distance, <=7 positive; >7 selected negative",
+      "checks": [
+        "exactSelectedContact",
+        "selectedNegativeRequiresExactEligiblePair",
+        "diagnosticOrRepresentationVariationDoesNotAddCriterion"
+      ]
     },
     {
       "id": "G03-02",
       "case": "wrong residue labels or duplicate names",
-      "expected": "UNKNOWN identity; no chemistry inferred from labels"
+      "expected": "UNKNOWN for unestablished source residue identity; duplicate canonical atom names rejected by unchanged Structure constructor before evaluation.",
+      "checks": [
+        "unknownCannotBecomeNegative",
+        "duplicateCanonicalSourceNameIsRejectedBeforeEvaluation"
+      ]
     },
     {
       "id": "G03-03",
       "case": "MET sulfur lookalikes",
-      "expected": "Known thiol/thiolate/disulfide/sulfoxide/sulfonium or extra neighbor UNSUPPORTED"
+      "expected": "Known thiol/thiolate/disulfide/sulfoxide/sulfonium or extra neighbor UNSUPPORTED",
+      "checks": [
+        "boundedExclusionsAreNotContactAbsence"
+      ]
     },
     {
       "id": "G03-04",
       "case": "PHE substituted/hetero/fused ring",
-      "expected": "UNSUPPORTED; no aromatic domain extension"
+      "expected": "UNSUPPORTED; no aromatic domain extension",
+      "checks": [
+        "boundedExclusionsAreNotContactAbsence"
+      ]
     },
     {
       "id": "G03-05",
       "case": "missing H/charge/NONE/aromaticity/source connection",
-      "expected": "UNKNOWN; no scientific positive or negative"
+      "expected": "UNKNOWN; no scientific positive or negative",
+      "checks": [
+        "unknownCannotBecomeNegative",
+        "conflictingIndependentSourceFactsRemainUnknown"
+      ]
     },
     {
       "id": "G03-06",
       "case": "missing or competing peptide link",
-      "expected": "UNKNOWN or known incompatible UNSUPPORTED; no sequence adjacency inference"
+      "expected": "UNKNOWN or known incompatible UNSUPPORTED; no sequence adjacency inference",
+      "checks": [
+        "missingCovalentLinkIsNotSequenceAdjacency"
+      ]
     },
     {
       "id": "G03-07",
       "case": "mixed isotope descriptors",
-      "expected": "UNSUPPORTED; no unreviewed mass model"
+      "expected": "UNSUPPORTED; no unreviewed mass model",
+      "checks": [
+        "boundedExclusionsAreNotContactAbsence",
+        "diagnosticOrRepresentationVariationDoesNotAddCriterion"
+      ]
     },
     {
       "id": "G03-08",
       "case": "degenerate/nonfinite/unqualified geometry",
-      "expected": "UNKNOWN; raw quantities kept with own eligibility"
+      "expected": "UNKNOWN; raw quantities kept with own eligibility",
+      "checks": [
+        "unknownCannotBecomeNegative",
+        "diagnosticOrRepresentationVariationDoesNotAddCriterion"
+      ]
     },
     {
       "id": "G03-09",
       "case": "missing/conflicting source scope and current review",
-      "expected": "UNKNOWN/conflict vs NOT_EVALUATED authority kept distinct"
+      "expected": "UNKNOWN/conflict vs NOT_EVALUATED authority kept distinct",
+      "checks": [
+        "absentScopeAuthorityAndParentAuthorityStaySeparate",
+        "unknownCannotBecomeNegative",
+        "conflictingIndependentSourceFactsRemainUnknown"
+      ]
     },
     {
       "id": "G03-10",
       "case": "same geometry in different state / changed bytes",
-      "expected": "Exact binding rejection"
+      "expected": "Exact binding rejection",
+      "checks": [
+        "changedStateCannotConsumePriorEvidence",
+        "sameIdentityChangedBytesRejected",
+        "changedRawGeometryCannotReplay",
+        "exactOrderedAnchorTupleCannotBeReplaced"
+      ]
     },
     {
       "id": "G03-11",
       "case": "duplicates/order/independent JVM",
-      "expected": "Deterministic exact pins and immutable original source"
+      "expected": "Deterministic exact pins and immutable original source",
+      "checks": [
+        "exactDuplicateReorderedEvidenceReplays",
+        "absentSelectedEvidenceNeverConsumesHistoricalChemistry"
+      ]
     },
     {
       "id": "G03-12",
       "case": "governed and prior regression/history/pins/clean source",
-      "expected": "Required before any bounded ledger closure"
+      "expected": "Required before any bounded ledger closure",
+      "checks": [
+        "MetPheSurveyCurrentPipelineTest"
+      ]
     }
   ]
 }
