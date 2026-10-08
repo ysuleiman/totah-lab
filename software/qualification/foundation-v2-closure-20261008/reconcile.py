@@ -24,6 +24,14 @@ for e in base['entries']:
  entries.append(r)
 counts=dict(collections.Counter(e['currentDisposition'] for e in entries));assert len(entries)==96 and len({e['capabilityId'] for e in entries})==96
 assert counts=={'BOUNDED_SUPPORTED_DOMAIN_QUALIFIED':75,'EXPLICIT_ARCHITECTURAL_DISPOSITION':12,'SCIENTIFIC_REVIEW_REQUIRED':2,'REQUIRES_EXTERNAL_REFERENCE_DATA':7}
-ledger={'schema':'foundation-v2-ledger/1','basis':pin(v1),'asOfQualifiedSourceCommit':'b49558e9e82e64d5f2a14514e2d0b85ed68f939f','counts':counts,'full96ScientificCompletion':False,'v2Sealed':False,'countMeaning':'75 rows have a qualified bounded domain. This is not 72 unrestricted rules and not a v2 Tier3 release certificate.','entries':entries}
+ledger={'schema':'foundation-v2-ledger/1','basis':pin(v1),'asOfQualifiedSourceCommit':'b49558e9e82e64d5f2a14514e2d0b85ed68f939f','counts':counts,'full96ScientificCompletion':False,'v2Sealed':False,'countMeaning':'75 rows have a qualified bounded domain. This is not 75 unrestricted rules. Release status is separately bound to exact Tier3 evidence.','entries':entries}
+seal=ROOT/'software/qualification/foundation-v2-seal-20261008/release/QUALIFICATION.json'
+if seal.exists():
+ seal_data=json.loads(seal.read_text())
+ assert seal_data['failures']==seal_data['skips']==0 and seal_data['historicalComparisons']==65 and seal_data['preservationPins']==25
+ assert seal_data['counts']==counts and seal_data['v2Replay']['status']=='PASS'
+ ledger.update(v2Sealed=True,asOfQualifiedSourceCommit=seal_data['sourceCommit'],releaseQualification=pin(str(seal.relative_to(ROOT))),countMeaning='75 rows have qualified bounded domains within a sealed v2 release. 12 architectural dispositions and 9 scientific exclusions remain explicit; no unrestricted 96-row completion or production activation.')
+ for entry in entries:
+  if entry['currentDisposition']=='BOUNDED_SUPPORTED_DOMAIN_QUALIFIED':entry['releaseQualification']='V2_BOUNDED_TIER3_QUALIFIED'
 (OUT/'FOUNDATION_V2_LEDGER.json').write_text(json.dumps(ledger,indent=2)+'\n')
 print(counts)
