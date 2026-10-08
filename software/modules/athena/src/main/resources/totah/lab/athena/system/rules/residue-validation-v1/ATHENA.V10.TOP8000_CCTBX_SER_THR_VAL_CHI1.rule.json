@@ -1,0 +1,80 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.V10.TOP8000_CCTBX_SER_THR_VAL_CHI1",
+  "version": "1.0.0",
+  "profile": "ATHENA_RESIDUE_REFERENCE_V1",
+  "family": "VALIDATOR",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.residue-reference",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Exact independently reviewed selected residue/context source facts, complete source connections, native stereochemistry and coherent preparation/state."
+  ],
+  "requiredGeometry": [
+    "Unchanged Athena DIHEDRAL; pinned cctbx scoring on identical measured binary64 angles."
+  ],
+  "measurementsProduced": {
+    "payload": "athena-rotamer-measurements/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "geometry": {
+      "value": "{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"ENVIRONMENT\",\"implementationId\":\"athena.geometry\",\"implementationVersion\":\"3\",\"limitations\":[\"raw measurements only; no interaction, energy or potency assertion\"],\"measurementsProduced\":{\"geometry\":\"athena-continuous-geometry/1\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"COMPLETE_EXPLICIT_SCOPE\",\"QUALIFIED_FRAME\",\"FINITE_COORDINATES\"],\"scope\":\"No continuous quantity establishes ABSENT_FALSE\",\"supportedDomain\":\"raw explicit geometry\",\"version\":\"1\"},\"parameters\":{\"planeNormalRelativeGapTolerance\":{\"definition\":\"Numerical eigengap guard; not empirical planarity\",\"unit\":\"dimensionless\",\"value\":\"1.0E-10\"}},\"profile\":\"ATHENA_CONTINUOUS_GEOMETRY_V3\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/p06-centroid-characterization-20261005/REVIEW_GATE.txt\",\"sha256\":\"ec889f0b9a9eb7c591a955e9a97342c931ba61fe19bec7b1a0aa659625a21a85\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"d48eaf31e98c114f8a03a33f63885c9963821c7565bc0388020c8e2abfe2723a\"}],\"requiredCapabilities\":[],\"requiredChemistry\":[\"explicit atoms; attributed radii only\"],\"requiredGeometry\":[\"explicit complete source frame\"],\"retired\":false,\"ruleId\":\"ATHENA.GEOMETRY.CONTINUOUS\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"}],\"tier\":\"GEOMETRY\",\"version\":\"3\"}",
+      "unit": "policy",
+      "definition": "Exact source identity or unchanged qualified mixed geometry."
+    },
+    "definition": {
+      "value": "ATHENA.V10.TOP8000_CCTBX_SER_THR_VAL_CHI1/1",
+      "unit": "policy",
+      "definition": "Exact approved bounded source and reference profile."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/v09-v10-public-contract-20261008/PUBLIC_CONTRACT_REVIEW.txt",
+      "sha256": "198aa68c0ea4e40f0f470a54847a2b4e1273cadc9894dc85094f40fd081342e0",
+      "citation": "Exact approved bounded source/serialization and pinned Top8000/cctbx numerical profile."
+    },
+    {
+      "locator": "software/qualification/v09-v10-decision-20261008/DECISION_PACKAGE.txt",
+      "sha256": "a0e86cc5a8984ac7d38ee1ea7fa6483c86c76820d5ffb8bcb1caf40419d86a58",
+      "citation": "Exact approved bounded source/serialization and pinned Top8000/cctbx numerical profile."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/residue-validation-v1/SOURCES.json",
+      "sha256": "df2997743d0c9ef1505fa2dfa0045ce2a1af8c33222f14d8fd4f0336505830c2",
+      "citation": "Exact approved bounded source/serialization and pinned Top8000/cctbx numerical profile."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Selected canonical six-class Rama or ordinary L-SER/L-THR/L-VAL chi1 only.",
+    "Reference categories are not energy, affinity, biological significance or rejection authority.",
+    "No production authority/activation; no coordinate-to-coordinate cctbx numerical parity or full V10 closure."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.V10.TOP8000_CCTBX_SER_THR_VAL_CHI1/coverage/1",
+    "scope": "SELECTED_RESIDUE_ONLY",
+    "requirements": [
+      "EXACT_REVIEWED_SOURCE_STATE",
+      "COMPLETE_CONNECTIONS",
+      "NATIVE_STEREO",
+      "COHERENT_FRAME",
+      "DEFINED_ATHENA_DIHEDRAL",
+      "COMPLETE_PINNED_GRIDS",
+      "CURRENT_INDEPENDENT_AUTHORITY"
+    ],
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+    "supportedDomain": "One selected qualified residue. OUTLIER is an evaluated category, never ABSENT_FALSE."
+  }
+}

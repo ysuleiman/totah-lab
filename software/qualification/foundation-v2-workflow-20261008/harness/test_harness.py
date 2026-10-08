@@ -14,8 +14,14 @@ import sys
 with patch.dict(sys.modules,{'foundation':f.engine}):spec.loader.exec_module(legacy)
 HarnessTests=legacy.HarnessTests
 class V2SelectionTests(unittest.TestCase):
-    def test_exact_g06_change_preserves_all_350_test_classes(self):
-        m=f.read(f.META);p=m['qualifiedChangePackages']['G06_705a2d78e'];s=f.select(list(p['pins']));self.assertEqual(2,s['tier']);self.assertEqual(set(p['classes']),set(s['classes']))
+    def test_historical_g06_package_does_not_exempt_new_dispatch_bytes(self):
+        m=f.read(f.META);p=m['qualifiedChangePackages']['G06_705a2d78e'];s=f.select(list(p['pins']));self.assertEqual(3,s['tier'])
+    def test_exact_v09_v10_package_selects_reviewed_batch(self):
+        p=f.read(f.META)['qualifiedChangePackages']['V09_V10_APPROVED_BATCH'];s=f.select(list(p['pins']));self.assertEqual(2,s['tier']);self.assertEqual(set(p['classes']),set(s['classes']))
+    def test_v09_v10_focused_does_not_select_g06(self):
+        p=f.read(f.META)['qualifiedChangePackages']['V09_V10_APPROVED_BATCH'];s=f.select(list(p['pins']),1);self.assertEqual(set(p['focused']),set(s['classes']))
+    def test_partial_v09_v10_dispatch_package_escalates(self):
+        p=list(f.read(f.META)['qualifiedChangePackages']['V09_V10_APPROVED_BATCH']['pins']);self.assertEqual(3,f.select(p[:-1])['tier'])
     def test_shared_water_change_alone_escalates(self):self.assertEqual(3,f.select(['software/modules/athena/src/main/java/totah/lab/athena/system/rules/WaterIdentity.java'])['tier'])
     def test_dispatch_change_alone_escalates(self):self.assertEqual(3,f.select(['software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleRegistry.java'])['tier'])
     def test_partial_qualified_package_cannot_exempt_shared_change(self):

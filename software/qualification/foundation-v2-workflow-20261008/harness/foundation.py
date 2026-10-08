@@ -18,7 +18,7 @@ def select(changes,tier=2,root=REPO):
     if set(all_tests)-set(meta['baselineClasses'])-set(meta['reviewedNewClasses']):return broad(root,'unreviewed test consumer')
     for name,package in meta['qualifiedChangePackages'].items():
         if set(changes)==set(package['pins']) and all((root/p).is_file() and digest(root/p)==h for p,h in package['pins'].items()):
-            return {'tier':tier,'classes':package['classes'] if tier==2 else meta['families']['G06']['focused'],'package':name,'reason':[package['basis']]}
+            return {'tier':tier,'classes':package['classes'] if tier==2 else package.get('focused',meta['families']['G06']['focused']),'package':name,'reason':[package['basis']]}
     families=set()
     for path in changes:
         matches=[k for k,v in meta['families'].items() if path in v['sources']+v['resources']+v['testSources']]
