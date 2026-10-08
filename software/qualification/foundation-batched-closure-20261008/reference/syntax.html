@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+   <!-- File:   head_common_bs.html
+
+     Updates: 
+      2013-Aug-24  jdw bootstrap 3.0.0  
+      2013-Oct-06  jdw add fonts
+   -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/assets/css/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+   <!-- local application css -->
+    <link href="/styles/app.css"                   rel="stylesheet">
+    <link href="/styles/prettify.css"              rel="stylesheet">
+
+   <!-- font definitions -->
+
+    <!-- 'gothic-league' -->
+    <link href="/assets/webfonts/LeagueGothic/stylesheet.css"           rel="stylesheet">
+
+    <!-- 'titilliumlight' -->
+    <link href="/assets/webfonts/Titillium/fonts.css"                   rel="stylesheet">
+
+    <!-- 'colaborate-thinregular' -->
+    <link href="/assets/webfonts/Colaborate/colaborate_thin_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'droid_sansregular' -->
+    <link href="/assets/webfonts/DroidSans/droidsans_regular_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'existencelight'  -->
+    <link href="/assets/webfonts/Existence/existence_light_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'existencestencil_light' -->
+    <link href="/assets/webfonts/Existence/existence_stencillight_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'existenceunicase_light' -->
+    <link href="/assets/webfonts/Existence/existence_unicaselight_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'robotothin' -->
+    <link href="/assets/webfonts/Roboto/roboto_thin_macroman/stylesheet.css" rel="stylesheet">
+
+    <!-- 'robotolight' -->
+    <link href="/assets/webfonts/Roboto/roboto_light_macroman/stylesheet.css" rel="stylesheet">
+
+
+
+    <!-- HTML5 shim, for IE 6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="/assets/js/html5shiv.js"></script>
+      <script src="/assets/js/respond.min.js"></script>
+    <![endif]--> 
+
+<!-- end of file File:   head_common_bs.html -->
+
+   <title>PDBx/mmCIF Syntax</title>    
+  </head>
+
+  <body>
+    <div id="wrap">
+      <!-- common page navigation -->
+      <!-- File:    page_header_bs.html
+     Update:  Aug 18, 2013  J. Westbrook
+     Update:  Sep 12, 2013  J. Westbrook add form details
+     Update:  Oct  6, 2013  J. Westbrook overhaul
+     Update:  Jan  9, 2015  J. Westbrook update -
+     Update:  Jul  8, 2017  E. Peisach - make v50 default
+     Update:  Jul 14, 2017  E. Peisach - Add IHM
+     Update:  Jul  7, 2018  E. Peisach - Add ma, remove mdb
+ -->
+
+       <div class="navbar navbar-inverse navbar-fixed-top">
+         <div class="container">
+           <div class="navbar-header">
+             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+             </button>
+             <a class="my-navbar-brand" href="/pdbx-mmcif-home-page.html">PDBx/mmCIF</a>
+	   </div> <!-- end navbar-header -->
+
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <!-- <li class="active"><a href="/index.html">Home</a></li> -->
+
+              <li><a href="/pdbx-mmcif-home-page.html">Home</a></li>
+
+
+	      <!--  Dictionary  pull-down -->
+	      <li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dictionaries<b class="caret"></b></a>
+		<ul class="dropdown-menu">
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Browse the PDBx/mmCIF Dictionaries</li>
+                  <li><a href="/dictionaries/mmcif_pdbx_v50.dic/Index">Current version (V5) PDBx/mmCIF</a></li>
+                  <li><a href="/dictionaries/mmcif_pdbx_v5_next.dic/Index">Development Version PDBx/mmCIF</a></li>
+                  <li><a href="/dictionaries/mmcif_ddl.dic/Index">Dictionary Definition Language V2</a></li>
+                  <li><a href="/dictionaries/mmcif_pdbx_vrpt.dic/Index">wwPDB Validation</a></li>		  
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Browse Other Dictionaries</li>
+                  <li><a href="/dictionaries/mmcif_ihm_ext.dic/Index">IHMCIF</a></li>
+                  <li><a href="/dictionaries/mmcif_ihm_flr_ext.dic/Index">flrCIF</a></li>		  
+                  <li><a href="/dictionaries/mmcif_pdbx_v40.dic/Index">Previous PDBx/mmCIF V4</a></li>
+                  <li><a href="/dictionaries/mmcif_std.dic/Index">Original mmCIF</a></li>
+                  <li><a href="/dictionaries/mmcif_nmr-star.dic/Index">NMRIF/NMR-STAR</a></li>
+                  <li><a href="/dictionaries/mmcif_nef.dic/Index">NMR Exchange Format (NEF)</a></li>
+                  <li><a href="/dictionaries/mmcif_sas.dic/Index">SAS</a></li>
+                  <li><a href="/dictionaries/mmcif_ndb_ntc.dic/Index">NDB NTC</a></li>
+                  <li><a href="/dictionaries/mmcif_em.dic/Index">3DEM</a></li>
+                  <li><a href="/dictionaries/mmcif_img.dic/Index">Image mmCIF</a></li>
+                  <li><a href="/dictionaries/mmcif_sym.dic/Index">Symmetry</a></li>
+                  <li><a href="/dictionaries/mmcif_biosync.dic/Index">Biosync</a></li>
+                  <li><a href="/dictionaries/mmcif_ma.dic/Index">ModelCIF</a></li>
+		  <li><a href="/dictionaries/mmcif_investigation_ligscreen.dic/Index">InvestigationCIF</a></li>
+		</ul>
+              </li>
+
+	      <!--  Documentation   pull-down -->
+	      <li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown">Documentation<b class="caret"></b></a>
+		<ul class="dropdown-menu">
+                  <li class="divider"></li>
+                  <li><a href="/docs/faqs/pdbx-mmcif-faq-general.html">PDBx/mmCIF FAQ</a></li>
+                  <li><a href="/docs/user-guide/guide.html">PDBx/mmCIF User Guide</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Format</li>
+                  <li><a href="/docs/large-pdbx-examples/index.html">Large Structures in PDBx/mmCIF</a></li>
+                  <li><a href="/docs/pdb_to_pdbx_correspondences.html">PDB to PDBx Format Correspondences</a></li>
+                  <li><a href="http://wwpdb.org/task/mmcif" target="_blank">wwPDB PDBx/mmCIF Working Group</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Software</li>
+		  <li><a href="/docs/software-resources.html">Software resources</a></li>
+                  <li><a href="/docs/sw-examples/cpp/html">C++ Examples</a></li>
+                  <li><a href="/docs/sw-examples/python/html">Python Examples</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Reference</li>
+		  <li><a href="/docs/tutorials/mechanics/pdbx-mmcif-syntax.html">File syntax</a> </li>
+		   <li> <a href="/docs/tutorials/mechanics/pdbx-mmcif-dict-struct.html">Dictionary organization</a></li>
+		  <li><a href="/docs/tutorials/content/atomic-description.html">Atomic description</a></li>
+		  <li><a href="/docs/tutorials/content/molecular-entities.html">Molecular description</li>
+
+		  <li><a href="/docs/pubs/pdbx-mmcif-references.html">Reference List</a></li>
+          <li><a href="/docs/tutorials/glossary/early-history.html">Early history</a></li>
+           <li><a href="/docs/tutorials/glossary/pdbx-mmcif-glossary.html">Glossary</a></li>
+		</ul>
+              </li>
+
+
+              <li><a href="/dictionaries/downloads.html">Downloads</a></li>
+              <li><a href="mailto:pdbx-mmcif-help@mail.wwpdb.org">Contact Us</a></li>
+
+            </ul> <!-- end nav -->
+
+	    <a href="http://www.wwpdb.org/" class="pull-right right-icon" title="Worldwide Protein Data Bank">
+	      <img alt="A Member of the wwPDB" src="/assets/images/wwpdb/wwpdb-logo-menubar-20.png" width="107" height="20"></a>
+
+            <form class="navbar-form pull-right"  id="searchSite" action="/cgi-bin/swish/swish.cgi" method="get" enctype="application/x-www-form-urlencoded">
+              <button type="submit" class="btn btn-wwpdb-green">
+		<span class="glyphicon glyphicon-search"></span></a>
+	      </button>
+              <div class="form-group">
+		<input type="text" placeholder="Search current dictionary" class="form-control" size=25 name="query">
+              </div>
+	      <input type="hidden" name="sort" value="swishrank" />
+	      <input type="hidden" name="si" value="0" />
+            </form>
+
+
+	  <!-- right-justified icon in navbar -->
+
+
+
+          </div><!--/.nav-collapse -->
+         </div> <!-- end container -->
+       </div> <!-- end navbar -->
+
+<!-- End  file page_header_bs.html -->
+
+
+
+      <!-- Begin page content -->
+      <div class="container">
+	<div class="row">
+	  <h2>PDBx/mmCIF Syntax</h2>
+	</div>
+	<div class="row">
+<p>  
+The syntax used in mmCIF data files and dictionaries is derived
+from the STAR (Self-defining Text Archive and Retrieval) grammar. 
+In its simplest form, an mmCIF file looks like a paired collection of 
+data item names and values.  In the following example of assigning values to cell 
+constants, for instance, the interpretation of the syntax is straightforward.
+</p>
+
+<pre>
+# 
+_cell.entry_id           4HHB 
+_cell.length_a           63.150 
+_cell.length_b           83.590 
+_cell.length_c           53.800 
+_cell.angle_alpha        90.00 
+_cell.angle_beta         99.34 
+_cell.angle_gamma        90.00 
+_cell.Z_PDB              4 
+</pre>
+
+<p>
+mmCIF data item names are identified by the leading underscore character.
+The underscore is followed by a text string which is interpreted in mmCIF 
+as containing both a category name and a keyword name separated by a 
+period.  The keyword portion of the name is the unique identifier of the 
+data item within the category.  In the example above, all of the data items 
+belong to the <code>CELL</code> category.   
+The above example also illustrates the one-to-one correspondence required between 
+item names and item values.   Data category and data item names are not case sensitive.
+</p>
+
+<p>
+The next example illustrates the how text strings are expressed in mmCIF.
+Short text strings may be enclosed in single or double quotation marks.
+Text strings which span multiple lines are enclosed by semi-colons that are placed
+at the first character position of the line. 
+There are two special characters
+used as placeholders for mmCIF item values which for some reason cannot be 
+explicitly assigned.
+The question mark (<code>?</code>) is used to mark an item value as missing.
+A period (<code>.</code>) may be used to identify that there is no 
+appropriate value for the item or that a value has been intentionally omitted.
+</p>
+
+<p>
+<pre>
+_entity_src_gen.entity_id                          1 
+_entity_src_gen.pdbx_gene_src_gene                 'MT3707, MTCY07H7B.20, panC, Rv3602c' 
+_entity_src_gen.pdbx_gene_src_scientific_name      'Mycobacterium tuberculosis' 
+_entity_src_gen.pdbx_gene_src_ncbi_taxonomy_id     1773 
+_entity_src_gen.pdbx_host_org_scientific_name      'Escherichia coli' 
+_entity_src_gen.pdbx_host_org_ncbi_taxonomy_id     562 
+_entity_src_gen.pdbx_host_org_vector_type          plasmid 
+_entity_src_gen.pdbx_host_org_tissue               ? 
+_entity_src_gen.pdbx_host_org_vector               ? 
+_entity_src_gen.plasmid_name                       pET30a 
+
+_struct_ref.id                         1 
+_struct_ref.db_name                    UNP 
+_struct_ref.db_code                    PANC_MYCTU 
+_struct_ref.pdbx_db_accession          P0A5R0 
+_struct_ref.entity_id                  1 
+_struct_ref.biol_id                    . 
+_struct_ref.pdbx_seq_one_letter_code   
+;MTIPAFHPGELNVYSAPGDVADVSRALRLTGRRVMLVPTMGALHEGHLALVRAAKRVPGS 
+VVVVSIFVNPMQFGAGEDLDAYPRTPDDDLAQLRAEGVEIAFTPTTAAMYPDGLRTTVQP 
+GPLAAELEGGPRPTHFAGVLTVVLKLLQIVRPDRVFFGEKDYQQLVLIRQLVADFNLDVA 
+VVGVPTVREADGLAMSSRNRYLDPAQRAAAVALSAALTAAAHAATAGAQAALDAARAVLD 
+AAPGVAVDYLELRDIGLGPMPLNGSGRLLVAARLGTTRLLDNIAIEIGTFAGTDRPDGYR 
+;
+</pre>
+</p>
+<p>
+Vectors and tables of data may be encoded in mmCIF using a 
+loop_ directive.   To build a table, the data item names
+corresponding to the table columns are preceded by the 
+<code>loop_</code> directive, and followed by the corresponding rows of data.
+The following example builds a table of author names.  
+</p>
+
+
+<pre>
+# 
+loop_
+_citation_author.citation_id 
+_citation_author.name 
+_citation_author.ordinal 
+primary 'Fermi, G.'     1  
+primary 'Perutz, M.F.'  2  
+primary 'Shaanan, B.'   3  
+primary 'Fourme, R.'    4  
+1       'Perutz, M.F.'  5  
+1       'Hasnain, S.S.' 6  
+1       'Duke, P.J.'    7  
+1       'Sessler, J.L.' 8  
+1       'Hahn, J.E.'    9  
+2       'Fermi, G.'     10 
+2       'Perutz, M.F.'  11 
+3       'Perutz, M.F.'  12 
+4       'Teneyck, L.F.' 13 
+4       'Arnone, A.'    14 
+5       'Fermi, G.'     15 
+6       'Muirhead, H.'  16 
+6       'Greer, J.'     17 
+# 
+</pre>
+
+<p>
+The use of the <code>loop_</code> directive in mmCIF has a few restrictions.
+First, it is required that all of the data items within the loop
+belong to the same mmCIF category.  Second, the number of data values
+following the loop must be an exact multiple of the number of 
+data item names.  Finally,  mmCIF prohibits the nesting of 
+<code>loop_</code>  directives.  
+</p>
+
+<p>
+mmCIF uses data blocks to organize related information and data.  A data
+block is a logical partition of a data file  or dictionary created
+using a <code>data_</code> directive.  A data block may be named by 
+appending a text string after the <code>data_</code> directive and 
+a data block is terminated by either another <code>data_</code> directive
+or by the end of the file.  The following example shows a very simple 
+example of a pair of abbreviated data blocks.
+</p>
+
+<pre>
+#
+# --- Lines beginning with # are treated as comments 
+#
+data_X987A
+_entry.id                              X987A
+
+_exptl_crystal.id                  'Crystal A'
+_exptl_crystal.colour              'pale yellow'
+_exptl_crystal.density_diffrn      1.113
+_exptl_crystal.density_Matthews    1.01 
+
+_cell.entry_id                         X987A
+_cell.length_a                         95.39
+_cell.length_a_esd                      0.05
+_cell.length_b                         48.80
+_cell.length_b_esd                      0.12
+_cell.length_c                         56.27
+_cell.length_c_esd                      0.06
+
+# Second data block
+data_T100A
+
+_entry.id                           T100A
+
+_exptl_crystal.id                  'Crystal B'
+_exptl_crystal.colour              'orange'
+_exptl_crystal.density_diffrn      1.156
+_exptl_crystal.density_Matthews    1.06
+
+_cell.entry_id                         T100A
+_cell.length_a                         68.39
+_cell.length_a_esd                      0.05
+_cell.length_b                         88.70
+_cell.length_b_esd                      0.12
+_cell.length_c                         76.27
+_cell.length_c_esd                      0.06
+</pre>
+
+<p>
+The above example illustrates how data blocks can be used to 
+separate similar information pertaining to different structures.
+This separation is required because the mmCIF syntax prohibits 
+the repetition of the same category at multiple places within 
+the same data block.  As a result, the simple concatenation of the 
+contents of the above two data blocks into a single data
+block would be syntactically incorrect.  
+</p>
+
+<p>
+Merging the data blocks in the above example 
+raises some additional issues associated with the 
+mmCIF data model and the structure of these specific categories.
+In above example, it would be possible to merge
+the information in the <code>EXPTL_CRYSTAL</code> category
+into a single data block by reorganizing this category
+using a <code>loop_</code> directive.  However,
+certain mmCIF categories like <code>CELL</code> and 
+<code>ENTRY</code> may contain only a single value within 
+the data block and therefore cannot be looped.
+The single-valued property of the data items in these
+categories is a consequence of the definition of the key items in these two 
+categories.  The category key for the <code>CELL</code> category, 
+<code>_cell.entry_id</code>, is a defined as a child definition of
+<code>_entry.id</code>.  This item is defined as the data block
+identifier and may therefore assume only a single value.
+</p>
+
+<p>
+Definitions in the mmCIF dictionary are encapsulated in named save frames.   
+A save frame begins with the  
+<code>save_</code> directive and is terminated by another <code>save_</code> 
+directive.  Save frames are named by appending a text string
+to the <code>save_</code> token.  In mmCIF dictionaries,
+save frames are used to encapsulate item and category definitions.  
+The mmCIF dictionary is composed of a data block containing thousands
+of save frames, where each save frame contains a different definition.
+Save frames may only appear in mmCIF dictionaries and they may not be nested.
+The following example shows the save frame containing the definition
+of the data item <code>_exptl.details</code>.
+</p>
+
+<pre>
+save__exptl.details
+    _item_description.description
+;              Any special information about the experimental work prior to the
+               intensity measurement. See also _exptl_crystal.preparation.
+;
+    _item.name                  '_exptl.details'
+    _item.category_id             exptl
+    _item.mandatory_code          no
+    _item_aliases.alias_name    '_exptl_special_details'
+    _item_aliases.dictionary      cif_core.dic
+    _item_aliases.version         2.0.1
+    _item_type.code               text
+     save_
+</pre>
+
+
+<p>
+Save frames play a much more important role in STAR than in mmCIF.  In a 
+STAR file application such as NMR-STAR where a save frame acts as a reuseable 
+cell of information which can be referenced and expanded within the file.  
+Save frames are referenced in a STAR file by preceding the save frame name 
+with a dollar sign.  The use of save frames in mmCIF has been limited to the organization and scoping
+features that they provide.  mmCIF does not support references to save frames
+or the use of save frames for purposes other than for encapsulating
+dictionary definitions.  
+</p>
+
+
+</div>
+	
+      </div> <!-- end main page container -->
+      
+    </div> <!-- end wrap -->
+    
+     <!--  File:    page_javascript_bs.html 
+       Update:  Oct 6, 2013  jdw
+   -->
+  <script  src="/assets/js/jquery/core/jquery-1.11.0.min.js" ></script>
+  <script  src="/assets/css/bootstrap/js/bootstrap.js" >  </script>
+
+  <!--  local application js -->
+  <script  src="/js/MyApp.js"></script>
+
+ <!-- end of file page_javascript_bs.html  -->
+
+
+
+    <!-- File:    page_footer_bs.html 
+     Update:  Oct 6, 2013  J. Westbrook
+  -->
+  <div id="footer">
+      <div class="container">
+         <p class="muted credit">&copy;  wwPDB </p>
+       </div>
+   </div>
+<!-- end file page_footer_bs.html -->
+
+  </body>
+</html>

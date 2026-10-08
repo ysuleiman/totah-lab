@@ -1,0 +1,161 @@
+PROPOSED V18 BOUNDED SOURCE METADATA CONTRACT — 2026-10-08
+Status: proposed, not implemented, not qualified. Public payload approval required.
+Definition: ATHENA.V18.MMCIF_SOURCE_SITE_METADATA/1
+
+DEPENDENCIES AND SOURCE COMPARISON
+Original immutable source artifact -> exact selected data block -> lossless lexical
+field extraction -> explicit source-row/state correspondence -> source metadata
+report -> independently governed interpretation. Existing state binding, evidence
+pins, correspondence and Research Gate are reused. Chemical source completeness
+and expected topology are NOT prerequisites for reporting literal source metadata,
+but remain prerequisites for any future chemical completeness claim.
+
+Normative reference pages and retrieval checksums: ../reference/SOURCE_PINS.json.
+wwPDB's syntax distinguishes unquoted ? from unquoted .; absent item is a third
+case. Occupancy's dictionary default is 1.0, not a statement that missing original
+source text contained 1.0. B_iso_or_equiv is a separate source quantity; do not derive
+it from U or another field. label_alt_id identifies source alternative positions;
+it is not an algorithm for assembling compatible positions across unrelated sites.
+ATOM_SITES_ALT supplies alternate descriptions, ATOM_SITES_ALT_ENS describes ensembles,
+and ATOM_SITES_ALT_GEN supplies explicit ens_id/alt_id membership. The last category
+is necessary for a machine-readable membership claim; prose alone is preserved,
+not converted into inferred membership. The dictionary examples' ALT_GEN membership
+and ensemble prose need not be treated as mutually confirming: retain both exactly,
+never silently repair a disagreement. No NLP interpretation of descriptions.
+
+Existing MmcifNonPolymerReader.value() merges '.', '?' and absent columns into null;
+BoundComponentAtom's nullable numeric values cannot reconstruct their distinction.
+Historical Gaia double occupancy and PdbReader's per-atom alternate selection are
+also not source-token authorities. Preserve all these historical APIs/outputs.
+This additive rule reads the pinned original textual mmCIF artifact, never reverse
+engineers tokens from a parsed structure or writes changes back to a source graph.
+
+SUPPORTED DOMAIN
+Textual PDBx/mmCIF data files, one explicitly selected data block at a time. Preserve
+source bytes and lexical spans for atom_site rows and all supplied ALT/ENS/GEN rows
+in that block. Support ordinary unquoted, single/double-quoted and semicolon text
+values, comments, LF/CRLF, case-insensitive item/category lookup with original case
+retained, loop and singleton category forms. No BinaryCIF, PDB, compressed artifact,
+CIF2 lists/tables, STAR save-frame references, dictionaries or repair of malformed
+input. A pinned original decompressed source may be supplied separately with its
+actual preparation provenance; no silent decoding or conversion.
+
+SOURCE VALUE CONTRACT
+Exactly five atom-site items are reported separately for every selected source row:
+_atom_site.occupancy, _atom_site.B_iso_or_equiv, _atom_site.label_alt_id,
+_atom_site.pdbx_PDB_model_num, _atom_site.id.
+Each field has state EXPLICIT, MISSING_QUESTION, INAPPLICABLE_DOT or OMITTED.
+Only unquoted singleton ? and . are placeholders. Quoted '?' and '.' are EXPLICIT
+text, not missingness. EXPLICIT may have numeric or text lexical content; malformed
+numeric content remains explicit text with numeric interpretation unavailable.
+No default is injected. Dictionary defaults remain independently pinned reference
+metadata, never a fifth fabricated source-value state. Omitted input stays OMITTED.
+For each present field retain original item-name token span, value-token span,
+lexical form and decoded string. Offsets are zero-based half-open BYTE offsets in
+the exact artifact, not character offsets. Raw bytes are authoritative, retrievable
+without re-encoding. OMITTED has no spans or value. Raw numeric text including 0,
+-0, decimal precision, exponent and uncertainty notation is retained without double
+rounding. This profile does not convert numbers into probability or quality classes,
+reject coordinates based on occupancy, or enforce a sum-of-occupancies criterion.
+Model identity is literal source state; omitted model number does not become 1.
+Atom-site identity is source pin + block ordinal + row ordinal, with the original
+id/model fields retained. Duplicate source id values are preserved as a diagnostic,
+never silently merged or used as unique correspondence authority.
+
+ALTERNATE ENSEMBLES
+Retain every raw ALT/ENS/GEN field and row in source order, including unknown items,
+all details prose and missing/omitted values. Explicit membership uses only complete
+nonplaceholder GEN.ens_id/alt_id pairs resolving to unique explicit ENS.id and ALT.id
+within the selected block. Missing relation, dangling reference, duplicate identifier
+or unresolved identifier prevents a complete resolved ensemble interpretation; raw
+metadata still survives. Repeated identical GEN pairs are retained but flagged;
+this bounded profile does not certify them as a unique normalized relation set.
+A reported ensemble member is a relation and the matching atom_site row identities,
+partitioned by EXPLICIT source model identity. No merging across model IDs; unresolved
+model identity means ensemble-to-model resolution is unknown. A same-named alt_id
+alone does not establish correlation. Rows with . or ? alt_id are not automatically
+included as common atoms. Therefore the result is an explicit ALTERNATE MEMBERSHIP
+report, not an automatically completed molecular conformer. No coordinate-state
+construction, highest-occupancy choice or implicit Cartesian product is performed.
+Resolved membership means that source relations are referentially resolvable; it
+is not certification of physical/chemical coexistence. Source prose and structured
+membership stay separate; contradictory independently supplied evidence remains
+unknown, and known source contradictions cannot be repaired by preference rules.
+
+SMALLEST ADDITIVE PUBLIC PAYLOADS (no public Java reader/API needed)
+1. athena-source-site-metadata-plan/1
+Exact keys: schema, definition, state, source, blockOrdinal, blockName,
+correspondence, sourceProtocol.
+schema is the literal above; definition is the definition ID above; state is existing
+SystemStateView.Binding; source and sourceProtocol are existing {reference,sha256}
+evidence pins. blockOrdinal is a nonnegative exact integral block position;
+blockName is exact original data-block name, independently verified against bytes.
+correspondence is an array of {rowOrdinal,atom}, with exact nonnegative integer row
+ordinal and existing AtomReference. Each mapped source row and state atom occurs
+at most once. Mapping must exhaust the selected state atoms; unselected source rows
+remain in the metadata report and are not alleged to exist in the selected state.
+No source-row mapping from names, occupancy, row order of another structure or
+coordinate proximity. Current independently reviewed sourceProtocol and exact plan
+must explicitly support this mapping and selection. Ambiguous mapping is unknown.
+No unknown keys or lossy integer coercion. Evidence type athena:source-site-metadata-plan.
+
+2. athena-source-site-metadata/1
+Exact keys: schema, definition, state, plan, source, blockOrdinal, blockName,
+atomSiteRows, alternateCategories, correspondence, diagnostics.
+plan/source are exact evidence pins; state/block/definition match the plan.
+atomSiteRows contains {rowOrdinal,fields}; fields maps the five exact canonical item
+names above to {state,itemSpan,valueSpan,lexicalForm,value}, omitting span/form/value
+keys entirely for OMITTED. Spans are [start,end] exact integer byte offsets.
+lexicalForm is UNQUOTED, SINGLE_QUOTED, DOUBLE_QUOTED or SEMICOLON_TEXT.
+value is decoded source text, including placeholder spelling; original bytes win.
+alternateCategories contains, for each of atom_sites_alt/atom_sites_alt_ens/
+atom_sites_alt_gen, {present,rows}; rows are {rowOrdinal,fields}, whose keys are the
+canonical case-insensitive source item names and whose values use the same lexical
+field shape. Missing required id/relation fields are inserted as OMITTED. Unknown
+items are preserved, not interpreted. Categories absent from the block: present=false,
+rows=[]; present empty category remains distinct if syntactically representable.
+correspondence is copied from the plan. diagnostics is a sorted array of stable
+{code,category,rowOrdinal,item} records, with nullable rowOrdinal/item only for
+category-level issues. Diagnostic codes are limited to DUPLICATE_SOURCE_ID,
+NONNUMERIC_OCCUPANCY, NONNUMERIC_B_FACTOR, UNRESOLVED_MODEL, UNRESOLVED_ALT_ID,
+MISSING_RELATION, DANGLING_RELATION, DUPLICATE_RELATION, DUPLICATE_RELATION_ID.
+Numeric diagnostics validate lexical number grammar only, not chemical thresholds.
+Raw report replay reparses exact pinned bytes and must reproduce all spans/values.
+Evidence type athena:source-site-metadata. No source defaults or toolkit metadata.
+
+Governed interpretation uses existing EvidenceInterpretation measurement strings:
+proposition=ATHENA.V18.MMCIF_SOURCE_SITE_METADATA/1;
+rawMetadataPin, stateBinding, sourceProtocol, selectedStateMapping;
+metadataCoverage=COMPLETE_FOR_SELECTED_BLOCK or UNKNOWN;
+ensembleResolution=EXPLICIT_MEMBERSHIP_RESOLVED or UNKNOWN;
+resolvedMembership=canonical ordered array of {ensembleId,altId,modelValue,rowOrdinals};
+limitations=canonical explicit list. No selected structural conformer is produced.
+Collection is raw parsing only. A positive governed report establishes faithful
+source metadata/mapping, never chemical eligibility, model completeness or absence
+of atoms. Missing values can be faithfully reported: metadata extraction coverage
+and scientific value availability are independent. Ensemble uncertainty does not
+silently invalidate the raw record or become a complete conformer.
+
+PROVENANCE, STATUS AND NEGATIVE COVERAGE
+Bind original bytes, exact block/selection, state snapshot, correspondence, parser
+implementation and reviewed sourceProtocol. Exact plan, source mapping protocol,
+implementation qualification and definition need independent current Research Gate
+eligibility. No synthetic engineering fixture is production authority. Missing current
+authority NOT_EVALUATED; missing/conflicting source/selection/mapping UNKNOWN;
+known outside format UNSUPPORTED; malformed source rejected with reason and no
+positive report. SUPPORTED_PRESENT applies only to the explicit metadata proposition.
+No molecular ABSENT_FALSE result. Absence of a field/category can be reported only
+after exhaustive parsing of the exact complete block, with no truncation. It never
+means chemical absence. Missing expected atoms/component completeness/linkage remains
+unresolved without independently qualified expected-topology authority (e.g. pinned
+reviewed CCD domain). Occupancy/B values never certify geometry or source H origin.
+
+REUSE AND STOP BOUNDARY
+Private source-token extraction is the concrete lossless primitive currently missing;
+it is a V18-local implementation detail, not a replacement graph/event/parser framework
+or modification of historical Hermes behavior. Reuse envelopes, bindings, snapshots,
+correspondence, current gate and existing rule-measurement transport. No new path engine.
+Acceptance cases are in ACCEPTANCE_MATRIX_PROPOSED.json. All must run focused first;
+one Batch C global suite then covers this addition together with approved siblings.
+Stop for public payload approval before implementation. User's source semantics are
+accepted; this review makes their exact new serialized representation reviewable.

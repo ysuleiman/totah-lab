@@ -1,0 +1,103 @@
+A08 — IMMUTABLE DERIVED-STATE BOUNDARY REVIEW — 2026-10-08
+Status: existing fragment-parent profile remains qualified unchanged. Additional
+bounded lineage payload proposed below, not implemented/qualified.
+
+DEPENDENCY AND SOURCE COMPARISON
+Immutable source state -> already-qualified
+ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT/1 -> exact selected component view
+-> explicit derived lineage receipt -> downstream opt-in to that exact profile.
+Existing MolecularGraph.Delta retains before/after snapshots and atom/bond/coordinate
+changes with exact replay. Existing source-fragment result already pins component
+inventory, selected graph, source coverage, unchanged atom/bond lineage and discarded
+component references. Its qualified output must not be silently rewritten.
+MolecularTransformationBackend's canonicalRepresentation/exactEdit/provenance strings
+are not independently sufficient for a complete source/derived-state audit.
+
+Pinned RDKit reference: ../reference/rdkit-standardize.html and SOURCE_PINS.json.
+Normalization, fragment selection, charge processing and tautomer processing are
+separate operations. Tautomer parameters expose stereo removal/reassignment and
+isotopic H removal choices. Therefore a toolkit parent is policy output, not chemical
+identity. These docs justify pinning policy, not selecting one for Athena.
+No RDKit execution/authority/compatibility is adopted by this proposal.
+
+BOUNDED ADDITION
+ATHENA.A08.SOURCE_FRAGMENT_PARENT_LINEAGE/1 reports a DERIVED view only for the
+already-qualified unique-largest-heavy source-component profile. It performs no
+new selection, cleanup, charge/H/bond/stereo/isotope edits or chemistry perception.
+Read the original independently qualified fragment-parent result and exact source
+snapshot, verify its profile/result/state/source witnesses and independently recompute
+its literal selected-view lineage. Retain old bytes and receipts verbatim.
+
+Exact new public payload athena-source-fragment-parent-lineage/1:
+- schema: literal above;
+- stateKind: DERIVED;
+- operation: FRAGMENT_PARENT;
+- sourceState: existing Binding;
+- sourceSnapshot: exact existing envelope pin;
+- sourceStateSha256: SHA256 of exact canonical source snapshot bytes;
+- parentInterpretation: exact original governed fragment-parent evidence pin;
+- definition: ATHENA.A08.SOURCE_FRAGMENT_PARENT_LINEAGE/1;
+- selectionDefinition: ATHENA.A08.UNIQUE_LARGEST_HEAVY_SOURCE_COMPONENT/1;
+- selectionManifest: original exact manifest pin;
+- implementation: existing ScientificReference identifying exact adapter version/digest;
+- profile: exact existing selection profile ScientificReference;
+- parameters: {preferOrganic:false,countHeavyAtomsOnly:true,uniqueMaximumOnly:true,
+  explicitHydrogenVertices:"UNSUPPORTED",charge:"PRESERVE",hydrogen:"PRESERVE",
+  atomStereo:"PRESERVE_REPRESENTED",bondStereo:"UNSUPPORTED_NONTRIVIAL",
+  isotope:"PRESERVE",normalization:"NONE",tautomerization:"NONE",
+  reionization:"NONE",stereoReassignment:"NONE"};
+- parametersSha256: canonical parameters object hash;
+- dataTables: [] (no transformation tables used, never an unspecified default);
+- selectedComponent: existing exact source component ScientificReference;
+- resultingGraph: exact existing MolecularGraph of selected component, with ordering,
+  metadata, isotope, charge, H and supported stereo unchanged;
+- resultingStateSha256: canonical hash of {stateKind,sourceStateSha256,operation,
+  selectionManifest,implementation,profile,parametersSha256,dataTables,
+  selectedComponent,resultingGraph}; includes source lineage and exact policy;
+- atomLineage: ordered {sourceComponent,sourceAtomId,derivedAtomId,sourceAtomReference}
+  for every selected graph atom, using existing exact correspondence;
+- bondLineage: ordered {sourceComponent,sourceBondId,derivedBondId} for selected bonds;
+- excludedSourceComponents: ordered {component,graphSha256,atomIds,bondIds};
+- changes: {addedAtoms:[],removedFromDerivedView:[component-scoped source atom IDs],
+  addedBonds:[],removedBondsFromDerivedView:[component-scoped source bond IDs],
+  changedAtoms:[],changedBonds:[],changedCoordinates:[]};
+- sourceWitnesses: sorted exact existing evidence pins from source/result authority.
+All keys required and exact; no unknown keys. Source removals are explicitly removal
+from the DERIVED view, never deletion from SOURCE_GRAPH. Component-scoped identity
+avoids collisions between atom IDs in disconnected components. No single connected
+Delta is fabricated over distinct component graphs; use existing component snapshots
+and identity lineage. Nonselected components remain available unchanged in the source.
+
+DOMAIN / STATUS / PROVENANCE
+Same domain/exclusions as qualified fragment-parent /1; no expansion to explicit-H,
+nontrivial bond stereo, enhanced stereo, nonordinary connections or ambiguous mapping.
+No selector tie-break. Charged/isotopic/represented atom stereo states remain exact.
+A derived state hash does not assert chemical equivalence, canonical identity or
+biological parentage. Missing lineage/state/definition evidence -> UNKNOWN; absent
+current authority -> NOT_EVALUATED; known excluded source profile -> UNSUPPORTED.
+Failure emits no DERIVED result and does not fall back to source/another parent.
+No ABSENT_FALSE chemistry assertion. Downstream scientific rules retain their current
+source-only admission; adding this receipt grants no derived-state eligibility.
+An eventual consumer must expressly admit this exact selection and lineage profile,
+implementation and source provenance through its own reviewed definition.
+
+OTHER OPERATIONS REMAIN UNSELECTED
+NORMALIZATION, CHARGE_PARENT, TAUTOMER_PARENT/CANONICAL_TAUTOMER, STEREO_PARENT,
+ISOTOPE_PARENT and SUPER_PARENT must be separate future contracts. No transformations
+or 'empty successful' placeholders are implemented for them. Each needs exact
+implementation/library build, parameters and transformation table digests, stereo
+and isotopic-H choices and explicit atom lineage/failure policy before implementation.
+Neutralization and reionization are distinct operations within any reviewed charge
+policy; neither follows from approving immutable derived-state architecture.
+Full A08 qualification is NOT claimed by this bounded receipt. Stereo/isotope/charge/
+multi-fragment/tautomer-sensitive counterexamples with intentionally different output
+profiles are mandatory when such actual profiles are selected. Present tests must
+prove that those unselected transformations are rejected, not invent outcomes.
+
+REUSE / PUBLIC BOUNDARY
+Reuse existing immutable component graph/snapshot, source scope, qualified selector,
+canonical evidence hashing, Research Gate and correspondence. Add only a private
+adapter/validator and exact additive payload; do not change old rule/output bytes or
+build a generic transformation registry/engine. This publicly serialized lineage
+contract requires approval under AGENTS.md before implementation. Focused matrix in
+ACCEPTANCE_MATRIX_PROPOSED.json, followed by one Batch C global qualification.

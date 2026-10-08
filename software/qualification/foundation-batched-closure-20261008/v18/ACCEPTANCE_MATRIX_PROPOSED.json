@@ -1,0 +1,366 @@
+{
+  "status": "PROPOSED_UNEXECUTED",
+  "capability": "V18",
+  "cases": [
+    {
+      "id": "V18-BATCH-001",
+      "category": "positive",
+      "case": "explicit numeric occupancy and B values",
+      "expected": "Preserve both independent raw tokens, spans and values"
+    },
+    {
+      "id": "V18-BATCH-002",
+      "category": "boundary",
+      "case": "occupancy zero versus omitted",
+      "expected": "Zero EXPLICIT; omitted OMITTED; neither inferred absent atom"
+    },
+    {
+      "id": "V18-BATCH-003",
+      "category": "boundary",
+      "case": "occupancy 1.0 versus dictionary default",
+      "expected": "Explicit 1.0 retained; no source default materialized"
+    },
+    {
+      "id": "V18-BATCH-004",
+      "category": "missing",
+      "case": "unquoted question mark",
+      "expected": "MISSING_QUESTION with exact source span"
+    },
+    {
+      "id": "V18-BATCH-005",
+      "category": "missing",
+      "case": "unquoted dot",
+      "expected": "INAPPLICABLE_DOT distinct from question mark"
+    },
+    {
+      "id": "V18-BATCH-006",
+      "category": "boundary",
+      "case": "quoted question mark",
+      "expected": "EXPLICIT text; no missing-value conversion"
+    },
+    {
+      "id": "V18-BATCH-007",
+      "category": "boundary",
+      "case": "quoted dot",
+      "expected": "EXPLICIT text; no null conversion"
+    },
+    {
+      "id": "V18-BATCH-008",
+      "category": "positive",
+      "case": "single-quoted value",
+      "expected": "Exact token including quotes preserved via source span"
+    },
+    {
+      "id": "V18-BATCH-009",
+      "category": "positive",
+      "case": "double-quoted value",
+      "expected": "Exact token including quotes preserved via source span"
+    },
+    {
+      "id": "V18-BATCH-010",
+      "category": "positive",
+      "case": "semicolon multiline details",
+      "expected": "Original bytes and decoded multiline text preserved"
+    },
+    {
+      "id": "V18-BATCH-011",
+      "category": "boundary",
+      "case": "CRLF versus LF",
+      "expected": "Each has distinct source digest and valid byte spans"
+    },
+    {
+      "id": "V18-BATCH-012",
+      "category": "boundary",
+      "case": "source item case variants",
+      "expected": "Canonical lookup with original item spelling preserved"
+    },
+    {
+      "id": "V18-BATCH-013",
+      "category": "positive",
+      "case": "singleton atom_site category",
+      "expected": "One source row without synthetic loop bytes"
+    },
+    {
+      "id": "V18-BATCH-014",
+      "category": "positive",
+      "case": "multirow atom_site loop",
+      "expected": "Exact original row order retained"
+    },
+    {
+      "id": "V18-BATCH-015",
+      "category": "negative",
+      "case": "incomplete loop row",
+      "expected": "Reject malformed input; no positive extraction"
+    },
+    {
+      "id": "V18-BATCH-016",
+      "category": "negative",
+      "case": "duplicate case-equivalent item names",
+      "expected": "Reject ambiguous category"
+    },
+    {
+      "id": "V18-BATCH-017",
+      "category": "negative",
+      "case": "unterminated quoted token",
+      "expected": "Reject malformed input"
+    },
+    {
+      "id": "V18-BATCH-018",
+      "category": "negative",
+      "case": "unterminated semicolon field",
+      "expected": "Reject malformed input"
+    },
+    {
+      "id": "V18-BATCH-019",
+      "category": "negative",
+      "case": "BinaryCIF or CIF2 object",
+      "expected": "UNSUPPORTED; no conversion fallback"
+    },
+    {
+      "id": "V18-BATCH-020",
+      "category": "negative",
+      "case": "dictionary/save frame source",
+      "expected": "UNSUPPORTED for selected data-file profile"
+    },
+    {
+      "id": "V18-BATCH-021",
+      "category": "missing",
+      "case": "missing atom_site category",
+      "expected": "Unknown selected-state mapping; no atom absence"
+    },
+    {
+      "id": "V18-BATCH-022",
+      "category": "missing",
+      "case": "occupancy item entirely omitted",
+      "expected": "OMITTED not a default, zero or dot"
+    },
+    {
+      "id": "V18-BATCH-023",
+      "category": "boundary",
+      "case": "negative zero and exponent text",
+      "expected": "Original lexical text retained; no double round-trip"
+    },
+    {
+      "id": "V18-BATCH-024",
+      "category": "boundary",
+      "case": "numeric uncertainty notation",
+      "expected": "Exact token preserved; no uncertainty-to-value collapse"
+    },
+    {
+      "id": "V18-BATCH-025",
+      "category": "unknown",
+      "case": "nonnumeric occupancy",
+      "expected": "Explicit text retained; NONNUMERIC_OCCUPANCY"
+    },
+    {
+      "id": "V18-BATCH-026",
+      "category": "unknown",
+      "case": "nonnumeric B field",
+      "expected": "Explicit text retained; NONNUMERIC_B_FACTOR"
+    },
+    {
+      "id": "V18-BATCH-027",
+      "category": "boundary",
+      "case": "negative or greater-than-one occupancy",
+      "expected": "Preserve source value; no invented quality threshold"
+    },
+    {
+      "id": "V18-BATCH-028",
+      "category": "missing",
+      "case": "model item missing/dot/omitted",
+      "expected": "Separate source states; no default model one"
+    },
+    {
+      "id": "V18-BATCH-029",
+      "category": "positive",
+      "case": "same alt id in two explicit models",
+      "expected": "Relations partitioned by model; no cross-model conformer"
+    },
+    {
+      "id": "V18-BATCH-030",
+      "category": "unknown",
+      "case": "alternate IDs without GEN relationships",
+      "expected": "Raw values retained; ensemble resolution UNKNOWN"
+    },
+    {
+      "id": "V18-BATCH-031",
+      "category": "positive",
+      "case": "complete ALT ENS GEN membership",
+      "expected": "Explicit relation-to-row membership only"
+    },
+    {
+      "id": "V18-BATCH-032",
+      "category": "unknown",
+      "case": "ENS description only",
+      "expected": "Preserve prose; no inferred membership"
+    },
+    {
+      "id": "V18-BATCH-033",
+      "category": "unknown",
+      "case": "GEN dangling alternate ID",
+      "expected": "DANGLING_RELATION; no complete ensemble resolution"
+    },
+    {
+      "id": "V18-BATCH-034",
+      "category": "unknown",
+      "case": "GEN dangling ensemble ID",
+      "expected": "DANGLING_RELATION; no complete ensemble resolution"
+    },
+    {
+      "id": "V18-BATCH-035",
+      "category": "unknown",
+      "case": "duplicate ALT or ENS ID",
+      "expected": "DUPLICATE_RELATION_ID; fail resolved-membership claim"
+    },
+    {
+      "id": "V18-BATCH-036",
+      "category": "unknown",
+      "case": "duplicate identical GEN pair",
+      "expected": "Preserve both; DUPLICATE_RELATION; no normalization"
+    },
+    {
+      "id": "V18-BATCH-037",
+      "category": "missing",
+      "case": "GEN missing relation identifier",
+      "expected": "Raw missing state retained; no fabricated relation"
+    },
+    {
+      "id": "V18-BATCH-038",
+      "category": "negative",
+      "case": "independent highest-occupancy choices",
+      "expected": "Never produce selected conformer"
+    },
+    {
+      "id": "V18-BATCH-039",
+      "category": "negative",
+      "case": "dot altloc automatically used as common atom",
+      "expected": "Never auto-add common atoms"
+    },
+    {
+      "id": "V18-BATCH-040",
+      "category": "conflict",
+      "case": "structured membership versus incompatible supplied evidence",
+      "expected": "UNKNOWN; no silent repair or preference"
+    },
+    {
+      "id": "V18-BATCH-041",
+      "category": "unknown",
+      "case": "uninterpreted conflicting-looking details prose",
+      "expected": "Preserve both; no claim that prose was validated"
+    },
+    {
+      "id": "V18-BATCH-042",
+      "category": "positive",
+      "case": "unknown ALT/ENS/GEN source items",
+      "expected": "Retain fields without inventing interpretation"
+    },
+    {
+      "id": "V18-BATCH-043",
+      "category": "boundary",
+      "case": "duplicate atom_site id",
+      "expected": "Rows remain distinct by block/row; diagnostic emitted"
+    },
+    {
+      "id": "V18-BATCH-044",
+      "category": "negative",
+      "case": "row mapping collision",
+      "expected": "Reject noninjective correspondence"
+    },
+    {
+      "id": "V18-BATCH-045",
+      "category": "missing",
+      "case": "selected state atom omitted from mapping",
+      "expected": "UNKNOWN; no complete selected-state claim"
+    },
+    {
+      "id": "V18-BATCH-046",
+      "category": "negative",
+      "case": "row index fraction or integer overflow",
+      "expected": "Reject without lossy coercion"
+    },
+    {
+      "id": "V18-BATCH-047",
+      "category": "negative",
+      "case": "wrong block ordinal/name combination",
+      "expected": "Reject source selection mismatch"
+    },
+    {
+      "id": "V18-BATCH-048",
+      "category": "provenance",
+      "case": "changed source byte",
+      "expected": "Reject stale pin/replay"
+    },
+    {
+      "id": "V18-BATCH-049",
+      "category": "provenance",
+      "case": "changed lexical field or span",
+      "expected": "Reparse mismatch rejected"
+    },
+    {
+      "id": "V18-BATCH-050",
+      "category": "provenance",
+      "case": "different bound source state",
+      "expected": "Reject cross-state replay"
+    },
+    {
+      "id": "V18-BATCH-051",
+      "category": "provenance",
+      "case": "changed mapping protocol",
+      "expected": "No inherited mapping authority"
+    },
+    {
+      "id": "V18-BATCH-052",
+      "category": "provenance",
+      "case": "missing/expired current review",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "V18-BATCH-053",
+      "category": "provenance",
+      "case": "synthetic fixture presented as source authority",
+      "expected": "No production qualification"
+    },
+    {
+      "id": "V18-BATCH-054",
+      "category": "negative",
+      "case": "truncated source or row budget",
+      "expected": "UNKNOWN; never complete metadata coverage"
+    },
+    {
+      "id": "V18-BATCH-055",
+      "category": "negative",
+      "case": "claim chemical completeness from all rows",
+      "expected": "No expected-topology claim permitted"
+    },
+    {
+      "id": "V18-BATCH-056",
+      "category": "positive",
+      "case": "original source with unselected rows",
+      "expected": "Retain rows; do not insert them into selected state"
+    },
+    {
+      "id": "V18-BATCH-057",
+      "category": "replay",
+      "case": "focused deterministic replay",
+      "expected": "Identical pinned inputs produce identical output"
+    },
+    {
+      "id": "V18-BATCH-058",
+      "category": "governed",
+      "case": "current independently qualified pipeline",
+      "expected": "Only metadata proposition eligible"
+    },
+    {
+      "id": "V18-BATCH-059",
+      "category": "regression",
+      "case": "historical readers and qualified definitions",
+      "expected": "Unchanged bytes/behavior"
+    },
+    {
+      "id": "V18-BATCH-060",
+      "category": "batch",
+      "case": "one committed-source Batch C suite",
+      "expected": "Global regression/isolation/JVM/65 historical/25 pins/fresh export"
+    }
+  ]
+}
