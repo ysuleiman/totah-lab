@@ -64,6 +64,8 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.residue-reference"))return ResidueValidationRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.cbeta-deviation"))return CbetaDeviationRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.restraint-deviation"))return RestraintDeviationRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.ordered-chiral-sign"))return OrderedChiralSignRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.sam-water-tetrel"))return SamWaterTetrelRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.sam-g05"))return SamG05Rules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,false);
@@ -128,6 +130,8 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.residue-reference"))return ResidueValidationRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.cbeta-deviation"))return CbetaDeviationRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.restraint-deviation"))return RestraintDeviationRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.ordered-chiral-sign"))return OrderedChiralSignRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.sam-water-tetrel"))return SamWaterTetrelRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.sam-g05"))return SamG05Rules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,true);

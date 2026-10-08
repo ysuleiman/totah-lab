@@ -1,0 +1,93 @@
+BOUNDED V08 ORDERED SIGN — AUTONOMOUS SOURCE-JUSTIFIED CONTRACT
+2026-10-08; user expanded existing-rule execution authority applies.
+Definition ATHENA.V08.STV_ORDERED_CHIRAL_SIGN_JAVA21/1.
+This contract is independent of V07 reference-applicability approval. No source
+profile receipt is copied into scientific authority for this definition.
+
+Scientific proposition: compare the computed ordered binary64 determinant sign
+of exact selected source coordinates to the sign-specific monomer reference row.
+This is numerical reference-sign geometry, not reassignment of chemical chirality,
+energetic strain, a restraint-magnitude outlier, mutation or coordinate repair.
+Domain: independently reviewed ordinary internal L-SER/native L-THR/L-VAL source
+context, same exact chemistry/connection/stereo/preparation/coherence requirements
+as V07's STV source domain, including exclusion of explicit isotope substitutions.
+No residue-name-only or coordinate-derived chemistry admission.
+
+Exact rows from monomers commit1c97ea23a7df06373ed01cd7c3156a1f8e9b27e3:
+ SER chir_1 [CA,N,C,CB] POSITIVE
+ THR chir_1 [CA,N,C,CB] POSITIVE
+ THR chir_2 [CB,OG1,CA,CG2] NEGATIVE
+ VAL chir_1 [CA,N,C,CB] POSITIVE
+VAL chir_2 [CB,CA,CG1,CG2] has source 'both'; it is explicitly excluded from
+this sign-specific comparison, not interpreted as a chiral carbon requirement.
+DEL-HN1/DEL-OXT leave these four rows unchanged; they supply no numerical ideal
+volume. Internal source chemistry is already independently established; there is
+no source graph transformation or inferred link-profile assignment here.
+
+Pinned cctbx chirality.h commit ed314689c2d2945d7fd136d5f66d33ce1688e7a7 defines
+volume_model=(site1-site0) dot ((site2-site0) cross (site3-site0)), without1/6.
+Its ideal-volume/weight and both_signs residual are NOT adopted. Sources and
+comparison are separately recorded in ../v08/REVIEW.txt and SOURCE_PINS.json.
+
+Exact numerical profile ATHENA.JAVA21.ORDERED_BINARY64_TRIPLE_PRODUCT/1:
+for x,y,z in that order form a=p1-p0,b=p2-p0,c=p3-p0;
+x=b.y*c.z-b.z*c.y; y=b.z*c.x-b.x*c.z; z=b.x*c.y-b.y*c.x;
+v=(a.x*x+a.y*y)+a.z*z. Java21 binary64, no FMA/reassociation/normalization.
+Require all source coordinates, subtractions, cross components, dot products and
+final additions finite. Nonfinite arithmetic => UNKNOWN, no fabricated volume.
+Defined zero keeps raw volume and ZERO numerical sign; comparison remains UNKNOWN.
+Nonzero numerical sign may be arbitrarily small: no epsilon or robust geometric
+handedness claim is made. Near-cancellation probes retain this exact finite-arithmetic
+meaning; do not label it coordinate-independent absolute stereochemistry. This
+explicitly avoids choosing an unprovided scientific 'near-planar' tolerance.
+No cross-runtime bitwise cctbx parity is claimed. The source supports the ordered
+formula and sign semantics; Java21 operation order is the named bounded implementation.
+
+Public additive payload athena-ordered-chiral-sign-measurements/1, existing
+athena:rule-measurements envelope. Exact top-level fields:
+ schema,definition,definitionSha256,stateBinding,requestSha256,contextBinding,
+ centralResidue,sourceAdmissionStatus,sourceFactStatuses,authorityStatus,
+ referenceProfile,rows,assessmentStatus,sourcePins,reasons,limitations.
+Use unchanged Pin/Binding/ResidueId/AtomReference/Status serializers. sourceFactStatuses
+has exact six existing residue-source category keys. No caller-provided status can
+admit chemistry. Reject unknown/duplicate keys and malformed pins; no defaults.
+referenceProfile={repository,commit,artifacts:[Pin],numericProfile}; exact pinned
+monomer rows, cctbx source and license artifacts. Missing references UNKNOWN;
+current source and V08 definition authority required independently via Research Gate.
+
+Row exact fields:
+ rowId:SER.chir_1|THR.chir_1|THR.chir_2|VAL.chir_1
+ atomTuple:[AtomReference] (exact four ordered distinct atoms, or [] if unresolved)
+ referenceSign:POSITIVE|NEGATIVE
+ sourceRow:{artifact:Pin,dataBlock:string,category:literal _chem_comp_chir,
+   chiralityId:string,center:string,orderedLigands:[string],volumeSign:string}
+ volume:{status:Status,value:number|null,binary64Hex:string|null,unit:ANGSTROM_CUBED}
+ numericalSign:POSITIVE|NEGATIVE|ZERO|null
+ comparison:MATCHES_REFERENCE_SIGN|OPPOSES_REFERENCE_SIGN|null
+ assessmentStatus:Status
+ reasons:[string]
+All fields required, only listed nullability allowed. Bits=16 lowercase hex exact
+raw IEEE754 bits incl signed zero. atomTuple order binds formula, not sorted order.
+Sorted sourcePins contains consumed original/reference/preparation/authority evidence.
+Original source stereochemistry remains in its own source binding/facts; never
+replace it with numericalSign. Input coordinates are pinned by tuple+immutable
+coordinate/state digest. sourceRow retains exact reference order and source bytes.
+
+Current source and definition authority missing => NOT_EVALUATED, no comparison.
+Conflicting/incomplete source chemistry/provenance => UNKNOWN; known excluded source
+chemistry => UNSUPPORTED; valid nonzero comparison => SUPPORTED_PRESENT for either
+MATCHES or OPPOSES. Zero/nonfinite/undefined geometry => UNKNOWN. Defined quantities
+remain independent per row; selection UNKNOWN if a required row is unknown. No
+ABSENT_FALSE, whole-system absence or aggregate score. Collector records bindings
+only; evaluator recomputes from source, never trusts serialized comparison.
+Request first=[central],second=[],atoms=sorted union of mapped required tuple atoms.
+Operational budgets must cover all selected rows/atoms; truncation NOT_EVALUATED.
+
+Acceptance must cover all four rows; sign inversion and ligand permutation; exact
+zero and both signed zeros; tiny nonzero/cancellation; finite arithmetic overflow;
+missing coordinates; D/allo/modified/isotope states; unknown and contradictory
+source/stereo/connection facts; current source/rule authority absent/expired;
+byte/state/tuple/reference tampering; independent JVM replay; preservation of source
+and all existing V09/V10/V11 outputs. Exclude VAL 'both' explicitly. No planarity,
+ideal-volume magnitude or robust near-degenerate handedness domain is qualified.
+Tier1 then independent replay; share Tier2 with V07. Tier3 only at v2 seal.

@@ -1,0 +1,73 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION",
+  "version": "1.0.0",
+  "profile": "ATHENA_RESTRAINT_DEVIATION_V1",
+  "family": "VALIDATOR",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.restraint-deviation",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Exact reviewed ordinary internal L-SER/native L-THR/L-VAL context; independent current TRANS profile applicability for both source links."
+  ],
+  "requiredGeometry": [
+    "Existing qualified DISTANCE/ANGLE on exact central heavy-atom tuples; unchanged degeneracy semantics."
+  ],
+  "measurementsProduced": {
+    "payload": "athena-restraint-deviation-measurements/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1",
+      "unit": "policy",
+      "definition": "Exact bounded continuous heavy-atom restraint comparison; no statistical classification."
+    },
+    "geometry": {
+      "value": "{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"ENVIRONMENT\",\"implementationId\":\"athena.geometry\",\"implementationVersion\":\"3\",\"limitations\":[\"raw measurements only; no interaction, energy or potency assertion\"],\"measurementsProduced\":{\"geometry\":\"athena-continuous-geometry/1\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"COMPLETE_EXPLICIT_SCOPE\",\"QUALIFIED_FRAME\",\"FINITE_COORDINATES\"],\"scope\":\"No continuous quantity establishes ABSENT_FALSE\",\"supportedDomain\":\"raw explicit geometry\",\"version\":\"1\"},\"parameters\":{\"planeNormalRelativeGapTolerance\":{\"definition\":\"Numerical eigengap guard; not empirical planarity\",\"unit\":\"dimensionless\",\"value\":\"1.0E-10\"}},\"profile\":\"ATHENA_CONTINUOUS_GEOMETRY_V3\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/p06-centroid-characterization-20261005/REVIEW_GATE.txt\",\"sha256\":\"ec889f0b9a9eb7c591a955e9a97342c931ba61fe19bec7b1a0aa659625a21a85\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"d48eaf31e98c114f8a03a33f63885c9963821c7565bc0388020c8e2abfe2723a\"}],\"requiredCapabilities\":[],\"requiredChemistry\":[\"explicit atoms; attributed radii only\"],\"requiredGeometry\":[\"explicit complete source frame\"],\"retired\":false,\"ruleId\":\"ATHENA.GEOMETRY.CONTINUOUS\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"}],\"tier\":\"GEOMETRY\",\"version\":\"3\"}",
+      "unit": "policy",
+      "definition": "Exact source identity or unchanged qualified mixed geometry."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/foundation-v2-closure-20261008/v07-public-contract/PUBLIC_CONTRACT_REVIEW.txt",
+      "sha256": "6a048a6d83258991f42a12d329a9a1ca8ac67d8eec5234e9d2c4d4689bf53a61",
+      "citation": "Pinned bounded V07 contract and reference provenance."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/restraint-deviation-v1/SOURCES.json",
+      "sha256": "6daf43c444cde56676131d5dec6359800ea0099db3a0a98b8cc8427745f36a6d",
+      "citation": "Pinned bounded V07 contract and reference provenance."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Ordinary internal L-SER/native L-THR/L-VAL heavy-atom restraints only.",
+    "Targets and esds are restraints, not empirical reference distributions.",
+    "No H or interresidue measurements, thresholds, outlier classification, aggregate score, energy, repair or source mutation.",
+    "Independent current source/profile/rule authority required; no production activation."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/coverage/1",
+    "scope": "SELECTED_CENTRAL_REFERENCE_ROWS_ONLY",
+    "requirements": [
+      "EXACT_SOURCE",
+      "CURRENT_TRANS_PROFILE_REVIEW",
+      "EXACT_REFERENCE_ROWS",
+      "DEFINED_GEOMETRY"
+    ],
+    "supportedDomain": "Exact36 STV central heavy-atom reference rows",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

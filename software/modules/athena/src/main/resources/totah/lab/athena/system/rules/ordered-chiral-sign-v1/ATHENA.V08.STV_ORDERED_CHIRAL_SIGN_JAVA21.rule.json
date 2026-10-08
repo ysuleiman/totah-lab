@@ -1,0 +1,68 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.V08.STV_ORDERED_CHIRAL_SIGN_JAVA21",
+  "version": "1.0.0",
+  "profile": "ATHENA_ORDERED_CHIRAL_SIGN_V1",
+  "family": "VALIDATOR",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.ordered-chiral-sign",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Exact reviewed internal native L-SER/L-THR/L-VAL source context, no explicit isotopes."
+  ],
+  "requiredGeometry": [
+    "Exact source-coordinate ordered tuples and named Java21 binary64 triple product; zero comparison UNKNOWN."
+  ],
+  "measurementsProduced": {
+    "payload": "athena-ordered-chiral-sign-measurements/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "ATHENA.V08.STV_ORDERED_CHIRAL_SIGN_JAVA21/1",
+      "unit": "policy",
+      "definition": "Exact ordered binary64 determinant sign comparison; no ideal volume or threshold."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/foundation-v2-closure-20261008/v08-ordered-sign/CONTRACT.txt",
+      "sha256": "e6ffce5926a855aab7e8bb5c48e53b267c87e6bc3de2d21048e3eff42ad7514e",
+      "citation": "Pinned V08 ordered-sign formula, monomer rows and bounded contract."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/ordered-chiral-sign-v1/SOURCES.json",
+      "sha256": "a15155f05d8482941dead20c80c3ab046e5bd62e9af0018f0097db372284d593",
+      "citation": "Pinned V08 ordered-sign formula, monomer rows and bounded contract."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Only four sign-specific STV reference rows; VAL beta both-sign row excluded.",
+    "Numerical sign only, not absolute stereochemical reassignment or robust near-zero handedness.",
+    "No ideal-volume magnitude, planarity, energy, biological inference, repair or source mutation.",
+    "No cctbx bitwise parity claim or production activation."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.V08.STV_ORDERED_CHIRAL_SIGN_JAVA21/coverage/1",
+    "scope": "SELECTED_SIGN_SPECIFIC_ROWS_ONLY",
+    "requirements": [
+      "EXACT_SOURCE_CONTEXT",
+      "CURRENT_SOURCE_AND_RULE_AUTHORITY",
+      "EXACT_REFERENCE_ROWS",
+      "DEFINED_NONZERO_ORDERED_VOLUME"
+    ],
+    "supportedDomain": "Ordinary L-SER/native L-THR/ordinary L-VAL four ordered sign-specific rows",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

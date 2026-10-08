@@ -1,0 +1,43 @@
+V08 INDEPENDENT SOURCE REVIEW — 2026-10-08
+No authority or scientific scope is inherited from V07 approval.
+
+Pinned cctbx commit ed314689c2d2945d7fd136d5f66d33ce1688e7a7; exact chirality.h
+and planarity.h source bytes match the pinned Git tree (SOURCE_PINS.json).
+No Athena V08 implementation or acceptance result is claimed by this review.
+
+Ordered chirality is an independently supportable candidate, distinct from
+restraint-volume magnitude fitting. The source computes
+ (site1-site0) dot ((site2-site0) cross (site3-site0)), with no factor1/6.
+Reordering two ligands reverses the sign. Its proxy sort flips volume_ideal when
+both_signs is false. both_signs changes the residual logic and must not be treated
+as a requirement for one handedness. Model volume, ideal magnitude, sign acceptance
+and squared weighted refinement residual are different quantities.
+
+Exact pinned monomer rows:
+ SER chir_1: CA / N,C,CB / positive
+ THR chir_1: CA / N,C,CB / positive
+ THR chir_2: CB / OG1,CA,CG2 / negative
+ VAL chir_1: CA / N,C,CB / positive
+ VAL chir_2: CB / CA,CG1,CG2 / both
+Do not classify the VAL CB 'both' record as one chiral stereocenter. Source-native
+THR beta stereo is independent of the measured ordered-volume sign. None of these
+source rows is a numerical ideal-volume/esd parameter set. An ideal magnitude must
+not be invented from a sign. DEL-HN1/DEL-OXT do not modify these chirality rows.
+
+Potential bounded closure: raw ordered determinant and comparison only to the four
+sign-specific rows, with exact reviewed source context, unchanged source chemistry,
+explicit atom ordering and an explicit numerical/zero policy. It cannot claim full
+cctbx chirality restraint residual parity or robust near-zero handedness without
+an independently selected error/degeneracy policy. Preserve raw/source stereochemical
+identity and coordinate-derived handedness separately; a mismatch is not a mutation.
+Further numerical-profile evaluation is required before implementation.
+
+Planarity is independently unresolved: pinned cctbx uses per-site weights, weighted
+centroid, a real-symmetric weighted residual tensor, and its smallest-eigenvalue
+normal. Signed per-site deltas depend on normal orientation. Original monomer
+plan-1 is deleted by DEL-OXT; TRANS supplies different sets. In particular its
+second plane includes hydrogen. dist_esd0.020 is a restraint parameter, not an
+outlier threshold. Exact fitting/eigensystem/sign/rank/degeneracy policy and choice
+between source-weighted refinement residual versus existing Athena continuous plane
+geometry must remain explicit. No epsilon, weighting rule or full protocol parity
+has been selected here. This blocker must not prevent independent chirality review.

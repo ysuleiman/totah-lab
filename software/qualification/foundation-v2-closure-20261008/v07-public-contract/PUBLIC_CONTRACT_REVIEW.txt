@@ -1,0 +1,326 @@
+V07 — EXACT ADDITIVE PUBLIC CONTRACTS FOR APPROVAL
+2026-10-08. Finalized under expanded autonomous execution authority; scientific direction approved.
+No implementation, qualification receipt, production registration or activation.
+Definition: ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1
+
+AUTHORIZED ADDITIVE CONTRACTS
+Implement only:
+ A. athena-restraint-source-reference-binding/1
+ B. ATHENA.V07.TRANS_PROFILE_APPLICABILITY_SOURCE_FACT/1
+ C. athena-restraint-deviation-measurements/1
+and the exact acceptance/geometry composition contract below. Existing residue
+binding/source-fact/geometry/Research Gate schemas and behavior remain unchanged.
+REFERENCE_PROFILE.json and REFERENCE_ROWS.json are finite pinned review artifacts,
+not a new runtime registry or source authority. Their exact bytes join the approved
+rule's scientific sources. The IDs and field sets below have no unstated defaults.
+
+1. DOMAIN, REFERENCE AND REUSE
+Only ordinary internal L-SER/native L-THR/ordinary L-VAL under the existing reviewed
+selected residue-context domain and unchanged V10 STV source chemistry predicate.
+All existing identity/charge/H/isotope/aromaticity/electronic-state/stereo/connection/
+preparation/coherence checks continue independently. Heavy-only measurements do
+not waive chemical H evidence. No source graph is constructed or transformed from
+the monomer library. Previous/next chemistry and directed peptide links remain
+independently qualified; no source topology is inferred from geometry or labels.
+
+Use exact monomers commit1c97ea23a7df06373ed01cd7c3156a1f8e9b27e3 and the four runtime
+files pinned by REFERENCE_PROFILE.json plus existing COPYING. Ordered central
+reference modifications are [DEL-HN1,DEL-OXT]. Incoming central component is2,
+outgoing central component is1 of the TRANS link definition. These are reference
+construction identities, not a statement that the source was prepared by applying
+these operations. No A08 transformation is authorized. No generic CIF interpreter
+or link-selection engine: use the finite reviewed reference rows only.
+
+All36 rows and original base/override provenance chains are explicit in
+REFERENCE_ROWS.json. SER:V07-001..010; THR:011..023; VAL:024..036.
+An invocation selects one central residue and ALWAYS its entire finite row set
+(10 or13). No arbitrary row subset, optimization, hydrogen/interresidue restraint,
+chirality/planarity/torsion/aggregate measurement is allowed. Row order is ascending
+rowId. The rows are target/esd restraints, not empirical reference distributions.
+Unchanged existing DISTANCE/ANGLE measure coordinates; V07 only composes their
+exact binary64 quantities with target/esd. No new geometry primitive is needed.
+
+2. COMMON WIRE RULES
+Pin, Binding, SourceAtom, Locator, ResidueId, AtomReference and Status retain the
+exact existing V09/V10 serializers and semantics in
+software/qualification/v09-v10-public-contract-20261008/PUBLIC_CONTRACT_REVIEW.txt.
+Pin={reference:ScientificReference,sha256:64 lowercase hex}; exact payload bytes.
+Binding contains state,stateSha256,chemicalSha256,coordinateSha256,
+correspondenceSha256. SourceAtom={component:ScientificReference,atomId:string}.
+Locator={artifact:Pin,selector:nonblank exact source locator}.
+Status uses existing EvidenceInterpretation.Status; UNKNOWN below means
+UNKNOWN_INCONCLUSIVE. No novel status enum is added to that type.
+
+All listed fields required; only explicitly marked nullable fields may be null.
+Reject unknown/duplicate JSON keys, duplicate semantic entries, malformed hashes,
+nonfinite JSON numbers, identity collisions, unrecognized enums or wrong schemas.
+No defaults. Pin arrays sorted/deduplicated by canonical Pin JSON; preparation pins
+retain their ordered causal sequence and reject duplicates/cycles. Atom reference
+arrays use existing canonical sorting except explicitly ordered geometry tuples.
+Reference source bytes and decimal strings are never canonicalized into authority.
+No payload carries scientific self-approval. Output artifacts are never admissible
+as independent source/profile witnesses.
+
+Quantity={status:Status,value:number|null,binary64Hex:string|null,unit:
+ ANGSTROM|DEGREE|DIMENSIONLESS}.
+Defined values must be finite, with exact16-lowercase-hex IEEE754 bits agreeing
+with the JSON number, including signed zero. An unavailable quantity has null
+value/hex, its correct unit and explicit noneligible status; never numeric zero.
+
+3. A — athena-restraint-source-reference-binding/1
+Evidence type: athena:restraint-source-reference-binding.
+Exact top-level fields:
+ schema: literal athena-restraint-source-reference-binding/1
+ definition: literal ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1
+ stateBinding: Binding
+ contextBinding: Pin of unchanged athena-residue-context-binding/1
+ centralResidue: ResidueId
+ candidateIdentity: SER|THR|VAL|null
+ referenceProfile: Profile
+ linkBindings: [LinkBinding] (exactly2, INCOMING then OUTGOING)
+ atomCorrespondence: [MappedRole]
+ preparationReferences: ordered Pin array
+ limitations: string array
+
+Profile exact fields:
+ identity: literal ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_TRANS_HEAVY/1
+ repository: literal MonomerLibrary/monomers
+ commit: literal1c97ea23a7df06373ed01cd7c3156a1f8e9b27e3
+ profileManifest: Pin (exact REFERENCE_PROFILE.json)
+ referenceRows: Pin (exact REFERENCE_ROWS.json)
+ sourceArtifacts: sorted Pin array (all four exact required library artifacts)
+ licenseArtifacts: sorted Pin array (exact existing COPYING)
+ centralModifications: literal [DEL-HN1,DEL-OXT]
+ hydrogenRestraints: literal EXCLUDED
+ numericProfile: literal ATHENA.JAVA21.BINARY64.SUBTRACT_THEN_DIVIDE/1
+All profile artifacts must resolve to approved bytes; reference identity cannot
+be caller-selectable. Missing artifacts are UNKNOWN; supplied changed bytes or
+mismatched digests are rejected as invalid evidence, never evaluated as a new profile.
+A missing reference pin must not be replaced with a fabricated resolved artifact.
+
+LinkBinding exact fields:
+ direction: INCOMING|OUTGOING
+ from: SourceAtom|null
+ to: SourceAtom|null
+ referenceLink: literal TRANS
+ centralComponent: integer2 for INCOMING,1 for OUTGOING
+ sourceLocations: Locator array
+Required eligibility: incoming previous.C->central.N and outgoing central.C->next.N,
+exact ordinary source SINGLE links identical to the existing context and qualified
+connection evidence. Null endpoints permit representation of unresolved input only;
+no endpoint or link is fabricated. Locations empty => missing evidence, not absence.
+
+MappedRole={role:N|CA|C|O|CB|OG|OG1|CG1|CG2,source:SourceAtom|null,
+ coordinate:AtomReference|null}.
+Exactly nine entries in the enum order shown above. Unused identity-specific roles
+are both null. Every required role must independently match the existing context
+map, source chemistry and state correspondence; no alternative/best-fit mapping.
+All nonnull sources are distinct; all nonnull coordinates are distinct. A coordinate
+cannot be nonnull when its source is null. Unresolved required mapping stays UNKNOWN.
+CandidateIdentity is an input assertion cross-checked against qualified source facts;
+it is never sufficient for admission. Different source preparation or coherent state
+requires a new A and new independent authority, even if the atom names match.
+
+A contains no B or receipt pin. Existing context A0 must not reference this A, B,
+or their receipts. Upstream coverage and original source evidence must be acyclic.
+Witnesses B are discovered from invocation evidence by exact A pin; their authority
+is downstream. Pin graph cycles are rejected; content hashes cannot self-authorize.
+
+4. B — EXACT PROFILE-APPLICABILITY WITNESS
+Use existing athena:event-source EvidenceInterpretation carrier; no generic record.
+Exact measurement keys (every value is a string in that carrier):
+ proposition: ATHENA.V07.TRANS_PROFILE_APPLICABILITY_SOURCE_FACT/1
+ stateBinding: canonical JSON Binding
+ contextBinding: canonical JSON Pin of existing residue-context binding
+ sourceReferenceBinding: canonical JSON Pin of A
+ factValues: canonical JSON ApplicabilityFacts
+ sourceProtocol: canonical JSON Pin
+ sourceLocations: canonical JSON nonempty Locator array
+ preparationReferences: canonical JSON ordered Pin array
+
+ApplicabilityFacts exact fields:
+ centralResidue: ResidueId
+ referenceProfile: Profile (exact equality to A; equality alone proves nothing)
+ centralModifications: literal [DEL-HN1,DEL-OXT]
+ linkFacts: [LinkFact] (exact2, INCOMING then OUTGOING)
+ sourceStateDescription: nonblank string
+ sourceEvidence: nonempty sorted Pin array
+ reasons: string array
+
+LinkFact exact fields:
+ direction: INCOMING|OUTGOING
+ from: SourceAtom|null
+ to: SourceAtom|null
+ referenceLink: literal TRANS
+ centralComponent: integer2 or1 matching direction
+ applicability: APPLICABLE|EXCLUDED|UNRESOLVED
+ sourceLocations: Locator array
+ applicabilityEvidence: sorted Pin array
+ rationale: nonblank string
+
+The proposition is ONLY whether this exact TRANS reference profile is scientifically
+applicable to each exact already-established source peptide link/context. It is not
+peptide perception, an omega/trans geometry classifier, H inference, general chemical
+identity, or a production scientific authority. sourceProtocol pins the independently
+reviewed source-specific applicability rationale and its provenance. Evidence must
+support both link assignments, source identity and context; residue labels, coordinate
+proximity, omega, toolkit defaults and a caller's TRANS enum cannot supply that support.
+No new rule for deriving applicability from structural measurements is introduced.
+If actual source evidence cannot support that claim, use UNRESOLVED/UNKNOWN. An
+arbitrary APPLICABLE value with a digest or generic parser receipt is insufficient.
+
+Every sourceEvidence/applicabilityEvidence pin must resolve to original source,
+review protocol or existing residue source-fact evidence, never A/B output or its own
+receipt. All supplied witnesses for the exact binding are examined; contradictory
+unsuperseded applicability claims => UNKNOWN. Only explicit governed supersession
+can retire an earlier conflicting claim. A selected convenient witness is insufficient.
+Missing witness category/facts or null required endpoints => UNKNOWN when scientific
+authority otherwise exists. Missing current authority is tracked independently.
+Known reviewed EXCLUDED applicability => UNSUPPORTED unless unresolved/conflicting
+required facts already make the selection UNKNOWN.
+
+GOVERNANCE: additive source-fact rule identity ATHENA.V07.TRANS_PROFILE_APPLICABILITY_SOURCE_FACT
+under unchanged athena-rule/3 / EvidenceInterpretation / Research Gate machinery.
+Its current receipt must independently bind exact B/A/context, source artifacts,
+sourceProtocol, exact immutable state, method/implementation, invocation selection,
+review time/expiry/revocation and selected domain. Existing V09/V10 source receipts
+continue to be required for their source facts but cannot authorize this new profile
+claim. V07 definition authority cannot substitute for source/profile authority.
+Evidence method must match its interpreter/evaluator; every consumed Pin is retained
+in evidence inputs. User approval authorizes contract implementation only, not a
+production source receipt. Synthetic qualification reviews must remain synthetic.
+
+5. C — athena-restraint-deviation-measurements/1
+Existing athena:rule-measurements envelope; exact fields:
+ schema: literal athena-restraint-deviation-measurements/1
+ definition: literal ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1
+ definitionSha256: exact approved runtime RuleManifest SHA256
+ stateBinding: Binding
+ requestSha256: existing canonical RuleRequest SHA256
+ contextBinding: Pin
+ sourceReferenceBinding: Pin of A
+ centralResidue: ResidueId
+ sourceAdmissionStatus: Status
+ sourceFactStatuses: {identityState:Status,atomCorrespondence:Status,
+   connections:Status,stereochemistry:Status,preparation:Status,coherence:Status}
+ profileApplicability: {incoming:Status,outgoing:Status,status:Status,witnesses:[Pin]}
+ authority: {definition:Status,residueSource:Status,profileSource:Status,status:Status}
+ referenceProfile: Profile
+ referenceStatus: Status
+ geometry: {plan:Pin|null,rawMeasurements:Pin|null}
+ rowCoverage: {expectedRowIds:[string],emittedRowIds:[string],
+   evaluatedRowIds:[string],status:Status}
+ rows: [RowMeasurement]
+ sourcePins: sorted distinct Pin array of every consumed source/reference/preparation/
+   plan/raw-measurement/witness/protocol/manifest/authority artifact
+ assessmentStatus: Status
+ reasons: string array
+ limitations: string array
+
+RowMeasurement exact fields:
+ rowId: exact V07-001..036 applicable to central identity
+ kind: BOND|ANGLE
+ orderedRoles: [role tokens] (exact2 or3 from reference row)
+ sourceAtoms: [SourceAtom] (exact ordered tuple or [] if incomplete)
+ coordinateAtoms: [AtomReference] (exact ordered tuple or [] if incomplete)
+ reference: {table:Pin,rowId:string,provenanceChain:[RowOrigin],
+   targetDecimal:string,esdDecimal:string,target:Quantity,esd:Quantity}
+ geometryOperationId: string|null
+ measurement: Quantity
+ signedResidual: Quantity
+ restraintNormalizedResidual: Quantity
+ assessmentStatus: Status
+ reasons: string array
+
+RowOrigin={artifact:Pin,dataBlock:string,category:string,rowOrdinal:positive integer,
+ line:positive integer,rowValues:object<string,string>,valueItems:[string]}.
+Exact category field/value map, row ordinal/line and target/esd item names are copied
+from the pinned REFERENCE_ROWS row's provenanceChain. File paths in the review
+artifact are resolved to supplied exact source Pin identities. Base row first, then
+applicable override; preserve override endpoint order even where it is reversed from
+the measurement's original row order. Do not silently canonicalize that provenance.
+Both original and final target/esd strings remain available from the provenance chain.
+
+All quantity units follow the reference row (ANGSTROM for BOND, DEGREE for ANGLE),
+except normalized residual DIMENSIONLESS. Reference target/esd may be exposed as
+uninterpreted source numbers when the exact reference is verified even if chemistry
+or authority is not eligible; they do not imply an applicable comparison. Otherwise
+reference quantities are null/UNKNOWN. Raw geometric measurements may likewise be
+retained when independently defined; gate them separately from derived residuals.
+No residual is emitted unless source admission, BOTH applicability facts, ALL current
+authorities, exact complete reference artifacts and that row's raw geometry qualify.
+
+rowCoverage is finite selected-reference inventory bookkeeping only, never scientific
+admission or whole-system completeness. If identity is independently established,
+expectedRowIds and emittedRowIds are exactly its10/13 rows. If identity unresolved or
+outside STV, both are empty, status UNKNOWN/UNSUPPORTED respectively. No SER fallback.
+evaluatedRowIds are exactly rows with defined residuals, never unqualified raw values.
+Coverage status SUPPORTED_PRESENT means the expected inventory was emitted, even if
+some/all rows are UNKNOWN; it does NOT mean all residuals were evaluable.
+Partial geometry retains valid other-row quantities independently. An incomplete row
+has an empty unresolved tuple, explicit reason and UNKNOWN measurement; no fabricated
+atom or coordinate. Missing entire A/context produces a governed finding with
+NOT_EVALUATED and no C payload, rather than inventing binding identity.
+
+6. ARITHMETIC, GEOMETRY AND ASSESSMENT
+Parse exact pinned decimal target/esd using Java21 Double.parseDouble.
+Let x be existing Athena DISTANCE/ANGLE output without rounding/recomputation.
+Compute delta=x-target, then residual=delta/esd as two binary64 operations.
+No FMA, reassociation, decimal quantization, epsilon, clipping or thresholds.
+Retain x/delta/residual bits separately. esd must be finite and strictly positive;
+invalid reference esd is a reference error/UNKNOWN, never infinite residual or pass.
+Any nonfinite arithmetic result => UNKNOWN for that derived quantity; retain defined
+raw measurements independently. Never serialize NaN/Infinity. Signed zero retained.
+The term 'restraintNormalizedResidual' is descriptive, not a population z-score.
+Zero, huge positive and huge negative finite values are all evaluated measurements.
+
+Use existing geometry's degeneracy behavior unchanged. No new zero-length tolerance
+or distance clamp. No cctbx coordinate-arithmetic parity claim. Independent scalar
+oracles take exactly Athena-measured binary64 x; geometric qualification remains
+Athena's existing primitive and its exact manifest/version is pinned.
+
+Assessment priority: missing/invalid current authority or insufficient operational
+budget => NOT_EVALUATED; with authority, any required unresolved/conflicting source
+or applicability fact => UNKNOWN; otherwise known outside-domain facts => UNSUPPORTED;
+otherwise reference missing/corrupt or required geometry unavailable => UNKNOWN;
+otherwise successfully evaluated row => SUPPORTED_PRESENT. All intermediate statuses
+remain visible even when final priority is NOT_EVALUATED. Malformed payload/binding
+is rejected using existing error behavior, not converted to a scientific status.
+Selection-level assessment is SUPPORTED_PRESENT only when all required rows evaluate;
+one unknown geometry row gives selection UNKNOWN while other eligible row residuals
+remain defined. ABSENT_FALSE is never used. No numerical value means normal, favorable,
+energetically strained, erroneous biological function, or a request to repair coordinates.
+
+Unchanged RuleRequest: first=[centralResidue], second=[], atoms=sorted distinct union
+of all currently mapped required central heavy-atom coordinates for that exact STV
+selection. Do not add neighbor/H atoms merely for authority or measure their geometry.
+If source identity is unresolved, use the nonnull mapped central roles from A only;
+no manufactured correspondence. State/manifest pins must match exactly. Existing
+radius/hop limits are operational only, not chemistry. maximumNodes must cover the
+selected mapped atom union and maximumCandidates must cover all10/13 expected rows;
+insufficient budget => NOT_EVALUATED, no misleading subset/negative claim. Raw x may
+remain; no residuals are reported from an incomplete-budget run.
+
+7. ACCEPTANCE AND IMPLEMENTATION AUTHORITY
+ACCEPTANCE_MATRIX.json enumerates every planned case with exact target behavior.
+Tests must distinguish source graph evidence, correspondence, profile applicability,
+source/profile/definition authority, geometry and residual arithmetic. Governing a
+synthetic source does not manufacture production certificates. Per-row scalar cases
+are explicitly distinct from coordinate end-to-end cases; do not imply every exact
+scalar is geometrically realizable. REFERENCE_ROWS and approval pin are immutable.
+
+Required qualification: Tier1 all enumerated cases, separate reference-row
+provenance verification, deterministic replay through two independent JVMs, then ONE
+shared Tier2 affected-family batch including existing source-context/V09/V10/V11,
+geometry, source scope and Research Gate consumers. Preserve historical bytes and
+unrelated work. Tier3,65 historical comparisons,25 preservation pins only at v2 seal.
+No current production activation/default registration. No V08 or other domain approval
+is implied. Implementation authorized by the user’s expanded Foundation v2 execution authority.
+
+RUNTIME EVIDENCE CLOSURE CLARIFICATION (2026-10-08)
+The four runtime library artifacts are SER.cif, THR.cif, VAL.cif and
+links_and_mods.cif. The separately pinned 4-MB mon_lib_list.cif is retained as
+independent duplicate-block review evidence, not redundantly required at runtime.
+SOURCE_CHECKS.json proves its exact selected blocks equal the authoritative
+links_and_mods.cif. No restraint value, chemistry, or source definition changes.
+This removes redundant payload amplification in governed execution.
