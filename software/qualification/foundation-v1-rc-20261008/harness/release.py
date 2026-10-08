@@ -16,8 +16,13 @@ def main():
     paths.update(p for p in tracked if p.startswith('software/qualification/') and p.endswith(('.json','.txt','.py','.java')))
     # Exact literature/standard bytes not covered by textual audit suffixes.
     for p in f.read(f.BASE/'BUILD.json')['sourcePins']:paths.add(p)
-    archive=subprocess.check_output(['git','archive',commit,'--',*sorted(paths)],cwd=repo)
-    tarfile.open(fileobj=io.BytesIO(archive)).extractall(source,filter='data');stages['cleanExportSeconds']=time.monotonic()-stage
+    # Bound argv size while preserving the exact committed file selection.
+    ordered_paths=sorted(paths)
+    for offset in range(0,len(ordered_paths),128):
+        archive=subprocess.check_output(['git','archive',commit,'--',*ordered_paths[offset:offset+128]],cwd=repo)
+        with tarfile.open(fileobj=io.BytesIO(archive)) as contents:
+            contents.extractall(source,filter='data')
+    stages['cleanExportSeconds']=time.monotonic()-stage
     f.BASE=source/f.BASE.relative_to(repo);f.META=source/f.META.relative_to(repo)
     build=f.build(source,out,Path('/unused-no-release-cache'),clean=True);build['commit']=commit
     f.write(out/'BUILD.json',build);stages['sourceHashAndJarVerificationSeconds']=build['inputHashSeconds'];stages['compileSeconds']=build['compile']['seconds']
