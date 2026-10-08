@@ -25,7 +25,7 @@ for p,h in sourcepins.items():assert f.digest(ROOT/p)==h,p
 classes=Path(build['classes']);assert {str(p.relative_to(classes)):f.digest(p) for p in classes.rglob('*') if p.is_file()}==f.read(out/'COMMITTED_CLOSURE_PARITY.json')['classPins']
 tests=f.read(out/'RESULT.json');actual=f.results(out,f.inventory(source))
 assert tests['tests']==actual['tests']==3255 and not actual['failuresErrorsOrSkips'] and all(j['exitCode']==0 for j in tests['jobs'])
-assert tests['executedIdentities']==actual['executedIdentities']
+assert tests['executedIdentities']==[list(v) for v in actual['executedIdentities']]
 ids={tuple(v) for v in actual['executedIdentities']};preserved={}
 for label,path in [('v1','software/qualification/foundation-v1-rc-20261008/release/RESULT.json'),('v2Shared','software/qualification/foundation-v2-closure-20261008/v07-v08-tier2/RESULT.json')]:
  oldids={tuple(v) for v in f.read(source/path)['executedIdentities']};assert oldids<=ids;preserved[label]=len(oldids)
