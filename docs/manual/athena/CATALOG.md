@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `aabe6911bb064dea649ce54cc53efec40c2ee780e1f4a68476d8c2b95d7b36b1`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `82547a6c0796d1516e8ff370c0f2098890618027a4ae3e6d5ba95dafad4e1a0a`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -47,7 +47,7 @@ Disposition is copied without upgrading partial capability coverage.
 | V01 | Valence/sanitization and nonempty graph validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V02 | Fragment/salt/solvent and neutral-charge checks | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V03 | Isotopes, allowed/disallowed elements and radicals | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v03-representation-boundary-20261006](../../../software/qualification/v03-representation-boundary-20261006/CHECKPOINT.txt), [v03-explicit-radical-20261006](../../../software/qualification/v03-explicit-radical-20261006/CHECKPOINT.txt) |
-| V04 | Representation/query/dummy/enhanced-stereo validation | P0 | SCIENTIFIC_REVIEW_REQUIRED |  |
+| V04 | Representation/query/dummy/enhanced-stereo validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | V05 | Stereo syntax and authoritative stereo validation | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [v01-validation-characterization-20261005](../../../software/qualification/v01-validation-characterization-20261005/REVIEW_GATE.txt), [validation-dimensions-20261005](../../../software/qualification/validation-dimensions-20261005/CHECKPOINT.txt), [v02-disconnected-comparison-20261005](../../../software/qualification/v02-disconnected-comparison-20261005/REVIEW_GATE.txt), [disconnected-validation-repair-20261005](../../../software/qualification/disconnected-validation-repair-20261005/CHECKPOINT.txt) |
 | V06 | 2D layout/dimensionality checks | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | V07 | Bond-length and bond-angle validation | P2 | REQUIRES_EXTERNAL_REFERENCE_DATA |  |
@@ -72,7 +72,7 @@ Disposition is copied without upgrading partial capability coverage.
 | A04 | Library/AM1-BCC/charge-increment/NAGL charge assignment | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A05 | GBSA implicit solvent parameterization | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | A06 | Virtual-site charge geometry | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
-| A07 | Chemical alerts and substructure filter catalogs | P3 | SCIENTIFIC_REVIEW_REQUIRED | [a07-embedded-catalog-characterization-20261006](../../../software/qualification/a07-embedded-catalog-characterization-20261006/CHECKPOINT.txt) |
+| A07 | Chemical alerts and substructure filter catalogs | P3 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [a07-embedded-catalog-characterization-20261006](../../../software/qualification/a07-embedded-catalog-characterization-20261006/CHECKPOINT.txt) |
 | A08 | Tautomers, normalization, fragment parents and stereochemical identity | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED |  |
 | A09 | Molecular descriptors/fingerprints/shape and torsion resources | P3 | EXPLICIT_ARCHITECTURAL_DISPOSITION |  |
 | G01 | Methyl environment | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [continuous-geometry-20261005](../../../software/qualification/continuous-geometry-20261005/CHECKPOINT.txt), [b05-chemical-attribution-20261005](../../../software/qualification/b05-chemical-attribution-20261005/CHECKPOINT.txt) |
@@ -662,15 +662,15 @@ Not qualified by this disposition. Consult pinned checkpoint limitations and lin
 
 ### V04 — Representation/query/dummy/enhanced-stereo validation
 
-Review query/dummy/enhanced-stereo representability and validation scope separately from molecular truth.
+Approved OCL_IDCODE_QUERY/2026.7.2 native operation profile with exact original bytes, native atom-index correspondence, supported feature controls, and checked exclusion of unrepresented query/dummy/parity/ESR/target assertions. Seven exact catalog entries independently qualified.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2686 committed-source tests +3 isolation;92 focused;25 JVM pairs,23 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** Graph mapper and sanitizer; unresolved mapping retained
+**Existing implementation:** Approved additive native SubstructureMatcher overload; unchanged historical B00 bodies. Immutable catalog and opt-in athena.advisory-alert/1 leaf; existing source scope, provenance and Research Gate.
 
-**Supporting source:** RDKit FeaturesValidation; OclGraphMapper
+**Supporting source:** Explicitly approved native boundary and advisory catalog semantics; exact pinned OCL jar/original catalog queries, entry-specific engineering controls. No catalog-membership-to-biological-truth inference.
 
-OclGraphMapper supports specific atom parity strings and rejects unsupported bond stereo; MolecularGraph has no reviewed query-atom/dummy/enhanced-stereo-group semantics. Generic properties can preserve unknown assertions but do not execute them. Need exact additive opt-in representation/operation contract before new property semantics; do not silently cast a query molecule as a physical one.
+No universal query, dummy or enhanced-stereo representation engine; unsupported native features remain unsupported operations, never assertions that a physical molecule is invalid. No canonical re-encoding equality or unproven SMARTS transfer.
 
 ### V05 — Stereo syntax and authoritative stereo validation
 
@@ -954,15 +954,15 @@ Learn frame/provenance handling; never present virtual charge sites as measured 
 
 ### A07 — Chemical alerts and substructure filter catalogs
 
-Review specific alert catalog/version/domain and advisory semantics; never automatic evidence rejection.
+Exact pinned OCL.PAINS/2026.7.2 advisory occurrences for independently qualified entries113,159,162,169,202,207,840 in one complete eligible source component. Every890 entry classified:7 representation/execution qualified,482 executable incomplete,401 unsupported. No catalog-wide absence.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2686 committed-source tests +3 isolation;92 focused;25 JVM pairs,23 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** Existing matcher; no qualification of these catalogs
+**Existing implementation:** Approved additive native SubstructureMatcher overload; unchanged historical B00 bodies. Immutable catalog and opt-in athena.advisory-alert/1 leaf; existing source scope, provenance and Research Gate.
 
-**Supporting source:** RDKit FilterCatalog.h
+**Supporting source:** Explicitly approved native boundary and advisory catalog semantics; exact pinned OCL jar/original catalog queries, entry-specific engineering controls. No catalog-membership-to-biological-truth inference.
 
-Pinned OCL contains890 embedded PAINS entries. Exact encoded-query to SMARTS roundtrip demonstrated for386, not established for504; B00 accepts886 generated queries and explicitly rejects4. Existing PainsDetector bypasses B00 and returns labels without Athena atom mappings. Need qualified lossless transfer/domain/fixtures plus advisory meaning; do not equate catalog membership with toxicity or automatic rejection.
+Other883 entries lack independent qualification or are unsupported; all-catalog absence unavailable. No toxicity, assay interference truth, drug-likeness, rejection authority, binding failure or medicinal-chemistry score.
 
 ### A08 — Tautomers, normalization, fragment parents and stereochemical identity
 
