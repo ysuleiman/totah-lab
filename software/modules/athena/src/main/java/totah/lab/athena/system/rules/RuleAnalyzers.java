@@ -62,6 +62,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.zn-source-features"))return ZnSourceFeatureRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,matcher,false);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.sam-g05"))return SamG05Rules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.cl-phe-candidate"))return ClPheCandidateRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.source-site-metadata"))return SourceSiteMetadataRules.analyzer(m,r,false);
@@ -122,6 +123,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.zn-source-features"))return ZnSourceFeatureRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,null,true);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.sam-g05"))return SamG05Rules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.cl-phe-candidate"))return ClPheCandidateRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.source-site-metadata"))return SourceSiteMetadataRules.analyzer(m,r,true);

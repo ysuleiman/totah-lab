@@ -1,0 +1,175 @@
+G05 / G06 — BOUNDED SCIENTIFIC DECISION PACKAGE
+2026-10-08. REVIEW ONLY. No implementation, activation, receipt, or qualification.
+Foundation v1 remains frozen. This proposal does not close either entire ledger row.
+
+1. DECISION AND DEPENDENCIES
+Recommend a first batch limited to exact stereospecific SAM identity and selected
+SAM/Phe continuous geometry. Decide the SAM chemical state now. Keep the separate
+G06 partner-admission decision explicit; do not silently expand oxygen chemistry.
+
+G05 dependency chain:
+immutable source/state/preparation binding -> P03/P09 source chemistry facts +
+V03 explicit closed-shell evidence + complete source connection/H evidence ->
+exact full-graph correspondence to the selected stereospecific reference ->
+SAM S and methyl-C anchors -> existing qualified Phe ring identity -> existing
+ContinuousGeometry POINT_PAIR_GROUP measurements -> evidence/Research Gate.
+G06 dependency chain: the same SAM admission -> independently qualified selected
+oxygen-partner state -> same-state S/Cm/O coordinates -> continuous distance and
+angle -> definition-specific predicate -> selected-tuple coverage/Research Gate.
+No event/path, matcher, graph, nitrogen-SP3, or role-manifest change is proposed.
+Nitrogen-specific S1 source scope cannot itself authorize full SAM chemistry.
+
+2. SOURCE COMPARISON — A MATERIAL CHOICE
+Pinned source bytes, retrieval failures, URLs, SHA-256 and repository versions are
+in SOURCES.json. Reference coordinates are never experimental source coordinates.
+
+CCD SAM (reference/SAM.cif; revision 2011-06-04): C15 H22 N6 O5 S,
+net charge 0. Alpha N is neutral NH2, carboxylate OXT is -1, SD is +1.
+CCD explicitly labels SD stereochemistry S; CA S; C4' S, C3' S, C2' R, C1' R.
+Thus CCD does provide sulfur stereo, but its protonation differs from the following.
+
+ChEBI:142094, (S)-S-adenosyl-L-methionine zwitterion: C15 H23 N6 O5 S,
+net +1; alpha NH3+, carboxylate -1, sulfonium +1. Exact stereospecific reference:
+C[S@@+](CC[C@H]([NH3+])C(=O)[O-])C[C@H]1O[C@@H](n2cnc3c(N)ncnc32)[C@H](O)[C@@H]1O
+Pinned original molfile and page are supplied. The SMILES specifies an identity,
+not permission to regenerate or normalize an authoritative source state.
+ChEBI:59789 does not fix the sulfur stereoisomer. ChEBI:15414 represents a different
+protonation description. Name, formula, residue code, or normalized InChI alone is
+not sufficient admission. SAH is a separate thioether identity, not SAM with a
+missing coordinate. The pinned SAH component is a negative control, not admitted.
+
+Recommendation: choose ChEBI:142094 as the FIRST exact domain. CCD net-zero SAM
+would require a separately named profile and independent acceptance cases. Neither
+choice permits automatic protonation, stereo assignment, or source mutation.
+
+Literature L05: Comparative Analysis of Sulfonium-pi, Ammonium-pi, and Sulfur-pi
+Interactions and Relevance to SAM-dependent Methyltransferases. Existing pinned
+full text: ../advanced-rule-research-design-20261004/reference/L05.txt.
+Keep SAM/S, SAM/methyl-C, SAH/S, peptide cations, QM models and structural surveys
+separate. Survey distance bins and volume-normalized densities are not an energy
+classifier. Proposed first G05 geometry is continuous; it adopts no favorable
+cutoff or density model.
+
+Literature L06: Trievel and Scheiner, Molecules 2018, 23:2965,
+https://doi.org/10.3390/molecules23112965, pinned L06.txt beside L05.txt.
+Original NAC paper: Lau and Bruice 1998, https://doi.org/10.1021/ja9827447.
+The original NAC criterion is d(Cm,O) < 3.2 A AND angle(S,Cm,O) > 165 degrees.
+The 2018 summary writes >= 165 degrees. These are distinct at exactly 165.
+The user-requested inclusive boundary can be adopted as a separately attributed
+2018-summary profile, never as exact original-paper parity.
+L06 methyl-tetrel structural selection instead uses 160..180 degrees and oxygen
+distance <= 3.25 A. It includes partners such as waters and inhibitors. It does
+not establish substrate identity, catalytic competence, energy, or methyl transfer.
+
+3. PROPOSED EXACT G05 BOUNDED CONTRACTS
+ATHENA.G05.SAM_CHEBI_142094_SOURCE_IDENTITY/1 (PROPOSED)
+Admit exactly the full graph and stereochemical identity specified above. Required:
+- complete element, isotope, formal-charge, H-count, aromaticity and bond-order
+  evidence for the selected molecule, with lossless ordinary/nonordinary source
+  connection coverage and explicit V03 NONE; no radical or unusual-valence inference;
+- ordinary covalent graph exactly matches the reference, with all stereocenters
+  resolved by an explicit source-bound stereochemical authority;
+- no additional covalent attachments; known nonordinary connections retained
+  separately. For this first identity profile, any known nonordinary attachment
+  to the selected SAM is OUT_OF_DOMAIN; unknown connection coverage is UNKNOWN;
+- unspecified isotopes only (explicit isotope substitutions excluded in this first
+  profile); unspecified isotope evidence is distinct from explicitly unresolved
+  isotope identity; no isotope removal;
+- total H counts independently established, either through mapped source H atoms
+  or attributed source H-count assertions. Coordinates of all H are NOT required
+  for heavy-atom measurements. Toolkit defaults are not assertions;
+- S has exactly three ordinary single-bond heavy neighbors: methyl C, methionine
+  side-chain C, ribose-linked C. The transferable methyl anchor is the unique
+  S-bound carbon with three H and no other heavy neighbor;
+- all atom identities map bijectively to one selected source occurrence. Distinct
+  occurrences cannot be spliced together, even when residue names match.
+Absolute stereo must be compared through qualified correspondence, not by comparing
+PARITY_1/PARITY_2 strings across different atom orders. Sulfonium stereochemistry
+is a focused qualification obligation; existing generic stereo handling is not
+already qualification for this identity.
+No pH-based identity inference. Supplied prepared states retain their actual
+preparation attribution. Derived states require an explicitly admitted exact A08
+profile; none is admitted by this proposal.
+
+ATHENA.G05.SAM_PHE_CONTINUOUS_GEOMETRY/1 (PROPOSED)
+Selected admitted SAM + one existing qualified Phe aromatic six-carbon ring,
+same immutable state and explicitly coherent conformer. Coordinates finite;
+centroid is the unweighted arithmetic mean of the six selected ring carbons.
+Report separately d(S,centroid), d(Cm,centroid), acute S-to-centroid/normal angle,
+and acute Cm-to-centroid/normal angle. Reuse existing POINT_PAIR_GROUP outputs
+with ordered point pairs [Cm,S] and [S,Cm], respectively. Existing unique-plane
+and degeneracy rules remain unchanged and version-pinned. Undefined normal =>
+orientation UNKNOWN, not zero. No new plane tolerance, favorable label, survey
+population, protein-wide count or aromatic-role expansion. Tyr/Trp and SAH remain
+outside this first geometry leaf. This bounded leaf does not exhaust all of G05.
+
+4. G06 OPTIONS — DO NOT IMPLEMENT UNTIL SELECTED
+A. ATHENA.G06.SAM_CATECHOLATE_NAC_2018_SUMMARY/1 (candidate proposal)
+Selected admitted SAM and an exact unsubstituted catechol monoanion:
+[O-]c1ccccc1O. Ring has six aromatic carbons; adjacent O substituents, exactly one
+O- and one neutral OH; no other substituents; closed shell. Only the O- is the
+selected target. H counts/state are explicit; H coordinates do not enter geometry.
+Predicate d(Cm,O) < 3.2 A AND angle(S,Cm,O) >= 165 degrees. Angle vertex is Cm,
+using vectors Cm->S and Cm->O. No S...O or donor-distance substitute.
+This preserves the 2018 inclusive summary as requested, with no original-boundary
+parity claim. Original strict >165 may instead be selected as a distinct contract.
+
+Remaining exact blocker before implementing A: source admission for a catecholate
+in a coordination context. The COMT domain involves metal coordination. Ordinary
+covalent identity cannot establish complete coordination coverage, and excluding
+all metal-associated partners would sever the direct modeled COMT context. A
+source-bound protocol must distinguish explicitly recorded O/Mg connections from
+missing connectivity and must specify their admission without inferring valence,
+coordination function or a complete first sphere. This package does NOT resolve
+that question by extending S1 or inventing coordination. A's geometry definition
+is explicit; its complete scientific admission contract is not yet supportable.
+Neutral catechol, dinitrocatecholate, arbitrary phenolate, carbonyl O, N/S targets
+and generic 'oxygen nucleophile' are not silently admitted.
+
+B. ATHENA.G06.SAM_WATER_METHYL_TETREL_GEOMETRIC_CANDIDATE/1 (PROPOSED alternative)
+Exact same SAM plus a selected independently qualified explicit-source-H neutral
+water under unchanged I12 identity, in the same immutable coherent state.
+Only oxygen is measured. Predicate 160 <= angle(S,Cm,O) <= 180 degrees AND
+ d(Cm,O) <= 3.25 A. Retain both quantities. No inferred water H/orientation; no
+new water role. This is a methyl-tetrel geometric candidate, NOT a NAC contract
+or a methyl-transfer/oxygen-nucleophile classifier. It could qualify a bounded
+G06 geometric subdomain, but does not close the whole mechanistic row.
+
+Recommendation: approve the exact G05 identity/continuous geometry first; B is a
+separately selectable narrow G06 leaf. Keep A blocked pending partner admission.
+Do not label G06 complete by changing the meaning of its original row.
+
+5. EVIDENCE, COVERAGE AND OUTCOMES
+Bind all findings to original source bytes/category/items, immutable state digest,
+exact selection tuple, ordered coordinates, correspondence digest, reference
+hash/version, preparation chain, definition/version, geometry version and current
+review authority. Full chemistry assertions require independently reviewed source
+witnesses; a caller's coverage declaration cannot establish chemical eligibility.
+Known excluded identity => UNSUPPORTED; unresolved/conflicting facts => UNKNOWN;
+missing/expired current authority => NOT_EVALUATED for governed execution.
+Raw attributable measurements can remain available independently of authority.
+For geometric predicates only: ABSENT_FALSE requires complete eligibility of the
+one explicitly selected tuple and a defined geometry that fails the predicate.
+No whole-system or no-SAM absence claim; no inventory exhaustiveness inferred.
+Identity eligibility and geometric candidacy remain separate evidence dimensions.
+Zero-length vectors, NaN/Inf, mixed models/altlocs, unmapped anchors, duplicate atom
+identities, changed bytes and contradictory provenance fail closed. Preserve
+existing historical evidence explicitly; never consume it as new current authority.
+
+6. REPRESENTATION / API STOP BOUNDARY
+Existing graph, correspondence, group geometry, immutable evidence, event coverage
+and Research Gate suffice computationally. No new engine is justified.
+A SAM-specific binding must serialize the full reference-to-source atom map,
+source chemistry witnesses, S/Cm anchors and reference/definition digests. Existing
+payload reuse must be checked against the chosen chemistry before proposing exact
+new public fields. No new payload schema is approved or implemented by this file.
+After scientific selection, produce the smallest exact additive payload if existing
+contracts cannot losslessly carry those bindings, and obtain approval before code.
+This avoids asking approval for a speculative generic 'SAM receipt'.
+
+7. QUALIFICATION PLAN
+G05_G06_ACCEPTANCE_MATRIX.json is a planned matrix, not test results. Focused
+identity/geometry/governance and deterministic JVM replay per approved leaf;
+one committed-source regression/isolation/historical/preservation/clean-export run
+for the completed coherent batch. Do not repeat v1's full suite for this review.
+Never alter the source commit while its batch qualification runs.

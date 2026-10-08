@@ -1,0 +1,170 @@
+G05 — EXACT ADDITIVE SERIALIZATION PROPOSAL / APPROVAL BOUNDARY
+2026-10-08. Scientific definitions approved; this serialization proposal is pending.
+
+Approved scientific definitions, unchanged:
+ATHENA.G05.SAM_CHEBI_142094_SOURCE_IDENTITY/1
+ATHENA.G05.SAM_PHE_CONTINUOUS_GEOMETRY/1
+
+WHY EXISTING PAYLOADS ARE INSUFFICIENT
+RuleRequest binds the selected source atoms/state but has no reference graph map.
+SystemStateView.Component maps source chemistry to coordinate atoms, not ChEBI
+reference atom indices to source chemistry. Its stereo strings alone do not carry
+independently reviewed original-source stereo evidence.
+athena-group-source-coverage/1 has a strict field set carrying charge/H/aromaticity;
+it has no source isotope/stereo authority or lossless nonordinary connection scope.
+ATHENA.I03.SP3_SOURCE_SCOPE/1 and /2 carry nitrogen-specific reviewed semantics;
+S1Qualification.scope explicitly requires ATHENA.I03.SP3_SOURCE_SCOPE authority.
+Reusing that scientific authority for SAM would violate the approved G05 contract.
+Existing EvidenceInterpretation is a suitable carrier for a new, explicitly named
+SAM witness proposition. Generic string maps do not remove the need to approve
+its new public scientific semantics.
+Existing continuous geometry and Research Gate require no changes in semantics.
+
+PROPOSED ADDITIONS: TWO PAYLOADS, ONE WITNESS PROPOSITION
+No public Java overload, new matcher, graph/path engine or general source framework.
+Existing strict JSON parser, evidence pins, canonical hashing, state binding,
+correspondence and Research Gate remain the carriers. Implementations stay internal.
+All objects below reject duplicate JSON keys, unknown/missing fields, malformed
+pins and identity collisions. Arrays reject duplicates where stated. No defaults.
+Pin = existing {reference: EvidenceEnvelope ScientificReference, sha256: lower-case
+64-hex SHA-256 of exact payload bytes}. Binding = existing SystemStateView.Binding.
+
+A. athena-sam-source-binding/1, evidence type athena:sam-source-binding
+Exact top-level fields:
+ schema: literal athena-sam-source-binding/1
+ definition: literal ATHENA.G05.SAM_CHEBI_142094_SOURCE_IDENTITY/1
+ stateBinding: Binding
+ componentReference: existing ScientificReference of the selected SAM component
+ referenceArtifact: Pin of the exact approved ChEBI:142094 molfile
+ sourceCoverage: Pin of existing athena-group-source-coverage/1 for this component
+ referenceAtomMap: object from decimal reference atom index (1..27 in original
+   pinned molfile order) to source heavy-atom ID; 27 bijective entries required
+   for eligibility. A partial map remains UNKNOWN; unknown keys or duplicate
+   mapped source IDs reject as malformed
+ sourceHydrogenAtomIds: sorted array of every explicit H atom ID in this component
+ sourceScope: COMPLETE_ORDINARY | KNOWN_NONORDINARY | UNKNOWN
+ sourceKind: SOURCE | PREPARED_SOURCE | DERIVED
+ preparationReferences: ordered Pin array; empty permitted only for SOURCE
+ coherenceWitnesses: nonempty Pin array of source witnesses for the selected
+   immutable state/model/explicitly coherent conformation; missing evidence does
+   not authorize construction of an alternate ensemble
+ factWitnesses: object with exactly the following keys, each a nonempty Pin array:
+   elements, isotopes, formalCharges, hydrogens, aromaticity, bondOrders,
+   stereochemistry, electronicState, connections
+ limitations: array of nonblank strings (may be empty)
+
+Map must cover all and only source heavy atoms in the selected molecule. Together
+with sourceHydrogenAtomIds it must cover every component atom, with no cross-
+component overlap. Explicit H and authoritative H-count assertions remain distinct;
+no H creation/removal, source mutation or canonical re-encoding authority.
+Reference atom 2 = sulfonium S, atom 1 = transferable methyl C. These anchors are
+computed from the exact map and verified against the reference topology, not
+independently user-selected aliases. Original reference hash:
+034fde087f28026075bc49a63557207bcc60252359a73c8739afff956937f974.
+Reference coordinates are 2D identity depiction, never measured source geometry.
+
+SOURCE_SCOPE does not prove any chemical identity, stereo, H, or role eligibility.
+COMPLETE_ORDINARY requires independent connection witnesses affirming lossless
+ordinary-only coverage. KNOWN_NONORDINARY requires witnesses identifying the exact
+connection endpoints/type and source record; classify outside this first domain.
+UNKNOWN never means known nonordinary. Contradictory witnesses remain UNKNOWN.
+DERIVED is ineligible (no A08 profile admitted). PREPARED_SOURCE retains the exact
+original preparation chain; no relabeling as experimentally observed geometry.
+
+B. ATHENA.G05.SAM_SOURCE_FACT/1 in existing athena:event-source EvidenceInterpretation
+This is a new normative proposition, NOT a new generic record type.
+Exact measurement keys:
+ proposition: ATHENA.G05.SAM_SOURCE_FACT/1
+ stateBinding: canonical JSON Binding
+ componentReference: canonical JSON selected component ScientificReference
+ category: one of the nine factWitnesses keys above, or coherence
+ factValues: canonical JSON object, category-specific as below
+ sourceProtocol: canonical JSON Pin
+ sourceLocations: canonical JSON nonempty array of objects {artifact:Pin,
+   selector:nonblank original category/item/record locator}
+ preparationReferences: canonical JSON ordered Pin array
+
+Exact category-specific factValues shapes:
+ elements: {atoms:{sourceAtomId:elementSymbol}} covering every component atom.
+ isotopes: {atoms:{sourceAtomId:integer|null}}; null = explicitly source-established
+   unspecified isotope, NOT unresolved source evidence. Explicit mass labels are
+   excluded in this first profile. Unresolved knowledge uses UNKNOWN status.
+ formalCharges: {atoms:{sourceAtomId:integer}} covering every component atom.
+ hydrogens: {atoms:{sourceHeavyId:{explicitAtomIds:[sorted source H IDs],
+   authoritativeCount:nonnegative integer}}}; authoritativeCount excludes explicit
+   listed H atoms, and requires source attribution even when zero. No toolkit default.
+ aromaticity: {model:nonblank source model identifier,
+   atoms:{sourceAtomId:boolean}, bonds:[{first:sourceId,second:sourceId,aromatic:boolean}]}
+ bondOrders: {bonds:[{first:sourceId,second:sourceId,order:SINGLE|DOUBLE|TRIPLE|AROMATIC}]}
+ stereochemistry: {atoms:{sourceAtomId:nonblank exact source stereo token},
+   protocol:Pin}; tokens must bind the exact source graph ordering and the reviewed
+   interpretation protocol. Comparing raw relative tokens across atom orders is
+   forbidden. Source state plus protocol must resolve every reference stereocenter.
+ electronicState: {state:NONE|KNOWN_NON_NONE|UNKNOWN}; explicit NONE required.
+ connections: {coverage:COMPLETE_ORDINARY|KNOWN_NONORDINARY|UNKNOWN,
+   ordinaryBondDigest:64hex canonical digest of the component bond list,
+   nonordinary:[{first:source locator string,second:source locator string,
+     kind:nonblank exact source connection token,source:Pin,selector:nonblank string}]}
+ coherence: {stateBinding:Binding, selection:[sorted AtomReference],
+   sourceLocations:[{artifact:Pin,selector:nonblank string}]}; selected atoms include
+   all SAM mapped atoms for identity, and both partners for geometry. This assertion
+   cannot invent correlation absent source authority.
+
+Pair arrays use lexicographically ordered endpoint IDs and unique pairs. No numeric
+bond/valence contribution is inferred from nonordinary connection kind.
+No additional optional fields or chemistry thresholds. Missing category/facts or
+status UNKNOWN => unresolved eligibility. Disagreeing values for the same bound
+category => UNKNOWN, never choose a convenient witness. Malformed bindings reject.
+Witness subjects must refer to the same immutable source state; envelope method
+must equal interpretation evaluator. All source/protocol/preparation pins appear
+in interpretation inputs and must resolve to exact verified artifacts.
+
+Independent authority: introduce a G05-specific reviewed source-fact rule manifest
+identity ATHENA.G05.SAM_SOURCE_FACT under unchanged athena-rule/3 and Research Gate.
+A current receipt must pin this EXACT witness artifact AND its protocol in the
+reviewed scientific sources, bind this state, pass current policy/revocation and
+implementation checks, and agree with invocation time. A generic parser receipt,
+caller assertion, user approval, or a nitrogen S1 receipt cannot satisfy this.
+No production witness/receipt is manufactured during implementation. Qualification
+uses explicitly labeled synthetic authorities only, as existing governed tests do.
+Witness receipt absence => NOT_EVALUATED governed execution; factual uncertainty
+is retained separately. Raw source fact reporting never implies eligibility.
+
+C. athena-sam-measurements/1 within existing athena:rule-measurements envelope
+Exact top-level fields:
+ schema: athena-sam-measurements/1
+ definition: one of the two approved exact G05 definition IDs
+ definitionSha256: exact selected rule manifest digest
+ stateBinding: Binding
+ requestSha256: canonical existing RuleRequest digest
+ sourceBinding: Pin of A
+ sourcePins: sorted distinct Pin array of all consumed evidence
+ referenceAtomMap: exact verified map from A
+ anchors: {sulfur:AtomReference|null,methylCarbon:AtomReference|null}; null
+   only when incomplete source mapping leaves that anchor unresolved
+ identityStatus: existing EvidenceInterpretation.Status
+ geometry: null for identity definition; for geometry definition exactly:
+   {plan:Pin, rawMeasurements:Pin,
+    sulfurCentroidDistance:Quantity,methylCentroidDistance:Quantity,
+    sulfurNormalAngle:Quantity,methylNormalAngle:Quantity}
+ reasons: array of nonblank strings
+ limitations: array of nonblank strings
+Quantity = {status:existing EvidenceInterpretation.Status,value:finite number|null,
+ unit:ANGSTROM|DEGREE}. A known defined quantity has SUPPORTED_PRESENT and finite
+value; undefined quantity has UNKNOWN_INCONCLUSIVE and null, never fabricated zero.
+No overall favorable-interaction Boolean or ABSENT_FALSE for continuous G05 values.
+Distance and orientation statuses remain separate, including degenerate planes.
+
+Existing geometry plan has one Phe ring group and two ordered POINT_PAIR_GROUP
+operations: [Cm,S] for S quantities and [S,Cm] for methyl quantities. Ring membership
+must come from the unchanged qualified finite Phe source context. It cannot be
+asserted by naming six carbons PHE. Existing unique-normal/plane rules apply.
+RawMeasurements pins the unchanged ContinuousGeometry output; recomputation must
+match on evaluation. Existing Phe source-role logic may be extracted to an internal
+helper only with exact parity tests; no role manifest or chemistry expansion.
+
+QUALIFICATION SCOPE
+Before implementing these additions, approve this exact serialization/witness
+contract. After approval: implement two scientific leaves, focused tests and
+independent focused replay, then affected-family regression. One full suite at
+coherent v2 seal only. No G06 implementation, broad G05 closure, v1 change or push.

@@ -89,6 +89,7 @@ public final class RuleRegistry {
         if(m.implementationId().equals("athena.zn-source-features")){ZnSourceFeatureRules.validate(m);return;}
         if(m.implementationId().equals("athena.advisory-alert")){AdvisoryAlertRules.validate(m);return;}
         if(m.implementationId().equals("athena.glycine-h-carbonyl")){GlycineHCarbonylRules.validate(m);return;}
+        if(m.implementationId().equals("athena.sam-g05")){SamG05Rules.validate(m);return;}
         if(m.implementationId().equals("athena.met-phe-survey")){MetPheSurveyRules.validate(m);return;}
         if(m.implementationId().equals("athena.cl-phe-candidate")){ClPheCandidateRules.validate(m);return;}
         if(m.implementationId().equals("athena.source-site-metadata")){SourceSiteMetadataRules.validate(m);return;}
