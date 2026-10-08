@@ -1,0 +1,30 @@
+Approved native boundary — implementation preparation,2026-10-08
+Historical preparation record made during I04 qualification. I04 is now sealed; see implementation/ for subsequent A07 changes and discoveries.
+Original pinned PAINS strings all contain a space-delimited coordinate suffix.
+Preserve the WHOLE original string as query, hash exact UTF-8 bytes, and use the
+approved IDCodeParser(false) directly. Do not split away coordinates or replace
+original bytes with canonical serialization. Original catalog ordered hash remains
+d0e92e06907a6bcb9e8a0cb59674a6410b42816b65e05e725b269fb2e736f7c2.
+
+Read-only engineering inventory (not qualification): all native version9.
+Candidate feature profile: Any, aromatic/not-aromatic, ring-state,H-count and
+pi-electron query bits; native bond-type/ring-state bits and atom lists.
+Unknown bits, excluded atoms, explicit query H and unqualified atom/bond parity
+or ESR semantics must fail closed. Every admitted feature still needs directed
+positive/negative execution tests. Current conservative precedence inventory:
+489 candidate feature-profile entries,111 non-ABS ESR,1 excluded-atom entry,
+289 remaining entries with atom/bond parity outside that initial profile.
+These counts are NOT a qualification result and may change if validation finds
+additional unsupported semantics. Category2 is not scientific admission.
+
+Eight original-query-based engineering witness pairs prepared: indices113,159,
+162,167,169,202,207,840. Explicit concrete source SMILES built from inspection of
+query topology, not guessed from catalog labels, match original queries directly
+in pinned SSSearcher; single controlled near-miss targets do not. Rigorous positive
+embedding counts8,4,4,1,2,2,1,2 respectively; one target-atom-set occurrence each.
+These are engineering controls, not measured molecules, assays or a new dataset.
+They still require the approved backend path, source coverage/current Gate,
+mutation/format/ordering checks, independent replay and clean-source qualification.
+Every other entry receives its own disposition/reason; parse success cannot admit
+an entry. Catalog-wide ABSENT_FALSE remains unavailable unless all890 qualify.
+No PAINS toxicity, interference-truth, drug-likeness, rejection, binding or score.

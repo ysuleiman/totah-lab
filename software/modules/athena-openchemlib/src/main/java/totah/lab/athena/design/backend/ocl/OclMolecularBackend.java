@@ -273,6 +273,17 @@ public final class OclMolecularBackend implements MolecularSanitizer, CanonicalI
         return OclOccurrenceMatcher.match(query, mapper.toOcl(graph));
     }
 
+    @Override
+    public SubstructureMatcher.Result match(String queryFormat, String query, MolecularGraph graph)
+            throws MolecularBackendException {
+        if ("ATHENA_SMARTS_ENVELOPE/1".equals(queryFormat)) return match(query, graph);
+        if (!"OCL_IDCODE_QUERY/2026.7.2".equals(queryFormat))
+            throw new MolecularBackendException("unsupported query format: " + queryFormat);
+        rejectRadicalOperation("native-query-match");
+        OclOccurrenceMatcher.validateNativeTarget(graph);
+        return OclOccurrenceMatcher.matchNative(query, mapper.toOcl(graph));
+    }
+
     private BackendEvidence evidence(String operation, OclGraphMapper.Mapping mapping,
                                             List<BackendEvidence.GraphChange> changes, List<String> messages) {
         var lineage = new LinkedHashMap<String, String>();

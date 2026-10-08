@@ -3370,6 +3370,140 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.A07.OCL_PAINS_ADVISORY_OCCURRENCES — 1.0.0 (advisory-alert-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/advisory-alert-v1/ATHENA.A07.OCL_PAINS_ADVISORY_OCCURRENCES.rule.json) · SHA256 `4c8fc498ad5607fe3bf1261196e7db15392a5ebc6437817f56ba1481f2111875`
+
+**family**
+
+```json
+"MOTIF"
+```
+
+**profile**
+
+```json
+"ATHENA_A07_NATIVE_PAINS_V1"
+```
+
+**implementationId**
+
+```json
+"athena.advisory-alert"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "One complete connected closed-shell source component; explicit authoritative H/charge/aromaticity and independent source scope",
+  "Exact pinned native OCL.PAINS queries; seven bounded entry admissions, all remaining entries individually retained"
+]
+```
+
+**requiredGeometry**
+
+```json
+[]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "Native query raw evidence in existing rule measurements",
+  "entryAssessments": "Selected component, independently qualified entry only; never catalog-wide absence"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "A07/negative/1",
+  "scope": "COMPLETE_SELECTED_SOURCE_COMPONENT_PER_QUALIFIED_ENTRY_ONLY",
+  "requirements": [
+    "EXACT_CATALOG_QUERY",
+    "INDEPENDENT_ENTRY_QUALIFICATION",
+    "COMPLETE_SOURCE_CHEMISTRY",
+    "COMPLETE_SOURCE_SCOPE",
+    "EXHAUSTIVE_NATIVE_CORRESPONDENCE",
+    "CURRENT_RESEARCH_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Seven exact original queries; catalog-wide absence unavailable"
+}
+```
+
+**limitations**
+
+```json
+[
+  "Advisory exact catalog occurrence only; no toxicity, assay interference truth, drug-likeness, rejection authority, binding failure or score.",
+  "Only indices113,159,162,169,202,207,840 are admitted; remaining entries are incomplete or unsupported.",
+  "No catalog-wide ABSENT_FALSE. Synthetic implementation qualification does not create current scientific authority."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/advisory-alert-v1/ocl-pains-2026.7.2.json",
+    "sha256": "0de1f1135bc3ca2f8885df76a8f9500e8f56cd51a8c5a18ed450b46afb75c1df",
+    "citation": "Exact approved source catalog/native representation and advisory contract; no scientific authority implied."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/a07/NATIVE_QUERY_BOUNDARY_REVIEW.txt",
+    "sha256": "907bda0d13880a362efce69bc4e15c4e2f9dee9c65192197a98ebab2e50d7f5e",
+    "citation": "Exact approved source catalog/native representation and advisory contract; no scientific authority implied."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/advisory-alert-v1/entry-dispositions.json",
+    "sha256": "b87c944fe9707615f0e26f9ace0a0201e2c0cb991f9c664a22e1c43dbeac60d6",
+    "citation": "Individual entry representation/execution dispositions; engineering qualification only, never production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.PERCEPTION.AROMATIC_CARBOCYCLE.ALL_MEMBERS_NONPOLAR — 1.0.0 (all-members-nonpolar-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/all-members-nonpolar-v1/ATHENA.PERCEPTION.AROMATIC_CARBOCYCLE.ALL_MEMBERS_NONPOLAR.rule.json) · SHA256 `743194973ec54443b1f720f20314c71c5e5ba895a2d7e9940e561be7ddb3ee8f`

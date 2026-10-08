@@ -87,6 +87,7 @@ public final class RuleRegistry {
         if(m.implementationId().equals("athena.selected-pharmacophore")){SelectedPharmacophoreRules.validate(m);return;}
         if(m.implementationId().equals("athena.source-fragment-parent")){SourceFragmentParentRules.validate(m);return;}
         if(m.implementationId().equals("athena.zn-source-features")){ZnSourceFeatureRules.validate(m);return;}
+        if(m.implementationId().equals("athena.advisory-alert")){AdvisoryAlertRules.validate(m);return;}
         if(m.implementationId().equals("athena.glycine-h-carbonyl")){GlycineHCarbonylRules.validate(m);return;}
         if(m.implementationId().equals("athena.met-phe-survey")){MetPheSurveyRules.validate(m);return;}
         if(m.implementationId().equals("athena.implicit-h-proxy-s1")){S1ImplicitHProxyRules.validate(m);return;}

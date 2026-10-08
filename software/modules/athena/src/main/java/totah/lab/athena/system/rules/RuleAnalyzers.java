@@ -60,6 +60,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.selected-pharmacophore"))return SelectedPharmacophoreRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.source-fragment-parent"))return SourceFragmentParentRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.zn-source-features"))return ZnSourceFeatureRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,matcher,false);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,false);
@@ -116,6 +117,7 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.selected-pharmacophore"))return SelectedPharmacophoreRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.source-fragment-parent"))return SourceFragmentParentRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.zn-source-features"))return ZnSourceFeatureRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,null,true);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,true);

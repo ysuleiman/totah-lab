@@ -4,6 +4,8 @@ import hashlib,json,subprocess
 repo=Path(__file__).resolve().parents[3];q=Path(__file__).resolve().parent
 b=json.loads((q/'PRESERVATION_BEFORE.json').read_text())
 allowed={'software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleAnalyzers.java','software/modules/athena/src/main/java/totah/lab/athena/system/rules/RuleRegistry.java','docs/manual/athena/CATALOG.md','docs/manual/athena/RULES.md',*[f'software/qualification/chemistry-geometry-foundation-20261005/{p}' for p in ['START_HERE.txt','PROGRESS.json','CAPABILITY_LEDGER.json']]}
+# Explicitly approved additive A07 native-query boundary; old B00 bodies checked separately.
+allowed.update({'software/modules/athena/src/main/java/totah/lab/athena/design/backend/SubstructureMatcher.java','software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclMolecularBackend.java','software/modules/athena-openchemlib/src/main/java/totah/lab/athena/design/backend/ocl/OclOccurrenceMatcher.java'})
 for p,h in b['trackedFiles'].items():
  if p not in allowed:assert hashlib.sha256((repo/p).read_bytes()).hexdigest()==h,p
 pins=json.loads((repo/'software/qualification/water-bridge-contract-20261006/PRESERVATION_BEFORE.json').read_text())['sha256']
