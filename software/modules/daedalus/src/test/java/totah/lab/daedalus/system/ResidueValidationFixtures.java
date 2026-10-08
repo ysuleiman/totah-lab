@@ -23,7 +23,7 @@ import static totah.lab.mnemosyne.EvidenceInterpretation.Status.*;
 
 /** Hand-authored Gly-X-Gly source states and synthetic short-lived review. No production source authority. */
 final class ResidueValidationFixtures {
-    static JsonNode node(Object value){return JSON.valueToTree(value);}
+    static JsonNode node(Object value){try{return JSON.readTree(SystemStateView.bytes(value));}catch(java.io.IOException e){throw new java.io.UncheckedIOException(e);}}
     static final Path RESOURCE=Path.of("software/modules/athena/src/main/resources/totah/lab/athena/system/rules/residue-validation-v1");
     static final String V09="ATHENA.V09.TOP8000_CCTBX_COMPILED_SIX_CLASS",V10="ATHENA.V10.TOP8000_CCTBX_SER_THR_VAL_CHI1";
     static final String[] ROLES={"N","CA","C","O","CB","OG","OG1","CG1","CG2","CD1","ND1","NE2","CD"};
