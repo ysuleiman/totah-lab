@@ -18,15 +18,18 @@ def main():
     paths=set(f.read(f.BASE/'BUILD.json')['sourcePins'])
     paths.update(p for p in tracked if p.startswith(str(f.BASE.relative_to(repo))+'/'))
     paths.update(p for p in tracked if p.startswith('software/modules/') and '/src/' in p)
-    paths.update(p for p in tracked if p.startswith('software/qualification/') and p.endswith(('.json','.txt','.py','.java')))
+    paths.update(p for p in tracked if p.startswith('software/qualification/') and not p.endswith('.class'))
     # Exact literature/standard bytes not covered by textual audit suffixes.
     for p in f.read(f.BASE/'BUILD.json')['sourcePins']:paths.add(p)
     # Bound argv size while preserving the exact committed file selection.
-    ordered_paths=sorted(paths)
+    ordered_paths=sorted(p for p in paths if not p.endswith(".class"))
     for offset in range(0,len(ordered_paths),128):
         archive=subprocess.check_output(['git','archive',commit,'--',*ordered_paths[offset:offset+128]],cwd=repo)
         with tarfile.open(fileobj=io.BytesIO(archive)) as contents:
             contents.extractall(source,filter='data')
+    fixture='software/qualification/foundation-v2-review-20261008/reference/CHEBI-142094.mol'
+    assert (source/fixture).read_bytes()==subprocess.check_output(['git','show',commit+':'+fixture],cwd=repo), 'Pinned G05/G06 fixture omitted or changed'
+    f.write(out/'EXPORT.json',{'sourceCommit':commit,'trackedPaths':ordered_paths,'fixturePreflight':{fixture:f.digest(source/fixture)},'compiledArtifactsExcluded':True})
     stages['cleanExportSeconds']=time.monotonic()-stage
     f.BASE=source/f.BASE.relative_to(repo);f.META=source/f.META.relative_to(repo)
     build=f.build(source,out,Path('/unused-no-release-cache'),clean=True);build['commit']=commit
