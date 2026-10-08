@@ -1,0 +1,102 @@
+{
+  "sourceCommit": "705a2d78efc441a1b79eb661577cfe063899b465",
+  "beforeResult": "software/qualification/g06-water-tetrel-20261008/affected-qualified/RESULT.json",
+  "afterResult": "software/qualification/foundation-v2-workflow-20261008/g06-after/RESULT.json",
+  "beforeSeconds": 491.34804591699503,
+  "afterSeconds": 239.86798220896162,
+  "reductionPercent": 51.181655406545914,
+  "same350TestIdentities": true,
+  "sameSourceAndResourcePins": true,
+  "sameCompilerCacheKey": "e254f4924201fe213285a36961c6f423b50acdabd4bfe007fa4c8276a5b37d4f",
+  "beforeWorkersEffective": 1,
+  "afterIsolatedWorkers": 3,
+  "dominantClassesBeforeSeconds": 455.864,
+  "families": [
+    {
+      "class": "totah.lab.daedalus.system.WaterBridgeCurrentPipelineTest",
+      "tests": 5,
+      "beforeJUnitSeconds": 193.271,
+      "dependencyKind": "true transitive consumer",
+      "reason": "The changed WaterIdentity entry point is used by I12/I13 through WaterBridgeRules; real governed behavior and historical input exclusions must remain."
+    },
+    {
+      "class": "totah.lab.daedalus.system.SamWaterTetrelCurrentPipelineTest",
+      "tests": 4,
+      "beforeJUnitSeconds": 152.349,
+      "dependencyKind": "direct consumer",
+      "reason": "New G06 pipeline; positive, negative, missing time authority and historical-only input cases."
+    },
+    {
+      "class": "totah.lab.daedalus.system.SamG05CurrentPipelineTest",
+      "tests": 4,
+      "beforeJUnitSeconds": 110.244,
+      "dependencyKind": "conservative retention",
+      "reason": "G05 is an unchanged direct dependency; G06 separately tests current SAM admission. Retained prior-leaf pipeline protection for additive dispatcher changes; no removal needed to meet target."
+    },
+    {
+      "class": "totah.lab.daedalus.system.WaterBridgeDomainTest",
+      "tests": 67,
+      "beforeJUnitSeconds": 12.311,
+      "dependencyKind": "true transitive consumer",
+      "reason": "Exact unchanged water chemistry/exclusion and bridge-domain behavior via changed delegation."
+    },
+    {
+      "class": "totah.lab.daedalus.system.SamWaterTetrelAcceptanceTest",
+      "tests": 41,
+      "beforeJUnitSeconds": 9.995000000000001,
+      "dependencyKind": "direct consumer",
+      "reason": "New leaf contract, exact boundaries, unknown/negative/provenance/independent admission."
+    },
+    {
+      "class": "totah.lab.daedalus.system.SamG05AcceptanceTest",
+      "tests": 58,
+      "beforeJUnitSeconds": 6.829,
+      "dependencyKind": "direct dependency plus conservative regression",
+      "reason": "G06 reuses SamSourceFacts and exact G05 identity; unchanged dependency checks are retained cheaply."
+    },
+    {
+      "class": "totah.lab.daedalus.system.WaterBridgeAcceptanceTest",
+      "tests": 23,
+      "beforeJUnitSeconds": 3.997,
+      "dependencyKind": "true transitive consumer",
+      "reason": "Water identity, explicit H, inventory independence, provenance and path outcomes."
+    },
+    {
+      "class": "totah.lab.daedalus.system.WaterBridgeMatrixClosureTest",
+      "tests": 3,
+      "beforeJUnitSeconds": 0.715,
+      "dependencyKind": "true transitive consumer",
+      "reason": "Bridge closure/coverage semantics after internal WaterIdentity overload."
+    },
+    {
+      "class": "totah.lab.daedalus.system.B01FunctionalGroupAcceptanceTest",
+      "tests": 95,
+      "beforeJUnitSeconds": 0.521,
+      "dependencyKind": "conservative dependency coverage",
+      "reason": "Unchanged group report validation consumed by water identity; inexpensive broad group regression retained."
+    },
+    {
+      "class": "totah.lab.daedalus.system.ContinuousGeometryAcceptanceTest",
+      "tests": 21,
+      "beforeJUnitSeconds": 0.205,
+      "dependencyKind": "direct dependency coverage",
+      "reason": "G06 consumes DISTANCE/ANGLE from unchanged engine; replay contract and degenerate geometry."
+    },
+    {
+      "class": "totah.lab.daedalus.system.ContinuousGeometryV3AcceptanceTest",
+      "tests": 18,
+      "beforeJUnitSeconds": 0.028,
+      "dependencyKind": "direct dependency coverage",
+      "reason": "Pinned G06 geometry manifest version3; versioned mixed geometry regressions retained."
+    },
+    {
+      "class": "totah.lab.daedalus.system.ContinuousGeometryV2AcceptanceTest",
+      "tests": 11,
+      "beforeJUnitSeconds": 0.015,
+      "dependencyKind": "conservative dependency coverage",
+      "reason": "Unchanged earlier geometry version; inexpensive historical geometry assertions retained."
+    }
+  ],
+  "measurementLimit": "One recorded before/after measurement on the same local source/compiled closure. Load varies; not a statistical performance guarantee. No assertions removed.",
+  "tier3Run": false
+}
