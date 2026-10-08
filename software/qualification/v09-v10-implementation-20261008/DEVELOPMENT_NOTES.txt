@@ -1,0 +1,33 @@
+Qualification development notes — 2026-10-08
+
+No scientific definition or numerical tolerance changed during implementation.
+
+An initial OUTLIER test placed SER chi1 at 180 degrees, where the pinned grid is
+favored. Its source coordinate fixture was corrected to chi1=0. The expected
+numerical table, threshold and production predicate were not changed.
+
+An early combined run was not retained as qualification: it had the above
+fixture failure and source changes occurred while its slower tests ran.
+The final focused-5 and Tier2 sources are frozen; the harness rehashes them.
+
+Independent JVM replay first detected nondeterministic fixture construction:
+Jackson valueToTree retained randomized Map.of iteration order inside source
+JSON. The fixture now serializes maps through the existing canonical state
+serializer before forming JSON nodes. No existing public serializer was changed.
+The complete source binding and witness pins are retained in the comparison;
+no fields or provenance were stripped to obtain deterministic replay.
+
+A full repository archive exceeded available temporary disk space. Only this
+newly generated partial archive/export was removed. A smaller committed export
+of the required modules/review artifacts was then used for build parity. Two
+legacy characterization sources outside modules were added from the same commit.
+The first incomplete build's cache directory was not reused. The final committed
+build used a separate empty cache and produced all 683 class files identically.
+This is build parity, not the deferred full Tier3 release export/qualification.
+
+Upstream rotamer_names.props and LICENSE contain original trailing whitespace.
+Those bytes were preserved to keep the approved upstream digests exact. Native
+Java, Python, JSON and checkpoint text passed git diff --check.
+
+No unrelated scientific or UI source was changed, cleaned, stashed or reset.
+No push. No production source authority, activation, or default registration.
