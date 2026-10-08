@@ -1,0 +1,128 @@
+V07 FIRST-DOMAIN DECISION — PROPOSED, NOT APPROVED OR IMPLEMENTED
+2026-10-08; baseline remote 7ed0f8477279e572c952d1f65462f3f38391e7c9
+
+DECISION REQUIRED
+Recommend option A: central-residue heavy-atom continuous restraint deviations
+for ordinary internal L-SER/native L-THR/L-VAL, with independently reviewed
+admission to the exact pinned standard TRANS peptide reference profile.
+Proposed definition: ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1.
+This is a selected restraint comparison, not an empirical outlier classifier.
+Option B: include hydrogen-bearing rows, but select a nuclear or electron-cloud
+coordinate convention and qualify its preparation authority first. These are
+materially different domains. Do not infer that convention from coordinates,
+source format, experimental method, or toolkit defaults.
+Option C: defer V07 and retain the blocker for a bounded v2 seal.
+Approval here selects the scientific direction; exact new public field sets and
+source-profile witness must still be presented for approval before implementation.
+
+1. PINNED SOURCE AND SOURCE COMPARISON
+MonomerLibrary/monomers commit 1c97ea23a7df06373ed01cd7c3156a1f8e9b27e3.
+Exact files, URLs, SHA256 and upstream Git blob identities: SOURCE_PINS.json.
+Fetched SER, THR, VAL, links_and_mods.cif and list/mon_lib_list.cif.
+All five file bytes match that commit's previously pinned tree. TRANS,
+DEL-HN1 and DEL-OXT blocks are token-identical in both supplied library files.
+SOURCE_CHECKS.json records this review; it is not scientific qualification.
+License source is the existing pinned monomers--COPYING (LGPL v3 text);
+implementation distribution must retain applicable source/license provenance.
+
+The free monomer graphs contain N+1 with H/H2/H3 and OXT-1. Internal peptide
+admission cannot use those graphs unchanged. TRANS explicitly requests DEL-OXT
+on component1 and DEL-HN1 on component2. DEL-HN1 removes H2/H3, makes N neutral,
+and changes N-CA to 1.453 +/-0.010 A. DEL-OXT removes OXT, changes CA-C to
+1.526 +/-0.010 A and C-O to 1.229 +/-0.012 A, and CA-C-O to120.614 +/-1.50 deg.
+These are reference modifications, never permission to mutate SOURCE_GRAPH.
+The source state must already independently establish the exact internal chemistry.
+
+Hydrogen choices differ after modification too: N-H ordinary target0.914/esd0.010
+versus nuclear1.036/esd0.016 A. Option A measures neither; required chemical H
+identity/count evidence remains mandatory and is not waived by heavy-only geometry.
+Free-monomer descriptor strings must not override atom/bond/charge records.
+Do not use free ALA as an internal-residue reference or mix source versions.
+No conformation-dependent/CDL or other restraint library is claimed equivalent.
+
+2. EXACT PROPOSED MEASUREMENT DOMAIN
+Central ordinary internal L-SER, native L-THR, ordinary L-VAL only. Reuse the
+existing reviewed source-state chemistry and stereospecific correspondence domain.
+Both peptide connections and their ordinary/nonordinary coverage must be explicit.
+Additionally require independent current review binding that exact source context
+to this pinned TRANS reference profile; a caller enum cannot qualify this choice.
+Do not select TRANS using residue names, sequence adjacency, distance or omega.
+No automatic neighbor repair or new trans/cis geometry classifier.
+
+Only central intramonomer heavy-atom bond/angle rows in
+PROPOSED_HEAVY_ATOM_TABLE.json (36 total across three residue types).
+Rows involving deleted OXT or any H are absent. Exact DEL-HN1/DEL-OXT overrides
+are applied to the reference table, not to source chemistry. No interresidue
+bond/angle measurement, torsion, chirality, plane, aggregate RMSZ or chain score.
+All source-defined atom orderings remain explicit; no best-map optimization.
+
+Dependency chain: exact immutable source/context + current source review -> exact
+profile applicability review + versioned restraint table -> atom correspondence
+-> existing qualified DISTANCE/ANGLE -> per-row signed residual -> measurement.
+For each eligible selected row: measured x, exact target t, restraint esd s,
+delta=x-t and restraint-normalized residual delta/s (s must be positive finite).
+Angles use existing Athena angle output in degrees, distances in angstroms.
+Propose Java21 binary64 decimal parse, subtraction, then division in that order.
+No clipping, rounding, epsilon, statistical threshold or pass/fail category.
+The normalized residual is NOT an empirical population z-score/probability.
+A defined large residual remains a successful evaluated continuous measurement.
+Undefined geometry remains UNKNOWN and emits no fabricated residual.
+
+3. EXCLUSIONS, UNKNOWN AND AUTHORITY
+Exclude other residues, D/allo/modified/isotope states, termini, free zwitterions,
+proline/N-methyl profiles, unapproved link assignments, known nonordinary links,
+other preparation/tautomer/protonation states, and unapproved reference versions.
+Known excluded chemistry -> UNSUPPORTED; incomplete/conflicting chemistry,
+correspondence, coordinates or connection coverage -> UNKNOWN.
+Missing/expired exact-state or profile scientific authority -> NOT_EVALUATED.
+No whole-system absence and no ABSENT_FALSE from any residual or missing row.
+Completeness metadata can describe the finite selected row inventory only; it
+cannot prove source identity, peptide connectivity, or reference applicability.
+
+4. MINIMAL ADDITIVE REPRESENTATION TO FINALIZE AFTER THIS DECISION
+Reuse residue-context binding, immutable state, raw geometry plans/measurements,
+source witnesses, preparation lineage, RuleRequest and Research Gate receipts.
+Require an exact profile-applicability witness binding source/context digest,
+reference commit/file/table digest and ordered modifications, independently reviewed.
+Proposed measurement carries each tuple, raw measurement pin/value/unit, exact
+reference row identity/target/esd, delta, normalized residual, statuses/reasons,
+all consumed provenance and current definition/profile authority.
+No generic restraint engine, source transformation, graph/matcher changes or new
+geometry primitive needed. A finite leaf adapter and table suffice.
+No public payload field set is approved by implication from this direction review.
+
+5. PLANNED ACCEPTANCE OBLIGATIONS (NOT EXECUTED TESTS)
+Positive: each36 exact rows; all3 source classes; zero/positive/negative residuals.
+Negative domain: free and terminal states, D/allo/modified/isotope, incorrect H/
+charge/bond states, proline/N-methyl link profiles, known coordination attachments.
+Ambiguous: unresolved link-profile applicability, source stereochemistry, mappings.
+Missing: coordinates, neighbor connection evidence, target/esd/artifact, source review.
+Conflicting: source graph vs witness, two incompatible profile/source receipts.
+Numerical: signed residuals, exact target, nextUp/nextDown around target, zero/
+nonpositive esd rejection, zero-length angle arms, nonfinite input, no epsilon.
+Provenance: changed bytes, other commit/row/state/frame/request, swapped correspondence,
+expired/inherited-only authority, preparation mismatch, serialization tampering,
+reordered requests with canonical identity, independent JVM report replay.
+Preservation: existing residue/V09/V10/V11 bytes and source semantics unchanged;
+one shared affected Tier2 batch after new leaf acceptance. No Tier3 until seal.
+Do not count source downloads or proposed matrix obligations as acceptance passes.
+
+6. V08 FINDING — INDEPENDENT, NOT PART OF OPTION A APPROVAL
+The same modifications delete the free-monomer plan-1 carboxylate plane; TRANS
+introduces different peptide plane sets, including one containing H. Therefore
+free-residue plane membership must not survive blindly into an internal context.
+Ordered chirality sign comparison and weighted planarity are separate contracts.
+Before V08: pin exact ordered signed-volume formula/sign convention, zero/near-
+degenerate behavior, and whether only sign or a magnitude target is asserted.
+Separately pin plane fit, weighting, membership, rank/degeneracy, and residual
+semantics. dist_esd0.020 alone is not an outlier threshold or a fitting algorithm.
+Existing source stereo and plane diagnostics do not qualify either automatically.
+No V08 implementation or protocol selected here.
+
+7. RELEASE CONSEQUENCES
+Ledger unchanged:73 bounded/12 architectural/11 unfinished scientific rows.
+V13/V14 exact source/evaluator choices, I15 shell completeness, I17 named full
+protocol, V17 licensed access, V19-22 native-versus-report scope, and G06 NAC
+admission remain as recorded in REMAINING_V2.json. No blanket new authority.
+Do not run Tier3 yet: this requested next-domain scientific choice is pending.
+A future bounded seal may document exclusions without claiming96 green rows.
