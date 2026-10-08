@@ -1,0 +1,69 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION",
+  "version": "1.0.0",
+  "profile": "ATHENA_CBETA_DEVIATION_V1",
+  "family": "VALIDATOR",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.cbeta-deviation",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Exact independently reviewed selected residue/context source facts, complete source connections, native stereochemistry and coherent preparation/state."
+  ],
+  "requiredGeometry": [
+    "Exact selected N/CA/C/CB coordinates; approved private V11 reference reconstruction, no source mutation."
+  ],
+  "measurementsProduced": {
+    "payload": "athena-cbeta-deviation-measurements/1"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "definition": {
+      "value": "ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION/1",
+      "unit": "policy",
+      "definition": "Exact approved uncorrected bounded C-beta deviation profile."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/foundation-v2-closure-20261008/v11/DECISION_PACKAGE.txt",
+      "sha256": "607fe10ab27b4d88de87106ebd93b1b7955ab7749eaa78d18930e8e950ffc894",
+      "citation": "Approved bounded uncorrected V11 source, numerical and output contract."
+    },
+    {
+      "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cbeta-deviation-v1/SOURCES.json",
+      "sha256": "74da7d22341a36fa79d0a8ec1f0b72415384d8668902f7ac9ad493b9bdf706d7",
+      "citation": "Approved bounded uncorrected V11 source, numerical and output contract."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Ordinary internal native L-SER/L-THR/L-VAL only; independent current exact source authority required.",
+    "Constructed reference point is not an observed atom or a source-state mutation.",
+    "Uncorrected Java21 StrictMath profile only; no universal or bitwise coordinate-to-cctbx parity.",
+    "No energetic strain, biological function, mutation, repair or model-correction inference.",
+    "Selected residue only; OUTLIER is an evaluated classification, not ABSENT_FALSE; no production activation."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION/coverage/1",
+    "scope": "SELECTED_RESIDUE_ONLY",
+    "requirements": [
+      "EXACT_REVIEWED_SOURCE_STATE",
+      "COMPLETE_CONNECTIONS",
+      "CURRENT_SOURCE_AND_RULE_AUTHORITY",
+      "DEFINED_REFERENCE_RECONSTRUCTION"
+    ],
+    "supportedDomain": "Approved ordinary internal L-SER/native L-THR/L-VAL uncorrected C-beta profile",
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE"
+  }
+}

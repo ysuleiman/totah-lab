@@ -33,7 +33,8 @@ final class ResidueValidationFixtures {
     final Map<String,AtomReference> map=new TreeMap<>();final ScientificReference component=ref(ScientificReference.Kind.SUBJECT,"residue-source-component");
     final ObjectNode binding;final EvidenceEnvelope original,protocol,coverageEnvelope;final String identity;final boolean rama;
     RuleManifest manifest;RuleRequest request;EvidenceEnvelope bindingEnvelope;List<EvidenceEnvelope> witnessEnvelopes=new ArrayList<>();S1ResearchFixtures.Qualified main;int sequence;
-    ResidueValidationFixtures(String identity,boolean rama,String variant)throws Exception {
+    ResidueValidationFixtures(String identity,boolean rama,String variant)throws Exception {this(identity,rama,variant,Map.of());}
+    ResidueValidationFixtures(String identity,boolean rama,String variant,Map<String,double[]> coordinateOverrides)throws Exception {
         this.identity=identity;this.rama=rama;manifest=RuleRegistry.decode(Files.readAllBytes(RESOURCE.resolve((rama?V09:V10)+".rule.json")));
         var atoms=new ArrayList<MolecularGraph.Atom>();var bonds=new ArrayList<MolecularGraph.Bond>();
         for(int r=1;r<=3;r++) {
@@ -55,7 +56,7 @@ final class ResidueValidationFixtures {
             edge(bonds,"3_CA","3_CB",false);edge(bonds,"3_CB","3_CG",false);edge(bonds,"3_CG","3_CD",false);edge(bonds,"3_CD","3_N",false);
         }
         var coords=Map.of("1_C",new double[]{0,0,1},"1_CA",new double[]{-1,0,1},"2_N",new double[]{0,0,0},"2_CA",new double[]{1,0,0},"2_C",new double[]{1,1,0},"3_N",new double[]{1,1,1});
-        for(int i=0;i<atoms.size();i++){var a=atoms.get(i);double[] xyz=coords.get(a.id());if(variant.equals("cis-pro")&&a.id().equals("1_CA"))xyz=new double[]{1,0,1};if(variant.equals("outlier")&&a.id().equals("2_OG"))xyz=new double[]{0,0,1};if(variant.equals("degenerate")&&a.id().equals("2_CB"))xyz=new double[]{2,0,0};if(variant.equals("tiny")&&a.id().equals("2_CB"))xyz=new double[]{1,0,1e-11};if(xyz!=null)atoms.set(i,new MolecularGraph.Atom(a.id(),a.element(),a.isotope(),a.formalCharge(),a.explicitHydrogens(),a.aromatic(),a.stereochemistry(),new MolecularGraph.Coordinates(xyz[0],xyz[1],xyz[2]),a.properties()));}
+        for(int i=0;i<atoms.size();i++){var a=atoms.get(i);double[] xyz=coords.get(a.id());if(variant.equals("cis-pro")&&a.id().equals("1_CA"))xyz=new double[]{1,0,1};if(variant.equals("outlier")&&a.id().equals("2_OG"))xyz=new double[]{0,0,1};if(variant.equals("degenerate")&&a.id().equals("2_CB"))xyz=new double[]{2,0,0};if(variant.equals("tiny")&&a.id().equals("2_CB"))xyz=new double[]{1,0,1e-11};if(coordinateOverrides.containsKey(a.id()))xyz=coordinateOverrides.get(a.id());if(xyz!=null)atoms.set(i,new MolecularGraph.Atom(a.id(),a.element(),a.isotope(),a.formalCharge(),a.explicitHydrogens(),a.aromatic(),a.stereochemistry(),new MolecularGraph.Coordinates(xyz[0],xyz[1],xyz[2]),a.properties()));}
         graph=new MolecularGraph(atoms,bonds,Map.of("fixture","hand-authored synthetic Gly-X-Gly"));
         var residues=new ArrayList<Residue>();var charges=new TreeMap<AtomReference,Integer>();for(int r=1;r<=3;r++){
             var group=new ArrayList<Atom>();for(var a:atoms)if(a.id().startsWith(r+"_")){String name=a.id().substring(2);var ar=new AtomReference("A",r,' ',name);map.put(a.id(),ar);charges.put(ar,a.formalCharge());var p=a.coordinates();group.add(Atom.builder().name(name).element(Element.fromSymbol(a.element())).autoDockType(a.element()).position(new Point3D(p.x(),p.y(),p.z())).build());}

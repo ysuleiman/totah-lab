@@ -90,6 +90,7 @@ public final class RuleRegistry {
         if(m.implementationId().equals("athena.advisory-alert")){AdvisoryAlertRules.validate(m);return;}
         if(m.implementationId().equals("athena.glycine-h-carbonyl")){GlycineHCarbonylRules.validate(m);return;}
         if(m.implementationId().equals("athena.residue-reference")){ResidueValidationRules.validate(m);return;}
+        if(m.implementationId().equals("athena.cbeta-deviation")){CbetaDeviationRules.validate(m);return;}
         if(m.implementationId().equals("athena.sam-water-tetrel")){SamWaterTetrelRules.validate(m);return;}
         if(m.implementationId().equals("athena.sam-g05")){SamG05Rules.validate(m);return;}
         if(m.implementationId().equals("athena.met-phe-survey")){MetPheSurveyRules.validate(m);return;}

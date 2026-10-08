@@ -1,0 +1,192 @@
+V11 BOUNDED C-BETA REVIEW / PUBLIC CONTRACT — 2026-10-08
+PROPOSED; NOT APPROVED; NO ATHENA IMPLEMENTATION OR QUALIFICATION
+
+1. Exact identity and dependency chain
+Proposed ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION/1.
+Existing exact reviewed-selected-residue context and SOURCE_FACT/1 authority
+-> ordinary internal L-SER/native L-THR/L-VAL source admission (same chemical
+states as qualified V10; V10 itself is unchanged)
+-> exact source roles [N,CA,C,CB], immutable same coherent frame
+-> two pinned uncorrected cctbx ideal-CB constructions and normalized mean
+-> observed source CB to computed reference-point distance
+-> OUTLIER iff actual binary64 deviation >= 0.25 Angstrom.
+This is one selected residue; no chain completeness, occupancy weighting,
+energetic, rotamer-name or mechanistic claim.
+
+2. Source comparison and material choices
+Primary implementation: cctbx/cctbx_project ed314689c2d2945d7fd136d5f66d33ce1688e7a7,
+mmtbx/validation/cbetadev.py, SHA256
+c6661721fa398358f5a9a98a112105149f40643a801ea17b0c158e464229bd19.
+Exact pinned scitbx/matrix/__init__.py and cbd_utils.py are in reference/,
+with immutable URLs/digests in NEW_SOURCE_PINS.json. cctbx LICENSE is already
+pinned in the V09/V10 resource package. Lovell et al. 2003 is cited by this
+implementation; the executable profile is the selected numerical authority,
+not a claim that every MolProbity version uses identical behavior.
+
+Uncorrected profile: calculate_ideal_and_deviation, idealized_calpha_angles,
+construct_fourth, apply_phi_psi_correction=False. All reconstruction constants
+are in this source; a separate empirical monomer library is not needed for this
+bounded uncorrected profile. This resolves that part of the old V11 data blocker.
+Corrected profile: apply_phi_psi_correction=True uses cbd_utils and separate
+mean_devs_PRO_phi_psi / mean_devs_others_phi_psi /
+mean_devs_VAL_THR_ILE_phi_psi tables and phi/psi rounding. It is a different
+protocol. NOT proposed here; correction tables are not silently omitted from
+an alleged corrected implementation.
+Upstream D/unknown-name geometry guessing, hierarchy name/altloc selection,
+occupancy-weighted statistics and exclude_d_peptides dev>=2 behavior are NOT
+source admission. Athena admission remains independently reviewed exact state.
+
+Recommendation: uncorrected first bounded profile. It has an explicit finite
+parameter closure, needs no new residue-state catalog, and does not require
+expanding V09/V10. The corrected version remains a distinct unapproved profile.
+
+3. Supported domain and source requirements
+Only ordinary internal L-SER, ordinary native L-THR and ordinary L-VAL already
+admissible under the exact V10 chemical domain, including its full graph/H/charge/
+isotope/aromaticity/electronic-state, stereochemical and methyl-correspondence
+requirements. No admission from names, coordinate handedness or supplied enums.
+Reuse unchanged athena-residue-context-binding/1 and
+ATHENA.V09_V10.RESIDUE_CONTEXT_SOURCE_FACT/1 as exact selected-source facts;
+this proposal approves a new V11 consumer, not a change to those facts.
+Require exact previous/next peptide context and independently reviewed current
+source authority even though reconstruction uses only the four central atoms.
+SOURCE/PREPARED_SOURCE retain actual preparation evidence. DERIVED has no
+admitted transformation. Preserve original sources and complete ordinary and
+nonordinary connection coverage. Known nonordinary/cyclic/crosslinked or modified
+states remain UNSUPPORTED; missing/conflicting state facts remain UNKNOWN.
+D, allo-THR, GLY, other residues, terminal central residues and parent mappings
+are excluded from this first profile. No mirror correction or best-map search.
+
+4. Reconstruction / exact arithmetic specification
+All source coordinates are Angstrom binary64 values. Fixed ordered tuple N,CA,C,CB.
+Parameter order: dist, angleCAB, dihedralNCAB, angleNAB, dihedralCNAB, angleideal.
+ SER: 1.530, 110.1, 122.8, 110.5, -122.6, 111.2.
+ THR/VAL: 1.540, 109.1, 123.4, 111.5, -122.0, 111.2.
+angleideal is retained for source traceability; upstream does not use it in this
+reconstruction. Do not add an angleideal eligibility test.
+
+Preserve the expression/operation order of pinned construct_fourth for NCAB
+then CNAB and pinned rotate_point_around_axis, using Java21 strict binary64,
+StrictMath.sin/cos/sqrt, Math.PI and left-to-right sums. x**2 is x*x; dlsq**0.5
+is StrictMath.sqrt(dlsq). Cross products preserve the pinned operand order.
+No FMA, reassociation, intermediate decimal rounding or alternate orthogonalizer.
+
+NCAB uses res0=N,res1=C,res2=CA; CNAB uses res0=C,res1=N,res2=CA.
+In each construction a=res2-res1, b=res0-res1, c=a cross b.
+Normalize c to dist, add res2, rotate about res1->res2 by dihedral-90 degrees
+using the pinned rotation formula. Recompute a=newD-res2, b=res1-res2,
+c=a cross b; normalize c to dist; rotate newD about res2->(res2+c) by
+90-angle degrees. These two resulting points are betaNCAB and betaCNAB.
+Mean=(betaNCAB+betaCNAB)/2; betadist=norm(CA-Mean).
+If betadist != dist, reference=CA+(Mean-CA)*dist/betadist in that order;
+otherwise reference=Mean. deviation=norm(sourceCB-reference).
+Vector norm sums x*x then y*y then z*z and applies StrictMath.sqrt.
+The reference point is COMPUTED_REFERENCE_POSITION, never an observed atom,
+new source-graph member, H coordinate or preparation mutation.
+
+Numerical profile ID: ATHENA_JAVA21_STRICT_BINARY64_CB_RECONSTRUCTION/1.
+This is a declared native arithmetic profile of the pinned uncorrected algorithm.
+Do NOT claim bit-identical coordinate-to-deviation cctbx parity: Python libm and
+Java StrictMath may differ. Retain those differences, with no invented tolerance.
+Category comparisons against upstream are exact when given the SAME resulting
+binary64 deviation. Independent upstream coordinate fixtures characterize the
+algorithm; any categorical disagreement must be recorded and reviewed, not
+accepted by widening a tolerance. Exact JVM replay remains required.
+
+5. Degeneracy choice requiring approval
+Pinned construct_fourth normalizes only if cmag > 0.000001, otherwise it continues
+with the unnormalized vector. Review probes show a finite ideal/deviation for a
+tiny nonzero normal, None for a collinear case, and ZeroDivisionError for a zero
+axis. These are actual upstream outcomes, not hypothetical claims.
+Recommended bounded Athena policy: require BOTH normalization guards in BOTH
+constructions to satisfy the exact source condition cmag > 0.000001. Otherwise
+UNKNOWN and no ideal point/deviation/category. Also require each rotation axis
+squared norm and final betadist to be finite and >0, and all intermediates finite.
+No new numerical guard constant is introduced; 1e-6 comes from pinned source,
+but refusing the unnormalized branch IS an explicit narrower-domain choice.
+It must not be called exact upstream degeneracy parity. The alternative faithful
+unnormalized continuation is defensible but is not this recommended contract.
+Undefined optional reference-to-observed CB orientation is not needed: this first
+payload omits that extra torsion entirely. No change to existing Athena DIHEDRAL.
+
+6. Assessment / negative coverage
+Qualified source + defined reconstruction + current V11 and source authority:
+ deviation >=0.25 -> category OUTLIER, assessment SUPPORTED_PRESENT.
+ deviation <0.25 -> category NON_OUTLIER, assessment SUPPORTED_PRESENT.
+OUTLIER is a successful classification, not ABSENT_FALSE. No whole-chain negative.
+Missing/expired current rule or source authority -> NOT_EVALUATED, no category.
+Incomplete/conflicting chemistry or undefined geometry -> UNKNOWN_INCONCLUSIVE.
+Known outside supported chemical domain -> UNSUPPORTED.
+Malformed/cross-state/tampered payloads -> reject. Operational truncation ->
+NOT_EVALUATED. No production receipt or registration is implied by approval.
+
+7. Minimal additive public payload — approval requested
+athena-cbeta-deviation-measurements/1. Strict exact fields below; no unknown keys.
+Reuse existing pin, StateBinding, AtomReference, ResidueId and fact-status types.
+
+schema: literal above
+definition: ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION/1
+definitionSha256: exact RuleRegistry manifest digest
+stateBinding: exact immutable StateBinding
+requestSha256: exact RuleRequest digest
+contextBinding: pin of unchanged residue-context binding
+centralResidue: exact selected ResidueId
+atomTuple: ordered four AtomReferences [N,CA,C,CB]
+sourceAdmissionStatus: existing Status
+sourceFactStatuses: exact existing identityState/atomCorrespondence/connections/
+ stereochemistry/preparation/coherence factual statuses (not admission authority)
+authorityStatus: existing Status
+referenceProfile: {
+ repository: cctbx/cctbx_project,
+ commit: ed314689c2d2945d7fd136d5f66d33ce1688e7a7,
+ artifacts: sorted distinct exact source+matrix+license pins,
+ numericProfile: ATHENA_JAVA21_STRICT_BINARY64_CB_RECONSTRUCTION/1,
+ phiPsiCorrection: false,
+ parameterClass: SER | THR_VAL | null,
+ parameters: null or exact six ordered binary64 values with raw bits,
+ normalizationGuard: {operator: GT, value: 0.000001, binary64Hex: exact bits},
+ outlierBoundary: {operator: GE, value: 0.25, binary64Hex: 3fd0000000000000,
+ unit: ANGSTROM}
+}
+reconstruction: {
+ status: existing Status,
+ kind: COMPUTED_REFERENCE_POSITION,
+ firstConstruction: point | null,
+ secondConstruction: point | null,
+ normalizedReference: point | null,
+ degeneracy: NONE | INCOMPLETE_TUPLE | NORMALIZATION_GUARD |
+ ZERO_ROTATION_AXIS | ZERO_MEAN_DISTANCE | NONFINITE | NOT_EVALUATED
+}
+ point is {value:[x,y,z], binary64Hex:[16lowerhex,16lowerhex,16lowerhex],
+ unit:ANGSTROM}; values/bits must agree exactly, including signed zero.
+deviation: {status: existing Status, value: number|null,
+ binary64Hex:16lowerhex|null, unit:ANGSTROM}
+category: OUTLIER | NON_OUTLIER | null
+assessmentStatus: existing Status
+sourcePins: sorted distinct consumed source/preparation/witness/authority/reference pins
+reasons: deterministic string list
+limitations: deterministic approved definition limitations
+
+All keys mandatory; only the explicitly named values may be null. Classification
+and reference reconstruction may be emitted only after independent source admission
+and required source/rule authority. Collector may bind inputs and report missing
+requirements; it cannot self-qualify a reference point or a category. Evaluation
+recomputes exact graph admission, arithmetic and payload consistency. This new
+payload does not add a generic computed-point API or change any older serializer.
+
+8. Reuse / new primitive analysis
+Reuse source binding/checker, correspondence, frame/coverage evidence, current
+Research Gate, request/manifest/pin conventions and deterministic replay. The
+ordinary three-residue chemical-domain check can be shared internally with V10
+only with exact parity tests; no V10 output/registration/science changes.
+The double ideal-CB reconstruction is a genuinely new V11-specific internal
+calculation not expressible by measuring an existing source point. Keep it private
+to V11; no graph/matcher/event/path framework or public geometry API is required.
+
+9. Acceptance and qualification
+ACCEPTANCE_MATRIX.json is the proposed matrix. UPSTREAM_PROBES.json contains
+24 independently executed pinned upstream coordinate cases plus three exact
+threshold probes, explicitly NOT Athena implementation qualification.
+After approval: Tier1 source/geometry/category/payload cases and upstream/JVM
+replay; one shared Tier2 affected-family campaign. Tier3 only at v2 seal.
+Scientific approval does not create production source-state authority.

@@ -85,7 +85,7 @@ final class ResidueValidationRules {
             private Finding finding(SystemStateView state,EvidenceInterpretation.Status status,ObjectNode p,String reason){return new Finding(evaluate?"evaluate":"collect",List.of(state.subject()),status,p==null?Map.of():Map.of("payload",canonical(p)),List.of(reason),m.limitations());}
         };
     }
-    private static EvidenceInterpretation.Status rotamerDomain(ResidueContextSource.Checked c,String id) {
+    static EvidenceInterpretation.Status rotamerDomain(ResidueContextSource.Checked c,String id) {
         if(id==null)return UNKNOWN_INCONCLUSIVE;if(!Set.of("SER","THR","VAL").contains(id))return UNSUPPORTED;
         var roles=c.binding().path("central").path("roles");var expected=new TreeMap<String,Integer>();
         expected.put(canonical(roles.path("N")),1);expected.put(canonical(roles.path("CA")),1);expected.put(canonical(roles.path("C")),0);expected.put(canonical(roles.path("O")),0);
