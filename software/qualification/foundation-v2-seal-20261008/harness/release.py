@@ -90,7 +90,7 @@ def main():
     stage=time.monotonic();pins=f.read(repo/'software/qualification/water-bridge-contract-20261006/PRESERVATION_BEFORE.json')['sha256'];assert len(pins)==25
     for p,h in pins.items():assert f.digest(repo/p)==h,p
     for p,h in f.read(repo/'software/qualification/v09-v10-implementation-20261008/PRESERVATION_BEFORE.json').items():assert f.digest(repo/p)==h,p
-    preservation=f.timed(['python3',str(repo/'software/qualification/foundation-supportable-pass-20261007/validate_preservation.py')],out/'preservation.log',repo);assert preservation['exitCode']==0
+    preservation=f.timed(['python3',str(q/'harness/preservation.py')],out/'preservation.log',repo);assert preservation['exitCode']==0
     stages['preservationSeconds']=time.monotonic()-stage
     # Selection harness unit tests deliberately verify the original development
     # closure, including preserved untracked inputs. Execute committed tool bytes
