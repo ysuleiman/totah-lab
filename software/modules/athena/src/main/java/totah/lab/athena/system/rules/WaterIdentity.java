@@ -20,13 +20,16 @@ final class WaterIdentity {
     }
     private WaterIdentity() { }
     static Result assess(SystemStateView s,WaterBridgeInputs inputs,AtomReference oxygen)throws Exception {
+        return assess(s,inputs.chemistry,oxygen);
+    }
+    static Result assess(SystemStateView s,HbondCandidateSources chemistry,AtomReference oxygen)throws Exception {
         var candidates=new ArrayList<SystemStateView.Component>();
         for(var c:s.components())if(c.correspondenceAlternatives().stream().anyMatch(m->m.containsValue(oxygen)))candidates.add(c);
         if(candidates.size()!=1||candidates.getFirst().correspondenceAlternatives().size()!=1)return unknown(oxygen,"unresolved component correspondence");
         var c=candidates.getFirst();var mapping=c.correspondenceAlternatives().getFirst();
         var ids=mapping.entrySet().stream().filter(e->e.getValue().equals(oxygen)).map(Map.Entry::getKey).toList();
         if(ids.size()!=1)return unknown(oxygen,"ambiguous oxygen mapping");String id=ids.getFirst();
-        var report=inputs.chemistry.report(c,WaterBridgeInputs.WATER);
+        var report=chemistry.report(c,WaterBridgeInputs.WATER);
         if(report==null)return unknown(oxygen,"missing/conflicting independently qualified source chemistry");
         var graph=c.chemistry();var atom=graph.atom(id).orElseThrow();
         if(!atom.element().equals("O"))return unknown(oxygen,"source element disagreement");
@@ -59,7 +62,7 @@ final class WaterIdentity {
         if(topology&&(graphH.size()>2||knownH&&coverage.path("completeGraph").asText().equals("SUPPORTED_PRESENT")&&graphH.size()+a.path("implicitHydrogenCount").asInt()!=2))exclusions.add("E4 known non-water hydrogen count");
         if(!exclusions.isEmpty())return new Result(oxygen,"DEFINITELY_NOT_WATER",List.of(),null,false,List.copyOf(exclusions));
         var descriptor=JSON.readTree("[{\"id\":\""+WaterBridgeInputs.WATER+"\",\"role\":\"oxygen\"}]");
-        var anchors=inputs.chemistry.anchors(c,descriptor).stream().filter(x->x.atom().equals(oxygen)).toList();
+        var anchors=chemistry.anchors(c,descriptor).stream().filter(x->x.atom().equals(oxygen)).toList();
         if(!topology||!report.complete()||anchors.isEmpty())return unknown(oxygen,"water identity coverage incomplete");
         var anchor=anchors.getFirst();var hs=HbondCandidateEnumeration.hydrogens(s,anchor);
         boolean oriented=s.frameQualified()&&hs.size()==2&&knownH&&a.path("implicitHydrogenCount").asInt()==0;

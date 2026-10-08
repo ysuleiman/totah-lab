@@ -1,0 +1,252 @@
+{
+  "status": "PLANNED_NOT_EXECUTED",
+  "boundaryStrategy": "Test exact scalar predicate using nextUp/nextDown separately from coordinate integration; do not claim trigonometric coordinate reconstruction yields exact one-ULP angle inputs. Integration replays actual measured angles.",
+  "cases": [
+    {
+      "id": "G06-W-001",
+      "name": "positive",
+      "case": "Eligible water at 170 degrees, 3.0 A",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-002",
+      "name": "distance_equal",
+      "case": "3.25 A inclusive",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-003",
+      "name": "distance_below",
+      "case": "Math.nextDown(3.25), eligible angle",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-004",
+      "name": "distance_above",
+      "case": "Math.nextUp(3.25), eligible angle",
+      "expected": "ABSENT_FALSE"
+    },
+    {
+      "id": "G06-W-005",
+      "name": "angle_equal",
+      "case": "160 degrees inclusive",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-006",
+      "name": "angle_below",
+      "case": "Math.nextDown(160), eligible distance",
+      "expected": "ABSENT_FALSE"
+    },
+    {
+      "id": "G06-W-007",
+      "name": "angle_above",
+      "case": "Math.nextUp(160), eligible distance",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-008",
+      "name": "angle_linear",
+      "case": "180 degrees",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-009",
+      "name": "distance_only",
+      "case": "3.0 A, angle below160",
+      "expected": "ABSENT_FALSE"
+    },
+    {
+      "id": "G06-W-010",
+      "name": "angle_only",
+      "case": "170 degrees, distance above3.25",
+      "expected": "ABSENT_FALSE"
+    },
+    {
+      "id": "G06-W-011",
+      "name": "zero_vector",
+      "case": "Cm=O or S=Cm",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-012",
+      "name": "nonfinite",
+      "case": "NaN/Inf coordinates",
+      "expected": "reject or UNKNOWN, never positive/negative"
+    },
+    {
+      "id": "G06-W-013",
+      "name": "missing_h",
+      "case": "One water H absent",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-014",
+      "name": "implicit_h",
+      "case": "Water H inferred/implicit",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-015",
+      "name": "both_h",
+      "case": "Both mapped H preserved; reordered input canonicalized",
+      "expected": "same result and replay"
+    },
+    {
+      "id": "G06-W-016",
+      "name": "coincident_h",
+      "case": "O-H zero length",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-017",
+      "name": "charged_water",
+      "case": "Known hydronium/hydroxide",
+      "expected": "UNSUPPORTED"
+    },
+    {
+      "id": "G06-W-018",
+      "name": "other_oxygen",
+      "case": "Alcohol/carbonyl/phenolate/peroxide",
+      "expected": "UNSUPPORTED"
+    },
+    {
+      "id": "G06-W-019",
+      "name": "sam_exclusion",
+      "case": "CCD SAM/SAH/isotope/known nonordinary attachment",
+      "expected": "UNSUPPORTED"
+    },
+    {
+      "id": "G06-W-020",
+      "name": "sam_unknown",
+      "case": "Missing/conflicting chemistry/stereo/connection facts",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-021",
+      "name": "mapping",
+      "case": "Partial/ambiguous or mismatched source correspondence",
+      "expected": "UNKNOWN or malformed rejection, never negative"
+    },
+    {
+      "id": "G06-W-022",
+      "name": "mixed_state",
+      "case": "Mixed frame/model/source bindings",
+      "expected": "reject or UNKNOWN"
+    },
+    {
+      "id": "G06-W-023",
+      "name": "coherence",
+      "case": "Unresolved alternate correlation",
+      "expected": "UNKNOWN_INCONCLUSIVE"
+    },
+    {
+      "id": "G06-W-024",
+      "name": "preparation",
+      "case": "Modeled supplied H retains actual preparation lineage",
+      "expected": "no observed-H relabeling"
+    },
+    {
+      "id": "G06-W-025",
+      "name": "inventory",
+      "case": "Complete inventory with unqualified water",
+      "expected": "no identity upgrade"
+    },
+    {
+      "id": "G06-W-026",
+      "name": "source_authority",
+      "case": "Missing SAM source fact review",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "G06-W-027",
+      "name": "sam_authority",
+      "case": "Missing current G05 admission authority",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "G06-W-028",
+      "name": "water_authority",
+      "case": "Missing current independent water admission authority",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "G06-W-029",
+      "name": "leaf_authority",
+      "case": "Missing/expired/revoked G06 authority",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "G06-W-030",
+      "name": "historical",
+      "case": "Historical inherited evidence only",
+      "expected": "NOT_EVALUATED"
+    },
+    {
+      "id": "G06-W-031",
+      "name": "conflict",
+      "case": "Conflicting source reports/reviews",
+      "expected": "UNKNOWN or NOT_EVALUATED, never select convenient evidence"
+    },
+    {
+      "id": "G06-W-032",
+      "name": "bytes",
+      "case": "Changed source/plan/report bytes",
+      "expected": "reject"
+    },
+    {
+      "id": "G06-W-033",
+      "name": "definition",
+      "case": "Cross-definition/threshold replay",
+      "expected": "reject"
+    },
+    {
+      "id": "G06-W-034",
+      "name": "identity_collision",
+      "case": "Duplicate pins/atom identities/JSON keys",
+      "expected": "reject"
+    },
+    {
+      "id": "G06-W-035",
+      "name": "geometry_replay",
+      "case": "Original geometry differs from recomputation",
+      "expected": "reject"
+    },
+    {
+      "id": "G06-W-036",
+      "name": "governed_positive",
+      "case": "Fully reviewed synthetic composition",
+      "expected": "SUPPORTED_PRESENT"
+    },
+    {
+      "id": "G06-W-037",
+      "name": "governed_negative",
+      "case": "Fully eligible tuple fails predicate",
+      "expected": "ABSENT_FALSE"
+    },
+    {
+      "id": "G06-W-038",
+      "name": "no_global_absence",
+      "case": "Other waters unenumerated",
+      "expected": "selected tuple only"
+    },
+    {
+      "id": "G06-W-039",
+      "name": "deterministic",
+      "case": "Reordered artifacts and two fresh JVM executions",
+      "expected": "byte-identical canonical outputs"
+    },
+    {
+      "id": "G06-W-040",
+      "name": "legacy",
+      "case": "G05/I12/I13 affected regressions",
+      "expected": "unchanged"
+    },
+    {
+      "id": "G06-W-041",
+      "name": "no_activation",
+      "case": "Default registration/production authority unchanged",
+      "expected": "no activation"
+    }
+  ]
+}

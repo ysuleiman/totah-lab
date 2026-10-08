@@ -1,0 +1,132 @@
+G06 WATER METHYL-TETREL — BOUNDED CONTRACT AND PUBLIC SERIALIZATION REVIEW
+2026-10-08. Scientific scope authorized by user; additive output schema pending approval.
+No implementation or qualification claim. Foundation v1 remains unchanged.
+
+PUSH VERIFIED
+Remote refs/heads/codex/mmp-chemistry-roundtrip:
+1bbbd6be562f0d2df3e88974aa6a2c888aff441e
+Only the previously committed G05 checkpoint was pushed. Dirty files are not commits.
+
+1. EXACT SCIENTIFIC CONTRACT
+ATHENA.G06.SAM_WATER_METHYL_TETREL_GEOMETRIC_CANDIDATE/1
+Dependencies: immutable source/correspondence/preparation/frame -> exact G05
+ChEBI:142094 identity and independently reviewed SAM source facts -> selected
+reference atom 2 (S) and reference atom 1 (Cm) -> unchanged I12 neutral-water
+identity with two mapped explicit source H -> independently qualified chemistry
+and current Research Gate -> existing DISTANCE and ANGLE geometry -> predicate.
+
+Only an admitted exact G05 SAM and selected independently qualified I12 water
+are eligible, in one source-supported coherent immutable state/frame. G05 full
+reference map, stereochemistry, protonation, preparation and connection scope
+requirements remain unchanged. Coherence witness must include the SAM selection
+and selected water O/H1/H2. No derived-state profile is newly admitted.
+Water is exactly ATHENA.GROUP.WATER.NEUTRAL_H2 with existing WaterIdentity
+QUALIFIED_WATER and oriented=true conditions. Explicit mapped H, known neutral
+source chemistry, complete source topology, finite H coordinates and positive
+O-H lengths are required exactly as in I12. H orientation is an admission fact;
+no additional H-angle criterion enters this G06 predicate. A water inventory
+assertion never establishes chemical eligibility or orientation.
+
+Measure independently d=distance(Cm,O) in angstrom and theta=angle(S,Cm,O) in
+ degrees, vertex Cm, vectors Cm->S and Cm->O. Predicate:
+  160 <= theta <= 180 AND d <= 3.25.
+Inclusive binary-double comparisons; no epsilon, rounding or new tolerance.
+Undefined angle (including zero vector) yields UNKNOWN, never a positive from
+distance alone. Retain each defined continuous quantity if the other is undefined.
+
+Meaning only: selected SAM methyl and qualified water oxygen satisfy the approved
+methyl-tetrel geometric candidate. No methyl transfer, NAC, catalysis, substrate,
+energy/favorability, rate, affinity or biological implication.
+
+2. SOURCE COMPARISON AND EXCLUSIONS
+Source: Trievel and Scheiner, Molecules 2018 23:2965,
+https://doi.org/10.3390/molecules23112965; existing pinned L06.txt.
+The structural selection describes near-linear S-C...X geometry and oxygen
+contact distance 3.25 A; water is explicitly represented in the G9A example.
+The user-approved inclusive operational predicate is retained exactly. Survey
+observations described as less than 3.25 A are not a claim that a datum exactly
+at the adopted inclusive boundary appeared in the survey. The paper's QM energy
+results do not transfer into this purely geometric output.
+This is narrower than that source: exact G05 SAM and explicit-H neutral water
+only, not all oxygen partners or universal tetrel detection.
+The separate COMT/catecholate NAC summary (<3.2 A, >=165 degrees) is not this
+rule; original NAC strict >165 is also distinct. Catecholate admission remains
+blocked by unresolved metal-associated source admission. Carbonyl, phenolate,
+other oxygen roles, N/S/halides, implicit-H or inferred waters are not admitted.
+
+3. OUTCOMES AND SELECTED-TUPLE COVERAGE
+SUPPORTED_PRESENT: both independently qualified identities and current authority,
+coherent complete selected tuple, defined measurements and predicate true.
+ABSENT_FALSE: same complete eligibility, but defined geometry fails predicate.
+UNKNOWN_INCONCLUSIVE: missing/conflicting chemical facts, ambiguous correspondence,
+missing H/orientation, unknown connection coverage, unsupported coherence evidence,
+or undefined geometry. Never infer whole-system absence.
+UNSUPPORTED: established excluded chemistry under exact G05/I12 domain rules.
+NOT_EVALUATED: current scientific authority missing/expired/revoked or absent
+independent source qualification; raw collection is never authority.
+Malformed serialization, digest mismatch, duplicate identity, inconsistent state
+binding or forged replay reject; do not manufacture negative scientific evidence.
+
+4. MINIMAL ADDITIVE PUBLIC CONTRACT — APPROVAL REQUEST
+Existing athena-sam-measurements/1 is explicitly restricted to two G05 definitions
+and Phe quantities. It remains unchanged. No new input plan, generic witness,
+Java public overload, matcher, graph, event/path engine or chemistry role needed.
+Reuse existing RuleRequest.atoms in order [S,Cm,O,H1,H2], with H1/H2 ordered by
+existing AtomReference order; five distinct mapped occurrences. This ordering
+identifies one selected water, not two different geometric candidates.
+Use existing SAM source binding/witnesses, group identity/source-coverage reports,
+continuous geometry plan/raw report and Research Gate documents as inputs.
+Continuous plan has no groups/radius assignment; exactly DISTANCE [Cm,O], then
+ANGLE [S,Cm,O]. Replay existing collector and bind original raw report bytes.
+
+Proposed sole new output: athena-sam-water-tetrel-measurements/1, carried by
+existing athena:rule-measurements. Exact top-level fields:
+ schema: literal athena-sam-water-tetrel-measurements/1
+ definition: literal ATHENA.G06.SAM_WATER_METHYL_TETREL_GEOMETRIC_CANDIDATE/1
+ definitionSha256: exact manifest digest
+ stateBinding: existing Binding
+ requestSha256: canonical existing RuleRequest digest
+ samSourceBinding: existing Pin
+ sourcePins: sorted unique Pins of consumed evidence (including source/preparation)
+ tuple: {sulfur:AtomReference,methylCarbon:AtomReference,
+         waterOxygen:AtomReference,waterHydrogens:[AtomReference,AtomReference]}
+ samIdentityStatus: existing EvidenceInterpretation.Status
+ waterIdentityStatus: existing EvidenceInterpretation.Status
+ geometry: {plan:Pin,rawMeasurements:Pin,
+            methylOxygenDistance:Quantity,sulfurMethylOxygenAngle:Quantity}
+ assessment: existing EvidenceInterpretation.Status
+ reasons: array of nonblank strings
+ limitations: array of nonblank strings
+Pin = existing {reference:ScientificReference,sha256:lower-case 64-hex}.
+Quantity = {status:existing Status,value:finite number|null,unit:ANGSTROM|DEGREE}.
+Defined quantity: SUPPORTED_PRESENT + value; undefined: UNKNOWN_INCONCLUSIVE + null.
+Strict fields and duplicate-key rejection; no default values or hidden thresholds.
+Raw payload identity statuses cannot assert current qualification; evaluation
+replays raw output then applies independent current authority. The evaluated
+payload may report qualified identities and selected-tuple assessment separately.
+No new production authority, receipt or default registry activation is created.
+
+5. PRECISE INTERNAL REUSE
+SamSourceFacts.check/authorized reuse exact G05 source checking; G05 identity
+manifest/current admission must be independently qualified under its existing
+request, at the same invocation time. G06 authority alone cannot replace it.
+Existing HbondCandidateSources validates original water reports and correspondence.
+Current water group Research Gate receipt binds exact water definition, original
+report/source dependencies and same state; historical self-marked qualification
+cannot substitute for independently current admission.
+Reuse WaterIdentity.assess logic through a package-private overload taking its
+existing HbondCandidateSources dependency directly. The old WaterBridgeInputs
+entry point delegates to that identical logic. No I12/I13 behavior/schema change;
+mandatory parity regression. Do not invent bridge endpoints or require a hydrogen
+bond bridge merely to assess water identity. No new path traversal.
+Reuse existing geometry collector, current receipt verification and evidence pins.
+Reject conflicting supplied water reports rather than choosing a convenient one.
+Qualification must demonstrate governance of both admissions plus G06 composition.
+
+6. TESTING AND STOP BOUNDARY
+ACCEPTANCE_MATRIX.json is a plan, not completed results. Tier1 focused tests and
+deterministic independent JVM replay first; Tier2 G05, water, geometry and governed
+execution family regression once. No Tier3 until coherent v2 seal.
+No production source edited pending approval of section 4's additive payload.
+Bounded leaf success will NOT close unrestricted/full G06. Catecholate remains
+blocked and the checkpoint must preserve that blocker and the narrower meaning.
