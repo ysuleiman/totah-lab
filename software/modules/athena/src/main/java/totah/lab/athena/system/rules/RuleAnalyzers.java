@@ -63,6 +63,9 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,matcher,false);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.cl-phe-candidate"))return ClPheCandidateRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.source-site-metadata"))return SourceSiteMetadataRules.analyzer(m,r,false);
+        if(m.implementationId().equals("athena.source-fragment-lineage"))return SourceFragmentLineageRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,false);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,false);
@@ -120,6 +123,9 @@ public final class RuleAnalyzers {
         if(m.implementationId().equals("athena.advisory-alert"))return AdvisoryAlertRules.analyzer(m,r,null,true);
         if(m.implementationId().equals("athena.glycine-h-carbonyl"))return GlycineHCarbonylRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.met-phe-survey"))return MetPheSurveyRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.cl-phe-candidate"))return ClPheCandidateRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.source-site-metadata"))return SourceSiteMetadataRules.analyzer(m,r,true);
+        if(m.implementationId().equals("athena.source-fragment-lineage"))return SourceFragmentLineageRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.implicit-h-proxy-s1"))return S1ImplicitHProxyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.implicit-h-proxy"))return ImplicitHProxyRules.analyzer(m,r,true);
         if(m.implementationId().equals("athena.water-bridge"))return WaterBridgeRules.analyzer(m,r,true);

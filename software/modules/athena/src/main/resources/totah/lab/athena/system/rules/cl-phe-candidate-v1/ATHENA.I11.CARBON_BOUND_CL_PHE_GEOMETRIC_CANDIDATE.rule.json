@@ -1,0 +1,96 @@
+{
+  "schema": "athena-rule/2",
+  "ruleId": "ATHENA.I11.CARBON_BOUND_CL_PHE_GEOMETRIC_CANDIDATE",
+  "version": "1.0.0",
+  "profile": "ATHENA_I11_CL_PHE_V1",
+  "family": "INTERACTION",
+  "tier": "bounded-scientific-definition",
+  "implementationId": "athena.cl-phe-candidate",
+  "implementationVersion": "1",
+  "qualification": "NOT_EVALUATED",
+  "retired": false,
+  "requiredCapabilities": [],
+  "requiredChemistry": [
+    "Selected neutral carbon-bound Cl H0 with one ordinary single bond; unchanged exact finite PHE source context; complete source facts/scope and unique correspondence",
+    "Distinct ligand/protein components with independently current-reviewed exact original attribution"
+  ],
+  "requiredGeometry": [
+    "Six complete Cl-to-ring distances, unique nearest ring member, exact angle(Cl,nearest,centroid), qualified same frame and unique ring normal"
+  ],
+  "measurementsProduced": {
+    "payload": "unchanged continuous geometry/3 report",
+    "sourceRoles": "unchanged exact finite PHE context",
+    "ringMemberDistancesAngstrom": "all six distances in declared ring role order",
+    "nearestRingAtoms": "all exact nearest identities; positive requires one",
+    "distanceAngstrom": "Cl-centroid distance",
+    "thetaDegrees": "angle(Cl,unique nearest ring atom,centroid)",
+    "orientationCharacterization": "separate inclusive delta<=0.3 face-on else edge-on characterization"
+  },
+  "classificationStates": [
+    "SUPPORTED_PRESENT",
+    "ABSENT_FALSE",
+    "NOT_EVALUATED",
+    "UNSUPPORTED",
+    "UNKNOWN_INCONCLUSIVE",
+    "FAILED"
+  ],
+  "parameters": {
+    "sources": {
+      "value": "{\"ATHENA.G03.SOURCE.CARBON_RING\":{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"MOTIF\",\"implementationId\":\"athena.group\",\"implementationVersion\":\"4\",\"limitations\":[\"Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.\",\"Initial bounded domains only; no resonance/protonation normalization.\",\"Implementation qualification does not confer Scientific Rule Research Gate eligibility.\"],\"measurementsProduced\":{\"source-identities\":\"athena-group-identities/2\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"VALID_DEFINITION\",\"COMPLETE_GRAPH\",\"COMPLETE_CHARGE_STATE\",\"REQUIRED_H_STATE\",\"AROMATICITY_MODEL\",\"SUPPORTED_DOMAIN\",\"EXHAUSTIVE_B00\"],\"scope\":\"EXPLICIT_COMPONENT_ONLY\",\"supportedDomain\":\"Explicit complete source component under this declarative definition; see definition payload.\",\"version\":\"ATHENA.G03.SOURCE.CARBON_RING/negative/1\"},\"parameters\":{\"definition\":{\"definition\":\"Immutable declarative group identity and source-state requirements.\",\"unit\":\"policy\",\"value\":\"{\\\"contextPolicy\\\":\\\"ALL_ONE_BOND_NEIGHBORS_PLUS_QUERY_CONTEXT\\\",\\\"definitionVersion\\\":\\\"1.0.0\\\",\\\"groupId\\\":\\\"ATHENA.G03.SOURCE.CARBON_RING\\\",\\\"limitations\\\":[\\\"Identity only; no donor/acceptor, reaction, pKa, binding, potency or biology claim.\\\",\\\"Initial bounded domains only; no resonance/protonation normalization.\\\",\\\"Implementation qualification does not confer Scientific Rule Research Gate eligibility.\\\"],\\\"memberQueryIndices\\\":[0,1,2,3,4,5],\\\"negativeCoverageVersion\\\":\\\"ATHENA.G03.SOURCE.CARBON_RING/negative/1\\\",\\\"occurrenceExclusions\\\":[],\\\"patternId\\\":\\\"ATHENA.G03.SOURCE.CARBON_RING/pattern\\\",\\\"patternVersion\\\":\\\"1\\\",\\\"query\\\":\\\"c1ccccc1\\\",\\\"requiredMatcher\\\":\\\"2026.7.2/athena-ocl-occurrences/2\\\",\\\"requiredState\\\":{\\\"aromaticity\\\":true,\\\"formalCharge\\\":true,\\\"graphCompleteness\\\":true,\\\"hydrogenConsistencyQueries\\\":{\\\"0\\\":\\\"[*;H0]\\\",\\\"1\\\":\\\"[*;H1]\\\",\\\"2\\\":\\\"[*;H2]\\\",\\\"3\\\":\\\"[*;H3]\\\",\\\"4\\\":\\\"[*;H4]\\\"},\\\"hydrogenElements\\\":[\\\"C\\\",\\\"N\\\",\\\"O\\\",\\\"S\\\"],\\\"hydrogenRoles\\\":[],\\\"roleCharges\\\":{\\\"ringMembers\\\":0}},\\\"roles\\\":{\\\"ringMembers\\\":[0,1,2,3,4,5]},\\\"schema\\\":\\\"athena-group-definition/2\\\",\\\"sourceReferences\\\":[{\\\"id\\\":\\\"software/qualification/advanced-rule-research-design-20261004/reference/L04.txt\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"c377b7437a5192e2db6a7f817ef1d02f2dd384e6b581a0be13a32a8ff8b9b2bf\\\"},{\\\"id\\\":\\\"software/qualification/foundation-supportable-pass-20261007/g03/CONTRACT.txt\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"b5c5f0e3ead1671bcd77892bd75017b1bf1a86ed038f1db64cc508fa817b8266\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/CysteineBackboneAttribution.java\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"d922b9569032e65191289dfe17e7ee7e6f1de1ab9389d758ec9820d9470f77ee\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/java/totah/lab/athena/system/SystemStateView.java\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"e153af17ebf5741a776fc4d1f5e6bd7b8d3d395597655c8250ddbc1068cc714f\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION.rule.json\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"ccf55d6bb85df5469528cf4bdb7bf6a11108510990b370d4fb65aac4305e861a\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/ContinuousGeometryRules.java\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"f9836cc3cd3079a3530905d6e67f30638021bcb6cf0655bec2ef97a31b4a36f6\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.THIOETHER.rule.json\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"5a2f8f18c4bc5c592ed9e0b462f0420fdf0b4377cf8b6be042df2e64506a76c3\\\"},{\\\"id\\\":\\\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AROMATIC.rule.json\\\",\\\"kind\\\":\\\"SOURCE\\\",\\\"namespace\\\":\\\"athena.g03.source\\\",\\\"version\\\":\\\"218b65a203fc08fc56646f40291da1afc6ae5b4e1262b2f90dd6d8c45865bf78\\\"}],\\\"supportedDomain\\\":{\\\"coveredAtomQuery\\\":\\\"[c]\\\",\\\"elements\\\":[\\\"C\\\",\\\"N\\\",\\\"O\\\",\\\"S\\\"],\\\"unsupportedQueries\\\":[{\\\"query\\\":\\\"[n]\\\",\\\"reason\\\":\\\"heteroaromatic domain deferred\\\"},{\\\"query\\\":\\\"[o]\\\",\\\"reason\\\":\\\"heteroaromatic domain deferred\\\"},{\\\"query\\\":\\\"[s]\\\",\\\"reason\\\":\\\"heteroaromatic domain deferred\\\"},{\\\"query\\\":\\\"[p]\\\",\\\"reason\\\":\\\"heteroaromatic domain deferred\\\"}]}}\"}},\"profile\":\"ATHENA_GROUP_SOURCE_H_V4\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[],\"requiredCapabilities\":[],\"requiredChemistry\":[\"B00 qualified matching\",\"attributed complete chemical state\"],\"requiredGeometry\":[],\"retired\":false,\"ruleId\":\"ATHENA.G03.SOURCE.CARBON_RING\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/qualification/advanced-rule-research-design-20261004/reference/L04.txt\",\"sha256\":\"c377b7437a5192e2db6a7f817ef1d02f2dd384e6b581a0be13a32a8ff8b9b2bf\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/qualification/foundation-supportable-pass-20261007/g03/CONTRACT.txt\",\"sha256\":\"b5c5f0e3ead1671bcd77892bd75017b1bf1a86ed038f1db64cc508fa817b8266\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/CysteineBackboneAttribution.java\",\"sha256\":\"d922b9569032e65191289dfe17e7ee7e6f1de1ab9389d758ec9820d9470f77ee\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/java/totah/lab/athena/system/SystemStateView.java\",\"sha256\":\"e153af17ebf5741a776fc4d1f5e6bd7b8d3d395597655c8250ddbc1068cc714f\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cysteine-backbone-b06/ATHENA.SULF.CYSTEINE_BACKBONE_ATTRIBUTION.rule.json\",\"sha256\":\"ccf55d6bb85df5469528cf4bdb7bf6a11108510990b370d4fb65aac4305e861a\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/java/totah/lab/athena/system/rules/ContinuousGeometryRules.java\",\"sha256\":\"f9836cc3cd3079a3530905d6e67f30638021bcb6cf0655bec2ef97a31b4a36f6\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-foundation-v1/ATHENA.GROUP.THIOETHER.rule.json\",\"sha256\":\"5a2f8f18c4bc5c592ed9e0b462f0420fdf0b4377cf8b6be042df2e64506a76c3\"},{\"citation\":\"Pinned source Met/Phe survey convention and exact bounded source/geometry contract; no energy, cysteine or chalcogen-O extension.\",\"locator\":\"software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-b01/ATHENA.GROUP.AROMATIC.rule.json\",\"sha256\":\"218b65a203fc08fc56646f40291da1afc6ae5b4e1262b2f90dd6d8c45865bf78\"}],\"tier\":\"G03_SOURCE_CONTEXT\",\"version\":\"1.0.0\"}}",
+      "unit": "policy",
+      "definition": "Exact source identity or unchanged qualified mixed geometry."
+    },
+    "geometry": {
+      "value": "{\"classificationStates\":[\"SUPPORTED_PRESENT\",\"ABSENT_FALSE\",\"NOT_EVALUATED\",\"UNSUPPORTED\",\"UNKNOWN_INCONCLUSIVE\",\"FAILED\"],\"family\":\"ENVIRONMENT\",\"implementationId\":\"athena.geometry\",\"implementationVersion\":\"3\",\"limitations\":[\"raw measurements only; no interaction, energy or potency assertion\"],\"measurementsProduced\":{\"geometry\":\"athena-continuous-geometry/1\"},\"negativeCoverage\":{\"incompleteStatus\":\"UNKNOWN_INCONCLUSIVE\",\"requirements\":[\"COMPLETE_EXPLICIT_SCOPE\",\"QUALIFIED_FRAME\",\"FINITE_COORDINATES\"],\"scope\":\"No continuous quantity establishes ABSENT_FALSE\",\"supportedDomain\":\"raw explicit geometry\",\"version\":\"1\"},\"parameters\":{\"planeNormalRelativeGapTolerance\":{\"definition\":\"Numerical eigengap guard; not empirical planarity\",\"unit\":\"dimensionless\",\"value\":\"1.0E-10\"}},\"profile\":\"ATHENA_CONTINUOUS_GEOMETRY_V3\",\"qualification\":\"NOT_EVALUATED\",\"referenceArtifacts\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/p06-centroid-characterization-20261005/REVIEW_GATE.txt\",\"sha256\":\"ec889f0b9a9eb7c591a955e9a97342c931ba61fe19bec7b1a0aa659625a21a85\"},{\"citation\":\"Previously approved geometry extension\",\"locator\":\"software/qualification/b05-mixed-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"d48eaf31e98c114f8a03a33f63885c9963821c7565bc0388020c8e2abfe2723a\"}],\"requiredCapabilities\":[],\"requiredChemistry\":[\"explicit atoms; attributed radii only\"],\"requiredGeometry\":[\"explicit complete source frame\"],\"retired\":false,\"ruleId\":\"ATHENA.GEOMETRY.CONTINUOUS\",\"schema\":\"athena-rule/2\",\"scientificSources\":[{\"citation\":\"Approved continuous geometry contract\",\"locator\":\"software/qualification/continuous-geometry-contract-20261005/DESIGN.txt\",\"sha256\":\"7ee64be41ca6e2e16c5bc5c2a2d5836454ab5d6be694550904c1974df432e6a1\"}],\"tier\":\"GEOMETRY\",\"version\":\"3\"}",
+      "unit": "policy",
+      "definition": "Exact source identity or unchanged qualified mixed geometry."
+    },
+    "maximumDistanceAngstrom": {
+      "value": "4.5",
+      "unit": "angstrom",
+      "definition": "Strict Cl-centroid upper bound; selected geometric candidate only."
+    },
+    "maximumThetaDegrees": {
+      "value": "140",
+      "unit": "degree",
+      "definition": "Strict angle(Cl,unique nearest ring atom,centroid) upper bound."
+    }
+  },
+  "scientificSources": [
+    {
+      "locator": "software/qualification/foundation-supportable-pass-20261007/i11/SOURCE_PARTNER_BOUNDARY_REVIEW.txt",
+      "sha256": "c25fe92c20cf791b8e4f4643d685fa3bb1cd06ce062f358d598c50b64f9ec536",
+      "citation": "Approved exact I11 source/chemistry/geometry contract; Imai 2008 DOI10.1110/ps.033910.107."
+    },
+    {
+      "locator": "software/qualification/bounded-literature-review-20261008/reference/PMC2442010.txt",
+      "sha256": "4b5f7ad40e0eada7a767e8f8d42731273d44dfff4a0bb4cfc855c8a601116d93",
+      "citation": "Exact primary definition or unchanged qualified source implementation; no empirical dataset or production authority."
+    },
+    {
+      "locator": "software/qualification/bounded-literature-review-20261008/reference/clpi-fig1.jpg",
+      "sha256": "56f27851dcc0a0464127254906e659243e29a1b4399b6f08cc996c9ff158a4d6",
+      "citation": "Exact primary definition or unchanged qualified source implementation; no empirical dataset or production authority."
+    }
+  ],
+  "referenceArtifacts": [],
+  "limitations": [
+    "Selected Cl/PHE geometric candidate only; no other halogens, energy, affinity, potency, mechanism or biological interpretation.",
+    "No whole-system absence; exact nearest ties remain inconclusive.",
+    "No production source protocol or scientific authority supplied by implementation."
+  ],
+  "negativeCoverage": {
+    "version": "ATHENA.I11.CARBON_BOUND_CL_PHE_GEOMETRIC_CANDIDATE/coverage/1",
+    "scope": "EXACT_SELECTED_SOURCE_PAIR_ONLY",
+    "requirements": [
+      "EXACT_SOURCE_IDENTITIES",
+      "COMPLETE_SOURCE_COMPONENTS",
+      "INDEPENDENT_SOURCE_SCOPE",
+      "QUALIFIED_SELECTED_GEOMETRY",
+      "CURRENT_POLICY_AUTHORITY",
+      "INDEPENDENT_SOURCE_PARTNER_ATTRIBUTION"
+    ],
+    "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+    "supportedDomain": "Exact selected neutral carbon-bound Cl and explicitly attributed protein PHE only."
+  }
+}
