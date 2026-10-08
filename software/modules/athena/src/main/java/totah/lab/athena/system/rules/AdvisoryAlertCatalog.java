@@ -24,7 +24,7 @@ final class AdvisoryAlertCatalog {
         var entries=new ArrayList<Entry>();var ordered=new StringBuilder();
         for(var e:d.get("entries")){
             fields(e,Set.of("index","label","queryFormat","query","querySha256"));
-            if(!e.path("index").isIntegralNumber()||e.path("index").intValue()!=entries.size())throw new IllegalArgumentException("catalog index/order");
+            if(!e.path("index").isIntegralNumber()||!e.path("index").canConvertToInt()||e.path("index").intValue()!=entries.size())throw new IllegalArgumentException("catalog index/order");
             equal(e,"queryFormat",FORMAT);String query=text(e,"query"),label=text(e,"label"),hash=text(e,"querySha256");
             if(!sha(query).equals(hash))throw new IllegalArgumentException("original query bytes/hash");
             ordered.append(query.length()).append(':').append(query).append(label.length()).append(':').append(label);

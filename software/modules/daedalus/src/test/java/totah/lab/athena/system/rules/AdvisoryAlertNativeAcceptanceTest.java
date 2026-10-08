@@ -59,10 +59,10 @@ class AdvisoryAlertNativeAcceptanceTest {
         assertThrows(MolecularBackendException.class,()->defaultOnly.match(AdvisoryAlertCatalog.FORMAT,"CO",g));
         assertThrows(MolecularBackendException.class,()->BACKEND.match("OCL_IDCODE_QUERY/2026.7.3","CO",g));
     }
-    @ParameterizedTest @ValueSource(strings={"schema","catalogId","catalogVersion","sourceJarSha256","orderedCatalogSha256","index","label","queryFormat","query","querySha256","order","truncate","extra"})
+    @ParameterizedTest @ValueSource(strings={"schema","catalogId","catalogVersion","sourceJarSha256","orderedCatalogSha256","index","label","queryFormat","query","querySha256","order","truncate","extra","overflow-index","fractional-index"})
     void exactCatalogIdentityRejectsMutation(String field)throws Exception {
         var d=(ObjectNode)JSON.readTree(Files.readAllBytes(CATALOG));var entries=(ArrayNode)d.get("entries");var e=(ObjectNode)entries.get(113);
-        switch(field){case "index"->e.put(field,114);case "order"->{var first=entries.get(0);entries.set(0,entries.get(1));entries.set(1,first);}case "truncate"->entries.remove(889);case "extra"->d.put("unapproved",true);default->{if(e.has(field))e.put(field,e.get(field).asText()+"x");else d.put(field,"changed");}}
+        switch(field){case "index"->e.put(field,114);case "overflow-index"->e.put("index",4294967409L);case "fractional-index"->e.put("index",113.0);case "order"->{var first=entries.get(0);entries.set(0,entries.get(1));entries.set(1,first);}case "truncate"->entries.remove(889);case "extra"->d.put("unapproved",true);default->{if(e.has(field))e.put(field,e.get(field).asText()+"x");else d.put(field,"changed");}}
         assertThrows(IllegalArgumentException.class,()->AdvisoryAlertCatalog.decode(JSON.writeValueAsBytes(d)));
     }
     @Test void immutableEntriesAndNoQualificationOnLoad()throws Exception {assertEquals(890,catalog().entries().size());assertThrows(UnsupportedOperationException.class,()->catalog().entries().clear());}
