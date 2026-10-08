@@ -15,13 +15,13 @@ Tier1: focused contracts, boundaries, unknown/unsupported/negative and provenanc
 Tier2: reviewed affected family plus dependent test helpers/governed consumers.
 Tier3: commit source, then run:
 python3 software/qualification/foundation-v1-rc-20261008/harness/release.py NEW_EMPTY_OUTPUT_DIRECTORY
-This runs all2872 prior tests plus3 consumer tests, isolation,29 paired independent JVM
+This runs all2872 prior tests plus3 consumer tests and1 V18 historical-input determinism test, isolation,29 paired independent JVM
 replays,65 historical comparisons,25 pins and generated counts. No development cache.
 Python harness tests are additional. Every prior test identity must remain present.
 
 Only the exact compiled source/resource/compiler/jar closure is cached in development.
 Class bytes are checked before reuse. No mutable evidence or eligibility is cached.
-All production source files and old test assertions remain unchanged. No runtime
+All production source files and old test assertions remain unchanged. V18 fixture pin ordering is explicit to retain historical input bytes. No runtime
 reference cache is added because source parsing is not the leading measured cost.
 
 Reviewed pipeline test classes run in separate JVMs with separate java.io.tmpdir and

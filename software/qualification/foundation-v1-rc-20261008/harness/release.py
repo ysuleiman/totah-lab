@@ -29,7 +29,7 @@ def main():
     tests=f.run(source,f.Output(out,build),f.inventory(source),4);stages['regressionSeconds']=tests['wallSeconds']
     oldcases=[c for p in (f.BASE/'junit').glob('TEST-*.xml') for c in ET.parse(p).getroot().findall('testcase')]
     oldids={(c.get('classname'),c.get('name')) for c in oldcases};newids={tuple(v) for v in tests['executedIdentities']};assert oldids<=newids and len(oldids)==2872
-    assert len(newids)==2875 and all(c=='totah.lab.daedalus.system.FoundationV1ConsumerAcceptanceTest' for c,n in newids-oldids)
+    assert len(newids)==2876 and all(c=='totah.lab.daedalus.system.FoundationV1ConsumerAcceptanceTest' or (c=='totah.lab.daedalus.system.SourceSiteMetadataAcceptanceTest' and n=='fixturePlanRetainsHistoricalSourceBytes()') for c,n in newids-oldids)
     stage=time.monotonic();iso=out/'isolation';iso.mkdir();(out/'mnemosyne-test').mkdir();module=source/'software/modules/mnemosyne';(module/'target/classes').mkdir(parents=True);(module/'pom.xml').write_bytes(subprocess.check_output(['git','show',commit+':software/modules/mnemosyne/pom.xml'],cwd=repo))
     old=f.read(f.BASE/'BUILD.json');oldwork=str(Path(old['source']).parent)
     commands=[[x.replace(oldwork,str(out)) for x in c] for c in f.read(f.BASE/'isolation-commands.json')]

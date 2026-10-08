@@ -1,0 +1,9 @@
+Release b60b4090a passed all 2875 regression and 3 isolation checks, but V18 replay did not retain the previous historical hash. No final qualification was issued.
+
+Cause: SourceSiteMetadataAcceptanceTest inserted Map.of pins through an unsorted ObjectMapper.valueToTree into an ObjectNode. The tree retains the JVM-dependent reference/sha256 insertion order. Source plan bytes therefore differed even though all field values were the same. The old paired check happened to use matching ordering; paired agreement alone did not establish deterministic construction.
+
+Observed valid-plan digest with sha256 first: 2ef625cd0518c582b54efaa353707acb3505fd6c33afa0d7497e56f20f2966d4.
+Historical valid-plan digest with reference first: 8be1597c797f1031d529378ae9a068743b5c414fbf9afacf71f355d18f0567a7.
+Sorting only the two fixture pin maps before tree conversion reproduces the exact historical source bytes. No production serializer, source protocol, metadata semantics, public API, golden output or historical hash is changed. A focused assertion pins the historical input bytes.
+
+All 20 V18 focused tests pass. Independent JVM checks are recorded in REPLAY.json. The final committed-source qualification is rerun because the release fixture changed; the earlier regression evidence remains saved and is not represented as final release qualification.
