@@ -7,6 +7,7 @@ def load(p):return json.loads((ROOT/p).read_text())
 def pin(p):return {'path':p,'sha256':sha(ROOT/p)}
 v1='software/qualification/foundation-v1-rc-20261008/FOUNDATION_V1_RELEASE_LEDGER.json';base=load(v1)
 updates={
+'V11':('software/qualification/foundation-v2-closure-20261008/v11/QUALIFICATION.json','b3ee8cfd3754531b802087b4ee83523cc21d64e1',['ATHENA.V11.L_SER_THR_VAL_UNCORRECTED_CB_DEVIATION/1'],'Ordinary internal L-SER/native L-THR/L-VAL; exact reviewed source context; uncorrected C-beta reconstruction and approved Java21 profile only.'),
 'G05':('software/qualification/g05-bounded-implementation-20261008/QUALIFICATION.json','1bbbd6be562f0d2df3e88974aa6a2c888aff441e',['ATHENA.G05.SAM_CHEBI_142094_SOURCE_IDENTITY/1','ATHENA.G05.SAM_PHE_CONTINUOUS_GEOMETRY/1'],'Exact ChEBI:142094 source identity and selected Phe continuous geometry only; CCD SAM, SAH, other states and aromatic residues excluded.'),
 'G06':('software/qualification/g06-water-tetrel-20261008/QUALIFICATION.json','705a2d78efc441a1b79eb661577cfe063899b465',['ATHENA.G06.SAM_WATER_METHYL_TETREL_GEOMETRIC_CANDIDATE/1'],'Exact G05 SAM and independently qualified explicit-source-H neutral I12 water only; catecholate/NAC stays blocked.'),
 'V09':('software/qualification/v09-v10-implementation-20261008/QUALIFICATION.json','297736797',['ATHENA.V09.TOP8000_CCTBX_COMPILED_SIX_CLASS/1'],'Selected independently reviewed source residue context; six pinned grids; existing Athena torsions scored at identical binary64 angles; no scope expansion.'),
@@ -20,8 +21,7 @@ for e in base['entries']:
   r.update(currentDisposition='BOUNDED_SUPPORTED_DOMAIN_QUALIFIED',scope=scope,definitions=defs,qualificationEvidence=pin(p),sourceCommit=commit,releaseQualification='TIER1_TIER2_QUALIFIED_TIER3_PENDING',unrestrictedParentClosure=False)
  entries.append(r)
 counts=dict(collections.Counter(e['currentDisposition'] for e in entries));assert len(entries)==96 and len({e['capabilityId'] for e in entries})==96
-assert counts=={'BOUNDED_SUPPORTED_DOMAIN_QUALIFIED':72,'EXPLICIT_ARCHITECTURAL_DISPOSITION':12,'SCIENTIFIC_REVIEW_REQUIRED':2,'REQUIRES_EXTERNAL_REFERENCE_DATA':10}
-ledger={'schema':'foundation-v2-ledger/1','basis':pin(v1),'asOfQualifiedRemoteHead':'cc04752752bbe2e002cb223568f217b759766e8b','counts':counts,'full96ScientificCompletion':False,'v2Sealed':False,'countMeaning':'72 rows have a qualified bounded domain. This is not 72 unrestricted rules and not a v2 Tier3 release certificate.','entries':entries}
+assert counts=={'BOUNDED_SUPPORTED_DOMAIN_QUALIFIED':73,'EXPLICIT_ARCHITECTURAL_DISPOSITION':12,'SCIENTIFIC_REVIEW_REQUIRED':2,'REQUIRES_EXTERNAL_REFERENCE_DATA':9}
+ledger={'schema':'foundation-v2-ledger/1','basis':pin(v1),'asOfQualifiedSourceCommit':'b3ee8cfd3754531b802087b4ee83523cc21d64e1','counts':counts,'full96ScientificCompletion':False,'v2Sealed':False,'countMeaning':'73 rows have a qualified bounded domain. This is not 72 unrestricted rules and not a v2 Tier3 release certificate.','entries':entries}
 (OUT/'FOUNDATION_V2_LEDGER.json').write_text(json.dumps(ledger,indent=2)+'\n')
-(OUT/'REMOTE_HEAD.json').write_text(json.dumps({'remote':'origin','branch':'codex/mmp-chemistry-roundtrip','verifiedRemoteHead':'cc04752752bbe2e002cb223568f217b759766e8b','verification':'git ls-remote origin refs/heads/codex/mmp-chemistry-roundtrip','unrelatedWorkingTreeEditsIncluded':False},indent=2)+'\n')
 print(counts)
