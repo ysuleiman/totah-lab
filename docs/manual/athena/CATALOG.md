@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `171b6a9e31a7cb5538f35d2e192eafe5e7a3363bc2128b57c516a3aae05e3d83`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `aabe6911bb064dea649ce54cc53efec40c2ee780e1f4a68476d8c2b95d7b36b1`.
 
 Disposition is copied without upgrading partial capability coverage.
 
@@ -18,7 +18,7 @@ Disposition is copied without upgrading partial capability coverage.
 | I01 | Hydrophobic contact | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I02 | Explicit-H directional hydrogen bond | P0 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt), [i02-approved-candidate-20261006](../../../software/qualification/i02-approved-candidate-20261006/CHECKPOINT.txt) |
 | I03 | Implicit-H hydrogen-bond approximation | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt), [i03-a-implementation-20261006](../../../software/qualification/i03-a-implementation-20261006/CHECKPOINT.txt), [i03-s1-implementation-20261007](../../../software/qualification/i03-s1-implementation-20261007/CHECKPOINT.txt) |
-| I04 | Weak C-H donor perception | P1 | SCIENTIFIC_REVIEW_REQUIRED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt) |
+| I04 | Weak C-H donor perception | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [i03-i04-scientific-review-20261006](../../../software/qualification/i03-i04-scientific-review-20261006/CHECKPOINT.txt) |
 | I05 | Parallel/face-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I06 | T-shaped/edge-to-face pi stacking | P1 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
 | I07 | Union pi-stacking wrapper | P2 | BOUNDED_SUPPORTED_DOMAIN_QUALIFIED | [ocl-query-b00-corrected-20261005](../../../software/qualification/ocl-query-b00-corrected-20261005/CHECKPOINT.txt) |
@@ -294,15 +294,15 @@ No I03-B/C, inferred-H coordinates, SP/SP2 proxy, full ProLIF compatibility, new
 
 ### I04 — Weak C-H donor perception
 
-Define weak C-H donor classes, attachment/acidity scope and independent geometric controls.
+Exact selected [GLY CA,one explicit bonded H,GLY carbonyl O,C] in distinct finite N-acylated/C-amidated source components. dHO<3.5 AND(angle>120 OR(dHO<3.0 AND angle>90)); two explicit donor CA H independently required, tuples distinct.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2594 committed-source tests +3 isolation;62 focused;23 JVM pairs,22 prior hashes unchanged;65 historical files and25 pins exact.
 
-**Existing implementation:** No qualified weak-H-bond rule
+**Existing implementation:** Opt-in athena.glycine-h-carbonyl/1 leaf; unchanged carbonyl role, source scope, geometry and Research Gate.
 
-**Supporting source:** PLIP find_hbd and PLInteraction constructor
+**Supporting source:** Explicitly approved Option B adaptation of Senes2001 Results window; exact finite source glycine context. No energetic or survey-parity claim.
 
-Exact weak C-H donor class scope and directionality/window remain distinct from ordinary donor roles. Methyl identity and raw POINT_PAIR_GROUP geometry are implemented; no universal favorable C-H interaction follows from C/H elements.
+Option A protocol, universal weak donors, I03/inferred H, C-H-pi and N+-C-H-O proposals, charged/modified/non-GLY context, isotope-labelled donor H and same-component tuples. No whole-system absence or biological inference.
 
 ### I05 — Parallel/face-to-face pi stacking
 

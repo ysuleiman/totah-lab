@@ -4330,6 +4330,157 @@ Current-policy gate status must be established by a valid receipt, not the histo
 ]
 ```
 
+## ATHENA.I04.EXPLICIT_SOURCE_H_GLYCINE_BACKBONE_CARBONYL_CANDIDATE — 1.0.0 (glycine-h-carbonyl-v1)
+
+[Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/glycine-h-carbonyl-v1/ATHENA.I04.EXPLICIT_SOURCE_H_GLYCINE_BACKBONE_CARBONYL_CANDIDATE.rule.json) · SHA256 `971931f604fa13b48e7fb0e80661a34a9dac1d7436ba10c57cdd5335cbeeda10`
+
+**family**
+
+```json
+"INTERACTION"
+```
+
+**profile**
+
+```json
+"ATHENA_I04_GLYCINE_EXPLICIT_H_V1"
+```
+
+**implementationId**
+
+```json
+"athena.glycine-h-carbonyl"
+```
+
+**implementationVersion**
+
+```json
+"1"
+```
+
+**qualification**
+
+```json
+"NOT_EVALUATED"
+```
+
+**requiredCapabilities**
+
+```json
+[]
+```
+
+**requiredChemistry**
+
+```json
+[
+  "Exact approved finite GLY source graph; two explicitly mapped donor CA H; unchanged CARBONYL_O role",
+  "Independent source scope/current authority; original source preparation provenance"
+]
+```
+
+**requiredGeometry**
+
+```json
+[
+  "Exact selected H-O distance and CA-H-O angle"
+]
+```
+
+**measurementsProduced**
+
+```json
+{
+  "payload": "athena-continuous-geometry-measurements/1",
+  "proposition": "SELECTED_EXPLICIT_SOURCE_H_GLYCINE_CARBONYL_CANDIDATE"
+}
+```
+
+**classificationStates**
+
+```json
+[
+  "SUPPORTED_PRESENT",
+  "ABSENT_FALSE",
+  "NOT_EVALUATED",
+  "UNSUPPORTED",
+  "UNKNOWN_INCONCLUSIVE",
+  "FAILED"
+]
+```
+
+**negativeCoverage**
+
+```json
+{
+  "version": "ATHENA.I04.EXPLICIT_SOURCE_H_GLYCINE_BACKBONE_CARBONYL_CANDIDATE/negative/1",
+  "scope": "EXACT_SELECTED_ELIGIBLE_PAIR_ONLY",
+  "requirements": [
+    "COMPLETE_EXACT_GLYCINE_SOURCE_STATE",
+    "TWO_EXPLICIT_CA_H",
+    "UNCHANGED_CARBONYL_ROLE",
+    "INDEPENDENT_SOURCE_SCOPE_AUTHORITY",
+    "FINITE_EXPLICIT_SOURCE_GEOMETRY",
+    "INDEPENDENT_CURRENT_I04_AUTHORITY"
+  ],
+  "incompleteStatus": "UNKNOWN_INCONCLUSIVE",
+  "supportedDomain": "Exactly selected eligible Option B tuple only."
+}
+```
+
+**limitations**
+
+```json
+[
+  "Explicit source H geometry only; prepared H retains original attribution, never inferred experimentally observed.",
+  "No membrane-survey parity, energy, stability, biological interpretation or whole-system absence.",
+  "No production authority; independent current I04 and source-scope qualification required."
+]
+```
+
+**scientificSources**
+
+```json
+[
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/i04/EXPLICIT_GLYCINE_OPTION_REVIEW.txt",
+    "sha256": "7a061b2878a2d8948d9ed3f003b3165653c6751a72cf81de97958c59f30e84ae",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  },
+  {
+    "locator": "software/qualification/foundation-supportable-pass-20261007/i04/METHODS_RECOVERY_REVIEW.txt",
+    "sha256": "4b95b6e950c05da0eeed3de4660c421bd102b7e3b4767824d6db59076d055a26",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  },
+  {
+    "locator": "software/modules/athena/src/main/resources/totah/lab/athena/system/rules/perception-foundation-v1/ATHENA.PERCEPTION.ACCEPTOR.CARBONYL_O.rule.json",
+    "sha256": "d4c7f17b24d6923ea6e214241bb9e0f6771811a535764fd4cf4439c8f8641852",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-sp3-source-review-20261006/EVIDENCE_PROPOSAL.txt",
+    "sha256": "22ae24fbed89f2890fd0e183eab59720077cf7c22c229ddde9eae8474464799e",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SOURCE_SCOPE_BOUNDARY_REVIEW.txt",
+    "sha256": "101f4e37e6ae6d3d08b27210684bfe23dda2caef12fefb5d53a77285f7aafe0b",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  },
+  {
+    "locator": "software/qualification/i03-s1-implementation-20261007/SCOPE_V2_APPROVAL.txt",
+    "sha256": "4135402ff21c86130598b37ca690ad818c8c98f45feca7efeb1033ba0ce8148f",
+    "citation": "Approved Option B exact definition and unchanged source-role/scope dependencies; no production authority."
+  }
+]
+```
+
+**referenceArtifacts**
+
+```json
+[]
+```
+
 ## ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND — 1.0.0 (groups-adopted-v1)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/groups-adopted-v1/ATHENA.GROUP.ACYL_CHLORIDE.CARBON_BOUND.rule.json) · SHA256 `41932d8a0faa862cc45cbc928b8747b01ebd9054e0dc935fc948c4a389cd5ed0`
