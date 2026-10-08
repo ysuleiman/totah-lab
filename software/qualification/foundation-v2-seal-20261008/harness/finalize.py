@@ -38,7 +38,7 @@ extra=f.read(out/'V2_REPLAY.json');assert extra['status']=='PASS' and extra['ind
 assert len(extra['results'])==12 and {r['domain'] for r in extra['results']}=={'G05','G06','V09_V10','V11','V07','V08'}
 for r in extra['results']:
  for suffix,h in r['sha256'].items():
-  file='result.json' if suffix=='report' else 'result'+suffix
+  file='report.json' if suffix=='report' else 'report'+suffix
   assert f.digest(out/'replay-v2'/f"{r['domain']}-{r['copy']}"/file)==h
 for name in {r['domain'] for r in extra['results']}:
  pair=[r for r in extra['results'] if r['domain']==name];assert pair[0]['sha256']==pair[1]['sha256']

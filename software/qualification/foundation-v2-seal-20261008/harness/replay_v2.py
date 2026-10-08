@@ -14,7 +14,7 @@ def run_v2_replays(f,source,out,build):
       ('V08','OrderedSignAcceptanceTest','v08.replay',prefix+'foundation-v2-closure-20261008/v08-ordered-sign/independent-replay/replay-1')]
     def job(spec,n):
         name,cls,prop,golden=spec;work=out/'replay-v2'/f'{name}-{n}';work.mkdir(parents=True);tmp=work/'tmp';tmp.mkdir()
-        multiple=name in ['V07','V08'];target=work/('result' if multiple else 'result.json')
+        multiple=name in ['V07','V08'];target=work/('report' if multiple else 'report.json')
         if prop:
             cmd=list(base);cmd.insert(1,'-D'+prop+'='+str(target));cmd.insert(1,'-Djava.io.tmpdir='+str(tmp))
             cmd+=['--select-method' if '#' in cls else '--select-class','totah.lab.daedalus.system.'+cls,'--details','summary','--disable-ansi-colors','--reports-dir',str(work/'junit')]
@@ -26,7 +26,7 @@ def run_v2_replays(f,source,out,build):
             actual=Path(str(target)+suffix);expected=source/(golden+suffix)
             assert actual.read_bytes()==expected.read_bytes(),(name,n,suffix,'qualified golden mismatch')
             hashes[suffix or 'report']=f.digest(actual)
-        f.write(work/'RESULT.json',{'status':'PASS','sha256':hashes,'command':result})
+        f.write(work/'REPLAY_CHECK.json',{'status':'PASS','sha256':hashes,'command':result})
         return {'domain':name,'copy':n,'sha256':hashes,'seconds':result['seconds']}
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         futures=[pool.submit(job,spec,n) for spec in specs for n in [1,2]]
