@@ -1,0 +1,290 @@
+V09 / V10 — CONSOLIDATED v2 DECISION PACKAGE
+2026-10-08. REVIEW ONLY. No chemistry implementation, production dataset admission,
+public schema implementation, empirical refitting or row closure has occurred.
+
+DECISION REQUEST
+Approve or revise one coherent numerical/domain batch:
+ V09: ATHENA.V09.TOP8000_CCTBX_COMPILED_SIX_CLASS/1, selected canonical
+      protein residue/backbone-context validation using all six Rama grids.
+ V10: ATHENA.V10.TOP8000_CCTBX_SER_THR_VAL_CHI1/1, selected L-SER/L-THR/L-VAL
+      one-chi density/category validation only; no named-rotamer assignment.
+Prefer the exact current pinned cctbx numerical/category behavior described below,
+not a mixture of text-grid precision, deprecated evaluator and README boundaries.
+These are proposals. The remaining source-admission/public-binding review in
+section 8 is an implementation gate; acquiring grids does not qualify source
+residue identity or make the proposed profiles production-ready.
+
+1. IMMUTABLE SOURCE PACKAGE / LICENSE
+Data: rlabduke/reference_data commit
+ 5ee6875fc29eccc3c9dc7cbe705ff9fd1b505d7d.
+Evaluator: cctbx/cctbx_project commit
+ ed314689c2d2945d7fd136d5f66d33ce1688e7a7.
+Every acquired file is listed with exact URL, path, byte count, SHA-256 and verified
+Git blob SHA-1 in SOURCES.json. All 31 artifacts were checked against the previously
+pinned complete upstream Git trees. This is not a request to use moving master,
+a toolkit default, an installed pickle of unknown lineage, or a recreated dataset.
+
+Required Rama data (directory Top8000/Top8000_ramachandran_pct_contour_grids):
+ rama8000-general-noGPIVpreP.data
+ rama8000-gly-sym.data
+ rama8000-cispro.data
+ rama8000-transpro.data
+ rama8000-prepro-noGP.data
+ rama8000-ileval-nopreP.data
+All six complete original files are acquired. The alternate *.rama.combined.data
+files are Top500/clash-derived smoothed restraint potentials, NOT Top8000 validation
+grids; none is selected.
+
+Required initial rotamer data (Top8000/Top8000_rotamer_pct_contour_grids):
+ rota8000-ser.data
+ rota8000-thr.data
+ rota8000-val.data
+All three complete files are acquired. No other rotamer grid is needed for this
+explicit first domain. ARG/LYS multi-chi, PRO/PRO3D, LEU/LEU-raw, PHE/TYR symmetry,
+MSE->MET parent mapping, other residues and named rotamer boundaries are excluded.
+Their located files are not implicitly approved or claimed covered.
+
+Required evaluator sources:
+ mmtbx/rotamer/ramachandran_eval.py (current C++ dispatch)
+ mmtbx/validation/ramachandran/rama_eval.h (bins, wrap, categories)
+ mmtbx/validation/ramachandran/rama8000_tables.h (actual compiled doubles)
+ mmtbx/validation/ramachandran/convert_from_text.py (zero fill and %.6g recipe)
+ scitbx/math/linear_interpolation.h (arithmetic order)
+ mmtbx/validation/ramalyze.py (six-class precedence, cis-like selection)
+ mmtbx/rotamer/n_dim_table.py (rotamer storage, bins and interpolation)
+ mmtbx/rotamer/rotamer_eval.py; mmtbx/validation/rotalyze.py
+ mmtbx/rotamer/sidechain_angles.py; sidechain_angles.props
+ scitbx/math/dihedral.h; cctbx/geometry_restraints/dihedral.h
+Supporting __init__.py, deprecated evaluator and rotamer_names.props are comparison
+sources only where not needed by the chosen path. rotamer_names.props central
+angles/frequencies must not become extra acceptance thresholds.
+
+Data license: CC BY 4.0, Richardson Lab attribution required. Preserve LICENSE,
+README and modification notices with any derived tables. Cite Williams et al.
+2018, DOI 10.1002/pro.3330 for Rama; Hintze et al. 2016, DOI 10.1002/prot.25039 for
+rotamer distributions. Cctbx uses the pinned license agreement in LICENSE.txt;
+retain its copyright, conditions and disclaimer. The two licenses and attribution
+chains stay separate. SOURCES.json contains exact license digests, not just labels.
+
+2. MATERIAL SOURCE DIFFERENCES — DO NOT MERGE
+A. Current Rama code reads compiled doubles generated with six significant decimal
+ digits. Full-precision raw-text evaluation and deprecated NDimTable float storage
+ are different numerical contracts. Audit reconstructed all 194400 compiled cells
+ from the six original text files using the upstream recipe: ZERO mismatches.
+ Full raw precision differs at 110671 listed cells; see GRID_AUDIT.json for exact
+ per-table counts and maximum differences. No empirical table was invented.
+ Recommended authority: exact pinned compiled table + current C++ interpolation;
+ retain raw text and generation recipe as attributed provenance.
+
+B. Rotamer README says the 0.3% outlier boundary is inclusive. rotalyze.evaluateScore
+ and RotamerEval use score >=0.003 as Allowed, with score <0.003 as OUTLIER.
+ Recommended: cctbx category profile, exact 0.003 is Allowed. This is explicitly
+ not literal README boundary parity. Choosing <=0.003 OUTLIER would require a
+ separately named, separately tested README-derived profile.
+
+C. Rama is_cislike_peptide uses -90 < omega <90 degrees; a deprecated cis helper
+ uses -30 <omega<30. Select the former for cis-PRO table assignment only. This
+ is not a universal cis-peptide quality/strain classification. Exactly +/-90
+ uses trans-PRO. Upstream missing omega falls through as trans; Athena proposal
+ refuses that inference and reports UNKNOWN when PRO table selection is unresolved.
+
+D. Upstream wrappers can map MSE/modified parents or derive chain neighbors and
+ conformers. None is imported as source authority. Athena requires explicit source
+ correspondence, peptide connections and coherent alternative identity. No atom-name
+ label alone, residue-number adjacency, distance cutoff, highest-occupancy assembly,
+ inferred bond or automatic parent/tautomer normalization establishes admission.
+
+E. Current Rama string lookup searches only the first five strings and returns
+ index5 on failure, conflating unrecognized strings with Ile/Val. The first profile
+ has a closed reviewed enum 0..5 and rejects unknown class tokens. Do not reproduce
+ a permissive unknown-string path as chemical eligibility.
+
+3. V09 EXACT BOUNDED DOMAIN / CLASS ASSIGNMENT
+One explicitly selected internal canonical alpha-peptide residue in an explicitly
+connected, coherent protein triplet, with independently qualified source residue
+identities. Central source identity must be one of:
+ ALA ARG ASN ASP CYS GLN GLU GLY HIS ILE LEU LYS MET PHE PRO SER THR TRP TYR VAL.
+Require ordinary L stereochemistry for chiral canonical residues, ordinary native
+side-chain identity (including the native ILE/THR stereochemistry), or achiral GLY.
+No D-residue mirroring, unknown chirality, noncanonical backbone, beta residue,
+N-methyl substitution or label-only mapping. Source charge/H/protonation/isotope
+facts are retained without normalization; no new protonation/role classifier is
+implied. Modified side chains, unreviewed parent mappings, cyclic peptide contexts
+and known nonordinary source attachments are outside this first admission profile.
+Unresolved identity/connection coverage is UNKNOWN, not proof of exclusion.
+
+The complete source-admission producer/protocol and exact allowed side-chain state
+inventory must be pinned and reviewed before a coordinate-consuming implementation
+can be activated (section8). This package defines the numerical/domain target; it
+does not claim those identity facts are already independently qualified in Athena.
+If that inventory is not ready, keep source admission blocked rather than reducing
+identity to a residue label. An explicitly reviewed selected-source assertion can
+be proposed for approval; a caller's class enum cannot self-qualify its chemistry.
+
+Exact ordered torsions:
+ phi_i = (C_{i-1}, N_i, CA_i, C_i)
+ psi_i = (N_i, CA_i, C_i, N_{i+1})
+ omega_in_i = (CA_{i-1}, C_{i-1}, N_i, CA_i), required for central PRO.
+Require source bonds Cprev-N, N-CA, CA-C and C-Nnext; no bond-length surrogate.
+Require exact current/next residue identities for class selection even if the
+selected atoms already yield numerical phi/psi. No chain-wide aggregate initially.
+
+Precedence from ramalyze.py:
+ 1 GLY -> glycine, including GLY followed by PRO.
+ 2 PRO -> cis-proline if -90<omega_in<90; otherwise trans-proline for defined omega.
+ 3 non-GLY/non-PRO followed by PRO -> pre-proline, including ILE/VAL before PRO.
+ 4 remaining ILE/VAL -> isoleucine-or-valine.
+ 5 remaining admitted residues -> general.
+Missing required neighbors, unknown next identity or unresolved PRO omega => UNKNOWN.
+A terminal residue lacking a required torsion does not become a geometric outlier.
+No automatic chemical-completeness claim from coordinate records.
+
+4. V09 NUMERICAL / CATEGORY CONTRACT
+Every table is 180x180, axes [-180,180], periodic360, grid centers -179,-177,...,179.
+Use phi as first/row index and psi as second/column, matching cctbx c_grid order.
+For each finite angle bring into [-180,180] by the pinned 360-degree range logic;
+retain original angle and ranged angle. +180 and -180 interpolate the same seam.
+Use the current source algorithm exactly:
+ lower=floor(angle); if lower is even, lower-=1;
+ higher=ceil(angle); if higher is even, higher+=1;
+ if lower==higher, higher+=2.
+ bin=int((gridCoordinate+179)/2), wrapping <0 or >179 by180.
+Grid coordinates at a seam extend to -181/+181 while lookup bins wrap.
+For valid ordinary coordinate torsions the range is already bounded. Nonfinite or
+unbounded caller-supplied angles are not admitted by this first coordinate profile.
+
+Interpolate lower/lower -> higher/lower along phi and lower/higher -> higher/higher
+along phi; then interpolate those two results along psi. Preserve upstream
+linear formula y1+(y2-y1)*(x-x1)/(x2-x1), in this order. Use binary64 compiled values;
+no alternate smoothing, nearest-bin shortcut, FMA substitution or classifier epsilon.
+Native Athena geometry may only be reused once signed torsion order, wrap and
+undefined-coordinate handling are demonstrated against pinned upstream fixtures.
+No parity claim currently exists for that composition.
+
+Raw score q is a dimensionless empirical contour rank/validation quantity, not an
+energy or a posterior probability of a correct model. Display100*q is percentage;
+classification uses q itself, not rounded/displayed percentage.
+ All classes: q>=0.02 => FAVORED.
+ General: 0.0005<=q<0.02 => ALLOWED; q<0.0005 => OUTLIER.
+ Cis-PRO: 0.002<=q<0.02 => ALLOWED; q<0.002 => OUTLIER.
+ Gly/trans-PRO/pre-PRO/Ile-Val: 0.001<=q<0.02 => ALLOWED;
+                              q<0.001 => OUTLIER.
+OUTLIER is a named reference-validation category, not binding failure, strain
+energy, incorrect identity, biological insignificance or rejection authority.
+
+5. V10 EXACT FIRST DOMAIN / NUMERICAL CONTRACT
+Selected internal ordinary L-SER, L-THR or L-VAL residue in explicit peptide
+connectivity; no inferred residue/atom naming, no source graph transformation.
+SER: exact ordinary CH2-OH side chain; THR: native threonine CH(OH)-CH3 including
+its source-established beta stereochemistry; VAL: CH(CH3)2 with source-established
+atom correspondence. Exclude phospho-/glyco-/deprotonated hydroxyl states, allo-THR,
+D residues, modified or unidentified source chemistry. Full source identity,
+formal state and H-count facts must be independent of grid selection. H coordinates
+are not required for these heavy-atom torsions and must not be synthesized.
+Source-admission protocol still requires section8 review; no new chemistry role
+catalog is authorized merely by selecting a grid.
+
+Ordered chi1 from exact sidechain_angles.props:
+ SER: N,CA,CB,OG
+ THR: N,CA,CB,OG1
+ VAL: N,CA,CB,CG1
+VAL CG1/CG2 must retain exact authoritative stereospecific correspondence. Do not
+swap labels to maximize a score or treat arbitrary isomorphic maps as equivalent.
+No named m/p/t assignment, rotamer frequency, central-angle tolerance or pKa rule.
+
+All three grids have360 bins, bounds0..360, centers0.5..359.5, width1degree, wrap=true.
+Use upstream NDimTable storage: parse each text value, store as IEEE binary32
+(flex.float), then promote stored values for binary64 arithmetic. Parsing text
+straight into retained binary64 gives a different numerical profile.
+Coordinate-derived chi is signed in [-180,180] with the pinned scitbx dihedral
+convention. Use that signed value directly in the pinned valueAt path:
+ home=min(floor(chi),359); center=home+0.5;
+ neighbor=home-1 if chi<center, otherwise home+1;
+ w=abs(chi-center); lookup home/neighbor using positive modulo360;
+ value=(1-w)*float32_table[home mod360] + w*float32_table[neighbor mod360].
+This has upstream sum order home contribution then neighbor contribution.
+Negative indices wrap; the logical center is not first clipped to0. Exact360
+may be used in seam characterization but arbitrary multi-turn inputs are excluded:
+whereIs caps its upper bin, so calling the unmodified evaluator on chi>360 would
+not be a general periodic-normalization contract. Do not claim arbitrary-angle
+upstream parity. Positive-modulo display of chi is separate from scoring.
+
+Recommended cctbx categories:
+ q>=0.02 => FAVORED; 0.003<=q<0.02 => ALLOWED; q<0.003 => OUTLIER.
+Keep raw score and signed measured angle, selected class/grid and category separate.
+This is selected SER/THR/VAL chi1 validation, not full V10 rotamer coverage.
+
+6. COMPLETE ARTIFACT VERSUS SPARSE GRID
+Sparse rows are intentional source encoding. Both pinned loaders initialize the
+entire logical table to zero and overwrite listed bins. Thus an UNLISTED BIN IN
+A HASH-VERIFIED COMPLETE SELECTED FILE is a source-defined zero, not UNKNOWN.
+A missing file, truncated/download-corrupted file, wrong grid, missing manifest,
+unknown parser version or unverified source package is ineligible/UNKNOWN; never
+fill a missing artifact with zeros. Reject duplicate/off-center/nonfinite/out-of-
+range records under the strict Athena reader before scoring. Do not silently use
+upstream malformed-input quirks or untrusted stale .pickle files.
+
+GRID_AUDIT.json records:
+ Rama listed/unlisted counts: general27151/5249, gly29072/3328,
+ cispro6510/25890, transpro9276/23124, prepro17410/14990, ileval21272/11128.
+ Each has32400 logical cells. Reconstructed compiled tables match every cell.
+ Rotamers: SER357/3, THR352/8, VAL354/6, each360 logical cells.
+ No duplicate or off-center listed coordinates; all nine files audited in full.
+No pseudocount, empirical refit, density renormalization or missing-data imputation.
+
+7. EVIDENCE, COVERAGE AND ACCEPTANCE
+Bind exact definition/version, data repo commit, original data bytes, generated
+Rama header/recipe or rotamer binary32 loader version, evaluator source digests,
+source state/model/frame, residue identity and connection witnesses, ordered atom
+correspondence, original/measured/ranged torsions, interpolation bins/weights,
+raw score, category boundaries, preparation lineage and current review authority.
+Dataset availability, supplied class labels and successful parsing cannot confer
+scientific admission. Current authority absence => NOT_EVALUATED; factual ambiguity
+or undefined geometry => UNKNOWN; known excluded domain => UNSUPPORTED. A valid
+zero score under a complete selected table is an OUTLIER category, not missing data.
+Only selected-residue coverage is asserted; no whole-protein absence/completeness.
+No inferred altloc correlation, occupancy weighting, missing-atom inference,
+chain repair, coordinate imputation, energetic interpretation or master score.
+
+ACCEPTANCE_MATRIX.json specifies planned dataset-integrity, every-class precedence,
+seam/bin/interpolation/storage, exact category nextUp/nextDown, ambiguous chemistry,
+missing topology, changed bytes, current/historical authority, independent replay
+and legacy regression cases. It is NOT executed implementation qualification.
+Before native implementation is accepted, independently generated upstream golden
+fixtures must pin expected numerical outputs, arithmetic precision, class and
+boundaries. No invented tolerance: exact category agreement mandatory; any numeric
+comparison tolerance or deliberate arithmetic divergence requires explicit review.
+Review-only audit here validates artifacts, not a native Athena implementation.
+
+8. PUBLIC PAYLOADS / PREIMPLEMENTATION GATES
+Existing continuous geometry can carry selected DIHEDRAL plans and raw values.
+Existing correspondence, source-state, evidence and Research Gate machinery can
+carry immutable provenance. Existing event/path/matcher engines need no changes.
+Existing geometry payloads do NOT encode reference grids, empirical score/category,
+class assignment and reviewed source residue identity together. New additive
+rule-specific measurement payloads are needed, provisionally:
+ athena-ramachandran-measurements/1
+ athena-rotamer-measurements/1
+A concrete minimal source-residue/context binding or normative witness proposition
+is also needed unless an already-qualified representation proves sufficient.
+It must bind canonical residue identity/chemical state and exact atom correspondence,
+peptide neighbors/connection coverage, next-PRO fact, native stereochemistry,
+preparation and conformer coherence independently. It cannot be a caller receipt
+that qualifies itself. No blanket CCD/component completeness is asserted.
+
+Before coding: approve the proposed first domains and numerical choices, finalize
+and approve exact public field sets/source-admission protocol, and pin independent
+upstream oracle fixtures. If the full source-state inventory for six-class V09
+is not defensible yet, retain that source-admission blocker explicitly; do not
+implement residue-name heuristics or claim global/native MolProbity compatibility.
+These requirements are representation/scientific decisions, not ordinary coding
+choices. No new generic validation framework is proposed.
+
+9. BATCH PLAN / EXPLICIT EXCLUSIONS
+One coherent implementation batch after approval: immutable selected grid admission
++ V09 six-class numerical leaf + V10 three-class chi1 numerical leaf + source-bound
+composition where independently qualified. Focused per-leaf tests, then one reviewed
+Tier2 affected batch using the improved harness. Tier3 only at coherent v2 seal.
+No V11, V13, V14 or other external-data implementation. G06 catecholate/NAC remains
+blocked by its metal-associated source-admission problem. Neither this package nor
+the G06 water leaf changes that blocker. No v1 release or production activation.
