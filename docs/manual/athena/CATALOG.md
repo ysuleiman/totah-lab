@@ -1,6 +1,6 @@
 # Master capability catalog
 
-Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `82547a6c0796d1516e8ff370c0f2098890618027a4ae3e6d5ba95dafad4e1a0a`.
+Generated from [accepted ledger](../../../software/qualification/chemistry-geometry-foundation-20261005/CAPABILITY_LEDGER.json), SHA256 `0f770dcff005fc67237c854261c9b7a1755950f73cae3d399f44874198f00618`.
 
 Disposition is copied without upgrading partial capability coverage.
 

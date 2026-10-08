@@ -1,0 +1,329 @@
+{
+  "status": "PROPOSED_NOT_EXECUTED_PUBLIC_BOUNDARY_APPROVAL_REQUIRED",
+  "contract": "ATHENA.I11.CARBON_BOUND_CL_PHE_GEOMETRIC_CANDIDATE/1",
+  "sourceContract": "ATHENA.I11.SOURCE_PARTNER_ATTRIBUTION/1",
+  "cases": [
+    {
+      "id": "I11-001",
+      "kind": "positive",
+      "case": "Eligible explicit ligand Cl / protein PHE, unique nearest, d=4.0 and theta=100",
+      "expected": "SUPPORTED_PRESENT",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-002",
+      "kind": "positive",
+      "case": "Both source face-on and edge-on characterizations with eligible predicate",
+      "expected": "SUPPORTED_PRESENT; characterization separate",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-003",
+      "kind": "negative",
+      "case": "Eligible close distance but theta above140",
+      "expected": "ABSENT_FALSE selected pair only",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-004",
+      "kind": "negative",
+      "case": "Eligible theta but distance above4.5",
+      "expected": "ABSENT_FALSE selected pair only",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-005",
+      "kind": "boundary",
+      "case": "d=nextDown(4.5), theta100",
+      "expected": "SUPPORTED_PRESENT",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-006",
+      "kind": "boundary",
+      "case": "d=4.5, theta100",
+      "expected": "ABSENT_FALSE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-007",
+      "kind": "boundary",
+      "case": "d=nextUp(4.5), theta100",
+      "expected": "ABSENT_FALSE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-008",
+      "kind": "boundary",
+      "case": "theta=nextDown(140), d4.0",
+      "expected": "SUPPORTED_PRESENT",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-009",
+      "kind": "boundary",
+      "case": "theta=140, d4.0",
+      "expected": "ABSENT_FALSE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-010",
+      "kind": "boundary",
+      "case": "theta=nextUp(140), d4.0",
+      "expected": "ABSENT_FALSE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-011",
+      "kind": "boundary",
+      "case": "delta nextDown(0.3),0.3,nextUp(0.3)",
+      "expected": "face-on,face-on,edge-on; candidate unchanged",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-012",
+      "kind": "geometry",
+      "case": "Reverse source C-Cl axis while preserving eligible Cl/ring geometry",
+      "expected": "Candidate unchanged; no C-Cl-centroid substitution",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-013",
+      "kind": "ambiguous",
+      "case": "Two exactly equally nearest ring atoms",
+      "expected": "UNKNOWN_INCONCLUSIVE; retain both, no tie-break",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-014",
+      "kind": "ambiguous",
+      "case": "Reorder ring/source atoms in exact nearest tie",
+      "expected": "Same inconclusive result and tied identities",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-015",
+      "kind": "binding",
+      "case": "Supplied pair/group R differs from unique nearest ring atom",
+      "expected": "Reject selected geometry mismatch",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-016",
+      "kind": "missing",
+      "case": "Omit one of six nearest-distance operations or truncate coverage",
+      "expected": "UNKNOWN_INCONCLUSIVE or reject malformed plan; never negative",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-017",
+      "kind": "missing",
+      "case": "Missing frame, nonfinite coordinate or degenerate required vector",
+      "expected": "UNKNOWN_INCONCLUSIVE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-018",
+      "kind": "missing",
+      "case": "Nonunique numerical ring normal",
+      "expected": "UNKNOWN_INCONCLUSIVE; no invented planarity cutoff",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-019",
+      "kind": "excluded",
+      "case": "Selected F/Br/I or chloride instead of neutral carbon-bound Cl",
+      "expected": "UNSUPPORTED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-020",
+      "kind": "excluded",
+      "case": "Cl bonded to N, multiple neighbors, non-single bond or source H",
+      "expected": "UNSUPPORTED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-021",
+      "kind": "excluded",
+      "case": "Known nonordinary connection; separately unknown connection coverage",
+      "expected": "UNSUPPORTED; UNKNOWN_INCONCLUSIVE respectively",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-022",
+      "kind": "missing",
+      "case": "Missing/conflicting Cl/carbon charge,H,aromaticity or V03 NONE",
+      "expected": "UNKNOWN_INCONCLUSIVE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-023",
+      "kind": "excluded",
+      "case": "Tyr/Trp/His, generic aromatic ring, fused/modified PHE context",
+      "expected": "UNSUPPORTED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-024",
+      "kind": "missing",
+      "case": "Missing/duplicate PHE source names or correspondence",
+      "expected": "UNKNOWN_INCONCLUSIVE or reject duplicate identity",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-025",
+      "kind": "excluded",
+      "case": "Wrong finite PHE backbone/side-chain state or mixed ring isotope descriptors",
+      "expected": "UNSUPPORTED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-026",
+      "kind": "missing",
+      "case": "Incomplete unchanged ring pattern enumeration or membership",
+      "expected": "UNKNOWN_INCONCLUSIVE",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-027",
+      "kind": "attribution",
+      "case": "Only HETATM/HETERO, residue name or generic POLYMER label supplied",
+      "expected": "UNKNOWN_INCONCLUSIVE; no inferred partner roles",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-028",
+      "kind": "attribution",
+      "case": "Only ordinary SP3_SOURCE_SCOPE coverage supplied",
+      "expected": "UNKNOWN_INCONCLUSIVE; scope cannot prove partner roles",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-029",
+      "kind": "attribution",
+      "case": "Exact supported partner assertion without independent review",
+      "expected": "NOT_EVALUATED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-030",
+      "kind": "attribution",
+      "case": "Independent exact protocol and interpretation review with full bindings",
+      "expected": "Eligible attribution only; chemistry/geometry still separate",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-031",
+      "kind": "attribution",
+      "case": "Known wrong partner class, or conflicting selected role witnesses",
+      "expected": "UNSUPPORTED, or UNKNOWN_INCONCLUSIVE for conflict",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-032",
+      "kind": "binding",
+      "case": "Same component or overlapping/incomplete attribution atom sets",
+      "expected": "Reject or ineligible; never positive",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-033",
+      "kind": "binding",
+      "case": "Changed state, components, atoms, protocol or original bytes under old attribution",
+      "expected": "Reject",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-034",
+      "kind": "binding",
+      "case": "Absent original source snapshot/protocol/witness artifact",
+      "expected": "UNKNOWN_INCONCLUSIVE; no source fabrication",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-035",
+      "kind": "binding",
+      "case": "Changed evidence bytes under same identity",
+      "expected": "Reject collision",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-036",
+      "kind": "binding",
+      "case": "Cross-definition, I10 or G03 measurement replay",
+      "expected": "Reject",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-037",
+      "kind": "binding",
+      "case": "Wrong angle vertex, ring group or reordered semantic role tuple",
+      "expected": "Reject",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-038",
+      "kind": "governed",
+      "case": "Missing current candidate authority",
+      "expected": "NOT_EVALUATED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-039",
+      "kind": "governed",
+      "case": "Expired/revoked partner or candidate authority",
+      "expected": "NOT_EVALUATED",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-040",
+      "kind": "governed",
+      "case": "Historical source evidence available only in ancestor snapshot",
+      "expected": "Not implicitly consumed",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-041",
+      "kind": "replay",
+      "case": "Duplicate identical/reordered evidence and stable source-ID reorder",
+      "expected": "Idempotent and deterministic",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-042",
+      "kind": "provenance",
+      "case": "Prepared coordinates and source-H facts",
+      "expected": "Actual source/preparation retained; never relabeled observed",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-043",
+      "kind": "scope",
+      "case": "Eligible selected-pair negative amid other unexamined pairs",
+      "expected": "Only selected pair ABSENT_FALSE; no system absence",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-044",
+      "kind": "preservation",
+      "case": "Independent JVM replay and prior25 family hashes",
+      "expected": "Identical output and unchanged prior hashes",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-045",
+      "kind": "preservation",
+      "case": "65 historical comparisons and25 preservation pins",
+      "expected": "Exact preservation",
+      "execution": "NOT_RUN"
+    },
+    {
+      "id": "I11-046",
+      "kind": "qualification",
+      "case": "Focused matrix, affected regressions and fresh committed-source suite",
+      "expected": "All required tests pass before ledger closure",
+      "execution": "NOT_RUN"
+    }
+  ]
+}
