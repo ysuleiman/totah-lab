@@ -1,0 +1,41 @@
+FOUNDATION V1 RC — DEVELOPMENT AND RELEASE WORKFLOW
+
+Capability expansion is frozen. Release scope is recorded in RELEASE_SCOPE_DECISIONS.json;
+scientific blockers remain scientifically blocked, even where deferred from v1 scope.
+No new authority, preparation, chemistry or external-data selection occurs here.
+
+Use the runner from the repository root:
+python3 software/qualification/foundation-v1-rc-20261008/harness/foundation.py run --tier 1 --changed PATH --out NEW_OUTPUT_DIRECTORY
+python3 software/qualification/foundation-v1-rc-20261008/harness/foundation.py run --tier 2 --changed PATH --out NEW_OUTPUT_DIRECTORY
+Repeat --changed for every affected file. Explicit --class-name is available for focused
+work on a new test before its dependency metadata is reviewed. A narrow selection is
+not a release certificate. Unmapped changes and changed shared dependencies escalate.
+
+Tier1: focused contracts, boundaries, unknown/unsupported/negative and provenance checks.
+Tier2: reviewed affected family plus dependent test helpers/governed consumers.
+Tier3: commit source, then run:
+python3 software/qualification/foundation-v1-rc-20261008/harness/release.py NEW_EMPTY_OUTPUT_DIRECTORY
+This runs all2872 prior tests plus3 consumer tests, isolation,29 paired independent JVM
+replays,65 historical comparisons,25 pins and generated counts. No development cache.
+Python harness tests are additional. Every prior test identity must remain present.
+
+Only the exact compiled source/resource/compiler/jar closure is cached in development.
+Class bytes are checked before reuse. No mutable evidence or eligibility is cached.
+All production source files and old test assertions remain unchanged. No runtime
+reference cache is added because source parsing is not the leading measured cost.
+
+Reviewed pipeline test classes run in separate JVMs with separate java.io.tmpdir and
+JUnit TempDir locations. Other tests execute sequentially. Changed isolation-dependency
+pins disable parallelism until reviewed. No thread-level parallelization inside tests.
+Replay jobs have separate outputs and evidence stores; exact paired bytes are mandatory.
+
+New capabilities require an approved bounded contract, focused tests, dependency-map
+review and affected-family tests. Shared infrastructure or dispatcher changes require
+full qualification at sealing. Ordinary leaf edits do not require per-leaf full runs.
+
+Consumer: FoundationV1ConsumerAcceptanceTest uses exact frozen METTL7B parent-pose
+bytes plus the supplied parent-netarsudil SMILES property. It reports B00 identity/query
+occurrences, exact source geometry and evidence readback. Pose chemistry correspondence
+and current scientific authority remain missing explicitly. SDF import is unsupported.
+These distinct propositions must not be merged into a biological interaction verdict.
+No METTL7 hypothesis is strengthened, weakened or newly introduced by this engineering demo.

@@ -1,0 +1,234 @@
+Freeze further capability expansion for now.
+
+Treat the current state as **Foundation v1 Release Candidate**:
+
+- 68 bounded-qualified capabilities
+- 12 architectural dispositions
+- 4 scientific blockers
+- 12 external-data blockers
+
+Do not add new chemistry subdomains until the release workflow and qualification harness are improved.
+
+## 1. Prove one real consumer workflow
+
+Build one concrete Foundation v1 consumer acceptance workflow using a real molecular system, preferably METTL7-related.
+
+The workflow should demonstrate:
+
+source structure/state
+→ qualified chemistry identities
+→ selected interaction/geometry rules
+→ explicit PRESENT / ABSENT_FALSE / UNKNOWN / UNSUPPORTED / NOT_EVALUATED outcomes
+→ inspectable evidence/provenance
+
+The purpose is to prove that the foundation is usable, not merely well tested.
+
+Do not introduce new chemistry to make the workflow pass. Expose missing domains explicitly.
+
+## 2. Profile the qualification harness before changing it
+
+The full regression suite is now taking roughly 25–45+ minutes and will become worse as the rule set grows.
+
+Do not weaken assertions or remove scientific checks.
+
+Instrument/profile the current suite and report where wall-clock time is spent.
+
+At minimum measure:
+
+- JVM startup / process-launch overhead
+- compilation
+- fixture construction
+- source artifact parsing
+- hashing/digest generation
+- Research Gate / authority setup
+- graph/source reconstruction
+- matcher execution
+- geometry evaluation
+- governed execution
+- evidence serialization/read-back
+- historical replay
+- preservation-pin verification
+- independent-JVM replay
+- clean-export setup
+- repeated immutable reference-data loading
+
+Produce a ranked timing report by test family and by repeated setup operation.
+
+## 3. Create a three-tier testing model
+
+### Tier 1 — focused development tests
+
+Run constantly during implementation.
+
+Target:
+- rule-specific acceptance tests
+- boundary tests
+- UNKNOWN/UNSUPPORTED/negative cases
+- local provenance/tamper tests
+
+Goal: seconds to low minutes.
+
+### Tier 2 — affected-family regression
+
+Run after a coherent rule/family change.
+
+Only execute consumers/dependencies actually affected by the changed source or shared infrastructure.
+
+Examples:
+- halogen family
+- metal family
+- source-state/representation family
+- SAM/sulfur family
+- event/coverage family
+
+Goal: a few minutes.
+
+### Tier 3 — full release qualification
+
+Run only when sealing a batch or Foundation release candidate.
+
+Includes:
+- complete regression suite
+- isolation suite
+- all independent JVM replay
+- 65 historical comparisons
+- 25 preservation pins
+- fresh committed-source clean export
+- full ledger/checkpoint generation
+
+Do not run Tier 3 after every leaf predicate.
+
+## 4. Add test dependency metadata
+
+Determine which tests actually depend on which qualified rules/modules.
+
+A change to an I11 leaf should not automatically rerun unrelated Zn, water, SAM and external-data tests unless shared infrastructure changed.
+
+Create a deterministic affected-test selection mechanism.
+
+When shared infrastructure changes—matcher, source graph, evidence serialization, Research Gate, correspondence, geometry engine, etc.—escalate automatically to the broader required tier.
+
+The selection mechanism must fail safe: uncertainty about dependency means include the test.
+
+## 5. Cache only immutable qualified setup
+
+Investigate safe caching of expensive immutable artifacts such as:
+
+- pinned reference source parsing
+- immutable catalog parsing
+- source digests
+- static rule manifests
+- immutable graph fixtures
+- qualification/reference metadata
+
+Do not cache mutable scientific state or anything whose reuse could hide provenance mismatches.
+
+Every cached artifact must remain keyed by exact source/configuration digest so changed bytes invalidate the cache automatically.
+
+## 6. Parallelize where independence is proven
+
+Identify tests and replay jobs that can execute independently.
+
+Potential candidates:
+- unrelated focused rule families
+- independent JVM replay pairs
+- historical comparison groups
+- preservation-pin checks
+
+Do not parallelize tests sharing mutable state, ports, databases, output locations or evidence stores unless isolation is explicit.
+
+Determinism must remain mandatory.
+
+## 7. Eliminate redundant repeated setup
+
+Look specifically for cases where hundreds/thousands of tests repeatedly:
+
+- parse the same immutable source
+- hash the same artifact
+- recreate the same Research Gate records
+- rebuild identical molecular graphs
+- reload identical OCL/RDKit/reference material
+- reconstruct identical qualification fixtures
+
+Move safe immutable setup to qualified shared fixtures where this does not change scientific semantics.
+
+Do not optimize by weakening source/provenance verification.
+
+## 8. Separate replay modes
+
+During development:
+
+- run replay only for newly affected identities plus required dependency hashes
+
+At release:
+
+- run all historical/replay/preservation checks
+
+Existing historical byte identity remains mandatory for release qualification.
+
+## 9. Automate qualification bookkeeping
+
+Stop maintaining overlapping counts and checkpoint documents manually.
+
+Generate from verified machine-readable results:
+
+- qualified count
+- architectural count
+- scientific blockers
+- external-data blockers
+- focused matrix coverage
+- replay counts/hashes
+- historical comparisons
+- preservation status
+- exact source commit
+- exact affected capabilities
+- parent-row closure status
+- unresolved limitations
+
+Human-written checkpoint text should summarize generated evidence, not reproduce it manually.
+
+## 10. Set measurable performance targets
+
+After profiling, propose realistic targets.
+
+Preferred direction:
+
+- Tier 1: under ~1 minute for a typical leaf rule
+- Tier 2: under ~5 minutes for an affected family
+- Tier 3: expensive but occasional; reduce substantially from the current 25–45+ minute range if profiling supports safe optimization
+
+Do not optimize to an arbitrary number at the expense of scientific validation.
+
+Report before/after timings and explain every optimization.
+
+## 11. Remaining blockers
+
+After the consumer workflow and harness optimization are complete, prepare one consolidated decision package for:
+
+Scientific blockers:
+- I15
+- I17
+- G05
+- G06
+
+External-data blockers:
+- all 12 exact remaining rows
+
+For each blocker, state whether it belongs in:
+- Foundation v1
+- DEFERRED_TO_V2
+- REQUIRES_EXTERNAL_REFERENCE_DATA
+
+Do not start another open-ended closure pass.
+
+## Release objective
+
+After the workflow is proven and the qualification harness is optimized:
+
+1. resolve or defer the remaining 4 scientific blockers,
+2. document the 12 external-data dependencies,
+3. run one final Tier-3 release qualification,
+4. produce `FOUNDATION_V1_FINAL_CHECKPOINT`,
+5. push/tag/freeze Foundation v1.
+
+After that, stop foundation expansion and move back to the METTL7 scientific workflow.

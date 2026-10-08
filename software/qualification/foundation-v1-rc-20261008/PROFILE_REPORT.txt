@@ -1,0 +1,43 @@
+FOUNDATION V1 RC — INITIAL TIMING FINDINGS (2026-10-08)
+
+Saved Batch C JUnit wall time:2506.985 seconds (41.78 minutes),2872 tests.
+The preceding A07 run took1321.004 seconds. These are historical observations,
+not a controlled benchmark. Batch C contains a946.486-second positive direct
+execution outlier; the same unchanged test reran in10.045 seconds. The reason for
+that delay is unestablished; it must not be presented as an optimization gain.
+See BASELINE_TIMINGS.json for every family ranked by accumulated test duration.
+
+Measurement-only ByteBuddy profiling (existing pinned local dependency, no production
+class changes) counts nested inclusive and exclusive operation times. JFR on the
+unchanged direct scenario separately shows Jackson serialization/introspection and
+allocation activity. One instrumented direct execution:87975 record encodings,
+29768 EvidenceExchange constructions,68184 SHA-256 calls. Record encoding accounts
+for7.01 exclusive seconds of a10.46-second instrumented process; direct SHA calls
+account for0.215 seconds. Constructor timing alone does not include the subsequent
+serializer/type discovery work. Full operation tables are in profiling/.
+
+The current codec/history/catalog files are preservation-pinned. No memoization of
+records, gate decisions, source verification, expiry, or scientific state is introduced.
+Runtime source parsing/reference caching was investigated but is not the leading
+measured cost. It is left unchanged. Improvements target avoided unnecessary tests,
+byte-keyed compiled output, and process isolation/parallel scheduling.
+
+Cold compilation:5.836 seconds. Typical leaf (I11),62 focused checks:13.206 seconds
+with compiled-cache reuse. Affected I11 consumers,82 checks including the9-case
+three-family governed pipeline:224.333 seconds (~3.74 minutes). That affected run
+initially exposed a selector bug: Tier1 reverse-helper expansion included governed
+consumers. The assertion caught it; Tier1 now omits that expansion. The retained run
+is labeled affected-family evidence by its actual executed identities, not Tier1.
+No assertions were removed.16 harness tests include fail-safe selection, cache
+source invalidation, cache tamper rejection, missing/duplicate/skipped checks, and
+release cache exclusion. Each release starts with fresh source and empty classes.
+
+JVM -version launch lower-bound samples:about0.024–0.026 seconds. This is not JUnit
+startup/discovery overhead. Compilation, source hashing, clean export, regression,
+isolation, full replay and pin verification receive separate timed release stages.
+Per-job wall/user/system CPU times help distinguish computation from unexplained
+wall delays. Profiled operations are not added to uninstrumented wall timings.
+
+Before/after full release timing remains pending until the single Tier3 run completes.
+Targets:typical leaf under1 minute; reviewed affected family under5 minutes.
+Tier3 retains every old test identity, all replay hashes,65 historical files and25pins.
