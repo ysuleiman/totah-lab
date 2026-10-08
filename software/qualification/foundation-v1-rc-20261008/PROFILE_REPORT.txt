@@ -1,4 +1,4 @@
-FOUNDATION V1 RC — INITIAL TIMING FINDINGS (2026-10-08)
+FOUNDATION V1 — VERIFIED TIMING FINDINGS (2026-10-08)
 
 Saved Batch C JUnit wall time:2506.985 seconds (41.78 minutes),2872 tests.
 The preceding A07 run took1321.004 seconds. These are historical observations,
@@ -38,6 +38,19 @@ isolation, full replay and pin verification receive separate timed release stage
 Per-job wall/user/system CPU times help distinguish computation from unexplained
 wall delays. Profiled operations are not added to uninstrumented wall timings.
 
-Before/after full release timing remains pending until the single Tier3 run completes.
+Final committed-source regression: 610.696 seconds (10m11s); complete release: 712.191 seconds (11m52s). All 2876 regression checks pass, including the added V18 deterministic-input assertion. The first release attempt detected a historical V18 fixture byte-order defect after regression passed; its focused repair and eight independent JVM proofs are retained in v18-replay-repair/. A new committed-source release run then passed every criterion. The first export launch also required a bounded argv-size fix before any tests started.
 Targets:typical leaf under1 minute; reviewed affected family under5 minutes.
 Tier3 retains every old test identity, all replay hashes,65 historical files and25pins.
+
+FINAL RELEASE STAGES (seconds; uninstrumented)
+cleanExportSeconds: 9.274
+sourceHashAndJarVerificationSeconds: 0.777
+compileSeconds: 5.817
+regressionSeconds: 610.696
+isolationSeconds: 1.591
+independentJvmReplaySeconds: 68.185
+historicalReplaySeconds: 7.311
+preservationSeconds: 6.229
+harnessTestsSeconds: 0.524
+
+Runtime operation caching remains deferred: measured serialization cost lies in preservation-pinned files. No scientific or provenance verification was cached or removed.
