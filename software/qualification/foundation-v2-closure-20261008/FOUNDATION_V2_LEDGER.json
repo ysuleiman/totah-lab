@@ -4,16 +4,16 @@
     "path": "software/qualification/foundation-v1-rc-20261008/FOUNDATION_V1_RELEASE_LEDGER.json",
     "sha256": "eb4bc82a35492d2464aa2b7af05fe1fd1099019ba652f6db96e80fffbcb5821d"
   },
-  "asOfQualifiedSourceCommit": "b3ee8cfd3754531b802087b4ee83523cc21d64e1",
+  "asOfQualifiedSourceCommit": "b49558e9e82e64d5f2a14514e2d0b85ed68f939f",
   "counts": {
-    "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED": 73,
+    "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED": 75,
     "SCIENTIFIC_REVIEW_REQUIRED": 2,
     "EXPLICIT_ARCHITECTURAL_DISPOSITION": 12,
-    "REQUIRES_EXTERNAL_REFERENCE_DATA": 9
+    "REQUIRES_EXTERNAL_REFERENCE_DATA": 7
   },
   "full96ScientificCompletion": false,
   "v2Sealed": false,
-  "countMeaning": "73 rows have a qualified bounded domain. This is not 72 unrestricted rules and not a v2 Tier3 release certificate.",
+  "countMeaning": "75 rows have a qualified bounded domain. This is not 72 unrestricted rules and not a v2 Tier3 release certificate.",
   "entries": [
     {
       "capabilityId": "P01",
@@ -459,21 +459,39 @@
       "capabilityId": "V07",
       "capability": "Bond-length and bond-angle validation",
       "v1Disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
-      "currentDisposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
-      "scope": "Select chemical-context reference lengths/angles, uncertainty and outlier definition.",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+      "scope": "Exact36 central STV heavy-atom restraint rows; continuous residuals, source-specific current TRANS applicability; no H/interresidue/statistical classifier.",
       "v1EntryReference": "V07",
-      "releaseQualification": "NONE",
-      "productionAuthorityImplied": false
+      "releaseQualification": "TIER1_TIER2_QUALIFIED_TIER3_PENDING",
+      "productionAuthorityImplied": false,
+      "definitions": [
+        "ATHENA.V07.MONOMER_LIBRARY_STV_INTERNAL_HEAVY_RESTRAINT_DEVIATION/1"
+      ],
+      "qualificationEvidence": {
+        "path": "software/qualification/foundation-v2-closure-20261008/v07-public-contract/QUALIFICATION.json",
+        "sha256": "f20ee7384adbc629f13499e5b232b74190fc10eb16c0c11c37105925c07105a7"
+      },
+      "sourceCommit": "b49558e9e82e64d5f2a14514e2d0b85ed68f939f",
+      "unrestrictedParentClosure": false
     },
     {
       "capabilityId": "V08",
       "capability": "Chirality/planarity validation in coordinates",
       "v1Disposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
-      "currentDisposition": "REQUIRES_EXTERNAL_REFERENCE_DATA",
-      "scope": "Define coordinate stereo/planarity comparison against supplied chemistry and qualified reference domain.",
+      "currentDisposition": "BOUNDED_SUPPORTED_DOMAIN_QUALIFIED",
+      "scope": "Exact four STV sign-specific ordered numerical determinant rows; zero comparison UNKNOWN; no ideal-volume magnitude, planarity, robust near-zero stereochemistry, or VAL beta both-sign classification.",
       "v1EntryReference": "V08",
-      "releaseQualification": "NONE",
-      "productionAuthorityImplied": false
+      "releaseQualification": "TIER1_TIER2_QUALIFIED_TIER3_PENDING",
+      "productionAuthorityImplied": false,
+      "definitions": [
+        "ATHENA.V08.STV_ORDERED_CHIRAL_SIGN_JAVA21/1"
+      ],
+      "qualificationEvidence": {
+        "path": "software/qualification/foundation-v2-closure-20261008/v08-ordered-sign/QUALIFICATION.json",
+        "sha256": "91bf5022d7b2cab7ae18312b23f560e3482a2d525b9c4649abec46a22b79749f"
+      },
+      "sourceCommit": "b49558e9e82e64d5f2a14514e2d0b85ed68f939f",
+      "unrestrictedParentClosure": false
     },
     {
       "capabilityId": "V09",
