@@ -1,0 +1,406 @@
+V09/V10 — EXACT ADDITIVE SOURCE AND MEASUREMENT CONTRACTS
+2026-10-08. PROPOSED, NOT IMPLEMENTED. Numerical/domain approval is retained.
+Read this alongside ../v09-v10-decision-20261008/DECISION_PACKAGE.txt.
+
+DECISION REQUEST
+Approve the following minimal additions as one coherent batch:
+ A. athena-residue-context-binding/1, limited to these V09/V10 definitions;
+ B. ATHENA.V09_V10.RESIDUE_CONTEXT_SOURCE_FACT/1, an independently governed
+    selected-source witness using existing EvidenceInterpretation;
+ C. athena-ramachandran-measurements/1;
+ D. athena-rotamer-measurements/1.
+Also approve the explicit geometry composition choice in section 6. Nothing here
+changes a graph API, matcher, role manifest, existing payload or geometry engine.
+The numerical score/category profiles and their grids/thresholds are unchanged.
+
+1. SOURCE-ADMISSION PRODUCER: REVIEWED EXACT SELECTED SOURCE, NOT NAME PERCEPTION
+Proposed protocol ATHENA.V09_V10.REVIEWED_SELECTED_RESIDUE_CONTEXT/1.
+This is a bounded evidence-verification protocol, not a 20-residue classifier or
+an automatically populated CCD/component registry. It checks an independently
+reviewed exact source graph/state and map. There is no default admitted chemical
+state for a residue label, no assumed pH, protonation, aromaticity or stereochemistry.
+
+For each selected context, an independent review must pin the exact binding A,
+original source artifacts/locators, preparation chain, source-fact witnesses B,
+source protocol, and explicit source-state interpretation. The reviewer must
+establish that the exact graph/charge/H/stereo state belongs to the already-approved
+canonical domain. A review of SER as a name does not admit every graph named SER.
+Review of one protonation state does not authorize another. There is no wildcard
+state, element-only identity, unbounded toolkit classifier or automatic parent map.
+
+This deliberately avoids inventing the previously missing universal side-chain
+state inventory. Production admission is CLOSED unless the exact selected state
+has that review. Approval of this contract authorizes the verification mechanism,
+not any production source-state certificate. Synthetic qualification witnesses
+must be labeled synthetic and cannot be installed as production authority.
+
+Independently reviewed source facts must establish ALL of the following:
+- central canonical residue identity among the exact 20 V09 identities, or the
+  exact ordinary L-SER/L-THR/L-VAL V10 domain; every source atom in that residue,
+  every ordinary incident bond and every nonordinary incident connection;
+- exact element, isotope state, formal charge, explicit H membership, authoritative
+  non-explicit H count, aromaticity and original bond-order representation;
+- exact source protonation/tautomer state WITHOUT converting to another state;
+- native L alpha stereochemistry (achiral GLY); native ILE/THR beta stereochemistry;
+  V10 THR excludes allo-THR and V10 VAL requires stereospecific CG1/CG2 attribution;
+- ordinary backbone N-CA-C(=O), incoming Cprev-N and outgoing C-Nnext peptide bonds;
+  PRO ring closure is part of its identity; N-methyl/modified/non-alpha backbone,
+  covalent crosslinks, cyclic-peptide context and known nonordinary attachments
+  are outside this first profile; uncertainty about those facts is UNKNOWN;
+- previous/next source identities and exact linkage direction, central membership,
+  explicit next-PRO fact for V09, independent of residue numbers/chain labels;
+- exact model/frame/coherent conformer and preparation lineage. Atom-name labels,
+  atom-site occupancy, graph defaults or geometric proximity cannot establish any
+  of these source-chemistry facts.
+
+For V09 the selected-source review explicitly decides the supplied charge/H state
+within the approved ordinary canonical domain; it does NOT erase charge/H/isotope
+facts or transfer admission to another state. Unsupported modification stays out.
+No implicit blanket claim is made that all imaginable canonical protonation states
+are admitted. A missing exact-state review remains NOT_EVALUATED, even if geometry
+is numerically available. Unknown chemistry inside a reviewed source stays UNKNOWN.
+For V10 neutral ordinary SER/THR hydroxyl chemistry is required exactly as approved.
+
+Neighbors need not have available coordinates for their entire side chains, but
+must have complete independently reviewed source identity/topology. Only atoms in
+required torsion tuples need coordinates. The central residue is internal. An
+adjacent terminal residue is not silently converted to an internal residue: its
+exact terminal charge/H/connectivity state must be included in the selected-source
+review. Missing neighbor identity is unresolved. Do not add a requirement for an
+infinite chain of neighbor-of-neighbor coordinates or infer terminal chemistry.
+
+2. REUSED TYPES AND WIRE RULES (NORMATIVE)
+Pin = existing {reference:ScientificReference,sha256:64 lowercase hex}, digest of
+EXACT evidence payload bytes. ScientificReference, AtomReference, ResidueId and
+Binding use their existing canonical JSON serializers without field additions.
+Binding is existing SystemStateView.Binding: state, stateSha256, chemicalSha256,
+coordinateSha256, correspondenceSha256. It binds the exact immutable state.
+SourceAtom = {component:ScientificReference,atomId:nonblank string}.
+Locator = {artifact:Pin,selector:nonblank exact original source locator}.
+Status = existing EvidenceInterpretation.Status. UNKNOWN means UNKNOWN_INCONCLUSIVE.
+All fields listed below are required; nullable fields are explicitly marked.
+Reject unknown fields, duplicate JSON keys, malformed pins, nonfinite numbers,
+identity collisions, unsupported enum values and duplicate semantic entries.
+No unspecified default values. BondFact endpoints are canonical SourceAtom ordered
+(first < second), and bond arrays are sorted by those endpoints; directed peptide
+links retain from/to direction. Role objects have the exact stated keys. Strings are nonblank unless the existing referenced
+serializer explicitly allows blanks (e.g. insertion code). IDs are not chemistry.
+Pin arrays are sorted/deduplicated by canonical Pin JSON except preparation lineage,
+which is an ordered causal sequence and rejects duplicate pins/cycles. Tuple order
+is normative. Atom arrays sort by canonical SourceAtom; no source atom renumbering.
+No payload can qualify itself through serialization, status, completeness or labels.
+
+3. A — athena-residue-context-binding/1
+Evidence type: athena:residue-context-binding. Exact top-level fields:
+ schema: literal athena-residue-context-binding/1
+ admissionDefinition: literal ATHENA.V09_V10.REVIEWED_SELECTED_RESIDUE_CONTEXT/1
+ stateBinding: Binding
+ central: ResidueSelection
+ previous: ResidueSelection|null
+ next: ResidueSelection|null
+ peptideLinks: array of PeptideLink (exact two required for eligibility)
+ sourceKind: SOURCE|PREPARED_SOURCE|DERIVED
+ preparationReferences: ordered Pin array
+ modelIdentity: {artifact:Pin,selector:string,rawValue:string}
+ frameReference: Pin
+ conformerSelection: {sourceLocations:[Locator],correlationWitnesses:[Pin]}
+ sourceCoverage: Pin array of existing athena-group-source-coverage/1 evidence
+ sourceScope: COMPLETE_ORDINARY|KNOWN_NONORDINARY|UNKNOWN
+ limitations: string array
+
+ResidueSelection exact fields:
+ residue: existing ResidueId
+ sourceLocations: Locator array
+ candidateIdentity: one of the approved 20 V09 residue tokens, or null if unresolved
+ stateDescription: string|null (original state description; never admission itself)
+ atoms: nonempty array of {source:SourceAtom,coordinate:AtomReference|null}
+ roles: object of role token -> SourceAtom|null
+
+Role keys are EXACTLY N,CA,C,O,CB,OG,OG1,CG1,CG2,CD1,ND1,NE2,CD.
+Unused keys are null, not invented atoms; CB is null for GLY. N/CA/C/O are required
+for all admitted residues, plus CB for non-GLY. Additional nonnull keys are allowed
+only when their exact canonical role exists and is independently attributed:
+SER OG; THR OG1,CG2; VAL CG1,CG2; ILE CG1,CG2,CD1; HIS ND1,NE2; PRO CD.
+Full residue membership is in atoms; this is a minimal role map, not a full naming
+catalog for all side-chain atoms. No required coordinate on unused source atoms.
+Distinct role keys resolve to distinct source atoms. The coordinate map must agree
+with every eligible existing state correspondence; unresolved alternatives do not
+get resolved by choosing a map that gives a preferred score. ResidueId is a locator.
+
+PeptideLink = {from:SourceAtom,to:SourceAtom,sourceLocations:[Locator]}.
+Eligibility requires exact previous.C -> central.N and central.C -> next.N,
+ordinary source SINGLE bonds; all atom identities must exist in the same bound
+state. Source-scope evidence establishes complete connection coverage, not peptide
+chemistry. Known explicit nonordinary connections retain exact source identity;
+UNKNOWN does not mean a known coordination bond. Other incident ordinary/nonordinary
+connections are preserved in B, even when they make this selection unsupported.
+A terminal/missing link never becomes an OUTLIER. Repeated residue selections or
+cross-state atoms reject malformed binding; incomplete facts remain UNKNOWN.
+
+A does not contain witness/receipt pins that point back to A. The six B category
+witness sets are selected from invocation evidence by their exact contextBinding
+Pin and category, then retained in measurement sourcePins. This avoids a circular
+content digest. conformerSelection.correlationWitnesses may reference only original
+source ensemble/correlation evidence, never B or a receipt for A. A source coverage
+artifact likewise must not reference A. Empty independent category sets remain
+UNKNOWN. Scientific receipts are downstream artifacts, not fields hashed into A.
+
+There is intentionally NO input ramaClass, rotamerClass, nextIsPro, SP3, score,
+category, favorable flag or admitted Boolean. CandidateIdentity is only a proposed
+name to cross-check against independent witnesses. DERIVED is unsupported because
+no A08 transformation profile is admitted. PREPARED_SOURCE requires complete exact
+preparation lineage and retains modeled/prepared attribution. Preparation must not
+silently repair missing atoms or alter authoritative chemistry.
+
+4. B — NORMATIVE SOURCE-FACT PROPOSITION
+Use existing athena:event-source EvidenceInterpretation, not a new generic record.
+Exact measurement keys (all values strings as required by existing carrier):
+ proposition: ATHENA.V09_V10.RESIDUE_CONTEXT_SOURCE_FACT/1
+ stateBinding: canonical JSON Binding
+ contextBinding: canonical JSON Pin of A
+ category: identityState|atomCorrespondence|connections|stereochemistry|preparation|coherence
+ factValues: canonical JSON of one exact category object below
+ sourceProtocol: canonical JSON Pin
+ sourceLocations: canonical JSON nonempty Locator array
+ preparationReferences: canonical JSON ordered Pin array
+
+Category factValues exact shapes:
+ identityState: {residues:[{residue:ResidueId,canonicalIdentity:20-token enum|null,
+   domainStatus:SUPPORTED_PRESENT|UNSUPPORTED|UNKNOWN_INCONCLUSIVE,
+   sourceStateDescription:string,atoms:[AtomFact],bonds:[BondFact]}]}
+ AtomFact = {source:SourceAtom,element:string,isotopeMass:positive integer|null,
+   isotopeStatus:KNOWN_UNSPECIFIED|EXPLICIT|UNKNOWN,formalCharge:integer|null,
+   explicitHydrogens:[SourceAtom],nonExplicitHydrogenCount:nonnegative integer|null,
+   aromatic:boolean|null,aromaticityModel:string|null,
+   electronicState:NONE|KNOWN_NON_NONE|UNKNOWN}.
+ null isotopeMass with KNOWN_UNSPECIFIED means source explicitly leaves isotope
+ unspecified; UNKNOWN is different. H counts are facts, not orientation/coordinates.
+ Formal charge/H/aromaticity null means unresolved, never zero/default. Ordinary
+closed-shell identity requires independently established electronicState NONE;
+known radicals are outside this first source domain and unresolved electronic
+state remains UNKNOWN. All atoms
+ (including explicit H) are listed exactly once; explicit H has an empty H list and
+ nonExplicitHydrogenCount=0 when known. No disconnected/extra atoms are discarded.
+ BondFact = {first:SourceAtom,second:SourceAtom,order:SINGLE|DOUBLE|TRIPLE|AROMATIC,
+   aromatic:boolean,sourceLocations:[Locator]}.
+ Internal bonds are complete; boundary bonds are in connections. Original aromatic
+ or Kekule representation is preserved; review must explicitly interpret that exact
+ representation. No canonical re-encoding, aromaticization or resonance conversion
+ supplies identity authority. CandidateIdentity must equal independently reviewed
+ canonicalIdentity; disagreement => UNKNOWN, not prefer one label.
+
+ atomCorrespondence: {residues:[{residue:ResidueId,atoms:[{source:SourceAtom,
+   coordinate:AtomReference|null}],roles:{exact role keys from A}}]}.
+ This independently reviews the exact source-to-coordinate map and chemical roles.
+ Source atom names alone do not establish VAL CG1 or a stereo center. Role mapping
+ cannot permute enantiotopic/stereospecific atoms for a better score.
+
+ connections: {residues:[{residue:ResidueId,coverage:COMPLETE_ORDINARY|
+   KNOWN_NONORDINARY|UNKNOWN,incidentOrdinaryBonds:[BondFact],
+   nonordinary:[{first:SourceAtom,second:{artifact:Pin,selector:string},kind:string,
+     sourceLocations:[Locator]}]}],
+   previousPresence:PRESENT|ABSENT|UNKNOWN,nextPresence:PRESENT|ABSENT|UNKNOWN,
+   previousResidue:ResidueId|null,nextResidue:ResidueId|null,
+   nextProline:TRUE|FALSE|NOT_APPLICABLE|UNKNOWN,cyclicPeptide:TRUE|FALSE|UNKNOWN}.
+ Endpoint locator preserves even a nonordinary endpoint outside the selected graph;
+ no inferred bond order, valence, metal coordination or favorability. Complete
+ coverage includes every connection touching residue atoms, including to outside
+ neighbors. nextProline must agree with independently established next identity;
+ FALSE is an affirmative qualified non-PRO identity, not failure to detect PRO.
+ PRESENT requires the respective nonnull residue locator. ABSENT requires an
+ affirmative independently reviewed complete source boundary and null locator;
+ a missing input record alone is UNKNOWN, never ABSENT. Known next ABSENT uses
+ nextProline NOT_APPLICABLE; unknown next uses UNKNOWN. Known terminal central
+ selections are UNSUPPORTED in this internal-residue domain; missing boundary
+ evidence is UNKNOWN. Neither case is a reference-distribution OUTLIER.
+
+ stereochemistry: {residues:[{residue:ResidueId,
+   alpha:L|D|ACHIRAL_GLY|UNKNOWN,beta:NATIVE_ILE|NATIVE_THR|OTHER|NOT_APPLICABLE|UNKNOWN,
+   sourceStereo:[{center:SourceAtom,orderedLigands:[SourceAtom],
+     nonExplicitHydrogenLigand:boolean,sourceToken:string,sourceLocations:[Locator]}],
+   valineMethylAttribution:{cg1:SourceAtom,cg2:SourceAtom,protocol:Pin}|null}],
+   interpretationProtocol:Pin}.
+ SourceStereo lists exactly the explicit ligands in the original order; a separately
+ true H flag represents one independently established non-explicit H ligand under
+ the pinned stereo protocol, never an inferred position. The protocol must define
+ that virtual ligand's order and absolute interpretation. Do not compare relative
+ stereo tokens across changed atom order without the exact permutation. L/D are
+ conclusions of independent source review, never coordinate pyramidalization or
+ raw CIP=S shortcuts (CYS is not a generic S rule). Native ILE/THR beta states and
+ VAL methyl attribution require their own explicit review, not alpha-L inheritance.
+
+ preparation: {sourceKind:SOURCE|PREPARED_SOURCE|DERIVED,
+   preparationReferences:[Pin],originalSources:[Pin],resultState:Binding}.
+ coherence: {stateBinding:Binding,modelIdentity:{artifact:Pin,selector:string,
+   rawValue:string},frameReference:Pin,selectedAtoms:[AtomReference],
+   sourceLocations:[Locator],alternateEnsembleReferences:[Pin],
+   correlation:EXPLICIT_SINGLE_CONFORMER|EXPLICIT_ENSEMBLE_MEMBER|UNRESOLVED}.
+ Lack of supplied ensemble relationships does not authorize invented altloc
+ correlations or independently choosing maximum occupancy per atom. Alternate
+ identity, occupancy and source model bytes remain in pinned evidence. A single
+ conformer still requires source evidence of coherence, not merely an empty alt ID.
+
+Every claimed atom/charge/H/bond/isotope/stereo fact is cross-checked against the
+exact bound SystemStateView source graph, source coverage and original artifacts.
+Agreement with graph defaults does not establish independent knowledge. Full
+membership/incident-connection coverage is checked before eligibility, not supplied
+by a label. A witnessed fact contradicting the immutable graph remains UNKNOWN;
+it cannot mutate or replace that graph.
+Every category binds all selected residue members relevant to it. Known nonordinary
+facts and unresolved facts are retained independently. Empty/missing independent category
+witness sets or incomplete source values mean UNKNOWN. Conflicting witnesses for
+the same immutable fact mean UNKNOWN; an omitted competing witness cannot be hidden
+by selecting a convenient binding. Independent current review checks all relevant
+supplied evidence and identifies supersession explicitly, never silently.
+
+GOVERNANCE: new source-fact rule identity ATHENA.V09_V10.RESIDUE_CONTEXT_SOURCE_FACT
+under unchanged athena-rule/3 and Research Gate. Current receipt pins this EXACT
+witness, exact context binding, original source artifacts and protocol; it binds
+the state, evaluator/implementation identity, invocation time, expiry/revocation
+and selected domain. A generic parser receipt, residue-name match, numerical-grid
+receipt, S1/G05 authority or user approval cannot substitute for source-fact review.
+All consumed pins must resolve and appear in interpretation inputs. Method equals
+interpretation evaluator. Scientific authority absence => NOT_EVALUATED; chemistry
+uncertainty is separately retained. No production receipt is created by this batch.
+
+5. C/D — EXACT MEASUREMENT FIELDS
+Both payloads live in existing athena:rule-measurements envelopes. They are outputs,
+not caller-controlled sources of chemical admission. Evaluator reconstructs every
+derived selection, geometry value, grid lookup and category from qualified inputs.
+
+Common EXACT fields:
+ schema: literal athena-ramachandran-measurements/1 or athena-rotamer-measurements/1
+ definition: corresponding approved exact scientific definition ID
+ definitionSha256: exact rule manifest SHA-256
+ stateBinding: Binding
+ requestSha256: canonical existing RuleRequest SHA-256
+ contextBinding: Pin of A
+ sourcePins: sorted distinct array of all consumed Pins (including review/protocol,
+   dataset/evaluator/license/source/preparation/geometry pins)
+ centralResidue: ResidueId
+ sourceAdmissionStatus: Status
+ sourceFactStatuses: {identityState:Status,atomCorrespondence:Status,
+   connections:Status,stereochemistry:Status,preparation:Status,coherence:Status}
+ authorityStatus: Status
+ geometry: {plan:Pin|null,rawMeasurements:Pin|null,torsions:[Torsion]}
+ referenceProfile: ReferenceProfile
+ referenceScore: {status:Status,value:number|null,binary64Hex:string|null}
+ category: FAVORED|ALLOWED|OUTLIER|null
+ assessmentStatus: Status
+ reasons: string array
+ limitations: string array
+
+Torsion = {name:PHI|PSI|OMEGA_IN|CHI1,atoms:[AtomReference],status:Status,
+ value:number|null,binary64Hex:string|null,unit:DEGREE}.
+ Four ordered distinct atoms when mapped; empty tuple permitted only when mapping
+ is unresolved; no partial/invented tuple. Defined value is finite binary64 and
+ hex is exactly the 16 lowercase hex digits of its IEEE754 bits. Undefined has
+ null value/hex and UNKNOWN status. Decimal number and bits must agree exactly,
+ including signed zero. Data below use the same decimal/bits binding rule.
+
+ReferenceProfile = {dataRepository:string,dataCommit:40hex,evaluatorRepository:string,
+ evaluatorCommit:40hex,sourceManifest:Pin,datasetArtifacts:[Pin],
+ evaluatorArtifacts:[Pin],licenseArtifacts:[Pin],numericProfile:string,
+ selectedGrid:Pin|null,thresholds:{favoredMinimum:number,allowedMinimum:number|null}}.
+ Exact repository/commit/files/digests from existing SOURCES.json, no arbitrary
+ runtime override. Rama numericProfile=CCTBX_COMPILED_BINARY64_SIX_SIGNIFICANT_DIGITS;
+ rotamer numericProfile=CCTBX_NDIM_BINARY32_STORAGE_BINARY64_INTERPOLATION.
+ All six Rama or all three selected rotamer grids belong to the profile; selected
+ grid is null if class admission is unresolved. favoredMinimum always0.02;
+ allowedMinimum is the exact selected class threshold, null only before selection.
+ Licensing/provenance artifacts are retained separately, not used as chemistry.
+
+Additional EXACT C fields:
+ classSelection: {status:Status,canonicalIdentity:20-token enum|null,
+   nextProline:TRUE|FALSE|NOT_APPLICABLE|UNKNOWN,prolineCislike:TRUE|FALSE|NOT_APPLICABLE|UNKNOWN,
+   ramaClass:GENERAL|GLYCINE|CIS_PROLINE|TRANS_PROLINE|PRE_PROLINE|ILE_VAL|null}
+ interpolation: RamaInterpolation|null
+ RamaInterpolation = {phi:Axis2,psi:Axis2,corners:[Corner],scoreBinary64Hex:string}.
+ Axis2 = {input:number,ranged:number,lowerCoordinate:number,upperCoordinate:number,
+   lowerBin:integer,upperBin:integer}; bounds/order exactly upstream; bins0..179.
+ Corner = {phiBin:integer,psiBin:integer,value:number,binary64Hex:string}.
+ Exactly four corners, order lower/lower, higher/lower, lower/higher, higher/higher.
+ Exact phi-first then psi arithmetic from approved package; no FMA/reassociation.
+ C torsions contain PHI,PSI, plus OMEGA_IN iff independently established central
+ identity is PRO. Unknown central identity permits only the PHI/PSI selections;
+ class remains UNKNOWN, not GENERAL. Missing next identity stays UNKNOWN under
+ the approved source-admission rule even where GLY/PRO precedence would suffice
+ to choose a table numerically. Class output cannot overwrite admission status.
+
+Additional EXACT D fields:
+ classSelection: {status:Status,canonicalIdentity:SER|THR|VAL|null,
+   rotamerClass:SER_CHI1|THR_CHI1|VAL_CHI1|null}
+ interpolation: RotamerInterpolation|null
+ RotamerInterpolation = {input:number,homeLogicalBin:integer,
+   neighborLogicalBin:integer,homeWrappedBin:integer,neighborWrappedBin:integer,
+   homeCenter:number,neighborWeight:number,
+   homeStoredBinary32Hex:string,neighborStoredBinary32Hex:string,
+   homeValue:number,neighborValue:number,scoreBinary64Hex:string}.
+ Binary32 hex is exactly8 lowercase hex digits; values are exact binary32 promotion
+ to binary64. Both contributions are retained even when one weight is zero.
+ D torsions contain exactly CHI1. No named rotamer, multi-chi score or best-map score.
+
+Quantity availability does not imply chemistry/authority: raw defined torsions may
+be retained with source admission UNKNOWN/NOT_EVALUATED. A public referenceScore,
+category and interpolation are emitted only when source admission, required
+geometry, complete pinned artifacts AND current definition/source authority are
+eligible. Otherwise value/category/interpolation=null; status explains the gate.
+Successful classification uses SUPPORTED_PRESENT for assessment for ALL three
+categories, including OUTLIER; this proposition is 'selected reference validation
+was evaluated', not 'not an outlier'. ABSENT_FALSE is not used to encode OUTLIER.
+No chain-wide negative/coverage claim. Missing or corrupt grid => UNKNOWN; a valid
+zero in a complete sparse grid is q=0/OUTLIER. Current missing authority takes
+NOT_EVALUATED precedence for assessment while fact statuses retain their values;
+with authority, unresolved/conflicting required facts take UNKNOWN precedence,
+then known excluded chemistry UNSUPPORTED, then complete eligible classification.
+Malformed input is rejected under existing error behavior, not made a category.
+
+RuleRequest contract (no overload/additional field): atoms is the sorted unique
+union of fully mapped required torsion atoms; first=[central ResidueId], second=[];
+state/manifest bindings exact. Existing radius/hop/count values are operational
+bounds only and MUST NOT change source admission, thresholds or tuple selection.
+Insufficient operational budget gives NOT_EVALUATED, never a partial false result.
+
+6. GEOMETRY COMPOSITION — EXPLICIT APPROVAL CHOICE
+The oracle exposed a real pre-existing distinction. Athena's qualified DIHEDRAL
+uses atan2 with its existing 1e-10 vector degeneracy guard. Pinned scitbx uses acos
+and an exact zero-normal test. They share torsion orientation but are NOT guaranteed
+bit-identical, and very small nonzero vectors can be defined upstream yet undefined
+in Athena. oracle/GEOMETRY_COMPARISON.json records actual probes, not a tolerance.
+
+RECOMMENDED minimal choice: retain unchanged Athena DIHEDRAL as the authoritative
+coordinate measurement and preserve its existing undefined semantics. Feed those
+exact measured binary64 angles to the pinned cctbx score/interpolation/category
+profile. Require exact score/category parity when upstream is given THE SAME
+binary64 angles. Do not claim bitwise coordinate-to-category cctbx parity. Keep
+upstream coordinate-angle fixtures as sign/wrap/degeneracy characterization; do not
+invent an angular tolerance or modify the generic geometry primitive.
+
+This is an explicit composition clarification requiring approval; it is not
+silently covered by numerical-grid approval. An alternative is a separately named
+cctbx coordinate-torsion numerical primitive, which would require another contract
+and is NOT proposed for implementation in this batch. Neither option may replace
+existing historical Athena geometry. Undefined Athena torsion remains UNKNOWN.
+
+7. INDEPENDENT ORACLE AND ACCEPTANCE
+oracle/UPSTREAM_FIXTURES.jsonl.gz pins direct results from unchanged upstream
+rama_eval.h/compiled tables/scitbx dihedral.h and exact pinned n_dim_table.py using
+real native flex.float. The pinned upstream rotalyze.evaluateScore function is
+executed as an unchanged AST extraction to avoid unrelated whole-program imports.
+No hand-written approximation or mock float array supplies expected values.
+The numerical probes are synthetic; they are not experimental residue evidence.
+Runtime/wheel/compiler/Boost/header/generator provenance is recorded. The runtime
+wheel is only a binary32 storage dependency, NOT the authority for evaluator code
+or dataset selection. Independent process replay must be byte-identical.
+
+The original 125-case matrix remains required, supplemented by SOURCE_PAYLOAD_MATRIX.json.
+All grid centers and extra seams/fractional probes have independently generated
+expected scores. Category boundary nextDown/exact/nextUp probes are synthetic raw
+score inputs to the upstream category function, not claims that a structure yields
+that precise score. No epsilon or hand-picked acceptance tolerance is introduced.
+Coordinate fixtures do not establish residue identity, source completeness or
+scientific authority. Those require separate synthetic governed acceptance cases.
+
+After approval: Tier1 per leaf/source-binding, deterministic independent JVM replay,
+one Tier2 affected-family batch, then Tier3 only at coherent v2 seal. No production
+activation, V11/V13/V14, generic framework, G06 catecholate change or full V10 closure.
