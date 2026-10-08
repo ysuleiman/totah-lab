@@ -79,6 +79,7 @@ def main():
     for name in list(previous)+['FoundationV1ConsumerAcceptanceTest']:
         values={x['sha256'] for x in replay_results if x['name']==name};assert len(values)==1;hashes[name]=values.pop()
         if name in previous:assert hashes[name]==previous[name],name
+    assert hashes==f.read(source/'software/qualification/foundation-v1-rc-20261008/release/QUALIFICATION.json')['independentJvmHashes'], 'Frozen v1 replay hash changed'
     extra_replays=run_v2_replays(f,source,out,build)
     stages['independentJvmReplaySeconds']=time.monotonic()-stage
     stage=time.monotonic()
@@ -103,6 +104,6 @@ def main():
     stages['harnessTestsSeconds']=unit['seconds']
     ledger=f.read(source/'software/qualification/foundation-v2-closure-20261008/FOUNDATION_V2_LEDGER.json');counts={}
     for row in ledger['entries']:counts[row['currentDisposition']]=counts.get(row['currentDisposition'],0)+1
-    result={'sourceCommit':commit,'scope':'Foundation v2 bounded release; 75 bounded qualified rows, 12 architectural dispositions, 9 scientific exclusions; no production activation','cleanExport':True,'compileCacheUsed':False,'regressionTests':tests['tests'],'previousTestIdentitiesPreserved':2872,'preservedQualifiedInventories':preserved,'isolationTests':3,'failures':0,'skips':0,'independentJvmPairs':len(hashes),'previousReplayHashesUnchanged':len(previous),'independentJvmHashes':hashes,'historicalComparisons':65,'preservationPins':25,'unrelatedTrackedEditsPreserved':14,'counts':counts,'full96ScientificCompletion':False,'v2Replay':extra_replays,'v2DefinitionCount':8,'newCapabilityFamilies':0,'productionScientificReceiptsIssued':0,'stages':stages,'totalSeconds':time.monotonic()-start,'replayJobs':replay_results}
+    result={'sourceCommit':commit,'scope':'Foundation v2 bounded release; 75 bounded qualified rows, 12 architectural dispositions, 9 scientific exclusions; no production activation','cleanExport':True,'compileCacheUsed':False,'regressionTests':tests['tests'],'previousTestIdentitiesPreserved':2872,'preservedQualifiedInventories':preserved,'isolationTests':3,'failures':0,'skips':0,'independentJvmPairs':len(hashes),'previousReplayHashesUnchanged':len(hashes),'independentJvmHashes':hashes,'historicalComparisons':65,'preservationPins':25,'unrelatedTrackedEditsPreserved':14,'counts':counts,'full96ScientificCompletion':False,'v2Replay':extra_replays,'v2DefinitionCount':8,'newCapabilityFamilies':0,'productionScientificReceiptsIssued':0,'stages':stages,'totalSeconds':time.monotonic()-start,'replayJobs':replay_results}
     f.write(out/'QUALIFICATION.json',result);print(json.dumps({k:v for k,v in result.items() if k not in ['replayJobs','independentJvmHashes']},indent=2))
 if __name__=='__main__':main()
