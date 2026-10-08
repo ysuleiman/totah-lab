@@ -6,6 +6,16 @@ Shared perception/group/role support: [Mobley 2018](supporting-material/MOBLEY_2
 
 Current-policy gate status must be established by a valid receipt, not the historical qualification field. Supporting-material completeness is not inferred from a citation or from this rendering.
 
+## Approved bounded Batch C — 2026-10-08
+
+I11 source-partner attribution, V18 lexical mmCIF metadata and A08 immutable fragment-view lineage are implementation-qualified within their exact approved domains. Current scientific authority remains separately required.
+
+[Qualification checkpoint](../../../software/qualification/foundation-batched-closure-20261008/implementation/CHECKPOINT.txt)
+
+- [ATHENA.I11.CARBON_BOUND_CL_PHE_GEOMETRIC_CANDIDATE](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/cl-phe-candidate-v1/ATHENA.I11.CARBON_BOUND_CL_PHE_GEOMETRIC_CANDIDATE.rule.json) · SHA256 `54882a96641550bace9cac10f796bcee36220b5ffd48fbf5d24c070e39711290`
+- [ATHENA.V18.MMCIF_SOURCE_SITE_METADATA](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/source-site-metadata-v1/ATHENA.V18.MMCIF_SOURCE_SITE_METADATA.rule.json) · SHA256 `21015a19e8755d0ea8ceba832785a882bf35b6b9f30a499cab98d5ed5fcee9a5`
+- [ATHENA.A08.SOURCE_FRAGMENT_PARENT_LINEAGE](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/source-fragment-lineage-v1/ATHENA.A08.SOURCE_FRAGMENT_PARENT_LINEAGE.rule.json) · SHA256 `1cd6543402e5dfd4e110250a9c9cd6fe93016da05213280ae3cc519dde9c4523`
+
 ## GEO.PATH.001 — 1.0.0 (rules)
 
 [Authoritative manifest](../../../software/modules/athena/src/main/resources/totah/lab/athena/system/rules/GEO.PATH.001--ATHENA_NATIVE.rule.json) · SHA256 `c7afd6c57facebf542aea6b3137c13b82c6028a68438eb654100c8a61d3243cb`

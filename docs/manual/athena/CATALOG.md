@@ -384,15 +384,17 @@ No fluorine/At/noncarbon donor/other acceptor/pi/same-component/charged or radic
 
 ### I11 — Halogen bond to pi system
 
-Define aromatic-face acceptance, halogen axis and element-specific geometry separately from atom-acceptor rules.
+Selected neutral carbon-bound Cl and independently attributed protein PHE in distinct ligand/protein source components; unique nearest ring member; d(Cl,centroid)<4.5 A and angle(Cl,nearest,centroid)<140 degrees, both strict. Face/edge characterization separate.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2872 fresh committed-source tests +3 isolation;186 focused Batch C checks;28 independent JVM pairs,25 prior hashes unchanged;65 historical files and25 pins exact. Implementation qualification only; no production receipt.
 
-**Existing implementation:** No qualified equivalent
+**Existing implementation:** Opt-in ClPheCandidateRules and literal I11PartnerAttribution; existing PHE source checks, mixed geometry, evidence and Research Gate.
 
-**Supporting source:** RING4 primary paper non-covalent bond section
+**Supporting source:** Pinned protein-ligand Cl-pi survey and exact user-approved SOURCE_PARTNER_BOUNDARY_REVIEW.txt; no cross-halogen or energetic interpretation.
 
-Aromatic-face halogen interaction requires explicit face/axis/angular/radius definition separate from atom-acceptor I10; ring and mixed geometry exist. Do not silently substitute atom distance thresholds.
+Only exact selected Cl/PHE domain; no F/Br/I, alternate aromatic residue expansion, heuristic partner assignment, exact-tie resolution, whole-system absence, or energetic/biological claim.
+
+[Batch C checkpoint](../../../software/qualification/foundation-batched-closure-20261008/implementation/CHECKPOINT.txt)
 
 ### I12 — Single-water H-bond bridge
 
@@ -834,15 +836,17 @@ Need authorized versioned distributions, fragment/state matching rules, sample c
 
 ### V18 — Composition, missing atoms, alternate conformations, occupancy/B factors, linkage
 
-Review missing-atom/composition/altloc/occupancy/linkage propositions and uncertainty propagation per source format.
+Lossless selected mmCIF atom_site occupancy, B_iso_or_equiv, label_alt_id, model and atom-site id lexical source states/spans; explicit ALT/ENS/GEN source memberships only.
 
-**Qualification:** Disposition of scope/review need; no implemented capability implied.
+**Qualification:** 2872 fresh committed-source tests +3 isolation;186 focused Batch C checks;28 independent JVM pairs,25 prior hashes unchanged;65 historical files and25 pins exact. Implementation qualification only; no production receipt.
 
-**Existing implementation:** SystemStateView identities/mapping; source fields
+**Existing implementation:** Opt-in SourceSiteMetadata and SourceSiteMetadataRules; original UTF8 byte parsing, exact source mapping, existing evidence/Research Gate transport.
 
-**Supporting source:** wwPDB composition/linkage/model quality
+**Supporting source:** Pinned wwPDB/mmCIF item/category definitions and user-approved CONTRACT_AND_BOUNDARY_REVIEW.txt.
 
-Expected composition/missing-atom assertion requires an external expected-component/topology model; occupancy/altloc/linkage scopes are format-dependent. Preserve source metadata, distinguish absent field from zero, and specify conflict/evaluation policy before classifying incompleteness.
+No defaults or reconstruction of original missingness from parsed numbers; no invented alt correlation, conformer, chemical coexistence, missing-atom/composition/linkage completeness or physical validity. Expected topology remains unqualified.
+
+[Batch C checkpoint](../../../software/qualification/foundation-batched-closure-20261008/implementation/CHECKPOINT.txt)
 
 ### V19 — X-ray experimental-data and refinement validation
 
@@ -966,15 +970,17 @@ Other883 entries lack independent qualification or are unsupported; all-catalog 
 
 ### A08 — Tautomers, normalization, fragment parents and stereochemical identity
 
-Optional unique-largest eligible heavy-source component view over one complete declared state; exact source graph/atom/bond lineage and all nonselected components retained. No normalization or tie-break.
+Optional unique-largest eligible heavy-source component view over one complete declared state; exact source graph/atom/bond lineage and all nonselected components retained. No normalization or tie-break. Additive immutable DERIVED fragment-view payload with exact original governed selection, snapshot/profile/parameters/result digests, atom/bond lineage and explicit removals; selection chemistry unchanged.
 
-**Qualification:** 2406 fresh committed-source tests +3 isolation;38 focused A08;20 JVM pairs,19 prior hashes unchanged;65 historical files and25 pins exact.
+**Qualification:** 2872 fresh committed-source tests +3 isolation;186 focused Batch C checks;28 independent JVM pairs,25 prior hashes unchanged;65 historical files and25 pins exact. Implementation qualification only; no production receipt.
 
-**Existing implementation:** Opt-in athena.source-fragment-parent/1; existing immutable state snapshot, source coverage/scope, correspondence and Research Gate; no graph edits.
+**Existing implementation:** Opt-in athena.source-fragment-parent/1; existing immutable state snapshot, source coverage/scope, correspondence and Research Gate; no graph edits. Approved SourceFragmentLineageRules adapter; no new parent operation.
 
 **Supporting source:** Pinned RDKit Fragment.cpp comparison; explicit bounded unique heavy-count source policy under REQUEST.txt. No RDKit normalization/parity, chemical validity, salt or biological inference.
 
-No explicit-H vertices, incomplete/overlapping source universe, unresolved source chemistry, known nonordinary connection, query/dummy/unrepresented stereo, tie choice, tautomerization or neutralization. Independent current source and parent-policy authority required.
+No explicit-H vertices, incomplete/overlapping source universe, unresolved source chemistry, known nonordinary connection, query/dummy/unrepresented stereo, tie choice, tautomerization or neutralization. Independent current source and parent-policy authority required. NORMALIZATION, CHARGE_PARENT, TAUTOMER_PARENT, STEREO_PARENT, ISOTOPE_PARENT and SUPER_PARENT are unimplemented; no equivalence or automatic downstream admission.
+
+[Batch C checkpoint](../../../software/qualification/foundation-batched-closure-20261008/implementation/CHECKPOINT.txt)
 
 ### A09 — Molecular descriptors/fingerprints/shape and torsion resources
 
