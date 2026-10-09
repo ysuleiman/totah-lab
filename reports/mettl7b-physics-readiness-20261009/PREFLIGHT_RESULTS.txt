@@ -1,0 +1,78 @@
+METTL7B PHYSICS — EXECUTED PREFLIGHT, 2026-10-09
+
+Two actual neutral-ligand AM1-BCC/GAFF2 derivations completed. No production model
+is qualified. No binding energy, MD trajectory or reaction barrier was calculated.
+The mechanistic interpretation remains unchanged.
+
+Exact original matched-SAR SDFs were hash-verified: parent61 atoms/34 heavy;
+AR43 atoms/24 heavy. Neutral closed-shell is an explicit conditional reference,
+not an inferred assay protonation state. Source files were never changed.
+PARAMETER_PREFLIGHT_CONTRACT.txt precedes execution; exact commands, elapsed
+times and peak process-tree memory are in parameter-preflight/COMMANDS.json.
+AmberTools26 AM1 charge derivations took136.83s parent and28.26s AR. Both reported
+geometry convergence and completion. All six tool commands completed within
+the recorded resource envelope; no missing-parameter placeholder was present.
+Several torsion/improper terms were assigned by analogy and remain unvalidated.
+
+VALIDATION FINDINGS (failures retained)
+1. Atom-order elements and bond connectivity match the exact source. The source
+   3D stereochemical identity is pinned. This is not universal chemistry proof.
+2. Generated Mol2/inpcrd coordinates round to0.001 A: maximum atom displacements
+   0.000812404 A parent,0.000754983 A AR. Raw outputs are unchanged. Separate
+   source_bound.inpcrd files restore exact original SDF coordinates through the
+   verified atom ordering; independent reload equals the source coordinates.
+3. Requested neutral charge versus serialized topology sums:
+   parent +0.001999002321331573 e; AR +0.002000004390225312 e.
+   Both FAIL the six-decimal output charge-sum precision gate. SQM printed atom
+   charges already sum to+0.002 e for each, while its separately printed total
+   is0.000 e. This is consistent with per-atom three-decimal rounding; it is not
+   a prediction of molecular ionization. No silent renormalization or acceptance.
+   Local AmberClassic reference code prints F14.3 and the charge reader consumes
+   those values; that checkout is explanatory, not proven installed build source.
+4. At exact original coordinates, gas-phase unrestrained single-point diagnostics:
+   parent Amber -37.57726647559113, OpenMM -37.58020742387575 kcal/mol;
+   AR Amber -43.94269183488237, OpenMM -43.94538380898518 kcal/mol.
+   Absolute differences0.00294095/0.00269197 kcal/mol; maximum force-component
+   differences0.000221429/0.000575680 kcal/mol/A. All values finite. No agreement
+   tolerance was invented and no physical-validation pass is inferred. These
+   different-composition vacuum energies must NOT be subtracted as affinity.
+5. Fresh-process independent validation outputs are byte-identical. This replays
+   topology loading and energy/force diagnostics, not an independent AM1 rerun.
+
+Procedural limitation: topology construction preceded the independent charge-sum
+check. Therefore those files are rejected diagnostic candidates, not admitted
+models. This differs from the intended gate ordering in the preflight contract;
+no production consumed them. Preserve the failure before any corrected derivation.
+parameter_preflight.initial.py is the exact initially executed script. The later
+parameter_preflight.py adds endpoint selection/receipt continuation only.
+
+RESOURCES
+Host16 GiB RAM,12 logical CPUs; about3.74 GiB available at initial probe.
+OpenMM8.5.2 Reference/CPU contexts work; OpenCL has no compatible platform.
+AmberTools26, ParmEd4.3.1 and RDKit2026.03.1 are installed. PySCF2.14.0 imports
+under native execution, with HDF5 runtime/build version mismatch warning
+(2.2.0 versus2.1.0); its initial sandbox import failed on temporary storage.
+Small scientific-runtime writes succeeded after earlier ENOSPC failures.
+System Python writes still failed on finalization, while scientific Python
+succeeded. User subsequently authorized Git garbage cleanup; exact reclamation
+and unchanged HEAD/refs/status checks are in GIT_GARBAGE_CLEANUP.json.
+
+CONCRETE NEXT DEPENDENCIES, IN ORDER
+1. Resolve charge export precision using a documented, pinned Amber charge
+   extraction/conservation protocol; verify the installed implementation and
+   repeat neutrality/identity/energy-force checks. Do not simply loosen the gate
+   or patch the charge array. The discrepancy is a computationally resolvable
+   engineering/protocol issue, not an irreducible scientific obstacle.
+2. Validate cap/ester and retained-scaffold torsion/conformer energetics against
+   independent electronic calculations; include explicit relevant protonation
+   alternatives. AM1-BCC convergence and GAFF2 coverage cannot do this alone.
+3. Build matched substrate-free protein/SAM endpoints with explicit SAM state,
+   then qualify short replicated stability/sampling pilots before production.
+4. Binding free energy requires validated solvent and bound legs, explicit mode/
+   protonation conditioning, overlap and uncertainty. QM/MM separately requires
+   a reaction/proton route and validated chemical benchmark before enzyme barriers.
+
+The failed TSL classical force field remains excluded. Foundation v2 is unchanged.
+READINESS_MATRIX.txt contains the three-branch assessment, ranked calculations,
+source literature and explicitly illustrative resource budgets. Parameter files
+are preserved evidence of a construction attempt, not deployable force fields.

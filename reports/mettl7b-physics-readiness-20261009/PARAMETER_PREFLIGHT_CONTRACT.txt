@@ -1,0 +1,32 @@
+Bounded neutral-endpoint parameter preflight, 2026-10-09.
+Written before executing either charge calculation.
+
+Question: can the installed AmberTools26 generate reproducible, graph-bound
+candidate GAFF2/AM1-BCC parameters for the two exact preserved neutral ligands?
+This clears an engineering/model-construction dependency, not target validation.
+Neutral is a declared reference state; it is not an inferred assay microstate.
+No protein, SAM, TSL, solvent MD, binding energy or production simulation.
+
+Inputs: the two original prepared SDFs in the pinned matched-SAR manifest.
+Require source hash, explicit H, neutral closed-shell graph, expected61/43 atoms,
+certified34/24 heavy atoms, and source-derived stereochemical correspondence.
+Use antechamber AM1-BCC (-c bcc), GAFF2 (-at gaff2), integer charge0 and
+multiplicity1. Explicit SQM AM1 settings: scfconv1e-10, grms_tol0.0005,
+maxcyc2000. Preserve all SQM inputs/logs and intermediate charge records.
+AM1 optimization used for charge derivation is a separate isolated model;
+no original ligand/receptor pose is changed. Record output-coordinate changes.
+Run parmchk2 -s2; preserve every estimated/analogy term. A missing-parameter
+placeholder or failed SCF must fail the respective gate, never be filled manually.
+Build a vacuum single-ligand topology only if charge/type derivation passes.
+Check atom order/elements, connectivity, stereochemistry, net partial charge,
+parameter completeness and independently loaded finite energies/forces.
+Parameter coverage and numerical execution are NOT scientific energetic validation;
+QM torsion/conformer and relevant protonation checks still precede production.
+
+Resource envelope: at least100MiB free at admission and between commands;
+at most16MiB total task calculation output, at most1GiB process-tree RSS,
+at most180seconds per command, one endpoint at a time, one thread.
+Abort and preserve diagnostics if any bound fails. No deletion of research data.
+These are operational bounds, not chemistry or convergence thresholds.
+The unsandboxed27-byte probe succeeded after sandbox ENOSPC. Only this bounded
+preflight is attempted; approximately130MiB free remains inadequate for production.

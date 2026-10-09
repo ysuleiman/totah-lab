@@ -1,0 +1,16 @@
+Initial independent validation rejected exact coordinate equality.
+Cause: Amber-generated mol2/inpcrd coordinates round the four-decimal source to
+three decimals. Maximum atom displacement: parent0.0008124038404635402 A,
+AR0.0007549834435273447 A. This is not silently treated as unchanged geometry.
+The original candidate files are preserved. A separate source_bound.inpcrd is
+created from the original SDF coordinates through the verified atom order;
+exact reload equality is required before evaluating both engines at that state.
+Per-axis decimal half-unit rounding is checked separately (0.0005 A), as a
+serialization explanation, not a chemical tolerance. Original SDFs unchanged.
+
+The next charge-admission check also FAILED: requested neutral source but partial
+charge sum is parent+0.001999002321331573e, AR+0.002000004390225312e. No charge
+was silently renormalized. SQM prints total Mulliken charge0.000, so the precise
+rounding/correction chain must be investigated before these become production
+parameters. Independent engine evaluations proceed only as diagnostics of the
+exact candidate Hamiltonian; their success cannot override charge admission.
