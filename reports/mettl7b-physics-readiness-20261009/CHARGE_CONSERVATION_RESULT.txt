@@ -1,0 +1,22 @@
+2026-10-09 — derived charge-conservation check completed
+
+The installed OpenFF Toolkit0.18.1 standard uniform-offset policy resolves the
+neutral charge-sum gate for both separately derived candidates. Parent offset
+-0.00003277053 e/atom; AR offset -0.00004651173 e/atom. Serialized net charges
+-3.8634e-9 e and -1.23475e-8 e satisfy their actual decimal serialization bounds.
+Every non-charge topology array and every source coordinate is unchanged.
+Original failed candidates remain byte-identical. No charge-generation rerun,
+new force-field fit, source-state change or production simulation was performed.
+
+Independent replay and all before/after charges are in charge-conservation/.
+The implementation and AmberTools wrapper documentation are pinned in
+CHARGE_CONSERVATION_VALIDATION.json. The full OpenFF method executed; this is
+not a claim that a new complete OpenFF parameterization was performed.
+An initial fixed serialization-bound expression failed because it omitted the
+printed exponent; the corrected bound is calculated per exact token, not fitted
+to the observed residual. Original charge/model values were not tuned.
+
+Next physical-model gate: independent cap/ester and scaffold torsion/conformer
+validation, with explicit protonation alternatives. Short matched substrate-free
+MD can follow endpoint validation; RBFE and enzyme QM/MM remain later steps.
+The remaining gap is physical-model validation, not Foundation rule coverage.

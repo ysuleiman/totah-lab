@@ -1,0 +1,32 @@
+2026-10-09 — bounded derived charge-conservation diagnostic
+Protocol: METTL7.NEUTRAL_AM1BCC_OPENFF0181_CONSERVATION/1
+
+Use the installed OpenFF Toolkit0.18.1 Molecule._normalize_partial_charges
+implementation, not a hand-selected atom adjustment. Its AmberTools wrapper
+documents this operation for low-precision charge generation. Pin both exact
+source files and package metadata. No claim of a fresh OpenFF charge derivation:
+input is the already retained Amber candidate topology charge vector.
+
+For each exact neutral source graph, expected total charge is0 from the source;
+q_i' = q_i + (0 - sequential_sum(q_i))/N. Execute the installed implementation.
+Every before/after charge and common offset must be retained. No atom, bond,
+coordinate, type or bonded parameter change is permitted. Source SDF coordinates
+remain exact. Save a new derived topology; never overwrite raw candidates.
+
+Checks established before execution: atom order/connectivity unchanged; every
+topology array except CHARGE unchanged; coordinate equality; after serialization
+absolute charge sum <= sum of half the decimal last-place units of the actual
+serialized CHARGE tokens, divided by18.2223. Retain actual sums without rounding.
+Run Amber/OpenMM single-point diagnostics and fresh-process deterministic replay.
+No cross-engine energy/force tolerance or physical-model pass is invented.
+
+This explicitly sourced derived protocol resolves the original conservation
+gate only if it passes. It does not recover lost Mulliken precision, independently
+validate torsions, establish an assay protonation state or authorize production.
+The original failed gates remain historical failures. This is not a change to
+Foundation or authoritative source chemistry.
+
+Engineering correction during first execution: an initially written fixed
+N*0.5e-8/18.2223 bound incorrectly ignored each E16.8 token's exponent and failed.
+Use the exact token-dependent rounding bound above, not an empirical tolerance.
+No derived charge or topology value was modified to achieve this correction.
