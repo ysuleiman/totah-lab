@@ -1,0 +1,266 @@
+METTL7B COMPUTATIONAL PHYSICS READINESS AND MINIMAL EXECUTION PLAN
+2026-10-09 | Checkpoint a60e4b44324fe51761aca7d2faf1381aaacf2d49
+Root: /Users/yazan/totah-lab
+
+DECISION
+The required physical methods exist, and substantial reusable software is
+installed. None of the three requested production calculations is currently
+scientifically qualified for this exact parent/AR/METTL7B system. That is a
+system-parameter/sampling problem, not a requirement to finish Foundation's
+deferred rules. Several blockers can be resolved computationally.
+
+The first executable scientific dependency is matched ligand parameterization
+and validation. It does not require restarting docking or repairing the failed
+TSL force field. However, the host currently cannot reliably create even a
+temporary/report file (ENOSPC). No new charge calculation, MD, free-energy or
+reaction calculation was launched into that condition. CPU/OpenCL capability
+probes were executed; their results are recorded separately as engineering facts.
+
+READINESS MATRIX
+Question | Existing tools | Validated/reusable inputs | Missing dependencies | Readiness | Next action
+Parent/AR binding free energy | AmberTools26, OpenMM8.5.2; existing charge/topology tools; no openmmtools/pymbar/openfe/perses in inspected MD environment | Certified24-heavy-atom correspondence, explicit source graphs and stereo caveat, preserved parent/AR poses, exact coordinate-frame records | Matched state-specific ligand charges/torsions; sampled binding modes; explicit SAM state; tested alchemical protocol/estimator; solvent and convergence evidence | NOT READY for defensible target DDG; state/basin-conditional pilot feasible after parameter gates | Validate ligand endpoints, then restrained-endpoint/solvent sampling and soft-core overlap pilot; do not publish one RBFE from an arbitrary pose
+Matched MD | OpenMM8.5.2 CPU works; Amber topology readers; preserved DCMB explicit-solvent workflow | ff14SB assets; repaired protein/SAM local-MM topologies; existing alternative ligand poses | Ligand validation; full-mobile solvated assembly requalification; protonation/SAM choices; replicas and convergence; practical GPU access | NO target production yet; parameter work is the immediate dependency | Paired endpoint parameter validation, solvent QC, then small multi-start diagnostic MD, with no TSL initially
+Catalytic reaction modeling | sander binary; installed PySCF package/geoMETRIC; local Aether PBE/CP calculations; existing TSL electronic-structure records | Six modeled B SAM–TSL geometries; source chemistry/provenance; accepted limited local203 calculations | Reactive sulfur/proton model, equilibrated reactant ensemble, validated MM environment, QM-region/boundary and electronic-method benchmarks; working/tested QM/MM coupling | NOT READY for a mechanistic activation barrier | Validate a small chemical reaction model and alternative proton routes first; only then embed and sample matched inhibitor conditions
+
+WHAT IS ACTUALLY AVAILABLE
+1. Source structures: 60 parent/59 AR matched-SAR B poses, six B SAM–TSL
+   placements, AD4 and Chai/Boltz alternative arrangements. They are predictions,
+   not experimentally selected binding states. Existing uncertainty is retained.
+   The 1,074 completed cap/TSL comparisons are not repeated.
+2. Chemistry: parent34/AR24 heavy atoms, ten-heavy-atom cap deletion, O8 becoming
+   AR alcohol O1, and two certified symmetry mappings. This is a substantial
+   terminal-group and polarity change. Mapping alone does not prove an easy
+   alchemical path or conserved binding mode. The prepared SDF absolute-stereo
+   flag caveat must travel with the pinned reference correspondence.
+3. Ligand states: existing netarsudil preflight distinguishes neutral,
+   free-amine-protonated(+1), isoquinolinium(+1), and diprotonated(+2).
+   Assay pH/buffer and actual state populations remain unknown. AR must receive
+   an explicit matching state review, not inherit parent populations. Fixed-state
+   conditional calculations remain possible; unknown assay pH is not a reason
+   to forbid all computation. It does prevent relabeling one state as the assay.
+4. Protein/SAM: the repaired local-MM systems have independently checked bonds,
+   parameters, H construction and coordinate correspondence. But their SAM model
+   is NH3+/carboxylate-/sulfonium+, net+1, whereas the historical docking graph is
+   NH2/carboxylate-/sulfonium+, net0. The added amino H is an explicit model-state
+   change. Do not silently combine these. The original validation covered fixed
+   background, local mobile masks and implicit-solvent MM, not full-mobile
+   explicit-solvent ligand-bound dynamics. Three later apo relaxations failed
+   their convergence/force gates; they are not an accepted receptor ensemble.
+5. Existing DCMB systems show that solvated MD construction and GPU execution
+   have been achieved in another chemotype. They are reusable workflow evidence,
+   not parent/AR force-field validation or production trajectories.
+6. TSL: final56-atom Amber topology exists and reloads, but the recorded torsion
+   validation failed. No substrate-containing classical production is admitted
+   with that force field. This does not forbid substrate-free parent/AR MD.
+7. Electronic physics: accepted local203 finite-cluster PBE/CP+D3 results are
+   preserved. The expanded203 run failed acceptance, and whole-parent PBE was
+   not launched under its memory gate. Neither is a catalytic reaction barrier.
+   Aether's electronic density-gradient machinery is not evidence of a qualified
+   nuclear-force QM/MM reaction sampler. External software must be tested for
+   the selected Hamiltonian; an installed sander executable alone proves neither
+   interface completeness nor sulfur methyl-transfer accuracy.
+
+CURRENT RESOURCE PROBES
+MD environment: analysis/dcmb/selectivity_validation/.conda-md
+  AmberTools26.0, OpenMM8.5.2, ParmEd4.3.1, RDKit2026.03.1 package records.
+  antechamber, sqm, parmchk2, tleap and sander binaries exist; antechamber help runs.
+  openmmtools, pymbar, alchemlyb, openfe, perses absent in this environment.
+  Actual single-particle Context creation: Reference PASS, CPU PASS;
+  OpenCL FAIL, "No compatible OpenCL platform is available".
+  These are software availability probes, not MD or scientific validation.
+QM environment: analysis/mettl7-phase2/execution-unit-05D/.conda-qm
+  Package records: PySCF2.14.0, geoMETRIC1.1.1, DFT-D3 bindings1.5.0.
+  PySCF import reaches installed code but fails for lack of writable temporary
+  storage. Runtime operability must be rechecked; metadata is not an import pass.
+  Old certified OpenMM8.2.0 temporary environment is no longer present.
+Host: arm64,16GiB RAM,12 logical CPUs; approximately3.74GiB available at probe.
+  No usable local GPU context in the tested OpenMM environment. Historical cloud
+  GPU jobs do not establish a currently allocated or authorized paid resource.
+Storage: data volume926GiB, reported100% capacity, approximately122MiB available.
+  Both shell temporary-file creation and a27-byte Python output write failed
+  with ENOSPC. Editor-tool success on small text files does not cure this.
+  No research artifacts, caches, environments or trajectories were deleted.
+
+A. RELATIVE BINDING FREE ENERGY: EXACT QUESTION AND MODEL
+Question: within a specified receptor/SAM/ligand protonation ensemble, does
+conversion of parent to AR make binding less favorable? Define
+DDG = DG_bind(AR) - DG_bind(parent); positive favors parent within that model.
+Do not derive a target DDG from23.04uM IC50 and the qualitative AR panel.
+
+Use a two-environment thermodynamic cycle: transform parent->AR in solvent and
+in the bound complex. Same-charge transformations are possible for matched
+neutral or amine-protonated endpoints; ester->alcohol changes atom types, H
+inventory and partial charges, not only deletion of ten heavy atoms. Soft-core
+nonbonded treatment, bonded/dummy terms, restraints and electrostatic conventions
+must be explicit and independently checked. Net-charge-changing cycles require
+additional finite-size/protonation treatment; do not mix them silently.
+
+The large removed cap and alternate predicted sites raise sampling risks, not a
+categorical ban on RBFE. A staged alchemical path can improve overlap but cannot
+repair a wrong binding site. Disagreeing basin-conditioned answers cannot be
+averaged by docking frequency. Absolute double-decoupling per admitted basin
+is an alternative if common-mode RBFE is unsuitable, but needs standard-state
+restraint corrections and basin/population accounting and is more costly.
+MM/GBSA or MM/PBSA could be a model-dependent diagnostic after sampling; neither
+is a justified shortcut to a definitive parent/AR binding free energy here.
+
+Before production: endpoint Hamiltonians must reproduce independently loaded
+energies/forces, identity and charge; solvent and bound endpoint ensembles must
+be stable; test both transformation directions, lambda overlap, equilibration,
+correlation and independent starts. Freeze the estimator and protocol version.
+Report statistical uncertainty separately from force-field/pose/state uncertainty.
+An apparently small error bar with trapped modes is not convergence.
+No target-specific numerical convergence threshold is fabricated in this report;
+freeze it with the pilot's measured diagnostics before expensive production.
+
+B. MATCHED MD: EXACT QUESTION AND MODEL
+Question: under the same declared force field, cofactor state, solvent and
+protein preparation, do parent and AR produce reproducibly different protein/
+cofactor organization? Track prespecified residue196/151/201/203/153/205/R206/E207
+geometry, hydration and conformational distributions separately; do not reduce
+them to an inhibition score. Use autocorrelation-aware estimates and independent
+velocity replicas; retain starting-site dependence as a result.
+
+First validate ligand parameters in isolation/solvent. Then adapt the existing
+explicit-solvent workflow with a fully mobile, chemically checked protein/SAM
+system. Declare water model, ions, temperature, force-field files, integrator,
+constraints, PME treatment and proton states. Do not call convenient reference
+conditions experimental conditions. Recheck SAM identity/stereo and H geometry.
+Remove equilibration restraints before the diagnostic production interval.
+
+Start from existing distinct arrangements, without redocking. A short persistence
+test cannot establish equilibrium populations, affinity, unbinding rate or lack
+of an effect. If outcomes depend on starting site, report the dependence and
+stop interpretation until enhanced sampling or basin evidence resolves it.
+Do not interpret failure to leave a pose during a short trajectory as strong binding.
+
+C. CATALYTIC MODELING: EXACT QUESTION AND MODEL
+Question: for an explicitly admitted reactive state, does the inhibitor change
+the methyl-transfer activation free energy, rather than merely bind differently?
+The base reaction is an SN2-like S_nucleophile--C_methyl--S_SAM transformation.
+An initial reaction-coordinate candidate is the difference of forming and
+breaking C--S distances. Neutral RSH additionally requires an explicit proton
+acceptor and proton-transfer coordinate; pre-existing RS- is a distinct chemical
+state, not a free assumption. Both branches need independent chemical evaluation.
+
+Do not assign C203 or a nearby residue as general base from proximity. Compare
+reactant/product electronic states and plausible proton routes, verify spin and
+charge, and test the chosen electronic method on a small sulfur/sulfonium reaction
+model before using it in the enzyme. Optimize/check stationary points or sample
+a free-energy path as appropriate; a constrained energy maximum is not by itself
+a validated transition state. Static potential-energy barriers are not activation
+free energies or predicted rates.
+
+For eventual embedding, include both reactive sulfur centers and the transferred
+methyl in the QM region, plus any participating proton relay. Avoid cutting a
+reactive/conjugated unit; test larger regions and charge-boundary sensitivity.
+Preserve protein, solvent and long-range electrostatics; validate energies and
+forces across the selected interface. An independently equilibrated ensemble,
+window overlap and replicas are required for barrier differences. A small fragment
+reaction benchmark is computationally resolvable and does not require adopting
+the failed TSL force field, but it cannot establish the enzyme's proton route.
+Putting all TSL in QM avoids using its MM intramolecular torsions in that region;
+it does not automatically supply a valid pre-equilibrated ensemble or interface.
+
+RANKED MINIMAL EXECUTION PATH
+0. Restore reliable scratch space. Recheck writes/imports and resource limits.
+1. Clear ligand parameter blocker: paired source-pinned neutral parent/AR first
+   as a reference-state diagnostic; independently bind stereo and atom order.
+   Use the existing AmberTools26 GAFF2/AM1-BCC pathway, record all tables/binaries,
+   SCF/geometry convergence and charge sum, and forbid substitution of PDBQT
+   charges. Any AM1 charge-generation optimization is a new isolated derivation,
+   not a replacement docking pose. Keep original source coordinates immutable.
+   Build/reload topologies; verify graph, H count, handedness, types, charges,
+   bonds, torsions and1–4 terms. Crosscheck energy/forces in Amber and OpenMM.
+   This clears implementation readiness only. It does not validate molecular
+   energetics merely because GAFF2 assigns every atom.
+2. Validate the differential chemistry: use existing QM tools to compare selected
+   source conformers and torsion profiles spanning cap ester/linker, shared amide
+   and AR alcohol environments. Preserve coupled-torsion and protonation effects.
+   Pin a reference method and its own convergence/basis checks before claiming a
+   force-field pass. A discovered mismatch is a model failure to repair or bound,
+   not a reason to fit arbitrary thresholds. Add explicit amine+1 endpoints before
+   making an assay-relevant binding claim; keep other states as sensitivity needs.
+3. Substrate-free paired solvent/complex MD pilots. First test assembly and
+   numerical stability, then reproducibility of prespecified observables across
+   independent starts. Do not launch a long run merely because steps1–2 execute.
+4. If matched endpoints and modes are defensible, execute a small alchemical
+   overlap/convergence pilot. Escalate to RBFE only if those gates pass; use
+   conditional results or the explicit absolute/basin alternative otherwise.
+5. Reaction-model benchmark and proton-route discrimination; enzyme QM/MM only
+   after reactive-state/environment gates. This is the slowest and least ready
+   branch, and should not block steps1–4.
+
+ESTIMATED COSTS — PLANNING EXAMPLES, NOT CONVERGENCE CLAIMS OR QUOTES
+Parameter typing/AM1-BCC and topology checks: minutes to hours per endpoint on
+CPU when scratch works; actual SCF performance must be measured. QM torsion/
+electronic validation can take hours to days per small batch and may require
+32–64GiB RAM depending on region/basis. Do not squeeze a failed memory-admission
+model into the approximately4GiB currently available by changing its physics.
+
+An illustrative MD budget of2 ligands x2 starting basins x3 velocity replicas
+x50ns is600ns, not a declaration that50ns converges. A second protonation pair
+doubles it. The saved DCMB GPU pilot reports approximately233–238ns/day, so600ns
+would be2.5–2.6 ideal GPU-days IF that rate transferred; it is not a measurement
+on these systems or this CPU host. Allocation, equilibration, retries and analysis
+add cost. No dollar estimate is justified without a current provider/resource.
+
+An illustrative RBFE budget of2 environments x24 lambda states x3 repeats x5ns
+is720ns for one state/basin path, before extensions, extra modes and equilibration.
+The lambda count/durations must come from the pilot, not this budget illustration.
+Use the measured protocol-specific ns/day; alchemical/exchange overhead prevents
+equating the DCMB MD rate with RBFE throughput.
+
+Storage example:45,000 atoms x3 coordinates x4 bytes x5,000 frames is2.7GB
+uncompressed positions for one50ns trajectory saved every10ps;12 such runs are
+32.4GB before checkpoints/topologies/analysis. Compression varies. Reserve tens
+of GB for pilots and substantially more for a production batch;122MiB is not
+a safe scientific scratch budget. QM scratch must be measured per chosen job.
+QM/MM cost is currently unbenchmarked; a credible barrier campaign estimate
+requires a small admitted-region energy/gradient pilot. Expect it to exceed
+simple MD substantially; do not invent an exact wall time.
+
+PROVENANCE AND LITERATURE
+Primary local admission records:
+  analysis/netarsudil-196-mm-execution-readiness-v1-20260920/NETARSUDIL_PARAMETERIZATION_GATE_V1.json
+  analysis/netarsudil-196-apo-system-chemistry-repair-v1-20260920/NETARSUDIL_196_APO_READINESS_V2.md
+  analysis/netarsudil-196-apo-system-chemistry-repair-v1-20260920/SAM_CHEMISTRY_CERTIFICATION_V1.json
+  analysis/netarsudil-196-apo-system-chemistry-repair-v1-20260920/TOPOLOGY_AND_PARAMETER_CERTIFICATION.json
+  analysis/netarsudil-196-apo-local-mm-v1-20260920/BATCH_STATUS.json
+  knowledge/mettl7/core-reports/force-field-audit.md
+  analysis/mettl7-phase2/tsl-rsh-2d-torsion-completion/final-force-field/TSL_RSH_FINAL_VALIDATION.json
+  analysis/dcmb/md_production/PILOT16_GATE_REPORT.md
+  reports/mettl7b-inhibition-evidence-audit-20261009/REPORT.txt
+  reports/mettl7b-inhibition-evidence-audit-20261009/DATABASE_READBACK.jsonl
+  reports/mettl7b-cap-tsl-coexistence-20261009/REPORT.txt
+  reports/netarsudil-ar13503-correspondence-20261003/CORRESPONDENCE.json
+The read-only database snapshot is explicitly the2026-10-09T07:18:07.736682+03:00
+audit snapshot, not a new live query. Its18 relevant runs do not establish a
+completed parent/AR free-energy or reaction calculation. No DB mutation performed.
+
+Authoritative method references consulted, kept separate from target validation:
+  Mey et al., Best Practices for Alchemical Free Energy Calculations, v1.0,
+  DOI10.33011/livecoms.2.1.18378; https://arxiv.org/html/2008.03067v1
+  Supports explicit state/mode treatment, overlap and replicated sampling checks;
+  it does not validate this ligand transformation or supply a target error bar.
+  Amber antechamber documentation: https://ambermd.org/antechamber/ac.html
+  Defines AM1-Mulliken plus bond-charge correction and parameter preparation;
+  current exact executable/table versions must be pinned locally.
+  OpenMM documentation: https://docs.openmm.org/latest/userguide/application/02_running_sims.html
+  Documents Amber topology loading and execution; current docs8.6 are distinct
+  from the installed8.5.2 runtime and do not replace runtime tests.
+  Goetz et al., extensible AMBER QM/MM interface (2014):
+  https://pmc.ncbi.nlm.nih.gov/articles/PMC4063945/
+  Establishes method availability, not a tested local target interface.
+Some PMC/Amber pages failed full-text retrieval; no new target-specific kinetic,
+force-field or reaction conclusion is inferred from unavailable text.
+
+SCIENTIFIC UPDATE
+Strengthened: precise identification of computationally repairable parameter and
+execution dependencies. Refined: current CPU availability, unusable GPU platform,
+expired old runtime location, exact SAM model-state mismatch and storage failure.
+Unchanged:23.04uM parent assay, qualitative AR inactivity, negative cap obstruction,
+unknown AR binding, conditional203 support, no unique pose or kinetic mechanism.
+No new mechanistic prediction or molecular-energy result was generated in this
+readiness phase. This is an execution gate and concrete path forward, not a claim
+that another inventory has resolved the inhibition mechanism.
